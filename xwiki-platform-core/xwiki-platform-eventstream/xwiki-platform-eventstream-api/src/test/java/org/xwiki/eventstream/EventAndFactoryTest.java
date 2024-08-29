@@ -24,11 +24,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
-import org.junit.Assert;
-
-import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -39,8 +36,15 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for the {@link org.xwiki.eventstream.internal.DefaultEvent default event} and
@@ -48,335 +52,323 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
  * 
  * @version $Id$
  */
-@MockingRequirement(DefaultEventFactory.class)
-public class EventAndFactoryTest extends AbstractMockingComponentTestCase
+@ComponentTest
+class EventAndFactoryTest
 {
-    private EventFactory factory;
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
-    Event defaultEvent;
+    @MockComponent
+    private Execution execution;
 
-    Event rawEvent;
+    @MockComponent
+    private EntityReferenceResolver<String> resolver;
 
-    @Before
-    public void configure() throws Exception
+    @InjectMockComponents
+    private DefaultEventFactory factory;
+
+    private Event defaultEvent;
+
+    private Event rawEvent;
+
+    @BeforeEach
+    void configure() throws Exception
     {
-        final DocumentAccessBridge mockDocumentAccessBridge =
-            getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-                    {
-            {
-                allowing(mockDocumentAccessBridge).getCurrentUser();
-                will(returnValue("XWiki.Admin"));
-            }
-        });
+        when(this.documentAccessBridge.getCurrentUser()).thenReturn("XWiki.Admin");
 
-        final ExecutionContext context = new ExecutionContext();
-        final Execution mockExecution = getComponentManager().getInstance(Execution.class);
-        getMockery().checking(new Expectations()
-                    {
-            {
-                allowing(mockExecution).getContext();
-                will(returnValue(context));
-            }
-        });
+        ExecutionContext context = new ExecutionContext();
+        when(this.execution.getContext()).thenReturn(context);
 
-        final EntityReferenceResolver<String> mockResolver =
-            getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING);
-        getMockery().checking(new Expectations()
-                    {
-            {
-                allowing(mockResolver).resolve("XWiki.Admin", EntityType.DOCUMENT);
-                will(returnValue(new DocumentReference("xwiki", "XWiki", "Admin")));
-            }
-        });
-        this.factory = getComponentManager().getInstance(EventFactory.class);
+        when(resolver.resolve("XWiki.Admin", EntityType.DOCUMENT))
+            .thenReturn(new DocumentReference("xwiki", "XWiki", "Admin"));
+
         this.defaultEvent = this.factory.createEvent();
         this.rawEvent = this.factory.createRawEvent();
     }
 
     @Test
-    public void testId()
+    void testId()
     {
-        Assert.assertNotNull("Event ID not set on new event", this.defaultEvent.getId());
+        assertNotNull("Event ID not set on new event", this.defaultEvent.getId());
         String id = UUID.randomUUID().toString();
         this.defaultEvent.setId(id);
-        Assert.assertEquals("Event ID was not persisted on new event", id, this.defaultEvent.getId());
+        assertEquals(id, this.defaultEvent.getId(), "Event ID was not persisted on new event");
 
-        Assert.assertNull(this.rawEvent.getId());
+        assertNull(this.rawEvent.getId());
         this.rawEvent.setId(id);
-        Assert.assertEquals("Event ID was not persisted on raw event", id, this.rawEvent.getId());
+        assertEquals(id, this.rawEvent.getId(), "Event ID was not persisted on raw event");
 
         this.rawEvent.setId(null);
-        Assert.assertNull(this.rawEvent.getId());
+        assertNull(this.rawEvent.getId());
     }
 
     @Test
-    public void testGroupId()
+    void testGroupId()
     {
-        Assert.assertNotNull("Group ID not set on new event", this.defaultEvent.getGroupId());
-        Assert.assertEquals("Consecutive events have different group identifiers", this.defaultEvent.getGroupId(),
-            this.factory.createEvent().getGroupId());
+        assertNotNull("Group ID not set on new event", this.defaultEvent.getGroupId());
+        assertEquals(this.defaultEvent.getGroupId(), this.factory.createEvent().getGroupId(),
+            "Consecutive events have different group identifiers");
         String id = UUID.randomUUID().toString();
         this.defaultEvent.setGroupId(id);
-        Assert.assertEquals("Group ID was not persisted", id, this.defaultEvent.getGroupId());
+        assertEquals(id, this.defaultEvent.getGroupId(), "Group ID was not persisted");
 
-        Assert.assertNull(this.rawEvent.getGroupId());
+        assertNull(this.rawEvent.getGroupId());
         this.rawEvent.setGroupId(id);
-        Assert.assertEquals(id, this.rawEvent.getGroupId());
+        assertEquals(id, this.rawEvent.getGroupId());
 
         this.rawEvent.setGroupId(null);
-        Assert.assertNull(this.rawEvent.getGroupId());
+        assertNull(this.rawEvent.getGroupId());
     }
 
     @Test
-    public void testType()
+    void testType()
     {
-        Assert.assertNull(this.defaultEvent.getType());
+        assertNull(this.defaultEvent.getType());
         String type = "CommentAdded";
         this.defaultEvent.setType(type);
-        Assert.assertEquals(type, this.defaultEvent.getType());
+        assertEquals(type, this.defaultEvent.getType());
 
-        Assert.assertNull(this.rawEvent.getType());
+        assertNull(this.rawEvent.getType());
         this.rawEvent.setType(type);
-        Assert.assertEquals(type, this.rawEvent.getType());
+        assertEquals(type, this.rawEvent.getType());
 
         this.rawEvent.setType(null);
-        Assert.assertNull(this.rawEvent.getType());
+        assertNull(this.rawEvent.getType());
     }
 
     @Test
-    public void testDate()
+    void testDate()
     {
-        Assert.assertNotNull(this.defaultEvent.getDate());
-        Assert.assertTrue(new Date().getTime() - this.defaultEvent.getDate().getTime() < 1000);
+        assertNotNull(this.defaultEvent.getDate());
+        assertTrue(new Date().getTime() - this.defaultEvent.getDate().getTime() < 1000);
         Date date = new Date();
         this.defaultEvent.setDate(date);
-        Assert.assertEquals(date, this.defaultEvent.getDate());
+        assertEquals(date, this.defaultEvent.getDate());
 
-        Assert.assertNull(this.rawEvent.getDate());
+        assertNull(this.rawEvent.getDate());
         this.rawEvent.setDate(date);
-        Assert.assertEquals(date, this.rawEvent.getDate());
+        assertEquals(date, this.rawEvent.getDate());
 
         this.rawEvent.setDate(null);
-        Assert.assertNull(this.rawEvent.getDate());
+        assertNull(this.rawEvent.getDate());
     }
 
     @Test
-    public void testImportance()
+    void testImportance()
     {
-        Assert.assertEquals(Importance.MEDIUM, this.defaultEvent.getImportance());
+        assertEquals(Importance.MEDIUM, this.defaultEvent.getImportance());
         this.defaultEvent.setImportance(Importance.CRITICAL);
-        Assert.assertEquals(Importance.CRITICAL, this.defaultEvent.getImportance());
+        assertEquals(Importance.CRITICAL, this.defaultEvent.getImportance());
 
-        Assert.assertEquals(Importance.MEDIUM, this.rawEvent.getImportance());
+        assertEquals(Importance.MEDIUM, this.rawEvent.getImportance());
         this.rawEvent.setImportance(Importance.BACKGROUND);
-        Assert.assertEquals(Importance.BACKGROUND, this.rawEvent.getImportance());
+        assertEquals(Importance.BACKGROUND, this.rawEvent.getImportance());
 
         this.rawEvent.setImportance(null);
-        Assert.assertEquals(Importance.MEDIUM, this.rawEvent.getImportance());
+        assertEquals(Importance.MEDIUM, this.rawEvent.getImportance());
     }
 
     @Test
-    public void testApplication()
+    void testApplication()
     {
-        Assert.assertNull(this.defaultEvent.getApplication());
+        assertNull(this.defaultEvent.getApplication());
         String app = "Comments";
         this.defaultEvent.setApplication(app);
-        Assert.assertEquals(app, this.defaultEvent.getApplication());
+        assertEquals(app, this.defaultEvent.getApplication());
 
-        Assert.assertNull(this.rawEvent.getApplication());
+        assertNull(this.rawEvent.getApplication());
         this.rawEvent.setApplication(app);
-        Assert.assertEquals(app, this.rawEvent.getApplication());
+        assertEquals(app, this.rawEvent.getApplication());
 
         this.rawEvent.setApplication(null);
-        Assert.assertNull(this.rawEvent.getApplication());
+        assertNull(this.rawEvent.getApplication());
     }
 
     @Test
-    public void testStream()
+    void testStream()
     {
-        Assert.assertNull(this.defaultEvent.getStream());
+        assertNull(this.defaultEvent.getStream());
         String stream = "xwiki:XWiki.AdminGroup";
         this.defaultEvent.setStream(stream);
-        Assert.assertEquals(stream, this.defaultEvent.getStream());
+        assertEquals(stream, this.defaultEvent.getStream());
 
-        Assert.assertNull(this.rawEvent.getStream());
+        assertNull(this.rawEvent.getStream());
         this.rawEvent.setStream(stream);
-        Assert.assertEquals(stream, this.rawEvent.getStream());
+        assertEquals(stream, this.rawEvent.getStream());
 
         this.rawEvent.setStream(null);
-        Assert.assertNull(this.rawEvent.getStream());
+        assertNull(this.rawEvent.getStream());
     }
 
     @Test
-    public void testDocument()
+    void testDocument()
     {
-        Assert.assertNull(this.defaultEvent.getDocument());
+        assertNull(this.defaultEvent.getDocument());
         DocumentReference ref = new DocumentReference("wiki", "Space", "Page");
         this.defaultEvent.setDocument(ref);
-        Assert.assertEquals(ref, this.defaultEvent.getDocument());
+        assertEquals(ref, this.defaultEvent.getDocument());
 
-        Assert.assertNull(this.rawEvent.getDocument());
+        assertNull(this.rawEvent.getDocument());
         this.rawEvent.setDocument(ref);
-        Assert.assertEquals(ref, this.rawEvent.getDocument());
+        assertEquals(ref, this.rawEvent.getDocument());
 
         this.defaultEvent.setDocument(null);
-        Assert.assertNull(this.defaultEvent.getDocument());
+        assertNull(this.defaultEvent.getDocument());
     }
 
     @Test
-    public void testSpace()
+    void testSpace()
     {
-        Assert.assertNull(this.defaultEvent.getSpace());
+        assertNull(this.defaultEvent.getSpace());
         DocumentReference doc = new DocumentReference("wiki1", "Space1", "Page");
         SpaceReference space = new SpaceReference("Space2", new WikiReference("wiki2"));
 
         this.defaultEvent.setDocument(doc);
-        Assert.assertEquals(doc.getLastSpaceReference(), this.defaultEvent.getSpace());
-        Assert.assertEquals("Space1", this.defaultEvent.getSpace().getName());
+        assertEquals(doc.getLastSpaceReference(), this.defaultEvent.getSpace());
+        assertEquals("Space1", this.defaultEvent.getSpace().getName());
 
         this.defaultEvent.setSpace(space);
-        Assert.assertEquals(space, this.defaultEvent.getSpace());
-        Assert.assertEquals("Space2", this.defaultEvent.getSpace().getName());
+        assertEquals(space, this.defaultEvent.getSpace());
+        assertEquals("Space2", this.defaultEvent.getSpace().getName());
 
         this.defaultEvent.setSpace(null);
-        Assert.assertEquals(doc.getLastSpaceReference(), this.defaultEvent.getSpace());
+        assertEquals(doc.getLastSpaceReference(), this.defaultEvent.getSpace());
         this.defaultEvent.setDocument(null);
-        Assert.assertNull(this.defaultEvent.getSpace());
+        assertNull(this.defaultEvent.getSpace());
 
-        Assert.assertNull(this.rawEvent.getSpace());
+        assertNull(this.rawEvent.getSpace());
     }
 
     @Test
-    public void testWiki()
+    void testWiki()
     {
-        Assert.assertNull(this.defaultEvent.getWiki());
+        assertNull(this.defaultEvent.getWiki());
         DocumentReference doc = new DocumentReference("wiki1", "Space1", "Page");
         SpaceReference space = new SpaceReference("Space2", new WikiReference("wiki2"));
         WikiReference wiki = new WikiReference("wiki3");
 
         this.defaultEvent.setDocument(doc);
-        Assert.assertEquals(doc.getWikiReference(), this.defaultEvent.getWiki());
-        Assert.assertEquals("wiki1", this.defaultEvent.getWiki().getName());
+        assertEquals(doc.getWikiReference(), this.defaultEvent.getWiki());
+        assertEquals("wiki1", this.defaultEvent.getWiki().getName());
 
         this.defaultEvent.setSpace(space);
-        Assert.assertEquals(space.getRoot(), this.defaultEvent.getWiki());
-        Assert.assertEquals("wiki2", this.defaultEvent.getWiki().getName());
+        assertEquals(space.getRoot(), this.defaultEvent.getWiki());
+        assertEquals("wiki2", this.defaultEvent.getWiki().getName());
 
         this.defaultEvent.setWiki(wiki);
-        Assert.assertEquals(wiki, this.defaultEvent.getWiki());
-        Assert.assertEquals("wiki3", this.defaultEvent.getWiki().getName());
+        assertEquals(wiki, this.defaultEvent.getWiki());
+        assertEquals("wiki3", this.defaultEvent.getWiki().getName());
 
         this.defaultEvent.setWiki(null);
-        Assert.assertEquals(space.getRoot(), this.defaultEvent.getWiki());
+        assertEquals(space.getRoot(), this.defaultEvent.getWiki());
         this.defaultEvent.setSpace(null);
-        Assert.assertEquals(doc.getWikiReference(), this.defaultEvent.getWiki());
+        assertEquals(doc.getWikiReference(), this.defaultEvent.getWiki());
         this.defaultEvent.setDocument(null);
-        Assert.assertNull(this.defaultEvent.getWiki());
+        assertNull(this.defaultEvent.getWiki());
 
-        Assert.assertNull(this.rawEvent.getWiki());
+        assertNull(this.rawEvent.getWiki());
     }
 
     @Test
-    public void testRelatedEntity()
+    void testRelatedEntity()
     {
-        Assert.assertNull(this.defaultEvent.getRelatedEntity());
+        assertNull(this.defaultEvent.getRelatedEntity());
         DocumentReference ref = new DocumentReference("wiki", "Space", "Page");
         this.defaultEvent.setRelatedEntity(ref);
-        Assert.assertEquals(ref, this.defaultEvent.getRelatedEntity());
+        assertEquals(ref, this.defaultEvent.getRelatedEntity());
 
         this.defaultEvent.setRelatedEntity(null);
-        Assert.assertNull(this.defaultEvent.getRelatedEntity());
+        assertNull(this.defaultEvent.getRelatedEntity());
 
-        Assert.assertNull(this.rawEvent.getRelatedEntity());
+        assertNull(this.rawEvent.getRelatedEntity());
     }
 
     @Test
-    public void testDocumentVersion()
+    void testDocumentVersion()
     {
-        Assert.assertNull(this.defaultEvent.getDocumentVersion());
+        assertNull(this.defaultEvent.getDocumentVersion());
         String version = "4.2";
         this.defaultEvent.setDocumentVersion(version);
-        Assert.assertEquals(version, this.defaultEvent.getDocumentVersion());
+        assertEquals(version, this.defaultEvent.getDocumentVersion());
 
         this.defaultEvent.setDocumentVersion(null);
-        Assert.assertNull(this.defaultEvent.getDocumentVersion());
+        assertNull(this.defaultEvent.getDocumentVersion());
 
-        Assert.assertNull(this.rawEvent.getDocumentVersion());
+        assertNull(this.rawEvent.getDocumentVersion());
     }
 
     @Test
-    public void testDocumentTitle()
+    void testDocumentTitle()
     {
-        Assert.assertNull(this.defaultEvent.getDocumentTitle());
+        assertNull(this.defaultEvent.getDocumentTitle());
         String title = "Welcome to your wiki";
         this.defaultEvent.setDocumentTitle(title);
-        Assert.assertEquals(title, this.defaultEvent.getDocumentTitle());
+        assertEquals(title, this.defaultEvent.getDocumentTitle());
 
         this.defaultEvent.setDocumentTitle(null);
-        Assert.assertNull(this.defaultEvent.getDocumentTitle());
+        assertNull(this.defaultEvent.getDocumentTitle());
 
-        Assert.assertNull(this.rawEvent.getDocumentTitle());
+        assertNull(this.rawEvent.getDocumentTitle());
     }
 
     @Test
-    public void testUser()
+    void testUser()
     {
-        Assert.assertNotNull(this.defaultEvent.getUser());
+        assertNotNull(this.defaultEvent.getUser());
         DocumentReference user = new DocumentReference("xwiki", "XWiki", "Admin");
-        Assert.assertEquals(user, this.defaultEvent.getUser());
+        assertEquals(user, this.defaultEvent.getUser());
 
         user = new DocumentReference("wiki2", "XWiki", "jdoe");
         this.defaultEvent.setUser(user);
-        Assert.assertEquals(user, this.defaultEvent.getUser());
+        assertEquals(user, this.defaultEvent.getUser());
 
         this.defaultEvent.setUser(null);
-        Assert.assertNull(this.defaultEvent.getUser());
+        assertNull(this.defaultEvent.getUser());
 
-        Assert.assertNull(this.rawEvent.getUser());
+        assertNull(this.rawEvent.getUser());
         this.rawEvent.setUser(user);
-        Assert.assertEquals(user, this.rawEvent.getUser());
+        assertEquals(user, this.rawEvent.getUser());
     }
 
     @Test
-    public void testURL() throws MalformedURLException
+    void testURL() throws MalformedURLException
     {
-        Assert.assertNull(this.defaultEvent.getUrl());
+        assertNull(this.defaultEvent.getUrl());
         URL url = new URL("http://xwiki.org/xwiki/bin/Some/Page");
         this.defaultEvent.setUrl(url);
-        Assert.assertEquals(url, this.defaultEvent.getUrl());
+        assertEquals(url, this.defaultEvent.getUrl());
 
         this.defaultEvent.setUrl(null);
-        Assert.assertNull(this.defaultEvent.getUrl());
+        assertNull(this.defaultEvent.getUrl());
 
-        Assert.assertNull(this.rawEvent.getUrl());
+        assertNull(this.rawEvent.getUrl());
     }
 
     @Test
-    public void testTitle()
+    void testTitle()
     {
-        Assert.assertNull(this.defaultEvent.getTitle());
+        assertNull(this.defaultEvent.getTitle());
         String title = "Deleted attachment file.png";
         this.defaultEvent.setTitle(title);
-        Assert.assertEquals(title, this.defaultEvent.getTitle());
+        assertEquals(title, this.defaultEvent.getTitle());
 
         this.defaultEvent.setTitle(null);
-        Assert.assertNull(this.defaultEvent.getTitle());
+        assertNull(this.defaultEvent.getTitle());
 
-        Assert.assertNull(this.rawEvent.getTitle());
+        assertNull(this.rawEvent.getTitle());
     }
 
     @Test
-    public void testBody()
+    void testBody()
     {
-        Assert.assertNull(this.defaultEvent.getBody());
+        assertNull(this.defaultEvent.getBody());
         String body = "I **do** believe in fairies!";
         this.defaultEvent.setBody(body);
-        Assert.assertEquals(body, this.defaultEvent.getBody());
+        assertEquals(body, this.defaultEvent.getBody());
 
         this.defaultEvent.setBody(null);
-        Assert.assertNull(this.defaultEvent.getBody());
+        assertNull(this.defaultEvent.getBody());
 
-        Assert.assertNull(this.rawEvent.getBody());
+        assertNull(this.rawEvent.getBody());
     }
 }

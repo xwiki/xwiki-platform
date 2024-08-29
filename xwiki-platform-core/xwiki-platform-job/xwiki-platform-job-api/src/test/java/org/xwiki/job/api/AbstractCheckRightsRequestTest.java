@@ -21,6 +21,7 @@
 package org.xwiki.job.api;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.job.DefaultRequest;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,25 +31,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class AbstractCheckRightsRequestTest
+class AbstractCheckRightsRequestTest
 {
-    private AbstractCheckRightsRequest request = new AbstractCheckRightsRequest()
-    {
-    };
-
     // Tests
 
     @Test
-    public void isCheckAuthorRights()
+    void copyRequest()
     {
-        assertTrue(this.request.isCheckAuthorRights());
+        DefaultRequest request = new DefaultRequest();
+        request.setProperty("checkrights", false);
 
-        this.request.setCheckRights(false);
+        AbstractCheckRightsRequest checkrightRequest = new AbstractCheckRightsRequest(request)
+        {
+        };
 
-        assertFalse(this.request.isCheckAuthorRights());
+        assertFalse(checkrightRequest.isCheckRights());
+    }
 
-        this.request.setCheckAuthorRights(true);
+    @Test
+    void isCheckAuthorRights()
+    {
+        AbstractCheckRightsRequest request = new AbstractCheckRightsRequest()
+        {
+        };
 
-        assertTrue(this.request.isCheckAuthorRights());
+        assertTrue(request.isCheckAuthorRights());
+
+        request.setCheckRights(false);
+
+        assertFalse(request.isCheckAuthorRights());
+
+        request.setCheckAuthorRights(true);
+
+        assertTrue(request.isCheckAuthorRights());
     }
 }

@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
-import org.xwiki.test.ui.po.ChangesPane;
+import org.xwiki.test.ui.po.diff.RawChanges;
 
 /**
  * The merge conflict resolution UI.
@@ -57,6 +57,9 @@ public class MergeConflictPane extends BaseElement
      */
     @FindBy(xpath = "//button[@name = 'extensionAction' and @value = 'diff']")
     private WebElement diffButton;
+
+    @FindBy(id = "changescontent")
+    private WebElement changesContent;
 
     /**
      * @return the list box used to specify which version to keep
@@ -100,8 +103,8 @@ public class MergeConflictPane extends BaseElement
     /**
      * @return the changes between the selected versions
      */
-    public ChangesPane getChanges()
+    public RawChanges getChanges()
     {
-        return new ChangesPane();
+        return new RawChanges(this.changesContent);
     }
 }

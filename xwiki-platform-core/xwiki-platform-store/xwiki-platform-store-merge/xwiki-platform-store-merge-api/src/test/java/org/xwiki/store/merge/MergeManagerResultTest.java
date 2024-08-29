@@ -19,13 +19,18 @@
  */
 package org.xwiki.store.merge;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -62,5 +67,99 @@ public class MergeManagerResultTest
         mergeManagerResult.getLog().error("Something else");
         assertTrue(mergeManagerResult.hasConflicts());
         assertTrue(mergeManagerResult.getConflicts().isEmpty());
+    }
+
+    @Test
+    void equalsAndHashCode()
+    {
+        MergeManagerResult<DocumentModelBridge, Object> mergeManagerResult = new MergeManagerResult<>();
+        MergeManagerResult<DocumentModelBridge, Object> otherMergeManager = new MergeManagerResult<>();
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        DocumentModelBridge result = mock(DocumentModelBridge.class);
+        mergeManagerResult.setMergeResult(result);
+        otherMergeManager.setMergeResult(result);
+
+        mergeManagerResult.getLog().info("test");
+        otherMergeManager.getLog().info("test");
+
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        // changing logs doesn't impact equals unless it's an error log on a manager without conflicts
+        otherMergeManager.getLog().info("other");
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager.getLog().error("something");
+        assertNotEquals(mergeManagerResult, otherMergeManager);
+        assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager = new MergeManagerResult<>();
+        otherMergeManager.setMergeResult(result);
+
+        List<Conflict<Object>> conflictList = new ArrayList<>();
+        conflictList.add(mock(Conflict.class));
+        conflictList.add(mock(Conflict.class));
+
+        mergeManagerResult.addConflicts(conflictList);
+        otherMergeManager.addConflicts(conflictList);
+
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        // error log doesn't impact equals here since there was already conflicts listed
+        otherMergeManager.getLog().error("something");
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager = new MergeManagerResult<>();
+        otherMergeManager.setMergeResult(mock(DocumentModelBridge.class));
+        otherMergeManager.addConflicts(conflictList);
+        assertNotEquals(mergeManagerResult, otherMergeManager);
+        assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager = new MergeManagerResult<>();
+        otherMergeManager.setMergeResult(result);
+        otherMergeManager.addConflicts(Arrays.asList(mock(Conflict.class), mock(Conflict.class)));
+        assertNotEquals(mergeManagerResult, otherMergeManager);
+        assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager = new MergeManagerResult<>();
+        otherMergeManager.setMergeResult(result);
+        assertNotEquals(mergeManagerResult, otherMergeManager);
+        assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager = new MergeManagerResult<>();
+        otherMergeManager.setMergeResult(result);
+        otherMergeManager.addConflicts(conflictList);
+        assertEquals(mergeManagerResult, otherMergeManager);
+        assertEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+
+        otherMergeManager.setModified(true);
+        assertNotEquals(mergeManagerResult, otherMergeManager);
+        assertNotEquals(mergeManagerResult.hashCode(), otherMergeManager.hashCode());
+    }
+
+    @Test
+    void getConflictsNumber()
+    {
+        MergeManagerResult mergeManagerResult = new MergeManagerResult();
+        assertEquals(0, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.addConflicts(Collections.singletonList(mock(Conflict.class)));
+        mergeManagerResult.getLog().error("A new conflict");
+        assertEquals(1, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.getLog().error("Another new conflict");
+        assertEquals(2, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.getLog().error("Another one");
+        assertEquals(3, mergeManagerResult.getConflictsNumber());
+
+        mergeManagerResult.addConflicts(Collections.singletonList(mock(Conflict.class)));
+        mergeManagerResult.getLog().error("A new conflict");
+        assertEquals(4, mergeManagerResult.getConflictsNumber());
     }
 }

@@ -265,27 +265,20 @@ function executeCommand(url, callback) {
   } else if (window.ActiveXObject) {
     // ie
     ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
-    if (ajaxRequest) {
-      ajaxRequest.onreadystatechange = ajaxBindCallback;
-      ajaxRequest.open("GET", url, true);
-      ajaxRequest.send();
-    } else{
-      new XWiki.widgets.Notification('your browser does not support xmlhttprequest', 'error');
-    }
+    ajaxRequest.onreadystatechange = ajaxBindCallback;
+    ajaxRequest.open("GET", url, true);
+    ajaxRequest.send();
   } else{
     new XWiki.widgets.Notification("your browser does not support xmlhttprequest", 'error');
   }
 }
 
 function start1() {
-  var i;
-  var j;
-  var pos;
+  var i, pos, el;
   //attaching events to all panels
   var divs = document.getElementsByTagName("div");
   for (i = 0; i < divs.length; ++i) {
     el = divs[i];
-    var id = el.id;
     if (isPanel(el)) {
       attachDragHandler(el);
     }
@@ -295,7 +288,6 @@ function start1() {
   window.panelsOnLeft = getBlocList(leftPanels);
   window.panelsOnRight = getBlocList(rightPanels);
   //
-  var el;
   for (i = 0; i < panelsInList.length; ++i){
     pos = window.allPanelsPlace[i]['left'];
     if (pos != -1) {
@@ -389,7 +381,7 @@ function getBlocNameList(el) {
 }
 
 function save() {
-  url = window.ajaxurl;  
+  var url = window.ajaxurl;
   url += "&showLeftPanels=" + window.showLeftColumn;
   url += "&showRightPanels=" + window.showRightColumn;
   if (window.showLeftColumn) {
@@ -631,7 +623,7 @@ function panelEditorInit() {
 
   // Update the enabled/disable state of the left/right panel inputs.
   var selectedLayout = $('selectedoption');
-  changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().size());
+  changePreviewLayout(selectedLayout, selectedLayout.previousSiblings().length);
 }
 
 // Wait for asynchronous elements

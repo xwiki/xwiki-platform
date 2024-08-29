@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.AbstractJob;
-import org.xwiki.job.Request;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
@@ -60,19 +59,6 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
     private ObservationManager observation;
 
     private Thread thread;
-
-    @Override
-    protected XWikiInitializerRequest castRequest(Request request)
-    {
-        XWikiInitializerRequest indexerRequest;
-        if (request instanceof XWikiInitializerRequest) {
-            indexerRequest = (XWikiInitializerRequest) request;
-        } else {
-            indexerRequest = new XWikiInitializerRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     protected XWikiInitializerJobStatus createNewStatus(XWikiInitializerRequest request)

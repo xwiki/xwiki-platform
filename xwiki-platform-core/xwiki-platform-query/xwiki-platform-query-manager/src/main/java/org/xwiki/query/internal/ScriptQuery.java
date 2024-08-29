@@ -19,21 +19,29 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
-
-import java.util.List;
-import java.util.Map;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Query wrapper that allows to set filter from the filter component hint.
@@ -51,12 +59,18 @@ public class ScriptQuery implements SecureQuery
     /**
      * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
      */
-    private ComponentManager componentManager;
+    private final ComponentManager componentManager;
 
     /**
      * The wrapped {@link Query}.
      */
-    private Query query;
+    private final Query query;
+
+    private boolean switchAuthor;
+
+    private DocumentReference authorReference;
+
+    private DocumentReference sourceReference;
 
     /**
      * Constructor.
@@ -163,9 +177,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        this.query.bindValue(var, val);
+        this.query.bindValue(variable, val);
         return this;
     }
 
@@ -191,9 +205,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        QueryParameter parameter = this.query.bindValue(var);
+        QueryParameter parameter = this.query.bindValue(variable);
         return new ScriptQueryParameter(this, parameter);
     }
 
@@ -251,13 +265,57 @@ public class ScriptQuery implements SecureQuery
     @Override
     public <T> List<T> execute() throws QueryException
     {
-        return this.query.execute();
+        if (this.switchAuthor) {
+            try {
+                AuthorExecutor authorExecutor = this.componentManager.getInstance(AuthorExecutor.class);
+                return authorExecutor.call(this.query::execute, this.authorReference, this.sourceReference);
+            } catch (QueryException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new QueryException("Failed to execute query", this.query, e);
+            }
+        } else {
+            return this.query.execute();
+        }
     }
 
     @Override
     public boolean isCurrentAuthorChecked()
     {
         return this.query instanceof SecureQuery ? ((SecureQuery) this.query).isCurrentAuthorChecked() : true;
+    }
+
+    /**
+     * Switch the author and reference to use to execute the query.
+     * 
+     * @param authorReference the user to check rights on
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return this query.
+     * @throws AccessDeniedException when switching the query author is not allowed
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public SecureQuery setQueryAuthor(DocumentReference authorReference, DocumentReference sourceReference)
+        throws AccessDeniedException
+    {
+        if (this.query instanceof SecureQuery) {
+            // Only author with programming right can switch the query author
+            try {
+                ContextualAuthorizationManager authorization =
+                    this.componentManager.getInstance(ContextualAuthorizationManager.class);
+                authorization.checkAccess(Right.PROGRAM);
+
+                this.switchAuthor = true;
+                this.authorReference = authorReference;
+                this.sourceReference = sourceReference;
+            } catch (ComponentLookupException e) {
+                LOGGER.error("Failed to lookup authorization manager", e);
+            }
+        }
+
+        return this;
     }
 
     @Override
@@ -282,5 +340,30 @@ public class ScriptQuery implements SecureQuery
         }
 
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScriptQuery that = (ScriptQuery) o;
+
+        return new EqualsBuilder().append(switchAuthor, that.switchAuthor)
+            .append(componentManager, that.componentManager).append(query, that.query)
+            .append(authorReference, that.authorReference).append(sourceReference, that.sourceReference).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).append(componentManager).append(query).append(switchAuthor)
+            .append(authorReference).append(sourceReference).toHashCode();
     }
 }

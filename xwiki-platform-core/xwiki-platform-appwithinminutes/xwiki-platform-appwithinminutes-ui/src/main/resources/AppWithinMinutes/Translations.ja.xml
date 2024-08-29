@@ -1,0 +1,266 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="AppWithinMinutes.Translations" locale="ja">
+  <web>AppWithinMinutes</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AppWithinMinutes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Home page
+platform.appwithinminutes.homePageTitle=App Within Minutes
+platform.appwithinminutes.description=XWikiの強力な構造化データ管理システムをもとに、コラボレーション用のウェブアプリケーションを数分で作成しましょう。
+platform.appwithinminutes.createAppButtonLabel=アプリケーションを作成
+platform.appwithinminutes.appsLiveTableHeading=アプリケーション
+platform.appwithinminutes.appsLiveTable.doc.title=アプリケーション
+platform.appwithinminutes.appsLiveTable.doc.author=最終更新者
+platform.appwithinminutes.appsLiveTable.doc.date=更新日
+platform.appwithinminutes.appsLiveTable._actions=アクション
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=スペースの管理権限を与える。
+
+### AWM Applications panel entry
+platform.appwithinminutes.appPanelCreateEntry=あなたのアプリケーションを作りましょう！
+
+### Wizard step
+platform.appwithinminutes.wizardStepHeading=ステップ{0} — {1}
+appWithinMinutes.wizardStep.name.name=名称
+appWithinMinutes.wizardStep.name.title=アプリケーションに名称を付けましょう
+appWithinMinutes.wizardStep.name.description=アプリケーションの名称を選択しましょう
+appWithinMinutes.wizardStep.structure.name=構造
+appWithinMinutes.wizardStep.structure.title=データを構造化
+appWithinMinutes.wizardStep.structure.description=アプリケーションのデータを記述しましょう
+appWithinMinutes.wizardStep.entries.name=エントリー
+appWithinMinutes.wizardStep.entries.title=データを特定
+appWithinMinutes.wizardStep.entries.description=データの保存場所を選択
+appWithinMinutes.wizardStep.presentation.name=プレゼンテーション
+appWithinMinutes.wizardStep.presentation.title=アプリケーションのメインページをカスタマイズ
+appWithinMinutes.wizardStep.presentation.description=アプリケーションのメインページをカスタマイズしましょう
+platform.appwithinminutes.wizardStepNextButtonLabel=次のステップ
+platform.appwithinminutes.wizardStepNextButtonTip=次のステップに行く
+platform.appwithinminutes.wizardStepFinishButtonLabel=完了
+platform.appwithinminutes.wizardStepFinishButtonTip=アプリケーションのトップページに行く
+platform.appwithinminutes.wizardStepPreviousButtonLabel=前のステップ
+platform.appwithinminutes.wizardStepPreviousButtonTip=前のステップに戻る
+platform.appwithinminutes.wizardStepHelpTitle=ステップ
+platform.appwithinminutes.wizardStepHelpDescription=このウィザードでアプリケーションを作成しましょう。必要なステップは次の通りです：
+
+### Wizard Step 1: Application Name
+appWithinMinutes.createApp.location.label=場所
+appWithinMinutes.createApp.location.hint=アプリケーションを作成するページ階層内の位置。
+appWithinMinutes.createApp.parent.label=上位ページ
+appWithinMinutes.createApp.parent.hint=新しいアプリケーションの上位ページです。トップのレベルにアプリケーションを作成したい場合は、このフィールドを空のままにしてください。
+appWithinMinutes.createApp.parent.placeholder=上位ページ.への.パス
+appWithinMinutes.codeSpace.title=コード
+appWithinMinutes.codeSpace.description=これはアプリケーションのコードが保存される場所です。
+appWithinMinutes.codeSpace.hiddenPagesInfo=ページを非表示に設定すると、全てのアプリケーションコードのページが既定で表示されなくなります。そのため、ここではユーザーのプロフィールの設定を上書きして、非表示のページも一覧表示しています。
+platform.appwithinminutes.appNamePageTitle=アプリケーションを作成
+platform.appwithinminutes.appNameLabel=アプリケーション名
+platform.appwithinminutes.appNameHint=アプリケーション名はトップページのURLと、アプリケーションのコードを保存する場所を決定します。
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=アプリケーションのトップページのURL
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=アプリケーションのコードの場所
+platform.appwithinminutes.appNameIsUsedWarning=このアプリケーションは既に存在します。次のステップに進むと、既存のアプリケーションを編集します。
+platform.appwithinminutes.appNameEmptyError=アプリケーション名を入力してください。
+
+### Wizard Step 2: Application Structure
+platform.appwithinminutes.classEditorPaletteTitle=フィールドパレット
+platform.appwithinminutes.classEditorPaletteHint=フィールドをパレットからドラッグアンドドロップすると、データの入力に使用するフォームを作成します。
+platform.appwithinminutes.classEditorCanvasHint=フィールドをパレットからドラッグして、この領域にドロップしてください。
+platform.appwithinminutes.classEditorUpdateTemplateLabel=テンプレートを更新
+platform.appwithinminutes.classEditorUpdateTemplateHint=テンプレート（{0}）は既定のフィールドの値を保存します。
+platform.appwithinminutes.classEditorUpdateSheetLabel=シートを更新
+platform.appwithinminutes.classEditorUpdateSheetHint=シート（{0}）は構造化データを表示して編集するために使用されます。
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=翻訳を更新
+platform.appwithinminutes.classEditorUpdateTranslationsHint=フィールド名と一覧の値（{0}）の翻訳を更新。
+platform.appwithinminutes.classEditorMultipleSheetsWarning=このクラスには複数のシートがあります。
+platform.appwithinminutes.classEditorDuplicateFieldNameError=クラスに同じ名称のフィールドが2つあります：{0}
+platform.appwithinminutes.classEditorTemplateSaveComment=既定の値を更新
+platform.appwithinminutes.classEditorBindSheetSaveComment=クラスシートを結びつける
+platform.appwithinminutes.classEditorSheetSaveComment=クラスシートを更新
+platform.appwithinminutes.classEditorTranslationsSaveComment=翻訳を更新
+platform.appwithinminutes.classEditorStandardCategoryName=標準
+platform.appwithinminutes.classEditorPickersCategoryName=ピッカー
+platform.appwithinminutes.classEditorDocumentCategoryName=ページ
+platform.appwithinminutes.classEditorAdvancedCategoryName=高度
+platform.appwithinminutes.classEditorDBListFieldName=データベースのリスト
+platform.appwithinminutes.classEditorGroupsFieldName=グループ
+platform.appwithinminutes.classEditorUsersFieldName=ユーザー
+platform.appwithinminutes.classEditorDateFieldName=日付
+platform.appwithinminutes.classEditorStaticListFieldName=静的リスト
+platform.appwithinminutes.classEditorBooleanFieldName=ブーリアン
+platform.appwithinminutes.classEditorNumberFieldName=数
+platform.appwithinminutes.classEditorTextAreaFieldName=長いテキスト
+platform.appwithinminutes.classEditorStringFieldName=短いテキスト
+platform.appwithinminutes.classEditorContentFieldName=内容
+platform.appwithinminutes.classEditorTitleFieldName=タイトル
+platform.appwithinminutes.classEditorPageFieldName=ページ
+platform.appwithinminutes.classEditorDeleteFieldLabel=削除
+platform.appwithinminutes.classEditorConfigureFieldLabel=設定
+platform.appwithinminutes.classEditorPreviewFieldLabel=プレビュー
+platform.appwithinminutes.classEditorPreviewFieldHint=設定パネルを非表示とし、変更を適用
+platform.appwithinminutes.classEditorMoveFieldLabel=移動
+platform.appwithinminutes.classEditorMoveFieldHint=ドラッグアンドドロップで順番を変更
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=既定の値
+
+### Date Picker
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerClearSelectedDate=消去
+platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=今
+platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=今日
+
+### Static List Editor
+platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=値
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=追加
+platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=削除
+appWithinMinutes.templateProviderEditor.hint=アプリケーションのエントリーは、構造化データを含むウィキのページです。
+appWithinMinutes.templateProviderEditor.icon.hint=アプリケーションのエントリーに関係付けるアイコン。
+appWithinMinutes.templateProviderEditor.description.hint=アプリケーションのエントリーの短い説明。
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=エントリーを作成する元の場所
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=場所の指定がない場合、どのページからもエントリーを作成できます。
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=エントリーを作成する場所
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=場所の指定がない場合、ウィキのどの場所にもエントリーを作成できます。
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=エントリーの場所を強制しない
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=上で指定した場所は候補としてのみ使用し、アプリケーションエントリーを作成する際に異なる場所を選択することをユーザーに許可。
+appWithinMinutes.templateProviderEditor.terminal.hint=アプリケーションのエントリーをターミナルページとするか否かを選択。
+
+### Wizard Step 3: Application Presentation
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=アプリケーションのフィールド
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=汎用カラム
+platform.appwithinminutes.liveTableEditorHelpTitle=ヒント
+platform.appwithinminutes.liveTableEditorHelpDescription=汎用ライブテーブルの縦列は、アプリケーションの構造から独立しています。これらは、アプリケーションのデータを保持するページについての情報を提供します。
+platform.appwithinminutes.liveTableEditorDocTitleColumnName=ページのタイトル
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=アプリケーションのデータを含むページのタイトル
+platform.appwithinminutes.liveTableEditorDocNameColumnName=ページ名
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=アプリケーションのデータを含むページの名称
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=場所
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=アプリケーションのデータを含むページの場所
+platform.appwithinminutes.liveTableEditorDocAuthorColumnName=最終更新者
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=アプリケーションのデータを最後に編集したユーザー
+platform.appwithinminutes.liveTableEditorDocCreatorColumnName=作成者
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=アプリケーションのデータを作成したユーザー
+platform.appwithinminutes.liveTableEditorDocDateColumnName=日付
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=アプリケーションのデータを最後に編集した日付
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=作成日
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=アプリケーションのデータを作成した日付
+platform.appwithinminutes.liveTableEditorActionsColumnName=アクション
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=アプリケーションのデータについて実行できるアクション（編集や削除など）のリスト
+platform.appwithinminutes.liveTableEditorAttachmentsColumnName=添付ファイル
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=データページに添付されたファイルへのリンクを表示する特別なカラム
+platform.appwithinminutes.liveTableEditorImagesColumnName=画像
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=データページに添付された画像へのリンクを表示する特別なカラム
+platform.appwithinminutes.liveTableEditorAvatarColumnName=アバター
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=ユーザーアバターを表示する特別なカラム。XWiki.XWikiUsersクラスに結びつけられた表でのみ機能
+platform.appwithinminutes.liveTableEditorTitleHint=アプリケーションのタイトルは、アプリケーションのトップページ、アプリケーションのパネル、ライブテーブル、パンくずリストなどに表示されます。
+platform.appwithinminutes.liveTableEditorDescriptionHint=アプリケーションのデータがあるライブテーブルの上のトップページに表示する内容。アプリケーションの説明に使用できます。
+platform.appwithinminutes.liveTableEditorColumnsHint=アプリケーションのトップページに表示するライブテーブルに含める縦列を選択してください。
+platform.appwithinminutes.liveTableEditorSaveComment=ライブテーブルを更新
+platform.appwithinminutes.liveTableEditorMoveColumnHint=ドラッグアンドドロップで順番を変更
+platform.appwithinminutes.liveTableEditorDeleteColumnHint=削除
+platform.appwithinminutes.liveTableEditorAddColumnHint=選択したカラムを追加
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=いくつかのカラムは、対応するアプリケーションのフィールドが削除されたため非推奨です。削除してよろしいですか？&lt;a href=""&gt;はい&lt;/a&gt; / &lt;a href=""&gt;いいえ&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorIcon=アイコン
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=アプリケーションのアイコン。アイコンピッカーからアイコンを選択するか、添付したイメージを参照できます。
+
+### Wizard Step 4: Application home page
+platform.appwithinminutes.appLiveTableHeading=エントリー
+platform.appwithinminutes.appLiveTableEditEntryActionName=編集
+platform.appwithinminutes.appLiveTableDeleteEntryActionName=削除
+platform.appwithinminutes.appHomePageActionsHeading=アクション
+platform.appwithinminutes.appHomePageAddEntryLabel=追加
+platform.appwithinminutes.appHomePageAddEntryHint=新しいエントリーを追加
+platform.appwithinminutes.appHomePageEntryNameLabel=エントリーの名称：
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=全てのエントリーを削除
+platform.appwithinminutes.appHomePageEditAppLabel=アプリケーションを編集
+platform.appwithinminutes.appHomePageTranslateAppLabel=アプリケーションを翻訳
+platform.appwithinminutes.appHomePageDeleteAppLabel=アプリケーションを削除
+platform.appwithinminutes.appHomePageMovedWarning=このアプリケーションは、コードを更新せず名称が変更されたか移動されたため、適切に機能しないおそれがあります。アプリケーションを編集し、以下のステップに従ってコードを更新してください。
+platform.appwithinminutes.appHomePageNoScriptRight=アプリケーションの作成または編集に必要なスクリプト権限がありません。続行するとアプリケーションが正しく動作しないおそれがあります。
+AppWithinMinutes.LiveTableClass_description=詳細
+AppWithinMinutes.LiveTableClass_columns=ライブテーブルの縦列
+
+### Delete application dialog
+platform.appwithinminutes.deleteAppConfirmation=アプリケーション {0} と全てのエントリーが削除されます。続行してよろしいですか？
+platform.appwithinminutes.deleteAppEntriesConfirmation=アプリケーション {0} の全エントリーを削除します。続行してよろしいですか？
+platform.appwithinminutes.deleteAppDoesNotExistError=指定したアプリケーションは存在しません。
+platform.appwithinminutes.deleteAppInvalidAppError=指定した名称は、有効なApp Within Minutesアプリケーションではありません。
+platform.appwithinminutes.deleteAppNotSpecifiedError=アプリケーション名が指定されていません。
+
+### Rename Application
+appWithinMinutes.renameApp.label=アプリケーションの名称を変更
+appWithinMinutes.renameApp.close=閉じる
+appWithinMinutes.renameApp.changeAppTitleInfo=アプリケーションのタイトルは、アプリケーションのトップページを編集するだけで変更できます。アプリケーションの名称を変更する必要はありません。
+appWithinMinutes.renameApp.regenerateAppCodeWarning=アプリケーションの名称を変更すると、アプリケーションのコードが新しく生成されます。その結果、カスタマイズしたコードは上書きされます。
+appWithinMinutes.renameApp.newName.label=新しい名称
+appWithinMinutes.renameApp.pageExistsError=この名称のページは指定した場所に既に存在します。
+appWithinMinutes.renameApp.locationForbiddenError=アプリケーションを選択した場所に移動することは許可されていません。
+appWithinMinutes.renameApp.location.label=新しい場所
+appWithinMinutes.renameApp.location.hint=アプリケーションを移動するページの階層内の場所。
+appWithinMinutes.renameApp.parent.label=新しい親の要素
+appWithinMinutes.renameApp.parent.hint=新しい上位ページ。アプリケーションをページの階層の最上位に移動したい場合は、このフィールドを空のままにしてください。
+appWithinMinutes.renameApp.inProgress=アプリケーションの名称を変更しています…
+appWithinMinutes.renameApp.done=アプリケーションの名称を変更しました
+appWithinMinutes.renameApp.failed=アプリケーションの名称を変更できませんでした
+
+### Deprecated keys
+### Since 8.4
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=アプリケーションのクラス
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=アプリケーションのデータ保存場所
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=スペース
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=アプリケーションのエントリーを含むスペースの名称
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=ページの完全な名称
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=アプリケーションのエントリーを含むページの名称。先頭にスペースの名称が付きます
+
+#@deprecated appWithinMinutes.wizardStep.name.name
+platform.appwithinminutes.wizardStep1Name=名称
+#@deprecated appWithinMinutes.wizardStep.name.title
+platform.appwithinminutes.wizardStep1Title=アプリケーションに名称を付けましょう
+#@deprecated appWithinMinutes.wizardStep.name.description
+platform.appwithinminutes.wizardStep1Description=アプリケーションの名称を選択しましょう
+#@deprecated appWithinMinutes.wizardStep.structure.name
+platform.appwithinminutes.wizardStep2Name=構造
+#@deprecated appWithinMinutes.wizardStep.structure.title
+platform.appwithinminutes.wizardStep2Title=データを構造化しましょう
+#@deprecated appWithinMinutes.wizardStep.structure.description
+platform.appwithinminutes.wizardStep2Description=アプリケーションのデータを記述しましょう
+#@deprecated appWithinMinutes.wizardStep.presentation.name
+platform.appwithinminutes.wizardStep3Name=表示
+#@deprecated appWithinMinutes.wizardStep.presentation.title
+platform.appwithinminutes.wizardStep3Title=アプリケーションのトップページをカスタマイズしましょう
+#@deprecated appWithinMinutes.wizardStep.presentation.description
+platform.appwithinminutes.wizardStep3Description=アプリケーションのトップページをカスタマイズしましょう
+
+### Since 11.0
+platform.appwithinminutes.appsLiveTable.doc.space=アプリケーション名
+appWithinMinutes.classEditor.title={0}個の構造
+appWithinMinutes.templateProviderEditor.title={0}件のエントリー
+</content>
+</xwikidoc>

@@ -31,6 +31,7 @@ import org.xwiki.component.descriptor.DefaultComponentRole;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -46,6 +47,8 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
 
     private Block block;
 
+    private XDOM xdom;
+
     private boolean asyncAllowed;
 
     private boolean cacheAllowed;
@@ -57,6 +60,8 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
     private Syntax targetSyntax;
 
     private boolean inline;
+
+    private boolean resricted;
 
     private BlockAsyncRendererDecorator decorator;
 
@@ -70,8 +75,12 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
      */
     public BlockAsyncRendererConfiguration(List<?> idElements, Block block)
     {
-        this.id = new ArrayList<>(idElements.size());
-        addElements(idElements);
+        if (idElements != null) {
+            this.id = new ArrayList<>(idElements.size());
+            addElements(idElements);
+        } else {
+            this.id = new ArrayList<>();
+        }
         this.block = block;
 
         // Enabled by default
@@ -111,6 +120,28 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
     public Block getBlock()
     {
         return this.block;
+    }
+
+    /**
+     * @return the XDOM to use in the transformation context
+     * @since 14.8RC1
+     * @since 14.4.5
+     * @since 13.10.10
+     */
+    public XDOM getXDOM()
+    {
+        return this.xdom;
+    }
+
+    /**
+     * @param xdom the XDOM to use in the transformation context
+     * @since 14.8RC1
+     * @since 14.4.5
+     * @since 13.10.10
+     */
+    public void setXDOM(XDOM xdom)
+    {
+        this.xdom = xdom;
     }
 
     /**
@@ -207,6 +238,28 @@ public class BlockAsyncRendererConfiguration extends AsyncRendererConfiguration
     public void setInline(boolean inline)
     {
         this.inline = inline;
+    }
+
+    /**
+     * @return indicator of whether the transformation context is restricted or not
+     * @since 14.9
+     * @since 14.4.6
+     * @since 13.10.10
+     */
+    public boolean isResricted()
+    {
+        return this.resricted;
+    }
+
+    /**
+     * @param resricted indicator of whether the transformation context is restricted or not
+     * @since 14.9
+     * @since 14.4.6
+     * @since 13.10.10
+     */
+    public void setResricted(boolean resricted)
+    {
+        this.resricted = resricted;
     }
 
     /**

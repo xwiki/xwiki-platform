@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel rdf:about="/xwiki/bin/view/Blog/">
+    <title>Blog</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/</link>
+    <description>Most recent blog posts in the Blog space</description>
+    <image rdf:resource="https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000"/>
+    <dc:language></dc:language>
+    <dc:rights>This wiki is licensed under a &#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/Main/License&#34;&#62;Creative Commons Attribution&#60;/a&#62; license</dc:rights>
+    <items>
+      <rdf:Seq>
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en" />
+        <rdf:li rdf:resource="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en" />
+      </rdf:Seq>
+    </items>
+  </channel>
+  <image rdf:about="https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000">
+    <title>Wiki Logo</title>
+    <url>https://www.xwiki.org/xwiki/skins/flamingo/logo.png?cache-version=1666345756000</url>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/</link>
+  </image>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en">
+    <title>Highlights of XWiki 14.x cycle</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes?language=en</link>
+    <description>&#60;p&#62;December is almost over and this means we&#39;re finishing the XWiki 14.x cycle. It&#39;s time to look back at what we achieved in 2022. Here are some links to visual reports of what was done in 14.x:&#60;/p&#62;&#60;ul&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=High&#34;&#62;High importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=Medium&#34;&#62;Medium importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=Low&#34;&#62;Low importance changes&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=&#38;amp;importance=&#38;amp;containsScreenshots=true&#34;&#62;All changes having screenshots&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;li&#62;&#60;span class=&#34;wikiexternallink&#34;&#62;&#60;a href=&#34;https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/Code/Report?action=report&#38;amp;displayer=grid&#38;amp;products=XWiki&#38;amp;versions=14.%25&#38;amp;categories=&#38;amp;audience=user&#38;amp;importance=&#34;&#62;All user-related changes&#60;/a&#62;&#60;/span&#62; &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki14CycleReleaseNotes&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/li&#62;&#60;/ul&#62;</description>
+    <dc:subject>Blog.What&#39;s New for XWiki: Simple User</dc:subject>
+    <dc:date>2022-12-22T11:48:48+01:00</dc:date>
+    <dc:creator>Vincent Massol</dc:creator>
+  </item>
+  <item rdf:about="https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en">
+    <title>XWiki 14.9 Release Candidate 1 Released</title>
+    <link>https://www.xwiki.org:443/xwiki/bin/view/Blog/XWiki149RC1Released?language=en</link>
+    <description>&#60;p&#62;This releases improves the new client-side PDF Export feature (still experimental but getting closer to being production ready) by offering the ability to configure it in the Admin UI and by enhancing the default template. It also fixes bugs and especially several security bugs, making it a recommended upgrade. &#60;span class=&#34;wikilink&#34;&#62;&#60;a title=&#34;Read the full entry&#34; href=&#34;/xwiki/bin/view/Blog/XWiki149RC1Released&#34;&#62;...&#60;/a&#62;&#60;/span&#62;&#60;/p&#62;</description>
+    <dc:subject>Blog.Development, Blog.What&#39;s New for XWiki: Simple User</dc:subject>
+    <dc:date>2023-01-06T03:29:01+01:00</dc:date>
+    <dc:creator>Vincent Massol</dc:creator>
+  </item>
+</rdf:RDF>

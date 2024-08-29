@@ -1,0 +1,501 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.ImageEditorService" locale="">
+  <web>CKEditor</web>
+  <name>ImageEditorService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output='false'}}
+#if ($xcontext.action == 'get')
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
+#end
+{{/velocity}}
+
+{{velocity}}
+##
+## Expected request parameters:
+## - isHTML5: true when htm5 is supported
+##
+## Check if the image styles are available.
+#if ($services.imageStyle)
+  #set ($defaultImageStylesActive = true)
+#else
+  #set ($defaultImageStylesActive = false)
+#end
+#if ($xcontext.action == 'get')
+{{html clean='false'}}
+&lt;div&gt;
+  &lt;!-- Nav tabs --&gt;
+  &lt;ul class="nav nav-tabs" role="tablist"&gt;
+    &lt;li role="presentation" class="active"&gt;
+      &lt;a href="#standard" aria-controls="standard" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.title'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li role="presentation"&gt;
+      &lt;a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab"&gt;
+        $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.title'))
+      &lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;!-- Tab panes --&gt;
+  &lt;div class="tab-content"&gt;
+    &lt;div role="tabpanel" class="tab-pane active" id="standard"&gt;
+     &lt;form class="xform"&gt;
+     &lt;dl&gt;
+       #if ($defaultImageStylesActive)
+        &lt;dt&gt;
+          &lt;label for="imageStyles"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label'))
+          &lt;/label&gt;
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint'))
+          &lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'), 
+            {'type': 'text/css', 'rel': 'stylesheet'}))
+          #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+          #set ($discard = $xwiki.ssx.use('CKEditor.ImageEditorService'))
+          &lt;select id="imageStyles"&gt;&lt;/select&gt;
+        &lt;/dd&gt;
+       #end
+        &lt;dt&gt;
+          &lt;label for="altText"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.alt.label'))
+          &lt;/label&gt;
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.alt.hint'))
+          &lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;input id="altText" name="altText" value="" type="text" /&gt;
+        &lt;/dd&gt;
+        #if ($request.isHTML5 == 'true')
+        &lt;dt&gt;
+          &lt;label for="imageCaptionActivation"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.caption.label'))
+          &lt;/label&gt;
+          &lt;span class="xHint"&gt;
+            $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.caption.hint'))
+          &lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;div class="input-group"&gt;
+            &lt;input type="checkbox" 
+              aria-label="$escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel'))"
+              id="imageCaptionActivation" /&gt;
+          &lt;!-- TODO: Add support for editing the caption directly from the dialog (see CKEDITOR-435) --&gt;
+        &lt;/dd&gt;
+        #end
+      &lt;/dl&gt;
+     &lt;/form&gt;
+    &lt;/div&gt;
+    &lt;div role="tabpanel" class="tab-pane" id="advanced"&gt;
+      &lt;form class="xform"&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.label'))
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;label&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.width.label'))
+              &lt;input type="text" name="imageWidth" id="imageWidth" /&gt;
+            &lt;/label&gt;
+            &lt;label&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.size.height.label'))
+              &lt;input type="text" name="imageHeight" id="imageHeight" /&gt;
+            &lt;/label&gt;
+            &lt;button type="button" class="btn btn-default image-size-lock image-size-locked"&gt;
+                $services.icon.renderHTML('lock')
+            &lt;/button&gt;
+            &lt;button type="button" class="btn btn-default image-size-lock image-size-unlocked hidden"&gt;
+                $services.icon.renderHTML('unlock')
+            &lt;/button&gt;
+          &lt;/dd&gt;
+          &lt;dd class='hidden has-warning'&gt;
+            &lt;span class="help-block outscaleWarning"&gt;&lt;/span&gt;
+          &lt;/dd&gt;
+          &lt;dt&gt;
+            &lt;label for="imageBorder"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.border.label'))
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.border.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;input type="checkbox" name="imageBorder" id="imageBorder" /&gt;
+          &lt;/dd&gt;
+          &lt;dt&gt;
+            &lt;label for="imageAlignment"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.label'))
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd class="alignments"&gt;
+            &lt;label&gt;
+              #set ($noneOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none')))
+              &lt;input type="radio" name="alignment" value="none"/&gt;$noneOptionLabel
+            &lt;/label&gt;
+            &lt;label&gt;
+              #set ($startOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start')))
+              &lt;input type="radio" name="alignment" value="start"/&gt;$startOptionLabel
+            &lt;/label&gt;
+            &lt;label&gt;
+              #set ($centerOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center')))
+              &lt;input type="radio" name="alignment" value="center"/&gt;$centerOptionLabel
+            &lt;/label&gt;
+            &lt;label&gt;
+              #set ($endOptionLabel = $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end')))
+              &lt;input type="radio" name="alignment" value="end"/&gt;$endOptionLabel
+            &lt;/label&gt;
+          &lt;/dd&gt;
+          &lt;dt&gt;
+            &lt;label for="textWrap"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label'))
+            &lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;input type="checkbox" name="textWrap" id="textWrap" /&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+#end
+{{/velocity}}
+
+{{velocity output='false'}}
+#if ($xcontext.action == 'get')
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#end
+{{/velocity}}</content>
+  <object>
+    <name>CKEditor.ImageEditorService</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>800e4dc8-ee31-4b3c-a404-f68de85f06d5</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#advanced .image-size-lock {
+  margin-top: -2px;
+}
+
+#advanced .alignments label {
+  margin-right: 1em;
+}
+
+#standard .xform, #advanced .xform {
+  margin-top: floor(@font-size-base * 1.4);
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.ImageEditorService</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>4eed366c-fdfd-435b-a0ed-c502e0e939c0</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+{{html}}
+&lt;div class="hidden"&gt;
+&lt;input type="hidden" name="defaultImageStylesRestURL" id="defaultImageStylesRestURL"
+  value="$escapetool.xml($services.imageStyle.getDefaultImageStyleRestPath())" /&gt;
+&lt;input type="hidden" name="imageStylesRestURL" id="imageStylesRestURL"
+  value="$escapetool.xml($services.imageStyle.getImageStylesRestPath())" /&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.ckeditor.imageEditorService.template.header.after</name>
+    </property>
+    <property>
+      <parameters/>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

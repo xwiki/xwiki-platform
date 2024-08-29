@@ -19,17 +19,21 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link DefaultEvent}.
  * 
  * @version $Id$
  */
-public class DefaultEventTest
+class DefaultEventTest
 {
     @Test
     void equals()
@@ -57,5 +61,28 @@ public class DefaultEventTest
         event2.setId("id1");
 
         assertEquals(event1, event2);
+    }
+
+    @Test
+    void getParameters()
+    {
+        DefaultEvent event = new DefaultEvent();
+
+        assertTrue(event.getParameters().isEmpty());
+
+        Map<String, Object> custom = new HashMap<>();
+        custom.put("key1", "value");
+        custom.put("key2", null);
+        custom.put("key3", 42);
+
+        event.setCustom(custom);
+
+        Map<String, String> parameters = event.getParameters();
+
+        assertEquals(3, parameters.size());
+        assertEquals("value", parameters.get("key1"));
+        assertTrue(parameters.containsKey("key2"));
+        assertEquals(null, parameters.get("key2"));
+        assertEquals("42", parameters.get("key3"));
     }
 }

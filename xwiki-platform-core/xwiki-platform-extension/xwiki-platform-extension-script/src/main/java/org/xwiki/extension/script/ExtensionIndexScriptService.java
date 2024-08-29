@@ -27,12 +27,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.index.ExtensionIndex;
 import org.xwiki.extension.index.IndexedExtensionQuery;
 import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
 
 /**
- * Various script APIs related to installed extensions.
+ * Various script APIs related to indexed extensions.
  * 
  * @version $Id$
- * @since 5.3M1
+ * @since 12.10
  */
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID)
@@ -49,6 +52,9 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
      */
     @Inject
     private ExtensionIndex index;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
 
     /**
      * @return the extensions index
@@ -68,5 +74,19 @@ public class ExtensionIndexScriptService extends AbstractExtensionScriptService
     public IndexedExtensionQuery newQuery(String query)
     {
         return new IndexedExtensionQuery(query);
+    }
+
+    /**
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
+     * @since 15.5RC1
+     */
+    @SuppressWarnings("unchecked")
+    @Unstable
+    public <S extends ScriptService> S get(String serviceName)
+    {
+        return (S) this.scriptServiceManager.get(
+            ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionIndexScriptService.ID + '.' + serviceName);
     }
 }

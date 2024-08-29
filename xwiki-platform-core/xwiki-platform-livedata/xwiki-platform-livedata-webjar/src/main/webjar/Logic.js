@@ -30,12 +30,12 @@ define('xwiki-livedata', [
 ], function(
   Vue,
   VueI18n,
-  XWikiLivedata,
-  liveDataSource,
+  xwikiLivedataVue,
+  liveDataSourceModule,
   jsonMerge,
   editBus
 ) {
-
+  const XWikiLivedata = xwikiLivedataVue.XWikiLivedata;
   /**
    * Make vue use the i18n plugin
    */
@@ -53,7 +53,7 @@ define('xwiki-livedata', [
   /**
    * The init function of the logic script
    * For each livedata element on the page, returns its corresponding data / API
-   * If the data does not exists yet, create it from the element
+   * If the data does not exist yet, create it from the element
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata component
    */
   const init = function (element) {
@@ -96,6 +96,12 @@ define('xwiki-livedata', [
     }
   }
 
+  // Initializes a promise to be resolved once the translations loading is done.
+  var translationsLoadedResolve;
+  const translationsLoaded = new Promise((resolve) => {
+    translationsLoadedResolve = resolve;
+  });
+
   /**
    * Class for a logic element
    * Contains the Livedata data object and methods to mutate it
@@ -103,8 +109,15 @@ define('xwiki-livedata', [
    * @param {HTMLElement} element The HTML Element corresponding to the Livedata
    */
   const Logic = function (element) {
+    // Make sure to have one Live Data source instance per Live Data instance. 
+    this.liveDataSource = liveDataSourceModule.init();
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-config") || "{}");
+    this.contentTrusted = element.getAttribute("data-config-content-trusted") === "true"; 
+    this.data.entries = Object.freeze(this.data.entries);
+
+    // Reactive properties must be initialized before Vue is instantiated.
+    this.firstEntriesLoading = true;
     this.currentLayoutId = "";
     this.changeLayout(this.data.meta.defaultLayout);
     this.entrySelection = {
@@ -114,6 +127,7 @@ define('xwiki-livedata', [
     };
     this.openedPanels = [];
     this.footnotes = new FootnotesService();
+    this.panels = [];
 
     element.removeAttribute("data-config");
 
@@ -125,9 +139,13 @@ define('xwiki-livedata', [
       silentFallbackWarn: true,
     });
 
+    // Vue.js replaces the container - prevent this by creating a placeholder for Vue.js to replace.
+    const placeholderElement = document.createElement('div');
+    this.element.appendChild(placeholderElement);
+
     // create Vuejs instance
-    new Vue({
-      el: this.element,
+    const vue = new Vue({
+      el: placeholderElement,
       components: {
         "XWikiLivedata": XWikiLivedata,
       },
@@ -136,9 +154,33 @@ define('xwiki-livedata', [
       data: {
         logic: this
       },
+      mounted()
+      {
+        element.classList.remove('loading');
+        // Trigger the "instanceCreated" event on the next tick to ensure that the constructor has returned and thus
+        // all references to the logic instance have been initialized.
+        this.$nextTick(function () {
+          this.logic.triggerEvent('instanceCreated', {});
+        });
+      }
     });
 
-    editBus.init(this);
+    // Fetch the data if we don't have any. This call must be made just after the main Vue component is initialized as 
+    // LivedataPersistentConfiguration must be mounted for the persisted filters to be loaded and applied when fetching 
+    // the entries.
+    // We use a dedicated field (firstEntriesLoading) for the first load as the fetch start/end events can be triggered 
+    // before the loader components is loaded (and in this case the loader is never hidden even once the entries are
+    // displayed).
+    if (!this.data.data.entries.length) {
+      this.updateEntries()
+        // Mark the loader as finished, even if it fails as the loader should stop and a message be displayed to the 
+        // user in this case.
+        .finally(() => this.firstEntriesLoading = false);
+    } else {
+      this.firstEntriesLoading = false;
+    }
+
+    this.setEditBus(editBus.init(this));
 
     /**
      * Load given translations from the server
@@ -155,7 +197,7 @@ define('xwiki-livedata', [
       this.loadTranslations[componentName] = true;
       // Fetch translation and load them.
       try {
-        const translations = await liveDataSource.getTranslations(locale, prefix, keys);
+        const translations = await this.liveDataSource.getTranslations(locale, prefix, keys);
         i18n.mergeLocaleMessage(locale, translations)
       } catch (error) {
         console.error(error);
@@ -163,7 +205,7 @@ define('xwiki-livedata', [
     }
 
     // Load needed translations for the Livedata
-    this.loadTranslations({
+    const translationsPromise = this.loadTranslations({
       prefix: "livedata.",
       keys: [
         "dropdownMenu.title",
@@ -177,8 +219,11 @@ define('xwiki-livedata', [
         "selection.infoBar.selectedCount",
         "selection.infoBar.allSelected",
         "selection.infoBar.allSelectedBut",
+        "pagination.label",
+        "pagination.label.empty",
         "pagination.currentEntries",
         "pagination.pageSize",
+        "pagination.selectPageSize",
         "pagination.page",
         "pagination.first",
         "pagination.previous",
@@ -186,7 +231,8 @@ define('xwiki-livedata', [
         "pagination.last",
         "action.refresh",
         "action.addEntry",
-        "action.reorder.hint",
+        "action.columnName.sortable.hint",
+        "action.columnName.default.hint",
         "action.resizeColumn.hint",
         "panel.filter.title",
         "panel.filter.noneFilterable",
@@ -207,17 +253,62 @@ define('xwiki-livedata', [
         "displayer.boolean.false",
         "displayer.xObjectProperty.missingDocumentName.errorMessage",
         "displayer.xObjectProperty.failedToRetrieveField.errorMessage",
+        "displayer.actions.edit",
+        "displayer.actions.followLink",
+        "filter.boolean.label",
+        "filter.date.label",
+        "filter.list.label",
         "filter.list.emptyLabel",
+        "filter.number.label",
+        "filter.text.label",
         "footnotes.computedTitle",
         "footnotes.propertyNotViewable",
-        "bottombar.noEntries"
+        "bottombar.noEntries",
+        "error.updateEntriesFailed"
       ],
+    }).then(() => {
+      translationsLoadedResolve(true);
     });
 
-    // Fetch the data if we don't have any.
-    if (!this.data.data.entries.length) {
-      this.updateEntries();
+    // Return a translation only once the translations have been loaded from the server.
+    this.translate = async (key, ...args) => {
+      // Make sure that the translations are loaded from the server before translating.
+      await translationsPromise;
+      return vue.$t(key, args);
     }
+    
+    // Waits for the translations to be loaded before continuing.
+    this.translationsLoaded = async() => {
+      await translationsPromise;
+    }
+
+    // Registers panels once the translations have been loadded as they are otherwise hard to update.
+    this.translationsLoaded().finally(() => {
+      this.registerPanel({
+        id: 'propertiesPanel',
+        title: vue.$t('livedata.panel.properties.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.properties'),
+        icon: 'list-bullets',
+        component: 'LivedataAdvancedPanelProperties',
+        order: 1000
+      });
+      this.registerPanel({
+        id: 'sortPanel',
+        title: vue.$t('livedata.panel.sort.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.sort'),
+        icon: 'table_sort',
+        component: 'LivedataAdvancedPanelSort',
+        order: 2000
+      });
+      this.registerPanel({
+        id: 'filterPanel',
+        title: vue.$t('livedata.panel.filter.title'),
+        name: vue.$t('livedata.dropdownMenu.panels.filter'),
+        icon: 'filter',
+        component: 'LivedataAdvancedPanelFilter',
+        order: 3000
+      });
+    });
   };
 
 
@@ -413,7 +504,7 @@ define('xwiki-livedata', [
       const propertyDescriptor = this.data.meta.propertyDescriptors
         .find(propertyDescriptor => propertyDescriptor.id === propertyId);
       if (!propertyDescriptor) {
-        console.error("Property descriptor of property `" + propertyId + "` does not exists");
+        console.error("Property descriptor of property `" + propertyId + "` does not exist");
       }
       return propertyDescriptor;
     },
@@ -499,23 +590,38 @@ define('xwiki-livedata', [
       // Before fetch event
       this.triggerEvent("beforeEntryFetch");
       // Fetch entries from data source
-      return liveDataSource.getEntries(this.data.query)
+      return this.liveDataSource.getEntries(this.data.query)
         .then(data => {
           // After fetch event
-          this.triggerEvent("afterEntryFetch");
           return data
-        });
+        })
+        .finally(() => this.triggerEvent("afterEntryFetch"));
     },
 
 
     updateEntries () {
       return this.fetchEntries()
         .then(data => {
-          this.data.data = data
+          this.data.data = Object.freeze(data);
+          Vue.nextTick(() => this.triggerEvent('entriesUpdated', {}));
           // Remove the outdated footnotes, they will be recomputed by the new entries.
           this.footnotes.reset()
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          // Prevent undesired notifications of the end user for non business related errors (for instance, the user
+          // left the page before the request was completed).
+          // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+          if (err.readyState === 4) {
+            this.translate('livedata.error.updateEntriesFailed')
+              .then(value => new XWiki.widgets.Notification(value, 'error'));
+          }
+          
+          // Do not log if the request has been aborted (e.g., because a second request was started for the same LD with
+          // new criteria).
+          if(err.statusText !== 'abort') {
+            console.error('Failed to fetch the entries', err);
+          }
+        });
     },
 
 
@@ -587,7 +693,7 @@ define('xwiki-livedata', [
       const entryId = this.getEntryId(entry);
       // Once the entry updated, reload the whole livedata because changing a single entry can have an impact on other 
       // properties of the entry, but also possibly on other entriers, or in the way they are sorted.
-      liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
+      this.liveDataSource.updateEntryProperty(source, entryId, propertyId, entry[propertyId])
         .then(() => this.updateEntries());
     },
 
@@ -598,7 +704,7 @@ define('xwiki-livedata', [
      */
     setValues({entryId, values}) {
       const source = this.data.query.source;
-      return liveDataSource.updateEntry(source, entryId, values)
+      return this.liveDataSource.updateEntry(source, entryId, values)
         .then(() => this.updateEntries());
 
     },
@@ -1408,11 +1514,63 @@ define('xwiki-livedata', [
     },
     
     //
+    // Translations
+    //
+
+    /**
+     * @returns {Promise<boolean>} the promise is resolved to true once the translations are loaded
+     */
+    translationsLoaded() {
+      return translationsLoaded;
+    },
+    
+    //
     // Edit Bus
     //
 
+    setEditBus(editBusInstance) {
+      this.editBusInstance = editBusInstance;
+    },
+
     getEditBus() {
-      return editBus;
+      return this.editBusInstance;
+    },
+
+    /**
+     * Registers a panel.
+     *
+     * The panel must have the following attributes:
+     * * id: the id of the panel, must be unique among all panels, also used as suffix of the class on the panel
+     * * name: the name that shall be shown in the menu
+     * * title: the title that shall be displayed in the title bar of the panel
+     * * icon: the name of the icon for the menu and the title of the panel
+     * * container: the Element that shall be attached to the extension panel's body, this should contain the main UI
+     * * component: the component of the panel, should be "LiveDataAdvancedPanelExtension" for extension panels
+     * * order: the ordering number, panels are sorted by this number in ascending order
+     *
+     * @param {Object} panel the panel to add
+     */
+    registerPanel(panel)
+    {
+      // Basic insertion sorting to avoid shuffling the (reactive) array.
+      const index = this.panels.findIndex(p => p.order > panel.order);
+      if (index === -1) {
+        this.panels.push(panel);
+      } else {
+        this.panels.splice(index, 0, panel);
+      }
+    },
+
+    //
+    // Content status
+    //
+
+    /**
+     * @returns {boolean} when false, the content is not trusted will be sanitized whenever Vue integrated escaping
+     * is not enough. When true, the content is never sanitized
+     */
+    isContentTrusted() {
+      return this.contentTrusted;
     }
   };
 

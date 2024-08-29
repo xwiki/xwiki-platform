@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -36,14 +36,19 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters.Author;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -64,6 +69,15 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     @Inject
     private BeanManager beans;
 
+    @Inject
+    private TransformationManager transformationManager;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    protected AuthorizationManager authorization;
+
     /**
      * Default constructor.
      */
@@ -71,10 +85,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     {
         super("Include", DESCRIPTION, IncludeMacroParameters.class);
 
-        // The include macro must execute first since if it runs with the current context it needs to bring
-        // all the macros from the included page before the other macros are executed.
-        setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -88,8 +99,8 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        EntityReference includedReference = resolve(context.getCurrentMacroBlock(), parameters.getReference(),
-            parameters.getType(), "include");
+        EntityReference includedReference =
+            resolve(context.getCurrentMacroBlock(), parameters.getReference(), parameters.getType(), "include");
         checkRecursion(context.getCurrentMacroBlock(), includedReference);
 
         // Step 2: Retrieve the included document.
@@ -103,10 +114,10 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         }
 
         // Step 3: Check right
-        if (!this.authorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
+        if (!this.contextualAuthorization.hasAccess(Right.VIEW, documentBridge.getDocumentReference())) {
             throw new MacroExecutionException(
                 String.format("Current user [%s] doesn't have view rights on document [%s]",
-                    this.documentAccessBridge.getCurrentUserReference(), includedReference));
+                    this.documentAccessBridge.getCurrentUserReference(), documentBridge.getDocumentReference()));
         }
 
         // Step 4: Display the content of the included document.
@@ -126,6 +137,9 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
         displayParameters.setContentTranslated(true);
+        if (context.getXDOM() != null) {
+            displayParameters.setIdGenerator(context.getXDOM().getIdGenerator());
+        }
 
         Stack<Object> references = this.macrosBeingExecuted.get();
         if (parametersContext == Context.NEW) {
@@ -133,7 +147,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                 references = new Stack<>();
                 this.macrosBeingExecuted.set(references);
             }
-            references.push(includedReference);
+            references.push(documentBridge.getDocumentReference());
         }
 
         XDOM result;
@@ -146,7 +160,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                 references.pop();
             }
         }
-        
+
         // Step 5: If the user has asked for it, remove both Section and Heading Blocks if the first included block is
         // a Section block with a Heading block inside.
         if (parameters.isExcludeFirstHeading()) {
@@ -156,10 +170,48 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
-        String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
+        // Serialize the document reference since that's what is expected in those properties
+        // TODO: add support for more generic source and base reference (object property reference, etc.)
+        String source = this.defaultEntityReferenceSerializer.serialize(documentBridge.getDocumentReference());
         metadata.getMetaData().addMetaData(MetaData.SOURCE, source);
         if (parametersContext == Context.NEW) {
             metadata.getMetaData().addMetaData(MetaData.BASE, source);
+        }
+
+        if (parametersContext == Context.CURRENT) {
+            // Step 7: If the include macro is explicitly configured to be executed with the included document content
+            // author or if that author does not have programming right, execute it right away
+            // Get the translated version of the document to get the content author
+            DocumentModelBridge translatedDocumentBridge;
+            try {
+                translatedDocumentBridge = this.documentAccessBridge.getTranslatedDocumentInstance(documentBridge);
+            } catch (Exception e) {
+                throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
+            }
+            if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
+                .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
+                // Merge the two XDOM before executing the included content so that it's as close as possible to the
+                // expect execution conditions
+                MacroBlock includeMacro = context.getCurrentMacroBlock();
+                MacroMarkerBlock includeMacroMarker = new MacroMarkerBlock(includeMacro.getId(),
+                    includeMacro.getParameters(), Collections.singletonList(metadata), includeMacro.isInline());
+                includeMacro.getParent().replaceChild(includeMacroMarker, includeMacro);
+
+                try {
+                    // Execute the content with the right author
+                    // Keep the same transformation context
+                    this.authorExecutor.call(() -> {
+                        this.transformationManager.performTransformations(metadata, context.getTransformationContext());
+                        return null;
+                    }, translatedDocumentBridge.getContentAuthorReference(), documentBridge.getDocumentReference());
+                } catch (Exception e) {
+                    throw new MacroExecutionException("Failed to execute tranformations for document ["
+                        + translatedDocumentBridge.getDocumentReference() + "]");
+                } finally {
+                    // Put back the macro in the main XDOM (it will be replaced that the current macro transformation)
+                    includeMacroMarker.getParent().replaceChild(includeMacro, includeMacroMarker);
+                }
+            }
         }
 
         return Collections.singletonList(metadata);

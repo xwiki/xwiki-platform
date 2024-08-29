@@ -21,10 +21,18 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.util.Arrays;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
+import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
@@ -37,97 +45,86 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 10.10RC1
  */
-public abstract class AbstractExtension
+public abstract class AbstractExtension implements BeforeAllCallback, AfterAllCallback,
+    BeforeEachCallback, AfterEachCallback, ParameterResolver, TestExecutionExceptionHandler, ExecutionCondition
 {
-    private static final ExtensionContext.Namespace NAMESPACE =
-        ExtensionContext.Namespace.create(XWikiDockerExtension.class);
-
-    private static ExtensionContext.Store getStore(ExtensionContext context)
-    {
-        return context.getRoot().getStore(NAMESPACE);
-    }
-
     protected void saveXWikiWebDriver(ExtensionContext context, XWikiWebDriver xwikiWebDriver)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         store.put(XWikiWebDriver.class, xwikiWebDriver);
     }
 
     protected XWikiWebDriver loadXWikiWebDriver(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(XWikiWebDriver.class, XWikiWebDriver.class);
     }
 
     protected void saveVNC(ExtensionContext context, VncRecordingContainer vnc)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         store.put(VncRecordingContainer.class, vnc);
     }
 
     protected VncRecordingContainer loadVNC(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(VncRecordingContainer.class, VncRecordingContainer.class);
     }
 
     protected void saveBrowserWebDriverContainer(ExtensionContext context, BrowserWebDriverContainer<?> container)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         store.put(BrowserWebDriverContainer.class, container);
     }
 
     protected void saveXWikiURL(ExtensionContext context, String xwikiURL)
     {
-        ExtensionContext.Store store = getStore(context);
-        store.put(String.class, xwikiURL);
+        DockerTestUtils.setXWikiURL(context, xwikiURL);
     }
 
     protected BrowserWebDriverContainer loadBrowserWebDriverContainer(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(BrowserWebDriverContainer.class, BrowserWebDriverContainer.class);
     }
 
     protected String loadXWikiURL(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(String.class, String.class);
+        return DockerTestUtils.getXWikiURL(context);
     }
 
     protected void savePersistentTestContext(ExtensionContext context, PersistentTestContext testContext)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         store.put(PersistentTestContext.class, testContext);
     }
 
     protected PersistentTestContext loadPersistentTestContext(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(PersistentTestContext.class, PersistentTestContext.class);
     }
 
     protected void saveTestConfiguration(ExtensionContext context, TestConfiguration configuration)
     {
-        ExtensionContext.Store store = getStore(context);
-        store.put(TestConfiguration.class, configuration);
+        DockerTestUtils.setTestConfiguration(context, configuration);
     }
 
     protected TestConfiguration loadTestConfiguration(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
-        return store.get(TestConfiguration.class, TestConfiguration.class);
+        return DockerTestUtils.getTestConfiguration(context);
     }
 
     protected void saveServletContainerExecutor(ExtensionContext context, ServletContainerExecutor executor)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         store.put(ServletContainerExecutor.class, executor);
     }
 
     protected ServletContainerExecutor loadServletContainerExecutor(ExtensionContext context)
     {
-        ExtensionContext.Store store = getStore(context);
+        ExtensionContext.Store store = DockerTestUtils.getStore(context);
         return store.get(ServletContainerExecutor.class, ServletContainerExecutor.class);
     }
 
@@ -158,4 +155,18 @@ public abstract class AbstractExtension
         }
     }
 
+    protected void mergeTestConfigurationInGlobalContext(TestConfiguration testConfiguration, ExtensionContext context)
+    {
+        // Allow extensions to contribute a dynamically-generated TestConfiguration by storing it in the GLOBAL
+        // test context. This allows test writers to provide dynamically-generated configuration before XWiki is
+        // started (e.g. to set the URL and port for an ElasticSearch instance for active installs).
+        ExtensionContext.Store globalStore = context.getStore(ExtensionContext.Namespace.GLOBAL);
+        if (globalStore.get(TestConfiguration.class) != null) {
+            try {
+                testConfiguration.merge((TestConfiguration) globalStore.get(TestConfiguration.class));
+            } catch (DockerTestException e) {
+                throw new RuntimeException("Failed to merge Test Configuration from the global test context store", e);
+            }
+        }
+    }
 }

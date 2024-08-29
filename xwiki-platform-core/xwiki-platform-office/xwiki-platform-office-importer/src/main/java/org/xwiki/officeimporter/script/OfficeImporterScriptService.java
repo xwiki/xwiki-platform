@@ -19,38 +19,36 @@
  */
 package org.xwiki.officeimporter.script;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
+import org.xwiki.officeimporter.internal.ModelBridge;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServer.ServerState;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the office importer APIs to server-side scripts.
@@ -79,19 +77,6 @@ public class OfficeImporterScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
-
-    /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * Used for converting string document names to objects.
-     */
-    @Inject
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     /**
      * Used to query office server status.
@@ -132,6 +117,12 @@ public class OfficeImporterScriptService implements ScriptService
     @Inject
     private ExtendedRenderingConfiguration extendedRenderingConfiguration;
 
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @Inject
+    private ModelBridge modelBridge;
+
     /**
      * Imports the given office document into an {@link XHTMLOfficeDocument}.
      * 
@@ -156,27 +147,6 @@ public class OfficeImporterScriptService implements ScriptService
             logger.error(ex.getMessage(), ex);
         }
         return null;
-    }
-
-    /**
-     * Imports the given office document into an {@link XHTMLOfficeDocument}.
-     * 
-     * @param officeFileStream binary data stream corresponding to input office document
-     * @param officeFileName name of the input office document, this argument is mainly used for determining input
-     *            document format where necessary
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this argument affects
-     *            the attachment URLs generated during the import process where all references to attachments will be
-     *            calculated assuming that the attachments are contained on the reference document
-     * @param filterStyles whether to filter styling information associated with the office document's content or not
-     * @return {@link XHTMLOfficeDocument} containing xhtml result of the import operation or null if an error occurs
-     * @since 2.2M1
-     * @deprecated use {@link #officeToXHTML(InputStream, String, DocumentReference, boolean)} instead
-     */
-    public XHTMLOfficeDocument officeToXHTML(InputStream officeFileStream, String officeFileName,
-        String referenceDocument, boolean filterStyles)
-    {
-        return officeToXHTML(officeFileStream, officeFileName,
-            this.currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
     }
 
     /**
@@ -229,27 +199,6 @@ public class OfficeImporterScriptService implements ScriptService
     }
 
     /**
-     * Imports the given office document into an {@link XDOMOfficeDocument}.
-     * 
-     * @param officeFileStream binary data stream corresponding to input office document
-     * @param officeFileName name of the input office document, this argument is mainly is used for determining input
-     *            document format where necessary
-     * @param referenceDocument reference wiki document w.r.t which import process is carried out; this srgument affects
-     *            the attachment URLs generated during the import process where all references to attachments will be
-     *            calculated assuming that the attachments are contained on the reference document
-     * @param filterStyles whether to filter styling information associated with the office document's content or not
-     * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
-     *         operation or null if an error occurs
-     * @deprecated use {@link #officeToXDOM(InputStream, String, DocumentReference, boolean)} instead
-     */
-    public XDOMOfficeDocument officeToXDOM(InputStream officeFileStream, String officeFileName,
-        String referenceDocument, boolean filterStyles)
-    {
-        return officeToXDOM(officeFileStream, officeFileName,
-            this.currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
-    }
-
-    /**
      * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
      * specified criterion. This method is useful when a single office document has to be imported and split into
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
@@ -268,12 +217,46 @@ public class OfficeImporterScriptService implements ScriptService
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
         String[] headingLevels, String namingCriterionHint, DocumentReference rootDocumentReference)
     {
+        String defaultDocumentName =
+            this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+        boolean useTerminalPages = !defaultDocumentName.equals(rootDocumentReference.getName());
+        return split(xdomDocument, headingLevels, namingCriterionHint, useTerminalPages, rootDocumentReference);
+    }
+
+    /**
+     * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
+     * specified criterion. This method is useful when a single office document has to be imported and split into
+     * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
+     * {@link TargetDocumentDescriptor} entry.
+     *
+     * @param xdomDocument {@link XDOMOfficeDocument} to be split
+     * @param headingLevels heading levels defining the split points on the original document
+     * @param namingCriterionHint hint indicating the child pages naming criterion
+     * @param useTerminalPages whether to create the child pages as terminal or not
+     * @param rootDocumentReference the reference of the root document w.r.t which splitting will occur; in the results
+     *            set the entry corresponding to the <b>root document</b> {@link TargetDocumentDescriptor} will hold an
+     *            auto-generated TOC structure
+     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
+     *         instances or null if an error occurs
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
+        String[] headingLevels, String namingCriterionHint, boolean useTerminalPages,
+        DocumentReference rootDocumentReference)
+    {
         int[] splitLevels = new int[headingLevels.length];
         for (int i = 0; i < headingLevels.length; i++) {
             splitLevels[i] = Integer.parseInt(headingLevels[i]);
         }
+        OfficeDocumentSplitterParameters parameters = new OfficeDocumentSplitterParameters();
+        parameters.setHeadingLevelsToSplit(splitLevels);
+        parameters.setNamingCriterionHint(namingCriterionHint);
+        parameters.setUseTerminalPages(useTerminalPages);
+        parameters.setBaseDocumentReference(rootDocumentReference);
         try {
-            return this.xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint, rootDocumentReference);
+            return this.xdomSplitter.split(xdomDocument, parameters);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -282,31 +265,25 @@ public class OfficeImporterScriptService implements ScriptService
     }
 
     /**
-     * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
-     * specified criterion. This method is useful when a single office document has to be imported and split into
-     * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
-     * {@link TargetDocumentDescriptor} entry.
-     * 
-     * @param xdomDocument {@link XDOMOfficeDocument} to be split
-     * @param headingLevels heading levels defining the split points on the original document
-     * @param namingCriterionHint hint indicating the child pages naming criterion
-     * @param rootDocumentName name of the root document w.r.t which splitting will occur; in the results set the entry
-     *            corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated
-     *            TOC structure
-     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
-     *         instances or null if an error occurs
-     * @deprecated use {@link #split(XDOMOfficeDocument, String[], String, DocumentReference)} instead
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using the
+     * default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
+     *
+     * @param doc {@link XDOMOfficeDocument} to be saved
+     * @param documentReference the reference of the target wiki page
+     * @param append whether to append content if the target wiki page exists
+     * @return true if the operation completes successfully, false otherwise
+     * @since 14.10.2
+     * @since 15.0RC1
      */
-    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
-        String[] headingLevels, String namingCriterionHint, String rootDocumentName)
+    @Unstable
+    public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, boolean append)
     {
-        return split(xdomDocument, headingLevels, namingCriterionHint,
-            this.currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
+        return save(doc, documentReference, null, null, append);
     }
 
     /**
-     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using
-     * the default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments (using the
+     * default content syntax, see {@link ExtendedRenderingConfiguration#getDefaultContentSyntax()}).
      *
      * @param doc {@link XDOMOfficeDocument} to be saved
      * @param documentReference the reference of the target wiki page
@@ -340,50 +317,7 @@ public class OfficeImporterScriptService implements ScriptService
         DocumentReference parentReference, String title, boolean append)
     {
         try {
-            // First check if the user has edit rights on the target document.
-            if (!this.docBridge.isDocumentEditable(documentReference)) {
-                String message = "You do not have edit rights on [%s] document.";
-                throw new OfficeImporterException(String.format(message, documentReference));
-            }
-
-            // Save.
-            if (this.docBridge.exists(documentReference) && append) {
-                // Check whether existing document's syntax is same as target syntax.
-                String currentSyntaxId =
-                    this.docBridge.getTranslatedDocumentInstance(documentReference).getSyntax().toIdString();
-                if (!currentSyntaxId.equals(syntaxId)) {
-                    String message =
-                        "The target page [%s] exists but its syntax [%s] is different from the specified syntax [%s]";
-                    throw new OfficeImporterException(String.format(message, documentReference, currentSyntaxId,
-                        syntaxId));
-                }
-
-                // Append the content.
-                String currentContent = this.docBridge.getDocumentContent(documentReference, null);
-                String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
-                this.docBridge.setDocumentContent(documentReference, newContent, "Updated by office importer.", false);
-            } else {
-                this.docBridge.setDocumentSyntaxId(documentReference, syntaxId);
-                this.docBridge.setDocumentContent(documentReference, doc.getContentAsString(syntaxId),
-                    "Created by office importer.", false);
-
-                // Set parent if provided.
-                if (null != parentReference) {
-                    this.docBridge.setDocumentParentReference(documentReference, parentReference);
-                }
-
-                // If no title is specified, try to extract one.
-                String docTitle = (null == title) ? doc.getTitle() : title;
-
-                // Set title if applicable.
-                if (null != docTitle) {
-                    this.docBridge.setDocumentTitle(documentReference, docTitle);
-                }
-            }
-
-            // Finally attach all the artifacts into target document.
-            attachArtifacts(doc.getArtifactsFiles(), documentReference);
-
+            this.modelBridge.save(doc, documentReference, syntaxId, parentReference, title, append);
             return true;
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -395,26 +329,6 @@ public class OfficeImporterScriptService implements ScriptService
             logger.error(message, ex);
         }
         return false;
-    }
-
-    /**
-     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments.
-     * 
-     * @param doc {@link XDOMOfficeDocument} to be saved
-     * @param target name of the target wiki page
-     * @param syntaxId syntax of the target wiki page
-     * @param parent name of the parent wiki page or null
-     * @param title title of the target wiki page or null
-     * @param append whether to append content if the target wiki page exists
-     * @return true if the operation completes successfully, false otherwise
-     * @deprecated use {@link #save(XDOMOfficeDocument, DocumentReference, String, DocumentReference, String, boolean)}
-     *             instead
-     */
-    public boolean save(XDOMOfficeDocument doc, String target, String syntaxId, String parent, String title,
-        boolean append)
-    {
-        return save(doc, this.currentMixedDocumentReferenceResolver.resolve(target), syntaxId,
-            this.currentMixedDocumentReferenceResolver.resolve(parent), title, append);
     }
 
     /**
@@ -456,26 +370,6 @@ public class OfficeImporterScriptService implements ScriptService
             }
             if (!connected) {
                 throw new OfficeImporterException("Office server unavailable.");
-            }
-        }
-    }
-
-    /**
-     * Utility method for attaching artifacts into a wiki page.
-     * 
-     * @param artifactFiles set of artifact files.
-     * @param targetDocumentReference target wiki page into which artifacts are to be attached
-     */
-    private void attachArtifacts(Set<File> artifactFiles, DocumentReference targetDocumentReference)
-    {
-        for (File artifact : artifactFiles) {
-            AttachmentReference attachmentReference =
-                new AttachmentReference(artifact.getName(), targetDocumentReference);
-            try (FileInputStream fis = new FileInputStream(artifact)) {
-                this.docBridge.setAttachmentContent(attachmentReference, IOUtils.toByteArray(fis));
-            } catch (Exception ex) {
-                // Log the error and skip the artifact.
-                logger.error("Error while attaching artifact.", ex);
             }
         }
     }

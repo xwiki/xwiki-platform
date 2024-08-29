@@ -54,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.xwiki.annotation.Annotation.SELECTION_FIELD;
 import static org.xwiki.mentions.MentionLocation.ANNOTATION;
-import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
+import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 import static org.xwiki.mentions.MentionLocation.COMMENT;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
@@ -225,7 +225,7 @@ public class UpdatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
             } else {
                 for (Object o : baseObject.getProperties()) {
                     if (o instanceof LargeStringProperty) {
-                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, AWM_FIELD, authorReference,
+                        handleProperty(oldBaseObject, (LargeStringProperty) o, version, TEXT_FIELD, authorReference,
                             syntax).ifPresent(mentionNotificationParametersList::add);
                     }
                 }

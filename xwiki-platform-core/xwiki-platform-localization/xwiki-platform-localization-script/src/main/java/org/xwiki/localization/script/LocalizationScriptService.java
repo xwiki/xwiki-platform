@@ -21,7 +21,6 @@ package org.xwiki.localization.script;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,16 +36,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.text.StringUtils;
@@ -74,13 +68,6 @@ public class LocalizationScriptService implements ScriptService
      */
     @Inject
     private LocalizationContext localizationContext;
-
-    /**
-     * Used to lookup renderers.
-     */
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManager;
 
     @Inject
     private Environment environment;
@@ -136,6 +123,16 @@ public class LocalizationScriptService implements ScriptService
     public Locale getCurrentLocale()
     {
         return this.localizationContext.getCurrentLocale();
+    }
+
+    /**
+     * @return the {@link Locale} configured as the default
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public Locale getDefaultLocale()
+    {
+        return this.localization.getDefaultLocale();
     }
 
     /**
@@ -357,12 +354,10 @@ public class LocalizationScriptService implements ScriptService
             return null;
         }
 
-        Translation translation = null;
-
+        String translation = null;
         for (String key : keys) {
             if (key != null) {
-                translation = this.localization.getTranslation(key, locale);
-
+                translation = getTranslation(key, syntax, parameters, locale);
                 if (translation != null) {
                     break;
                 }
@@ -370,28 +365,11 @@ public class LocalizationScriptService implements ScriptService
         }
 
         String result;
-
         if (translation != null) {
-            Block block =
-                parameters != null ? translation.render(locale, parameters.toArray()) : translation.render(locale);
-
-            // Render the block
-
-            try {
-                BlockRenderer renderer =
-                    this.componentManager.get().getInstance(BlockRenderer.class, syntax.toIdString());
-
-                DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
-                renderer.render(block, wikiPrinter);
-
-                result = wikiPrinter.toString();
-            } catch (ComponentLookupException e) {
-                // TODO set current error
-                result = null;
-            }
+            result = translation;
         } else {
+            // If no translations were found, or it couldn't be rendered, return the first non-null translation key.
             result = null;
-
             for (String key : keys) {
                 if (key != null) {
                     result = key;
@@ -410,23 +388,38 @@ public class LocalizationScriptService implements ScriptService
      */
     public Set<Locale> getAvailableLocales()
     {
-        Set<Locale> locales = new HashSet<>();
-        locales.addAll(Arrays.asList(Locale.getAvailableLocales()));
+        Set<Locale> locales = new HashSet<>(LocaleUtils.availableLocaleSet());
 
-        try (InputStream resource = environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt")) {
+        try (InputStream resource = this.environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt")) {
             LineIterator iterator = IOUtils.lineIterator(resource, StandardCharsets.US_ASCII);
             while (iterator.hasNext()) {
                 String line = iterator.nextLine();
                 if (StringUtils.isNotBlank(line)) {
-                    locales.add(new Locale(line));
+                    locales.add(LocaleUtils.toLocale(line));
                 }
             }
             iterator.close();
 
         } catch (Exception e) {
-            logger.warn("Exception while looking for XWiki Locales.", e);
+            this.logger.warn("Exception while looking for XWiki Locales.", e);
         }
 
         return locales;
+    }
+
+    private String getTranslation(String key, Syntax syntax, Collection<?> parameters, Locale locale)
+    {
+        String result;
+        try {
+            if (parameters == null) {
+                result = this.localization.getTranslation(key, locale, syntax);
+            } else {
+                result = this.localization.getTranslation(key, locale, syntax, parameters.toArray());
+            }
+        } catch (LocalizationException e) {
+            // TODO set current error
+            result = null;
+        }
+        return result;
     }
 }

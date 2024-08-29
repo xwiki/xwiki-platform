@@ -20,8 +20,11 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +39,9 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -65,6 +70,7 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(DefaultWikiMacro.class)
 class DefaultWikiMacroFactoryTest
 {
     private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
@@ -82,6 +88,10 @@ class DefaultWikiMacroFactoryTest
     @MockComponent
     private ContentParser contentParser;
 
+    @MockComponent
+    @Named("macro")
+    protected Transformation macroTransformation;
+
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
@@ -95,7 +105,7 @@ class DefaultWikiMacroFactoryTest
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "Test Macro");
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_DESCRIPTION_PROPERTY,
             "This is a macro used for testing purposes.");
-        this.macroObject.setStringValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY, "Test");
+        this.macroObject.setStringListValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORIES_PROPERTY, List.of("Test"));
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_VISIBILITY_PROPERTY, "Current User");
         this.macroObject.setIntValue(WikiMacroConstants.MACRO_INLINE_PROPERTY, 1);
         this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "No content");
@@ -129,7 +139,7 @@ class DefaultWikiMacroFactoryTest
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals(42, macro.getPriority());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
-        assertEquals("Test", macro.getDescriptor().getDefaultCategory());
+        assertEquals(Set.of("Test"), macro.getDescriptor().getDefaultCategories());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());

@@ -25,7 +25,7 @@
     #if ("$!panelClass" == "")
         #set ($panelClass = "default")
     #end
-    <div class="centered panel panel-$panelClass xwikimessage panel-body">
+    <div class="centered panel panel-$panelClass xwikimessage forgotusernamepanel">
       <div class="panel-heading">
         <div class="panel-title">$services.localization.render('xe.admin.forgotUsername.title')</div>
       </div>
@@ -36,82 +36,52 @@
     </div> ## xwikimessage
 #end
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
       #set($email = "$!request.get('e')")
       #if($email == '' || !$services.csrf.isTokenValid($request.form_token))
         #forgotUsernameBoxStart("default")
         $services.localization.render('xe.admin.forgotUsername.instructions')
-        <form method="post" action="$services.security.authentication.getAuthenticationURL('forgot', $NULL)" id="forgotUsernameForm" class="xformInline">
-        <div>
-          <label for="e">$services.localization.render('xe.admin.forgotUsername.email.label')</label> 
-          <input type="text" id="e" name="e"/> 
-          <span class="buttonwrapper">
-            <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="button"/>
-          </span>
-          <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
-        </div>
+        <form method="post" action="$services.security.authentication.getAuthenticationURL('retrieveusername', $NULL)" id="forgotUsernameForm" class="xform">
+            <dl>
+                <dt>
+                    <label for="e">$services.localization.render('xe.admin.forgotUsername.email.label')</label>
+                </dt>
+                <dd class="input-group">
+                  <span class="input-group-addon">$services.icon.renderHTML('envelope')</span>
+                  <input type="text" id="e" name="e" class="form-control" size="60" />
+                </dd>
+            </dl>
+            <div class="forgotusernamelinks">
+              <input type="submit" value="$services.localization.render('xe.admin.forgotUsername.submit')" class="btn btn-primary col-xs-12"/>
+            </div>
+            <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
         </form>
         #forgotUsernameBoxEnd()
       #else
-          #set($query = $services.query.hql(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and LOWER(prop.value) = :email").bindValue('email', $email.toLowerCase()))
-          #set($results = $query.execute())
-          ## If local user does not exist check global user
-          #if($results.size() == 0 && ${xcontext.database} != ${xcontext.mainWikiName})
-              #set($results = $query.setWiki("${xcontext.mainWikiName}").execute())
+          #try()
+            #set ($discard = $services.security.authentication.retrieveUsernameAndSendEmail($email))
           #end
-          #set ($emailError = false)
-          #if($results.size() != 0)
-              ## Send the email
-              #set ($from = $services.mail.sender.configuration.fromAddress)
-              #if ("$!from" == '')
-                  #set ($from = "no-reply@${request.serverName}")
-              #end
-              ## The mail temlate use $usernames to display the results.
-              #set ($usernames = $results)
-              #set ($mailTemplateReference = $services.model.createDocumentReference('', 'XWiki', 'ForgotUsernameMailContent'))
-              #set ($mailParameters = {'from' : $from, 'to' : $email, 'language' : $xcontext.locale})
-              #set ($message = $services.mail.sender.createMessage('template', $mailTemplateReference, $mailParameters))
-              #set ($discard = $message.setType('Forgot Username'))
-              #macro (displayError $text)
-                #forgotUsernameBoxStart("error")
-                <div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;">
-                  $services.localization.render('xe.admin.forgotUsername.error.emailFailed')
-                </div>
-                <div class="xwikirenderingerrordescription hidden">
-                <pre>${text}</pre>
-                </div>
-                #forgotUsernameBoxEnd()
-                #set ($emailError = true)
-              #end
-              ## Check for an error constructing the message!
-              #if ($services.mail.sender.lastError)
-                  #displayError($exceptiontool.getStackTrace($services.mail.sender.lastError))
-              #else
-                  ## Send the message and wait for it to be sent or for any error to be raised.
-                  #set ($mailResult = $services.mail.sender.send([$message], 'database'))
-                  ## Check for errors during the send
-                  #if ($services.mail.sender.lastError)
-                      #displayError($exceptiontool.getStackTrace($services.mail.sender.lastError))
-                  #else
-                      #set ($failedMailStatuses = $mailResult.statusResult.getAllErrors())
-                      #if ($failedMailStatuses.hasNext())
-                          #set ($mailStatus = $failedMailStatuses.next())
-                          #displayError($mailStatus.errorDescription)
-                      #end
-                  #end
-              #end
-          #end
+          #if ("$!exception" != '')
+            #forgotUsernameBoxStart("error")
+            <div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;">
+                $services.localization.render('xe.admin.forgotUsername.error.emailFailed')
+            </div>
+            <div class="xwikirenderingerrordescription hidden">
+              <pre>$escapetool.xml($exceptiontool.getStackTrace($exception))</pre>
+            </div>
+            #forgotUsernameBoxEnd()
+          #else
           ## We always display a success message even if there's no user found to avoid disclosing information
           ## about the users registered on the wiki.
-          #if (!$emailError)
             #forgotUsernameBoxStart("success")
             $services.localization.render('xe.admin.forgotUsername.emailSent', ["$escapetool.xml($email)"])
-            <div>
+            <div class="forgotusernamelinks">
                 <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', 'loginLink=1')">$services.localization.render('xe.admin.forgotUsername.login')</a>
             </div>
             #forgotUsernameBoxEnd()
           #end
       #end
-  </div>## mainContentArea
+  </main>## mainContentArea
 </div>## main
 #template("endpage.vm")

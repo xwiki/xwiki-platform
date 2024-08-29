@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWiki구문그룹</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Groups ==
+
+=== 2.0 Groups ===
+
+그룹을 사용하여 다른 문서를 현재 문서에 직접 인라인으로 삽입할 수 있습니다. 예를 들어 목록 항목, 표 셀 또는 문단 내부에 복잡한 요소 또는 스타일을 삽입할 수 있습니다. 그룹은 ##{{((...)}}}}## 의 구문 요소로 구분됩니다. 한 그룹은 다른 그룹을 포함할 수 있으며 유입의 제한은 없습니다.
+
+|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|((({{{
+|=Header 1|=Header 2|=Header 3
+|Cell One|(((
+= Embedded document =
+
+삽입된 단락이 있습니다.
+
+* list item one
+* list item two
+  ** sub-item 1
+  ** sub-item 2
+))) | Cell Three
+
+최상위 문서의 다음 단락
+}}})))|(((
+|=Header 1|=Header 2|=Header 3
+|Cell One|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Embedded document&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+삽입된 단락이 있습니다.
+
+* list item one
+* list item two
+  ** sub-item 1
+  ** sub-item 2
+))) | Cell Three
+
+최상위 문서의 다음 단락
+)))
+|((({{{(% class="myClass" style="color:blue" %)(((blue paragraphs
+
+inside myClass)))}}})))| (% class="myClass" style="color:blue" %)(((blue paragraphs
+
+inside my group)))</content>
+</xwikidoc>

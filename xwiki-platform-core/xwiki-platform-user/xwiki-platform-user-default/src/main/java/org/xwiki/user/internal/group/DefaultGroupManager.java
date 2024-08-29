@@ -86,7 +86,7 @@ public class DefaultGroupManager implements GroupManager
     {
         Collection<String> cacheWikis;
 
-        switch ((WikiTarget) wikiTarget) {
+        switch (wikiTarget) {
             case ENTITY:
                 cacheWikis = Collections.singleton(reference.getWikiReference().getName());
                 break;
@@ -156,6 +156,10 @@ public class DefaultGroupManager implements GroupManager
     public Collection<DocumentReference> getGroups(DocumentReference reference, Object wikiTarget, boolean recurse)
         throws GroupException
     {
+        // Guest user never belongs to any group.
+        if (reference == null) {
+            return Collections.emptyList();
+        }
         return getGroups(reference, wikiTarget, recurse, null);
     }
 

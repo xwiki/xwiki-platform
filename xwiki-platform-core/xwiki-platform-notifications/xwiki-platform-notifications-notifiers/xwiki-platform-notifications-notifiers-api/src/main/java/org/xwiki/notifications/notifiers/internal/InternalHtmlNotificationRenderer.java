@@ -55,6 +55,8 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Singleton
 public class InternalHtmlNotificationRenderer
 {
+    private static final String TM_FAILEDRENDER = "notification.error.failedRender";
+
     private static final String CLASS_PARAMETER = "class";
 
     @Inject
@@ -172,8 +174,8 @@ public class InternalHtmlNotificationRenderer
                 stringBuilder.append(this.render(compositeEvent, compositeEventStatus));
             } catch (Exception e) {
                 WikiPrinter printer = new DefaultWikiPrinter();
-                htmlRenderer.render(
-                    errorBlockGenerator.generateErrorBlocks("Error while rendering notification", e, false), printer);
+                htmlRenderer.render(errorBlockGenerator.generateErrorBlocks(false, TM_FAILEDRENDER,
+                    "Error while rendering notification", null, e), printer);
                 stringBuilder.append(printer.toString());
             }
         }

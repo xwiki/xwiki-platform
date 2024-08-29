@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+
+<Configure id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+  <Call name="addCustomizer">
+    <Arg>
+      <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
+        <Set name="forwardedOnly" property="jetty.httpConfig.forwardedOnly"/>
+        <Set name="proxyAsAuthority" property="jetty.httpConfig.forwardedProxyAsAuthority"/>
+        <Set name="forwardedPortAsAuthority" property="jetty.httpConfig.forwardedPortAsAuthority"/>
+        <Set name="forwardedHeader" property="jetty.httpConfig.forwardedHeader"/>
+        <Set name="forwardedHostHeader" property="jetty.httpConfig.forwardedHostHeader"/>
+        <Set name="forwardedServerHeader" property="jetty.httpConfig.forwardedServerHeader"/>
+        <Set name="forwardedProtoHeader" property="jetty.httpConfig.forwardedProtoHeader"/>
+        <Set name="forwardedForHeader" property="jetty.httpConfig.forwardedForHeader"/>
+        <Set name="forwardedPortHeader" property="jetty.httpConfig.forwardedPortHeader"/>
+        <Set name="forwardedHttpsHeader" property="jetty.httpConfig.forwardedHttpsHeader"/>
+        <Set name="forwardedSslSessionIdHeader" property="jetty.httpConfig.forwardedSslSessionIdHeader"/>
+        <Set name="forwardedCipherSuiteHeader" property="jetty.httpConfig.forwardedCipherSuiteHeader"/>
+      </New>
+    </Arg>
+  </Call>
+</Configure>

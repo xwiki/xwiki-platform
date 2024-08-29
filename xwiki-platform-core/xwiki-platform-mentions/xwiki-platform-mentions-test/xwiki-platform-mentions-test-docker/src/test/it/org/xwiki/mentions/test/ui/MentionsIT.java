@@ -47,22 +47,27 @@ import static org.xwiki.platform.notifications.test.po.NotificationsTrayPage.wai
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as extension
-        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    }, resolveExtraJARs = true)
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
+        // Required to ensure that the notifications rest endpoints are registered before XWikiJaxRsApplication is 
+        // initialized.
+        "org.xwiki.platform:xwiki-platform-notifications-rest"
+    },
+    resolveExtraJARs = true
+)
 class MentionsIT
 {
     private static final String U1_USERNAME = "U1";
 
-    private static final String USERS_PWD = "password";
-
     private static final String U2_USERNAME = "U2";
+
+    private static final String U3_USERNAME = "U3";
+
+    private static final String USERS_PWD = "password";
 
     /**
      * A duplicate of {@link Runnable} which allows to throw checked {@link Exception}.
@@ -150,11 +155,17 @@ class MentionsIT
             // create the users.
             setup.createUser(U1_USERNAME, USERS_PWD, null);
             setup.createUser(U2_USERNAME, USERS_PWD, null);
+            setup.createUser(U3_USERNAME, USERS_PWD, null);
         });
 
         runAsUser(setup, U1_USERNAME, USERS_PWD, () -> {
             setup.deletePage(reference);
             setup.createPage(reference, "", pageName);
+        });
+
+        // We comment with a user distinct from the one who created the page (U1) to make sure that the emitter of 
+        // the mention is correct.
+        runAsUser(setup, U3_USERNAME, USERS_PWD, () -> {
             Map<String, Object> properties = new HashMap<>();
             properties.put("author", "xwiki:XWiki.U1");
             properties.put("date", "17/08/2020 14:55:18");
@@ -184,54 +195,9 @@ class MentionsIT
             mentionNotificationPage.openGroup(0);
             assertEquals("mentioned you on a comment on page Mention Comment Test Page",
                 mentionNotificationPage.getText(0, 0));
-            assertEquals("U1", mentionNotificationPage.getEmitter(0, 0));
+            assertEquals("U3", mentionNotificationPage.getEmitter(0, 0));
             assertTrue(mentionNotificationPage.hasSummary(0, 0));
             assertEquals("@U2 XYZ", mentionNotificationPage.getSummary(0, 0));
-            tray.clearAllNotifications();
-        });
-    }
-
-    /**
-     * This test is similar to {@link #comment(TestUtils, TestReference)} but this time the comment is created on a page
-     * with an empty title. In this case, the link to the page displayed in the mention must have the name of the
-     * document displayed instead of an empty title.
-     */
-    @Test
-    @Order(3)
-    void commentOnPageWithEmptyTitle(TestUtils testUtils, TestReference testReference) throws Exception
-    {
-        runAsSuperAdmin(testUtils, () -> {
-            // create the users.
-            testUtils.createUser(U1_USERNAME, USERS_PWD, null);
-            testUtils.createUser(U2_USERNAME, USERS_PWD, null);
-        });
-
-        runAsUser(testUtils, U1_USERNAME, USERS_PWD, () -> {
-            testUtils.deletePage(testReference);
-            testUtils.createPage(testReference, "", null);
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("author", "xwiki:XWiki.U1");
-            properties.put("date", "17/08/2020 14:55:18");
-            properties
-                .put("comment",
-                    "AAAAA\n\n"
-                        + "{{mention reference=\"xwiki:XWiki.U2\" style=\"LOGIN\" anchor=\"test-mention-2\" "
-                        + "type=\"user\" /}} XYZ\n\nBBBBB");
-            testUtils.addObject(testReference, "XWiki.XWikiComments", properties);
-        });
-
-        runAsUser(testUtils, U2_USERNAME, USERS_PWD, () -> {
-            testUtils.gotoPage("Main", "WebHome");
-            waitOnNotificationCount("xwiki:XWiki.U2", "xwiki", 1);
-            // Checks that a notification is well received.
-            NotificationsTrayPage tray = new NotificationsTrayPage();
-            tray.showNotificationTray();
-            MentionNotificationPage mentionNotificationPage =
-                new MentionNotificationPage(tray.getNotificationsButton());
-            mentionNotificationPage.openGroup(0);
-            // Checks that the name of the document is used for the link of the page, and not the empty page title. 
-            assertEquals("mentioned you on a comment on page commentOnPageWithEmptyTitle",
-                mentionNotificationPage.getText(0, 0));
             tray.clearAllNotifications();
         });
     }

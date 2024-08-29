@@ -20,8 +20,9 @@
 package org.xwiki.store.legacy.store.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,8 +36,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
 import org.xwiki.store.StreamProvider;
+import org.xwiki.store.StringStreamProvider;
 import org.xwiki.store.TransactionRunnable;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 
@@ -151,9 +154,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         final File attachFile =
             this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
-        return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile,
-            this.fileTools.getTempFile(attachFile), this.fileTools.getBackupFile(attachFile),
-            this.fileTools.getLockForFile(attachFile));
+        return new AttachmentSaveTransactionRunnable(attachment, updateDocument, context, attachFile);
     }
 
     /**
@@ -206,9 +207,18 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     public void loadAttachmentContent(final XWikiAttachment attachment, final XWikiContext context,
         final boolean bTransaction) throws XWikiException
     {
-        final File attachFile =
+        File attachFile =
             this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
+        // Support links
+        try {
+            attachFile = StoreFileUtils.resolve(attachFile, true);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                "Failed to resolve the attachment file link for file [{0}]", e, new Object[] {attachFile});
+        }
+
+        // Check if the final file exist
         if (!attachFile.exists()) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
                 String.format("The attachment [%s] (file %s) could not be found in the filesystem attachment store.",
@@ -219,6 +229,22 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         content.setContentDirty(false);
         attachment.setAttachment_content(content);
         attachment.setContentStore(FileSystemStoreUtils.HINT);
+    }
+
+    @Override
+    public boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        File attachFile;
+        try {
+            attachFile = StoreFileUtils.resolve(
+                this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile(), false);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                "Failed to resolve the attachment file link", e);
+        }
+
+        return attachFile.exists();
     }
 
     @Override
@@ -258,8 +284,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         final File attachFile =
             this.fileTools.getAttachmentFileProvider(attachment.getReference()).getAttachmentContentFile();
 
-        return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile,
-            this.fileTools.getBackupFile(attachFile), this.fileTools.getLockForFile(attachFile));
+        return new AttachmentDeleteTransactionRunnable(attachment, updateDocument, context, attachFile);
     }
 
     @Override
@@ -276,45 +301,93 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     private class AttachmentSaveTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
-         * Construct a TransactionRunnable for saving the attachment content. @param attachment the XWikiAttachment
-         * whose content should be saved. @param updateDocument whether or not to update the document at the same
-         * time. @param context the XWikiContext for the request. @param attachFile the File to store the attachment
-         * in. @param tempFile the File to put the attachment content in until the transaction is complete. @param
-         * backupFile the File to backup the content of the existing attachment in. @param lock this Lock will be locked
-         * while the attachment file is being written to. @throws XWikiException if thrown by {@link
-         * XWikiAttachment#updateContentArchive(XWikiContext)} or {@link FilesystemAttachmentVersioningStore#
-         * getArchiveSaveRunnable(XWikiAttachmentArchive, XWikiContext)
+         * Construct a TransactionRunnable for saving the attachment content.
+         * 
+         * @param attachment the XWikiAttachment whose content should be saved.
+         * @param updateDocument whether or not to update the document at the same time.
+         * @param context the XWikiContext for the request.
+         * @param attachFile the File to store the attachment in.
+         * @param tempFile the File to put the attachment content in until the transaction is complete.
+         * @param backupFile the File to backup the content of the existing attachment in.
+         * @param lock this Lock will be locked while the attachment file is being written to.
+         * @throws XWikiException if thrown by {@link XWikiAttachment#updateContentArchive(XWikiContext)} or
+         *             {@link FilesystemAttachmentVersioningStore# getArchiveSaveRunnable(XWikiAttachmentArchive,
+         *             XWikiContext)}
          */
         AttachmentSaveTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
-            final XWikiContext context, final File attachFile, final File tempFile, final File backupFile,
-            final ReadWriteLock lock) throws XWikiException
+            final XWikiContext context, final File attachFile) throws XWikiException
         {
-            final StreamProvider provider = new AttachmentContentStreamProvider(attachment, context);
-            new FileSaveTransactionRunnable(attachFile, tempFile, backupFile, lock, provider).runIn(this);
+            boolean link = false;
+
+            //////////////////
+            // ARCHIVE
 
             // If the versioning store supports TransactionRunnable then use it, otherwise don't.
             AttachmentVersioningStore avs = resolveAttachmentVersioningStore(attachment, context);
-
-            final XWikiAttachmentArchive archive = attachment.getAttachment_archive();
-            if (avs instanceof FilesystemAttachmentVersioningStore) {
-                final FilesystemAttachmentVersioningStore favs = (FilesystemAttachmentVersioningStore) avs;
-
-                // If first save then create a new archive.
+            if (avs instanceof FilesystemAttachmentVersioningStore favs) {
+                XWikiAttachmentArchive archive = attachment.getAttachment_archive();
                 if (archive == null) {
-                    favs.getArchiveSaveRunnable(new ListAttachmentArchive(attachment), context).runIn(this);
+                    // If first save then create a new archive.
+                    archive = new ListAttachmentArchive(attachment);
+
+                    // The archive is identical to the current version by definition, so don't duplicate the content
+                    link = true;
                 } else {
-                    favs.getArchiveSaveRunnable(archive, context).runIn(this);
+                    // If the last archive is identical to the current version (which is the case except in very rare
+                    // cases), don't duplicate content
+                    XWikiAttachment archiveAttachment =
+                        archive.getRevision(attachment, attachment.getVersion(), context);
+                    // Really comparing the content could be very expensive so we assume comparing the size and date are
+                    // enough
+                    if (archiveAttachment != null && archiveAttachment.getDate() == attachment.getDate()
+                        && archiveAttachment.getLongSize() == attachment.getLongSize()) {
+                        link = true;
+                    }
                 }
+
+                favs.getArchiveSaveRunnable(archive, context).runIn(this);
             } else {
                 new TransactionRunnable<XWikiHibernateTransaction>()
                 {
                     @Override
                     protected void onRun() throws XWikiException
                     {
-                        avs.saveArchive(archive, context, false);
+                        avs.saveArchive(attachment.getAttachment_archive(), context, false);
                     }
                 }.runIn(this);
             }
+
+            //////////////////
+            // CURRENT
+
+            File linkAttachFile = StoreFileUtils.getLinkFile(attachFile);
+
+            File finalAttachFile;
+            File otherAttachFile;
+            StreamProvider streamProvider;
+            if (link) {
+                // Create a link to the current version
+                finalAttachFile = linkAttachFile;
+                streamProvider = new StringStreamProvider(fileTools.getLinkContent(attachment), StandardCharsets.UTF_8);
+                otherAttachFile = attachFile;
+            } else {
+                // Save the content as is
+                finalAttachFile = attachFile;
+                streamProvider = new AttachmentContentStreamProvider(attachment, context);
+                otherAttachFile = linkAttachFile;
+            }
+
+            // Save the attachment file
+            new FileSaveTransactionRunnable(finalAttachFile, fileTools.getTempFile(finalAttachFile),
+                fileTools.getBackupFile(finalAttachFile), fileTools.getLockForFile(finalAttachFile), streamProvider)
+                    .runIn(this);
+
+            // Also delete any file remaining at the other location
+            new FileDeleteTransactionRunnable(otherAttachFile, fileTools.getTempFile(otherAttachFile),
+                fileTools.getLockForFile(otherAttachFile)).runIn(this);
+
+            //////////////////
+            // DOCUMENT
 
             // If updating of the parent document is required then add a TransactionRunnable to do that.
             if (updateDocument) {
@@ -335,7 +408,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
     /**
      * A TransactionRunnable for deleting an attachment.
      */
-    private static class AttachmentDeleteTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
+    private class AttachmentDeleteTransactionRunnable extends TransactionRunnable<XWikiHibernateTransaction>
     {
         /**
          * The XWikiAttachment whose content should be saved.
@@ -359,15 +432,17 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
          * @param updateDocument whether or not to update the document at the same time.
          * @param context the XWikiContext for the request.
          * @param attachFile the file to where the attachment content is stored.
-         * @param tempFile the file to to move the attachment content to temporarily.
-         * @param lock this Lock will be locked while the attachment file is being written to.
          * @throws XWikiException if unable to load the archive for the attachment to delete.
          */
         AttachmentDeleteTransactionRunnable(final XWikiAttachment attachment, final boolean updateDocument,
-            final XWikiContext context, final File attachFile, final File tempFile, final ReadWriteLock lock)
-            throws XWikiException
+            final XWikiContext context, final File attachFile) throws XWikiException
         {
-            new FileDeleteTransactionRunnable(attachFile, tempFile, lock).runIn(this);
+            // Delete both the standard and link location
+            File linkAtachFile = StoreFileUtils.getLinkFile(attachFile);
+            new FileDeleteTransactionRunnable(attachFile, fileTools.getBackupFile(attachFile),
+                fileTools.getLockForFile(attachFile)).runIn(this);
+            new FileDeleteTransactionRunnable(linkAtachFile, fileTools.getBackupFile(linkAtachFile),
+                fileTools.getLockForFile(linkAtachFile)).runIn(this);
 
             // If the store supports deleting in the same transaction then do it.
             final AttachmentVersioningStore avs = context.getWiki().getDefaultAttachmentArchiveStore();

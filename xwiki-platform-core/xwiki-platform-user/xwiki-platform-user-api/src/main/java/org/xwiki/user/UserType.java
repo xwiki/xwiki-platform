@@ -19,8 +19,6 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * The type of the user (simple user, advanced user).
  *
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public enum UserType
 {
     /**

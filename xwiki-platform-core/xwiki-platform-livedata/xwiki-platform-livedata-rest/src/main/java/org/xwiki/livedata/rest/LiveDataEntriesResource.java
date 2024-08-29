@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Entries;
 import org.xwiki.livedata.rest.model.jaxb.Entry;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the list of entries from an existing {@link LiveDataSource}.
@@ -41,7 +40,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}/entries")
-@Unstable
 public interface LiveDataEntriesResource
 {
     /**

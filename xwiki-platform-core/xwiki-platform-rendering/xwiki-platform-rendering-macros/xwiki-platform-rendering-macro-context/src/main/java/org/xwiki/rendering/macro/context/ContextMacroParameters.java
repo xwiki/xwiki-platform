@@ -20,8 +20,10 @@
 package org.xwiki.rendering.macro.context;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
  * Parameters for the Context macro.
@@ -42,6 +44,10 @@ public class ContextMacroParameters
      * @since 8.4RC1
      */
     private TransformationContextMode transformationContextMode = TransformationContextMode.CURRENT;
+
+    private boolean restricted;
+
+    private MacroContentSourceReference source;
 
     /**
      * @return the reference to the document that will be set as the current document to evaluate the macro's content
@@ -82,5 +88,51 @@ public class ContextMacroParameters
     public void setTransformationContext(TransformationContextMode mode)
     {
         this.transformationContextMode = mode;
+    }
+
+    /**
+     * @return true if the content should be executed in a restricted context
+     * @since 14.10.4
+     * @since 15.0
+     * @since 15.1RC1
+     */
+    @PropertyDescription("True if the content should be executed in a restricted context")
+    public boolean isRestricted()
+    {
+        return this.restricted;
+    }
+
+    /**
+     * @param restricted true if the content should be executed in a restricted context
+     * @since 14.10.4
+     * @since 15.0
+     * @since 15.1RC1
+     */
+    public void setRestricted(boolean restricted)
+    {
+        this.restricted = restricted;
+    }
+
+    /**
+     * @param source the reference of the content to parse
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    @PropertyDescription("the reference of the content to parse instead of the content of the macro"
+        + " (script:myvariable for the entry with name myvariable in the script context)")
+    @PropertyAdvanced
+    public void setSource(MacroContentSourceReference source)
+    {
+        this.source = source;
+    }
+
+    /**
+     * @return the reference of the content to parse
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public MacroContentSourceReference getSource()
+    {
+        return this.source;
     }
 }

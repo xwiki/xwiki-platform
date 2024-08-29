@@ -32,6 +32,8 @@ import java.util.TreeSet;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,6 +50,8 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  */
 public class XWikiDocumentArchive
 {
+    private final WikiReference wikiReference;
+
     /** =docId. */
     private long id;
 
@@ -69,18 +73,40 @@ public class XWikiDocumentArchive
     /** Set of {@link XWikiRCSNodeContent} which need to update. */
     private Set<XWikiRCSNodeContent> updatedNodeContents = new TreeSet<XWikiRCSNodeContent>();
 
-    /** @param id = {@link XWikiDocument#getId()} */
-    public XWikiDocumentArchive(long id)
+    /**
+     * @param wikiReference the wiki of the document
+     * @param id the local identifier of the document
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public XWikiDocumentArchive(WikiReference wikiReference, long id)
     {
-        setId(id);
+        this.wikiReference = wikiReference;
+        this.id = id;
     }
 
-    /** default constructor. */
+    /**
+     * @param id the local identifier of the document
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
+    public XWikiDocumentArchive(long id)
+    {
+        this(null, id);
+    }
+
+    /**
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
     public XWikiDocumentArchive()
     {
+        this.wikiReference = null;
     }
 
     // helper methods
+
     /**
      * @param cur - current version
      * @param isMinor - is modification is minor
@@ -120,8 +146,8 @@ public class XWikiDocumentArchive
      * @return node content for newnode
      * @throws XWikiException if exception while loading content
      */
-    protected XWikiRCSNodeContent makePatch(XWikiRCSNodeInfo newnode, XWikiDocument doc,
-        XWikiContext context) throws XWikiException
+    protected XWikiRCSNodeContent makePatch(XWikiRCSNodeInfo newnode, XWikiDocument doc, XWikiContext context)
+        throws XWikiException
     {
         XWikiRCSNodeContent result = new XWikiRCSNodeContent();
         result.setPatch(new XWikiPatch().setFullVersion(doc, context));
@@ -129,13 +155,11 @@ public class XWikiDocumentArchive
         XWikiRCSNodeInfo latestNode = getLatestNode();
         if (latestNode != null) {
             int nodesCount = getNodes().size();
-            int nodesPerFull =
-                context.getWiki() == null ? 5 : Integer.parseInt(context.getWiki().getConfig()
-                    .getProperty("xwiki.store.rcs.nodesPerFull", "5"));
+            int nodesPerFull = context.getWiki() == null ? 5
+                : Integer.parseInt(context.getWiki().getConfig().getProperty("xwiki.store.rcs.nodesPerFull", "5"));
             if (nodesPerFull <= 0 || (nodesCount % nodesPerFull) != 0) {
                 XWikiRCSNodeContent latestContent = latestNode.getContent(context);
-                latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(),
-                    doc, context);
+                latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(), doc, context);
                 latestNode.setContent(latestContent);
                 updateNode(latestNode);
                 getUpdatedNodeContents().add(latestContent);
@@ -144,13 +168,28 @@ public class XWikiDocumentArchive
         return result;
     }
 
+    /**
+     * @return the wikiReference the wiki of the document
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public WikiReference getWikiReference()
+    {
+        return this.wikiReference;
+    }
+
     /** @return {@link XWikiDocument#getId()} - primary key */
     public long getId()
     {
         return this.id;
     }
 
-    /** @param id = {@link XWikiDocument#getId()} */
+    /**
+     * @param id = {@link XWikiDocument#getId()}
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiDocumentArchive(WikiReference, long)} instead
+     */
+    @Deprecated(since = "13.10.7")
     public void setId(long id)
     {
         this.id = id;
@@ -163,15 +202,26 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * @return collection of XWikiRCSNodeInfo where vfrom &gt;= version &gt;= vto order by version desc
-     * @param vfrom - start version
-     * @param vto - end version
+     * Be careful when using that method: the first argument is the upper bound and the second is the lower
+     * bound. So if you want to get nodes for versions between [2.1,3.4] you need to call it with {@code 3.4,2.1}.
+     *
+     * @return collection of XWikiRCSNodeInfo where upperBound &gt;= version &gt;= lowerBound order by version desc
+     * @param upperBound - start version (upper bound)
+     * @param lowerBound - end version (lower bound)
      */
-    public Collection<XWikiRCSNodeInfo> getNodes(Version vfrom, Version vto)
+    public Collection<XWikiRCSNodeInfo> getNodes(Version upperBound, Version lowerBound)
     {
-        int[] ito = vto.getNumbers();
-        ito[1]--;
-        return this.versionToNode.subMap(vfrom, new Version(ito)).values();
+        int[] ito = lowerBound.getNumbers();
+        // We do perform this call because by default subMap considers the first argument as inclusive and the second
+        // as exclusive. So if we call subMap(2.2,2.2) and we do have a version 2.2 it will return no version.
+        // So if getNodes is called with [2.2,2.2] submap will be called with (2.2,2.1): first argument is inclusive,
+        // and second exclusive but it's a lower bound than 2.2, so 2.2 version will be retrieved.
+        // Note that it works because we never have a version X.0 in XWiki: we always have X.1, so if we want to get
+        // [2.1,2.1] it will look for (2.1,2.0) and it works.
+        if (ito.length > 1) {
+            ito[1]--;
+        }
+        return this.versionToNode.subMap(upperBound, new Version(ito)).values();
     }
 
     /** @param versions - collection of XWikiRCSNodeInfo */
@@ -210,7 +260,7 @@ public class XWikiDocumentArchive
         try {
             XWikiRCSArchive archive = new XWikiRCSArchive(text);
             resetArchive();
-            Collection nodes = archive.getNodes(getId());
+            Collection nodes = archive.getNodes(getWikiReference(), getId());
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
@@ -219,9 +269,8 @@ public class XWikiDocumentArchive
                 this.updatedNodeContents.add(nodeContent);
             }
         } catch (Exception e) {
-            Object[] args = { text, Long.valueOf(getId()) };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+            Object[] args = {text, Long.valueOf(getId())};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
                 "Exception while constructing archive for JRCS string [{0}] for document [{1}]", e, args);
         }
     }
@@ -237,15 +286,15 @@ public class XWikiDocumentArchive
      * @param context - used for loading nodes content
      * @throws XWikiException in any error
      */
-    public void updateArchive(XWikiDocument doc, String author, Date date, String comment,
-        Version version, XWikiContext context) throws XWikiException
+    public void updateArchive(XWikiDocument doc, String author, Date date, String comment, Version version,
+        XWikiContext context) throws XWikiException
     {
         Version oldLatestVer = getLatestVersion();
         Version newVer = version;
         if (newVer == null || oldLatestVer != null && newVer.compareVersions(oldLatestVer) <= 0) {
             newVer = createNextVersion(oldLatestVer, doc.isMinorEdit());
         }
-        XWikiRCSNodeInfo newNode = new XWikiRCSNodeInfo(new XWikiRCSNodeId(getId(), newVer));
+        XWikiRCSNodeInfo newNode = new XWikiRCSNodeInfo(new XWikiRCSNodeId(getWikiReference(), getId(), newVer));
         newNode.setAuthor(author);
         newNode.setComment(comment);
         newNode.setDate(date);
@@ -264,8 +313,7 @@ public class XWikiDocumentArchive
      * @param context - used for loading nodes content
      * @throws XWikiException if any error
      */
-    public void removeVersions(Version newerVersion, Version olderVersion, XWikiContext context)
-        throws XWikiException
+    public void removeVersions(Version newerVersion, Version olderVersion, XWikiContext context) throws XWikiException
     {
         Version upperBound = newerVersion;
         Version lowerBound = olderVersion;
@@ -276,10 +324,23 @@ public class XWikiDocumentArchive
         }
         Version firstVersionAfter = getNextVersion(upperBound);
         Version firstVersionBefore = getPrevVersion(lowerBound);
-        if (firstVersionAfter == null && firstVersionBefore == null) {
-            resetArchive();
-            return;
+
+        // If there's no version matching the range, then the user inserted a wrong version: we don't do anything.
+        if (!getNodes(upperBound, lowerBound).isEmpty()) {
+            // If the versions specified are the first and latest one then we just reset everything.
+            if (firstVersionAfter == null && firstVersionBefore == null) {
+                resetArchive();
+            } else {
+                this.performSpecificVersionsRemoval(firstVersionBefore, firstVersionAfter, lowerBound, upperBound,
+                    context);
+            }
         }
+    }
+
+    private void performSpecificVersionsRemoval(Version firstVersionBefore, Version firstVersionAfter,
+        Version lowerBound, Version upperBound, XWikiContext context)
+        throws XWikiException
+    {
         if (firstVersionAfter == null) {
             // Deleting the most recent version.
             // Store full version in firstVersionBefore
@@ -317,8 +378,7 @@ public class XWikiDocumentArchive
      * @param context - used for loading
      * @throws XWikiException if any error
      */
-    public XWikiDocument loadDocument(Version version, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument loadDocument(Version version, XWikiContext context) throws XWikiException
     {
         XWikiRCSNodeInfo nodeInfo = getNode(version);
         if (nodeInfo == null) {
@@ -340,7 +400,7 @@ public class XWikiDocumentArchive
 
             return doc;
         } catch (Exception e) {
-            Object[] args = { version.toString(), Long.valueOf(getId()) };
+            Object[] args = {version.toString(), Long.valueOf(getId())};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                 "Exception while reading version [{0}] for document id [{1,number}]", e, args);
@@ -358,9 +418,9 @@ public class XWikiDocumentArchive
      */
     public String getVersionXml(Version version, XWikiContext context) throws XWikiException
     {
-        Version nearestFullVersion = getNearestFullVersion(version);
+        Version nextFullVersion = getNextFullVersion(version);
 
-        List<XWikiRCSNodeContent> lstContent = loadRCSNodeContents(nearestFullVersion, version, context);
+        List<XWikiRCSNodeContent> lstContent = loadRCSNodeContents(version, nextFullVersion, context);
         List<String> origText = new ArrayList<String>();
         for (XWikiRCSNodeContent nodeContent : lstContent) {
             nodeContent.getPatch().patch(origText);
@@ -418,30 +478,46 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * @param ver - for what version find nearest
-     * @return nearest version which contain full information (not patch)
+     * @param ver - for what version find next full one
+     * @return next version which contain full information (not patch)
+     * @deprecated This method has been deprecated as its name is error-prone, and it has never done what's documented:
+     * it always returned the next full version, and never the nearest one. So we renamed it to
+     * {@link #getNextFullVersion(Version)}.
      */
+    @Deprecated(since = "14.10.12,15.5RC1")
     public Version getNearestFullVersion(Version ver)
+    {
+        return getNextFullVersion(ver);
+    }
+
+    /**
+     * @param ver - for what version find next full one
+     * @return next version which contain full information (not patch)
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    public Version getNextFullVersion(Version ver)
     {
         if (this.fullVersions.contains(ver)) {
             return ver;
         }
         SortedSet<Version> headSet = this.fullVersions.headSet(ver);
-        return (headSet.size() == 0) ? null : headSet.last();
+        return headSet.isEmpty() ? null : headSet.last();
     }
 
     /**
-     * @return List of {@link XWikiRCSNodeContent} where vfrom<=version<=vto order by version
-     * @param vfrom - start version
-     * @param vto - end version
+     * @return List of {@link XWikiRCSNodeContent} where lowerBound<=version<=upperBound order by version
+     * @param lowerBound - start version
+     * @param upperBound - end version
      * @param context - used everywhere
      * @throws XWikiException if any error
      */
-    private List<XWikiRCSNodeContent> loadRCSNodeContents(Version vfrom, Version vto, XWikiContext context)
+    private List<XWikiRCSNodeContent> loadRCSNodeContents(Version lowerBound, Version upperBound, XWikiContext context)
         throws XWikiException
     {
         List<XWikiRCSNodeContent> result = new ArrayList<XWikiRCSNodeContent>();
-        for (XWikiRCSNodeInfo nodeInfo : getNodes(vfrom, vto)) {
+        for (XWikiRCSNodeInfo nodeInfo : getNodes(upperBound, lowerBound)) {
             XWikiRCSNodeContent nodeContent = nodeInfo.getContent(context);
             result.add(nodeContent);
         }
@@ -484,7 +560,7 @@ public class XWikiDocumentArchive
      */
     public XWikiDocumentArchive clone(long docId, XWikiContext context) throws XWikiException
     {
-        XWikiDocumentArchive result = new XWikiDocumentArchive(docId);
+        XWikiDocumentArchive result = new XWikiDocumentArchive(this.wikiReference, docId);
         result.setArchive(getArchive(context));
         return result;
     }

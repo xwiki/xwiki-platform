@@ -47,7 +47,7 @@ public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFact
     protected void addHeaders(MimeBodyPart part, Map<String, Object> parameters) throws MessagingException
     {
         Map<String, String> headers = (Map<String, String>) parameters.get(HEADERS_PARAMETER_KEY);
-        if (headers != null && headers instanceof Map) {
+        if (headers != null) {
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 part.setHeader(header.getKey(), header.getValue());
             }

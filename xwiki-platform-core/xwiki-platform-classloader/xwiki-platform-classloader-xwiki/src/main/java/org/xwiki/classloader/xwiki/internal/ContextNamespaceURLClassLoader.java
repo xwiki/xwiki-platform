@@ -58,7 +58,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
         // there's any NamingContext instance bound to it and at Tomcat's init (for example), Tomcat binds the defined
         // DataSource to the Tomcat CL (WebappClassLoader). Thus if we loose the path from our CL to the Tomcat CL, all
         // the DataSources defined in Tomcat will fail to be usable from our Hibernate code.
-        super(new URL[] {}, Thread.currentThread().getContextClassLoader(), null);
+        super(Thread.currentThread().getContextClassLoader(), null);
 
         this.wikis = wikis;
         this.classLoaderManager = classLoaderManager;
@@ -77,7 +77,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
             // (note that our default implementation doesn't and already falls back on the system classloader and thus
             // this "if" is never going to be true with the default implementation).
             if (this.currentClassLoader == null) {
-                this.currentClassLoader = new NamespaceURLClassLoader(new URL[] {}, getSystemClassLoader(), null);
+                this.currentClassLoader = new NamespaceURLClassLoader(getSystemClassLoader(), null);
             }
 
             this.cachedCurrentWiki = currentWiki;

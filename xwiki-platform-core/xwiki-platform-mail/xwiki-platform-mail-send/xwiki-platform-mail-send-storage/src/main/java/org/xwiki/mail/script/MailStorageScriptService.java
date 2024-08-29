@@ -44,7 +44,6 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -52,7 +51,7 @@ import com.xpn.xwiki.XWikiContext;
  * Expose Mail Storage API to scripts.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 12.4RC1
  */
 @Component
 @Named("mail.storage")
@@ -151,7 +150,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
      *         from the store
      * @since 12.10
      */
-    @Unstable
     public List<ScriptMailResult> resend(Map<String, Object> filterMap, int offset, int count)
     {
         return resendGeneric(filterMap, offset, count,
@@ -323,9 +321,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
     {
         List<Pair<MailStatus, MailStatusResult>> results;
         try {
-            results = multipleMailResender.resendMessages(filterMap, offset, count);
+            results = multipleMailResender.resendMessages(normalizeFilterMap(filterMap), offset, count);
         } catch (MailStoreException e) {
-            // Save the exception for reporting through the script services's getLastError() API
+            // Save the exception for reporting through the script service's getLastError() API
             setError(e);
             return null;
         }

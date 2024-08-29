@@ -246,7 +246,7 @@
       <code>require(['jquery'], function ($) {
   'use strict';
 
-  $(document).ready(function() {
+  $(function() {
 
     /**
      * Show only options of the current scope (local/global)
@@ -278,7 +278,7 @@
         /**
          * Event called when the user click on a tab and so change the current scope
          */
-        displayer.find('li &gt; a[role="tab"]').click(function () {
+        displayer.find('li &gt; a[role="tab"]').on('click', function() {
           var tabLink      = $(this);
           var displayer    = tabLink.parents('.XWikiColorThemeDisplayer');
           var select       = displayer.find('select');

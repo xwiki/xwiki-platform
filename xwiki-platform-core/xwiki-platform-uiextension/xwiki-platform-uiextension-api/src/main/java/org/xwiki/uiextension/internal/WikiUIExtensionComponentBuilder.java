@@ -24,11 +24,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentException;
@@ -54,14 +54,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentBuilder, WikiUIExtensionConstants
 {
     /**
-     * Used to transform the reference to the UI Extension XClass to a string usable in a query.
-     * {@see #searchDocumentReferences()}
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiSerializer;
-
-    /**
      * Used to generate a role hint for UI extensions based on their object reference.
      */
     @Inject
@@ -75,7 +67,7 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
     private ComponentManager wikiComponentManager;
 
     @Inject
-    private ComponentManager componentManager;
+    private Provider<WikiUIExtension> extensionProvider;
 
     @Inject
     private AuthorizationManager authorization;
@@ -137,18 +129,16 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
 
         WikiUIExtension extension;
         try {
-            extension = new WikiUIExtension(baseObject, roleHint, id, extensionPointId, this.componentManager);
-        } catch (ComponentLookupException e) {
+            extension = this.extensionProvider.get();
+            extension.initialize(baseObject, roleHint, id, extensionPointId);
+        } catch (Exception e) {
             throw new WikiComponentException(
                 String.format("Failed to initialize Panel UI extension [%s]", baseObject.getReference()), e);
         }
 
-        String rawParameters = baseObject.getStringValue(PARAMETERS_PROPERTY);
-
         // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
         // safer to use a POJO and pass the Component Manager to it.
-        WikiUIExtensionParameters parameters =
-            new WikiUIExtensionParameters(id, rawParameters, this.wikiComponentManager);
+        WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(baseObject, this.wikiComponentManager);
         extension.setParameters(parameters);
         extension.setScope(scope);
 

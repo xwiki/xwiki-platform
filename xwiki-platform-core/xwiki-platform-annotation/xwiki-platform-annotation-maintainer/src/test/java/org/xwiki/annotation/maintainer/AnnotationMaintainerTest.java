@@ -21,7 +21,6 @@ package org.xwiki.annotation.maintainer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
     /**
      * Document description files to run this test for.
      */
-    private static Collection<String[]> files = new ArrayList<String[]>();
+    private static Collection<String[]> files = new ArrayList<>();
 
     /**
      * Mock document to run tests for.
@@ -214,7 +213,7 @@ public class AnnotationMaintainerTest extends AbstractComponentTestCase
      */
     private void assertSameAnnotations(List<Annotation> expected, List<Annotation> actual)
     {
-        assertTrue(expected.size() == actual.size());
+        assertEquals(expected.size(), actual.size());
 
         for (Annotation actualAnn : actual) {
             Annotation expectedAnn = getAnnotation(actualAnn.getId(), expected);

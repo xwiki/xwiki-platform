@@ -22,7 +22,6 @@ package org.xwiki.mentions.events;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.mentions.MentionLocation;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -32,7 +31,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public class MentionEventParams
 {
     private String userReference;

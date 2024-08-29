@@ -43,4 +43,16 @@ public abstract class AbstractGeneralMailConfigClassDocumentConfigurationSource
     {
         return GENERAL_MAILCONFIGCLASS_REFERENCE;
     }
+
+    /**
+     * Clear the cache.
+     *
+     * @since 14.10.15
+     * @since 15.5.2
+     * @since 15.7RC1
+     */
+    void clearCache()
+    {
+        this.cache.removeAll();
+    }
 }

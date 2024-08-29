@@ -76,7 +76,7 @@ class LoggingScriptServiceTest
     private ContextualLocalizationManager localization;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(org.xwiki.test.LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(org.xwiki.test.LogLevel.WARN);
 
     @Test
     void getLogger()

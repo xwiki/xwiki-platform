@@ -40,11 +40,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.Block.Axes;
-import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.MetadataBlockMatcher;
-import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -232,13 +228,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         Reader currentReader = scriptContext.getReader();
         Map<String, Object> currentEngineBindings =
             new HashMap<>(scriptContext.getBindings(ScriptContext.ENGINE_SCOPE));
-        // Set standard javax.script.filename property
-        MetaDataBlock metaDataBlock = context.getCurrentMacroBlock()
-            .getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Axes.ANCESTOR_OR_SELF);
-        if (metaDataBlock != null) {
-            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE),
-                ScriptContext.ENGINE_SCOPE);
-        }
 
         try {
             StringWriter stringWriter = new StringWriter();
@@ -257,8 +246,6 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
             // restore "context" binding
             restoreBinding(currentEngineBindings, scriptContext, BINDING_CONTEXT);
-            // restore "javax.script.filename" binding
-            restoreBinding(currentEngineBindings, scriptContext, ScriptEngine.FILENAME);
         }
 
         return result;

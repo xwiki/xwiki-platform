@@ -71,11 +71,13 @@ public class AverageRatingProtectionListener extends AbstractEventListener
             XWikiDocument previousDocument = document.getOriginalDocument();
 
             for (BaseObject ratingXObject : xObjects) {
-                int number = ratingXObject.getNumber();
-                BaseObject previousObject = previousDocument
-                    .getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, number);
-                if (previousObject != null) {
-                    ratingXObject.apply(previousObject, true);
+                if (ratingXObject != null) {
+                    int number = ratingXObject.getNumber();
+                    BaseObject previousObject = previousDocument
+                        .getXObject(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE, number);
+                    if (previousObject != null) {
+                        ratingXObject.apply(previousObject, true);
+                    }
                 }
             }
         }

@@ -36,7 +36,77 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}##
+  <content>{{velocity output="false"}}
+#macro(showRestoreDocumentConfirmModal)
+  &lt;div class="modal" id="restoreDocumentConfirmModal" tabindex="-1" role="dialog"
+      aria-labelledby="restoreDocumentConfirmModal-label"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="$escapetool.xml(
+              $services.localization.render('core.viewers.share.cancel'))"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="restoreDocumentConfirmModal-label"&gt;
+            $escapetool.xml($services.localization.render('platform.index.trashDocumentsReplacePageTitle'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;p&gt;
+            $escapetool.xml($services.localization.render('platform.index.trashDocumentsReplacePageText'))
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-danger" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsRestoreText'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+#macro(deletedDocsActionsTemplate)
+  &lt;div class="hidden deletedDocsActionsTemplate"&gt;
+    ## Restore document action template.
+    &lt;a href="" class="action restore"
+        title="$escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip'))"&gt;
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('refresh')&lt;/span&gt;&lt;span
+        class="action-label"&gt;$escapetool.xml(
+        $services.localization.render('platform.index.trashDocumentsActionsRestoreText'))
+      &lt;/span&gt;
+    &lt;/a&gt;
+    ## Orphaned translations: cannot restore action template.
+    &lt;a href="" class="action cannot-restore" title="$escapetool.xml($services.localization.render(
+        'platform.index.trashDocumentsActionsCannotRestoreCausesOrphanedTranslationTooltip'))"&gt;
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('refresh')&lt;/span&gt;&lt;span
+        class="action-label"&gt;$escapetool.xml(
+        $services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText'))
+      &lt;/span&gt;
+    &lt;/a&gt;
+    ## Replace document action template.
+    &lt;a href="" class="action replace" data-toggle='modal' data-target='#restoreDocumentConfirmModal'
+        title="$escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsReplaceTooltip'))"&gt;
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('refresh')&lt;/span&gt;&lt;span
+        class="action-label"&gt;$escapetool.xml(
+        $services.localization.render('platform.index.trashDocumentsActionsReplaceText'))
+      &lt;/span&gt;
+    &lt;/a&gt;
+    ## Delete document action template.
+    &lt;a href="" class="action actiondelete"
+        title="$escapetool.xml($services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip'))"&gt;
+      &lt;span class="action-icon"&gt;$services.icon.renderHTML('cross')&lt;/span&gt;&lt;span
+        class="action-label"&gt;$escapetool.xml(
+        $services.localization.render('platform.index.trashDocumentsActionsDeleteText'))
+      &lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+#end
+{{/velocity}}
+
+{{velocity}}##
 #set($dateFormat = 'yyyy MMMM d, HH:mm')
 $xwiki.ssx.use('XWiki.DeletedDocuments')##
 $xwiki.jsx.use('XWiki.DeletedDocuments')##
@@ -87,7 +157,9 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
+#showRestoreDocumentConfirmModal()
 #livetable('documentsTrash' $columns $columnsProperties $options)
+#deletedDocsActionsTemplate()
 &lt;/div&gt;
 {{/html}}
 ##
@@ -119,7 +191,17 @@ $xwiki.jsx.use('XWiki.DeletedDocuments')##
           &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
         #end
         #if($ddoc.canDelete())
-          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+          #set ($deleteQueryParametersMap = {
+            "id": $id,
+            "xredirect": "$!{request.getRequestURI()}?$!{request.getQueryString()}"
+          })
+          &lt;a
+            href="$escapetool.xml(${originalDocument.getURL('delete', $escapetool.url($deleteQueryParametersMap))})"
+            class="tool delete"
+            title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"
+          &gt;
+            $services.localization.render('platform.index.trashDocumentsActionsDeleteText')
+          &lt;/a&gt;
         #end
       &lt;/td&gt;
     &lt;/tr&gt;
@@ -255,7 +337,7 @@ if (typeof XWiki.index.trash.documents == "undefined") {
 
 /**
  * Callback function used by the DeletedDocuments livetable for generating the HTML code needed to display an entry.
- * 
+ *
  * @param row the JSON data corresponding to the entry to be displayed
  * @param i the index of the row in the list of entries
  * @param table the LiveTable javascript object
@@ -275,48 +357,41 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
   tr.appendChild(new Element('td').update(row.date));
   var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
   tr.appendChild(new Element('td').update(deleter));
-  var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId);
-  tr.appendChild(new Element('td').update(batchId));
-  var actions = new Element('td', {'class' : 'itemActions'});
+  if (row.batchId != '') {
+    var batchId = new Element('a', {'href' : row.batchId_url}).update(row.batchId);
+    tr.appendChild(new Element('td').update(batchId));
+  } else {
+    tr.appendChild(new Element('td'));
+  }
+  var actions = new Element('td', {'class' : 'actions'});
   if(!row.alreadyExists) {
     if(row.canRestore) {
       if (row.causesOrphanedTranslation) {
         // Can not restore: It would cause the translation to be inaccessible from the UI until the main document is restored/created.
-        var restore = new Element('a', {
-            'href' : row.originalUrl,
-            'class' : 'tool cannot-restore',
-            'title' : "$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreCausesOrphanedTranslationTooltip')"
-          }).update("$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')");
-        actions.appendChild(restore);
+        var restore = document.querySelector('.deletedDocsActionsTemplate .cannot-restore').cloneNode(true);
+        restore.href = row.originalUrl;
+        actions.append(restore);
       } else {
         // Restore the document.
-        var restore = new Element('a', {
-            'href' : row.restoreUrl,
-            'class' : 'tool restore',
-            'title' : "$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"
-          }).update("$services.localization.render('platform.index.trashDocumentsActionsRestoreText')");
-        actions.appendChild(restore);
+        var restore = document.querySelector('.deletedDocsActionsTemplate .restore').cloneNode(true);
+        restore.href = row.restoreUrl;
+        actions.append(restore);
       }
     }
   } else {
-    // Can not restore: A document was already restored at that location.
-    // TODO: Add an overwrite dialog here.
-    var restore = new Element('a', {
-        'href' : row.originalUrl,
-        'class' : "tool cannot-restore",
-        'title' : "$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"
-      }).update("$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')");
-    actions.appendChild(restore);
+    // Replace: A document was already restored at that location.
+    var replace = document.querySelector('.deletedDocsActionsTemplate .replace').cloneNode(true);
+    replace.href = '#';
+    var deletedDocRef = XWiki.Model.resolve(row.fullname, XWiki.EntityType.DOCUMENT);
+    replace.setAttribute('data-deleteurl', new XWiki.Document(deletedDocRef).getURL('delete'));
+    replace.setAttribute('data-restoreurl', row.restoreUrl);
+    actions.append(replace);
   }
   if(row.canDelete) {
-    var delete_ = new Element('a', {
-        'href' : row.deleteUrl,
-        'class' : "tool delete",
-        'title' : "$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"
-      }).update("$services.localization.render('platform.index.trashDocumentsActionsDeleteText')");
-    actions.appendChild(document.createTextNode(' '));
-    actions.appendChild(delete_);
-    delete_.observe('click', XWiki.index.trash.documents.confirmDelete.bindAsEventListener(delete_, table, i));
+    var deleteAction = document.querySelector('.deletedDocsActionsTemplate .actiondelete').cloneNode(true);
+    deleteAction.href = row.deleteUrl;
+    actions.append(deleteAction);
+    deleteAction.observe('click', XWiki.index.trash.documents.confirmDelete.bindAsEventListener(deleteAction, table, i));
   }
   tr.appendChild(actions);
   return tr;
@@ -325,7 +400,7 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
 /**
  * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
  * deletion process.
- * 
+ *
  * @param event the link activation event
  * @param table the LiveTable javascript object
  * @param rowIdx the index of the row corresponding to the entry to be deleted
@@ -384,13 +459,13 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         'emptybin': true,
         'form_token': xm.form_token,
         'ajax': 1
-    }).done(function() {
+    }).then(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteDone')),
         'done'
       ));
       trashDocumentsLivetable.refresh();
-    }).fail(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('platform.index.trashDocumentsDeleteFailed')),
         'error'
@@ -411,6 +486,28 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
     $('#trashAllDeleted').toggleClass('disabled', trashDocumentsLivetable.totalRows &lt;= 0);
   };
+
+  // Restore a document which has been recreated at the original location.
+  var restoreDocumentConfirmModal = $('#restoreDocumentConfirmModal');
+  restoreDocumentConfirmModal.find('.btn-danger').on('click', function() {
+    var relatedTarget = restoreDocumentConfirmModal.data('relatedTarget');
+    $.post(relatedTarget.attr('data-deleteurl'), {
+      'confirm': 1,
+      'form_token': xm.form_token,
+      'ajax': 1
+    }).then(() =&gt; {
+      window.location.replace(relatedTarget.attr('data-restoreurl'));
+    }).catch(() =&gt; {
+      new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('platform.index.trashDocumentsReplacePageFailed')),
+        'failed'
+      );
+    });
+  });
+
+  $(document).on('show.bs.modal', '#restoreDocumentConfirmModal', function(event) {
+    $(this).data('relatedTarget', $(event.relatedTarget));
+  });
 
   var displayLivetable = function () {
     $('#documentsTrash').parents('.hidden').removeClass('hidden');
@@ -536,33 +633,29 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       <cache>long</cache>
     </property>
     <property>
-      <code>.itemActions .tool {
-  width: 16px;
-  height: 16px;
-  margin: 0 2px;
-  float: left;
-  text-indent: -1000em;
-  overflow: hidden;
-  background: transparent no-repeat center center;
+      <code>.actions {
+  .restore .action-icon {
+   color: @brand-success;
+  }
+  .cannot-restore .action-icon {
+     color: @brand-danger;
+  }
+  .replace .action-icon {
+     color: @brand-danger;
+  }
 }
-.itemActions .delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
-}
-.itemActions .restore {
-   background-image: url("$xwiki.getSkinFile('icons/silk/arrow_refresh.png')") !important;
-}
-.itemActions .cannot-restore {
-   background-image: url("$xwiki.getSkinFile('icons/silk/page_error.png')") !important;
+#restoreDocumentConfirmModal .btn-danger {
+  text-transform: capitalize;
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

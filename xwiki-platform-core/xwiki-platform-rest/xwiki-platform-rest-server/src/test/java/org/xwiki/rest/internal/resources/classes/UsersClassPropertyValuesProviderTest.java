@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
@@ -35,6 +37,11 @@ import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserConfiguration;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -68,6 +75,16 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
     private WikiUserManager wikiUserManager;
 
     private ClassPropertyReference propertyReference = new ClassPropertyReference("owner", this.classReference);
+
+    @MockComponent
+    private UserConfiguration userConfiguration;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    private UserPropertiesResolver userPropertiesResolver;
 
     @BeforeEach
     public void configure() throws Exception
@@ -184,11 +201,25 @@ public class UsersClassPropertyValuesProviderTest extends AbstractListClassPrope
         when(this.xcontext.getWiki().getPlainUserName(aliceReference, this.xcontext)).thenReturn("Alice White");
         when(this.xcontext.getWiki().getPlainUserName(bobReference, this.xcontext)).thenReturn("Bob Black");
 
+        when(this.userConfiguration.getUserQualifierProperty()).thenReturn("address");
+        UserReference aliceUserReference = mock(UserReference.class, "alice");
+        when(this.userReferenceResolver.resolve(aliceReference)).thenReturn(aliceUserReference);
+        UserReference bobUserReference = mock(UserReference.class, "bob");
+        when(this.userReferenceResolver.resolve(bobReference)).thenReturn(bobUserReference);
+        UserProperties aliceProperties = mock(UserProperties.class, "alice");
+        when(this.userPropertiesResolver.resolve(aliceUserReference)).thenReturn(aliceProperties);
+        UserProperties bobProperties = mock(UserProperties.class, "bob");
+        when(this.userPropertiesResolver.resolve(bobUserReference)).thenReturn(bobProperties);
+        when(aliceProperties.getProperty("address")).thenReturn("Paris, France");
+        when(bobProperties.getProperty("address")).thenReturn("Iasi, Romania");
+
         PropertyValues values = this.provider.getValues(this.propertyReference, 5, "foo");
 
         assertEquals(2, values.getPropertyValues().size());
         assertEquals("Alice White", values.getPropertyValues().get(0).getMetaData().get("label"));
+        assertEquals("Paris, France", values.getPropertyValues().get(0).getMetaData().get("hint"));
         assertEquals("Bob Black", values.getPropertyValues().get(1).getMetaData().get("label"));
+        assertEquals("Iasi, Romania", values.getPropertyValues().get(1).getMetaData().get("hint"));
 
         verify(this.allowedValuesQuery).setWiki("chess");
         verify(this.allowedValuesQuery, times(2)).execute();

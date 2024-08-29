@@ -22,12 +22,12 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -61,6 +61,8 @@ public class WARBuilder
     private static final Logger LOGGER = LoggerFactory.getLogger(WARBuilder.class);
 
     private static final String JAR = "jar";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
 
     private ExtensionMojoHelper extensionHelper;
 
@@ -124,8 +126,10 @@ public class WARBuilder
 
         // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
-        LOGGER.info("Found version = [{}]", xwikiVersion);
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        LOGGER.info("Found commons version = [{}]", commonsVersion);
+        String platformVersion = this.mavenResolver.getPlatformVersion();
+        LOGGER.info("Found platform version = [{}]", platformVersion);
 
         File webInfDirectory = new File(this.targetWARDirectory, "WEB-INF");
 
@@ -136,8 +140,8 @@ public class WARBuilder
             List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
-            Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
-                extraArtifacts);
+            Collection<ArtifactResult> artifactResults =
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -179,57 +183,13 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
-            // In order to work around issue https://jira.xwiki.org/browse/XWIKI-18335 with Jetty 10+, we replace
-            // jetty-web.xml with an overridden version when we're deploying on Jetty 10+
-            handleJetty10(webInfDirectory);
-
             // Mark it as having been built successfully
             touchMarkerFile();
         }
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
-    }
-
-    private void handleJetty10(File webInfDirectory) throws Exception
-    {
-        ServletEngine engine = this.testConfiguration.getServletEngine();
-        String tag = this.testConfiguration.getServletEngineTag();
-        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) >= 10) {
-            // Override the jetty-web.xml
-            copyJettyWebFile(webInfDirectory);
-        }
-    }
-
-    private void copyJettyWebFile(File webInfDirectory) throws Exception
-    {
-        File outputFile = new File(webInfDirectory, "jetty-web.xml");
-        if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Override jetty-web.xml since Jetty version is >= 10");
-        }
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty10-web.xml");
-            IOUtils.copy(is, fos);
-        }
-    }
-
-    private int extractJettyVersionFromDockerTag(String tag)
-    {
-        int result;
-        // TODO: Latest is currently 9.4.x for Jetty. Change this when it's no longer the case.
-        if (this.testConfiguration.getServletEngineTag() == null) {
-            result = 9;
-        } else {
-            try {
-                result = Integer.valueOf(this.testConfiguration.getServletEngineTag().substring(0, 2));
-            } catch (Exception e) {
-                // This can happen for example if we have "9-jre11" since "9-" will raise a NumberFormatException.
-                // In this case consider we're on 9.
-                result = 9;
-            }
-        }
-        return result;
+        this.configurationFilesGenerator.generate(webInfDirectory, platformVersion, this.artifactResolver);
     }
 
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
@@ -280,11 +240,11 @@ public class WARBuilder
         LOGGER.info("Copying JAR dependencies ...");
         createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: {}", artifact.getFile());
             }
             copyFile(artifact.getFile(), libDirectory);
-            if (testConfiguration.isDebug()) {
+            if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: {}", artifact.getFile());
             }
             generateXEDForJAR(artifact, libDirectory, this.mavenResolver);
@@ -306,48 +266,28 @@ public class WARBuilder
 
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
-        Artifact artifact;
-
         // Note: If the JDBC driver version is specified as "pom" or null then extract the information from the current
         // POM.
+        Properties pomProperties = this.mavenResolver.getPropertiesFromCurrentPOM();
+        String driverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
+            ? this.testConfiguration.getJDBCDriverVersion()
+            : getPropertyForDatabase("version", database, pomProperties);
+        String groupId = getPropertyForDatabase("groupId", database, pomProperties);
+        String artifactId = getPropertyForDatabase("artifactId", database, pomProperties);
 
-        switch (database) {
-            case MYSQL:
-                String mysqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("mysql.version");
-                artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
-                break;
-            case MARIADB:
-                String mariadbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("mariadb.version");
-                artifact = new DefaultArtifact("org.mariadb.jdbc", "mariadb-java-client", JAR, mariadbDriverVersion);
-                break;
-            case POSTGRESQL:
-                String pgsqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("pgsql.version");
-                artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
-                break;
-            case HSQLDB_EMBEDDED:
-                String hsqldbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("hsqldb.version");
-                artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
-                break;
-            case ORACLE:
-                String oracleDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
-                    ? this.testConfiguration.getJDBCDriverVersion()
-                    : this.mavenResolver.getPropertyFromCurrentPOM("oracle.version");
-                artifact = new DefaultArtifact("com.oracle.ojdbc", "ojdbc8", JAR, oracleDriverVersion);
-                break;
-            default:
-                throw new RuntimeException(
-                    String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));
-        }
-
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, JAR, driverVersion);
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
+    }
+
+    private String getPropertyForDatabase(String propertyName, Database database, Properties properties)
+    {
+        String value = properties.getProperty(String.format("%s.%s", database.getPomPropertyPrefix(), propertyName));
+        if (value == null) {
+            throw new RuntimeException(
+                String.format("Failed to get JDBC property [%s] for database [%s]. Database may not be supported yet!",
+                    propertyName, database));
+        }
+        return value;
     }
 
     private boolean isJDBCDriverSpecified(String jdbcDriverVersion)

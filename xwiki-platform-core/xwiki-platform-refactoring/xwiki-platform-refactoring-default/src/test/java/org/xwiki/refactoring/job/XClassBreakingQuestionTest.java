@@ -27,7 +27,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,10 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 10.10RC1
  * @version $Id$
  */
-public class XClassBreakingQuestionTest
+class XClassBreakingQuestionTest
 {
     @Test
-    public void markImpactedObject()
+    void markImpactedObject()
     {
         DocumentReference document1 = new DocumentReference("wiki1", "space1", "document1");
         DocumentReference document2 = new DocumentReference("wiki2", "space2", "document2");
@@ -81,7 +80,7 @@ public class XClassBreakingQuestionTest
     }
 
     @Test
-    public void selectAllFreePages()
+    void selectAllFreePages()
     {
         DocumentReference document1 = new DocumentReference("wiki1", "space1", "document1");
         DocumentReference document2 = new DocumentReference("wiki2", "space2", "document2");

@@ -1,0 +1,125 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="Image.Style.Code.Translations" locale="">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=Image Styles
+image.style.admin.heading=Image Style Administration
+image.style.administration.imageStyleList.heading=Image Styles
+image.style.administation.newImageStyle.button=Create the image style
+image.style.administation.defaultImageStyle.button=Update the default image style
+image.style.imageStyleSheet.backToAdministration.link=Back to the administration
+image.style.administration.liveData.doc.title=Identifier
+image.style.administration.liveData._actions=Actions
+image.style.administration.liveData.prettyName=Pretty Name
+image.style.administration.liveData.prettyName.hint=User oriented name of the image style
+image.style.administration.liveData.type=Type
+image.style.administration.liveData.type.hint=The type of the image style (used as a css class)
+image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=New Image Style
+image.style.administation.newImageStyle.hint=Identifier of the new image style.
+image.style.administation.newImageStyle.placeHolder=Identifier
+image.style.administation.newImageStyle.normalizedTitle=The new image style, following the naming conventions is [{0}].
+Image.Style.Code.ImageStyleClass_adjustableAlignment=Adjustable Alignment
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=When checked, the user is allowed to customize the aligment of the image.
+Image.Style.Code.ImageStyleClass_adjustableBorder=Adjustable Border
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=When checked, the user is allowed to customize the border of the image.
+Image.Style.Code.ImageStyleClass_adjustableSize=Adjustable Size
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=When checked, the user is allowed to customize the size of the image.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=Adjustable Text Wrap
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=When checked, the user is allowed to customize the text wrap of the image.
+Image.Style.Code.ImageStyleClass_defaultAlignment=Default Alignment
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Center
+Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=The default alignment of the image.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=None
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=Start
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Center
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=End
+Image.Style.Code.ImageStyleClass_defaultBorder=Default Border
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=When checked, the image has a border by default.
+Image.Style.Code.ImageStyleClass_defaultHeight=Default height
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=The default height of the image. If the default width is left empty, it will be computed according to the image ratio. Otherwise, the image will have a fixed size.
+Image.Style.Code.ImageStyleClass_defaultTextWrap=Default Text Wrap
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=When checked, the text will wrap around the image by default.
+Image.Style.Code.ImageStyleClass_defaultWidth=Default Width
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=The default width of the image. If the default height is left empty, it will be computed according to the image ratio. Otherwise, the image will have a fixed size.
+Image.Style.Code.ImageStyleClass_prettyName=Pretty Name
+Image.Style.Code.ImageStyleClass_prettyName_hint=User oriented name of the image style.
+Image.Style.Code.ImageStyleClass_type=Type
+Image.Style.Code.ImageStyleClass_type_hint=The type of the image style (used as a css class).
+Image.Style.Code.ConfigurationClass_defaultStyle=Default Style
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=The default image style for this wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Force Default Style
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=When checked, the constraints of the default style are forced in the image configuration, and users are forced to choose a style.</content>
+  <object>
+    <name>Image.Style.Code.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>104ae0ab-2315-4825-b18a-097c33a7158a</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

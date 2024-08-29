@@ -27,6 +27,8 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +47,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     implements PropertyInterface, Serializable, Cloneable
 {
     private static final long serialVersionUID = 1L;
+
+    private static final String MERGE_CONFLICT_LOG = "Collision found on property [{}] between from value [{}] and to"
+        + " [{}]";
 
     private BaseCollection object;
 
@@ -217,55 +222,112 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        super.merge(previousElement, newElement, configuration, context, mergeResult);
+        MergeManagerResult<ElementInterface, Object> mergeManagerResult =
+            this.merge(previousElement, newElement, configuration, context);
+        mergeResult.setModified(mergeResult.isModified() || mergeManagerResult.isModified());
+        mergeResult.getLog().addAll(mergeManagerResult.getLog());
+        // this method used to always set the value, no matter the result of
+        // MergeConfiguration#isProvidedVersionsModifiables.
+        setValue(((BaseProperty<R>)mergeManagerResult.getMergeResult()).getValue());
+    }
 
+    @Override
+    public MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context)
+    {
+        MergeManagerResult<ElementInterface, Object> mergeResult =
+            super.merge(previousElement, newElement, configuration, context);
+
+        // We don't change current result, but the one in the mergeResult so that we modify either current instance
+        // or a clone depending on the given configuration.
+        BaseProperty<R> modifiableResult = (BaseProperty<R>) mergeResult.getMergeResult();
         // Value
         Object previousValue = ((BaseProperty<R>) previousElement).getValue();
         Object newValue = ((BaseProperty<R>) newElement).getValue();
         if (previousValue == null) {
             if (newValue != null) {
                 if (getValue() == null) {
-                    setValue(newValue);
+                    modifiableResult.setValue(newValue);
+                    mergeResult.setModified(true);
                 } else {
                     // collision between current and new
-                    mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
-                        getName(), getValue(), newValue);
+                    if (configuration.getConflictFallbackVersion() == MergeConfiguration.ConflictFallbackVersion.NEXT) {
+                        modifiableResult.setValue(newValue);
+                        mergeResult.setModified(true);
+                    }
+                    mergeResult.getLog().error(MERGE_CONFLICT_LOG, getName(), getValue(), newValue);
                 }
             }
         } else if (newValue == null) {
             if (Objects.equals(previousValue, getValue())) {
-                setValue(null);
+                modifiableResult.setValue(null);
+                mergeResult.setModified(true);
             } else {
                 // collision between current and new
-                mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
-                    getName(), getValue(), newValue);
+                // We don't remove the value in fallback
+                mergeResult.getLog().error(MERGE_CONFLICT_LOG, getName(), getValue(), newValue);
             }
         } else {
             if (Objects.equals(previousValue, getValue())) {
-                setValue(newValue);
+                modifiableResult.setValue(newValue);
+                mergeResult.setModified(true);
             } else if (previousValue.getClass() != newValue.getClass()) {
                 // collision between current and new
-                mergeResult.getLog().error("Collision found on property [{}] between from value [] and to []",
-                    getName(), getValue(), newValue);
+                mergeResult.getLog().error(MERGE_CONFLICT_LOG, getName(), getValue(), newValue);
             } else if (!Objects.equals(newValue, getValue())) {
-                mergeValue(previousValue, newValue, mergeResult);
+                MergeManagerResult<Object, Object> mergeValueResult =
+                    mergeValue(previousValue, newValue, configuration);
+                mergeResult.getLog().addAll(mergeValueResult.getLog());
+                if (mergeValueResult.isModified()) {
+                    modifiableResult.setValue(mergeValueResult.getMergeResult());
+                    mergeResult.setModified(true);
+                    mergeResult.addConflicts(mergeValueResult.getConflicts());
+                }
             }
         }
+        return mergeResult;
     }
 
     /**
      * Try to apply 3 ways merge on property value.
+     * Note that this method modifies the internal value of the property.
      *
      * @param previousValue the previous version of the value
      * @param newValue the new version of the value
      * @param mergeResult merge report
      * @since 3.2M1
+     * @deprecated now use {@link #mergeValue(Object, Object, MergeConfiguration)}
      */
+    @Deprecated(since = "14.10.7,15.2RC1")
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
+        MergeManagerResult<Object, Object> result = this.mergeValue(previousValue, newValue, new MergeConfiguration());
+        mergeResult.setModified(mergeResult.isModified() || result.isModified());
+        mergeResult.getLog().addAll(result.getLog());
+        if (result.isModified()) {
+            setValue(result.getMergeResult());
+        }
+    }
+
+    /**
+     * Try to apply 3 ways merge on property value.
+     * Note that this method does not modify the internal value of the property.
+     *
+     * @param previousValue the previous version of the value
+     * @param newValue the new version of the value
+     * @param mergeConfiguration the merge configuration to use
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
+        MergeConfiguration mergeConfiguration)
+    {
+        MergeManagerResult<Object, Object> result = new MergeManagerResult<>();
+        result.setMergeResult(getValue());
         // collision between current and new: don't know how to apply 3 way merge on unknown type
-        mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]", getName(),
-            getValue(), newValue);
+        result.getLog().error(MERGE_CONFLICT_LOG, getName(), getValue(), newValue);
+        return result;
     }
 
     @Override
@@ -326,10 +388,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (ownerDocument != null && this.isValueDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isValueDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

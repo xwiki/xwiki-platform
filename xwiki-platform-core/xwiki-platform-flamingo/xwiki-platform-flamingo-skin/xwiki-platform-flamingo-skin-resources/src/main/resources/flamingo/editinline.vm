@@ -31,7 +31,6 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
 ##
 <div class="main">
-<div id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.
 ## ----------------------------------------------------------------------------
@@ -49,6 +48,13 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   </div>
 #end
 #template("hierarchy.vm")
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
+## Display a warning in case the document is restricted to explain explain the reason for potential errors.
+## Also, only display it to users with script right as it's very unlikely that others are impacted.
+#if ($doc.isRestricted() && $services.security.authorization.hasAccess('script'))
+  #warning($escapetool.xml($services.localization.render('core.document.restrictedEdit')))
+#end
 <div class="row">
   <div id="editMeta" class="col-xs-12 col-md-7">
     #template('editmeta.vm')
@@ -124,13 +130,18 @@ $renderedContent
   #end
   <input type="hidden" name="async" value="$escapetool.xml($async)" />
 #end
+## Pass the section number when the form is submitted in order to affect only the specified section.
+## We need to test if the section number is present to prevent a NumberFormatException for the empty string.
+#if("$!{request.section}" != '')
+  <input type="hidden" name="section" value="$!{escapetool.xml($request.section)}" />
+#end
 ## --------------
 ## Action buttons
 ## --------------
 #set($editactions = "bottom")
 <div class="bottombuttons sticky-buttons">#template("editactions.vm")</div>
 </div> ## form
+</main>## mainContentArea
 </form>
 #end ## can edit
-</div> ## mainContentArea
 </div> ## main

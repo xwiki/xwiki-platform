@@ -20,7 +20,9 @@
 package org.xwiki.search.solr.internal;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +49,7 @@ import org.xwiki.search.solr.SolrUtils;
 
 /**
  * Default implementation of {@link SolrUtils}.
- * 
+ *
  * @version $Id$
  * @since 12.3RC1
  */
@@ -146,7 +148,11 @@ public class DefaultSolrUtils implements SolrUtils
 
     private static final String PATTERN_GROUP = "(.+)";
 
+    private static final String PATTERN_EMPTY_STRING = "\"\"";
+
     private static final Pattern PATTERN_OR_AND_NOT = Pattern.compile("(OR|AND|NOT)");
+
+    private static final TypeVariable<Class<Iterable>> ITERABLE_PARAMETER = Iterable.class.getTypeParameters()[0];
 
     private static final Map<Class<?>, String> CLASS_SUFFIX_MAPPING = new HashMap<>();
 
@@ -219,12 +225,79 @@ public class DefaultSolrUtils implements SolrUtils
             }
         }
 
-        return typeName + 's';
+        // Fallback on list of strings when empty or full of null values
+        return (typeName != null ? typeName : SOLR_TYPE_STRING) + 's';
     }
 
-    private static String getTypeName(Class<?> valueClass)
+    private static String getTypeName(Class<?> clazz)
     {
-        return CLASS_SUFFIX_MAPPING.get(valueClass);
+        if (clazz != null) {
+            String typeName = CLASS_SUFFIX_MAPPING.get(clazz);
+
+            if (typeName != null) {
+                // It's a know class
+                return typeName;
+            }
+
+            if (Iterable.class.isAssignableFrom(clazz)) {
+                // We don't know the elements type so assume string
+                return SOLR_TYPE_STRINGS;
+            }
+
+            if (clazz.isArray()) {
+                typeName = getTypeName(clazz.getComponentType());
+
+                if (typeName != null) {
+                    // It's an array so use the multivalued version of the type
+                    return typeName + 's';
+                }
+            }
+
+        }
+
+        return null;
+    }
+
+    private static boolean isList(Class<?> clazz)
+    {
+        if (clazz != null && !CLASS_SUFFIX_MAPPING.containsKey(clazz)) {
+            return Iterable.class.isAssignableFrom(clazz) || clazz.isArray();
+        }
+
+        return false;
+    }
+
+    private static String getTypeName(Type type)
+    {
+        if (type != null) {
+            if (type instanceof Class) {
+                return getTypeName((Class) type);
+            } else if (type instanceof ParameterizedType) {
+                Type rawType = ((ParameterizedType) type).getRawType();
+
+                if (rawType instanceof Class && Iterable.class.isAssignableFrom((Class) rawType)) {
+                    Map<TypeVariable<?>, Type> variables = TypeUtils.getTypeArguments(type, Iterable.class);
+
+                    return getIterableTypeName(variables.get(ITERABLE_PARAMETER));
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static String getIterableTypeName(Type elementType)
+    {
+        if (elementType instanceof Class) {
+            String elementTypeName = CLASS_SUFFIX_MAPPING.get(elementType);
+
+            if (elementTypeName != null) {
+                // It's an Iterable so use the multivalued version of the type
+                return elementTypeName + 's';
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -254,7 +327,14 @@ public class DefaultSolrUtils implements SolrUtils
      */
     public static String getMapFieldName(String key, String mapFieldName, String type)
     {
-        return key + "__" + mapFieldName + '_' + type;
+        // Fallback on string type
+        return key + "__" + mapFieldName + '_' + (type != null ? type : SOLR_TYPE_STRING);
+    }
+
+    @Override
+    public String getMapFieldName(String key, String mapFieldName, Type type)
+    {
+        return getMapFieldName(key, mapFieldName, getTypeName(type));
     }
 
     @Override
@@ -487,6 +567,30 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public String toCompleteFilterQueryString(Object fieldValue)
+    {
+        String result = toFilterQueryString(fieldValue);
+
+        if ("".equals(result)) {
+            result = PATTERN_EMPTY_STRING;
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toCompleteFilterQueryString(Object fieldValue, Type valueType)
+    {
+        String result = toFilterQueryString(fieldValue, valueType);
+
+        if ("".equals(result)) {
+            result = PATTERN_EMPTY_STRING;
+        }
+
+        return result;
+    }
+
+    @Override
     public <T> T get(String fieldName, SolrDocument document, Type targetType)
     {
         return toValue(get(fieldName, document), targetType);
@@ -509,6 +613,12 @@ public class DefaultSolrUtils implements SolrUtils
 
     @Override
     public <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
+    {
+        return getList(fieldName, document, targetType);
+    }
+
+    @Override
+    public <T> List<T> getList(String fieldName, SolrDocument document, Type targetType)
     {
         Collection<?> solrCollection = document.getFieldValues(fieldName);
 
@@ -544,6 +654,6 @@ public class DefaultSolrUtils implements SolrUtils
             return null;
         }
 
-        return collection instanceof Set ? (List<T>) collection : new ArrayList<>(collection);
+        return collection instanceof List ? (List<T>) collection : new ArrayList<>(collection);
     }
 }

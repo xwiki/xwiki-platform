@@ -224,6 +224,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         remove(key, status.getReferences(), this.referenceMapping);
         remove(key, status.getRoleTypes(), this.roleTypeMapping);
         remove(key, status.getRoles(), this.roleMapping);
+        remove(key, status.getRights(), this.rightMapping);
     }
 
     private <T> void remove(String key, Set<T> values, Map<T, Set<String>> mapping)

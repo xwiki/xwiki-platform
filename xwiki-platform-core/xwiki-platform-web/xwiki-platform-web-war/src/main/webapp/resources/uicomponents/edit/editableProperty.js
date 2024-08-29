@@ -24,7 +24,7 @@
   'save',
   'core.editors.saveandcontinue.notification.inprogress',
   'core.editors.saveandcontinue.notification.done',
-  ['core.editors.saveandcontinue.notification.error', '<span id="saveFailureReason"/>'],
+  ['core.editors.saveandcontinue.notification.error', '<span id="saveFailureReason"></span>'],
   'web.editableProperty.editFailed',
   'web.editableProperty.viewFailed'
 ])
@@ -79,7 +79,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     // Prepare the editor. The 'form' CSS class is important because it ensures the action events (e.g.
     // xwiki:actions:beforeSave or xwiki:actions:cancel) don't have effects outside of this element. For instance,
     // saving or canceling one editable property shouldn't affect the other properties or the other forms on the page.
-    $('<dd class="editableProperty-editor form"/>').hide().insertAfter(viewer);
+    $('<dd class="editableProperty-editor form"></dd>').hide().insertAfter(viewer);
   };
 
   // Event listeners
@@ -113,14 +113,14 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var edit = function(editableProperty) {
     // Disable the edit action while we load the editor.
     var editIcon = editableProperty.find('.editableProperty-edit').addClass('disabled');
-    return $.get(XWiki.currentDocument.getURL('get'), {
+    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
       xpage: 'display',
       mode: 'edit',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
+      objectPolicy: editableProperty.data('objectPolicy'),
       language: xcontext.locale
-    }).done(function(html, textStatus, jqXHR) {
-      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+    })).then(html => {
       // Replace the edit action with the save and cancel actions.
       editIcon.hide();
       editableProperty.find('.editableProperty-save, .editableProperty-cancel').show();
@@ -131,9 +131,10 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       $(document).trigger('xwiki:dom:updated', {'elements': editor.toArray()});
       // Focus the first visible input.
       editor.find(':input').filter(':visible').focus();
-    }).fail(function() {
+    }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
-    }).always(function() {
+      return Promise.reject();
+    }).finally(() => {
       // Re-enable the edit action (even if hidden).
       editIcon.removeClass('disabled');
     });
@@ -165,61 +166,46 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     data.push({name: 'minorEdit', value: true});
     data.push({name: 'form_token', value: xcontext.form_token});
     data.push({name: 'ajax', value: true});
+    data.push({name: 'objectPolicy', value: editableProperty.data('objectPolicy')});
     // Make the request to save the property.
-    return $.post(XWiki.currentDocument.getURL('save'), data).done(function() {
+    return Promise.resolve($.post(XWiki.currentDocument.getURL('save'), data)).then(() => {
       editor.trigger('xwiki:document:saved');
       notification.replace(new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.done'],
         'done'));
-    }).fail(function(response) {
+    }).catch(response => {
       editor.trigger('xwiki:document:saveFailed');
       notification.replace(new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.error'],
         'error'));
       $('#saveFailureReason').text(response.statusText);
-    }).always(function() {
+      return Promise.reject();
+    }).finally(() => {
       // Re-enable the save and cancel actions.
       editableProperty.find('.editableProperty-save, .editableProperty-cancel').removeClass('disabled');
     });
   };
 
   var view = function(editableProperty) {
-    return $.get(XWiki.currentDocument.getURL('get'), {
+    return Promise.resolve($.get(XWiki.currentDocument.getURL('get'), {
       xpage: 'display',
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
+      objectPolicy: editableProperty.data('objectPolicy'),
       language: xcontext.locale
-    }).done(function(html, textStatus, jqXHR) {
-      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
+    })).then(html => {
       // Update the viewer.
       var viewer = editableProperty.next('.editableProperty-viewer').html(html);
       // Cancel the edit if needed.
       cancel(editableProperty);
       // Allow others to enhance the viewer.
       $(document).trigger('xwiki:dom:updated', {'elements': viewer.toArray()});
-    }).fail(function() {
+    }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.viewFailed'], 'error');
+      return Promise.reject();
     });
   };
 
   var saveAndView = function(editableProperty) {
-    return save(editableProperty).then($.proxy(view, null, editableProperty));
-  };
-
-  // Helpers
-
-  var loadRequiredSkinExtensions = function(requiredSkinExtensions) {
-    var existingSkinExtensions;
-    var getExistingSkinExtensions = function() {
-      return $('link, script').map(function() {
-        return $(this).attr('href') || $(this).attr('src');
-      }).get();
-    };
-    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
-      if (!existingSkinExtensions) {
-        existingSkinExtensions = getExistingSkinExtensions();
-      }
-      var url = $(this).attr('href') || $(this).attr('src');
-      return existingSkinExtensions.indexOf(url) < 0;
-    }).appendTo('head');
+    return save(editableProperty).then(view.bind(null, editableProperty));
   };
 });
 

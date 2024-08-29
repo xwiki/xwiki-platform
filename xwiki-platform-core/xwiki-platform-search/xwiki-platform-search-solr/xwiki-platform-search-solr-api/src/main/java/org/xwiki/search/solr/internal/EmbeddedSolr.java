@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -47,9 +49,10 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
-import org.apache.solr.core.SolrCore;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
+import org.apache.solr.servlet.SolrDispatchFilter;
 import org.apache.solr.core.CoreDescriptor;
+import org.apache.solr.core.SolrCore;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
@@ -78,6 +81,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
      */
     public static final String TYPE = "embedded";
 
+    private static final String SOLRCONFIG_PATH = "conf/solrconfig.xml";
+
     /**
      * Solr configuration.
      */
@@ -100,13 +105,18 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     public void initialize() throws InitializationException
     {
         this.solrHomePath = Paths.get(this.solrConfiguration.getHomeDirectory()).toAbsolutePath();
-        this.solrSearchCorePath = this.solrHomePath.resolve(SolrClientInstance.CORE_NAME);
+        this.solrSearchCorePath = this.solrHomePath.resolve(toSolrCoreName(SolrClientInstance.CORE_NAME));
 
         try {
             // Create the Solr home if it does not already exist
             if (!Files.exists(this.solrHomePath)) {
                 createHomeDirectory();
+            } else {
+                updateHomeDirectory();
             }
+
+            // Solr expects the Solr home path to be indicated as system property
+            System.setProperty(SolrDispatchFilter.SOLR_INSTALL_DIR_ATTRIBUTE, this.solrHomePath.toString());
 
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {
@@ -116,6 +126,13 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                     recreateSearchCore();
                 }
             } else {
+                // Remove search cores from previous locations
+                Path pre1601Path = this.solrHomePath.resolve(SolrClientInstance.CORE_NAME);
+                if (Files.exists(pre1601Path)) {
+                    FileUtils.deleteDirectory(pre1601Path.toFile());
+                }
+
+                // Create the new search core
                 createSearchCore();
             }
 
@@ -143,7 +160,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                     failure.getValue().exception);
             }
 
-            if (coreContainer.getCores().isEmpty()) {
+            if (coreContainer.getLoadedCoreNames().isEmpty()) {
                 throw new SolrServerException(
                     "Failed to initialize the Solr core. Please check previous log messages.");
             }
@@ -161,13 +178,13 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     }
 
     @Override
-    protected SolrClient createCore(SolrCoreInitializer initializer) throws SolrException
+    protected SolrClient createSolrClient(String solrCoreName, boolean isCache) throws SolrException
     {
         // Prepare the filesystem
-        // TODO: get rid of that we we find out how to have Solr fully create the core as it should...
+        // TODO: get rid of that when we find out how to have Solr fully create the core as it should...
         Path corePath;
         try {
-            corePath = prepareCore(initializer);
+            corePath = prepareCore(solrCoreName);
         } catch (IOException e) {
             throw new SolrException("Failed to prepare the Solr core storage", e);
         }
@@ -175,30 +192,30 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         Map<String, String> parameters = new HashMap<>();
 
         // Indicate the path of the data
-        if (initializer.isCache()) {
-            parameters.put(CoreDescriptor.CORE_DATADIR, getCacheCoreDataDir(corePath, initializer.getCoreName()).toString());
+        if (isCache) {
+            parameters.put(CoreDescriptor.CORE_DATADIR, getCacheCoreDataDir(corePath, solrCoreName).toString());
         }
 
         // Don't load the core on startup to workaround a possible dead lock during Solr init
         parameters.put(CoreDescriptor.CORE_LOADONSTARTUP, "false");
 
         // Create the actual core
-        SolrCore core = this.container.create(initializer.getCoreName(), parameters);
+        SolrCore core = this.container.create(solrCoreName, parameters);
 
         // Return a usable SolrClient instance
         return new EmbeddedSolrServer(core);
     }
 
-    private Path prepareCore(SolrCoreInitializer initializer) throws IOException
+    private Path prepareCore(String solrCoreName) throws IOException
     {
-        Path corePath = this.container.getConfig().getCoreRootDirectory().resolve(initializer.getCoreName());
+        Path corePath = this.container.getConfig().getCoreRootDirectory().resolve(solrCoreName);
 
         // Create the core directory
         Files.createDirectory(corePath);
 
         // Copy configuration
         try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
-            copyCoreConfiguration(stream, corePath, true);
+            copyCoreConfiguration(stream, corePath, true, null);
         }
 
         return corePath;
@@ -214,6 +231,12 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
     }
 
+    @Override
+    protected int getSolrMajorVersion()
+    {
+        return Version.LATEST.major;
+    }
+
     /**
      * Useful when testing.
      * 
@@ -224,19 +247,21 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return this.container;
     }
 
-    private boolean isExpectedSolrVersion(File solrconfigFile)
+    private Version getLuceneVersion(File solrconfigFile)
     {
         XMLInputFactory factory = XMLInputFactory.newInstance();
+        // Prevent any XXE attack by disabling DOCTYPE declarations (even though we control the solr config file and
+        // thus the risk is almost non-existent. The user would need to find a way to replace it).
+        // Note that all solrconfig files checked didn't contain any DOCTYPE so that should be good.
+        // This will also prevent SonarQube from complaining every time this file is modified.
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
         try (FileReader reader = new FileReader(solrconfigFile)) {
             XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);
 
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
                 if (xmlReader.getLocalName().equals("luceneMatchVersion")) {
-                    String versionStr = xmlReader.getElementText();
-
-                    // Valid if the version used in the configuration is the currently bundled version
-                    return Version.LATEST.toString().equals(versionStr);
+                    return Version.parse(xmlReader.getElementText());
                 }
             }
         } catch (Exception e) {
@@ -245,7 +270,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
 
         // Not the right version or invalid configuration
-        return false;
+        return null;
     }
 
     private boolean isSearchCoreValid()
@@ -258,8 +283,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
 
         // Check solrconfig.xml
-        File solrconfigFile = this.solrSearchCorePath.resolve("conf/solrconfig.xml").toFile();
-        return solrconfigFile.exists() && isExpectedSolrVersion(solrconfigFile);
+        File solrconfigFile = this.solrSearchCorePath.resolve(SOLRCONFIG_PATH).toFile();
+        return solrconfigFile.exists() && Version.LATEST.equals(getLuceneVersion(solrconfigFile));
     }
 
     private void recreateSearchCore() throws IOException
@@ -273,11 +298,22 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             FileUtils.deleteDirectory(this.solrSearchCorePath.toFile());
 
             // Delete the data directory
-            FileUtils.deleteDirectory(resolveCacheCoreDataPath(SolrClientInstance.CORE_NAME).toFile());
+            FileUtils.deleteDirectory(resolveCacheCoreDataPath(toSolrCoreName(SolrClientInstance.CORE_NAME)).toFile());
         }
 
         // Recreate
         createSearchCore();
+    }
+
+    private void writeHomeConfiguration() throws IOException
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append("<solr>");
+        // Disable the log watcher until Solr support SLF4J 2
+        // FIXME: remove when Solr upgrade SLF4J (or stop logging a stack trace at least)
+        builder.append("<logging><str name=\"enabled\">false</str></logging>");
+        builder.append("</solr>");
+        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), builder.toString(), StandardCharsets.UTF_8);
     }
 
     private void createHomeDirectory() throws IOException
@@ -290,8 +326,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         // Create the home directory
         Files.createDirectories(this.solrHomePath);
 
-        // Copy the default solr.xml configuration file
-        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
+        // Write the default solr.xml configuration file
+        writeHomeConfiguration();
 
         // [RETRO COMPATIBILITY for < 12.3]
         // Check if the solr home is not already at the old location (/solr) and move things
@@ -308,15 +344,58 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
     }
 
-    private void copyCoreConfiguration(InputStream stream, Path corePath, boolean skipCoreProperties) throws IOException
+    private void updateHomeDirectory() throws IOException
+    {
+        // Make sure the Solr Home contains expected configuration
+
+        this.logger.info("Updating Solr home directory at [{}]", this.solrHomePath);
+
+        // Reset the solr.xml configuration file
+        writeHomeConfiguration();
+
+        // Make sure cores have the expected configuration
+        try (Stream<Path> stream = Files.list(this.solrHomePath)) {
+            stream.filter(Files::isDirectory).forEach(this::updateCore);
+        }
+    }
+
+    private void updateCore(Path corePath)
+    {
+        try {
+            if (this.componentManager.hasComponent(SolrCoreInitializer.class,
+                toXWikiCoreName(corePath.getFileName().toString()))) {
+                Path solrconfig = corePath.resolve(SOLRCONFIG_PATH);
+
+                // If Solr was upgraded, reset the solrconfig.xml
+                if (Files.exists(solrconfig)) {
+                    Version luceneVersion = getLuceneVersion(solrconfig.toFile());
+
+                    // But only if it's the same major version (otherwise it needs to be migrated to a totally different
+                    // core)
+                    if (luceneVersion == null || getSolrMajorVersion() == luceneVersion.major) {
+                        // Reset solr configuration
+                        try (InputStream stream = this.solrConfiguration.getMinimalCoreDefaultContent()) {
+                            copyCoreConfiguration(stream, corePath, true, Set.of(SOLRCONFIG_PATH));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to update Solr core located at [{}]", corePath, e);
+        }
+    }
+
+    private void copyCoreConfiguration(InputStream stream, Path corePath, boolean skipCoreProperties, Set<String> force)
+        throws IOException
     {
         try (ZipInputStream zstream = new ZipInputStream(stream)) {
             for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
                 Path targetPath = corePath.resolve(entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(targetPath);
-                } else if (!skipCoreProperties || !entry.getName().equals("core.properties")) {
-                    FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), targetPath.toFile());
+                } else if ((force != null && force.contains(entry.getName())) || (!Files.exists(targetPath)
+                    && (!skipCoreProperties || !entry.getName().equals("core.properties")))) {
+                    FileUtils.copyInputStreamToFile(CloseShieldInputStream.wrap(zstream), targetPath.toFile());
                 }
             }
         }
@@ -325,28 +404,29 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private void createSearchCore() throws IOException
     {
         // Copy configuration
-        copyCoreConfiguration(this.solrConfiguration.getSearchCoreDefaultContent(), this.solrSearchCorePath, false);
+        copyCoreConfiguration(this.solrConfiguration.getSearchCoreDefaultContent(), this.solrSearchCorePath, false,
+            null);
 
         // Indicate the path of the data
-        createCacheCore(this.solrSearchCorePath, SolrClientInstance.CORE_NAME);
+        createCacheCore(this.solrSearchCorePath, toSolrCoreName(SolrClientInstance.CORE_NAME));
     }
 
-    private void createCacheCore(Path corePath, String core) throws IOException
+    private void createCacheCore(Path corePath, String solrCoreName) throws IOException
     {
         // Indicate the path of the data
-        Path dataPath = getCacheCoreDataDir(corePath, core);
+        Path dataPath = getCacheCoreDataDir(corePath, solrCoreName);
         FileUtils.write(corePath.resolve("core.properties").toFile(), "dataDir=" + dataPath, StandardCharsets.UTF_8,
             true);
     }
 
-    private Path getCacheCoreDataDir(Path corePath, String core)
+    private Path getCacheCoreDataDir(Path corePath, String solrCoreName)
     {
-        return corePath.relativize(resolveCacheCoreDataPath(core));
+        return corePath.relativize(resolveCacheCoreDataPath(solrCoreName));
 
     }
 
-    private Path resolveCacheCoreDataPath(String core)
+    private Path resolveCacheCoreDataPath(String solrCoreName)
     {
-        return this.environment.getPermanentDirectory().toPath().resolve("cache/solr/" + core).toAbsolutePath();
+        return this.environment.getPermanentDirectory().toPath().resolve("cache/solr/" + solrCoreName).toAbsolutePath();
     }
 }

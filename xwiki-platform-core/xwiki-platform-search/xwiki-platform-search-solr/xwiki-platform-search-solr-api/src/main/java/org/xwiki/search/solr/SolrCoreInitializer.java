@@ -30,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.2
  */
 @Role
-@Unstable
 public interface SolrCoreInitializer
 {
     /**
@@ -43,8 +42,22 @@ public interface SolrCoreInitializer
      * 
      * @param client to manipulate the core
      * @throws SolrException when failing to initialize the core
+     * @deprecated use {@link #initialize(XWikiSolrCore)} instead
      */
+    @Deprecated(since = "16.1.0RC1")
     void initialize(SolrClient client) throws SolrException;
+
+    /**
+     * Initialize the client after its creation.
+     * 
+     * @param core to manipulate the core
+     * @throws SolrException when failing to initialize the core
+     * @since 16.2.0RC1
+     */
+    default void initialize(XWikiSolrCore core) throws SolrException
+    {
+        initialize(core.getClient());
+    }
 
     /**
      * Indicate if the the core content is considered to be caching (it's possible to recreate it if the core is lost).
@@ -57,5 +70,17 @@ public interface SolrCoreInitializer
     default boolean isCache()
     {
         return false;
+    }
+
+    /**
+     * @param sourceCore the core to copy from
+     * @param targetCore the core to copy to
+     * @throws SolrException when failing to migrate the core
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    default void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        // Do nothing by default
     }
 }

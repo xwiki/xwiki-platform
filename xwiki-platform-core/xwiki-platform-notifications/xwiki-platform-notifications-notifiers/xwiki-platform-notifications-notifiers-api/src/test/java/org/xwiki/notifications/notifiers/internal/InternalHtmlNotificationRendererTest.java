@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.internal.RestrictedConfigurationSourceProvider;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.notifications.CompositeEvent;
@@ -44,6 +46,12 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.xml.internal.html.DefaultHTMLElementSanitizer;
+import org.xwiki.xml.internal.html.HTMLDefinitions;
+import org.xwiki.xml.internal.html.HTMLElementSanitizerConfiguration;
+import org.xwiki.xml.internal.html.MathMLDefinitions;
+import org.xwiki.xml.internal.html.SVGDefinitions;
+import org.xwiki.xml.internal.html.SecureHTMLElementSanitizer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -63,6 +71,14 @@ import static org.mockito.Mockito.when;
     DefaultXHTMLLinkTypeRenderer.class,
     DefaultXHTMLImageRenderer.class,
     DefaultXHTMLImageTypeRenderer.class,
+    DefaultHTMLElementSanitizer.class,
+    SecureHTMLElementSanitizer.class,
+    HTMLElementSanitizerConfiguration.class,
+    RestrictedConfigurationSourceProvider.class,
+    HTMLDefinitions.class,
+    MathMLDefinitions.class,
+    SVGDefinitions.class,
+    DefaultExecution.class
 })
 public class InternalHtmlNotificationRendererTest
 {

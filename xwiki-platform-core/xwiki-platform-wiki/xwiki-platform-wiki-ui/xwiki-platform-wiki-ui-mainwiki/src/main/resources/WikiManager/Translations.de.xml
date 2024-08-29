@@ -76,9 +76,9 @@ platform.wiki.menu.deletewiki=Löschen
 platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-### Missing: platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-### Missing: platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=Die Java Komponente "Wiki" ist nicht installiert. Die Seite wird möglicherweise nicht funktionieren. Überprüfe ob die "Wiki API" und "Wiki Script" Erweiterungen installiert sind (mit dem Extension-Manager) oder ob die Dateien 'xwiki-platform-wiki-api-&lt;version&gt;.jar' und 'xwiki-platform-wiki-script-&lt;version&gt;.jar' unter dem Pfad 'WEB-INF/lib/' des Web-Ordners vorhanden sind (wenn eine manuelle Installation durchgeführt wurde).
+platform.wiki.dependencies.template.missing=Die Java Komponente "Wiki Template" ist nicht installiert. Die Seite wird möglicherweise nicht funktionieren. Überprüfe ob die "Wiki Template API" und "Wiki Template Script" Erweiterungen installiert sind (mit dem Extension-Manager) oder ob die Dateien 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' und 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' unter dem Pfad 'WEB-INF/lib/' des Web-Ordners vorhanden sind (wenn eine manuelle Installation durchgeführt wurde).
+platform.wiki.dependencies.user.missing=Die Java Komponente "Wiki User" ist nicht installiert. Die Seite wird möglicherweise nicht funktionieren. Überprüfe ob die "Wiki User API" und "Wiki User Script" Erweiterungen installiert sind (mit dem Extension-Manager) oder ob die Dateien 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' und 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' unter dem Pfad 'WEB-INF/lib/' des Web-Ordners vorhanden sind (wenn eine manuelle Installation durchgeführt wurde).
 
 ## Create
 platform.wiki.create.button=Wiki erstellen
@@ -102,36 +102,36 @@ platform.wiki.csrf.error=Ungültiges Sicherheitstoken. Bitte Aktion wiederholen.
 platform.wiki.users.userAlreadyMemberOfWiki=Der Benutzer {0}{1}{2} ist bereits ein Mitglied des Wikis {3}{4}{5}.
 platform.wiki.users.userNotMemberOfWiki=Der Benutzer {0}{1}{2} ist kein Mitglied des Wikis {3}{4}{5}.
 platform.wiki.users.logInToContinue=Um fortzufahren, müssen Sie {0} zuerst {1} anmelden.
-### Missing: platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.error.needInvitation=This wiki is invite only. To do so, you need to receive an invitation from one of its admins.
-### Missing: platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-### Missing: platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
+platform.wiki.users.invitation.userAcceptedNotification=Der Benutzer ''{0}'' ({1}) hat die Einladung zum Beitritt zum Wiki ''{2}'' ({3}) angenommen.
+platform.wiki.users.invitation.userAcceptedSuccess=Der Benutzer {0}{1}{2} hat die Einladung erfolgreich angenommen und ist dem Wik {3}{4}{5} beigetreten.
+platform.wiki.users.invitation.userRejectedSuccess=Der Benutzer {0}{1}{2} hat die Einladung zum Wiki {3}{4}{5} erfolgreich abgelehnt.
+platform.wiki.users.join.error.needInvitation=In dieses Wiki muss man eingeladen werden. Eine Einladung kann nur über den Admin dieses Wikis erfolgen.
+platform.wiki.users.join.request.pendingRequestExists=Der Benutzer {0}{1}{2} hat bereits eine ausstehende Anfrage für das Wiki {3}{4}{5}. Bitte auf die Überprüfung durch einen Admin warten.
+platform.wiki.users.join.request.cancelConfirmation=Sind Sie sicher, dass Sie die Anfrage für das Wiki {0}{1}{2} abbrechen möchten?
 platform.wiki.users.join.request.cancelYes=Ja
 platform.wiki.users.join.request.cancelNo=nein
-### Missing: platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-### Missing: platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-### Missing: platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelSuccess=Der Benutzer {0}{1}{2} hat die Beitrittsanfrage zum Wiki {3}{4}{5} erfolgreich abgebrochen.
+platform.wiki.users.join.request.saveNotification=Der Benutzer ''{0}'' ({1}) hat angefragt, dem Wiki ''{2}'' ({3}) beizutreten.
+platform.wiki.users.join.request.success=Der Benuzter {0}{1}{2} hat die Beitrittsanfrage zu Wiki {3}{4}{5} erfolgreich abgeschickt.
+platform.wiki.users.join.confirmation=Sind Sie sicher, dass sie dem Wiki {0}{1}{2} beitreten wollen?
 platform.wiki.users.join.yes=Ja
 platform.wiki.users.join.no=Nein
-### Missing: platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
-### Missing: platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki cannot leave it unless the wiki is deleted or the owner is changed.
-### Missing: platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
+platform.wiki.users.join.success=Der Benutzer {0}{1}{2} trat dem Wiki {3}{4}{5} erfolgreich bei.
+platform.wiki.users.leave.error.userIsOwner=Der Benutzer {0}{1}{2} ist der Besitzer des Wikis {3}{4}{5}. Der Besitzer eines Wikis kann es nicht verlassen bis es entweder gelöscht oder der Besitzer geändert wurde.
+platform.wiki.users.leave.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} verlassen wollen?
 platform.wiki.users.leave.confirmation.yes=Ja
 platform.wiki.users.leave.confirmation.no=Nein
-### Missing: platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
+platform.wiki.users.leave.success=Der Benutzer {0}{1}{2} hat das Wiki {3}{4}{5} erfolgreich verlassen.
 ### Missing: platform.wiki.users.join.title=Join Wiki
-### Missing: platform.wiki.users.leave.title=Leave Wiki "{0}"
-### Missing: platform.wiki.users.leave.empty=Leave Wiki
+platform.wiki.users.leave.title=Verlassen Sie das Wiki "{0}"
+platform.wiki.users.leave.empty=Verlassen Sie das Wiki
 platform.wiki.users.delete.title=Wiki "{0}" löschen
 ### Missing: platform.wiki.users.delete.empty=Delete Wiki
-### Missing: platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-### Missing: platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After doing so, a wiki admin will review and consider your request.
-### Missing: platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
-### Missing: platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
-### Missing: platform.wiki.users.invitation.message.label=Invitation message
+platform.wiki.users.invitation.reply.hint=Eine für den Wiki-Administrator einsehbare Antwortnachricht zum Senden, in der Sie Ihre Entscheidung begründen können.
+platform.wiki.users.join.request.hint=Um dem Wiki {0}{1}{2} beizutreten, müssen Sie zuerst eine Beitrittsanfrage stellen. Danach wird ein Wiki-Administrator Ihre Anfrage prüfen und berücksichtigen.
+platform.wiki.users.join.request.message.hint=Eine für den Wiki-Administrator einsehbare Nachricht zum Senden, in der Sie Ihre Entscheidung begründen können.
+platform.wiki.users.invitation.title=Sie wurden in das Wiki {0}{1}{2} eingeladen.
+platform.wiki.users.invitation.message.label=Einladungsnachricht
 platform.wiki.users.invitation.reply.title=Antworten
 platform.wiki.users.invitation.accept.label=Akzeptieren
 platform.wiki.users.invitation.reject.label=Abweisen
@@ -151,9 +151,9 @@ platform.wiki.users.profile.activity.show=Aktivität zeigen
 
 ## Wiki Deletion
 platform.wiki.delete.confirmation=Sind Sie sicher, dass Sie das Wiki {0}{1}{2} löschen wollen? Dies kann nicht rückgängig gemacht werden!
-### Missing: platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
-### Missing: platform.wiki.delete.error.wikiIdDoesNotMatch=Type in the exact Wiki Identifier of the wiki that should be deleted.
-platform.wiki.delete.success=Benutzer {0}{1}{2}  hat das Wiki ''{3}'' erfolgreich gelöscht.
+platform.wiki.delete.confirmation.retypeWikiId=Bitte wiederholen Sie hier die Kennung (Identifier) des Wikis:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Geben Sie die genaue Wiki-Kennung (Identifier) des Wikis ein, das gelöscht werden soll.
+platform.wiki.delete.success=Benutzer {0}{1}{2} hat das Wiki ''{3}'' erfolgreich gelöscht.
 
 ## Wiki macro
 platform.wiki.macro.noWikis=Derzeit existieren keine Wikis (außer dem Hauptwiki).
@@ -218,27 +218,26 @@ platform.wiki.create.wizard.template.noTemplate=Keine Vorlage (Voreinstellung)
 platform.wiki.create.wizard.userScope.label=Benutzer
 platform.wiki.create.wizard.userScope.hint=Wählen Sie, welche Art von Benutzern auf das Wiki zugreifen kann
 platform.wiki.create.wizard.template.label=Vorlage
-### Missing: platform.wiki.create.wizard.flavortemplate.label=Flavor / Template
-### Missing: platform.wiki.create.wizard.flavortemplate.hint=Flavor or Template to use as the initial content of the new wiki
-### Missing: platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+platform.wiki.create.wizard.flavortemplate.label=Vorlage / Template
+platform.wiki.create.wizard.flavortemplate.hint=Vorlage oder Template, die als anfänglicher Inhalt des neuen Wikis verwendet werden soll
+platform.wiki.create.wizard.flavortemplate.flavorTab=Variante
 ### Missing: platform.wiki.create.wizard.flavortemplate.templateTab=Template
 platform.wiki.create.wizard.step.dw=Nachdem Sie auf "Erstellen" klicken, wird das Wiki erstellt und es erscheint der Installationsassistent, um das Wiki zu initialisieren. Wenn Sie den Assistenten abbrechen, wird das Wiki leer sein.
 platform.wiki.create.wizard.step.previous=Vorheriger Schritt
 platform.wiki.create.wizard.step.next=Zum nächsten Schritt
 platform.wiki.create.wizard.step.create=Erstellen
-
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
-### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
-### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
-### Missing: platform.wiki.create.wizard.step.creation.error=The creation of the wiki {0} failed. It''s recommended to delete it.
+platform.wiki.create.wizard.step.creation.wait=Bitte warten Sie, bis das Wiki erstellt ist.
+platform.wiki.create.wizard.step.creation.complete=Das Wiki {0} wurde erfolgreich erstellt. Sie können es nun benutzen.
+platform.wiki.create.wizard.step.creation.errorlog=Während dieses Vorgangs wurden Fehler generiert, die Sie möglicherweise überprüfen möchten.
+platform.wiki.create.wizard.step.creation.error=Die Erstellung des Wikis {0} scheiterte. Es wird empfohlen, es zu löschen.
 ### Missing: platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
-### Missing: admin.wikis.description=Wikis management.
-### Missing: admin.wikis.templates=Wiki Templates
-### Missing: admin.wikis.templates.description=Manage the wiki templates
-### Missing: admin.wikis.templates.hint=A template is a wiki that will be considered as a model to create new wikis. When a user selects a template to create a new wiki, all the content of the template is copied in the new wiki.
+admin.wikis.description=Wiki-Verwaltung.
+admin.wikis.templates=Wiki Vorlagen
+admin.wikis.templates.description=Verwalten Sie die Wiki Vorlagen
+admin.wikis.templates.hint=Eine Vorlage ist ein Wiki, das als Modell zum Erstellen neuer Wikis genutzt wird. Wenn ein Benutzer eine Vorlage zum Erstellen eines neuen Wikis auswählt, wird der gesamte Inhalt der Vorlage in das neue Wiki kopiert.
 admin.wikis.rights=Berechtigung, um Wikis zu erstellen
 
 ## XWikiServer Sheet
@@ -251,7 +250,7 @@ platform.wiki.sheet.title.viewaliases=Aliasse ansehen
 platform.wiki.sheet.desc.wikiprettyname=Der angezeigte Name des Wikis.
 platform.wiki.sheet.desc.owner=Ein globaler Benutzer, welcher alle Rechte im Wiki inne haben wird.
 platform.wiki.sheet.desc.secure=Wenn aktiviert, dann fangen alle vom Wiki generierten URLs mit //https// an.
-### Missing: platform.wiki.sheet.desc.port=The port to use for all this wiki's generated externals URLs. If not set it's inherited from the configuration and the main wiki. Only taken into account for domain based URLs.
+platform.wiki.sheet.desc.port=Der Port, der für alle generierten externen URLs dieses Wikis verwendet werden soll. Wenn es nicht gesetzt ist, wird es von der Konfiguration und dem Haupt-Wiki vererbt. Der Port wird nur bei domain-basierten URLs berücksichtigt.
 platform.wiki.sheet.desc.iswikitemplate=Signalisiert, dass dieses Wiki als Vorlage für weitere Wikis benutzt werden kann.
 platform.wiki.sheet.desc.server=Der Alias, under dem das Wiki erreichbar sein wird.
 platform.wiki.sheet.desc.description=Eine kurze Beschreibung.
@@ -264,7 +263,7 @@ platform.wiki.sheet.prop.description=Beschreibung
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Startseite
 platform.wiki.sheet.prop.iswikitemplate=Wiki Vorlage
-platform.wiki.sheet.descriptor=Diese Seite zeigt einige Eigenschaften  des Wikis "{0}" an. Mehr Konfigurationsoptionen bietet die
+platform.wiki.sheet.descriptor=Diese Seite bestimmt den Zugang zum Wiki "{0}" und einige Eigenschaften. Mehr Konfigurationsoptionen unter
 platform.wiki.sheet.descriptor.admin=Administration in dem Wiki.
 platform.wiki.sheet.aliases=Ein Alias ist ein alternativer Name für das Wiki. Sie können Aliasse hinzufügen, um das Wiki unter unterschiedlichen URLs erreichbar zu machen.
 
@@ -290,7 +289,7 @@ admin.wikis.template=Wiki Vorlage
 #######################################
 ## until 7.0M2
 #######################################
-platform.wiki.create.wizard.step.provisioning=Das System erstellt das Wiki
+platform.wiki.create.wizard.step.provisioning=Das System erstellt das Wiki.
 platform.wiki.create.wizard.step.provisioning.wait=Bitte warten Sie, während das System das Wiki erstellt.
 platform.wiki.create.wizard.step.provisioning.complete=Das neue Wiki ist fast fertig. Bitte wählen Sie "Fertigstellen", um den Prozess abzuschliessen.
 platform.wiki.create.wizard.step.provisioning.error=Das Wiki {0} wurde zwar erstellt, jedoch konnten einige Dokumente aus der Vorlage nicht kopiert werden. Möglicherweise sollten Sie das Wiki löschen und es nochmal versuchen.
@@ -299,9 +298,10 @@ platform.wiki.create.wizard.step.provisioning.finalize=Fertigstellen
 #######################################
 ## until 9.5-rc-1
 #######################################
-platform.wiki.delete.confirmation.yes=Ja
-platform.wiki.delete.confirmation.no=Nein
+platform.wiki.delete.confirmation.yes=Ja, das Wiki bitte löschen!
+platform.wiki.delete.confirmation.no=Nein, bring mich zurück!
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

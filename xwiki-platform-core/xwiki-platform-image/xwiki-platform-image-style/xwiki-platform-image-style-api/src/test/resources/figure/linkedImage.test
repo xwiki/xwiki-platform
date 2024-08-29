@@ -1,0 +1,41 @@
+.#-----------------------------------------------------
+.inputexpect|xwiki/2.1
+.# Test captioned images wrapped in a link.
+.#-----------------------------------------------------
+(% style="border: 1px;" %)
+[[~[~[Caption1~>~>image:my.png~|~|width="200" height="100"~]~]>>https://www.example.org]]
+
+[[~[~[Caption2~>~>image:my.png~]~]>>https://www.example.org]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+beginLink [Typed = [false] Type = [url] Reference = [https://www.example.org]] [false]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png] [[height]=[100][width]=[200]]
+endLink [Typed = [false] Type = [url] Reference = [https://www.example.org]] [false]
+beginFigureCaption
+beginParagraph
+onWord [Caption1]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+beginFigure [[class]=[image]]
+beginLink [Typed = [false] Type = [url] Reference = [https://www.example.org]] [false]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-1]
+endLink [Typed = [false] Type = [url] Reference = [https://www.example.org]] [false]
+beginFigureCaption
+beginParagraph
+onWord [Caption2]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<span class="wikiexternallink"><a href="https://www.example.org"><img src="my.png" width="200" height="100" id="Imy.png" class="wikigeneratedid" alt="my.png"/></a></span><div class="figcaption"><p>Caption1</p></div><span class="wikiexternallink"><a href="https://www.example.org"><img src="my.png" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/></a></span><div class="figcaption"><p>Caption2</p></div>
+.#-----------------------------------------------------
+.expect|html/5.0
+.#-----------------------------------------------------
+<figure style="border: 1px; width: 200px;" class="image"><span class="wikiexternallink"><a href="https://www.example.org"><img src="my.png" width="200" height="100" id="Imy.png" class="wikigeneratedid" alt="my.png"/></a></span><figcaption><p>Caption1</p></figcaption></figure><figure class="image"><span class="wikiexternallink"><a href="https://www.example.org"><img src="my.png" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/></a></span><figcaption><p>Caption2</p></figcaption></figure>

@@ -109,7 +109,7 @@ public class UntypedEventListenerTest
     @Before
     public void setUp() throws Exception
     {
-        componentManager = mocker.registerMockComponent(ComponentManager.class, "wiki");
+        componentManager = mocker.registerMockComponent(ComponentManager.class, "context");
         modelBridge = mocker.registerMockComponent(ModelBridge.class);
         renderer = mocker.getInstance(BlockRenderer.class, "html/5.0");
 
@@ -120,7 +120,7 @@ public class UntypedEventListenerTest
         templateManager = mocker.getInstance(TemplateManager.class);
         template = mock(Template.class);
         xdom = mock(XDOM.class);
-        when(templateManager.createStringTemplate(anyString(), any())).thenReturn(template);
+        when(templateManager.createStringTemplate(anyString(), any(), any(), any())).thenReturn(template);
         when(templateManager.execute(template)).thenReturn(xdom);
     }
 

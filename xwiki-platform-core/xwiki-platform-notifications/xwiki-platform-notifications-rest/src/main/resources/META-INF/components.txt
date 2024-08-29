@@ -1,4 +1,6 @@
 org.xwiki.notifications.rest.internal.DefaultNotificationsResource
+org.xwiki.notifications.rest.internal.DefaultNotificationsWatchResource
 org.xwiki.notifications.rest.internal.InternalNotificationsRenderer
 org.xwiki.notifications.rest.internal.NotificationEventExecutor
 org.xwiki.notifications.rest.internal.NotificationEventExecutorListener
+org.xwiki.notifications.rest.internal.RSSFeedRenderer

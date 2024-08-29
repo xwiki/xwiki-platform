@@ -55,7 +55,7 @@
 .revision .author img {
   max-width: 16px;
   max-height: 16px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 .revision .content {

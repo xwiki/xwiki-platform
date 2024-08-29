@@ -19,9 +19,11 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -84,12 +86,15 @@ public class WikiMacroDescriptor implements MacroDescriptor
         }
 
         /**
-         * @param defaultCategory the macro default category
-         * @return this builder
+         * @param defaultCategories the macro default categories
+         * @return this build
+         * @since 14.6RC1
          */
-        public Builder defaultCategory(String defaultCategory)
+        public Builder defaultCategories(Collection<String> defaultCategories)
         {
-            this.descriptor.defaultCategory = defaultCategory;
+            // Copy the content of the passed set of default categories to be sure to not have a reference to a mutable 
+            // set.
+            this.descriptor.defaultCategories = Set.copyOf(defaultCategories);
             return this;
         }
 
@@ -158,9 +163,9 @@ public class WikiMacroDescriptor implements MacroDescriptor
     private String description;
 
     /**
-     * Default category under which this macro should be listed.
+     * Default categories under which this macro should be listed.
      */
-    private String defaultCategory;
+    private Set<String> defaultCategories;
 
     /**
      * Whether the macro is visible in the current wiki, for the current user or global.
@@ -201,62 +206,9 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.description = descriptor.description;
         this.contentDescriptor = descriptor.contentDescriptor;
         this.parameterDescriptors = descriptor.parameterDescriptors;
-        this.defaultCategory = descriptor.defaultCategory;
+        this.defaultCategories = descriptor.defaultCategories;
         this.visibility = descriptor.visibility;
         this.supportsInlineMode = descriptor.supportsInlineMode;
-    }
-
-    /**
-     * Creates a new {@link WikiMacroDescriptor} instance.
-     * 
-     * @param id the macro id
-     * @param name the macro name
-     * @param description macro description
-     * @param defaultCategory default category under which this macro should be listed.
-     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
-     * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors.
-     * @since 2.3M1
-     * @deprecated since 10.10RC1 use the {@link Builder} instead
-     */
-    @Deprecated
-    public WikiMacroDescriptor(MacroId id, String name, String description, String defaultCategory,
-        WikiMacroVisibility visibility, ContentDescriptor contentDescriptor,
-        List<WikiMacroParameterDescriptor> parameterDescriptors)
-    {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.contentDescriptor = contentDescriptor;
-        this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategory = defaultCategory;
-        this.visibility = visibility;
-    }
-
-    /**
-     * Creates a new {@link WikiMacroDescriptor} instance.
-     * 
-     * @param name the macro name
-     * @param description macro description
-     * @param defaultCategory default category under which this macro should be listed.
-     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
-     * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors.
-     * @since 2.2M1
-     * @deprecated since 2.3M1 use
-     *             {@link #WikiMacroDescriptor(MacroId, String, String, String, WikiMacroVisibility, ContentDescriptor, List)}
-     *             instead
-     */
-    @Deprecated
-    public WikiMacroDescriptor(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
-        ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
-    {
-        this.name = name;
-        this.description = description;
-        this.contentDescriptor = contentDescriptor;
-        this.parameterDescriptors = parameterDescriptors;
-        this.defaultCategory = defaultCategory;
-        this.visibility = visibility;
     }
 
     @Override
@@ -305,9 +257,9 @@ public class WikiMacroDescriptor implements MacroDescriptor
     }
 
     @Override
-    public String getDefaultCategory()
+    public Set<String> getDefaultCategories()
     {
-        return this.defaultCategory;
+        return this.defaultCategories;
     }
 
     /**

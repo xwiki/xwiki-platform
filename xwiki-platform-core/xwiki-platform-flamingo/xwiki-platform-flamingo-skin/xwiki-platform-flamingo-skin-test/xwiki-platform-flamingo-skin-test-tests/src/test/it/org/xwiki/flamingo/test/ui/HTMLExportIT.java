@@ -62,7 +62,7 @@ public class HTMLExportIT extends AbstractTest
         void assertResult();
     }
 
-    private class TopPageValidator implements PageValidator
+    private final class TopPageValidator implements PageValidator
     {
         private boolean result;
 
@@ -87,7 +87,7 @@ public class HTMLExportIT extends AbstractTest
         }
     }
 
-    private class NestedPageValidator implements PageValidator
+    private final class NestedPageValidator implements PageValidator
     {
         private boolean result;
 

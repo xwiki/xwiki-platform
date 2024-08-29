@@ -21,6 +21,7 @@ package org.xwiki.bridge;
 
 import java.util.Date;
 
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
@@ -37,7 +38,7 @@ import org.xwiki.stability.Unstable;
 public interface DocumentModelBridge
 {    
     /**
-     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
+     * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example {@code Main.WebHome}.
      * 
      * @return A <code>String</code> representation of the document's full name.
      * @deprecated use {@link #getDocumentReference} instead
@@ -120,28 +121,71 @@ public interface DocumentModelBridge
     String getTitle();
 
     /**
+     * @return the prepared version of the title (for example in case of Velocity the compiled VelocityTemplate
+     *         instance)
+     * @since 16.3.0RC1
+     */
+    default Object getPreparedTitle()
+    {
+        return null;
+    }
+
+    /**
+     * @param preparedTitle the prepared version of the title (for example in case of Velocity the compiled
+     *            VelocityTemplate instance)
+     * @since 16.3.0RC1
+     */
+    default void setPreparedTitle(Object preparedTitle)
+    {
+        
+    }
+
+    /**
      * @return a string identifying the current version of this document
      */
     String getVersion();
 
     /**
+     * Return a cloned version of the document content as {@link XDOM}.
+     * 
      * @return the XDOM for the document
      * @since 3.0M3
      */
     XDOM getXDOM();
 
     /**
+     * Return a cloned and prepared version of the document content as {@link XDOM}.
+     * 
+     * @return the prepared version of the XDOM
+     * @since 16.3.0RC1
+     */
+    default XDOM getPreparedXDOM()
+    {
+        return getXDOM();
+    }
+
+    /**
      * @return the document's content author user reference
      * @since 7.2M1
+     * @deprecated since 14.0RC1 rely on {@link #getAuthors()}.
      */
+    @Deprecated
     DocumentReference getContentAuthorReference();
+
+    /**
+     * @return the various authors information of a document.
+     * @since 14.0RC1
+     */
+    default DocumentAuthors getAuthors()
+    {
+        return null;
+    }
 
     /**
      * @return the creation date of the current document.
      * @since 12.8RC1
      * @since 12.6.3
      */
-    @Unstable
     default Date getCreationDate()
     {
         return null;
@@ -153,8 +197,27 @@ public interface DocumentModelBridge
      * @since 12.10.5
      * @since 12.6.8
      */
-    @Unstable
     default Boolean isHidden()
+    {
+        return false;
+    }
+
+    /**
+     * @return the last save date of the current document.
+     * @since 14.0RC1
+     */
+    default Date getDate()
+    {
+        return null;
+    }
+
+    /**
+     * @return {@code true} if the document is restricted, i.e., transformations should be executed in restricted mode
+     * @since 15.2RC1
+     * @since 14.10.7
+     */
+    @Unstable
+    default boolean isRestricted()
     {
         return false;
     }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.CreateApplication" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.CreateApplication" locale="">
   <web>AppWithinMinutes</web>
   <name>CreateApplication</name>
   <language/>
@@ -57,7 +57,7 @@
     &lt;ul class="steps vertical"&gt;
       #foreach($step in $awmSteps)
         &lt;li&gt;
-          &lt;span class="number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
+          &lt;span class="btn btn-xs number"&gt;$mathtool.add($foreach.index, 1)&lt;/span&gt;
           &lt;span class="name"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.name")&lt;/span&gt;
           &lt;span class="description"&gt;$services.localization.render("appWithinMinutes.wizardStep.${step}.description")&lt;/span&gt;
         &lt;/li&gt;
@@ -65,27 +65,29 @@
     &lt;/ul&gt;
   &lt;/div&gt;
   &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
-    #locationPicker({
-      'id': 'app',
-      'title': {
-        'label': 'platform.appwithinminutes.appNameLabel',
-        'hint': 'platform.appwithinminutes.appNameHint',
-        'name': 'appName'
-      },
-      'preview': {
-        'label': 'appWithinMinutes.createApp.location.label',
-        'hint': 'appWithinMinutes.createApp.location.hint'
-      },
-      'parent': {
-        'label': 'appWithinMinutes.createApp.parent.label',
-        'hint': 'appWithinMinutes.createApp.parent.hint',
-        'name': 'appParentReference',
-        'reference': $doc.documentReference.wikiReference,
-        'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
-      }
-    })
-    &lt;div class="appName-preview"&gt;&lt;/div&gt;
-    #appWizardFooter(1)
+    &lt;fieldset&gt;
+      #locationPicker({
+        'id': 'app',
+        'title': {
+          'label': 'platform.appwithinminutes.appNameLabel',
+          'hint': 'platform.appwithinminutes.appNameHint',
+          'name': 'appName'
+        },
+        'preview': {
+          'label': 'appWithinMinutes.createApp.location.label',
+          'hint': 'appWithinMinutes.createApp.location.hint'
+        },
+        'parent': {
+          'label': 'appWithinMinutes.createApp.parent.label',
+          'hint': 'appWithinMinutes.createApp.parent.hint',
+          'name': 'appParentReference',
+          'reference': $doc.documentReference.wikiReference,
+          'placeholder': 'appWithinMinutes.createApp.parent.placeholder'
+        }
+      })
+      &lt;div class="appName-preview"&gt;&lt;/div&gt;
+      #appWizardFooter(1)
+    &lt;/fieldset&gt;
   &lt;/form&gt;
 #end
 
@@ -106,6 +108,7 @@
   #if (!$xwiki.exists($appClassRef))
     #set ($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
     #set ($discard = $queryString.putAll({
+      'form_token': $services.csrf.getToken(),
       'template': 'AppWithinMinutes.ClassTemplate',
       'parent': $services.model.serialize($appHomeRef),
       'title': "$appReference.name Class"
@@ -139,6 +142,11 @@
     #if ($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))
       &lt;div class="box warningmessage"&gt;
         $services.localization.render('platform.appwithinminutes.appNameIsUsedWarning')
+      &lt;/div&gt;
+    #end
+    #if (!$services.security.authorization.hasAccess('script', $xcontext.userReference, $appHomeRef))
+      &lt;div class="box errormessage"&gt;
+        $escapetool.xml($services.localization.render('platform.appwithinminutes.appHomePageNoScriptRight'))
       &lt;/div&gt;
     #end
   #end
@@ -205,6 +213,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -252,6 +262,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -269,21 +281,27 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-form-validation-async'], function($) {
   var appNameInput = $('input[name="appName"]');
   var appParentInput = $('input[name="appParentReference"]');
   var preview = $('.appName-preview');
-  var submitButton = $('#wizard-next').prop('disabled', true);
+
+  if (appNameInput.val() === '') {
+    // We use a function instead of passing directly the promise because we want to avoid the "Uncaught (in promise)"
+    // error. Basically, we want the rejected promise to be caught.
+    appNameInput.validateAsync(() =&gt; Promise.reject(), 'awm');
+  }
 
   var errorMessage = appNameInput.closest('dd').prev('dt').find('.xErrorMsg');
-  if (errorMessage.size() == 0) {
+  if (!errorMessage.length) {
     errorMessage = $(document.createElement('span')).addClass('xErrorMsg').hide().appendTo(errorMessage.addBack());
   }
 
   var toggleValidationError = function(message) {
     if (message) {
-      appNameInput.addClass('xErrorField').focus();
+      appNameInput.addClass('xErrorField');
       errorMessage.text(message).show();
+      return Promise.reject();
     } else {
       appNameInput.removeClass('xErrorField');
       errorMessage.hide();
@@ -293,34 +311,26 @@
   var updatePreview = function(content) {
     preview.removeClass('loading').html(content);
     var error = preview.find('.xErrorMsg');
-    submitButton.prop('disabled', error.size() &gt; 0);
-    toggleValidationError(error.remove().text());
+    return toggleValidationError(error.remove().text());
   };
 
   var fetchPreviewUpdate = function() {
-    if (appNameInput.val() == '') {
-      updatePreview('&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render("platform.appwithinminutes.appNameEmptyError"))&lt;/span&gt;');
+    if (appNameInput.val() === '') {
+      return updatePreview('&lt;span class="xErrorMsg"&gt;$escapetool.javascript($services.localization.render("platform.appwithinminutes.appNameEmptyError"))&lt;/span&gt;');
     } else {
       preview.addClass('loading');
-      $.get(XWiki.currentDocument.getURL('get'), submitButton.closest('form').serialize(), updatePreview);
+      return $.get(XWiki.currentDocument.getURL('get'), appNameInput.closest('form').serialize()).then(updatePreview);
     }
   };
 
-  var previewTimeout;
-  var schedulePreviewUpdate = function() {
-    clearTimeout(previewTimeout);
-    submitButton.prop('disabled', true);
-    setTimeout(fetchPreviewUpdate, 500);
-  };
-
-  appNameInput.add(appParentInput)
-    .on('input', schedulePreviewUpdate)
-    .keyup(function(event) {
-      // Show the error message if the user presses Enter before typing anything.
-      if (event.which == 13 &amp;&amp; appNameInput.val() == '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
-        fetchPreviewUpdate();
-      }
-    });
+  appNameInput.add(appParentInput).on('input', () =&gt; {
+    appNameInput.validateAsync(fetchPreviewUpdate, 500, 'awm');
+  }).on('keyup', function(event) {
+    // Show the error message if the user presses Enter before typing anything.
+    if (event.which === 13 &amp;&amp; appNameInput.val() === '' &amp;&amp; !appNameInput.hasClass('xErrorField')) {
+      appNameInput.validateAsync(fetchPreviewUpdate, 'awm').catch(() =&gt; appNameInput.focus());
+    }
+  });
 });</code>
     </property>
     <property>
@@ -352,6 +362,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -380,6 +392,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -415,6 +429,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

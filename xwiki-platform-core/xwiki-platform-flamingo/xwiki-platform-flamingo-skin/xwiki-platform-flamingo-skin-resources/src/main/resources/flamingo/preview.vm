@@ -19,11 +19,8 @@
 ## ---------------------------------------------------------------------------
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
 #template("hierarchy.vm")
+#set($isPreview = true)
 #template("contentview.vm")
-<hr />
-<div class="bottombuttons sticky-buttons">#template("previewactions.vm")</div>
-</div> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

@@ -19,10 +19,13 @@
  */
 package org.xwiki.test.ui;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import org.openqa.selenium.By;
@@ -38,8 +41,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.Keyboard;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.ErrorHandler;
 import org.openqa.selenium.remote.FileDetector;
@@ -78,7 +79,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutWaiting(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return findElement(by);
         } finally {
@@ -99,7 +100,7 @@ public class XWikiWebDriver extends RemoteWebDriver
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
         // Trying to use another unit in case there is a conflict when calling implicitlyWait both here
         // and in waitUntilCondition.
-        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofMillis(1));
         try {
             return findElementWithoutScrolling(by);
         } finally {
@@ -110,7 +111,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public List<WebElement> findElementsWithoutWaiting(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return findElements(by);
         } finally {
@@ -121,7 +122,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutWaiting(WebElement element, By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return element.findElement(by);
         } finally {
@@ -132,7 +133,7 @@ public class XWikiWebDriver extends RemoteWebDriver
     public List<WebElement> findElementsWithoutWaiting(WebElement element, By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
         try {
             return element.findElements(by);
         } finally {
@@ -205,26 +206,26 @@ public class XWikiWebDriver extends RemoteWebDriver
         }
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition, int timeout)
+    public <T> T waitUntilCondition(ExpectedCondition<T> condition, int timeout)
     {
         int currentTimeout = getTimeout();
 
         try {
             setTimeout(timeout);
 
-            waitUntilCondition(condition);
+            return waitUntilCondition(condition);
         } finally {
             setTimeout(currentTimeout);
         }
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition)
+    public <T> T waitUntilCondition(ExpectedCondition<T> condition)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        Wait<WebDriver> wait = new WebDriverWait(this, getTimeout());
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+        Wait<WebDriver> wait = new WebDriverWait(this, Duration.ofSeconds(getTimeout()));
         try {
-            wait.until(condition::apply);
+            return wait.until(condition::apply);
         } finally {
             // Reset timeout
             setDriverImplicitWait();
@@ -246,7 +247,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void setDriverImplicitWait(int timeout)
     {
-        manage().timeouts().implicitlyWait(timeout, TimeUnit.SECONDS);
+        manage().timeouts().implicitlyWait(Duration.ofSeconds(timeout));
     }
 
     public int getTimeout()
@@ -281,7 +282,7 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsVisible(WebElement parentElement, final By locator)
     {
-        waitUntilElementsAreVisible(parentElement, new By[] {locator}, true);
+        waitUntilElementsAreVisible(parentElement, new By[] { locator }, true);
     }
 
     /**
@@ -453,16 +454,20 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementIsEnabled(WebElement element)
     {
-        waitUntilCondition(driver -> {
-            try {
-                return element.isEnabled();
-            } catch (NotFoundException e) {
-                return false;
-            } catch (StaleElementReferenceException e) {
-                // The element was removed from DOM in the meantime
-                return false;
-            }
-        });
+        waitUntilCondition(element, WebElement::isEnabled);
+    }
+
+    /**
+     * Waits until the given element is disabled.
+     *
+     * @param element the element to wait on
+     * @since 15.6RC1
+     * @since 15.5.1
+     * @since 14.10.15
+     */
+    public void waitUntilElementIsDisabled(WebElement element)
+    {
+        waitUntilCondition(element, Predicate.not(WebElement::isEnabled));
     }
 
     /**
@@ -543,9 +548,29 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void waitUntilElementHasTextContent(final By locator, final String expectedValue)
     {
+        waitUntilElementHasTextContent(() -> findElement(locator), expectedValue);
+    }
+
+    /**
+     * Waits until the given element has a certain value as its inner text.
+     *
+     * @param getElement an arbitrary supplier for the element to wait on. {@link WebElement#getText()} is called on
+     *     the returned value and compared to the expected value
+     * @param expectedValue the content value to wait for
+     * @since 15.10RC1
+     */
+    public void waitUntilElementHasTextContent(Supplier<WebElement> getElement, String expectedValue)
+    {
         waitUntilCondition(driver -> {
-            WebElement element = driver.findElement(locator);
-            return Boolean.valueOf(expectedValue.equals(element.getText()));
+            try {
+                WebElement element = getElement.get();
+                return Objects.equals(expectedValue, element.getText());
+            } catch (NotFoundException | StaleElementReferenceException e) {
+                // In case of NotFoundException, the element is not yet present in the DOM.
+                // In case of StaleElementReferenceException, the element was removed from the DOM between the result of
+                // findElement and the call to getText.
+                return false;
+            }
         });
     }
 
@@ -673,6 +698,16 @@ public class XWikiWebDriver extends RemoteWebDriver
         executeScript(String.format("window.scrollTo(%d, %d)", xCoord, yCoord));
     }
 
+    /**
+     * Overwrites {@link WebDriver#findElement(By)} to make sure the found element is visible by scrolling it into view.
+     * This means that calling this method can have side effects on the User Interface. If the element you're looking
+     * for doesn't have to be visible in the viewport then you should use {@link #findElementWithoutScrolling(By)}
+     * instead.
+     * <p>
+     * Also node that this method is called internally by APIs such as
+     * {@code ExpectedConditions#presenceOfElementLocated()} so if you don't want the scrolling then you should
+     * implement your own {@link ExpectedCondition} using {@link #findElementWithoutScrolling(By)}.
+     */
     @Override
     public WebElement findElement(By by)
     {
@@ -773,102 +808,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     }
 
     @Override
-    public WebElement findElementById(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementById(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsById(String using)
-    {
-        return this.wrappedDriver.findElementsById(using);
-    }
-
-    @Override
-    public WebElement findElementByLinkText(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByLinkText(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByLinkText(String using)
-    {
-        return this.wrappedDriver.findElementsByLinkText(using);
-    }
-
-    @Override
-    public WebElement findElementByPartialLinkText(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByPartialLinkText(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByPartialLinkText(String using)
-    {
-        return this.wrappedDriver.findElementsByPartialLinkText(using);
-    }
-
-    @Override
-    public WebElement findElementByTagName(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByTagName(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByTagName(String using)
-    {
-        return this.wrappedDriver.findElementsByTagName(using);
-    }
-
-    @Override
-    public WebElement findElementByName(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByName(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByName(String using)
-    {
-        return this.wrappedDriver.findElementsByName(using);
-    }
-
-    @Override
-    public WebElement findElementByClassName(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByClassName(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByClassName(String using)
-    {
-        return this.wrappedDriver.findElementsByClassName(using);
-    }
-
-    @Override
-    public WebElement findElementByCssSelector(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByCssSelector(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByCssSelector(String using)
-    {
-        return this.wrappedDriver.findElementsByCssSelector(using);
-    }
-
-    @Override
-    public WebElement findElementByXPath(String using)
-    {
-        return this.scrollTo(this.wrappedDriver.findElementByXPath(using));
-    }
-
-    @Override
-    public List<WebElement> findElementsByXPath(String using)
-    {
-        return this.wrappedDriver.findElementsByXPath(using);
-    }
-
-    @Override
     public Object executeScript(String script, Object... args)
     {
         return this.wrappedDriver.executeScript(script, args);
@@ -884,18 +823,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     public void setLogLevel(Level level)
     {
         this.wrappedDriver.setLogLevel(level);
-    }
-
-    @Override
-    public Keyboard getKeyboard()
-    {
-        return this.wrappedDriver.getKeyboard();
-    }
-
-    @Override
-    public Mouse getMouse()
-    {
-        return this.wrappedDriver.getMouse();
     }
 
     @Override
@@ -1030,5 +957,19 @@ public class XWikiWebDriver extends RemoteWebDriver
         } else {
             return chainFrom.moveToElement(target, newOffsetX, newOffsetY);
         }
+    }
+
+    private void waitUntilCondition(WebElement element, Predicate<WebElement> condition)
+    {
+        waitUntilCondition(driver -> {
+            try {
+                return condition.test(element);
+            } catch (NotFoundException e) {
+                return false;
+            } catch (StaleElementReferenceException e) {
+                // The element was removed from DOM in the meantime
+                return false;
+            }
+        });
     }
 }

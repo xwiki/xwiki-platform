@@ -19,32 +19,26 @@
  */
 package org.xwiki.rendering.macro.dashboard;
 
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
-import org.hamcrest.core.AnyOf;
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.api.Invocation;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.lib.action.CustomAction;
-import org.junit.runner.RunWith;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.jmock.MockingComponentManager;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.velocity.internal.DefaultVelocityManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -53,110 +47,54 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTest
+@AllComponents
+public class IntegrationTest implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    @SuppressWarnings("unchecked")
-    public void initialize(final MockingComponentManager componentManager) throws Exception
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
         // Since we have a dependency on XWiki Platform Oldcore the Context Component Manager will be found and the
         // test will try to look up the Dashboard macro in the User and Wiki Component Manager and thus need a Current
         // User and a Current Wiki. It's easier for this test to simply unregister the Context Component Manager rather
         // than have to provide mocks for them.
         componentManager.unregisterComponent(ComponentManager.class, "context");
 
-        final SkinExtension mockSsfx =
-            componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx", "ssfxMock");
-        final SkinExtension mockJsfx =
-            componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx", "jsfxMock");
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockSsfx).use(with("uicomponents/container/columns.css"), with(any(Map.class)));
-                allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"));
-                allowing(mockJsfx).use(with("js/scriptaculous/effects.js"));
-                allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
-            }
-        });
+        // For performance reasons we mock some components to avoid having to draw all oldcore components
 
-        final GadgetSource mockGadgetSource = componentManager.registerMockComponent(mockery, GadgetSource.class);
-        mockery.checking(new Expectations()
-        {
-            {
-                // Mock gadget for macrodashboard_nested_velocity.test
-                allowing(mockGadgetSource).getGadgets(with("nested_velocity"),
-                    with(any(MacroTransformationContext.class)));
-                will(
-                    returnValue(Arrays.asList(new Gadget("0", Arrays.asList(new WordBlock("title")),
-                        Arrays.asList(new MacroMarkerBlock("velocity", Collections.emptyMap(), "someVelocityCodeHere",
-                            Collections.singletonList(new WordBlock("someVelocityOutputHere")), true)),
-                        "1,1"))));
+        // Some components we don't really use and which trigger a lot of dependencies or fill the log with errors
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "refactoring.automaticRedirectCreator");
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "observation.remote");
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "refactoring.backLinksUpdater");
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "XClassMigratorListener");
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "ExtensionJobHistoryRecorder");
+        componentManager.unregisterComponent(org.xwiki.observation.EventListener.class, "refactoring.legacyParentFieldUpdater");
 
-                // Mock gadget for macrodashboard1.test
-                allowing(mockGadgetSource).getGadgets(with(aNull(String.class)),
-                    with(any(MacroTransformationContext.class)));
-                will(returnValue(Arrays.asList(new Gadget("0", Arrays.<Block>asList(new WordBlock("title")),
-                    Arrays.<Block>asList(new WordBlock("content")), "1,1"))));
+        SkinExtension mockSsfx = componentManager.registerMockComponent(SkinExtension.class, "ssfx");
+        SkinExtension mockJsfx = componentManager.registerMockComponent(SkinExtension.class, "jsfx");
 
-                allowing(mockGadgetSource).getDashboardSourceMetadata(
-                    with(AnyOf.anyOf(aNull(String.class), any(String.class))),
-                    with(any(MacroTransformationContext.class)));
-                will(returnValue(Collections.<Block>emptyList()));
+        GadgetSource mockGadgetSource = componentManager.registerMockComponent(GadgetSource.class);
+        // Mock gadget for macrodashboard_nested_velocity.test
+        when(mockGadgetSource.getGadgets(eq("nested_velocity"), any(MacroTransformationContext.class)))
+            .thenReturn(Arrays.asList(new Gadget("0", Arrays.asList(new WordBlock("title")),
+                Arrays.asList(new MacroMarkerBlock("velocity", Collections.emptyMap(), "someVelocityCodeHere",
+                    Collections.singletonList(new WordBlock("someVelocityOutputHere")), true)),
+                "1,1")));
 
-                allowing(mockGadgetSource).isEditing();
-                // return true on is editing, to take as many paths possible
-                will(returnValue(true));
-            }
-        });
+        // Mock gadget for macrodashboard1.test
+        when(mockGadgetSource.getGadgets(isNull(String.class), any(MacroTransformationContext.class)))
+            .thenReturn(Arrays.asList(new Gadget("0", Arrays.<Block>asList(new WordBlock("title")),
+                Arrays.<Block>asList(new WordBlock("content")), "1,1")));
 
-        // Mock VelocityManager used in macrodashboard_nested_velocity.test because we do not have an XWikiContext
-        // instance in the ExecutionContext.
-        final VelocityManager mockVelocityManager =
-            componentManager.registerMockComponentWithId(mockery, VelocityManager.class, "velocityManagerMock");
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockVelocityManager).getVelocityContext();
-                will(returnValue(new VelocityContext()));
-                allowing(mockVelocityManager).getCurrentVelocityContext();
-                will(returnValue(new VelocityContext()));
-                allowing(mockVelocityManager).getVelocityEngine();
-                will(doAll(new CustomAction("mockGetVelocityEngine")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        VelocityEngine velocityEngine = componentManager.getInstance(VelocityEngine.class);
-                        Properties properties = new Properties();
-                        properties.setProperty("resource.loader", "file");
-                        velocityEngine.initialize(properties);
+        when(mockGadgetSource.getDashboardSourceMetadata(any(), any(MacroTransformationContext.class)))
+            .thenReturn(Collections.<Block>emptyList());
 
-                        return velocityEngine;
-                    }
+        // return true on is editing, to take as many paths possible
+        when(mockGadgetSource.isEditing()).thenReturn(true);
 
-                }));
-                allowing(mockVelocityManager).evaluate(with(any(Writer.class)), with(any(String.class)),
-                    with(any(Reader.class)));
-                will(doAll(new CustomAction("mockEvaluate")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        VelocityEngine velocityEngine = mockVelocityManager.getVelocityEngine();
+        // Use the much lighter xwiki-commons velocity manager
+        componentManager.registerComponent(DefaultVelocityManager.class);
 
-                        return velocityEngine.evaluate(mockVelocityManager.getVelocityContext(),
-                            (Writer) invocation.getParameter(0), (String) invocation.getParameter(1),
-                            (Reader) invocation.getParameter(2));
-                    }
-
-                }));
-            }
-        });
-
-        componentManager.registerMockComponent(mockery, ContextualAuthorizationManager.class);
+        ContextualAuthorizationManager authorization = componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        when(authorization.hasAccess(Right.SCRIPT)).thenReturn(true);
     }
 }

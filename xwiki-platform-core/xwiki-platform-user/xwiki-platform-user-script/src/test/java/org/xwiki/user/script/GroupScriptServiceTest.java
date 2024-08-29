@@ -59,7 +59,7 @@ class GroupScriptServiceTest
     private static final DocumentReference TARGET_GROUP = new DocumentReference("xwiki", "XWiki", "Target");
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @InjectMockComponents
     private GroupScriptService groupScriptService;

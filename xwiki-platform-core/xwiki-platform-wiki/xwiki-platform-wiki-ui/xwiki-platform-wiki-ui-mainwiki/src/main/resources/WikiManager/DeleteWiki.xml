@@ -60,7 +60,8 @@
   ##
   #if (!$wiki)
     #if (!$services.wiki.lastError)
-      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
+      #set ($escapedWikiId = $services.rendering.escape($escapetool.java($wikiId), 'xwiki/2.1'))
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="~"${escapedWikiId}~""/}}{{/error}}
     #else
       #printException($services.wiki.lastError)
     #end
@@ -105,7 +106,9 @@
             &lt;form action="$doc.getURL()" method="post"&gt;
               &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
               &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-              &lt;p&gt;$services.localization.render('platform.wiki.delete.confirmation.retypeWikiId') &lt;input type="text" name="wikiIdConfirm" value="$!{escapetool.xml($wikiIdConfirm)}" id="wikiDeleteConfirmation" class="required" /&gt;
+              &lt;p&gt;
+                &lt;label for='wikiDeleteConfirmation'&gt;$services.localization.render('platform.wiki.delete.confirmation.retypeWikiId')&lt;/label&gt;
+                &lt;input type="text" name="wikiIdConfirm" value="$!{escapetool.xml($wikiIdConfirm)}" id="wikiDeleteConfirmation" class="required" /&gt;
               &lt;/p&gt;
               &lt;button class="btn btn-danger" id="confirmButton"&gt;$services.localization.render('delete')&lt;/button&gt;
               &lt;a class="btn btn-default" href="$backUrl"&gt;$services.localization.render('cancel')&lt;/a&gt;

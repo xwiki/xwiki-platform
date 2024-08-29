@@ -31,7 +31,6 @@ import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
-import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.notifiers.internal.email.IntervalUsersManager;
@@ -64,19 +63,6 @@ public class MissingLiveNotificationMailsJob
 
     @Inject
     private IntervalUsersManager intervals;
-
-    @Override
-    protected MissingLiveNotificationMailsRequest castRequest(Request request)
-    {
-        MissingLiveNotificationMailsRequest indexerRequest;
-        if (request instanceof MissingLiveNotificationMailsRequest) {
-            indexerRequest = (MissingLiveNotificationMailsRequest) request;
-        } else {
-            indexerRequest = new MissingLiveNotificationMailsRequest(request);
-        }
-
-        return indexerRequest;
-    }
 
     @Override
     public String getType()

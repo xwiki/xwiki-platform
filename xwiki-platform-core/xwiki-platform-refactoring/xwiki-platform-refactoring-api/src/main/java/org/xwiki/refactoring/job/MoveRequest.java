@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
+
 /**
  * A job request that can be used to move a collection of entities to a specified destination. This request can also be
  * used to rename an entity.
@@ -50,6 +52,24 @@ public class MoveRequest extends AbstractCopyOrMoveRequest
      * @see #isUpdateParentField()
      */
     private static final String PROPERTY_UPDATE_PARENT_FIELD = "updateParentField";
+
+    /**
+     * Default constructor.
+     */
+    public MoveRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public MoveRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return {@code true} if the source entities specified by {@link #getEntityReferences()} should be deleted,

@@ -43,24 +43,29 @@ viewers.Comments = Class.create({
    * @returns {boolean} true if the comment block has an object number
    */
   hasCommentNumber : function (comment) {
-    return comment.id.match(this.commentNumberRegex).size() > 1;
+    return comment.id.match(this.commentNumberRegex).length > 1;
   },
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
-    var commentsContent = $('commentscontent');
-    if (commentsContent) {
-      // If the comments area is already visible, enhance them.
-      this.startup();
+    // Make sure this class is initialized only once. This can happen when this file is included several times in 
+    // a page.
+    if (XWiki.viewers.initialized === undefined) {
+      XWiki.viewers.initialized = true;
+      var commentsContent = $('commentscontent');
+      if (commentsContent) {
+        // If the comments area is already visible, enhance them.
+        this.startup();
+      }
+      if ($("Commentstab")) {
+        this.container = $("Commentspane");
+      } else if (commentsContent) {
+        // We need to wrap the comments because we replace all of them when a new comment is added.
+        this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
+      }
+      // We wait for a notification for the AJAX loading of the Comments metadata tab.
+      this.addTabLoadListener();
     }
-    if ($("Commentstab")) {
-      this.container = $("Commentspane");
-    } else if (commentsContent) {
-      // We need to wrap the comments because we replace all of them when a new comment is added.
-      this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
-    }
-    // We wait for a notification for the AJAX loading of the Comments metadata tab.
-    this.addTabLoadListener();
   },
   /** Enhance the Comments UI with JS behaviors. */
   startup : function () {
@@ -75,6 +80,7 @@ viewers.Comments = Class.create({
     if(openCommentForm) {
       openCommentForm.observe('click', function (event) {
         event.stop();
+        $(this.commentPlaceHolderSelector).show();
         this.displayHiddenForm()
         this.reloadEditor({
           callback: function () {
@@ -82,6 +88,10 @@ viewers.Comments = Class.create({
             this.addSubmitListener(this.form);
             this.addCancelListener();
             this.addPreview(this.form);
+            if(typeof CKEDITOR === 'undefined') {
+              // Focus on the textarea.
+              this.form["XWiki.XWikiComments_comment"].focus();
+            }
           }.bind(this)
         });
       }.bind(this));
@@ -105,9 +115,13 @@ viewers.Comments = Class.create({
       if (placeHolder) {
         placeHolder.removeClassName('hidden');
       }
-      var button = $('openCommentForm');
+      const button = $('openCommentForm');
       if (button) {
-        button.remove();
+        button.hide();
+      }
+      const secondaryButton = $('loginAndComment');
+      if (secondaryButton) {
+        secondaryButton.hide();
       }
       this.formDisplayed = true;
     }
@@ -136,7 +150,8 @@ viewers.Comments = Class.create({
       item.observe('click', function(event) {
         item.blur();
         event.stop();
-        this.displayHiddenForm()
+        this.displayHiddenForm();
+        this.resetForm();
         if (item.disabled) {
           // Do nothing if the button was already clicked and it's waiting for a response from the server.
           return;
@@ -196,10 +211,7 @@ viewers.Comments = Class.create({
                 });
               }.bind(this),
               onFailure : function (response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item._x_notification.replace(new XWiki.widgets.Notification(
                     "$services.localization.render('core.viewers.comments.editForm.fetch.failed')" + failureReason,
                     "error"));
@@ -228,16 +240,9 @@ viewers.Comments = Class.create({
     editActivator._x_editForm.hide();
     const commentNbr = this.extractCommentNumber(comment);
     const name = "XWiki.XWikiComments_" + commentNbr + "_comment";
-    this.destroyEditor("[name='" + name + "']", name);
+    this.destroyEditor("[name='" + name + "']");
     comment.show();
-    $(this.commentPlaceHolderSelector).show();
-    this.reloadEditor({
-          callback: function () {
-            this.getForm();
-            this.addSubmitListener(this.form);
-            this.addCancelListener();
-            this.addPreview(this.form);
-          }.bind(this)});
+    this.resetForm();
     this.cancelPreview(editActivator._x_editForm);
     this.editing = false;
   },
@@ -266,7 +271,6 @@ viewers.Comments = Class.create({
     item.observe('click', function(event) {
       item.blur();
       event.stop();
-      this.displayHiddenForm();
       this.getForm();
       // If the form was already displayed as a reply, re-enable the Reply button for the old location
       if (this.form.up('.commentthread')) {
@@ -283,8 +287,7 @@ viewers.Comments = Class.create({
           this.addPreview(this.form);
           // Set the replyto field to the replied comment's number
           this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
-          // Clear the contents and focus the textarea
-          this.form["XWiki.XWikiComments_comment"].value = "";
+          // Focus on the textarea.
           this.form["XWiki.XWikiComments_comment"].focus();
           // Hide the reply button
           item.hide();
@@ -334,10 +337,7 @@ viewers.Comments = Class.create({
               this.editing = false;
             }.bind(this),
             onFailure : function (response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               form._x_notification.replace(new XWiki.widgets.Notification(
                   "$services.localization.render('core.viewers.comments.add.failed')" + failureReason, "error"));
             }.bind(this),
@@ -357,7 +357,7 @@ viewers.Comments = Class.create({
                   name = "XWiki.XWikiComments_" + commentNbr + "_comment";
                 }
               }
-              this.destroyEditor("[name='" + name + "']", name);
+              this.destroyEditor("[name='" + name + "']");
 
               if (this.requestSucceeded) {
                 this.container.update(response.responseText);
@@ -373,18 +373,19 @@ viewers.Comments = Class.create({
                   // Forces displayHiddenForm to display the comment form with the content of the comment
                   // before submission.
                   this.formDisplayed = false;
+                  this.displayHiddenForm();
+                  this.reloadEditor({
+                    content: submittedComment,
+                    callback: function () {
+                      this.getForm();
+                      this.addSubmitListener(this.form);
+                      this.addCancelListener();
+                      this.addPreview(this.form);
+                    }.bind(this)
+                  });
+                } else {
+                  this.resetForm(); 
                 }
-
-                this.displayHiddenForm();
-                this.reloadEditor({
-                  content: submittedComment,
-                  callback: function () {
-                    this.getForm();
-                    this.addSubmitListener(this.form);
-                    this.addCancelListener();
-                    this.addPreview(this.form);
-                  }.bind(this)
-                });
 
                 document.fire("xwiki:docextra:loaded", {
                   "id": "Comments",
@@ -473,10 +474,7 @@ viewers.Comments = Class.create({
             notification.hide();
           }.bind(this),
           onFailure: function (response) {
-            var failureReason = response.statusText;
-            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-              failureReason = 'Server not responding';
-            }
+            var failureReason = response.statusText || 'Server not responding';
             notification.replace(new XWiki.widgets.Notification(
                 "$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
           },
@@ -506,7 +504,7 @@ viewers.Comments = Class.create({
         commentEditorSelector += "-" + commentNumber;
       }
       const commentElt = $(form).find(commentEditorSelector);
-      if ($(form).find(".commentPreview").size() === 0) {
+      if (!$(form).find(".commentPreview").length) {
         commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
       }
       const commentPreview = $(form).find(".commentcontent.commentPreview");
@@ -544,22 +542,30 @@ viewers.Comments = Class.create({
     if (event) {
       event.stop();
     }
-    this.getForm();
-    if (this.form.up('.commentthread')) {
-      // Show the comment's reply button
-      this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
-      // Put the form back to its initial location and clear the contents
-      this.initialLocation.insert({after: this.form});
-    }
-    this.form["XWiki.XWikiComments_replyto"].value = "";
-    this.reloadEditor();
-    this.cancelPreview(this.form);
+    require(['jquery'], function ($) {
+      const commentPlaceHolder = $('#' + this.commentPlaceHolderSelector);
+      if (this.form.up('.commentthread')) {
+        // Show the comment's reply button back
+        this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
+        // Move back to form to its default location.
+        commentPlaceHolder.empty().append(this.form)
+      }
+      // Hides the form and display the "add comment" button
+      commentPlaceHolder.addClass("hidden");
+      this.formDisplayed = false;
+      $('#openCommentForm').show();
+      $('#loginAndComment').show();
+      this.form["XWiki.XWikiComments_replyto"].value = "";
+      this.cancelPreview(this.form);
+      // Cancel the edit mode so that leaving the page does not require confirmation.
+      $(document).trigger('xwiki:actions:cancel');
+    }.bind(this));
   },
   /**
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.
    * After that, the listener removes itself, since it is no longer needed.
    */
-  addTabLoadListener: function (event) {
+  addTabLoadListener: function () {
     var listener = function (event) {
       if (event.memo.id == 'Comments') {
         this.startup();
@@ -567,10 +573,10 @@ viewers.Comments = Class.create({
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
   },
-  destroyEditor: function (selector, name) {
+  destroyEditor: function (selector) {
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       $(document).trigger('xwiki:actions:cancel');
-      if ($(selector).size() > 0) {
+      if ($(selector).length) {
         const parent = $(selector).parent(".commenteditor");
         parent.empty();
       }
@@ -589,41 +595,26 @@ viewers.Comments = Class.create({
 
     var content = options.content || {};
 
-    this.destroyEditor("[name='" + name + "']", name);
+    this.destroyEditor("[name='" + name + "']");
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
-      if ($(".commenteditor").size() > 0) {
+      if ($(".commenteditor").length) {
+        if(typeof CKEDITOR !== 'undefined') {
+          CKEDITOR.config.startupFocus = true;
+        }
         $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',
           number: commentNbr,
           name: name,
           content: content
-        }), function (data, status, jqXHR) {
-          function loadRequiredSkinExtensions(requiredSkinExtensions)
-          {
-            var existingSkinExtensions;
-            var getExistingSkinExtensions = function () {
-              return $('link, script').map(function () {
-                return $(this).attr('href') || $(this).attr('src');
-              }).get();
-            };
-            $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function () {
-              if (!existingSkinExtensions) {
-                existingSkinExtensions = getExistingSkinExtensions();
-              }
-              var url = $(this).attr('href') || $(this).attr('src');
-              return existingSkinExtensions.indexOf(url) < 0;
-            }).appendTo('head');
-          }
-
+        }), function (data) {
           const wf = $(wfClass);
           wf.empty();
           wf.append(data);
           wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
-          loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
-          if ($("#commentCaptcha").size() > 0) {
+          if ($("#commentCaptcha").length) {
             // FIXME: this solution is not good right now since it implies to always display the CAPTCHA
             // however since the idea is now to have a button "Add a comment", I won't got further: we should
             // display the captcha when the user decide to add a comment.
@@ -749,7 +740,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
    */
   var updateCount = function() {
     var commentsTab = $('#Commentstab').find('.itemCount');
-    var commentsNumber = $('.xwikicomment').size();
+    var commentsNumber = $('.xwikicomment').length;
     if(commentsTab) {
       commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
     }

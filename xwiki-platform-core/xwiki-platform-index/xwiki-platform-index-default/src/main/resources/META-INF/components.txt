@@ -1,0 +1,8 @@
+org.xwiki.index.internal.DefaultTasksManager
+org.xwiki.index.internal.TasksStore
+org.xwiki.index.internal.TaskExecutor
+org.xwiki.index.internal.TaskApplicationReadyListener
+org.xwiki.index.internal.DefaultLinksTaskConsumer
+org.xwiki.index.internal.listener.LinksUpdateListener
+org.xwiki.index.internal.migration.R140300000XWIKI19614DataMigration
+org.xwiki.index.migration.R140300001XWIKI19571DataMigration

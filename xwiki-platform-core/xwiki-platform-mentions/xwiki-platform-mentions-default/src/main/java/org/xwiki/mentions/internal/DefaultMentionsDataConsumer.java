@@ -24,36 +24,29 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.index.IndexException;
+import org.xwiki.index.TaskConsumer;
+import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.events.NewMentionsEvent;
 import org.xwiki.mentions.internal.analyzer.CreatedDocumentMentionsAnalyzer;
 import org.xwiki.mentions.internal.analyzer.UpdatedDocumentMentionsAnalyzer;
-import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.notifications.MentionNotificationParameter;
 import org.xwiki.mentions.notifications.MentionNotificationParameters;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.user.UserReferenceSerializer;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.LargeStringProperty;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-
 /**
- * Default implementation of {@link MentionsDataConsumer}.
+ * Implementation of {@link TaskConsumer} for the mentions tasks.
  * <p>
  * This class is responsible to analyze document updates in order to identify new user mentions. {@link
  * NewMentionsEvent} are then sent for each newly introduced user mentions. This analysis is done by identifying
@@ -66,20 +59,9 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-public class DefaultMentionsDataConsumer implements MentionsDataConsumer
+@Named(MentionsConfiguration.MENTION_TASK_ID)
+public class DefaultMentionsDataConsumer implements TaskConsumer
 {
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private ExecutionContextManager contextManager;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private Execution execution;
-
     @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
@@ -93,57 +75,33 @@ public class DefaultMentionsDataConsumer implements MentionsDataConsumer
     private UpdatedDocumentMentionsAnalyzer updatedDocumentMentionsAnalyzer;
 
     @Inject
-    private Logger logger;
-
-    /**
-     * Initialize the context.
-     *
-     * @param authorReference the author of the analyzed document
-     * @param wikiId the wiki id
-     * @throws ExecutionContextException in case one {@link ExecutionContextInitializer} fails to execute
-     */
-    private void initContext(DocumentReference authorReference, String wikiId) throws ExecutionContextException
-    {
-        ExecutionContext context = new ExecutionContext();
-        this.contextManager.initialize(context);
-
-        XWikiContext xWikiContext = this.xcontextProvider.get();
-        xWikiContext.setUserReference(authorReference);
-        xWikiContext.setWikiReference(authorReference.getWikiReference());
-        xWikiContext.setWikiId(wikiId);
-    }
+    private UserReferenceSerializer<String> userReferenceSerializer;
 
     @Override
-    public void consume(MentionsData data) throws XWikiException
+    public void consume(DocumentReference documentReference, String version) throws IndexException
     {
         try {
-            DocumentReference author = this.documentReferenceResolver.resolve(data.getAuthorReference());
-            this.initContext(author, data.getWikiId());
-            DocumentReference dr = this.documentReferenceResolver.resolve(data.getDocumentReference());
-            String version = data.getVersion();
-            XWikiDocument doc = this.documentRevisionProvider.getRevision(dr, version);
+            XWikiDocument doc = this.documentRevisionProvider.getRevision(documentReference, version);
             if (doc != null) {
-                // Stores the list of mentions found in the document and its attached objects.
+                String authorReference =
+                    this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
                 List<MentionNotificationParameters> mentionNotificationParameters;
-                DocumentReference documentReference = doc.getDocumentReference();
-
                 if (doc.getPreviousVersion() == null) {
                     // CREATE
                     mentionNotificationParameters = this.createdDocumentMentionsAnalyzer
-                        .analyze(doc, documentReference, version, data.getAuthorReference());
+                        .analyze(doc, documentReference, doc.getVersion(), authorReference);
                 } else {
                     // UPDATE
-                    XWikiDocument oldDoc = this.documentRevisionProvider.getRevision(dr, doc.getPreviousVersion());
+                    XWikiDocument oldDoc =
+                        this.documentRevisionProvider.getRevision(doc.getDocumentReferenceWithLocale(),
+                            doc.getPreviousVersion());
                     mentionNotificationParameters = this.updatedDocumentMentionsAnalyzer
-                        .analyze(oldDoc, doc, documentReference, version, data.getAuthorReference());
+                        .analyze(oldDoc, doc, documentReference, doc.getVersion(), authorReference);
                 }
                 sendNotification(mentionNotificationParameters);
             }
-        } catch (ExecutionContextException e) {
-            this.logger.warn("Failed to initialize the context of the mention update runnable. Cause [{}]",
-                getRootCauseMessage(e));
-        } finally {
-            this.execution.removeContext();
+        } catch (XWikiException e) {
+            throw new IndexException("Failed during the mention task execution", e);
         }
     }
 

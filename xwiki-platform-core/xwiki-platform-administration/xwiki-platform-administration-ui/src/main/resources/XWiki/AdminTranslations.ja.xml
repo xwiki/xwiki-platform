@@ -1,0 +1,186 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="ja">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=管理
+administration.title.page=ページの管理
+administration.title.wiki=ウィキの管理
+administration.title.global=共通設定
+administration.sectionTitle=管理：{0}
+administration.sectionTitle.page=ページの管理：{0}
+administration.sectionTitle.wiki=ウィキの管理：{0}
+administration.sectionTitle.global=共通設定：{0}
+administration.menu.search.hint=検索…
+administration.menu.search.noResults=結果がありません。
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=「はい」に設定すると、登録フォームを記入した際に指定したEメールアドレスにEメールを送信します。
+XWiki.XWikiPreferences_validation_email_content.hint=ユーザーがEメールアドレスを検証する際に送信されるEメールのテンプレート。
+XWiki.XWikiPreferences_confirmation_email_content.hint=ユーザーは、最初に受け取るEメールの認証リンクをクリックしてアカウントを認証します。このEメールテンプレートでは、認証を行ったユーザーに送信するメールを設定できます。
+XWiki.XWikiPreferences_invitation_email_content.hint=このEメールのテンプレートでは、登録を招待するユーザーに送るメールを設定できます。
+XWiki.Registration_heading.hint=登録中あるいは登録が完了したユーザーに表示されるページの最上部の行を設定できます。Velocityとウィキのシンタックスを使うことができます。
+XWiki.Registration_welcomeMessage.hint=これはユーザーがフォームを入力しているときにのみ表示されます。Velocityとウィキのシンタックスコードを使うことができます。
+XWiki.Registration_liveValidation_enabled.hint=JavaScriptのコードによるライブ認証を無効にする場合は、偽に設定してください（フィールドはサーバーにより検証されます）。
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=ライブ認証では、フィールドを適切に入力していることをユーザーに通知するメッセージを表示します。特定のフィールドで上書きされていない場合、このメッセージを表示します。Velocityコードを使うことができます。
+XWiki.Registration_loginButton_enabled.hint=ユーザーが登録すると、クリックするとユーザー名とパスワードをログインアクションに送信し、即座にログインするボタンを表示します。これはユーザー名とパスワードをHTML形式で返すため、必要とするセキュリティーによっては問題があるかもしれません。
+XWiki.Registration_loginButton_autoLogin_enabled.hint=ログインボタンが有効の場合、ユーザーのログインボタンを押すJavaScriptのコードを設定できます。
+XWiki.Registration_defaultRedirect.hint=転送パラメーターを設定していない場合で、ログインボタンを押したときにユーザーを転送するURLを設定できます。Velocityコードを使うことができます。
+XWiki.Registration_requireCaptcha.hint=ユーザーの登録時にCAPTCHAの解決を必須とする場合は、チェックしてください。
+XWiki.Registration_registrationSuccessMessage.hint=正常に登録が完了したユーザーに表示するメッセージを設定できます。Velocityとウィキのシンタックスコードを使うことができます。
+XWiki.Registration_passwordLength.hint=パスワードの最低の長さ。パスワードは長い方が安全性があります。6文字以上に設定することを推奨します。
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=チェックすると、パスワードが最低1つの小文字を含むことを必須とします。
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=チェックすると、パスワードに1つ以上大文字を設定するよう強制できます。
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=チェックすると、パスワードに1つ以上数字を設定するよう強制できます。
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=パスワードに1つ以上シンボル文字を設定するよう強制できます。
+
+# Look &amp; Feel Sections
+admin.themes=テーマ
+admin.themes.description=色とアイコンのテーマ、スキンとロゴをカスタマイズ。
+admin.colorthemes.local=ローカル
+admin.colorthemes.global=共通
+XWiki.XWikiPreferences_showannotations.hint=ページのレイアウトに注釈のセクションを表示。
+XWiki.XWikiPreferences_showcomments.hint=ページのレイアウトにコメントのセクションを表示。
+XWiki.XWikiPreferences_showattachments.hint=ページのレイアウトに添付ファイルのセクションを表示。
+XWiki.XWikiPreferences_showhistory.hint=ページのレイアウトに履歴のセクションを表示。
+XWiki.XWikiPreferences_showinformation.hint=ページのレイアウトに情報のセクションを表示。
+XWiki.XWikiPreferences_title.hint=ブラウザーで表示されるページタイトルのフォーマットを規定。
+XWiki.XWikiPreferences_meta.hint=ページの詳細、作者、キーワードなど、各ページに追加するメタデータを規定。
+XWiki.XWikiPreferences_webcopyright.hint=フッターの著作権セクションに表示する情報を規定。
+XWiki.XWikiPreferences_version.hint=フッターのバージョンセクションに表示する情報を規定。
+XWiki.XWikiPreferences_skin.hint=使用する既定のスキンを設定。ファイルシステムのスキン（例：flamingo）またはカスタムのページスキン（例：XWiki.DefaultSkin）を設定できます
+XWiki.XWikiPreferences_iconTheme.hint=既定で使用するアイコンのテーマを指定。
+XWiki.XWikiPreferences_colorTheme.hint=既定で使用する色のテーマを指定。
+
+# Editing Sections
+admin.edit=編集
+admin.edit.description=編集モード、WYSIWYGエディター、利用可能なシンタックスを設定。
+admin.title=タイトル
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=ウィキのページの作成時にタイトルを必須とする。
+XWiki.XWikiPreferences_editor.hint=ページの内容を編集する際に既定で使用するエディターの種類を選択してください。
+XWiki.XWikiPreferences_editcomment.hint=ページの新しいバージョンを作成する際にメッセージの入力を許可。
+XWiki.XWikiPreferences_editcomment_mandatory.hint=バージョンの要約メッセージを指定するまで、ページの変更は保存されません。
+XWiki.XWikiPreferences_minoredit.hint=ページに主要なバージョン（x.1）と軽微なバージョン（1.x）を設定することを許可。軽微なバージョンは、ページの履歴より「軽微な変更を表示」のボタンで表示できます。
+admin.wysiwyg.description=既定のWYSIWYGエディターを選択し、設定してください。
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=新しいウィキページを作成する際に、ページのコンテンツに既定で使用するマークアップのシンタックス。
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=ウィキに複数の言語によるコンテンツがある場合は、多言語モードを有効にしてください。ウィキのページを翻訳したり、好みの言語でインターフェースを表示したりできるようになります。
+XWiki.XWikiPreferences_languages.hint=インターフェースで利用可能な言語を選択してください。選択した言語でウィキのページを翻訳できるようになります（多言語モードが有効の場合）。
+XWiki.XWikiPreferences_default_language.hint=ウィキの既定の言語を選択
+XWiki.XWikiPreferences_dateformat.hint=日付（ページの作成日など）を表示する際に使用するフォーマットを選択
+XWiki.XWikiPreferences_timezone.hint=日付のタイムゾーンを共通設定
+
+# Import Section
+administration.section.import.hint=新しいパッケージをアップロードするか、利用可能なパッケージの一覧から選択してください。選択したパッケージの内容は、インポートのオプションとあわせて表示されます。
+
+# Export Section
+administration.section.export.pages=ページ
+administration.section.export.pages.all=全てのページ
+administration.section.export.withHistory.hint=ページの履歴をエクスポートに含める。それ以外の場合、ページの最新のバージョンだけをエクスポートします。
+administration.section.export.targetXWikiVersion=ターゲットのXWikiのバージョン
+administration.section.export.targetXWikiVersion.hint=ページをインポートするXWikiのバージョン。現在のバージョンは{0}です。
+administration.section.export.targetXWikiVersion.12plus=バージョン12.0以上
+administration.section.export.targetXWikiVersion.below12=バージョン12.0未満
+administration.section.export.packageName.hint=エクスポートしたウィキページのアーカイブを生成する際に使用するファイル名。
+administration.section.export.moreOptions=他のオプション
+administration.section.export.lessOptions=他のオプションを表示しない
+administration.section.export.description.hint=パッケージの説明。インポート時に表示します。
+administration.section.export.author.hint=パッケージの作者名。インポート時に表示します。
+administration.section.export.licence.hint=コンテンツのライセンス。例：LGPL、GPLV2など。
+administration.section.export.version.hint=パッケージのバージョン。パッケージの記述子に保存されます。
+administration.section.export.backupPack.hint=ページをインポートする際にページの著者を保持。このオプションは、エクスポートする内容には影響せず、インポートの際に変更できます。
+
+# Users Section
+administration.section.users.enableUser.inProgress=ユーザーアカウントを有効化しています…
+administration.section.users.enableUser.done=ユーザーアカウントを有効化しました
+administration.section.users.enableUser.failed=ユーザーアカウントを有効化できませんでした
+administration.section.users.disableUser.inProgress=ユーザーアカウントを無効化しています…
+administration.section.users.disableUser.done=ユーザーアカウントを無効化しました
+administration.section.users.disableUser.failed=ユーザーアカウントを無効化できませんでした
+administration.section.users.deleteUser.confirmationMessage=ユーザー {0} を削除し、所属する全ての{1}グループ{2}から削除します。続行してよろしいですか？
+administration.section.users.deleteUser.programmingRightsWarning=削除しようとしているユーザーは{0}{1,choice,1#1ページ|1&lt;{1}ページ}{2}のプログラミング権限をもつ最終更新者です。{1,choice,1#このページ|1&lt;これらのページ}にプログラミング権限を必要とするスクリプトがある場合、著者を置き換えずにユーザーを削除すると、それらのスクリプトは機能しなくなります。
+administration.section.users.deleteUser.scriptRightsWarning=削除しようとしているユーザーは{0}{1,choice,1#1ページ|1&lt;{1}ページ}{2}のスクリプト権限をもつ最終更新者です。著者を置き換えずにユーザーを削除すると、{1,choice,1#このページ|1&lt;これらのページ}は機能しなくなります。
+administration.section.users.deleteUser.newAuthor=新しい著者
+administration.section.users.deleteUser.newAuthor.hint={0}の権限をもつユーザーを選択するか、著者を置き換えない場合は、このフィールドを空のままにしてください。
+administration.section.users.deleteUser.newAuthor.error=選択したユーザーには{0}の権限がありません！
+administration.section.users.deleteUser.newAuthor.programming=プログラミング
+administration.section.users.deleteUser.newAuthor.script=スクリプト
+admin.usersgroups.extensionrights=拡張機能の権限
+
+# Other Category
+admin.other=その他
+admin.other.description=拡張機能の様々な設定。
+administration.section.analytics.status=状態
+administration.section.analytics.status.hint=Google Analytics™による追跡を有効かどうかを特定
+
+# Social category
+admin.social=ソーシャル
+admin.social.description=ソーシャル機能を設定。
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=セクションに表示
+XWiki.ConfigurableClass_heading=ヘッダー
+XWiki.ConfigurableClass_configurationClass=設定クラス
+XWiki.ConfigurableClass_linkPrefix=リンクの接頭辞
+XWiki.ConfigurableClass_propertiesToShow=表示するプロパティー
+XWiki.ConfigurableClass_codeToExecute=実行するコード
+XWiki.ConfigurableClass_iconAttachment=アイコンの添付
+XWiki.ConfigurableClass_displayInCategory=カテゴリー別で表示
+XWiki.ConfigurableClass_displayBeforeCategory=カテゴリーの前に表示
+XWiki.ConfigurableClass_categoryIcon=カテゴリーのアイコン
+XWiki.ConfigurableClass_scope=範囲
+XWiki.ConfigurableClass_scope_WIKI=ウィキ
+XWiki.ConfigurableClass_scope_SPACE=現在のスペース
+XWiki.ConfigurableClass_scope_ALL_SPACES=全てのスペース
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=ウィキと全てのスペース
+XWiki.ConfigurableClass_sectionOrder=セクションの順序
+
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=「はい」に設定すると、Eメールで送信されたトークンの入力をユーザーのログイン時に必須とします。
+administration.section.users.deleteUser.markInactiveMessage=ユーザーを削除する代わりに、プロフィールを非アクティブに設定できます。ユーザーのログインを防ぐとともに、ユーザーが作成したスクリプトに関連付けられたアクセス権限を保存します。
+
+## Deprecated since 11.8RC1
+administration.section.users.deleteUser.markDisabledMessage=ユーザーを削除する代わりに、プロフィールを無効に設定できます。ユーザーのログインを防ぐとともに、ユーザーが作成したスクリプトに関連付けられたアクセス権限を保存します。
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

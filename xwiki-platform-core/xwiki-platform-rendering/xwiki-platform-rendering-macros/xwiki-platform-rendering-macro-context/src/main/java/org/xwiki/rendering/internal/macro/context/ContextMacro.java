@@ -20,29 +20,34 @@
 package org.xwiki.rendering.internal.macro.context;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
 import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -56,7 +61,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 @Component
 @Named("context")
 @Singleton
-public class ContextMacro extends AbstractMacro<ContextMacroParameters>
+public class ContextMacro extends AbstractExecutedContentMacro<ContextMacroParameters>
 {
     /**
      * The description of the macro.
@@ -68,125 +73,132 @@ public class ContextMacro extends AbstractMacro<ContextMacroParameters>
      */
     private static final String CONTENT_DESCRIPTION = "The content to execute";
 
-    /**
-     * Used to set the current document in the context (old way) and check rights.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * The parser used to parse macro content.
-     */
-    @Inject
-    private MacroContentParser contentParser;
-
-    /**
-     * Used to transform document links into absolute references.
-     */
-    @Inject
-    @Named("macro")
-    private DocumentReferenceResolver<String> macroDocumentReferenceResolver;
-
     @Inject
     private TransformationManager transformationManager;
+
+    @Inject
+    private MacroContentWikiSourceFactory contentFactory;
+
+    @Inject
+    private ContextMacroDocument documentHandler;
 
     /**
      * Create and initialize the descriptor of the macro.
      */
     public ContextMacro()
     {
-        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), ContextMacroParameters.class);
+        super("Context", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
+            ContextMacroParameters.class);
 
-        // The Context macro must execute early since it can contain include macros which can bring stuff like headings
-        // for other macros (TOC macro, etc). Make it the same priority as the Include macro.
-        setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override
-    public boolean supportsInlineMode()
+    public List<Block> execute(ContextMacroParameters parameters, String macroContent,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        return true;
+        MetaData metadata;
+        if (parameters.getDocument() != null) {
+            metadata = new MetaData();
+            metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
+            metadata.addMetaData(MetaData.BASE, parameters.getDocument());
+        } else {
+            metadata = null;
+        }
+        String content = macroContent;
+        Syntax syntax = null;
+        if (parameters.getSource() != null) {
+            MacroContentWikiSource wikiSource = this.contentFactory.getContent(parameters.getSource(), context);
+            syntax = wikiSource.getSyntax();
+            content = wikiSource.getContent();
+        }
+
+        XDOM xdom = this.parser.parse(content, syntax, context, false, metadata, context.isInline());
+
+        if (xdom.getChildren().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Block> blocks;
+        if (parameters.isRestricted() || parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
+            || parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
+            // Execute the content in the context of the target document
+            blocks = executeContext(xdom, parameters, context);
+        } else {
+            // The content will be executed in the current context
+            blocks = xdom.getChildren();
+        }
+
+        // Keep metadata so that the result stay associated to context properties when inserted in the parent
+        // XDOM
+        return Arrays.asList(new MetaDataBlock(blocks, xdom.getMetaData()));
     }
 
-    @Override
-    public List<Block> execute(ContextMacroParameters parameters, String content, MacroTransformationContext context)
+    private List<Block> executeContext(XDOM xdom, ContextMacroParameters parameters, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        if (parameters.getDocument() == null) {
-            throw new MacroExecutionException("You must specify a 'document' parameter pointing to the document to "
-                + "set in the context as the current document.");
+        DocumentReference referencedDocReference = this.documentHandler.getDocumentReference(parameters, context);
+
+        // Reuse the very generic async rendering framework (even if we don't do async and caching) since it's
+        // taking
+        // care of many other things
+        BlockAsyncRendererConfiguration configuration = createBlockAsyncRendererConfiguration(null, xdom, context);
+        configuration.setAsyncAllowed(false);
+        configuration.setCacheAllowed(false);
+
+        if (parameters.isRestricted()) {
+            configuration.setResricted(true);
         }
 
-        DocumentReference referencedDocReference =
-            this.macroDocumentReferenceResolver.resolve(parameters.getDocument(), context.getCurrentMacroBlock());
-
-        boolean currentContextHasProgrammingRights = this.documentAccessBridge.hasProgrammingRights();
-
-        List<Block> result;
+        Map<String, Object> backupObjects = null;
         try {
-            Map<String, Object> backupObjects = new HashMap<>();
-            try {
+            if (referencedDocReference != null) {
+                backupObjects = new HashMap<>();
+
+                // Switch the context document
                 this.documentAccessBridge.pushDocumentInContext(backupObjects, referencedDocReference);
 
-                // The current document is now the passed document. Check for programming rights for it. If it has
-                // programming rights then the initial current document also needs programming right, else throw an
-                // error since it would be a security breach otherwise.
-                if (this.documentAccessBridge.hasProgrammingRights() && !currentContextHasProgrammingRights) {
-                    throw new MacroExecutionException("Current document must have programming rights since the "
-                        + "context document provided [" + parameters.getDocument() + "] has programming rights.");
+                // Apply the transformations but with a Transformation Context having the XDOM of the passed
+                // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
+                // the toc for the passed document instead of the current document).
+                DocumentModelBridge referencedDoc =
+                    this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
+                XDOM referencedXDOM = referencedDoc.getPreparedXDOM();
+
+                if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
+                    // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
+                    // executed and contribute XDOM elements.
+                    // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
+                    // defined in the referenced document. To be used with caution.
+                    TransformationContext referencedTxContext =
+                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax(),
+                            referencedDoc.isRestricted());
+                    this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
                 }
 
-                MetaData metadata = new MetaData();
-                metadata.addMetaData(MetaData.SOURCE, parameters.getDocument());
-                metadata.addMetaData(MetaData.BASE, parameters.getDocument());
+                // Configure the Transformation Context XDOM depending on the mode asked.
+                configuration.setXDOM(referencedXDOM);
+            }
 
-                XDOM xdom = this.contentParser.parse(content, context, false, metadata, false);
+            // Execute the content
+            Block result = this.executor.execute(configuration);
 
-                // Configure the  Transformation Context depending on the mode asked.
-                if (parameters.getTransformationContext() == TransformationContextMode.DOCUMENT
-                    || parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS)
-                {
-                    // Apply the transformations but with a Transformation Context having the XDOM of the passed
-                    // document so that macros execute on the passed document's XDOM (e.g. the TOC macro will generate
-                    // the toc for the passed document instead of the current document).
-                    DocumentModelBridge referencedDoc =
-                        this.documentAccessBridge.getTranslatedDocumentInstance(referencedDocReference);
-                    XDOM referencedXDOM = referencedDoc.getXDOM();
-
-                    if (parameters.getTransformationContext() == TransformationContextMode.TRANSFORMATIONS) {
-                        // Get the XDOM from the referenced doc but with Transformations applied so that all macro are
-                        // executed and contribute XDOM elements.
-                        // IMPORTANT: This can be dangerous since it means executing macros, and thus also script macros
-                        // defined in the referenced document. To be used with caution.
-                        TransformationContext referencedTxContext =
-                            new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
-                        this.transformationManager.performTransformations(referencedXDOM, referencedTxContext);
-                    }
-
-                    // Now execute transformation on the context macro content but with the referenced XDOM in the
-                    // Transformation context!
-                    TransformationContext txContext =
-                        new TransformationContext(referencedXDOM, referencedDoc.getSyntax());
-                    this.transformationManager.performTransformations(xdom, txContext);
-                }
-
-                // Keep metadata so that the result stay associated to context properties when inserted in the parent
-                // XDOM
-                result = Arrays.asList((Block) new MetaDataBlock(xdom.getChildren(), xdom.getMetaData()));
-
-            } finally {
+            return result.getChildren();
+        } catch (Exception e) {
+            throw new MacroExecutionException("Failed start the execution of the macro", e);
+        } finally {
+            if (backupObjects != null) {
+                // Restore the context document
                 this.documentAccessBridge.popDocumentFromContext(backupObjects);
             }
-        } catch (Exception e) {
-            if (e instanceof MacroExecutionException) {
-                throw (MacroExecutionException) e;
-            } else {
-                throw new MacroExecutionException(
-                    String.format("Failed to render page in the context of [%s]", referencedDocReference), e);
-            }
         }
+    }
 
-        return result;
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        if (macroBlock.getParameter("source") == null) {
+            this.parser.prepareContentWiki(macroBlock);
+        }
     }
 }

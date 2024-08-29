@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxTranslations" locale="ru">
+  <web>XWiki.Lightbox</web>
+  <name>LightboxTranslations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LightboxTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Admin section
+admin.lightbox=Галерея изображений
+admin.lightbox.description=Настройка галереи изображений
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Задействование галереи изображений
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Включена возможность открывать изображения в виде галереи изображений.
+
+# Gallery template
+image.lightbox.autoPlay.title=Слайд-шоу
+image.lightbox.caption.label=Надпись
+image.lightbox.imageId.title=Идентификатор изображения
+image.lightbox.imageId.copy.title=Копировать идентификатор изображения
+image.lightbox.imageId.copy.copied=Скопировано в буфер обмена
+image.lightbox.imageId.permalink=Постоянная ссылка
+image.lightbox.date.label=Дата
+image.lightbox.download.title=Скачать
+image.lightbox.escape.title=Уйти
+image.lightbox.fileName.label=Имя файла
+image.lightbox.fullscreen.title=Полный экран
+image.lightbox.gallery.title=Галерея изображений
+image.lightbox.nextSlide.title=Следующее изображение
+image.lightbox.prevSlide.title=Предыдущее изображение
+image.lightbox.publisher.label=Публикатор изображения
+image.lightbox.toggler.label=Открыть действия с изображением
+</content>
+  </xwikidoc>

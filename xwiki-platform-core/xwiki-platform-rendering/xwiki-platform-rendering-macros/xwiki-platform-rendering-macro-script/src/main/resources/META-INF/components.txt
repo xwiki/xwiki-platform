@@ -4,3 +4,4 @@ org.xwiki.rendering.internal.macro.script.NestedScriptMacroValidatorListener
 org.xwiki.rendering.internal.macro.script.PermissionCheckerListener
 org.xwiki.rendering.internal.macro.script.ScriptClassLoaderHandlerListener
 org.xwiki.rendering.internal.macro.script.DefaultScriptMacroPermissionPolicy
+org.xwiki.rendering.internal.macro.script.source.ScriptMacroContentWikiSourceFactory

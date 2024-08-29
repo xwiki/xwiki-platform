@@ -21,10 +21,10 @@ package org.xwiki.test.ui.po;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * Represents the widget used to select a page template.
@@ -32,31 +32,22 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
  * @version $Id$
  * @since 12.9RC1
  */
-public class PageTypePicker extends BaseElement
+public class PageTypePicker extends XWikiSelectWidget
 {
-    private WebElement container;
-
     public PageTypePicker()
     {
-        this.container = getDriver().findElementByCssSelector(".xwiki-select.page-type");
-        waitUntilReady();
+        super(By.cssSelector(".xwiki-select.page-type"), "type");
     }
 
     public PageTypePicker(WebElement container)
     {
-        this.container = container;
-        waitUntilReady();
+        super(container, "type");
     }
 
     private List<WebElement> getAvailableTemplateInputs()
     {
-        return getDriver().findElementsWithoutWaiting(this.container,
-            By.xpath("//input[@name = 'type' and @data-type = 'template']"));
-    }
-
-    private List<WebElement> getAvailableTypeInputs()
-    {
-        return getDriver().findElementsWithoutWaiting(this.container, By.xpath("//input[@name = 'type']"));
+        return getOptionInputsStream().filter(input -> "template".equals(input.getAttribute("data-type")))
+            .collect(Collectors.toList());
     }
 
     public int countAvailableTemplates()
@@ -90,25 +81,5 @@ public class PageTypePicker extends BaseElement
             }
         }
         throw new RuntimeException("Failed to find template [" + template + "]");
-    }
-
-    public void selectTypeByValue(String type)
-    {
-        List<WebElement> types = getAvailableTypeInputs();
-        for (WebElement typeInput : types) {
-            if (typeInput.getAttribute("value").equals(type)) {
-                // Get the label corresponding to the input so we can click on it
-                WebElement label = getDriver()
-                    .findElementWithoutWaiting(By.xpath("//label[@for = '" + typeInput.getAttribute("id") + "']"));
-                label.click();
-                return;
-            }
-        }
-        throw new RuntimeException("Failed to find type [" + type + "]");
-    }
-
-    protected void waitUntilReady()
-    {
-        getDriver().waitUntilCondition(ExpectedConditions.attributeToBe(this.container, "data-ready", "true"));
     }
 }

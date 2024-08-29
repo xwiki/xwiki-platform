@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -47,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class CurrentUserManagerTest
+class CurrentUserManagerTest
 {
     @InjectMockComponents
     private CurrentUserManager manager;
@@ -64,7 +63,7 @@ public class CurrentUserManagerTest
     private UserManager documentUserManager;
 
     @Test
-    void existsWhenNoCurrentUser()
+    void existsWhenNoCurrentUser() throws Exception
     {
         // No current user in the context
         XWikiContext xcontext = mock(XWikiContext.class);
@@ -77,7 +76,7 @@ public class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUser()
+    void existsWhenCurrentUser() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "User");
@@ -93,7 +92,7 @@ public class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUserIsSuperAdmin()
+    void existsWhenCurrentUserIsSuperAdmin() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "superadmin");
@@ -106,7 +105,7 @@ public class CurrentUserManagerTest
     }
 
     @Test
-    void existsWhenCurrentUserIsGuest()
+    void existsWhenCurrentUserIsGuest() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         DocumentReference documentReference = new DocumentReference("wiki", "XWiki", "xwikiguest");

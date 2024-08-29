@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-vfs</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-vfs-api</artifactId>
   <name>XWiki Platform - VFS - API</name>
@@ -58,12 +58,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -75,9 +69,14 @@
       <artifactId>truevfs-access</artifactId>
       <version>${truevfs.version}</version>
       <exclusions>
+        <!-- Wrong ids -->
         <exclusion>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -87,9 +86,14 @@
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
       <exclusions>
+        <!-- Wrong ids -->
         <exclusion>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -99,32 +103,14 @@
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
       <exclusions>
+        <!-- Wrong ids -->
         <exclusion>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
         </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.java.truevfs</groupId>
-      <artifactId>truevfs-kernel-impl</artifactId>
-      <scope>runtime</scope>
-      <version>${truevfs.version}</version>
-      <exclusions>
         <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>annotations</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.java.truevfs</groupId>
-      <artifactId>truevfs-kernel-spec</artifactId>
-      <version>${truevfs.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>annotations</artifactId>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -134,6 +120,7 @@
       <scope>runtime</scope>
       <version>${truecommons.version}</version>
       <exclusions>
+        <!-- Wrong ids -->
         <exclusion>
           <groupId>com.google.code.findbugs</groupId>
           <artifactId>annotations</artifactId>
@@ -145,18 +132,43 @@
       <artifactId>truevfs-driver-http</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <!-- Wrong ids -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
       <artifactId>truevfs-driver-odf</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <!-- Wrong ids -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
       <artifactId>truevfs-driver-tar</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <!-- Wrong ids -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truevfs</groupId>
@@ -181,6 +193,17 @@
       <artifactId>truevfs-driver-zip-raes</artifactId>
       <scope>runtime</scope>
       <version>${truevfs.version}</version>
+      <exclusions>
+        <!-- Wrong ids -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-jdk15on</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>net.java.truecommons</groupId>
@@ -188,10 +211,14 @@
       <scope>runtime</scope>
       <version>${truecommons.version}</version>
     </dependency>
-    <!-- Pull the right artifact for findbugs annotations -->
+    <!-- Pull the right artifacts for excluded transitive dependencies -->
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->

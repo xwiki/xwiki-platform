@@ -216,17 +216,11 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <fieldset id="commentform">
         <legend class="sr-only">$services.localization.render('core.viewers.comments.add.title')</legend>
         <div class="commentavatar">#largeUserAvatar($xcontext.user)</div>
-        #if($xcontext.user != 'XWiki.XWikiGuest')
+        #if(!$isGuest)
           <label>$xwiki.getUserName($xcontext.user) $services.localization.render('core.viewers.comments.add.says')</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author"><input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /> says:</label>
-          <strong>
-            <a href='$xwiki.getURL('XWiki.XWikiLogin',
-                'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")&loginLink=1'>
-              $escapetool.xml($services.localization.render('login'))
-            </a>
-          </strong>
         #end
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -241,7 +235,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
             #end
           </div>
         </div>
-        #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
+        #if($isGuest && $offerGuestsCaptcha)
           #displayCaptcha()
         #end
         <div>
@@ -256,10 +250,14 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayCommentButton)
-<button type="button" id="openCommentForm" class="btn btn-default">
-  $services.icon.renderHTML('comment')
-  $services.localization.render('core.viewers.comments.add.comment.label')
-</button>
+  <button type="button" id="openCommentForm" class="btn btn-default">
+    $services.icon.renderHTML('comment')
+    #if(!$isGuest)
+      $services.localization.render('core.viewers.comments.add.comment.label')
+    #else
+      $services.localization.render('core.viewers.comments.add.commentAsGuest.label')
+    #end
+  </button>
 #end
 ##
 ##
@@ -332,7 +330,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
         <div class="modal-body">
@@ -359,7 +357,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>
         <div class="modal-body">

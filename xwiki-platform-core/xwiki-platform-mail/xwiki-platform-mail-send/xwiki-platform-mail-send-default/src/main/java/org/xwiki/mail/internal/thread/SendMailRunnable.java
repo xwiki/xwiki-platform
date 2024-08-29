@@ -124,7 +124,8 @@ public class SendMailRunnable extends AbstractMailRunnable
                 // Note: a short pause to catch thread interruptions and to be kind on CPU.
                 Thread.sleep(50L);
             } catch (InterruptedException e) {
-                // Thread has been stopped, exit
+                Thread.currentThread().interrupt();
+                // Thread has been interrupted, exit
                 this.logger.debug("Mail Sender Thread was forcefully stopped", e);
                 break;
             } catch (Exception e) {
@@ -177,6 +178,7 @@ public class SendMailRunnable extends AbstractMailRunnable
             this.count++;
 
             // Step 4: Notify the user of the success if a listener has been provided
+            // Note that the listener is in charge of deleting the message from the mail content store.
             if (listener != null) {
                 listener.onSendMessageSuccess(message, Collections.emptyMap());
             }

@@ -29,17 +29,12 @@ import org.xwiki.rendering.syntax.Syntax;
  * @version $Id$
  * @since 6.2M1
  */
-public class DocumentInstanceOutputProperties extends InstanceOutputProperties
+public class DocumentInstanceOutputProperties extends EntityInstanceOutputProperties
 {
     /**
      * @see #getDefaultReference()
      */
     private EntityReference defaultReference;
-
-    /**
-     * @see #getSaveComment()
-     */
-    private String saveComment = "Import";
 
     /**
      * @see #getDefaultSyntax()
@@ -50,21 +45,6 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @see #isPreviousDeleted()
      */
     private boolean previousDeleted = true;
-
-    /**
-     * @see #isVersionPreserved()
-     */
-    private boolean versionPreserved = true;
-
-    /**
-     * @see #getAuthor()
-     */
-    private DocumentReference author;
-
-    /**
-     * @see #isAuthorSet()
-     */
-    private boolean authorSet;
 
     /**
      * @see #isAuthorPreserved()
@@ -92,24 +72,6 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     public void setDefaultReference(EntityReference defaultReference)
     {
         this.defaultReference = defaultReference;
-    }
-
-    /**
-     * @return The comment to set when saving a document
-     */
-    @PropertyName("Save comment")
-    @PropertyDescription("The comment to set when saving a document")
-    public String getSaveComment()
-    {
-        return this.saveComment;
-    }
-
-    /**
-     * @param saveComment The comment to set when saving a document
-     */
-    public void setSaveComment(String saveComment)
-    {
-        this.saveComment = saveComment;
     }
 
     /**
@@ -149,58 +111,10 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate if the versions coming from the events should be kept
-     */
-    @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions comming from the events should be kept")
-    public boolean isVersionPreserved()
-    {
-        return this.versionPreserved;
-    }
-
-    /**
-     * @param versionPreserved Indicate if the versions coming from the events should be kept
-     */
-    public void setVersionPreserved(boolean versionPreserved)
-    {
-        this.versionPreserved = versionPreserved;
-    }
-
-    /**
-     * @return the author to use when saving documents
-     * @since 8.2
-     */
-    @PropertyName("Save author")
-    @PropertyDescription("The author to use when saving documents")
-    public DocumentReference getAuthor()
-    {
-        return this.author;
-    }
-
-    /**
-     * @param author the author to use when saving documents
-     * @since 8.2
-     */
-    public void setAuthor(DocumentReference author)
-    {
-        this.author = author;
-        this.authorSet = true;
-    }
-
-    /**
-     * @return true if the author have been explicitly set
-     * @since 8.2
-     */
-    public boolean isAuthorSet()
-    {
-        return this.authorSet;
-    }
-
-    /**
      * @return true if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
-    @PropertyDescription("Indicate if the authors comming from the events should be kept."
+    @PropertyDescription("Indicate if the authors coming from the events should be kept."
         + " If false the current user is used.")
     public boolean isAuthorPreserved()
     {
@@ -217,12 +131,12 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate if an exception should be thrown if a document save fail.
+     * @return Indicate if an exception should be thrown if a document save fails.
      * @since 6.2.6
      * @since 6.4.2
      */
-    @PropertyName("Stop when document save fail")
-    @PropertyDescription("Indicate if an exception should be thrown if a document save fail")
+    @PropertyName("Stop when document save fails")
+    @PropertyDescription("Indicate if an exception should be thrown if a document save fails")
     public boolean isStoppedWhenSaveFail()
     {
         return this.stoppedWhenSaveFail;

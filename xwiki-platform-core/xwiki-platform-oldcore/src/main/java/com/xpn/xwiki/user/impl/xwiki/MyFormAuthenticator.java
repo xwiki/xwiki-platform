@@ -26,10 +26,6 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -39,9 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
-import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
 
-import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier;
+import com.xpn.xwiki.web.Utils;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
@@ -258,17 +256,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
 
             authenticationFailureManager.recordAuthenticationFailure(username, request);
-
-            String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
-            int rCode = HttpServletResponse.SC_UNAUTHORIZED;
-            if ((returnCode != null) && (!returnCode.equals(""))) {
-                try {
-                    rCode = Integer.parseInt(returnCode);
-                } catch (Exception e) {
-                    rCode = HttpServletResponse.SC_UNAUTHORIZED;
-                }
-            }
-            response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         return true;

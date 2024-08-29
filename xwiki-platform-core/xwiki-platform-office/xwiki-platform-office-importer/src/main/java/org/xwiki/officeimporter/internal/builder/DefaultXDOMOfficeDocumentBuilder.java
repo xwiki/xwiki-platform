@@ -100,7 +100,7 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
         } catch (ParseException ex) {
             throw new OfficeImporterException("Error: Could not parse xhtml office content.", ex);
         }
-        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifactsFiles(), this.componentManager,
+        return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifactsMap(), this.componentManager,
             xhtmlOfficeDocument.getConverterResult());
     }
 }

@@ -1,0 +1,195 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.LinkSuggestions" locale="">
+  <web>CKEditor</web>
+  <name>LinkSuggestions</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{template name="hierarchy_macros.vm"/}}
+
+{{include reference="XWiki.SuggestSolrMacros"/}}
+
+{{include reference="XWiki.DocumentTreeMacros"/}}
+
+{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity output="false"}}
+#macro (setIcon $suggestion $icon)
+  #set ($iconMetaData = $services.icon.getMetaData($icon))
+  #if ($iconMetaData)
+    #set ($suggestion.iconURL = "$!iconMetaData.url")
+    #set ($suggestion.iconClass = "$!iconMetaData.cssClass")
+  #else
+    #set ($suggestion.iconURL = $xwiki.getSkinFile("icons/silk/${icon}.png"))
+    #set ($suggestion.iconClass = '')
+  #end
+#end
+
+#set ($entityTypeToLinkType = {
+  'SPACE': 'space',
+  'DOCUMENT': 'doc',
+  'ATTACHMENT': 'attach'
+})
+
+#macro (getEntitySuggestion $entityReference $suggestion)
+  #set ($typed = "$entityReference.type" != 'DOCUMENT')
+  #set ($hint = "#hierarchy($entityReference {'local': true, 'excludeSelf': true, 'plain': true})")
+  #set ($discard = $suggestion.putAll({
+    'id': "$entityReference.type.toString().toLowerCase():$services.model.serialize($entityReference, 'default')",
+    'url': $xwiki.getURL($entityReference),
+    'reference': $services.model.serialize($entityReference, 'compact', $doc.documentReference),
+    'type': $entityTypeToLinkType.get($entityReference.type.toString()),
+    'typed': "$typed",
+    'label': $entityReference.name,
+    'hint': $services.xml.unescape($hint.trim())
+  }))
+#end
+
+#macro (getDocumentSuggestion $documentReference $suggestion)
+  #getEntitySuggestion($documentReference $suggestion)
+  #set ($targetDoc = $xwiki.getDocument($documentReference))
+  #if ($targetDoc.getObject('XWiki.XWikiUsers'))
+    #getUserAvatarURL($documentReference $avatarURL 30)
+    #if ($avatarURL.specified)
+      #set ($suggestion.iconURL = $avatarURL.url)
+      #set ($suggestion.iconClass = '')
+    #else
+      #setIcon($suggestion 'user')
+    #end
+    #set ($suggestion.label = $xwiki.getPlainUserName($documentReference))
+    ## All the user profiles are in the same location so it doesn't make sense to display it.
+    #set ($suggestion.hint = '')
+  #else
+    #set ($suggestion.label = $targetDoc.plainTitle)
+    #setIcon($suggestion, 'page_white')
+  #end
+#end
+
+#macro (getAttachmentSuggestion $attachmentReference $suggestion)
+  #getEntitySuggestion($attachmentReference $suggestion)
+  #setIcon($suggestion 'attach')
+#end
+
+#macro (getSuggestion $entityReference $suggestion)
+  #if ("$!entityReference.type" == 'DOCUMENT')
+    #getDocumentSuggestion($entityReference $suggestion)
+  #elseif ("$!entityReference.type" == 'ATTACHMENT')
+    #getAttachmentSuggestion($entityReference $suggestion)
+  #else
+    #getEntitySuggestion($entityReference $suggestion)
+  #end
+#end
+
+#macro (getSuggestions $entityReferences $suggestions)
+  #foreach ($entityReference in $entityReferences)
+    #set ($suggestion = {})
+    #getSuggestion($entityReference $suggestion)
+    #set ($discard = $suggestions.add($suggestion))
+  #end
+#end
+
+#macro (searchEntities $input $limit $entityReferences)
+  #if ($xwiki.exists('XWiki.SuggestSolrMacros'))
+    #searchEntitiesSolr($input $limit $entityReferences)
+  #elseif ($xwiki.exists('XWiki.DocumentTreeMacros'))
+    #searchEntitiesDatabase($input $limit $entityReferences)
+  #end
+#end
+
+#macro (searchEntitiesSolr $input $limit $entityReferences)
+  ## Enable prefix search.
+  #set ($input = "$input* $input")
+  #set ($results = [])
+  #searchDocumentsSolr($input $limit $results)
+  #searchAttachmentsSolr($input $limit $results)
+  #set ($results = $resolvedSortTool.sort($results, 'score:desc'))
+  #foreach ($result in $results.subList(0, $mathtool.min($results.size(), $limit)))
+    #set ($discard = $entityReferences.add($services.solr.resolve($result)))
+  #end
+#end
+
+#macro (searchDocumentsSolr $input $limit $results)
+  #set ($params = [
+    'fq=type:DOCUMENT',
+    'qf=title^6 name^4 doccontent^2 doccontentraw',
+    'fl=type wiki spaces name score',
+    "bq=author:""$services.model.serialize($xcontext.userReference, 'default')""",
+    "bq=creator:""$services.model.serialize($xcontext.userReference, 'default')""",
+    'bf=recip(ms(NOW,date),3.16e-11,1,1)'
+  ])
+  #executeSolrQuery($input $params $limit $results)
+#end
+
+#macro (searchAttachmentsSolr $input $limit $results)
+  #set ($params = [
+    'fq=type:ATTACHMENT',
+    'qf=filename^4 attcontent',
+    'fl=type wiki spaces name filename score',
+    "bq=attauthor:""$services.model.serialize($xcontext.userReference, 'default')""",
+    "bq=space_exact:""$services.model.serialize($doc.documentReference.parent, 'local')""",
+    'bf=recip(ms(NOW,attdate_sort),3.16e-11,1,1)'
+  ])
+  #executeSolrQuery($input $params $limit $results)
+#end
+
+#macro (executeSolrQuery $text $params $limit $results)
+  #set ($paramsAsString = $stringtool.join($params, $util.newline))
+  #createSearchSuggestQuery($paramsAsString $text $query)
+  #set ($discard = $query.setLimit($limit))
+  #set ($discard = $results.addAll($query.execute()[0].results))
+#end
+
+#macro (searchEntitiesDatabase $input $limit $entityReferences)
+  #set ($halfLimit = $limit / 2)
+  #searchDocumentsDatabase($input $halfLimit)
+  #set ($discard = $entityReferences.addAll($documentReferences))
+  #searchAttachmentsDatabase($input $halfLimit)
+  #set ($discard = $entityReferences.addAll($attachmentReferences))
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#set ($input = $request.input.trim())
+#if ("$!input" != '' || $input == '')
+  #set ($entityReferences = [])
+  #searchEntities($input 8 $entityReferences)
+  #set ($suggestions = [])
+  #getSuggestions($entityReferences $suggestions)
+  #if ($xcontext.action == 'get')
+    #set ($discard = $response.setContentType('application/json'))
+  #end
+  $jsontool.serialize($suggestions)
+#end
+{{/velocity}}</content>
+</xwikidoc>

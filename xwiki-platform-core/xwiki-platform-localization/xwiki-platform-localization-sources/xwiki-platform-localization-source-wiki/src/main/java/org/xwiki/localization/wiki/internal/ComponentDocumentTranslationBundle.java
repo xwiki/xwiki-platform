@@ -19,6 +19,8 @@
  */
 package org.xwiki.localization.wiki.internal;
 
+import java.util.Locale;
+
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -27,6 +29,11 @@ import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.authorization.AccessDeniedException;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Component wiki document based implementation of Bundle.
@@ -37,6 +44,8 @@ import org.xwiki.observation.event.Event;
  */
 public class ComponentDocumentTranslationBundle extends AbstractDocumentTranslationBundle
 {
+    private DocumentTranslationBundleFactory factory;
+
     private ComponentDescriptor<TranslationBundle> descriptor;
 
     /**
@@ -45,15 +54,52 @@ public class ComponentDocumentTranslationBundle extends AbstractDocumentTranslat
      * @param componentManager used to lookup components needed to manipulate wiki documents
      * @param translationMessageParser the parser to use for each message
      * @param descriptor the component descriptor used to unregister the bundle
+     * @param factory the factory
      * @throws ComponentLookupException failed to lookup some required components
      */
     public ComponentDocumentTranslationBundle(String idPrefix, DocumentReference documentReference,
         ComponentManager componentManager, TranslationMessageParser translationMessageParser,
-        ComponentDescriptor<TranslationBundle> descriptor) throws ComponentLookupException
+        ComponentDescriptor<TranslationBundle> descriptor, DocumentTranslationBundleFactory factory)
+        throws ComponentLookupException
     {
         super(idPrefix, documentReference, componentManager, translationMessageParser);
 
+        this.factory = factory;
         this.descriptor = descriptor;
+    }
+
+    /**
+     * {@inheritDoc}
+     * This overrides the default implementation to first check the author rights for the document.
+     *
+     * @param locale the requested locale
+     * @return the document defining the translation bundle if its author has the necessary rights, the default locale
+     *     otherwise, and fallback on the original implementation if the document doesn't exist or could not be fetched
+     */
+    @Override
+    protected XWikiDocument getDocumentLocaleBundle(Locale locale) throws Exception
+    {
+        XWikiDocument document = super.getDocumentLocaleBundle(locale);
+
+        if (document != null && !document.isNew()) {
+            XWikiContext context = this.contextProvider.get();
+            XWiki xwiki = context.getWiki();
+            XWikiDocument defaultLocaleDocument = xwiki.getDocument(this.documentReference, context);
+
+            if (defaultLocaleDocument != document) {
+                // We only need to check rights for non-default locales.
+                try {
+                    this.factory.checkRegistrationAuthorizationForDocumentLocaleBundle(document, defaultLocaleDocument);
+                } catch (AccessDeniedException e) {
+                    this.logger.warn("Failed to load and register the translation for locale [{}] from document [{}]. "
+                        + "Falling back to default locale.", locale, document.getDocumentReference());
+                    // We return the default translation bundle if the requested one has permission issues.
+                    return defaultLocaleDocument;
+                }
+            }
+        }
+
+        return document;
     }
 
     @Override

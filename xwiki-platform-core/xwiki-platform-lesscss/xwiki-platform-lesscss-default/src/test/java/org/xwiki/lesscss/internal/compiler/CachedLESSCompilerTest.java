@@ -19,50 +19,67 @@
  */
 package org.xwiki.lesscss.internal.compiler;
 
+import java.io.Writer;
+
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSConfiguration;
 import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * @since 6.4M2
+ * Validate {@link CachedLESSCompiler}.
+ * 
  * @version $Id$
  */
-public class CachedLESSCompilerTest
+@ComponentTest
+class CachedLESSCompilerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<CachedLESSCompiler> mocker =
-            new MockitoComponentMockingRule<>(CachedLESSCompiler.class);
+    @InjectMockComponents
+    private CachedLESSCompiler cachedCompiler;
 
+    @MockComponent
     private Provider<XWikiContext> xcontextProvider;
 
+    @MockComponent
     private Less4jCompiler less4jCompiler;
 
+    @MockComponent
     private LESSConfiguration lessConfiguration;
+
+    @MockComponent
+    private TemplateManager templateManager;
 
     private XWikiContext xcontext;
 
@@ -70,12 +87,18 @@ public class CachedLESSCompilerTest
 
     private XWikiEngineContext engineContext;
 
-    @Before
-    public void setUp() throws Exception
+    private Template template;
+
+    @AfterComponent
+    public void afterComponents()
     {
-        less4jCompiler = mocker.getInstance(Less4jCompiler.class);
-        lessConfiguration = mocker.getInstance(LESSConfiguration.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(lessConfiguration.getMaximumSimultaneousCompilations()).thenReturn(1);
+        when(lessConfiguration.isGenerateInlineSourceMaps()).thenReturn(false);
+    }
+
+    @BeforeEach
+    public void beforeEach() throws Exception
+    {
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);
@@ -84,28 +107,37 @@ public class CachedLESSCompilerTest
         when(xwiki.getEngineContext()).thenReturn(engineContext);
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
 
-        XWikiDocument mockDocument = mock(XWikiDocument.class);
-        when(mockDocument.getPrefixedFullName()).thenReturn("SomeContextDocument");
-        when(xcontext.getDoc()).thenReturn(mockDocument);
+        this.template = mock(Template.class);
+    }
 
-        when(lessConfiguration.getMaximumSimultaneousCompilations()).thenReturn(1);
-        when(lessConfiguration.isGenerateInlineSourceMaps()).thenReturn(false);
+    void mockTemplateExecution(LESSResourceReference resource, String input, String result) throws Exception
+    {
+        when(this.templateManager.createStringTemplate(resource.toString(), input, InternalTemplateManager.SUPERADMIN_REFERENCE, null))
+            .thenReturn(this.template);
+
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                invocation.<Writer>getArgument(1).write(result);
+
+                return null;
+            }
+        }).when(this.templateManager).renderNoException(same(this.template), any());
     }
 
     @Test
-    public void computeSkinFile() throws Exception
+    void computeSkinFile() throws Exception
     {
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
-            thenReturn("Some Velocity-rendered LESS content");
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2"),
-                eq(false)))
-            .thenReturn("output");
+        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
+        when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin2", false)).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, true, true, "skin2"));
+        assertEquals("output", cachedCompiler.compute(resource, false, true, true, "skin2"));
 
         // Verify
         verify(xcontext, times(1)).put("skin", "skin2");
@@ -113,85 +145,74 @@ public class CachedLESSCompilerTest
     }
 
     @Test
-    public void computeSkinFileWithoutVelocity() throws Exception
+    void computeSkinFileWithoutVelocity() throws Exception
     {
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"),
-                eq(false))).thenReturn("output");
+        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        when(less4jCompiler.compile("Some LESS content", "skin2", false)).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, true, "skin2"));
+        assertEquals("output", cachedCompiler.compute(resource, false, false, true, "skin2"));
 
         // Verify
         verify(xcontext, never()).put(eq("skin"), any());
     }
 
     @Test
-    public void computeSkinFileWithoutLESS() throws Exception
+    void computeSkinFileWithoutLESS() throws Exception
     {
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
-                thenReturn("Some Velocity-rendered LESS content");
+        when(resource.getContent("skin2")).thenReturn("Some LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
 
         // Tests
-        assertEquals("Some Velocity-rendered LESS content", mocker.getComponentUnderTest().compute(resource, false,
-            true, false, "skin2"));
+        assertEquals("Some Velocity-rendered LESS content",
+            cachedCompiler.compute(resource, false, true, false, "skin2"));
 
         // Verify that the LESS compiler is never called
-        verifyZeroInteractions(less4jCompiler);
+        verifyNoInteractions(less4jCompiler);
     }
 
     @Test
-    public void computeSkinFileWithMainStyleIncluded() throws Exception
+    void computeSkinFileWithMainStyleIncluded() throws Exception
     {
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent(eq("skin"))).thenReturn("Some LESS content");
-        when(
-            xwiki.evaluateVelocity(eq("@import (reference) \"style.less.vm\";\n" + "Some LESS content"),
-                eq("SomeContextDocument")))
-                .thenReturn("@import (reference) \"style.less.vm\";\n"
-                        +"Some Velocity-rendered LESS content");
-        when(less4jCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
-            +"Some Velocity-rendered LESS content"), eq("skin"),
-                eq(false)))
-                .thenReturn("output");
+        when(resource.getContent("skin")).thenReturn("Some LESS content");
+        mockTemplateExecution(resource, "@import (reference) \"style.less.vm\";\nSome LESS content",
+            "@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
+        when(less4jCompiler.compile("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content",
+            "skin", false)).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, true, "skin"));
-
+        assertEquals("output", cachedCompiler.compute(resource, true, true, true, "skin"));
     }
 
     @Test
-    public void computeSkinFileWhenException() throws Exception
+    void computeSkinFileWhenException() throws Exception
     {
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
-        when(resource.getContent(eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
-                thenReturn("Some Velocity-rendered LESS content");
+        when(resource.getContent("skin")).thenReturn("Some LESS content");
+        mockTemplateExecution(resource, "Some LESS content", "Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"),
-                eq(false))).
-            thenThrow(lessCompilerException);
+        when(less4jCompiler.compile("Some Velocity-rendered LESS content", "skin", false))
+            .thenThrow(lessCompilerException);
 
         // Tests
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().compute(resource, false, true, true, "skin");
-        } catch(LESSCompilerException e) {
+            cachedCompiler.compute(resource, false, true, true, "skin");
+        } catch (LESSCompilerException e) {
             caughtException = e;
         }
 
         // Verify
         assertNotNull(caughtException);
         assertEquals(lessCompilerException, caughtException.getCause());
-        assertEquals("Failed to compile the resource ["+resource.toString()+"] with LESS.",
+        assertEquals("Failed to compile the resource [" + resource.toString() + "] with LESS.",
             caughtException.getMessage());
-
     }
 }

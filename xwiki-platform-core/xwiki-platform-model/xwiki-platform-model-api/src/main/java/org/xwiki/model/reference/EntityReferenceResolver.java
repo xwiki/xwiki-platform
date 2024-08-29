@@ -54,7 +54,9 @@ public interface EntityReferenceResolver<T>
 
     /**
      * @param entityReferenceRepresentation the representation of an entity reference (eg as a String)
-     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to resolve out of the representation
+     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to resolve out of the representation,
+     *            since 14.8 it's possible to pass null if the resolver should extract the type from the representation
+     *            itself
      * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the valid resolved reference as an Object
      */

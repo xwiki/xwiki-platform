@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Panels.PanelWizard" locale="">
+<xwikidoc version="1.5" reference="Panels.PanelWizard" locale="">
   <web>Panels</web>
   <name>PanelWizard</name>
   <language/>
@@ -79,10 +79,7 @@
 
 {{velocity output="false"}}
 #macro (displayConfigPropertyValue $propName $action)
-  #set ($output = $doc.display($propName, $action))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $output
+  #unwrapXPropertyDisplay($doc.display($propName, $action))
 #end
 
 #macro (displayPageLayoutSection)
@@ -196,15 +193,12 @@
     #end
   #end
   #set ($panelsPerRow = 3)
-  (% id="dhtmltooltip" style="visibility: hidden;" %)((()))
+  (% id="dhtmltooltip" %)((()))
   #if ($request.place)
     #set ($ajaxurl = $xwiki.getDocument('Panels.PanelLayoutUpdate').getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;place=$!{escapetool.url($request.place)}&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
   #else
     #set ($ajaxurl = $xwiki.getDocument("Panels.PanelLayoutUpdate").getURL('get', "xpage=plain&amp;outputSyntax=plain&amp;prefsdoc=${escapetool.url($currentDoc)}&amp;form_token=${escapetool.url($services.csrf.getToken())}"))
   #end
-  ## accordion.js requires effects.js
-  $xwiki.jsfx.use('js/scriptaculous/effects.js')##
-  $xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/Drag.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/ieemu.js')##
   $xwiki.jsfx.use('js/xwiki/panelwizard/toolTip.js')##
@@ -260,9 +254,8 @@
   #else
     window.showApplicationPanel = false;
   #end
-  var obj = {div:'panellistaccordion', no:0, height:512};
-  document.observe('xwiki:dom:loaded', function () {
-    createAccordion(obj);
+  require(['scriptaculous-accordion'], function() {
+    createAccordion({div: 'panellistaccordion', no: 0, height: 512});
   });
   //]]&gt;
   &lt;/script&gt;
@@ -292,7 +285,7 @@
               (((
                 (% class="label" %)((($doc.display('name', $obj))))
                 (% id="panelContainer${panelCount}" class="panelcontainer" title="${doc.display('description', 'view', $obj, 'xwiki/2.0').replaceAll('^\{\{html(.*?)\}\}', '').replaceAll('\{\{/html\}\}$', '')}" %)(((#if($panelsStatus.get($item) == 'false')#displaypanel($item)#else(% class="panel" %)((()))#end)))
-                (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'inline')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
+                (% class="xwikibuttonlink" %)((([[$services.localization.render('edit')&gt;&gt;path:$xwiki.getURL($item, 'edit')]] [[$services.localization.render('delete')&gt;&gt;path:$xwiki.getURL($item, 'delete')]])))
               )))
               #set ($panelCount = $panelCount + 1)
             #end## foreach panel
@@ -367,8 +360,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -416,6 +412,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -500,8 +498,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -530,6 +531,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -565,6 +568,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -627,6 +632,7 @@
 }
 
 #dhtmltooltip {
+  display: none;
   background-color: $theme.highlightColor;
   border: 1px solid $theme.borderColor;
   padding: 2px 4px;

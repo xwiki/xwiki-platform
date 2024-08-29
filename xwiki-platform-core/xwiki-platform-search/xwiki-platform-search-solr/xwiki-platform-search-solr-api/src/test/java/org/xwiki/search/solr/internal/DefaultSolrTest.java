@@ -127,12 +127,24 @@ class DefaultSolrTest
         inputDocument.setField(FieldUtils.NAME, "name");
         inputDocument.setField(FieldUtils.DOCUMENT_LOCALE, "");
 
+        inputDocument.addField(FieldUtils.LINKS, "link1");
+        inputDocument.addField(FieldUtils.LINKS, "link2");
+        inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link1");
+        inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link2");
+        inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link1.1");
+        inputDocument.addField(FieldUtils.LINKS_EXTENDED, "link1.2");
+
+        String titleRootLocaleField = FieldUtils.getFieldName(FieldUtils.TITLE, Locale.ROOT);
+        inputDocument.setField(titleRootLocaleField, "Some title");
+
         client.add(inputDocument);
 
         storedDocument = client.getById("1");
 
         assertEquals("name", storedDocument.get(FieldUtils.NAME));
         assertEquals("", storedDocument.get(FieldUtils.DOCUMENT_LOCALE));
+        assertEquals(Arrays.asList("link1", "link2"), storedDocument.getFieldValues(FieldUtils.LINKS));
+        assertEquals(Arrays.asList("Some title"), storedDocument.get(titleRootLocaleField));
     }
 
     @Test

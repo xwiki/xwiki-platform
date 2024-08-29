@@ -20,7 +20,6 @@
 package org.xwiki.security.authentication;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.stability.Unstable;
 
 /**
  * Possible actions for {@link AuthenticationResourceReference}.
@@ -28,20 +27,19 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public enum AuthenticationAction
 {
     /**
      * Action used to reset the password of a user.
      */
-    RESET_PASSWORD("reset"),
+    RESET_PASSWORD("resetpassword"),
 
     /**
      * Action used to retrieve the username of a user.
      */
-    FORGOT_USERNAME("forgot");
+    RETRIEVE_USERNAME("retrieveusername");
 
-    private String requestParameter;
+    private final String requestParameter;
 
     AuthenticationAction(String requestParameter)
     {

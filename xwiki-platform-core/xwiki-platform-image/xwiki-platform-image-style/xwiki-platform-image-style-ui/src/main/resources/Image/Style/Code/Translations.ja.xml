@@ -1,0 +1,86 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="ja">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=画像のスタイル
+image.style.admin.heading=画像のスタイルの管理
+image.style.administration.imageStyleList.heading=画像のスタイル
+image.style.administation.newImageStyle.button=画像のスタイルを作成
+image.style.administation.defaultImageStyle.button=既定の画像のスタイルを更新
+image.style.imageStyleSheet.backToAdministration.link=管理機能に戻る
+image.style.administration.liveData.doc.title=識別子
+image.style.administration.liveData._actions=アクション
+image.style.administration.liveData.prettyName=名称
+image.style.administration.liveData.prettyName.hint=画像のスタイルのユーザー向けの名称
+image.style.administration.liveData.type=種類
+image.style.administration.liveData.type.hint=画像のスタイルの種類（CSSのクラスに使用されます）
+### Missing: image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=新しい画像のスタイル
+image.style.administation.newImageStyle.hint=新しい画像のスタイルの識別子。
+image.style.administation.newImageStyle.placeHolder=識別子
+Image.Style.Code.ImageStyleClass_adjustableAlignment=並べ方を調整できるようにする
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=チェックすると、画像の並べ方をカスタマイズできるようになります。
+Image.Style.Code.ImageStyleClass_adjustableBorder=ボーダーを調整できるようにする
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=チェックすると、画像のボーダーがカスタマイズできるようになります。
+Image.Style.Code.ImageStyleClass_adjustableSize=サイズを調整できるようにする
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=チェックすると、画像のサイズがカスタマイズできるようになります。
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=テキストの回り込みを調整できるようにする
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=チェックすると、画像のテキストの回り込みをカスタマイズできるようになります。
+Image.Style.Code.ImageStyleClass_defaultAlignment=既定の並べ方
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=中央
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=画像の既定の並べ方。
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=なし
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=先端
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=中央
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=末端
+Image.Style.Code.ImageStyleClass_defaultBorder=ボーダーを既定とする
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=チェックすると、画像に既定でボーダーが付きます。
+Image.Style.Code.ImageStyleClass_defaultHeight=既定の高さ
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=画像の既定の高さ。既定の幅の設定がなければ、画像の比率に応じて計算されます。それ以外の場合、画像のサイズは固定されます。
+Image.Style.Code.ImageStyleClass_defaultTextWrap=既定のテキストの折り返し
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=チェックすると、テキストは既定で画像の周囲を回り込みます。
+Image.Style.Code.ImageStyleClass_defaultWidth=既定の幅
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=画像の既定の幅。既定の高さの設定がなければ、画像の比率に応じて計算されます。それ以外の場合、画像のサイズは固定されます。
+Image.Style.Code.ImageStyleClass_prettyName=名称
+Image.Style.Code.ImageStyleClass_prettyName_hint=画像のスタイルのユーザー向けの名称。
+Image.Style.Code.ImageStyleClass_type=種類
+Image.Style.Code.ImageStyleClass_type_hint=画像のスタイルの種類（CSSのクラスに使用されます）。
+Image.Style.Code.ConfigurationClass_defaultStyle=既定のスタイル
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=このウィキの既定の画像のスタイル。
+</content>
+</xwikidoc>

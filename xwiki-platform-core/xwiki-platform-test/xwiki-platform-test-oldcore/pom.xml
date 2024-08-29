@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-oldcore</artifactId>
   <name>XWiki Platform - Test - Oldcore</name>
@@ -52,6 +52,13 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
+    </dependency>
+
+    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->

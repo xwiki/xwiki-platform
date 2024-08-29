@@ -33,11 +33,11 @@ import org.xwiki.environment.internal.DefaultEnvironmentConfiguration;
  *
  * @version $Id$
  * @since 3.5M1
- * @deprecated starting with 3.5M1 use the "environment.permanentDirectory" property instead
+ * @deprecated use the "environment.permanentDirectory" property instead
  */
 @Component
 @Singleton
-@Deprecated
+@Deprecated(since = "3.5M1")
 public class LegacyEnvironmentConfiguration extends DefaultEnvironmentConfiguration
 {
     /**

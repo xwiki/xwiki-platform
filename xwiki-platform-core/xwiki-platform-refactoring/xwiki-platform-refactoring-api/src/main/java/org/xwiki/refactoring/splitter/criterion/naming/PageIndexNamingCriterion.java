@@ -19,8 +19,16 @@
  */
 package org.xwiki.refactoring.splitter.criterion.naming;
 
+import javax.inject.Named;
+
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the name of the main document being split.
@@ -28,47 +36,54 @@ import org.xwiki.rendering.block.XDOM;
  * @version $Id$
  * @since 1.9M1
  */
-public class PageIndexNamingCriterion implements NamingCriterion
+@Component
+@Named("mainPageNameAndNumbering")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class PageIndexNamingCriterion extends AbstractNamingCriterion
 {
-    /**
-     * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
-     */
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * Base name to be used for generating new document names.
-     */
-    private String baseDocumentName;
-
     /**
      * Current value of the post-fix appended to new document names.
      */
-    private int index = 0;
+    private int index;
 
     /**
      * Constructs a new {@link PageIndexNamingCriterion}.
      * 
      * @param baseDocumentName base name to be used for generating new document names.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
+     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     *             {@link #getParameters()}
      */
+    @Deprecated
     public PageIndexNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge)
     {
-        this.baseDocumentName = baseDocumentName;
+        getParameters().setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
         this.docBridge = docBridge;
     }
 
-    @Override
-    public String getDocumentName(XDOM newDoc)
+    /**
+     * Implicit constructor. Don't use it directly. Use the component manager instead (e.g. through injection).
+     * 
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public PageIndexNamingCriterion()
     {
-        int newIndex = ++index;
-        String newDocumentName = baseDocumentName + INDEX_SEPERATOR + newIndex;
+    }
+
+    @Override
+    public DocumentReference getDocumentReference(XDOM newDoc)
+    {
+        int newIndex = ++this.index;
+        DocumentReference newDocumentReference = newDocumentReference(getBasePageName() + INDEX_SEPERATOR + newIndex);
         // Resolve any name clashes.
         int localIndex = 0;
-        while (docBridge.exists(newDocumentName)) {
+        while (exists(newDocumentReference)) {
             // Append a trailing local index if the page already exists
-            newDocumentName =
-                baseDocumentName + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex);
+            newDocumentReference =
+                newDocumentReference(getBasePageName() + INDEX_SEPERATOR + newIndex + INDEX_SEPERATOR + (++localIndex));
         }
-        return newDocumentName;
+        return newDocumentReference;
     }
 }

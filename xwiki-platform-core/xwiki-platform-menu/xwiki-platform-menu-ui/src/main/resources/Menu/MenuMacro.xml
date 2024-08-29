@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Menu.MenuMacro" locale="">
+<xwikidoc version="1.5" reference="Menu.MenuMacro" locale="">
   <web>Menu</web>
   <name>MenuMacro</name>
   <language/>
@@ -41,9 +41,11 @@
 = Horizontal Menu =
 
 {{velocity}}
+#set ($menuTemplateDoc = $xwiki.getDocument('MenuTemplate'))
 {{code language="none"}}
 {{menu type="horizontal fixedWidth"}}
-$xwiki.getDocument('MenuTemplate').content
+## No way to escape content in the code macro, so just remove {, see https://jira.xwiki.org/browse/XRENDERING-13.
+$menuTemplateDoc.content.replace('{', '')
 {{/menu}}
 {{/code}}
 {{/velocity}}
@@ -152,28 +154,99 @@ $xwiki.getDocument('MenuTemplate').content
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>define('menu-ui-translation-keys', {
+  prefix: 'menu.ui.',
+  keys: [
+    "openSubMenu",
+    "closeSubMenu"
+  ]
+});
+require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
   // It's not possible to write a CSS selector that targets list items containing lists so we rely on JavaScript.
   // The 'dropdown' CSS class is used only to display the down/left arrow.
-  $('.menu-horizontal li ul').parent().addClass('xDropdown');
-
+  // All nodes on the tree.
+  $('.menu-horizontal ul , .menu-vertical ul')
+    .attr('role', 'menu');
+  // All leaves on the tree.
+  $('.menu-horizontal li, .menu-vertical li')
+    .attr('role', 'menuitem');
+  $('.menu-horizontal li ul, .menu-vertical li ul')
+    .parent()
+    .addClass('xDropdown');
   // Make sure the menu separators are really empty.
-  $('.menu-horizontal, .menu-vertical').find('li &gt; br:first-child').remove();
+  var menus = $('.menu-horizontal, .menu-vertical');
+  menus.find('li &gt; br:first-child').remove();
 
-  // Collapsible menu bahavior.
-  $('.menu-vertical.collapsible').each(function(){
+  // Add aria attributes to the menu separators.
+  menus.find('li')
+    .filter(function() {return this.textContent.trim() === ""; })
+    .attr('role', 'separator')
+    .attr('aria-hidden', 'true');
+
+  // Vertical menus are initially expanded
+  $('.menu-vertical.collapsible').each(function() {
     var open = $(this).hasClass('open');
     $(this).find('li ul').each(function() {
       $(this).addClass('xDropdown-menu').parent().addClass('xDropdown' + (open ? ' open' : ''));
-      // Wrap everything (including text nodes) before the sub-menu in a DIV that will toggle its state.
-      var toggle = this.ownerDocument.createElement('div');
-      $(this).parent().prepend(toggle);
-      for(var next = toggle.nextSibling; next != this; next = toggle.nextSibling) {
-        toggle.appendChild(next);
+    });
+  });
+
+  function setDropdownButtonTitle(dropDownButton) {
+    var xDropdown = $(dropDownButton).parent().parent();
+    if($(xDropdown).hasClass('open')) {
+      $(dropDownButton).attr('title', l10n['closeSubMenu']);
+      $(xDropdown).attr('aria-expanded', "true");
+    } else {
+      $(dropDownButton).attr('title', l10n['openSubMenu']);
+      $(xDropdown).attr('aria-expanded', "false");
+    }
+  }
+
+  $('.xDropdown').each(function() {
+    var dropDownHeader = this.ownerDocument.createElement("div");
+    $(dropDownHeader).addClass("xDropdown-header");
+    var dropDownButton = this.ownerDocument.createElement("button");
+    $(dropDownButton).addClass("xDropdown-header-toggle");
+    setDropdownButtonTitle(dropDownButton);
+    dropDownButton.addEventListener('click',function() {
+      //Swaps the state of the submenu.
+      var xDropdown = $(this).parent().parent();
+      xDropdown.toggleClass('open');
+      setDropdownButtonTitle(dropDownButton);
+    });
+      let dropDownContent = $(this).contents();
+      // We put all the content of the entry in the header,
+      // except for the last one which is the content of the dropdown. This dropdown stays where it is.
+      for (let index = 0; index &lt; dropDownContent.length - 1 ; index++) {
+        let item = dropDownContent[index];
+        dropDownHeader.append(item);
       }
-      $(toggle).addClass('xDropdown-toggle').on('click', function() {
-        $(this).parent().toggleClass('open');
-      });
+      dropDownHeader.append(dropDownButton);
+      $(this).prepend(dropDownHeader);
+      $(dropDownHeader).next().addClass('xDropdown-menu');
+  });
+
+  $('.xDropdown-menu').each(function() {
+     this.addEventListener('keyup', function(event) {
+       if (event.key === 'Escape') {
+         // We change the state of the parent xDropdown
+         this.parentNode.classList.remove('open');
+         // We set the focus on the toggle button of the section we just collapsed
+         this.parentNode.querySelector(':scope > .xDropdown-header > .xDropdown-header-toggle').focus();
+       }
+       event.stopPropagation();
+     });
+  });
+
+  $('.menu-horizontal .xDropdown').each(function() {
+    // In case of horizontal menus, make it so that a class is added on hover, instead of using the :hover pseudo-class
+    this.addEventListener("mouseover", function() {
+      $(this).addClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
+    });
+    this.addEventListener("mouseout", function() {
+      $(this).removeClass('open');
+      setDropdownButtonTitle(this.firstChild.lastChild);
     });
   });
 
@@ -596,6 +669,32 @@ $xwiki.getDocument('MenuTemplate').content
   }
 }
 .menu {
+  /* Rotate the carets when the menu is opened. */
+  .xDropdown{
+    &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+        transform: rotate(90deg);
+      }
+    &amp;.open &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+      transform: rotate(0);
+    }
+  }
+  .xDropdown-header-toggle {
+    background: transparent;
+    border:none;
+    border-radius: @border-radius-base;
+    margin: 0 .3em;
+    line-height: (@line-height-computed / 2);
+    min-width: 24px;
+    min-height: 24px;
+    &amp;:hover, &amp;:focus-within {
+      background-color: @dropdown-bg;
+    }
+    &amp;:before {
+      .caret;
+      margin-left: 0;
+      content: '';
+    }
+  }
   &amp;.menu-vertical {
     ul {
       list-style-type: none;
@@ -617,32 +716,8 @@ $xwiki.getDocument('MenuTemplate').content
     .xDropdown-menu {
       display: none;
     }
-    .xDropdown-toggle {
-      cursor: pointer;
-      position: relative;
-      &amp;:hover {
-        background-color: @nav-link-hover-bg;
-      }
-      &amp;:after {
-        .caret;
-        content: '';
-        /* Positioning */
-        position: absolute;
-        margin-top: @line-height-computed / 3;
-        right: 1em;
-        /* Collapsed arrow style */
-        border-bottom: 4px solid transparent;
-        border-right: 4px solid;
-        border-top: 4px solid transparent;
-      }
-    }
     .xDropdown.open {
-      &gt; .xDropdown-toggle:after {
-        /* Expanded arrow style */
-        .caret;
-        margin-top: @line-height-computed / 2;
-      }
-      &gt; .xDropdown-menu {
+      &gt; ul {
         display: block;
       }
     }
@@ -656,22 +731,35 @@ $xwiki.getDocument('MenuTemplate').content
     .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
     min-height: @navbar-height;
     padding-left: 25px;
+    .xDropdown.open {
+      &gt; .xDropdown-header &gt; .xDropdown-header-toggle:before {
+        transform: rotate(0);
+      }
+      &gt; ul {
+        display: block;
+      }
+    }
     &amp; &gt; ul {
       padding-left: 0;
       list-style-type: none;
       margin: 0;
+      min-height: 50px;
+      display: flex;
+      align-items: stretch;
       &amp; &gt; li {
         position: relative;
-        display: block;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
         padding: @nav-link-padding;
-        padding-top: @navbar-padding-vertical;
-        padding-bottom: @navbar-padding-vertical;
+        padding-top: 0;
+        padding-bottom: 0;
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }
         line-height: @line-height-computed;
         color: @navbar-default-link-color;
-        &amp;:hover {
+        &amp;:hover, &amp;:focus-within {
           color: @navbar-default-link-hover-color;
           background-color: @navbar-default-link-hover-bg;
           background-color: @navbar-default-link-active-bg;
@@ -685,7 +773,7 @@ $xwiki.getDocument('MenuTemplate').content
         /* Links inside menu */
         a {
           color: @navbar-default-link-color;
-          &amp;:hover {
+          &amp;:hover, &amp;:focus-within {
             text-decoration: none;
           }
         }
@@ -694,6 +782,17 @@ $xwiki.getDocument('MenuTemplate').content
           /* Limit the height to the nav height minus the padding and minus border */
           max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
           overflow: hidden;
+          &amp;.xDropdown-header{
+            /* No border on the dropdown header */
+            max-height: unset;
+          }
+        }
+        /* Horizontal menu top-level headers. */
+        &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
+          &amp;:hover, &amp;:focus-within {
+            /* Change background color of the caret when hovering on the navbar. */
+            background-color: @navbar-default-bg;
+          }
         }
         /* Separator vertical inside menu */
         &amp;:empty {
@@ -718,7 +817,6 @@ $xwiki.getDocument('MenuTemplate').content
         font-size: @font-size-base;
         text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
         background-color: @dropdown-bg;
-        border: 1px solid @dropdown-fallback-border; // IE8 fallback
         border: 1px solid @dropdown-border;
         border-radius: @border-radius-base;
         .box-shadow(0 6px 12px rgba(0,0,0,.175));
@@ -726,20 +824,20 @@ $xwiki.getDocument('MenuTemplate').content
         margin-top: 0;
         border-top-right-radius: 0;
         border-top-left-radius: 0;
+        overflow-wrap: break-word;
+        hyphens: auto;
         li {
           /* Text inside menu */
           color: @dropdown-link-color;
+          padding: 3px 20px;
           /* Links inside menu */
           a {
             display: block;
-            padding: 3px 20px;
             clear: both;
             font-weight: normal;
             line-height: @line-height-base;
             color: @dropdown-link-color;
-            overflow: hidden;
-            text-overflow: ellipsis; // Displaying ... if the text is too long
-            &amp;:hover {
+            &amp;:hover, &amp;:focus-within {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;
               color: @dropdown-link-hover-color;
@@ -757,7 +855,7 @@ $xwiki.getDocument('MenuTemplate').content
             color: @dropdown-link-color;
             /* Empty dropdowns should have height in order to display the arrow */
             min-height: 2 * @font-size-base;
-            &amp;:hover {
+            &amp;:hover, &amp;:focus-within {
               text-decoration: none;
               color: @dropdown-link-hover-color;
               background-color: @dropdown-link-hover-bg;
@@ -767,15 +865,16 @@ $xwiki.getDocument('MenuTemplate').content
               }
             }
             /* When in dropdown we also have a link, reset the duplicated padding */
-            &amp; &gt; span &gt; a {
+            &amp; &gt; .xDropdown-header &gt; span &gt; a {
               padding: 0;
               display: inherit;
             }
-            /* Place the arrow on the right */
-            &amp;:after {
+            /* Reposition the toggle when in a dropdown of fixed size
+              to avoid eating away at the bit of space we have for the text. */
+            &amp; &gt; .xDropdown-header &gt; .xDropdown-header-toggle {
               position: absolute;
-              margin-top: @line-height-computed / 2;
-              right: 8px;
+              right: 0;
+              top: 0;
             }
           }
           /* Separator horizontal inside menu */
@@ -789,16 +888,8 @@ $xwiki.getDocument('MenuTemplate').content
     /* Stylization: Generic */
     li {
       /* Display submenus on hover */
-      &amp;:hover &gt; ul {
+      &amp;.open &gt; ul {
         display: block;
-      }
-      /* Display an arrow for expandable items */
-      &amp;.xDropdown {
-        &amp;:after {
-          .caret;
-          content: '';
-          margin-left: .5em;
-        }
       }
     }
     /* The only way to have a menu with more than 2 levels without JavaScript is to use a fixed width. */
@@ -821,7 +912,7 @@ $xwiki.getDocument('MenuTemplate').content
     }
     /* Resetting rules for mobile view */
     @media (max-width: @screen-xs-max) {
-      &gt; ul { 
+      &gt; ul {
         margin: 0 0 0 -25px; /* Remove padding added in normal view */
         &gt; li {
           &amp;:empty {
@@ -843,19 +934,16 @@ $xwiki.getDocument('MenuTemplate').content
             /* Links inside menu */
             a {
               color: @navbar-default-link-color;
-              &amp;:hover {
-                /* Preserve the styling from dropdown */
-              }
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
               color: @navbar-default-link-color;
-              &amp;:hover {
+              &amp;.open {
                 background-color: transparent;
                 color: inherit;
               }
               /* When in dropdown we also have a link */
-              &gt; span &gt; a { 
+              &gt; span &gt; a {
                 color: @navbar-default-link-color;
               }
             }
@@ -963,7 +1051,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -976,14 +1064,14 @@ $xwiki.getDocument('MenuTemplate').content
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -992,7 +1080,7 @@ $xwiki.getDocument('MenuTemplate').content
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -1058,15 +1146,24 @@ $xwiki.getDocument('MenuTemplate').content
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -1097,6 +1194,16 @@ $xwiki.getDocument('MenuTemplate').content
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1139,6 +1246,7 @@ $xwiki.getDocument('MenuTemplate').content
       <code>{{velocity}}
 #set ($id = $xcontext.macro.params.id)
 #set ($type = $xcontext.macro.params.type)
+#set ($label = $xcontext.macro.params.label)
 #set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
 #if ("$!colorTheme" != '')
   ## Make sure we use an absolute reference (see XWIKI-9672)
@@ -1146,25 +1254,38 @@ $xwiki.getDocument('MenuTemplate').content
 #end
 #set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
+## Make sure the label is non-empty as otherwise the aria-label doesn't work.
+#if ("$!label" != '')
+  #set ($label = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId('Menu',''))
+#end
 #if($type.contains('horizontal'))
-  (% role="navigation" class="menu-horizontal-toggle" %)(((
+  ## Make sure the id is non-empty for horizontal menus as otherwise the toggle doesn't work.
+  #if ("$!id" == '')
+    #set ($id = $wikimacro.context.getXDOM().getIdGenerator().generateUniqueId("M", "GeneratedMenuId"))
+  #end
+  (% role='navigation' class='menu-horizontal-toggle'
+  aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
     (% class="navbar-header" %)(((
       {{html}}
-        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{id}" aria-expanded="false"&gt;
-          &lt;span class="sr-only"&gt;&lt;/span&gt;
+        &lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#$!{escapetool.xml($id)}"
+          aria-expanded="false" aria-controls="$!{escapetool.xml($id)}"&gt;
+          &lt;span class="sr-only"&gt;
+            $escapetool.xml($services.localization.render('menu.ui.horizontal.toggler.description'))
+          &lt;/span&gt;
           &lt;span class="icon-bar"&gt;&lt;/span&gt;
           &lt;span class="icon-bar"&gt;&lt;/span&gt;
           &lt;span class="icon-bar"&gt;&lt;/span&gt;
         &lt;/button&gt;
       {{/html}}
     )))
-    (% id="${id}" class="menu menu-$!type collapse navbar-collapse" %)(((
-      $xcontext.macro.content
+    (% id="$!{services.rendering.escape($id, 'xwiki/2.1')}" class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')} collapse navbar-collapse" role="navigation" %)(((
+      {{wikimacrocontent/}}
     )))
   )))
 #else
-  (% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
-    $xcontext.macro.content
+  (% role="navigation" #if ("$!id" != '') id="${services.rendering.escape($id, 'xwiki/2.1')}"#end class="menu menu-${services.rendering.escape($!type, 'xwiki/2.1')}"
+        aria-label="${services.rendering.escape($label, 'xwiki/2.1')}" %)(((
+    {{wikimacrocontent/}}
   )))
 #end
 {{/velocity}}</code>
@@ -1173,13 +1294,15 @@ $xwiki.getDocument('MenuTemplate').content
       <contentDescription>Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.</contentDescription>
     </property>
     <property>
-      <contentJavaType/>
+      <contentJavaType>Wiki</contentJavaType>
     </property>
     <property>
       <contentType>Mandatory</contentType>
     </property>
     <property>
-      <defaultCategory>Navigation</defaultCategory>
+      <defaultCategories>
+        <value>Navigation</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Displays a menu created using simple wiki syntax (nested lists and links).</description>
@@ -1189,6 +1312,9 @@ $xwiki.getDocument('MenuTemplate').content
     </property>
     <property>
       <name>Menu</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -1348,6 +1474,85 @@ $xwiki.getDocument('MenuTemplate').content
     </property>
     <property>
       <name>id</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>Menu.MenuMacro</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>7101f71c-870b-4d80-8cbc-0ca11389151a</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Optional menu label used to describe the content of the menu.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>label</name>
     </property>
     <property>
       <type/>

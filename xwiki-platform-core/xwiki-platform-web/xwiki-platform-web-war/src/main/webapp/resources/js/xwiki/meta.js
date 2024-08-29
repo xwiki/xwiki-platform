@@ -91,13 +91,13 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
       var pageInfoUrl = self.restURL;
       // We put a timestamp in the JSON URL to avoid getting it from cache.
       pageInfoUrl += "?media=json&timestamp=" + new Date().getTime();
-      $.getJSON(pageInfoUrl).done(function (data) {
+      $.getJSON(pageInfoUrl).then(data => {
         self.setVersion(data.version);
-      }).fail(function (err) {
-        if (err.status === 404 && typeof(handle404) === "function") {
-          handle404(err);
+      }).catch(error => {
+        if (error.status === 404 && typeof(handle404) === "function") {
+          handle404(error);
         } else {
-          console.error("Error while refreshing the version from URL "+pageInfoUrl, err);
+          console.error("Error while refreshing the version from URL " + pageInfoUrl, error);
         }
       });
     };

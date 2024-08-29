@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.ClassSheetGenerator" locale="">
+<xwikidoc version="1.4" reference="AppWithinMinutes.ClassSheetGenerator" locale="">
   <web>AppWithinMinutes</web>
   <name>ClassSheetGenerator</name>
   <language/>
@@ -47,7 +47,7 @@ $string.replace("'", "''")##
 #macro(displayProperty $property $indentation)
 ${indentation}&lt;dt ${escapetool.h}if (!${escapetool.d}editing &amp;&amp; ${escapetool.d}hasEdit)
 ${indentation}    class="editableProperty"
-${indentation}    data-property="${escapetool.d}escapetool.xml(${escapetool.d}services.model.serialize(${escapetool.d}object.getProperty('#escapeSingleQuotes($property.name)').reference))"
+${indentation}    data-property="${escapetool.d}escapetool.xml(${escapetool.d}services.model.serialize(${escapetool.d}object.getPropertyReference('#escapeSingleQuotes($property.name)')))"
 ${indentation}    data-property-type="object"${escapetool.h}end&gt;
 ${indentation}  &lt;label${escapetool.h}if (${escapetool.d}editing) for="$escapetool.xml("${doc.fullName}_0_$property.name")"${escapetool.h}end&gt;
 ${indentation}    ${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))

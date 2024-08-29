@@ -52,7 +52,7 @@ import static org.mockito.Mockito.*;
 public class DefaultMailSenderConfigurationTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private DefaultMailSenderConfiguration configuration;
@@ -111,6 +111,77 @@ public class DefaultMailSenderConfigurationTest
         when(this.mainWikiMailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
 
         assertEquals("john@doe.com", this.configuration.getFromAddress());
+    }
+
+    /**
+     * Verify the ability to define anonymous credentials for a SMTP host in a subwiki (i.e. credentials not taken from
+     * the main wiki config).
+     */
+    @Test
+    public void getUsernameAndPasswordWhenNotDefinedAndHostModifiedInSubwiki()
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+
+        when(this.mailConfigDocumentSource.getProperty("host", String.class)).thenReturn("something");
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn(null);
+
+        assertNull(this.configuration.getUsername());
+        assertNull(this.configuration.getPassword());
+
+        verifyNoInteractions(this.mainWikiMailConfigDocumentSource);
+        verifyNoInteractions(this.xwikiPropertiesSource);
+    }
+
+    @Test
+    public void getUsernameAndPasswordWhenNotDefinedInSubWikiButInMainWikiAndHostNotModifiedInSubwiki()
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+
+        when(this.mailConfigDocumentSource.getProperty("host", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn(null);
+        when(this.mainWikiMailConfigDocumentSource.getProperty("username", String.class)).thenReturn("username");
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn(null);
+        when(this.mainWikiMailConfigDocumentSource.getProperty("password", String.class)).thenReturn("password");
+
+        assertEquals("username", this.configuration.getUsername());
+        assertEquals("password", this.configuration.getPassword());
+
+        verifyNoInteractions(this.xwikiPropertiesSource);
+    }
+
+    @Test
+    public void getUsernameAndPasswordWhenNotDefinedInSubWikiButInPropertiesAndHostNotModifiedInSubwiki()
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+
+        when(this.mailConfigDocumentSource.getProperty("host", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn(null);
+        when(this.xwikiPropertiesSource.getProperty("mail.sender.username", String.class)).thenReturn("username");
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn(null);
+        when(this.xwikiPropertiesSource.getProperty("mail.sender.password", String.class)).thenReturn("password");
+
+        assertEquals("username", this.configuration.getUsername());
+        assertEquals("password", this.configuration.getPassword());
+    }
+
+    @Test
+    public void getUsernameAndPasswordWhenDefinedInSubwiki()
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn("username");
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn("password");
+
+        assertEquals("username", this.configuration.getUsername());
+        assertEquals("password", this.configuration.getPassword());
+
+        verifyNoInteractions(this.mainWikiMailConfigDocumentSource);
+        verifyNoInteractions(this.xwikiPropertiesSource);
     }
 
     @Test

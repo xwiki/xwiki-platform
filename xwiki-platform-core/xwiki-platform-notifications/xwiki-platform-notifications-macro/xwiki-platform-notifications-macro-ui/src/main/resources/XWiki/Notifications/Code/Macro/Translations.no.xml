@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="no">
+  <web>XWiki.Notifications.Code.Macro</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=Varsler
+rendering.macro.notifications.description=Vis varsler om hendelser som har skjedd på wikien.
+rendering.macro.notifications.parameter.count.name=Antall
+rendering.macro.notifications.parameter.count.description=Maksimalt antall hendelser som skal vises som standard
+rendering.macro.notifications.parameter.useUserPreferences.name=Bruk brukerens preferanser
+rendering.macro.notifications.parameter.useUserPreferences.description=Hvis sant, brukes brukerens preferanser om varsler
+rendering.macro.notifications.parameter.displayOwnEvents.name=Vis egne hendelser
+rendering.macro.notifications.parameter.displayOwnEvents.description=Hvis sant, vises hendelsene til den nåværende brukeren som de andre. De er ellers skjult.
+rendering.macro.notifications.parameter.displayMinorEvents.name=Vis mindre hendelser
+rendering.macro.notifications.parameter.displayMinorEvents.description=Hvis sant, vises hendelser vedrørende mindre revisjoner av sider som de andre. De er ellers skjult.
+rendering.macro.notifications.parameter.displaySystemEvents.name=Vis systemhendelser
+rendering.macro.notifications.parameter.displaySystemEvents.description=Hvis sant, vises hendelsene som utløses av XWiki-programvaren som de andre. De er ellers skjult.
+rendering.macro.notifications.parameter.displayReadEvents.name=Vis leste hendelser
+rendering.macro.notifications.parameter.displayReadEvents.description=Hvis sant, vises hendelser som brukeren allerede har merket som lest som de andre. De er ellers skjult.
+rendering.macro.notifications.parameter.wikis.name=Wikier
+rendering.macro.notifications.parameter.wikis.description=Liste over inkluderte wikier (kommaadskilt). Denne parameteren ignoreres hvis useUserPreferences er satt til "true".
+rendering.macro.notifications.parameter.spaces.name=Rom
+rendering.macro.notifications.parameter.spaces.description=Liste over inkluderte rom (kommaadskilt). Denne parameteren ignoreres hvis useUserPreferences er satt til "true".
+rendering.macro.notifications.parameter.pages.name=Sider
+rendering.macro.notifications.parameter.pages.description=Liste over inkluderte sider (fulle referanser, kommaadskilt). Denne parameteren ignoreres hvis useUserPreferences er satt til "true".
+rendering.macro.notifications.parameter.displayReadStatus.name=Vis "lest"-statusen
+rendering.macro.notifications.parameter.displayReadStatus.description=Om statusen til hendelsene (enten den er merket som lest eller ikke) vises
+rendering.macro.notifications.parameter.users.name=Brukere
+rendering.macro.notifications.parameter.users.description=Liste over inkluderte brukere (kommaadskilt). Ignoreres hvis "useUserPreferences" er satt til "true".
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Bare vis fulgte brukere
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=Vis bare hendelsene som utføres av den gitte brukerlisten (hvis den er tom, brukes listen over fulgte brukere av den nåværende brukeren).
+rendering.macro.notifications.parameter.displayRSSLink.name=Vis RSS-lenke
+rendering.macro.notifications.parameter.displayRSSLink.description=Vis en lenke til RSS-visningen av gjeldende makro.
+rendering.macro.notifications.parameter.tags.name=Tagger
+rendering.macro.notifications.parameter.tags.description=Liste over tagger du bør vurdere (kommaadskilt). Dette virker bare på den nåværende wikien. Ignoreres hvis "useUserPreferences" er satt til "true".
+notifications.macro.noWatchedUsers=Du følger ikke noen.
+notifications.macro.whenNotView=Varsler Makro. Kan sees i visningsmodus.
+notifications.macro.markEventAsRead=Merk hendelsen som lest
+notifications.macro.showEventDetails=Vis hendelsesdetaljer
+notifications.menu.nothing=Ingen varsler tilgjengelig!
+notifications.menu.more=Hent eldre varsler
+notifications.menu.details=Detaljer ({0})
+</content>
+</xwikidoc>

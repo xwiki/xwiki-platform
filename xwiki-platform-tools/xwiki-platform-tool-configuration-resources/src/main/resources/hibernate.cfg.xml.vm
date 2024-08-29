@@ -59,15 +59,10 @@
     <!-- Tell Hibernate to use XWiki's custom DBCP Connection Provider so that the DBCP pool is used -->
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
-    <!-- Enable JMX monitoring for Hibernate -->
-    <property name="hibernate.jmx.enabled">true</property>
-    <property name="hibernate.jmx.sessionFactoryName">XWiki</property>
-    <property name="hibernate.generate_statistics">true</property>
-
     <!--
       Keep the old behavior. The new version of hibernate tries to delete and recreate unique
       constraints when updating the database schema. The problem is that an exception is thrown
-      when the constraint to be deleted does not exists, which is the case with a new XWiki
+      when the constraint to be deleted does not exist, which is the case with a new XWiki
       instance.
       See https://hibernate.atlassian.net/browse/HHH-8162
     -->
@@ -235,7 +230,6 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <property name="hibernate.connection.username">sa</property>
     <property name="hibernate.connection.password"></property>
     <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
 
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
@@ -300,7 +294,6 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
     <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
     <property name="hibernate.connection.SetBigStringTryClob">true</property>
     <property name="hibernate.jdbc.batch_size">0</property>
     <property name="hibernate.jdbc.use_streams_for_binary">false</property>

@@ -28,22 +28,22 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
@@ -81,7 +81,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**
@@ -161,8 +160,6 @@ public class EventStoreTest
     @XWikiTempDir
     private File permanentDirectory;
 
-    private ConfigurationSource mockXWikiProperties;
-
     private Environment mockEnvironment;
 
     @MockComponent
@@ -177,18 +174,7 @@ public class EventStoreTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.mockXWikiProperties =
-            this.componentManager.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
         this.mockEnvironment = this.componentManager.registerMockComponent(Environment.class);
-        when(this.mockXWikiProperties.getProperty(anyString(), anyString())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return invocation.getArgument(1);
-            }
-        });
-
         when(this.mockEnvironment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
         FileUtils.deleteDirectory(this.permanentDirectory);
         this.permanentDirectory.mkdirs();
@@ -228,7 +214,7 @@ public class EventStoreTest
         return result;
     }
 
-    private void assertEqualsResult(Collection<Event> expected, EventSearchResult result) throws EventStreamException
+    private void assertEqualsResult(Collection<Event> expected, EventSearchResult result)
     {
         assertEquals(new HashSet<>(expected), result.stream().collect(Collectors.toSet()));
     }
@@ -236,7 +222,7 @@ public class EventStoreTest
     // Tests
 
     @Test
-    public void saveGetDeleteEvent() throws Exception
+    void saveGetDeleteEvent() throws Exception
     {
         assertFalse(this.eventStore.getEvent("id").isPresent());
 
@@ -262,10 +248,11 @@ public class EventStoreTest
         event.setUser(USER_REFERENCE);
         event.setWiki(WIKI2_REFERENCE);
 
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("param1", "value1");
-        parameters.put("param2", "value2");
-        event.setParameters(parameters);
+        Map<String, Object> custom = new HashMap<>();
+        custom.put("param1", "value1");
+        custom.put("param2", "value2");
+        custom.put("list", List.of(1, 2));
+        event.setCustom(custom);
 
         this.eventStore.saveEvent(event).get();
 
@@ -290,7 +277,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void saveDeleteEventStatuses() throws Exception
+    void eventStatuses() throws Exception
     {
         Date date0 = new Date(0);
         Date date10 = new Date(10);
@@ -366,6 +353,27 @@ public class EventStoreTest
         this.eventStore.saveEventStatus(status141);
         this.eventStore.saveEventStatus(status151).get();
 
+        assertEquals(List.of(), this.eventStore.getEventStatuses(List.of(EVENT1, EVENT2, EVENT3), List.of("entity6")));
+        assertEquals(
+            Set.of(eventstatus(EVENT1, "entity1", true), eventstatus(EVENT1, "entity2", false),
+                eventstatus(EVENT2, "entity1", false), eventstatus(EVENT3, "entity1", true)),
+            new HashSet<>(
+                this.eventStore.getEventStatuses(List.of(EVENT1, EVENT2, EVENT3), List.of("entity1", "entity2"))));
+
+        assertEquals(
+            Set.of(eventstatus(EVENT1, "entity1", true), eventstatus(EVENT2, "entity1", false),
+                eventstatus(EVENT3, "entity1", true), eventstatus(EVENT4, "entity1", true),
+                eventstatus(EVENT5, "entity1", true), eventstatus(EVENT6, "entity1", true),
+                eventstatus(EVENT7, "entity1", true), eventstatus(EVENT8, "entity1", true),
+                eventstatus(EVENT9, "entity1", true), eventstatus(EVENT10, "entity1", true),
+                eventstatus(EVENT11, "entity1", true), eventstatus(EVENT12, "entity1", true)
+            ),
+            new HashSet<>(
+                this.eventStore.getEventStatuses(
+                    List.of(EVENT1, EVENT2, EVENT3, EVENT4, EVENT5,
+                        EVENT6, EVENT7, EVENT8, EVENT9, EVENT10, EVENT11, EVENT12),
+                    List.of("entity1"))));
+
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
 
         this.eventStore.deleteEventStatus(status12).get();
@@ -387,7 +395,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void allSearch()
+    void allSearch()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         // Misc
@@ -411,7 +419,7 @@ public class EventStoreTest
         searchFields();
     }
 
-    public void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
+    private void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
     {
         EVENT1.setHidden(true);
         EVENT2.setHidden(true);
@@ -422,6 +430,15 @@ public class EventStoreTest
         EVENT2.setUser(new DocumentReference("wiki", "space", "user2"));
         EVENT3.setUser(new DocumentReference("wiki", "space", "user3"));
         EVENT4.setUser(new DocumentReference("wiki", "space", "user4"));
+
+        EVENT1.setDocumentTitle("title1");
+        EVENT2.setDocumentTitle("title2");
+        EVENT3.setDocumentTitle("title3");
+        EVENT4.setDocumentTitle("title4");
+
+        EVENT1.setDocumentVersion("2.1");
+        EVENT3.setDocumentVersion("");
+        EVENT4.setDocumentVersion(" foo");
 
         this.eventStore.saveEvent(EVENT1);
         this.eventStore.saveEvent(EVENT2);
@@ -459,8 +476,24 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_ID, EVENT1.getId()).open()
             .eq(Event.FIELD_ID, EVENT1.getId()).or().eq(Event.FIELD_ID, EVENT2.getId()).close());
 
+        assertSearch(Collections.singletonList(EVENT3), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Collections.singletonList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, null));
+
+        assertSearch(Collections.singletonList(EVENT3), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_DOCUMENTVERSION, ""));
+        assertSearch(Collections.singletonList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENTVERSION, null));
+        assertSearch(Collections.singletonList(EVENT1),
+            new SimpleEventQuery().greaterOrEq(Event.FIELD_DOCUMENTVERSION, ""));
+
         assertSearch(Arrays.asList(EVENT1, EVENT2),
             new SimpleEventQuery().in(Event.FIELD_ID, EVENT1.getId(), EVENT2.getId()));
+
+        assertSearch(Arrays.asList(), new SimpleEventQuery().in(Event.FIELD_ID));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery().not().in(Event.FIELD_ID));
 
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
         assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
@@ -470,10 +503,56 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENTOR), new SimpleEventQuery().in(Event.FIELD_ID, EVENTOR.getId()));
 
         this.eventStore.deleteEvent(EVENTOR).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().startsWith(Event.FIELD_ID, "id"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().endsWith(Event.FIELD_ID, "1"));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().contains(Event.FIELD_ID, ""));
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4),
+            new SimpleEventQuery().contains(Event.FIELD_ID, "d"));
+        assertSearch(List.of(EVENT1), new SimpleEventQuery().contains(Event.FIELD_ID, "d1"));
     }
 
     @Test
-    public void searchDate() throws EventStreamException, InterruptedException, ExecutionException
+    void searchCustom() throws EventStreamException, InterruptedException, ExecutionException
+    {
+        EVENT1.setParameters(Collections.singletonMap("param", "value1"));
+        EVENT2.setParameters(Collections.singletonMap("param", "value2"));
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", "value1"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", "value2"));
+
+        EVENT1.setCustom(Map.of("param", 1, "list", List.of("l0", "l1"), "listint", List.of(0, 1)));
+        EVENT2.setCustom(Map.of("param", 2, "list", List.of("l2"), "listint", List.of(2)));
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom().eq("param", 1));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom().eq("param", 2));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().custom().greater("param", 0));
+
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom(List.class).eq("list", "l0"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().custom(List.class).eq("list", "l1"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().custom(List.class).eq("list", "l2"));
+
+        assertSearch(Arrays.asList(EVENT1),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 0));
+        assertSearch(Arrays.asList(EVENT1),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 1));
+        assertSearch(Arrays.asList(EVENT2),
+            new SimpleEventQuery().custom(TypeUtils.parameterize(List.class, Integer.class)).eq("listint", 2));
+    }
+
+    @Test
+    void searchDate() throws EventStreamException, InterruptedException, ExecutionException
     {
         Date date0 = new Date(0);
         Date date10 = new Date(10);
@@ -560,7 +639,7 @@ public class EventStoreTest
         assertEquals(2, result.getTotalHits());
     }
 
-    public void searchReference() throws EventStreamException, InterruptedException, ExecutionException
+    private void searchReference() throws EventStreamException, InterruptedException, ExecutionException
     {
         DocumentReference document1 = new DocumentReference("document1", SPACE_REFERENCE);
         DocumentReference document2 = new DocumentReference("document2", SPACE_REFERENCE);
@@ -589,6 +668,8 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString1));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2").and()
+            .eq(Event.FIELD_WIKI, WIKI_REFERENCE));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
         assertSearch(Arrays.asList(EVENT1),
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE1_REFERENCE)));
@@ -596,9 +677,12 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2),
             new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, new EntityReference(SPACE2_REFERENCE)));
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_RELATEDENTITY, SPACE2_REFERENCE));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().startsWith(Event.FIELD_SPACE, "space"));
+        assertSearch(Arrays.asList(EVENT1, EVENT2),
+            new SimpleEventQuery().in(Event.FIELD_DOCUMENT, Arrays.asList("space.document1", "space.document2")));
     }
 
-    public void searchStatus()
+    private void searchStatus()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         DefaultEventStatus status11 = eventstatus(EVENT1, "entity1", true);
@@ -634,7 +718,7 @@ public class EventStoreTest
         assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withStatus("entity1", false));
     }
 
-    public void searchMail()
+    private void searchMail()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
         DefaultEntityEvent mail11 = entityevent(EVENT1, "entity1");
@@ -683,8 +767,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void deleteWiki()
-        throws EventStreamException, InterruptedException, ExecutionException, ComponentLookupException
+    void deleteWiki() throws EventStreamException, InterruptedException, ExecutionException, ComponentLookupException
     {
         EVENT1.setWiki(new WikiReference("wikia"));
         EVENT2.setWiki(new WikiReference("wikia"));

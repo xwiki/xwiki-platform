@@ -38,11 +38,15 @@
   <hidden>true</hidden>
   <content>index.spacesMacro.title=Spații
 index.spacesMacro.spaceIndex.title=Vezi indexul spațiului
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+index.spacesMacro.spaceIndex.alt=Indexul spațiului
 index.spacesMacro.spaceAdministration.title=Vezi administrarea spațiului
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+index.spacesMacro.spaceAdministration.alt=Administrează spațiul
 index.spacesMacro.createSpace.link=Creează un spațiu nou
 index.spacesMacro.createSpace.defaultSpaceName=Nume spațiu
 index.spacesMacro.createSpace.submit=Creează
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+index.deletedDocuments.deleteAll=Șterge tot
+index.administration.remainingTasks.heading=Sarcini rămase de analiză a documentelor
+index.administration.remainingTasks.emptyQueue=Nu există sarcini rămase.
+admin.documentanalysis=Analiza documentelor
+</content>
 </xwikidoc>

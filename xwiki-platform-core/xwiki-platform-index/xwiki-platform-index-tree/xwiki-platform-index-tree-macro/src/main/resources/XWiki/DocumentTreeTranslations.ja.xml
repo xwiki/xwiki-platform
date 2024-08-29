@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=ページツリー
+rendering.macro.documentTree.description=XWikiページのツリーを表示。
+rendering.macro.documentTree.parameter.readOnly.name=読み取り専用
+rendering.macro.documentTree.parameter.readOnly.description=必要な権限がある場合、ユーザーにツリーの構造の変更を許可しますか？
+rendering.macro.documentTree.parameter.showWikis.name=ウィキを表示
+rendering.macro.documentTree.parameter.showWikis.description=ウィキのノードを表示するか否かを選択。メインウィキで、ツリーのソースがプログラミング権限で保存されている場合にのみ表示できます。
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=ウィキの名称を表示
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=ウィキのノードを表示する際、ウィキのIDの代わりに名称を表示。
+rendering.macro.documentTree.parameter.showSpaces.name=スペースを表示
+rendering.macro.documentTree.parameter.showSpaces.description=スペースのノードを表示するか否かを選択。スペースのノードを表示する際、ページはスペースによってまとめられます。
+rendering.macro.documentTree.parameter.showDocumentTitle.name=ページのタイトルを表示
+rendering.macro.documentTree.parameter.showDocumentTitle.description=ページのノードを表示する際に、ページの名称の代わりにページのタイトルを表示するか否かを選択。
+rendering.macro.documentTree.parameter.showTranslations.name=翻訳を表示
+rendering.macro.documentTree.parameter.showTranslations.description=ページの翻訳を表示するか否かを選択。
+rendering.macro.documentTree.parameter.showAttachments.name=添付ファイルを表示
+rendering.macro.documentTree.parameter.showAttachments.description=添付ファイルを表示するか否かを選択。
+rendering.macro.documentTree.parameter.showObjects.name=オブジェクトを表示
+rendering.macro.documentTree.parameter.showObjects.description=ページのオブジェクトを表示するか否かを選択。
+rendering.macro.documentTree.parameter.showClassProperties.name=クラスプロパティーを表示
+rendering.macro.documentTree.parameter.showClassProperties.description=クラスを規定するページのクラスのプロパティーを表示するかどうかを選択。
+rendering.macro.documentTree.parameter.root.name=ルート
+rendering.macro.documentTree.parameter.root.description=ルートのノードのIDです。特定のノード（指定したルート）以下のノードを表示する際に役立ちます。ツリーは、ルートにあるノードの子供を最初のレベルに表示するため、ルートのノードは実際には表示されません。ルートのノードが指定されていない場合は、ツリー全体を表示します。ノードの識別子のフォーマットは「構成要素の種類:構成要素の参照」となります。構成要素の種類にはインスタンスのウィキ、スペース、ドキュメントを設定できます。例：wiki:xwiki、space:xwiki:Main、document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=ルートを表示
+rendering.macro.documentTree.parameter.showRoot.description=ルートのノードを表示するか否かを選択。ルードのノードは多くの場合、ツリーを表示するコンテクストにより暗示されるため（例：ツリーの前のラベル）既定では表示しませんが、ルート以下に新しいノードを作成する際などには、表示すると役立つかもしれません。
+rendering.macro.documentTree.parameter.compact.name=コンパクト
+rendering.macro.documentTree.parameter.compact.description=水平のスペースが限られている場合は、これを真に設定してください。ノードのアイコンと、アイコンを結ぶエッジをを非表示とします。また、ノードのラベルを表示したまま、使用する水平のスペースを減らすスタイルも適用します。
+rendering.macro.documentTree.parameter.links.name=リンク
+rendering.macro.documentTree.parameter.links.description=ノードのラベルをリンク（アンカー）のように表示し、機能させるかどうかを指定。
+rendering.macro.documentTree.parameter.checkboxes.name=チェックボックス
+rendering.macro.documentTree.parameter.checkboxes.description=ツリーの各ノードの前にチェックボックスを表示して、複数のノードを選択可能にするかどうかを選択。
+rendering.macro.documentTree.parameter.openTo.name=ツリーを開くノード
+rendering.macro.documentTree.parameter.openTo.description=ツリーを開くノードのID。ツリーのルートまで、上位にある全てのルートも開きます。ノードのIDのフォーマットは、ルートのパラメーターに使用されているフォーマットです。
+rendering.macro.documentTree.parameter.showOnlyViewable.name=閲覧可能なものだけを表示
+rendering.macro.documentTree.parameter.showOnlyViewable.description=現在のユーザーが閲覧権限をもっているウィキ、スペース、ページのノードのみを表示。偽に設定すると、現在のユーザーが閲覧できないウィキ、スペース、ページのノードをツリー内に一覧表示します。ただし、ユーザーがリンクを開いても、それらの内容を見ることはできません（それらが存在することのみをユーザーに知らせます）。
+rendering.macro.documentTree.parameter.filterByClass.name=クラスでフィルタリング
+rendering.macro.documentTree.parameter.filterByClass.description=特定の種類のオブジェクトがあるページのみを表示。このパラメーターの値には、クラスの定義があるXWikiページの完全な名称を設定してください。例えば、'Blog.CategoryClass'は、ブログのカテゴリーを示すページのみを表示するのに使用できます。ツリーに表示するページの種類を制限しない場合は、このパラメーターを空のままにしてください。
+rendering.macro.documentTree.parameter.finder.name=ファインダー
+rendering.macro.documentTree.parameter.finder.description=ツリーのノードを探すのに使用できるテキストのインプットを表示。インプットの結果はツリーの上に表示され、入力と並行して、ツリーの内容に応じた候補を表示します。候補を選択すると、ツリーは対応するノードにまで展開されます。
+rendering.macro.documentTree.parameter.hierarchyMode.name=ページ階層モード
+rendering.macro.documentTree.parameter.hierarchyMode.description=どの階層をページ間で使用するかを指定。指定可能な値は"reference"（既定）と"parentchild"です。"reference"を指定すると、ページの参照、特にページの参照に関する入れ子式のスペースコンポーネントのみによって規定されるページ階層を使用します。"parentchild"を指定すると、階層は、データベースの"parent"ページのフィールドで規定される親子関係に基づきます。
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=非表示のドキュメントをフィルタリング
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=このパラメーターを偽とすると、非表示のドキュメントをツリーに含めます。真とすると、非表示のドキュメントは、現在のユーザーの設定に応じて、含まれたり除かれたりします。
+rendering.macro.documentTree.parameter.limit.name=制限
+rendering.macro.documentTree.parameter.limit.description=初めに親ノードを展開した際に表示する子ノードの最大数。その他の子ノードは残りのノード数を示すリンクからアクセスできます。このパラメーターは子ノードをページ化し、子ノードの数が多いときにツリーのサイズを調整するのに使用されます。
+rendering.macro.documentTree.parameter.exclusions.name=除外
+rendering.macro.documentTree.parameter.exclusions.description=ツリーから除外するノードの一覧。ノードはIDで指定し、コンマで分割してください。
+index.documentTree.empty=ページが見つかりません
+index.documentTree.more=あと{0}件
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=子ドキュメントを表示
+rendering.macro.documentTree.parameter.showChildDocuments.description=ドキュメントの親フィールドに基づき、子ドキュメントを表示するかどうかを選択。
+</content>
+</xwikidoc>

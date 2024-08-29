@@ -197,7 +197,6 @@ editors.XDataEditors = Class.create({
    * @param init true if it's the call performed during the script initialization.
    */
   enhanceClassUX : function(xclass, init) {
-    var xclassName = this.getXClassNameFromXClassId(xclass.id);
     this.ajaxObjectAdd(xclass);
     this.expandCollapseClass(xclass);
 
@@ -354,10 +353,7 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')" + failureReason, "error"));
               },
               onComplete : function() {
@@ -367,11 +363,7 @@ editors.XDataEditors = Class.create({
                 });
                 document.fire('xwiki:dom:refresh');
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }
@@ -509,20 +501,13 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.done')", "done"));
               },
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.statusText || 'Server not responding';
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.removeDeprecatedProperties.failed')" + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }
@@ -539,7 +524,6 @@ editors.XDataEditors = Class.create({
       item._x_propnameElt = $('propname');
       item._x_proptypeElt = $('proptype');
       item._x_form_tokenElt = $('form_token');
-      var token = item._x_form_tokenElt ? item._x_form_tokenElt.value : "";
       item.observe('click', function(event) {
         item.blur();
         event.stop();
@@ -576,20 +560,13 @@ editors.XDataEditors = Class.create({
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.done')", "done"));
               }.bind(this),
               onFailure : function(response) {
-                var failureReason = response.statusText;
-                if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                  failureReason = 'Server not responding';
-                }
+                var failureReason = response.responseText;
                 item.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.class.addProperty.failed') " + failureReason, "error"));
               },
               onComplete : function() {
                 item.disabled = false;
               },
-              // IE converts 204 status code into 1223...
-              on1223 : function(response) {
-                response.request.options.onSuccess(response);
-              },
-              // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+              // 0 is returned for network failures.
               on0 : function(response) {
                 response.request.options.onFailure(response);
               }
@@ -656,7 +633,7 @@ editors.XDataEditors = Class.create({
   },
   // Update the number of objects displayed in the class group title, when objects are added or deleted
   updateXObjectCount: function(xclass) {
-    var xobjectCount = xclass.select('.xobject').size();
+    var xobjectCount = xclass.select('.xobject').length;
     if (xobjectCount == 0) {
       xclass.remove();
     } else {
@@ -710,18 +687,11 @@ editors.XDataEditors = Class.create({
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.done')", "done"));
             }.bind(this),
             onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               object.removeClassName('loading');
               object.notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.loadObject.failed') " + failureReason, "error"));
             },
-            // IE converts 204 status code into 1223...
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
-            },
-            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            // 0 is returned for network failures.
             on0 : function(response) {
               response.request.options.onFailure(response);
             }
@@ -782,8 +752,8 @@ editors.XDataEditors = Class.create({
     element.select('.xproperty-title .tools').each(function(item) {
       var movebutton = new Element('span', {
         'class': 'tool move',
-        title: 'Drag and drop to change the order'
-      }).update('move');
+        title: $jsontool.serialize($services.localization.render('core.editors.class.moveProperty.handle.label'))
+      }).update($jsontool.serialize($services.icon.renderHTML('reposition')));
       item.makePositioned();
       item.appendChild(movebutton);
       movebutton.observe('click', function(event) {
@@ -802,7 +772,7 @@ editors.XDataEditors = Class.create({
   },
   updateOrder : function(container) {
     var children = container.childElements();
-    for (var i = 0; i < children.size(); ++i) {
+    for (var i = 0; i < children.length; ++i) {
       var child = children[i].down(".xproperty-content");
       child.numberProperty.value = i+1;
     }
@@ -825,7 +795,10 @@ editors.XDataEditors = Class.create({
 });
 
 function init() {
-  return new editors.XDataEditors();
+  require(['scriptaculous/dragdrop'], function() {
+    new editors.XDataEditors()
+  });
+  return true;
 }
 
 // When the document is loaded, create the Autosave control
@@ -838,7 +811,7 @@ return XWiki;
 
 // Class Switcher
 require(['jquery', 'xwiki-events-bridge'], function($) {
-  $('#switch-xclass').change(function(event) {
+  $('#switch-xclass').on('change', function(event) {
     var selectedClass = $(event.target).val();
     if (selectedClass) {
       var selectedClassReference = XWiki.Model.resolve(selectedClass, XWiki.EntityType.DOCUMENT,

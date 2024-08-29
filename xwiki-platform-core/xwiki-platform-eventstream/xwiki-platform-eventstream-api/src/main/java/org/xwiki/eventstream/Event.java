@@ -22,6 +22,7 @@ package org.xwiki.eventstream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,6 +72,7 @@ import org.xwiki.model.reference.WikiReference;
  * <li>the {@link #getDocumentTitle() display title} of the target document at the time that the event occurred</li>
  * <li>the {@link #getUrl() requested URL} that caused the event</li>
  * </ul>
+ * Use {@link org.xwiki.eventstream.EventFactory} to create a new {@link Event} instance.
  * 
  * @version $Id$
  * @since 3.0M2
@@ -195,6 +197,12 @@ public interface Event
      * @since 12.5RC1
      */
     String FIELD_PREFILTERED = "preFiltered";
+
+    /**
+     * @see #getRemoteObservationId()
+     * @since 14.7RC1
+     */
+    String FIELD_REMOTE_OBSERVATION_ID = "observationInstanceId";
 
     /** The importance of an event. */
     enum Importance
@@ -449,14 +457,55 @@ public interface Event
 
     /**
      * @return the named parameters associated with this event as key/value pairs.
+     * @deprecated use {@link #getCustom()} instead
      */
+    @Deprecated(since = "14.2RC1")
     Map<String, String> getParameters();
 
     /**
      * @param parameters the parameters to associate to the event.
      * @see #getParameters()
+     * @deprecated use {@link #setCustom(Map)} instead
      */
+    @Deprecated(since = "14.2RC1")
     void setParameters(Map<String, String> parameters);
+
+    /**
+     * @return the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default Map<String, Object> getCustom()
+    {
+        return (Map) getParameters();
+    }
+
+    /**
+     * Associate the event with custom named values.
+     * <p>
+     * The exactly list of supported types can vary depending on the {@link EventStore} implementation but it's expected
+     * that at least the following are supported:
+     * <ul>
+     * <li>String</li>
+     * <li>All standard primitive wrappers (Boolean, Integer, etc)</li>
+     * <li>java.util.Date</li>
+     * <li>Iterable and arrays of other supported types</li>
+     * </ul>
+     * 
+     * @param custom the custom properties associated with this event
+     * @since 14.2RC1
+     */
+    default void setCustom(Map<String, ?> custom)
+    {
+        Map<String, String> parameters;
+        if (custom == null) {
+            parameters = null;
+        } else {
+            parameters = new HashMap<>(custom.size());
+            custom.forEach((k, v) -> parameters.put(k, v != null ? v.toString() : null));
+        }
+
+        setParameters(parameters);
+    }
 
     /**
      * @param target a list of entities (users, groups) that are interested by this event
@@ -513,5 +562,15 @@ public interface Event
     {
         LoggerFactory.getLogger(Event.class)
             .warn("org.xwiki.eventstream.Event#setPrefiltered(boolean) has been called without being reimplemented.");
+    }
+
+    /**
+     * @return the unique identifier of the instance in the cluster, or {@code null} if the event was produced in a
+     *         version of XWiki older than 14.7
+     * @since 14.7RC1
+     */
+    default String getRemoteObservationId()
+    {
+        return null;
     }
 }

@@ -1,7 +1,7 @@
+org.xwiki.refactoring.internal.DefaultReferenceUpdater
 org.xwiki.refactoring.internal.job.ReplaceUserJob
 org.xwiki.refactoring.internal.listener.UpdateObjectsOnClassRenameListener
 org.xwiki.refactoring.internal.listener.UpdateRightsOnDocumentRenameListener
-org.xwiki.refactoring.internal.DefaultLinkRefactoring
 org.xwiki.refactoring.internal.DefaultModelBridge
 org.xwiki.refactoring.internal.DefaultRefactoringConfiguration
 org.xwiki.refactoring.internal.MainWikiRefactoringConfigurationSource

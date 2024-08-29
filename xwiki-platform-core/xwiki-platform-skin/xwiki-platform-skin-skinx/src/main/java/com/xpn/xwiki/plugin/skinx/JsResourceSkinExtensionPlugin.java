@@ -19,32 +19,25 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
  * Skin Extension plugin that allows pulling javascript files from JAR resources.
- * 
+ *
  * @version $Id$
  * @since 1.3
  */
 public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtensionPlugin
 {
     /**
-     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
-     * nothing is specified in the parameters of this extension.
-     */
-    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
-
-    /**
      * XWiki plugin constructor.
-     * 
+     *
      * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
      * @param className The canonical classname of the plugin. Unused.
      * @param context The current request context.
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#XWikiDefaultPlugin(String, String, com.xpn.xwiki.XWikiContext)
      */
     public JsResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
@@ -66,13 +59,13 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
     @Override
     protected String generateLink(String url, String resourceName, XWikiContext context)
     {
-        StringBuilder result = new StringBuilder("<script src='").append(url).append("'");
-        // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true
-        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
-        Boolean defaultDefer = (!StringUtils.isEmpty(defaultDeferString)) ? Boolean.valueOf(defaultDeferString) : true;
-        if (BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", resourceName, context), defaultDefer)) {
+        StringBuilder result =
+            new StringBuilder("<script src='").append(XMLUtils.escapeAttributeValue(url)).append("'");
+
+        if (isDefer(resourceName, context)) {
             result.append(" defer='defer'");
         }
+
         result.append("></script>\n");
         return result.toString();
     }
@@ -83,7 +76,7 @@ public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtension
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
      * </p>
-     * 
+     *
      * @see AbstractSkinExtensionPlugin#endParsing(String, XWikiContext)
      */
     @Override

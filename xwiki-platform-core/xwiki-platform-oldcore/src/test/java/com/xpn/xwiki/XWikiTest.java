@@ -21,24 +21,20 @@ package com.xpn.xwiki;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -51,12 +47,15 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.refactoring.ReferenceRenamer;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserProperties;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -82,7 +81,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
@@ -94,13 +92,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.XWiki}.
+ * Unit tests for {@link XWiki}.
  *
  * @version $Id$
  */
 @OldcoreTest(mockXWiki = false)
 @AllComponents
-public class XWikiTest
+class XWikiTest
 {
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
@@ -110,6 +108,9 @@ public class XWikiTest
 
     @MockComponent
     private ReferenceRenamer referenceRenamer;
+
+    @MockComponent
+    private ReferenceUpdater referenceUpdater;
 
     private static final String DOCWIKI = "Wiki";
 
@@ -169,33 +170,30 @@ public class XWikiTest
     }
 
     @Test
-    public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
+    void userNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
     {
         // given
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
 
         XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
-        xwiki.setGroupService(xWikiGroupService);
-
-        XWiki spyXWiki = Mockito.spy(xwiki);
+        this.xwiki.setGroupService(xWikiGroupService);
 
         // when
-        spyXWiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
+        this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
 
         // then
-        Mockito.verify(spyXWiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
+        verify(this.xwiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
     @Test
-    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlessXWikiAllGroupIsImplicit()
-        throws Exception
+    void userAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlessXWikiAllGroupIsImplicit() throws Exception
     {
         // given
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
         XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
-        xwiki.setGroupService(xWikiGroupService);
+        this.xwiki.setGroupService(xWikiGroupService);
 
         // when
         this.xwiki.setUserDefaultGroup("XWiki.user1", this.oldcore.getXWikiContext());
@@ -206,7 +204,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testAuthorAfterDocumentCopy() throws XWikiException
+    void authorAfterDocumentCopy() throws XWikiException
     {
         DocumentReference copyReference =
             new DocumentReference("Lyre", this.document.getDocumentReference().getLastSpaceReference());
@@ -218,7 +216,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testCreatorAfterDocumentCopy() throws XWikiException
+    void creatorAfterDocumentCopy() throws XWikiException
     {
         DocumentReference copyReference =
             new DocumentReference("Sirius", this.document.getDocumentReference().getLastSpaceReference());
@@ -230,7 +228,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    void creationDateAfterDocumentCopy() throws XWikiException, InterruptedException
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
@@ -239,11 +237,11 @@ public class XWikiTest
         this.xwiki.copyDocument(this.document.getDocumentReference(), copyReference, this.oldcore.getXWikiContext());
         XWikiDocument copy = this.xwiki.getDocument(copyReference, this.oldcore.getXWikiContext());
 
-        assertTrue(copy.getCreationDate().equals(sourceCreationDate));
+        assertEquals(copy.getCreationDate(), sourceCreationDate);
     }
 
     @Test
-    public void testParseTemplateConsidersObjectField() throws XWikiException
+    void parseTemplateConsidersObjectField() throws XWikiException
     {
         DocumentReference skinReference =
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "XWikiSkins");
@@ -269,7 +267,7 @@ public class XWikiTest
      * See XWIKI-2096
      */
     @Test
-    public void testParseTemplateConsidersAttachment() throws XWikiException
+    void parseTemplateConsidersAttachment() throws XWikiException
     {
         XWikiDocument skin =
             new XWikiDocument(new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "XWiki", "Skin"));
@@ -291,7 +289,7 @@ public class XWikiTest
      * See XWIKI-2098
      */
     @Test
-    public void testParseTemplateConsidersObjectFieldBeforeAttachment() throws Exception
+    void parseTemplateConsidersObjectFieldBeforeAttachment() throws Exception
     {
         DocumentReference skinReference = new DocumentReference("xwiki", "XWiki", "XWikiSkins");
         XWikiDocument skinClass = new XWikiDocument(skinReference);
@@ -316,36 +314,34 @@ public class XWikiTest
     }
 
     @Test
-    public void testClearNameWithoutStripDotsWithoutAscii()
+    void clearNameWithoutStripDotsWithoutAscii()
     {
-        assertEquals("ee{&.txt",
-            this.xwiki.clearName("\u00E9\u00EA{&.txt", false, false, this.oldcore.getXWikiContext()));
+        assertEquals("ee{&.txt", this.xwiki.clearName("éê{&.txt", false, false, this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testClearNameWithoutStripDotsWithAscii()
+    void clearNameWithoutStripDotsWithAscii()
     {
-        assertEquals("ee.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, true, this.oldcore.getXWikiContext()));
+        assertEquals("ee.txt", this.xwiki.clearName("éê{&.txt", false, true, this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testClearNameWithStripDotsWithoutAscii()
+    void clearNameWithStripDotsWithoutAscii()
     {
-        assertEquals("ee{&txt",
-            this.xwiki.clearName("\u00E9\u00EA{&.txt", true, false, this.oldcore.getXWikiContext()));
+        assertEquals("ee{&txt", this.xwiki.clearName("éê{&.txt", true, false, this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testClearNameWithStripDotsWithAscii()
+    void clearNameWithStripDotsWithAscii()
     {
-        assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, this.oldcore.getXWikiContext()));
+        assertEquals("eetxt", this.xwiki.clearName("éê{&.txt", true, true, this.oldcore.getXWikiContext()));
     }
 
     /**
      * We only verify here that the saveDocument API calls the Observation component.
      */
     @Test
-    public void testSaveDocumentSendsObservationEvents() throws Exception
+    void saveDocumentSendsObservationEvents() throws Exception
     {
         EventListener mockListener = mock(EventListener.class);
         when(mockListener.getName()).thenReturn("testlistener");
@@ -370,11 +366,83 @@ public class XWikiTest
             same(this.oldcore.getXWikiContext()));
     }
 
+    @Test
+    void saveDocumentWithListenerSwitchDirtyFlagToTrue() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        DocumentReference ref = new DocumentReference("xwikitest", "Some", "Document");
+        when(mockListener.getEvents())
+            .thenReturn(List.of(new DocumentCreatingEvent(ref)));
+        doAnswer(invocation -> {
+            invocation.<XWikiDocument>getArgument(1).setContent("modified content");
+            return null;
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        doAnswer(invocation -> {
+            XWikiDocument document = invocation.getArgument(0);
+            assertFalse(document.isMetaDataDirty());
+            assertFalse(document.isContentDirty());
+
+            return null;
+        }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        XWikiDocument document = new XWikiDocument(ref);
+        document.setContent("the content");
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void saveDocumentWithListenerSwitchDirtyFlagToFalse() throws Exception
+    {
+        EventListener mockListener = mock(EventListener.class);
+        when(mockListener.getName()).thenReturn("testlistener");
+        DocumentReference ref = new DocumentReference("xwikitest", "Some", "Document");
+        when(mockListener.getEvents())
+            .thenReturn(List.of(new DocumentCreatingEvent(ref)));
+        doAnswer(invocation -> {
+            invocation.<XWikiDocument>getArgument(1).setMetaDataDirty(false);
+            invocation.<XWikiDocument>getArgument(1).setContentDirty(false);
+
+            return null;
+        }).when(mockListener).onEvent(any(), any(), any());
+
+        doAnswer(invocation -> {
+            XWikiDocument document = invocation.getArgument(0);
+            assertFalse(document.isMetaDataDirty());
+            assertFalse(document.isContentDirty());
+
+            return null;
+        }).when(this.oldcore.getMockStore()).saveXWikiDoc(any(), any());
+
+        ObservationManager om = this.oldcore.getMocker().getInstance(ObservationManager.class);
+        om.addListener(mockListener);
+
+        XWikiDocument document = new XWikiDocument(ref);
+        document.setContent("the content");
+
+        this.xwiki.saveDocument(document, this.oldcore.getXWikiContext());
+
+        // Ensure that the onEvent method has been called
+        verify(mockListener).onEvent(any(DocumentCreatingEvent.class), any(XWikiDocument.class),
+            same(this.oldcore.getXWikiContext()));
+    }
+
     /**
      * We only verify here that the renameDocument API calls the Observation component.
      */
     @Test
-    public void testRenameDocumentSendsObservationEvents() throws Exception
+    void renameDocumentSendsObservationEvents() throws Exception
     {
         DocumentReference sourceReference = new DocumentReference("xwikitest", "Some", "Source");
         DocumentReference targetReference = new DocumentReference("xwikitest", "Some", "Target");
@@ -412,7 +480,7 @@ public class XWikiTest
      * We only verify here that the deleteDocument API calls the Observation component.
      */
     @Test
-    public void testDeleteDocumentSendsObservationEvents() throws Exception
+    void deleteDocumentSendsObservationEvents() throws Exception
     {
         EventListener mockListener = mock(EventListener.class);
         when(mockListener.getName()).thenReturn("testlistener");
@@ -442,20 +510,19 @@ public class XWikiTest
     }
 
     @Test
-    public void testLanguageSelection() throws Exception
+    void languageSelection()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
-            @SuppressWarnings("unchecked")
             @Override
-            public Enumeration getLocales()
+            public Enumeration<Locale> getLocales()
             {
-                ArrayList<Locale> locales = new ArrayList<Locale>();
-                locales.add(new Locale("*"));
-                locales.add(new Locale("en", "US"));
-                locales.add(new Locale("fr"));
-                locales.add(new Locale("de"));
-                return IteratorUtils.asEnumeration(locales.iterator());
+                return Collections.enumeration(List.of(
+                    new Locale("*"),
+                    new Locale("en", "US"),
+                    new Locale("fr"),
+                    new Locale("de")
+                ));
             }
 
             @Override
@@ -481,19 +548,18 @@ public class XWikiTest
     }
 
     @Test
-    public void testLanguageSelectionWithSupportedLanguages() throws Exception
+    void languageSelectionWithSupportedLanguages()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
-            @SuppressWarnings("unchecked")
             @Override
-            public Enumeration getLocales()
+            public Enumeration<Locale> getLocales()
             {
-                ArrayList<Locale> locales = new ArrayList<Locale>();
-                locales.add(new Locale("*"));
-                locales.add(new Locale("fr", "FR"));
-                locales.add(new Locale("de"));
-                return IteratorUtils.asEnumeration(locales.iterator());
+                return Collections.enumeration(List.of(
+                    new Locale("*"),
+                    new Locale("fr", "FR"),
+                    new Locale("de")
+                ));
             }
 
             @Override
@@ -523,13 +589,13 @@ public class XWikiTest
      * XWIKI-8469: Bad default of 1 in XWiki.isMultilingual instead of 0 (when no XWikiPreferences object exists)
      */
     @Test
-    public void testIsMultilingualDefaultFalse() throws Exception
+    void isMultilingualDefaultFalse()
     {
         assertFalse(this.xwiki.isMultiLingual(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testGetCurrentContentSyntaxId()
+    void getCurrentContentSyntaxId()
     {
         XWikiDocument doc1 = new XWikiDocument();
         doc1.setSyntax(Syntax.CREOLE_1_0);
@@ -557,7 +623,7 @@ public class XWikiTest
      * @throws Exception when any exception occurs inside XWiki
      */
     @Test
-    public void testValidationKeyStorage() throws Exception
+    void validationKeyStorage() throws Exception
     {
         XWikiContext context = this.oldcore.getXWikiContext();
         context.setLanguage("en");
@@ -614,7 +680,7 @@ public class XWikiTest
      * @throws Exception when any exception occurs inside XWiki
      */
     @Test
-    public void testGetPrefsClass() throws Exception
+    void getPrefsClass() throws Exception
     {
         when(this.oldcore.getMockStore().getLimitSize(any(), any(), any())).thenReturn(255);
 
@@ -623,20 +689,14 @@ public class XWikiTest
         documents.put(prefsDoc.getDocumentReference(), prefsDoc);
 
         when(this.oldcore.getMockStore().loadXWikiDoc(notNull(), same(this.oldcore.getXWikiContext())))
-            .then(new Answer<XWikiDocument>()
-            {
-
-                @Override
-                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.getArgument(0);
-                    if (!documents.containsKey(document.getDocumentReference())) {
-                        documents.put(document.getDocumentReference(), document);
-                    } else {
-                        document = documents.get(document.getDocumentReference());
-                    }
-                    return document;
+            .then(invocation -> {
+                XWikiDocument document = invocation.getArgument(0);
+                if (!documents.containsKey(document.getDocumentReference())) {
+                    documents.put(document.getDocumentReference(), document);
+                } else {
+                    document = documents.get(document.getDocumentReference());
                 }
+                return document;
             });
 
         this.xwiki.getPrefsClass(this.oldcore.getXWikiContext());
@@ -651,7 +711,7 @@ public class XWikiTest
      * XWIKI-12398: No layout for login page in a closed wiki
      */
     @Test
-    public void testSkinResourcesAreAlwaysAllowed() throws XWikiException
+    void skinResourcesAreAlwaysAllowed() throws XWikiException
     {
         // /skin/resources/icons/xwiki/noavatar.png
         XWikiDocument doc1 = new XWikiDocument(
@@ -670,7 +730,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testCheckActiveSuperadmin() throws Exception
+    void checkActiveSuperadmin() throws Exception
     {
         int isUserActive =
             this.xwiki.checkActive(XWikiRightService.SUPERADMIN_USER_FULLNAME, this.oldcore.getXWikiContext());
@@ -682,7 +742,7 @@ public class XWikiTest
      * XWIKI-14300: Superadmin is locked out of subwikis with "AUTHENTICATION ACTIVE CHECK" enabled
      */
     @Test
-    public void testCheckActivePrefixedSuperadmin() throws Exception
+    void checkActivePrefixedSuperadmin() throws Exception
     {
         // In a subwiki, the superadmin always logs in as a global user.
         int isUserActive = this.xwiki.checkActive("xwiki:" + XWikiRightService.SUPERADMIN_USER_FULLNAME,
@@ -692,7 +752,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithContext() throws Exception
+    void getLocalePreferenceWithContext()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null));
         this.oldcore.getXWikiContext().setLocale(Locale.FRENCH);
@@ -701,7 +761,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceDefaultNonMultilingual() throws Exception
+    void getLocalePreferenceDefaultNonMultilingual()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null));
 
@@ -709,7 +769,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithParameterForcingUnset() throws Exception
+    void getLocalePreferenceWithParameterForcingUnset()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -733,7 +793,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithParameter() throws Exception
+    void getLocalePreferenceWithParameter()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -755,7 +815,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithParameterWithSupportedLanguages() throws Exception
+    void getLocalePreferenceWithParameterWithSupportedLanguages()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -778,7 +838,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithParameterDefault() throws Exception
+    void getLocalePreferenceWithParameterDefault()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -799,7 +859,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithCookieForcingUnset() throws Exception
+    void getLocalePreferenceWithCookieForcingUnset()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -820,7 +880,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithCookie() throws Exception
+    void getLocalePreferenceWithCookie()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -834,12 +894,12 @@ public class XWikiTest
         // Set the wiki to multilingual mode.
         this.oldcore.getMockWikiConfigurationSource().setProperty("multilingual", "1");
 
-        // By default we force only supported languages
+        // By default, we force only supported languages
         assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testGetLocalePreferenceWithCookieDefaultNotSet() throws Exception
+    void getLocalePreferenceWithCookieDefaultNotSet()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -853,12 +913,12 @@ public class XWikiTest
         // Set the wiki to multilingual mode.
         this.oldcore.getMockWikiConfigurationSource().setProperty("multilingual", "1");
 
-        // By default we force only supported languages
+        // By default, we force only supported languages
         assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testGetLocalePreferenceWithCookieDefaultSet() throws Exception
+    void getLocalePreferenceWithCookieDefaultSet()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
@@ -873,24 +933,24 @@ public class XWikiTest
         this.oldcore.getMockWikiConfigurationSource().setProperty("multilingual", "1");
         this.oldcore.getMockWikiConfigurationSource().setProperty("languages", "en, |fr_FR, |en_US, |fr_CA");
 
-        // By default we force only supported languages
+        // By default, we force only supported languages
         assertEquals(Locale.CANADA_FRENCH, this.xwiki.getLocalePreference(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testGetLocalePreferenceWithNavigatorLanguagesForcingUnset() throws Exception
+    void getLocalePreferenceWithNavigatorLanguagesForcingUnset()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
             @Override
             public Enumeration<Locale> getLocales()
             {
-                ArrayList<Locale> locales = new ArrayList<>();
-                locales.add(new Locale("*"));
-                locales.add(new Locale("en", "US"));
-                locales.add(new Locale("fr"));
-                locales.add(new Locale("de"));
-                return IteratorUtils.asEnumeration(locales.iterator());
+                return Collections.enumeration(List.of(
+                    new Locale("*"),
+                    new Locale("en", "US"),
+                    new Locale("fr"),
+                    new Locale("de")
+                ));
             }
         });
 
@@ -904,19 +964,19 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithNavigatorLanguages() throws Exception
+    void getLocalePreferenceWithNavigatorLanguages()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
             @Override
             public Enumeration<Locale> getLocales()
             {
-                ArrayList<Locale> locales = new ArrayList<>();
-                locales.add(new Locale("*"));
-                locales.add(new Locale("en", "US"));
-                locales.add(new Locale("fr"));
-                locales.add(new Locale("de"));
-                return IteratorUtils.asEnumeration(locales.iterator());
+                return Collections.enumeration(List.of(
+                    new Locale("*"),
+                    new Locale("en", "US"),
+                    new Locale("fr"),
+                    new Locale("de")
+                ));
             }
         });
 
@@ -928,19 +988,19 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithNavigatorLanguagesDefaultSet() throws Exception
+    void getLocalePreferenceWithNavigatorLanguagesDefaultSet()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null)
         {
             @Override
             public Enumeration<Locale> getLocales()
             {
-                ArrayList<Locale> locales = new ArrayList<>();
-                locales.add(new Locale("*"));
-                locales.add(new Locale("en", "US"));
-                locales.add(new Locale("fr"));
-                locales.add(new Locale("de"));
-                return IteratorUtils.asEnumeration(locales.iterator());
+                return Collections.enumeration(List.of(
+                    new Locale("*"),
+                    new Locale("en", "US"),
+                    new Locale("fr"),
+                    new Locale("de")
+                ));
             }
         });
 
@@ -953,7 +1013,7 @@ public class XWikiTest
     }
 
     @Test
-    public void testGetLocalePreferenceWithNavigatorLanguagesFallback() throws Exception
+    void getLocalePreferenceWithNavigatorLanguagesFallback()
     {
         this.oldcore.getXWikiContext().setRequest(new XWikiServletRequest(null));
 
@@ -963,82 +1023,8 @@ public class XWikiTest
         assertEquals(Locale.ENGLISH, this.xwiki.getLocalePreference(this.oldcore.getXWikiContext()));
     }
 
-    // test implementation of document rename before atomic rename.
     @Test
-    public void renameDocumentOldImplementation() throws Exception
-    {
-        // Possible ways to write parents, include documents, or make links:
-        // "name" -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
-        // "space.name" -means----> DOCWIKI+":"+input
-        // "database:space.name" (no change)
-
-        // We don't want to use atomic rename here: we are testing the old implementation.
-        this.oldcore.getConfigurationSource().setProperty("refactoring.rename.useAtomicRename", false);
-
-        this.document.setContent("[[doc:pageinsamespace]]");
-        this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(this.document, this.oldcore.getXWikiContext());
-
-        DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
-        XWikiDocument doc1 = new XWikiDocument(reference1);
-        doc1.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>doc:" + DOCSPACE + "."
-            + DOCNAME + "]] [[doc:" + DOCNAME + "]]");
-        doc1.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc1, this.oldcore.getXWikiContext());
-
-        DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
-        XWikiDocument doc2 = new XWikiDocument(reference2);
-        doc2.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc2.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc2, this.oldcore.getXWikiContext());
-
-        DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
-        XWikiDocument doc3 = new XWikiDocument(reference3);
-        doc3.setContent("[[doc:" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
-        doc3.setSyntax(Syntax.XWIKI_2_1);
-        this.xwiki.saveDocument(doc3, this.oldcore.getXWikiContext());
-
-        // Test to make sure it also drags children along.
-        DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
-        XWikiDocument doc4 = new XWikiDocument(reference4);
-        doc4.setParent(DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc4, this.oldcore.getXWikiContext());
-
-        DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
-        XWikiDocument doc5 = new XWikiDocument(reference5);
-        doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
-        this.xwiki.saveDocument(doc5, this.oldcore.getXWikiContext());
-
-        DocumentReference targetReference = new DocumentReference("newwikiname", "newspace", "newpage");
-        DocumentReference sourceReference = this.document.getDocumentReference();
-
-        this.xwiki.renameDocument(sourceReference,
-            targetReference, true,
-            Arrays.asList(reference1, reference2, reference3), Arrays.asList(reference4, reference5),
-            this.oldcore.getXWikiContext());
-
-        // Test links
-        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
-            eq(targetReference), eq(false));
-        verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false);
-        verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false);
-        verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false);
-
-        assertTrue(this.xwiki
-            .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());
-
-        // Test parents
-        assertEquals("newwikiname:newspace.newpage",
-            this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
-        assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
-            this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
-    }
-
-    @Test
-    public void atomicRename() throws Exception
+    void atomicRename() throws Exception
     {
         XWikiContext xWikiContext = this.oldcore.getXWikiContext();
         doAnswer(invocationOnMock -> {
@@ -1107,8 +1093,7 @@ public class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceRenamer).renameReferences(any(), eq(targetReference), eq(sourceReference),
-            eq(targetReference), eq(false));
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
             targetReference, false);
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
@@ -1124,5 +1109,21 @@ public class XWikiTest
             this.xwiki.getDocument(reference4, this.oldcore.getXWikiContext()).getParent());
         assertEquals(new DocumentReference("newwikiname", "newspace", "newpage"),
             this.xwiki.getDocument(reference5, this.oldcore.getXWikiContext()).getParentReference());
+    }
+
+    @Test
+    void formatDate()
+    {
+        Date date = new Date(1718887539000L);
+        String expectedResult = "2024/06/20 12:45";
+        this.oldcore.getMockWikiConfigurationSource().setProperty("default_language", "fr_CA");
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.timezone", "BRT");
+        when(this.oldcore.getMockAllUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE))
+            .thenReturn(mock(UserProperties.class));
+        assertEquals(expectedResult, this.xwiki.formatDate(date, null, this.oldcore.getXWikiContext()));
+
+        String format = "EEEE dd MMMM YYYY HH:mm:ss";
+        assertEquals("jeudi 20 juin 2024 12:45:39",
+            this.xwiki.formatDate(date, format, this.oldcore.getXWikiContext()));
     }
 }

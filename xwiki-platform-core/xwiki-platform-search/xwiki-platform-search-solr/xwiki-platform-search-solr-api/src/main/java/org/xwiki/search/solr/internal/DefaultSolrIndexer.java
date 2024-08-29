@@ -24,10 +24,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
+import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -44,6 +46,7 @@ import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.search.solr.internal.api.IndexingUserConfig;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
@@ -54,6 +57,8 @@ import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.AbstractXWikiRunnable;
 
 /**
@@ -180,7 +185,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      * 
      * @version $Id$
      */
-    private class Resolver extends AbstractXWikiRunnable
+    private final class Resolver extends AbstractXWikiRunnable
     {
         @Override
         public void runInternal()
@@ -275,6 +280,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private SolrReferenceResolver solrRefereceResolver;
 
+    /**
+     * Provide a context user for indexing.
+     */
+    @Inject
+    private IndexingUserConfig indexingUserConfig;
+
     @Inject
     private Execution execution;
 
@@ -283,6 +294,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
     @Inject
     private JobExecutor jobs;
+
+    @Inject
+    private DocumentContextExecutor documentContextExecutor;
+
+    @Inject
+    private Provider<XWikiContext> xWikiContextProvider;
 
     /**
      * The queue of index operation to perform.
@@ -402,7 +419,10 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // For the current contiguous operations queue, group the changes
             try {
-                this.ecim.initialize(new ExecutionContext());
+                ExecutionContext executionContext = new ExecutionContext();
+                this.ecim.initialize(executionContext);
+                XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+                xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
 
                 if (IndexOperation.INDEX.equals(operation)) {
                     LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
@@ -496,7 +516,20 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {
-            return metadataExtractor.getSolrDocument(reference);
+            // Set the document that belongs to the entity reference as context document to ensure that the correct
+            // settings are loaded for the current document/wiki.
+            XWikiContext context = this.xWikiContextProvider.get();
+            try {
+                XWikiDocument document = context.getWiki().getDocument(reference, context);
+
+                return this.documentContextExecutor.call(() -> metadataExtractor.getSolrDocument(reference), document);
+            } catch (SolrIndexerException | IllegalArgumentException e) {
+                // Re-throw to avoid wrapping exceptions that are declared in the method signature.
+                throw e;
+            } catch (Exception e) {
+                throw new SolrIndexerException("Error executing the indexer in the context of the document to index",
+                    e);
+            }
         }
 
         return null;

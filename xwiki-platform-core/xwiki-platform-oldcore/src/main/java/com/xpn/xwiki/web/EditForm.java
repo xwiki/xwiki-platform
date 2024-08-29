@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
 import com.xpn.xwiki.util.Util;
 
@@ -46,7 +48,7 @@ public class EditForm extends XWikiForm
 
     /**
      * Format for passing xproperties references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;} (e.g.
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_<propertyName>} (e.g.
      * {@code XWiki.XWikiRights_0_member}).
      */
     private static final Pattern XPROPERTY_REFERENCE_PATTERN =
@@ -54,7 +56,7 @@ public class EditForm extends XWikiForm
 
     /**
      * Format for passing xobjects references in URLs. General format:
-     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;} (e.g.
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_<number>} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
     private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:[\\S ]+\\.)+[\\S ]+?)_([0-9]+)$");
@@ -104,6 +106,8 @@ public class EditForm extends XWikiForm
 
     private Map<String, SortedMap<Integer, Map<String, String[]>>> updateOrCreateMap;
 
+    private List<String> temporaryUploadedFiles;
+
     @Override
     public void readRequest()
     {
@@ -129,6 +133,7 @@ public class EditForm extends XWikiForm
         setUpdateOrCreateMap(request);
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
         setObjectsToAdd(request.getParameterValues("addedObjects"));
+        setTemporaryUploadedFiles(request.getParameterValues("uploadedFiles"));
     }
 
     public void setTags(String[] parameter)
@@ -446,6 +451,27 @@ public class EditForm extends XWikiForm
         }
     }
 
+    private void setTemporaryUploadedFiles(String[] temporaryUploadedFiles)
+    {
+        if (temporaryUploadedFiles == null || temporaryUploadedFiles.length == 0) {
+            this.temporaryUploadedFiles = Collections.emptyList();
+        } else {
+            this.temporaryUploadedFiles = Arrays.asList(temporaryUploadedFiles);
+        }
+    }
+
+    /**
+     * Retrieve the list of temporary uploaded files to add as attachment.
+     *
+     * @see TemporaryAttachmentSessionsManager
+     * @return a list of filenames that should be attached.
+     * @since 14.3RC1
+     */
+    public List<String> getTemporaryUploadedFiles()
+    {
+        return temporaryUploadedFiles;
+    }
+
     public Map<String, List<Integer>> getObjectsToAdd()
     {
         return objectsToAdd;
@@ -499,10 +525,10 @@ public class EditForm extends XWikiForm
 
     /**
      * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
-     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_&lt;propertyname&gt;'}
-     * Keys of this map will be the reference {@code &lt;spacename&gt;.&lt;classname&gt;} to the Class
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_<propertyname>'}
+     * Keys of this map will be the reference {@code &lt;spacename&gt;.<classname>} to the Class
      * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
-     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code &lt;propertyname&gt;} and
+     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code <propertyname>} and
      * content is the array of corresponding values.
      *
      * Example with a list of HTTP parameters:

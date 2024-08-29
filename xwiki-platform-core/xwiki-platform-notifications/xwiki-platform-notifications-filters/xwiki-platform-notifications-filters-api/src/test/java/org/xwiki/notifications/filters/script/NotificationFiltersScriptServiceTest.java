@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -37,11 +36,10 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.internal.ModelBridge;
+import org.xwiki.notifications.filters.internal.FilterPreferencesModelBridge;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.UserReference;
 import org.xwiki.user.internal.document.DocumentUserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @since 13.3RC1
  */
 @ComponentTest
-public class NotificationFiltersScriptServiceTest
+class NotificationFiltersScriptServiceTest
 {
     @InjectMockComponents
     private NotificationFiltersScriptService scriptService;
@@ -68,7 +66,7 @@ public class NotificationFiltersScriptServiceTest
 
     @MockComponent
     @Named("cached")
-    private ModelBridge cachedModelBridge;
+    private FilterPreferencesModelBridge cachedFilterPreferencesModelBridge;
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;

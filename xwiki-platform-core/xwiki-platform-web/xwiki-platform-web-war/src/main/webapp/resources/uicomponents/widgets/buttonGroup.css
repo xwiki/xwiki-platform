@@ -5,8 +5,8 @@
   position: relative;
 }
 
-#distributionWizard a.dropdown-toggle > span, 
-#contentcontainer a.dropdown-toggle > span {
+#distributionWizard .button-group a.dropdown-toggle > span, 
+#contentcontainer .button-group a.dropdown-toggle > span {
   /* Draw the down arrow/triangle using the border. */
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
@@ -15,8 +15,8 @@
   vertical-align: middle;
 }
 
-#distributionWizard a.dropdown-toggle.secondary > span,
-#contentcontainer a.dropdown-toggle.secondary > span {
+#distributionWizard .button-group a.dropdown-toggle.secondary > span,
+#contentcontainer .button-group a.dropdown-toggle.secondary > span {
   border-top: 4px solid $theme.buttonSecondaryTextColor;
 }
 
@@ -56,7 +56,7 @@
   background-color: $theme.pageContentBackgroundColor;
   border: 1px solid $theme.borderColor;
   /* Same border radius as the button. */
-  border-radius: 3px;
+  border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   /* Hidden by default. */
   display: none;
@@ -75,10 +75,7 @@
   right: 0;
 }
 
-/* IE discards the :target selector and thus we have to duplicate the rule.. */
-.button-group > .dropdown-menu:target {
-  display: block;
-}
+.button-group > .dropdown-menu:target,
 .button-group > .dropdown-menu.open {
   display: block;
 }
@@ -94,8 +91,6 @@
   box-shadow: none;
   color: $theme.textColor;
   display: block;
-  /* Reset the IE filter. */
-  filter: none;
   padding: 3px 6px;
   text-align: left;
   text-shadow: none;

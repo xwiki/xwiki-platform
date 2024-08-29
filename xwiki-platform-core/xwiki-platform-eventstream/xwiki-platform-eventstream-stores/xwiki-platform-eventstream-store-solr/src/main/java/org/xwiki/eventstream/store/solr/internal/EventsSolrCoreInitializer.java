@@ -82,7 +82,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_6;
+        return SCHEMA_VERSION_14_7;
     }
 
     @Override
@@ -126,5 +126,14 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
         if (cversion < SCHEMA_VERSION_12_6) {
             setStringField(SOLR_FIELD_MAILLISTENERS, true, false);
         }
+        if (cversion < SCHEMA_VERSION_14_7) {
+            setStringField(Event.FIELD_REMOTE_OBSERVATION_ID, false, false);
+        }
+    }
+
+    @Override
+    protected int getMigrationBatchRows()
+    {
+        return 1000;
     }
 }

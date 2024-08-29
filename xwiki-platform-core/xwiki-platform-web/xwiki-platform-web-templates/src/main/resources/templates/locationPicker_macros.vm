@@ -40,12 +40,14 @@
     #set ($escapedValue = $escapetool.xml($value))
     #if ($titleField.label)
       <dt>
-        <label for="$!{options.id}Title">$services.localization.render($titleField.label)</label>
-        <span class="xHint">$!services.localization.render($titleField.hint)</span>
+        <label for="$escapetool.xml($!{options.id})Title">##
+          $escapetool.xml($services.localization.render($titleField.label))##
+        </label>
+        <span class="xHint">$!escapetool.xml($services.localization.render($titleField.hint))</span>
       </dt>
       <dd>
-        <input type="text" id="$!{options.id}Title" name="$titleField.name" value="$!escapedValue"
-          class="location-title-field" placeholder="$!services.localization.render($titleField.placeholder)" />
+        <input type="text" id="$escapetool.xml($!{options.id})Title" name="$escapetool.xml($titleField.name)" value="$!escapedValue"
+          class="location-title-field" placeholder="$!escapetool.xml($services.localization.render($titleField.placeholder))" />
       </dd>
     #elseif ($titleField)
       <dt class="hidden"></dt>
@@ -60,20 +62,17 @@
     ## ---------------------------------------------------------------------------------------------------------
     ##
     <dt>
-      <label>$services.localization.render($options.preview.label)</label>
-      <span class="xHint">$services.localization.render($options.preview.hint)</span>
+      <label>$escapetool.xml($services.localization.render($options.preview.label))</label>
+      <span class="xHint">$escapetool.xml($services.localization.render($options.preview.hint))</span>
     </dt>
     <dd>
-      #if ($isDocumentTreeAvailable)
-        #documentPickerModal($options)
-        #locationPickerActions()
-      #end
       ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
       ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
       ## this, we wrap the breadcrumb element in a DIV that remains the same.
       <div class="breadcrumb-container">
         ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
         #hierarchy($options.parent.reference $options)
+        #locationPickerActions($options)
       </div>
       ##
       ## ---------------------------------------------------------------------------------------------------------
@@ -85,14 +84,21 @@
   </dl>
 #end
 
-#macro (locationPickerActions)
+#macro (locationPickerActions $options)
   <div class="location-actions">
     ## Tree picker toggle
-    <a href="#" class="location-action location-action-pick" title="Select a new location">
-      $services.icon.renderHTML('chart-organisation')</a>
+    #if ($isDocumentTreeAvailable && $options.parent.label && !$options.parent.readOnly)
+      #documentPickerModal($options)
+      <a href="#" class="location-action location-action-pick"
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.pick'))">
+        $services.icon.renderHTML('chart-organisation')
+      </a>
+    #end
     ## Location advanced edit button.
-    #if ($isAdvancedUser)
-      <a href="#" class="location-action location-action-edit">
+    #if ($isAdvancedUser && ($options.name.label || $options.parent.label ||
+        ($options.wiki.label && $displayWikiFields)))
+      <a href="#" class="location-action location-action-edit"
+         title="$escapetool.xml($services.localization.render('core.create.locationPreview.actions.edit'))">
         $services.icon.renderHTML('pencil')
       </a>
     #end
@@ -113,8 +119,10 @@
       #set ($escapedValue = $escapetool.xml($value))
       #if ($wikiField.label && $displayWikiFields)
         <dt>
-          <label for="$!{options.id}Wiki">$services.localization.render($wikiField.label)</label>
-          <span class="xHint">$!services.localization.render($wikiField.hint)</span>
+          <label for="$escapetool.xml($!{options.id})Wiki">##
+            $escapetool.xml($services.localization.render($wikiField.label))##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($wikiField.hint))</span>
         </dt>
         <dd>
           <select id="$!{options.id}Wiki" name="$wikiField.name" class="location-wiki-field">
@@ -132,9 +140,9 @@
         </dd>
       #elseif ($wikiField)
         <dt class="hidden"></dt>
-        <dt class="hidden">
+        <dd class="hidden">
           <input type="hidden" name="$wikiField.name" class="location-wiki-field" value="$!escapedValue" />
-        </dt>
+        </dd>
       #end
       ## ---------------------------------------------------------------------------------------------------------
       ## Parent Reference field
@@ -155,15 +163,26 @@
         #set ($value = $defaultParentReferenceString)
       #end
       #set ($escapedValue = $escapetool.xml($value))
-      <dt>
-        <label for="$!{options.id}ParentReference">$services.localization.render($parentField.label)</label>
-        <span class="xHint">$!services.localization.render($parentField.hint)</span>
-      </dt>
-      <dd>
-        <input type="text" id="$!{options.id}ParentReference" class="location-parent-field suggestSpaces"
-          name="$parentField.name" value="$!escapedValue"
-          placeholder="$!services.localization.render($parentField.placeholder)" />
-      </dd>
+      #if ($parentField.label)
+        <dt>
+          <label for="$escapetool.xml($!{options.id})ParentReference">##
+            $escapetool.xml($services.localization.render($parentField.label))##
+          </label>
+          <span class="xHint">$!escapetool.xml($services.localization.render($parentField.hint))</span>
+        </dt>
+        <dd>
+          <input type="text" id="$escapetool.xml($!{options.id})ParentReference" class="location-parent-field suggestSpaces"
+            name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+            placeholder="$!escapetool.xml($services.localization.render($parentField.placeholder))"
+            #if ($parentField.readOnly)readonly#end />
+        </dd>
+      #else
+        <dt class="hidden"></dt>
+        <dd class="hidden">
+          <input type="hidden" name="$escapetool.xml($parentField.name)" value="$!escapedValue"
+                 class="location-parent-field" />
+        </dd>
+      #end
       ##
       ## ---------------------------------------------------------------------------------------------------------
       ## Name field
@@ -177,13 +196,16 @@
       #set ($escapedValue = $escapetool.xml($value))
       #if ($nameField.label)
         <dt>
-          <label for="$!{options.id}Name">$services.localization.render($nameField.label)</label>
-          <span class="xHint">$!services.localization.render($nameField.hint)</span>
+          <label for="$escapetool.xml($!{options.id})Name">##
+            $escapetool.xml($services.localization.render($nameField.label))##
+          </label>
+          <span class="xHint">$escapetool.xml($services.localization.render($nameField.hint))</span>
         </dt>
         <dd>
-          <input type="text" id="$!{options.id}Name" name="$nameField.name" class="location-name-field"
+          <input type="text" id="$escapetool.xml($!{options.id})Name" name="$escapetool.xml($nameField.name)" class="location-name-field"
             value="$!escapedValue"
-            placeholder="$!services.localization.render($nameField.placeholder)" />
+            placeholder="$!escapetool.xml($services.localization.render($nameField.placeholder))"
+            #if ($nameField.readOnly)readonly#end />
         </dd>
       #elseif ($nameField)
         <dt class="hidden"></dt>
@@ -201,8 +223,8 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+          <button type="button" class="close" data-dismiss="modal" title="Close">
+            $services.icon.renderHTML('cross')
           </button>
           <div class="modal-title">$services.localization.render('core.documentPicker.title')</div>
         </div>
@@ -219,7 +241,8 @@
             'showRoot': $showRoot,
             'showTerminalDocuments': $showTerminalDocuments,
             'showTranslations': false,
-            'showWikis': $showWikis
+            'showWikis': $showWikis,
+            'exclusions': "$!options.exclusions"
           })
         </div>
         <div class="modal-footer">

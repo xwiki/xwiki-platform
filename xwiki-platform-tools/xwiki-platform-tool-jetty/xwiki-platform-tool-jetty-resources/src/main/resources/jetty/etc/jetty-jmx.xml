@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
@@ -39,14 +39,13 @@
         <Arg>
           <Ref refid="MBeanServer" />
         </Arg>
+        <Call name="beanAdded">
+          <Arg/>
+          <Arg>
+            <Get name="ILoggerFactory" class="org.slf4j.LoggerFactory"/>
+          </Arg>
+        </Call>
       </New>
-    </Arg>
-  </Call>
-
-  <!-- Add the static log -->
-  <Call name="addBean">
-    <Arg>
-      <Get class="org.eclipse.jetty.util.log.Log" name="Log" />
     </Arg>
   </Call>
 </Configure>

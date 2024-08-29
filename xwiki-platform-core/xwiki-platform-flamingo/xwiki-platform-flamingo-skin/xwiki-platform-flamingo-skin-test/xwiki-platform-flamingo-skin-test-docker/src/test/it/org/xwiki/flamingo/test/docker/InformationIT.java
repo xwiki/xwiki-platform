@@ -56,7 +56,7 @@ public class InformationIT
     {
         // Enable the plain syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass", "disabledSyntaxes",
-            "xdom+xml/current,xhtml/1.0,xwiki/2.0");
+            "xdom+xml/current,xhtml/1.0,xwiki/2.0,xhtml/5,html/5.0");
         setup.deletePage(testReference);
 
         try {

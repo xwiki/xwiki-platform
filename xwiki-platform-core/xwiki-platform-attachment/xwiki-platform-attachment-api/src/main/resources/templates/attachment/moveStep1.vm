@@ -1,0 +1,186 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+### Move attachment template, step 1: choose new name and a new location + updated backlinks + redirection.
+###
+
+#set ($discard = $xwiki.ssrx.use('css/attachment/move.css'))
+#set ($discard = $xwiki.jsrx.use('js/attachment/move.js'))
+#set($titleToDisplay = $services.localization.render('attachment.move.title', [
+  $escapetool.xml($attachment.name), 
+  $escapetool.xml($doc.plainTitle), 
+  $escapetool.xml($doc.getURL())
+]))
+<div class="xcontent">
+#template('contentheader.vm')
+#template('attachment/refactoring_macros.vm')
+#template('refactoring_macros.vm')
+#template('locationPicker_macros.vm')
+<form action="?xpage=attachment/move&amp;step=2" method="post" id="move" class="xform">
+  <div class="hidden">
+    ## CSRF prevention
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+    ## Perform the move asynchronously.
+    <input type="hidden" name="async" value="true" />
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        ##------------
+        ## Source Page
+        ##------------
+        #displaySourceAttachment()
+        ##------------
+        ## Links field
+        ##------------
+         #displayAttachmentLinksCheckbox()
+        ##--------------------
+        ## Auto redirect field
+        ##--------------------
+        ## We set Autoredirect to off by default for the following reasons:
+        ## - Several users have reported a usability issue about automatic redirects. The way they express it is the
+        ##   following: "I have duplicates pages in my wiki. I don't understand why this is happening. I'm choosing to
+        ##   move pages and not to copy them but I still get duplicates in the Navigation panel".
+        ## - Automatic redirects are especially useful for public wikis where users can have bookmark on pages and you
+        ##   don't want to break them. It can also be useful for internal wikis but it's less an issue.
+        ## - Even for public wikis not all pages need automatic redirects. Technical pages don't need them for example.
+        ## - We don't have management UIs for redirects FTM and reducing the number of redirects make the wiki easier
+        ##   to manage.
+        ## In the future we'll offer a config option to define the default behavior, see
+        ## http://jira.xwiki.org/browse/XWIKI-13384
+        #set ($checked = $request.autoRedirect == 'true')
+        <dt class="autoRedirect">
+          <label>
+            <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
+            $escapetool.xml($services.localization.render('attachment.move.autoRedirect.label'))
+          </label>
+          ## The value submitted when the checkbox is not checked, used to preserve the form state.
+          <input type="hidden" name="autoRedirect" value="false" />
+        </dt>
+        <dd class="autoRedirect">
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.autoRedirect.hint'))
+          </span>
+        </dd>
+      </dl>
+    </div>
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        ##------------
+        ## Target attachment
+        ##------------
+        <dt class="targetAttachmentName">
+          <label for="targetAttachmentNameTitle">
+            $escapetool.xml($services.localization.render('attachment.move.newName.label'))
+          </label>
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.newName.hint'))
+          </span>
+        </dt>
+        <dd>
+          <input type="text" 
+                 id="targetAttachmentNameTitle" 
+                 name="targetAttachmentName" 
+                 value="$escapetool.xml($attachment.name)"
+                 class="location-title-field" 
+                 placeholder="$escapetool.xml($services.localization.render('attachment.move.newName.placeholder'))" /> 
+        </dd>
+        ##------------
+        ## Target Page
+        ##------------
+        <dt>
+          <label for="targetLocation">
+              $escapetool.xml($services.localization.render('attachment.move.newLocation.label'))
+          </label>
+          <span class="xHint">
+            $escapetool.xml($services.localization.render('attachment.move.newLocation.hint'))
+          </span>
+        </dt>
+        <dd>
+          #set ($targetRef = $doc.documentReference)
+          #if ($request.targetLocation)
+            #set ($targetRef = $request.targetLocation)
+          #end
+          #set ($documentReference = $services.model.serialize($targetRef, 'local'))
+          <div class="modal fade documentTree" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">$services.icon.renderHTML('cross')</span>
+                  </button>
+                  <h5 class="modal-title">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.title'))
+                  </h5>
+                </div>
+                <div class="modal-body">
+                  #template("documentTree_macros.vm")
+                  #documentTree({
+                    'class': 'location-tree',
+                    'finder': true,
+                    'showAttachments': false,
+                    'showTerminalDocuments': true,
+                    'showTranslations': false,
+                    'showWikis': true
+                  })
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.closeButton'))
+                  </button>
+                  <button type="button" class="btn btn-primary">
+                    $escapetool.xml($services.localization.render('attachment.move.targetLocation.modal.selectButton'))
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div>
+              #pagePicker({
+                'id': 'targetLocation',
+                'name': 'targetLocation',
+                'value': $documentReference
+              })
+            </div>
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default newLocationTree" value="doc" title="Select a page">
+                $services.icon.renderHTML('chart-organisation')
+              </button>
+            </div>
+          </div>
+        </dd>
+      </dl>
+    </div>
+  </div>
+  <div class="buttons">
+    <span class="buttonwrapper">
+      <input type="submit" 
+             value="$escapetool.xml($services.localization.render('attachment.move.submit'))" 
+             class="button" />
+    </span>
+    <span class="buttonwrapper">
+      <a class="secondary button" href="$doc.getURL()">
+        $escapetool.xml($services.localization.render('cancel'))
+      </a>
+    </span>
+  </div>
+</form>
+</div>

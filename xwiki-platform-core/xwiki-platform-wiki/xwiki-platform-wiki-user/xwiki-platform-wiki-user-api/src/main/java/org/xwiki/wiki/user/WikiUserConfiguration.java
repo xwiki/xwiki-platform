@@ -35,21 +35,11 @@ public class WikiUserConfiguration
     private MembershipType membershipType;
 
     /**
-     * Constructor.
-     */
-    public WikiUserConfiguration()
-    {
-        // Default values
-        setUserScope(UserScope.GLOBAL_ONLY);
-        setMembershipType(MembershipType.INVITE);
-    }
-
-    /**
      * @return the user scope
      */
     public UserScope getUserScope()
     {
-        return userScope;
+        return this.userScope != null ? this.userScope : UserScope.GLOBAL_ONLY;
     }
 
     /**
@@ -73,7 +63,7 @@ public class WikiUserConfiguration
      */
     public MembershipType getMembershipType()
     {
-        return membershipType;
+        return this.membershipType != null ? this.membershipType : MembershipType.INVITE;
     }
 
     @Override

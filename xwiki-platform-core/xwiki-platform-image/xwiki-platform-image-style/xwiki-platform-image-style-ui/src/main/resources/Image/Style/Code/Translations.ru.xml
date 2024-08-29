@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="ru">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=Стили изображений
+image.style.admin.heading=Управление стилями изображений
+image.style.administration.imageStyleList.heading=Стили изображений
+image.style.administation.newImageStyle.button=Создать стиль изображений
+image.style.administation.defaultImageStyle.button=Обновить стиль изображений по умолчанию
+image.style.imageStyleSheet.backToAdministration.link=Вернуться к администрированию
+image.style.administration.liveData.doc.title=Идентификатор
+image.style.administration.liveData._actions=Действия
+image.style.administration.liveData.prettyName=Отображаемое имя
+image.style.administration.liveData.prettyName.hint=Ориентированное на пользователя имя стиля изображений
+image.style.administration.liveData.type=Тип
+image.style.administration.liveData.type.hint=Тип стиля изображений (используется как класс css)
+### Missing: image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=Новый стиль изображений
+image.style.administation.newImageStyle.hint=Идентификатор нового стиля изображений.
+image.style.administation.newImageStyle.placeHolder=Идентификатор
+image.style.administation.newImageStyle.normalizedTitle=Новый стиль изображения, в соответствии с соглашениями об именовании, имеет вид [{0}].
+Image.Style.Code.ImageStyleClass_adjustableAlignment=Настраиваемое выравнивание
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Если галочка установлена, пользователь может настраивать выравнивание изображения.
+Image.Style.Code.ImageStyleClass_adjustableBorder=Настраиваемая рамка
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=Если галочка установлена, пользователь может настраивать рамку изображения.
+Image.Style.Code.ImageStyleClass_adjustableSize=Настраиваемый размер
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=Если галочка установлена, пользователь может настраивать размер изображения.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=Настраиваемое обтекание текстом
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=Если галочка установлена, пользователь может настраивать обтекание изображения текстом.
+Image.Style.Code.ImageStyleClass_defaultAlignment=Выравнивание по умолчанию
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Центр
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=Выравнивание изображения по умолчанию.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=Нет
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=Начало
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Центр
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=Окончание
+Image.Style.Code.ImageStyleClass_defaultBorder=Изображение с рамкой по умолчанию
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=Когда галочка установлена, изображение по умолчанию имеет рамку.
+Image.Style.Code.ImageStyleClass_defaultHeight=Высота по умолчанию
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=Высота изображения по умолчанию. Если ширина по умолчанию не указана, она будет вычисляться в соответствии с соотношением сторон изображения. В противном случае изображение будет иметь фиксированный размер.
+Image.Style.Code.ImageStyleClass_defaultTextWrap=Обтекание текстом по умолчанию
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=Если галочка установлена, по умолчанию текст будет обтекать изображение.
+Image.Style.Code.ImageStyleClass_defaultWidth=Ширина по умолчанию
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=Ширина изображения по умолчанию. Если высота по умолчанию не указана, она будет вычисляться в соответствии с соотношением сторон изображения. В противном случае изображение будет иметь фиксированный размер.
+Image.Style.Code.ImageStyleClass_prettyName=Отображаемое имя
+Image.Style.Code.ImageStyleClass_prettyName_hint=Ориентированное на пользователя имя стиля изображений.
+Image.Style.Code.ImageStyleClass_type=Тип
+Image.Style.Code.ImageStyleClass_type_hint=Тип стиля изображений (используется как класс css).
+Image.Style.Code.ConfigurationClass_defaultStyle=Стиль по умолчанию
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль изображений по умолчанию для этой вики.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Сохранять стиль по умолчанию
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Если флажок установлен, то в конфигурации изображения принудительно сохраняются настройки стиля по умолчанию, и пользователю придется изменять стиль самостоятельно.
+</content>
+</xwikidoc>

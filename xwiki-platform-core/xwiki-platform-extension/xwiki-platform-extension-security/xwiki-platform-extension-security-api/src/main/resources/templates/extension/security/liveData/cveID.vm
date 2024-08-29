@@ -1,0 +1,65 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Since 15.6RC1
+## This template renders the content of the CVEs list of an extension.
+## The CVEs list is enriched with links to the CVEs description page, their corresponding CVSS scores.
+## Additionally, reviewed CVSS have a popup with providing more details explanations.  
+## ---------------------------------------------------------------------------
+#macro (showCVEs $indexes $isSafe)
+  #foreach($index in $indexes)
+    #set ($cveId = $cveIds.get($index))
+    #set ($message = $messages[$index])
+  <a href="$cveLinks[$index]" class="#if ($isSafe)small#end">$cveId</a>
+  <span class="#if ($isSafe)small#end">($cveCVSS[$index])</span>
+    #if ("$!message" != '')
+    <button type="button" class="btn btn-default btn-xs #if ($isSafe)small#end" data-toggle="modal"
+            data-target="#$escapetool.xml($cveId)"
+            aria-controls="$escapetool.xml($cveId)">
+      <span class="sr-only">
+        $escapetool.xml($services.localization.render("extension.security.liveData.cveID.modal.openButton", [$cveId]))
+      </span>
+      $services.icon.renderHTML('file-text')
+    </button>
+    <div class="modal fade security-vulnerability-detail-modal" tabindex="-1" role="dialog"
+         id='$escapetool.xml($cveId)'>
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">$services.icon.renderHTML('cross')</span>
+            </button>
+            <h2 class="modal-title">
+              $escapetool.xml($services.localization.render(
+                "extension.security.liveData.cveID.modal.title", [$cveId, $extensionId]))
+            </h2>
+          </div>
+          <div class="modal-body">
+            $message
+          </div>
+        </div>
+      </div>
+    </div>
+    #end
+  <br>
+  #end
+#end
+##
+#showCVEs($notSafeCVEsIndex false)
+#showCVEs($safeCVEsIndex true)

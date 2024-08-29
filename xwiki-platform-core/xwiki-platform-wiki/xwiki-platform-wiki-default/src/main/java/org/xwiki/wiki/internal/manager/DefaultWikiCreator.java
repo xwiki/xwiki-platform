@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
@@ -56,6 +57,9 @@ public class DefaultWikiCreator implements WikiCreator
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private WikiConfiguration wikiConfiguration;
+
     @Override
     public WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException
     {
@@ -68,11 +72,14 @@ public class DefaultWikiCreator implements WikiCreator
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        // Create database/schema
-        try {
-            xwiki.getStore().createWiki(wikiId, context);
-        } catch (Exception e) {
-            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation", wikiId), e);
+        // Create database/schema/user (unless configured otherwise)
+        if (this.wikiConfiguration.shouldCreateDatabase()) {
+            try {
+                xwiki.getStore().createWiki(wikiId, context);
+            } catch (Exception e) {
+                throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation", wikiId),
+                    e);
+            }
         }
 
         // Create the descriptor

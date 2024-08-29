@@ -1,0 +1,37 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Verify that the fallback to the default works and can be disabled.
+.#-----------------------------------------------------
+{{displayIcon name="fallback" iconSet="special" /}} {{displayIcon name="fallback" /}} {{displayIcon name="fallback" fallback="false" /}}
+
+{{displayIcon name="home" iconSet="none" fallback="false" /}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginMacroMarkerInline [displayIcon] [name=fallback|iconSet=special]
+beginMetaData [[syntax]=[XWiki 2.1]]
+onWord [fallback]
+onSpace
+onWord [fallbackIcon]
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerInline [displayIcon] [name=fallback|iconSet=special]
+onSpace
+beginMacroMarkerInline [displayIcon] [name=fallback]
+beginMetaData [[syntax]=[XWiki 2.1]]
+onWord [fallback]
+onSpace
+onWord [fallbackIcon]
+endMetaData [[syntax]=[XWiki 2.1]]
+endMacroMarkerInline [displayIcon] [name=fallback]
+onSpace
+beginMacroMarkerInline [displayIcon] [name=fallback|fallback=false]
+beginMetaData
+endMetaData
+endMacroMarkerInline [displayIcon] [name=fallback|fallback=false]
+endParagraph
+beginMacroMarkerStandalone [displayIcon] [name=home|iconSet=none|fallback=false]
+endMacroMarkerStandalone [displayIcon] [name=home|iconSet=none|fallback=false]
+endDocument

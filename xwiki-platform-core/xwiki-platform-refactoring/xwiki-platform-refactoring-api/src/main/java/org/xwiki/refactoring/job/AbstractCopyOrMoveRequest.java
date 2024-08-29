@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -40,9 +41,22 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
 
     /**
-     * @see #isUpdateLinksOnFarm()
+     * Default constructor.
      */
-    private static final String PROPERTY_UPDATE_LINKS_ON_FARM = "updateLinksOnFarm";
+    public AbstractCopyOrMoveRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    protected AbstractCopyOrMoveRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}
@@ -86,10 +100,12 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
      * @return {@code true} if the job should update the links that target the old entity reference (before the move)
      *         from anywhere on the farm, {@code false} if the job should update only the links from the wiki where the
      *         entity was located before the move
+     * @deprecated not taken into account anymore
      */
+    @Deprecated(since = "14.8RC1")
     public boolean isUpdateLinksOnFarm()
     {
-        return getProperty(PROPERTY_UPDATE_LINKS_ON_FARM, false);
+        return true;
     }
 
     /**
@@ -100,9 +116,11 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
      *
      * @param updateLinksOnFarm {@code true} to update the links from anywhere on the farm, {@code false} to update only
      *            the links from the wiki where the entity is located
+     * @deprecated not taken into account anymore
      */
+    @Deprecated(since = "14.8RC1")
     public void setUpdateLinksOnFarm(boolean updateLinksOnFarm)
     {
-        setProperty(PROPERTY_UPDATE_LINKS_ON_FARM, updateLinksOnFarm);
+        // Ignored
     }
 }

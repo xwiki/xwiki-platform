@@ -27,7 +27,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,33 +55,13 @@ class DefaultMailStorageConfigurationTest
     void discardSuccessStatusesWhenNotDefined()
     {
         when(xwikiPropertiesSource.getProperty("mail.sender.database.discardSuccessStatuses", 1)).thenReturn(1);
-
-        assertEquals(true, this.configuration.discardSuccessStatuses());
+        assertTrue(this.configuration.discardSuccessStatuses());
     }
 
     @Test
     void discardSuccessStatusesFalseWhenDefinedInMailConfig()
     {
         when(mailConfigSource.getProperty("discardSuccessStatuses")).thenReturn(0);
-
-        assertEquals(false, this.configuration.discardSuccessStatuses());
-    }
-
-    @Test
-    void resendAutomaticallyAtStartupWhenNotDefined()
-    {
-        when(xwikiPropertiesSource.getProperty(
-            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(true);
-
-        assertEquals(true, this.configuration.resendAutomaticallyAtStartup());
-    }
-
-    @Test
-    void resendAutomaticallyAtStartupWhenFalse()
-    {
-        when(xwikiPropertiesSource.getProperty(
-            "mail.sender.database.resendAutomaticallyAtStartup", true)).thenReturn(false);
-
-        assertEquals(false, this.configuration.resendAutomaticallyAtStartup());
+        assertFalse(this.configuration.discardSuccessStatuses());
     }
 }

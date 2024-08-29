@@ -22,15 +22,25 @@ package org.xwiki.refactoring.event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
+import org.xwiki.refactoring.job.MoveRequest;
 
 /**
  * Event fired after a document has been renamed.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the job which produced this event or null for a remote event</li>
+ * <li>data: the {@link MoveRequest} request of the job which  produced this event</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 11.1RC1
  */
 public class DocumentRenamedEvent extends AbstractEntityCopyOrRenameEvent<DocumentReference> implements EndFoldEvent
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor, used by listeners.
      */

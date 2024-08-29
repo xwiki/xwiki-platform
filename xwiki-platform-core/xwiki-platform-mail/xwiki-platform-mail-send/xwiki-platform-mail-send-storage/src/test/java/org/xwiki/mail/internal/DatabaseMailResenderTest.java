@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +72,7 @@ class DatabaseMailResenderTest
     private MockitoComponentManager componentManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void resendAsynchronouslySingleMesssage() throws Exception
@@ -87,13 +86,13 @@ class DatabaseMailResenderTest
         when(contentStore.load(any(), eq(batchId), eq("messageId"))).thenReturn(message);
 
         MailSender sender = this.componentManager.getInstance(MailSender.class);
-        when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(), any(MailListener.class)))
+        when(sender.sendAsynchronously(eq(Collections.singletonList(message)), any(), any(MailListener.class)))
             .thenReturn(new DefaultMailResult(batchId));
 
         this.databaseMailResender.resendAsynchronously(batchId, "messageId");
 
         // The test is here
-        verify(sender).sendAsynchronously(eq(Arrays.asList(message)), any(), same(listener));
+        verify(sender).sendAsynchronously(eq(Collections.singletonList(message)), any(), same(listener));
         verify(listener).getMailStatusResult();
     }
 
@@ -104,16 +103,15 @@ class DatabaseMailResenderTest
         when(contentStore.load(any(), eq("batchId"), eq("messageId"))).thenThrow(
             new MailStoreException("error"));
 
-        Throwable exception = assertThrows(MailStoreException.class, () -> {
-            this.databaseMailResender.resendAsynchronously("batchId", "messageId");
-        });
+        Throwable exception = assertThrows(MailStoreException.class,
+            () -> this.databaseMailResender.resendAsynchronously("batchId", "messageId"));
         assertEquals("error", exception.getMessage());
     }
 
     @Test
     void resendAsynchronouslySeveralMessages() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
@@ -141,8 +139,8 @@ class DatabaseMailResenderTest
         this.databaseMailResender.resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
-        verify(sender).sendAsynchronously(eq(Arrays.asList(message1)), any(), any(MailListener.class));
-        verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
+        verify(sender).sendAsynchronously(eq(Collections.singletonList(message1)), any(), any(MailListener.class));
+        verify(sender).sendAsynchronously(eq(Collections.singletonList(message2)), any(), any(MailListener.class));
     }
 
     @BeforeComponent("resendSynchronouslySeveralMessages")
@@ -155,7 +153,7 @@ class DatabaseMailResenderTest
     @Test
     void resendSynchronouslySeveralMessages() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
@@ -198,7 +196,7 @@ class DatabaseMailResenderTest
     @Test
     void resendAsynchronouslySeveralMessagesWhenMailContentStoreLoadingFailsForFirstMessage() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
@@ -230,13 +228,13 @@ class DatabaseMailResenderTest
         // The test is here
         assertEquals("Failed to resend mail message for batchId [batch1], messageId [message1]. "
             + "Root cause [MailStoreException: error1]", logCapture.getMessage(0));
-        verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
+        verify(sender).sendAsynchronously(eq(Collections.singletonList(message2)), any(), any(MailListener.class));
     }
 
     @Test
     void resendAsynchronouslySeveralMessagesWhenMailFailedPrepare() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
@@ -258,6 +256,7 @@ class DatabaseMailResenderTest
         this.databaseMailResender.resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
-        verify(sender, never()).sendAsynchronously(eq(Arrays.asList(message1)), any(), any(MailListener.class));
+        verify(sender, never()).sendAsynchronously(eq(Collections.singletonList(message1)), any(),
+            any(MailListener.class));
     }
 }

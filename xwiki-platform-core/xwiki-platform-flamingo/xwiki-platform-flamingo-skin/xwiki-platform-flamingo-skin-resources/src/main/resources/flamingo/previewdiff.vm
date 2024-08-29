@@ -59,7 +59,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">$services.icon.renderHTML('cross')</button>
         <div class="modal-title" id="previewDiffModalTitle">$services.localization.render('core.editors.save.previewDiff.title')</div>
         <hr />
         <div class="xHint">
@@ -111,7 +111,7 @@
           </div>
           ## Display the custom choice only if there is conflicts on the content of the page, for now we don't provide
           ## a way to solve other kind of conflicts.
-          #if (!$mergedDocResult.contentConflicts.isEmpty() && $mergedDocResult.contentConflicts.size() == $mergedDocResult.allConflicts.size())
+          #if ($mergedDocResult.hasOnlyContentConflicts())
           <div class="panel">
             <div class="panel-radio">
               <input type="radio" id="actionCustomRadio" name="warningConflictAction" value="custom"#if ($warningConflictAction == "custom") checked="checked"#end />

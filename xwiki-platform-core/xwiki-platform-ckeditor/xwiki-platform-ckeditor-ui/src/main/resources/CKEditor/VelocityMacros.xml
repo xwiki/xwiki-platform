@@ -1,0 +1,301 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.VelocityMacros" locale="">
+  <web>CKEditor</web>
+  <name>VelocityMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>CKEditor.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (ckeditor_convert $text $toHTML $fromHTML $stripHTMLEnvelope)
+  #set ($sourceSyntax = $request.sourceSyntax)
+  #if ("$!sourceSyntax" != '')
+    #set ($sourceSyntax = $services.rendering.resolveSyntax($sourceSyntax))
+  #end
+  #if (!$sourceSyntax)
+    #set ($sourceSyntax = $doc.syntax)
+  #end
+  #if ($toHTML)
+    #set ($source = {
+      'documentReference': $doc.documentReference,
+      'syntax': $sourceSyntax,
+      'restricted' : $request.wysiwygRestricted
+    })
+    #if ($fromHTML)
+      #set ($source.html = $text)
+    #else
+      #set ($source.content = $text)
+    #end
+    #if ($stripHTMLEnvelope)
+      ## Don't wrap the rendered content with the HTML and BODY tags. This is needed when the HTML fragment is injected
+      ## directly in the current page, e.g. when CKEditor is used in-line (no iframe). We still need to send back the
+      ## required style sheets and JavaScript files because some of them might not be available in the target page, e.g.
+      ## when a macro is inserted and it needs resource files not available on every page.
+      #ckeditor_initRequiredSkinExtensions()
+      #set ($output = "#ckeditor_getRenderedContent($source)$!html")
+      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#ckeditor_getRequiredSkinExtensions()"))
+    #else
+      ## Returns a full HTML page, including the HEAD tag with the style sheets and possibly the JavaScript includes.
+      ## This is needed when the edited content is loaded in an iframe, which is the case when CKEditor replaces a text
+      ## area (classical editor).
+      #set ($output = "#ckeditor_renderContentSheet($source)")
+    #end
+  #else
+    #set ($output = $services.wysiwyg.fromAnnotatedXHTML($text, $sourceSyntax.toIdString()))
+    #if ("$!output" == '' &amp;&amp; $output != '')
+      ## $output is null, probably because $services.wysiwyg.fromAnnotatedXHTML() is not available (before 10.10RC1)
+      #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
+      #set ($output = $services.rendering.render($xdom, $sourceSyntax.toIdString()))
+    #end
+  #end
+  #if ("$!output" != '' || $output == '')
+    $output##
+  #else
+    ## The output is null so an exception must have been thrown.
+    $response.sendError(500)
+  #end
+#end
+
+#macro (ckeditor_renderContentSheet $source)
+  ## The $source variable is used inside the content sheet.
+  #set ($output = $services.wysiwyg.render('CKEditor.ContentSheet'))
+  #if ("$!output" == '' &amp;&amp; $output != '')
+    ## $output is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
+    #set ($output = $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent())
+    #set ($skinExtensionHooks = {
+      'ssx': 'CssSkinExtensionPlugin',
+      'ssfx': 'CssSkinFileExtensionPlugin',
+      'ssrx': 'CssResourceSkinExtensionPlugin'
+    })
+    #foreach ($entry in $skinExtensionHooks.entrySet())
+      #set ($output = $output.replace("&lt;!-- com.xpn.xwiki.plugin.skinx.$entry.value --&gt;",
+        $xwiki.get($entry.key).importString))
+    #end
+  #end
+  ## Unescape {{ which happened in CKEditor.ContentSheet for protecting the {{html}} macro.
+  $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
+#end
+
+#macro (ckeditor_getRenderedContent $source)
+  ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
+  #set ($macro.previousDisplayMode = $xcontext.displayMode)
+  #set ($discard = $xcontext.setDisplayMode('view'))
+  #if ($xcontext.displayMode != 'view')
+    ## Before XWiki 14.0-rc-1, 13.4.7, 13.10.3 and 12.10.12 there's no API to get the current display mode so we can't
+    ## restore the previous display mode properly. We assume the previous display mode is 'edit' because the WYSIWYG
+    ## editor is used.
+    #set ($macro.previousDisplayMode = 'edit')
+  #end
+  #set ($restricted = "$!source.restricted" == 'true')
+  #if ($source.html)
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
+    #if ("$!html" == '' &amp;&amp; $html != '')
+      ## Before XWiki 11.9RC1 (see XWIKI-16737)
+      #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
+    #end
+  #else
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference, $restricted))
+    #if ("$!html" == '' &amp;&amp; $html != '')
+      ## Before XWiki 11.9RC1 (see XWIKI-16737)
+      #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
+    #end
+  #end
+  #if ("$!html" == '')
+    ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
+    ## CKEDITOR-185: Whitespace is generated in Firefox when creating a page without typing the content
+    #set ($html = '&lt;p&gt;&lt;/p&gt;')
+  #end
+  ## Restore the previous display mode.
+  #set ($discard = $xcontext.setDisplayMode($macro.previousDisplayMode))
+#end
+
+#macro (ckeditor_importCSS $groupId $artifactId $path $evaluate)
+  #set ($url = $services.webjars.url("$groupId:$artifactId", $path, {'evaluate': $evaluate}))
+  #set ($discard = $xwiki.linkx.use($url, {'type': 'text/css', 'rel': 'stylesheet'}))
+#end
+
+#macro (importCKEditorResources)
+  #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
+  ## Add the version of each JavaScript dependency of CKEditor Integration to the URL used to load the CKEditor in order
+  ## to make sure the browser cache is invalidated when one of these versions changes (e.g. when we upgrade XWiki or one
+  ## of these dependencies but the CKEditor version remains the same).
+  #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet', {
+    'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui',
+      "wiki:$xcontext.database").version.value,
+    'xwiki-version': $services.extension.core.getCoreExtension(
+      'org.xwiki.platform:xwiki-platform-tree-webjar').version.value,
+    'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff',
+      "wiki:$xcontext.database").version.value,
+    'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
+      "wiki:$xcontext.database").version.value
+  }))
+  #ckeditor_importCSS('org.xwiki.platform' 'xwiki-platform-ckeditor-plugins' 'webjar.bundle.min.css' true)
+  ## Tree styles needed for the document/attachment tree picker.
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+#end
+
+#macro (ckeditor $parameters)
+  #importCKEditorResources
+  ##
+  #set ($escapedName = $escapetool.xml($parameters.attributes.name))
+  &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
+  ##
+  #set ($syntaxId = $parameters.attributes.get('data-syntax'))
+  &lt;input value="$!escapetool.xml($syntaxId)" name="$!{escapedName}_syntax" type="hidden"/&gt;
+  ##
+  ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
+  ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
+  ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
+  ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
+  &lt;input value="" name="$!{escapedName}_cache" type="hidden" class="cache"/&gt;
+  ##
+  #set ($discard = $parameters.attributes.putAll({
+    'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
+    'spellcheck': false
+  }))
+  ##
+  #set ($sourceDocumentReference = $parameters.attributes.get('data-sourceDocumentReference'))
+  #if (!$sourceDocumentReference)
+    #set ($sourceDocumentReference = $tdoc.documentReference)
+  #end
+  #set ($source = {
+    'documentReference': $sourceDocumentReference,
+    'syntax': $syntaxId,
+    'content': $parameters.content,
+    'restricted': $parameters.attributes.data-restricted
+  })
+  ##
+  ## Disable the file upload and drag &amp; drop when the current user doesn't have edit right on the source document, if
+  ## the source is restricted. This is the case for instance when an user with comment right adds a comment to a page
+  ## they don't have edit right on. They are allowed to add the comment but they can't upload files because that
+  ## requires edit right. We check if the source is in restricted mode because in some cases (such as for Change Request
+  ## Application) we want to allow file upload even if the current user doesn't have edit right on the source document.
+  #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReference))
+    #set ($parameters.attributes.data-upload-disabled = 'true')
+  #end
+  ##
+  &lt;textarea
+    #foreach ($entry in $parameters.attributes.entrySet())
+      $entry.key="$!escapetool.xml($entry.value)"
+    #end
+  ## We render the content sheet at the end because the edited content can overwrite the variables used by this macro.
+  #set ($content = "#ckeditor_renderContentSheet($source)")
+  &gt;$!escapetool.xml($content)&lt;/textarea&gt;
+#end
+
+#macro (displayCKEditorConfigProperty $configDoc $propName $action)
+  &lt;dt&gt;
+    &lt;label for="CKEditor.ConfigClass_$escapetool.xml($configDoc.getObject("CKEditor.ConfigClass").getNumber())_${propName}"&gt;$configDoc.displayPrettyName($propName)&lt;/label&gt;
+    &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("CKEditor.ConfigClass_${propName}.hint"))&lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc $propName $action)&lt;/dd&gt;
+#end
+
+#macro (displayCKEditorConfigBooleanProperty $configDoc $propName $action)
+  &lt;dt&gt;
+    &lt;label&gt;
+      #displayCKEditorConfigPropertyValue($configDoc $propName $action)
+      $configDoc.displayPrettyName($propName)
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("CKEditor.ConfigClass_${propName}.hint"))&lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;&lt;/dd&gt;
+#end
+
+#macro (displayCKEditorConfigPropertyValue $configDoc $propName $action)
+  #unwrapXPropertyDisplay($configDoc.display($propName, $action))
+#end
+
+#macro (displayCKEditorConfig $configDoc $action)
+  #set ($discard = $xwiki.ssx.use('CKEditor.ConfigSheet'))
+  #set ($discard = $xwiki.jsx.use('CKEditor.ConfigSheet'))
+  #ckeditor_importCSS('org.webjars' 'bootstrap-select' 'css/bootstrap-select.min.css')
+  &lt;dl class="ckeditor-config#if ($configDoc.isNew()) new#end"&gt;
+    #displayCKEditorConfigProperty($configDoc 'removePlugins' $action)
+    #displayCKEditorConfigProperty($configDoc 'removeButtons' $action)
+    #displayCKEditorConfigBooleanProperty($configDoc 'linkShowAdvancedTab' $action)
+    #displayCKEditorConfigBooleanProperty($configDoc 'linkShowTargetTab' $action)
+    #displayCKEditorConfigBooleanProperty($configDoc 'loadJavaScriptSkinExtensions' $action)
+    &lt;dt&gt;
+      &lt;label&gt;$configDoc.displayPrettyName('advanced')&lt;/label&gt;
+      #set ($advancedHint = $escapetool.xml(
+        $services.localization.render('CKEditor.ConfigClass_advanced.hint', ['__linkStart__', '__linkEnd__'])
+        ).replace('__linkStart__', '&lt;a href="http://docs.ckeditor.com/#!/api/CKEDITOR.config"&gt;'
+        ).replace('__linkEnd__', '&lt;/a&gt;'))
+      &lt;span class="xHint"&gt;$advancedHint&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;#displayCKEditorConfigPropertyValue($configDoc 'advanced' $action)&lt;/dd&gt;
+  &lt;/dl&gt;
+#end
+
+#macro (ckeditor_initRequiredSkinExtensions)
+  #set ($requiredSkinExtensions = $collectiontool.orderedMap)
+  #if ("$!requiredSkinExtensions" == '')
+    ## For XWiki versions older than 12.1RC1 fallback on the old $collectionstool (available since 4.0M1).
+    #set ($requiredSkinExtensions = $collectionstool.orderedMap)
+  #end
+  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
+  ## (they are aready available on the edit page so there's no need to load them).
+  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
+    #set ($discard = $requiredSkinExtensions.put($pluginName, $xwiki.get($pluginName).importString))
+  #end
+#end
+
+#macro (ckeditor_getRequiredSkinExtensions)
+  #foreach ($entry in $requiredSkinExtensions.entrySet())
+    #set ($importString = $xwiki.get($entry.key).importString)
+    ## Remove the always used skin extensions, keep only those that have been requested by the macro parameter pickers.
+    $!stringtool.removeStart($importString, $entry.value).trim()##
+  #end
+#end
+
+#macro (ckeditor_defineSortTool $sortToolVariable)
+  #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
+  ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
+  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
+    #setVariable ($sortToolVariable, $collectiontool)
+  ## With the upgrade of Velocity $sorttool has been replaced by $collectionstool (XCOMMONS-1296)
+  #elseif ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.0-SNAPSHOT") &gt;= 0)
+    #setVariable ($sortToolVariable, $collectionstool)
+  ## Old API for sorting was $sorttool
+  #else
+    #setVariable ($sortToolVariable, $sorttool)
+  #end
+#end
+
+#ckeditor_defineSortTool("$resolvedSortTool")
+{{/velocity}}</content>
+</xwikidoc>

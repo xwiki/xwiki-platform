@@ -19,15 +19,12 @@
  */
 package org.xwiki.security.authentication;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * This class aims at holding any exception that might occur during a reset password process.
  *
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public class ResetPasswordException extends Exception
 {
     /**

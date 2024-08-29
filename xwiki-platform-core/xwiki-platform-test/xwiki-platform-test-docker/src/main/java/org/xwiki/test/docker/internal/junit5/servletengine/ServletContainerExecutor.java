@@ -23,12 +23,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -38,6 +41,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
+import org.xwiki.test.docker.internal.junit5.XWikiGenericContainer;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -69,6 +73,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
+    private static final String DOCKER_SOCK = "/var/run/docker.sock";
+
+    private static final String ROOT_USER = "root";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
+
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
@@ -92,6 +102,24 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.testConfiguration = testConfiguration;
         this.jettyStandaloneExecutor = new JettyStandaloneExecutor(testConfiguration, artifactResolver, mavenResolver);
         this.repositoryResolver = repositoryResolver;
+    }
+
+    /**
+     * @return the directory where the exploded XWiki WAR will be created
+     */
+    public File getWARDirectory()
+    {
+        File warDirectory;
+        if (ServletEngine.JETTY_STANDALONE.equals(this.testConfiguration.getServletEngine())) {
+            warDirectory = this.jettyStandaloneExecutor.getWARDirectory();
+        } else {
+            warDirectory =
+                new File(String.format("%s/xwiki", this.testConfiguration.getOutputDirectory())).getAbsoluteFile();
+        }
+        // Note: We compute the absolute file because otherwise there can be ".." elements in the file path and
+        // some containers (such as Jetty) have a protection against directory attacks and would refuse to load
+        // resources located in a path having ".." in it.
+        return warDirectory.getAbsoluteFile();
     }
 
     /**
@@ -131,7 +159,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
             startContainer();
 
-            xwikiIPAddress = this.servletContainer.getContainerIpAddress();
+            xwikiIPAddress = this.servletContainer.getHost();
             xwikiPort =
                 this.servletContainer.getMappedPort(this.testConfiguration.getServletEngine().getInternalPort());
         }
@@ -150,8 +178,20 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private void configureJetty(File sourceWARDirectory) throws Exception
     {
         this.servletContainer = createServletContainer();
-        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-            "/var/lib/jetty/webapps/xwiki");
+        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(), "/var/lib/jetty/webapps/xwiki");
+
+        List<String> javaOpts = new ArrayList<>();
+
+        // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
+        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
+        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
+        // run on Java 17+.
+        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
+        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
+        // ATM).
+        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
+            addJava17AddOpens(javaOpts);
+        }
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -159,25 +199,67 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         //   recursive SQL level 1
         //   ORA-01882: timezone region not found
         if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
-            List<String> commandPartList =
-                new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
-            commandPartList.add(ORACLE_TZ_WORKAROUND);
-            this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
+            javaOpts.add(ORACLE_TZ_WORKAROUND);
         }
+
+        maybeEnableRemoteDebugging(javaOpts);
+        this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
+
+        // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
+        // ambiguous.See https://github.com/jetty/jetty.project/issues/12162#issuecomment-2286747043 for an explanation.
+        // Since XWiki uses them, we need to configure Jetty to allow for it. See also
+        //   https://jetty.org/docs/jetty/10/operations-guide/modules/standard.html#server-compliance
+        // Thus we need to relax the following rules in addition to using RFC3986:
+        //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
+        //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
+        //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
+        // Note: It's important that this command comes before the one below that specifies the module.
+        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance="
+            + "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+
+        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
+        // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
+            this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
+                "--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
+        }
+
+        // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
+        // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
+        // export application).
+        this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
+    }
+
+    private int extractJettyVersionFromDockerTag(String tag)
+    {
+        int result = 12;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 12
+                }
+            }
+        }
+        return result;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
     {
         // Configure Tomcat logging for debugging. Create a logging.properties file
         File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
-        if (!logFile.createNewFile()) {
-            throw new Exception(String.format("Logging configuration file already exists at [%s]. Maybe more than one"
-                + " IT test have executed, leading to several Docker setups?", logFile.getAbsoluteFile()));
-        }
-        try (FileWriter writer = new FileWriter(logFile)) {
-            IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
-                + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
-                + "java.util.logging.ConsoleHandler\n", writer);
+        if (!logFile.exists()) {
+            if (!logFile.createNewFile()) {
+                throw new Exception(String.format("Failed to create Tomcat logging configuration file at [%s]",
+                    logFile.getAbsoluteFile()));
+            }
+            try (FileWriter writer = new FileWriter(logFile)) {
+                IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
+                    + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
+                    + "java.util.logging.ConsoleHandler\n", writer);
+            }
         }
         this.servletContainer = createServletContainer();
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
@@ -189,16 +271,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
         catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
 
-        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
-        // in order to debug.
-        // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
-        // "localhost" as the JVM host to connect to.
-        if (this.testConfiguration.isDebug()) {
-            catalinaOpts.add("-Xdebug");
-            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
-            catalinaOpts.add("-Xnoagent");
-            catalinaOpts.add("-Djava.compiler=NONE");
-        }
+        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // need to add them as we do for Jetty.
+        // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
+
+        maybeEnableRemoteDebugging(catalinaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -212,15 +289,33 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
     }
 
+    private void maybeEnableRemoteDebugging(List<String> options)
+    {
+        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
+        // in order to debug.
+        // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
+        // "localhost" as the JVM host to connect to.
+        if (this.testConfiguration.isDebug()) {
+            options.add("-Xdebug");
+            options.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005");
+            options.add("-Xnoagent");
+            options.add("-Djava.compiler=NONE");
+        }
+    }
+
     private void startContainer() throws Exception
     {
+        List<String> networkAliases = new ArrayList<>();
+        networkAliases.add(this.testConfiguration.getServletEngine().getInternalIP());
+        networkAliases.addAll(this.testConfiguration.getServletEngineNetworkAliases());
+
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.
         this.servletContainer
             .withNetwork(Network.SHARED)
-            .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
+            .withNetworkAliases(networkAliases.toArray(new String[networkAliases.size()]))
             .waitingFor(
-                Wait.forHttp("/xwiki/bin/get/Main/WebHome")
+                Wait.forHttp("/xwiki/rest")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
 
         List<Integer> exposedPorts = new ArrayList<>();
@@ -231,6 +326,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             exposedPorts.add(5005);
         }
         this.servletContainer.withExposedPorts(exposedPorts.toArray(new Integer[exposedPorts.size()]));
+
+        // Some XWiki modules (e.g. PDF export) are using Docker so we need to mount the Docker socket in order for them
+        // to work when the servlet engine runs itself inside a Docker container.
+        this.servletContainer.withFileSystemBind(DOCKER_SOCK, DOCKER_SOCK);
 
         // We want by default to have the local repository mounted, but this won't work in the DOOD use case.
         // For that to work we would need to copy the data instead of mounting the volume but the time
@@ -255,15 +354,28 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             mountFromHostToContainer(this.servletContainer, CLOVER_DATABASE, CLOVER_DATABASE);
         }
 
+        // Also map the permanent directory if asked by the test (to keep it after the test is finished, can be
+        // useful to debug something that only happens on the CI for example).
+        if (this.testConfiguration.isPermanentDirectoryDataSaved()
+            && !this.testConfiguration.getServletEngine().isOutsideDocker())
+        {
+            File permanentDirectoryOnHost = new File(this.testConfiguration.getOutputDirectory(), "permanentDirectory");
+            this.servletContainer.withFileSystemBind(permanentDirectoryOnHost.getAbsolutePath(),
+                this.testConfiguration.getServletEngine().getPermanentDirectory());
+        }
+
         start(this.servletContainer, this.testConfiguration);
     }
 
     private String getDockerImageTag(TestConfiguration testConfiguration)
     {
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
+        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
+        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
+            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
     }
 
-    private GenericContainer createServletContainer() throws Exception
+    private GenericContainer<?> createServletContainer() throws Exception
     {
         String baseImageName = String.format("%s:%s",
             this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
@@ -271,9 +383,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
-            // So we provide a name to the image we will built and we check that the image does not exist yet.
+            // So we compute a name for the image we will build, and we check that the image does not exist yet.
             String imageName = String.format("xwiki-%s-office:%s",
-                this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
+                this.testConfiguration.getServletEngine().name().toLowerCase(),
+                getDockerImageTag(this.testConfiguration));
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
@@ -287,25 +400,31 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
-                container = new XWikiLocalGenericContainer(new ImageFromDockerfile(imageName, false)
+                container = new XWikiLocalGenericContainer<>(new ImageFromDockerfile(imageName, false)
                     .withDockerfileFromBuilder(builder -> {
                         builder
                             .from(baseImageName)
-                            .user("root")
+                            .user(ROOT_USER)
                             .env("LIBREOFFICE_VERSION", officeVersion)
-                            .env("LIBREOFFICE_DOWNLOAD_URL", "https://downloadarchive.documentfoundation.org/"
-                                + "libreoffice/old/$LIBREOFFICE_VERSION/deb/x86_64/"
+                            // Note: we use https://download.documentfoundation.org/libreoffice/stable/ and not
+                            // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
+                            // from automatic LTS updates without any maintenance on our side. This is because the
+                            // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
+                            .env("LIBREOFFICE_DOWNLOAD_URL",
+                                "https://download.documentfoundation.org/libreoffice/stable/"
+                                + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
-                                + "apt-get --no-install-recommends -y install curl unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 && "
+                                + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2 libxslt1-dev && "
                                 + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
                                 + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
                                 + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd /tmp/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb/DEBS && "
+                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
                                 + "dpkg -i *.deb && "
                                 + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
@@ -322,10 +441,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder.build();
                     }));
             } else {
-                container = new XWikiLocalGenericContainer(imageName);
+                container = new XWikiLocalGenericContainer<>(imageName);
             }
         } else {
-            container = new GenericContainer<>(baseImageName);
+            container = new XWikiGenericContainer<>(baseImageName);
         }
 
         return container;
@@ -347,5 +466,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         {
             this.servletContainer.copyFileFromContainer(CLOVER_DATABASE, CLOVER_DATABASE);
         }
+    }
+
+    private void addJava17AddOpens(List<String> list)
+    {
+        list.add("--add-opens=java.base/java.lang=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.io=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util=ALL-UNNAMED");
+        list.add("--add-opens=java.base/java.util.concurrent=ALL-UNNAMED");
     }
 }

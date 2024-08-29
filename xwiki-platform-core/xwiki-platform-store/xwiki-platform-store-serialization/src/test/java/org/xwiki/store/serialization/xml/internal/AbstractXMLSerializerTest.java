@@ -25,17 +25,17 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Element;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests to make sure AbstractXMLSerializer faithfuly parses and serializes content.
  *
- * @param <T> The class of object which the serializer can serialize.
  * @version $Id$
  * @since 3.0M2
  */
-public class AbstractXMLSerializerTest extends AbstractXMLSerializer<Element, Element>
+class AbstractXMLSerializerTest
 {
     private static final String TEST_CONTENT =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -51,26 +51,28 @@ public class AbstractXMLSerializerTest extends AbstractXMLSerializer<Element, El
       + " </doc>\n"
       + "</root>";
 
-    public Element parse(final Element xmlElement)
-    {
-        return xmlElement;
-    }
-
-    public void serialize(final Element object, final XMLWriter writeTo) throws IOException
-    {
-        writeTo.write(object);
-    }
-
     @Test
-    public void testParseSerialize() throws Exception
+    void parseAndSerialize() throws Exception
     {
+        AbstractXMLSerializer<Element, Element> serializer = new AbstractXMLSerializer<Element, Element>()
+        {
+            @Override public Element parse(Element xmlElement)
+            {
+                return xmlElement;
+            }
+
+            @Override public void serialize(Element object, XMLWriter writeTo) throws IOException
+            {
+                writeTo.write(object);
+            }
+        };
         final ByteArrayInputStream bais = new ByteArrayInputStream(TEST_CONTENT.getBytes("US-ASCII"));
-        final Element element = this.parse(bais);
+        final Element element = serializer.parse(bais);
         bais.close();
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(this.serialize(element), baos);
+        IOUtils.copy(serializer.serialize(element), baos);
         final String test = new String(baos.toByteArray(), "US-ASCII");
-        Assert.assertEquals("Parsing and serializing yields a different output.", TEST_CONTENT, test);
+        assertEquals(TEST_CONTENT, test, "Parsing and serializing yields a different output.");
     }
 }

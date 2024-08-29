@@ -1,0 +1,60 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+### Refactoring attachments macros.
+###
+#macro (displaySourceAttachment) 
+<dt>
+  <label>
+    $escapetool.xml($services.localization.render('attachment.move.source.label'))
+  </label>
+  <span class="xHint">
+    $escapetool.xml($services.localization.render('attachment.move.source.hint'))
+  </span>
+</dt>
+<dd>
+  #hierarchy($attachment)
+  <input type="hidden" name="sourceLocation" 
+          value="$!escapetool.xml($services.model.serialize($doc.documentReference, 'default'))" />
+  <input type="hidden" name="sourceAttachmentName" value="$!escapetool.xml($attachment.name)"/>
+</dd>
+#end
+
+#macro (displayAttachmentLinksCheckbox)
+  #set ($hidden = !$isAdvancedUser && !$isSuperAdmin)
+  ## We hide this option for simple users (instead of simply removing it) because we want to submit the default value
+  ## (i.e. we want to make sure the links are updated for simple users).
+<dt#if ($hidden) class="hidden"#end>
+  <label>
+    #set ($checked = !$request.updateReferences || $request.updateReferences == 'true')
+    <input type="checkbox" name="updateReferences" value="true" #if ($checked)checked="checked"#end />
+    $escapetool.xml($services.localization.render('attachment.move.links.label'))
+  </label>
+  ## The value submitted when the checkbox is not checked, used to preserve the form state.
+  <input type="hidden" name="updateReferences" value="false"/>
+</dt>
+<dd#if ($hidden) class="hidden"#end>
+  #set ($backLinksCount = $services.attachment.backlinksCount($attachment))
+  #set ($backLinksURL = '')
+  <span class="xHint">
+  $escapetool.xml($services.localization.render('attachment.move.links.hint', [$backLinksCount]))
+  </span>
+</dd>
+#end

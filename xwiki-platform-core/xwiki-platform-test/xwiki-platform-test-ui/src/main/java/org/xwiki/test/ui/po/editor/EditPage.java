@@ -55,6 +55,9 @@ public class EditPage extends BasePage
     @FindBy(name = "action_cancel")
     protected WebElement cancel;
 
+    @FindBy(id = "doAutosave")
+    protected WebElement autoSaveCheckbox;
+
     @FindBy(id = "editcolumn")
     protected WebElement currentEditorDiv;
 
@@ -222,6 +225,14 @@ public class EditPage extends BasePage
         return save;
     }
 
+    /**
+     * @return the checkbox used to toggle auto-save
+     */
+    public WebElement getAutoSaveCheckbox()
+    {
+        return this.autoSaveCheckbox;
+    }
+
     public ViewPage clickCancel()
     {
         this.cancel.click();
@@ -280,22 +291,6 @@ public class EditPage extends BasePage
         return this.titleField.getAttribute("value");
     }
 
-    /**
-     * @since 7.4M2
-     */
-    @Override
-    public void waitUntilPageJSIsLoaded()
-    {
-        super.waitUntilPageJSIsLoaded();
-
-        // // Actionbuttons javascript for saving the page.
-        getDriver().waitUntilJavascriptCondition(
-            "return XWiki != undefined "
-                + "&& XWiki.actionButtons != undefined "
-                + "&& XWiki.actionButtons.EditActions != undefined "
-                + "&& XWiki.actionButtons.AjaxSaveAndContinue != undefined");
-    }
-
     protected Set<Locale> getExistingLocales(List<WebElement> elements)
     {
         Set<Locale> locales = new HashSet<>(elements.size());
@@ -339,7 +334,7 @@ public class EditPage extends BasePage
     {
         WebElement element;
         if ("default".equals(locale)) {
-            element = getDriver().findElementByLinkText("default");
+            element = getDriver().findElement(By.linkText("default"));
         } else {
             element = getDriver().findElementWithoutWaiting(
                 By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));

@@ -21,7 +21,6 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -31,9 +30,14 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.junit5.RuntimeUtils;
+
+import static org.xwiki.test.docker.junit5.database.Database.MARIADB;
+import static org.xwiki.test.docker.junit5.database.Database.MYSQL;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -50,6 +54,10 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private static final String DBUSERNAME = DBNAME;
 
     private static final String DBPASSWORD = DBUSERNAME;
+
+    private static final String ORACLE_USERNAME = "oracle";
+
+    private static final String ORACLE_PASSWORD = ORACLE_USERNAME;
 
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
@@ -100,12 +108,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MySQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MySQLContainer<>("mysql:latest");
         }
-        startMySQLContainer(databaseContainer, testConfiguration);
+        startMySQLContainer(databaseContainer, testConfiguration, MYSQL);
     }
 
-    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration)
+    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration,
+        Database database)
         throws Exception
     {
         databaseContainer
@@ -121,23 +131,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         commands.setProperty("character-set-server", "utf8mb4");
         commands.setProperty("collation-server", "utf8mb4_bin");
 
-        if (!isMySQL55x(testConfiguration)) {
-            commands.setProperty("explicit-defaults-for-timestamp", "1");
-        }
-        // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
-        // the native password mechanism.
-        if (isMySQL8xPlus(testConfiguration)) {
-            commands.setProperty("default-authentication-plugin", "mysql_native_password");
-        }
         databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
 
         // Allow the XWiki user to create databases (ie create subwikis)
-        grantMySQLPrivileges(databaseContainer);
+        grantMySQLPrivileges(databaseContainer, database);
     }
 
-    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer) throws Exception
+    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer, Database database) throws Exception
     {
         // Retry several times, as we're getting some flickering from time to time with the message:
         //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
@@ -148,7 +150,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             // put the credentials in a file.
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
-            Container.ExecResult result = databaseContainer.execInContainer("mysql",
+            Container.ExecResult result = databaseContainer.execInContainer(getCommandName(database),
                 "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
@@ -173,37 +175,16 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         }
     }
 
-    private boolean isMySQL55x(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.getDatabaseTag() != null && testConfiguration.getDatabaseTag().startsWith("5.5");
-    }
-
-    private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
-    {
-        boolean isMySQL8xPlus;
-        if (testConfiguration.getDatabaseTag() != null) {
-            isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
-                || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
-        } else {
-            isMySQL8xPlus = extractMajor(MySQLContainer.DEFAULT_TAG) >= 8;
-        }
-        return isMySQL8xPlus;
-    }
-
-    private int extractMajor(String version)
-    {
-        return Integer.valueOf(StringUtils.substringBefore(version, "."));
-    }
-
     private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new MariaDBContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new MariaDBContainer<>("mariadb:latest");
         }
-        startMySQLContainer(databaseContainer, testConfiguration);
+        startMySQLContainer(databaseContainer, testConfiguration, MARIADB);
     }
 
     private void startPostgreSQLContainer(TestConfiguration testConfiguration) throws Exception
@@ -216,7 +197,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer =
                 new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new PostgreSQLContainer<>();
+            // No tag specific, use "latest"
+            databaseContainer = new PostgreSQLContainer<>("postgres:latest");
         }
         databaseContainer
             .withDatabaseName(DBNAME)
@@ -248,15 +230,19 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer<?> databaseContainer;
+        String oracleImageFullName;
         if (testConfiguration.getDatabaseTag() != null) {
-            databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
-                testConfiguration.getDatabaseTag()));
+            oracleImageFullName = String.format("xwiki/oracle-database:%s", testConfiguration.getDatabaseTag());
         } else {
-            databaseContainer = new OracleContainer("xwiki/oracle-database");
+            // No tag specific, use "latest"
+            oracleImageFullName = "xwiki/oracle-database:latest";
         }
+        DockerImageName oracleImage = DockerImageName.parse(oracleImageFullName)
+            .asCompatibleSubstituteFor("gvenzl/oracle-xe");
+        databaseContainer = new OracleContainer(oracleImage);
         databaseContainer
-            .withUsername("system")
-            .withPassword("oracle");
+            .withUsername(ORACLE_USERNAME)
+            .withPassword(ORACLE_PASSWORD);
 
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }
@@ -285,5 +271,23 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration.getDatabase().setIP(databaseContainer.getNetworkAliases().get(0));
             testConfiguration.getDatabase().setPort(port);
         }
+    }
+
+    /**
+     * Since mariadb 11.0, the {@code mysql} executable is not available in the mariadb container. Consequently, we need
+     * to use the {@code mariadb} executable instead. This is safe since the {@code mysql} executable previously
+     * available was just a symbolic link to the {@code mariadb} executable.
+     *
+     * @param database the database to use for the selection of the command
+     * @return the name of the command to use to execute the SQL commands ({@code mysql} for mysql, {@code mariadb} for
+     *     mariadb)
+     */
+    private static String getCommandName(Database database)
+    {
+        String command = "mysql";
+        if (database == MARIADB) {
+            command = "mariadb";
+        }
+        return command;
     }
 }

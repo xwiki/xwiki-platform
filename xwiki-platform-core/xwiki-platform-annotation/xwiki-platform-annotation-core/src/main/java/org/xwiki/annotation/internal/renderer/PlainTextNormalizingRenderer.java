@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.annotation.content.ContentAlterer;
+import org.xwiki.annotation.content.TextExtractor;
 import org.xwiki.annotation.renderer.GeneratorEmptyBlockChainingListener;
 import org.xwiki.annotation.renderer.LinkLabelGeneratorChainingListener;
 import org.xwiki.component.annotation.Component;
@@ -68,6 +69,12 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
     @Inject
     private LinkLabelGenerator linkLabelGenerator;
 
+    /**
+     * Helper for extracting the plain text depending on the syntax.
+     */
+    @Inject
+    private TextExtractor textExtractor;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -82,6 +89,6 @@ public class PlainTextNormalizingRenderer extends AbstractChainingPrintRenderer 
         // empty block listener is needed by the label generator
         chain.addListener(new GeneratorEmptyBlockChainingListener(chain));
         chain.addListener(new LinkLabelGeneratorChainingListener(linkLabelGenerator, plainTextParser, chain));
-        chain.addListener(new PlainTextNormalizingChainingRenderer(textCleaner, chain));
+        chain.addListener(new PlainTextNormalizingChainingRenderer(textCleaner, textExtractor, chain));
     }
 }

@@ -1,0 +1,333 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="ru">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Отключенные плагины
+CKEditor.ConfigClass_removePlugins.hint=Список плагинов, которые были отключены.
+CKEditor.ConfigClass_removeButtons=Отключенные функции панели инструментов
+CKEditor.ConfigClass_removeButtons.hint=Список отключенных функций панели инструментов.
+CKEditor.ConfigClass_linkShowAdvancedTab=Ссылка: Отображать вкладку "Дополнительно"
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Позволяет установить атрибуты ссылки, такие как: ID, имя, класс или стиль.
+CKEditor.ConfigClass_linkShowTargetTab=Ссылка: Отображать вкладку "Цель"
+CKEditor.ConfigClass_linkShowTargetTab.hint=Позволяет установить атрибут "Цель" ссылки (например, открыть ссылку в новой вкладке).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Загрузка расширений JavaScript Skin
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Некоторые макросы рендеринга отображаются с использованием кода JavaScript. Загрузка кода JavaScript улучшает вид WYSIWYG редактора, но может вызвать проблемы, если код JavaScript мешает коду CKEditor или если он изменяет содержимое вне границ вывода макроса.
+CKEditor.ConfigClass_advanced=Расширенная настройка
+CKEditor.ConfigClass_advanced.hint=Вы можете написать фрагмент кода на JavaScript для прямого изменения объекта конфигурации. Обратитесь к {0}документации CKEditor {1} для получения списка доступных свойств конфигурации.
+ckeditor.content.placeholder=Начните печатать здесь...
+ckeditor.admin.saveComment=Настройки CKEditor обновлены администрацией
+ckeditor.admin.reset=Сброс настроек
+ckeditor.admin.reset.hint=Восстановление настроек по умолчанию
+ckeditor.admin.reset.confirmation=Вы уверены, что хотите восстановить настройки по умолчанию? Все ваши изменения будут потеряны.
+ckeditor.plugin.link.options=Опции
+ckeditor.plugin.link.anchor=Якорь
+ckeditor.plugin.link.queryString=Строка запроса
+ckeditor.plugin.link.defaultLabel=введите текст ссылки
+ckeditor.plugin.link.openInNewTab=Открыть ссылку в новой вкладке
+ckeditor.plugin.link.upload=Загрузить вложение
+ckeditor.plugin.link.uploadHint=Ссылка на новое загруженное вложение.
+ckeditor.plugin.link.uploadProgress=Загружается {0}...
+ckeditor.plugin.link.uploadSuccess={0} загружено
+ckeditor.plugin.link.uploadError=Не удалось загрузить {0}
+ckeditor.plugin.list.listType.none=Отсутствует
+ckeditor.plugin.macro.placeholder=макрос:{0}
+ckeditor.plugin.macro.buttonHint=XWiki макрос
+ckeditor.plugin.macro.editButtonHint=Редактировать макрос
+ckeditor.plugin.macro.refreshFailed=Не удалось обновить отредактированный контент.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Вставить {0} макрос
+ckeditor.plugin.macro.installPending=Устанавливаем {0} {1}...
+ckeditor.plugin.macro.installSuccessful=Успешно установлено {0} {1}.
+ckeditor.plugin.macro.installFailed=Не удалось установить {0} {1}.
+ckeditor.plugin.office.importer.title=Импортировать файл Office
+ckeditor.plugin.office.importer.filePath=Путь к файлу
+ckeditor.plugin.office.importer.filePath.hint=Выберите файл для импорта. Файл будет загружен и прикреплен к этой странице, а его содержимое будет вставлено в содержимое страницы.
+ckeditor.plugin.office.importer.filterStyles=Фильтр Стилей
+ckeditor.plugin.office.importer.filterStyles.hint=Фильтруйте стили текста, такие как шрифт, цвет, выравнивание, поля. Структура содержимого, включая уровни заголовков, абзацы, списки и таблицы, сохраняется.
+ckeditor.plugin.office.importer.useOfficeViewer=Использовать Office Viewer
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Выберите эту опцию, если вы не планируете редактировать содержимое файла office после импорта или если вы не хотите смешивать содержимое файла Office с содержимым, которое вы в данный момент редактируете.
+ckeditor.plugin.office.importer.required=Обязательно
+ckeditor.plugin.office.importer.import=Импорт
+ckeditor.plugin.office.importer.inProgress=Импорт файла Office ...
+ckeditor.plugin.office.importer.done=Файл Office успешно импортирован.
+ckeditor.plugin.office.importer.fail=Не удалось импортировать файл Office.
+ckeditor.plugin.office.importer.noUploadURL=URL загрузки файла не настроен.
+ckeditor.plugin.office.importer.failedToLoadForm=Не удалось загрузить форму.
+ckeditor.plugin.resource.notSpecified=Не указан {0}.
+ckeditor.plugin.save.leaveConfirmationMessage=Есть несохраненные изменения. Вы хотите отменить их?
+ckeditor.plugin.save.failed=Содержимое не может быть сохранено из-за внутренней ошибки CKEditor. Вы должны попытаться скопировать ваши важные изменения и перезагрузить редактор.
+ckeditor.plugin.source.conversionFailed=Не удалось выполнить преобразование.
+ckeditor.plugin.toolbar.basicStyles=Основные стили
+ckeditor.plugin.toolbar.lists=Списки
+ckeditor.plugin.toolbar.bulletedlist=Маркированный список
+ckeditor.plugin.toolbar.numberedlist=Нумерованный список
+ckeditor.plugin.toolbar.insert=Вставить
+ckeditor.plugin.toolbar.horizontalrule=Разделитель
+ckeditor.plugin.toolbar.specialchar=Cпециальные символы
+ckeditor.plugin.toolbar.infoBox=Информация
+ckeditor.plugin.toolbar.successBox=Успешное завершение
+ckeditor.plugin.toolbar.warningBox=Предупреждение
+ckeditor.plugin.toolbar.errorBox=Ошибка
+ckeditor.plugin.toolbar.toc=Оглавление
+ckeditor.plugin.toolbar.include=Вложенная страница
+ckeditor.plugin.toolbar.code=Фрагмент кода
+ckeditor.plugin.toolbar.otherMacros=Другие макросы
+ckeditor.plugin.syntax.update.inProgress=Обновление редактора WYSIWYG
+ckeditor.plugin.syntax.update.done=WYSIWYG редактор обновлен
+ckeditor.plugin.syntax.update.failed=Не удалось обновить редактор WYSIWYG
+ckeditor.plugin.syntax.wysiwygModeUnsupported=Режим редактирования WYSIWYG не поддерживается синтаксисом {0}.
+ckeditor.plugin.icon.iconsFetchFailed=Не удалось получить список иконок.
+ckeditor.plugin.icon.iconThemesFetchFailed=Не удалось получить доступные темы иконок.
+ckeditor.plugin.image.imageEditor.standardTab.title=Основное
+ckeditor.plugin.image.imageEditor.advancedTab.title=Дополнительное
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Стиль изображения
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Выберите стиль, который нужно применить к изображению.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Альтернативный текст
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Определяет альтернативный текст для изображения, показываемый если изображение не может быть отображено.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Подпись
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Активирует подпись под изображением.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Активирует подпись под изображением.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Размер
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Ширина
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Высота
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Определяет размер изображения.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Рамка
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Когда галочка установлена, изображение отображается с рамкой
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Выравнивание
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Определите выравнивание изображения.
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=Нет
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Начало
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=Центр
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Окончание
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Обтекание текстом
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Если галочка установлена, окружающий текст обтекает изображение.
+ckeditor.plugin.image.imageSelector.treeTab.title=Дерево
+ckeditor.plugin.image.imageSelector.uploadTab.title=Загрузка
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Выберите локальный файл для добавления на страницу.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Загрузить
+ckeditor.plugin.image.imageSelector.iconTab.title=Иконка
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Иконка
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=Идентификатор иконки для отображения в качестве изображения.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=принять
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=URL-адрес изображения для отображения.
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.plugin.image.slash.currentPageBadge=Эта страница
+ckeditor.plugin.image.slash.externalBadge=Внешняя
+ckeditor.plugin.image.slash.loading=Загрузка...
+ckeditor.plugin.image.slash.upload=Загрузить изображение
+ckeditor.plugin.image.slash.uploadProgress=Загрузка {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Успешно загружено {0}
+ckeditor.plugin.image.slash.uploadError=Не удалось загрузить {0}
+ckeditor.plugin.slash.group.Layout=Макет
+ckeditor.plugin.slash.group.Content=Содержимое
+ckeditor.plugin.slash.group.Formatting=Форматирование
+ckeditor.plugin.slash.group.Navigation=Навигация
+ckeditor.plugin.slash.group.Actions=Действия
+ckeditor.plugin.slash.group.Table=Таблица
+ckeditor.plugin.slash.group.Macro=Макрос
+ckeditor.plugin.slash.action.h1.hint=Заголовок первого уровня.
+ckeditor.plugin.slash.action.h2.hint=Заголовок второго уровня.
+ckeditor.plugin.slash.action.h3.hint=Заголовок третьего уровня.
+ckeditor.plugin.slash.action.h4.hint=Заголовок четвертого уровня.
+ckeditor.plugin.slash.action.h5.hint=Заголовок пятого уровня.
+ckeditor.plugin.slash.action.h6.hint=Заголовок шестого уровня.
+ckeditor.plugin.slash.action.p.name=Абзац
+ckeditor.plugin.slash.action.p.hint=Создаёт абзац обычного текста.
+ckeditor.plugin.slash.action.ul.hint=Создаёт простой маркированный список.
+ckeditor.plugin.slash.action.ol.hint=Создаёт список с нумерацией.
+ckeditor.plugin.slash.action.table.hint=Добавляет на страницу простую таблицу.
+ckeditor.plugin.slash.action.blockquote.name=Цитата
+ckeditor.plugin.slash.action.blockquote.hint=Выделяет цитату.
+ckeditor.plugin.slash.action.info.hint=Подчеркнет важную мысль.
+ckeditor.plugin.slash.action.info.defaultContent=Введите здесь информационное сообщение.
+ckeditor.plugin.slash.action.success.hint=Сообщит об успехе.
+ckeditor.plugin.slash.action.success.defaultContent=Введите здесь сообщение об успехе.
+ckeditor.plugin.slash.action.warning.hint=Напечатает предупреждающее сообщение.
+ckeditor.plugin.slash.action.warning.defaultContent=Введите здесь предупреждение.
+ckeditor.plugin.slash.action.error.hint=Сообщит об ошибке.
+ckeditor.plugin.slash.action.error.defaultContent=Введите здесь сообщение об ошибке.
+ckeditor.plugin.slash.action.hr.hint=Обозначит тематический перерыв между блоками содержимого: например, смену места действия в рассказе или смену темы в разделе.
+ckeditor.plugin.slash.action.a.hint=Создаёт ссылку на другую страницу.
+ckeditor.plugin.slash.action.img.hint=Вставляет или загружает изображение.
+ckeditor.plugin.slash.action.icon.name=Иконка
+ckeditor.plugin.slash.action.icon.hint=Вставляет иконку.
+ckeditor.plugin.slash.action.mention.name=Упоминание
+ckeditor.plugin.slash.action.mention.hint=Упомянуть кого-либо, чтобы отправить ему уведомление.
+ckeditor.plugin.slash.action.emoji.name=Эмодзи
+ckeditor.plugin.slash.action.emoji.hint=Подберёте эмодзи для вставки.
+ckeditor.plugin.slash.action.code.hint=Вставит фрагмент программного кода.
+ckeditor.plugin.slash.action.toc.hint=Составит список разделов содержания.
+ckeditor.plugin.slash.action.include.hint=Вставляет содержимое другой страницы.
+ckeditor.plugin.slash.action.macros.name=Обзор макросов
+ckeditor.plugin.slash.action.macros.hint=Найдите нужный макрос.
+ckeditor.plugin.slash.action.find.hint=Замена нескольких вхождений заданного текста.
+ckeditor.plugin.slash.action.table_row_before.hint=Вставляет новую строку таблицы перед текущей.
+ckeditor.plugin.slash.action.table_row_after.hint=Вставляет новую строку таблицы после текущей.
+ckeditor.plugin.slash.action.table_row_delete.name=Удаление строки
+ckeditor.plugin.slash.action.table_row_delete.hint=Удаляет текущую строку таблицы.
+ckeditor.plugin.slash.action.table_col_before.hint=Вставляет новый столбец таблицы перед текущим.
+ckeditor.plugin.slash.action.table_col_after.hint=Вставляет новый столбец таблицы после текущего.
+ckeditor.plugin.slash.action.table_col_delete.name=Удаление столбца
+ckeditor.plugin.slash.action.table_col_delete.hint=Удаляет текущий столбец таблицы.
+ckeditor.plugin.slash.action.table_cell_split_horizontal.hint=Разделит текущую ячейку таблицы по горизонтали.
+ckeditor.plugin.slash.action.table_cell_split_vertical.hint=Разделит текущую ячейку таблицы по вертикали.
+ckeditor.plugin.slash.action.table_cell_merge_right.name=Объединение ячеек справа
+ckeditor.plugin.slash.action.table_cell_merge_right.hint=Объединяет текущую ячейку таблицы со следующей.
+ckeditor.plugin.slash.action.table_cell_merge_down.name=Объединение ячеек вниз
+ckeditor.plugin.slash.action.table_cell_merge_down.hint=Объединяет текущую ячейку таблицы с ячейкой ниже.
+ckeditor.plugin.slash.action.table_cell_before.hint=Вставляет новую ячейку таблицы перед текущей.
+ckeditor.plugin.slash.action.table_cell_after.hint=Вставляет новую ячейку таблицы после текущей.
+ckeditor.plugin.slash.action.table_cell_delete.name=Удаление ячейки
+ckeditor.plugin.slash.action.table_cell_delete.hint=Удаляет текущую ячейку таблицы.
+ckeditor.plugin.slash.action.table_delete.hint=Удаляет текущую таблицу.
+ckeditor.plugin.slash.placeholder=Введите / для быстрых действий...
+ckeditor.plugin.slash.dropdown.hint=Выберите элемент для автозаполнения.
+ckeditor.plugin.focusedplaceholder.placeholder.body=Тело документа
+ckeditor.plugin.focusedplaceholder.placeholder.address=Адрес
+ckeditor.plugin.focusedplaceholder.placeholder.aside=Сторона
+ckeditor.plugin.focusedplaceholder.placeholder.footer=Подвал
+ckeditor.plugin.focusedplaceholder.placeholder.header=Шапка
+ckeditor.plugin.focusedplaceholder.placeholder.h1=Заголовок 1
+ckeditor.plugin.focusedplaceholder.placeholder.h2=Заголовок 2
+ckeditor.plugin.focusedplaceholder.placeholder.h3=Заголовок 3
+ckeditor.plugin.focusedplaceholder.placeholder.h4=Заголовок 4
+ckeditor.plugin.focusedplaceholder.placeholder.h5=Заголовок 5
+ckeditor.plugin.focusedplaceholder.placeholder.h6=Заголовок 6
+ckeditor.plugin.focusedplaceholder.placeholder.main=Основное содержимое
+ckeditor.plugin.focusedplaceholder.placeholder.nav=Навигация
+ckeditor.plugin.focusedplaceholder.placeholder.section=Раздел
+ckeditor.plugin.focusedplaceholder.placeholder.blockquote=Цитата
+ckeditor.plugin.focusedplaceholder.placeholder.dl=Перечень определений
+ckeditor.plugin.focusedplaceholder.placeholder.dt=Запись определения
+ckeditor.plugin.focusedplaceholder.placeholder.dd=Описание
+ckeditor.plugin.focusedplaceholder.placeholder.figcaption=Подпись
+ckeditor.plugin.focusedplaceholder.placeholder.figure=Рисунок
+ckeditor.plugin.focusedplaceholder.placeholder.ol=Упорядоченный список
+ckeditor.plugin.focusedplaceholder.placeholder.ul=Неупорядоченный список
+ckeditor.plugin.focusedplaceholder.placeholder.menu=Меню (неупорядоченный список)
+ckeditor.plugin.focusedplaceholder.placeholder.li=Элемент списка
+ckeditor.plugin.focusedplaceholder.placeholder.p=Абзац
+ckeditor.plugin.focusedplaceholder.placeholder.pre=Преформатированный текст
+ckeditor.plugin.focusedplaceholder.placeholder.caption=Название
+ckeditor.plugin.focusedplaceholder.placeholder.th=Шапка
+ckeditor.plugin.focusedplaceholder.placeholder.td=Ячейка
+ckeditor.plugin.realtime.notification.sourcearea.temporarilyLeftSession=Временный выход из сеанса реального времени.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=Никаких изменений не было. Повторное присоединение к сеансу реального времени.
+ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=Есть несохраненные изменения, но в сеансе реального времени больше никого нет. Повторное присоединение.
+ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Не удалось возобновить сеанс реального времени из-за несохраненных изменений.
+ckeditor.inline.failedToInit=Не удалось инициализировать CKEditor.
+ckeditor.upload.error.csrf=Токен CSRF отсутствует.
+ckeditor.upload.error.emptyReturn=Ошибка при загрузке файла: он может превышать настроенный максимальный размер загрузки.
+modal.ok=ОК
+modal.cancel=Отмена
+modal.close=Закрыть
+resource.attach.label=Вложение
+resource.attach.placeholder=Путь.К.Странице@вложение.png
+resource.data.label=URI данных
+resource.doc.label=Страница
+resource.doc.placeholder=Путь.К.Странице
+resource.icon.label=Иконка
+resource.mailto.label=E-Mail адрес
+resource.mailto.placeholder=user@example.org
+resource.path.label=Путь
+resource.path.placeholder=/путь/к/файлу
+resource.unc.label=UNC путь
+resource.unc.placeholder=//имя_сервера/общая_папка/путь/к/файлу
+resource.unknown.label=Неизвестно
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=Пользователь
+resource.user.placeholder=алиас
+resourcePicker.attach.hint=Выберите вложение
+resourcePicker.doc.hint=Выберите страницу
+entityResourceSuggester.doc.placeholder=Найти страницу ...
+entityResourceSuggester.attach.placeholder=Найти вложение ...
+entityResourcePicker.select=Выбрать
+entityResourcePicker.doc.title=Выбрать страницу
+entityResourcePicker.attach.title=Выбрать вложение
+macroSelector.title=Выбрать макрос
+macroSelector.filter.text.placeholder=Введите для отбора
+macroSelector.filter.category.all=Все макросы
+macroSelector.filter.category.other=Прочее
+macroSelector.filter.category.notinstalled=Не установлен
+macroSelector.failedToRetrieveMacros=Не удалось получить список доступных макросов.
+macroSelector.select=Выбрать
+macroSelector.recommended=Рекомендовано
+macroSelector.install=Установить
+macroSelector.install.confirm=Вы собираетесь установить расширение {0} {1}. Вы уверены что хотите продолжить?
+macroSelector.install.notAllowed=Вам не разрешено устанавливать это расширение
+macroSelector.filter.category.placeholder=Выберите категорию...
+macroEditor.title=Редактировать макрос
+macroEditor.more=Еще...
+macroEditor.changeMacro=Изменить макрос
+macroEditor.submit=Подтвердить
+macroEditor.content=Контент
+macroEditor.noParameters=Этот макрос не имеет параметров.
+macroEditor.descriptorRequestFailed=Не удалось получить {0} дескриптор макроса.
+macroEditor.installRequestFailed=Не удалось установить макрос {0}.
+
+
+imageEditor.modal.changeImage.button=Заменить изображение
+
+
+imageEditor.modal.loadFail.message=Не удалось получить диалог настройки изображения.
+imageEditor.modal.title=Настройка изображения
+imageEditor.modal.insertButton=Вставить
+imageEditor.modal.updateButton=Обновить
+imageEditor.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+imageEditor.modal.outscaleWarning=Один из размеров больше исходного изображения ({0}). Результатом может быть снижение качества отображаемого изображения.
+imageSelector.modal.title=Выбор изображения
+imageSelector.modal.selectButton=Выбрать
+imageSelector.modal.loadFail.message=Не удалось получить диалог выбора изображения.
+imageSelector.modal.fileUpload.success=Загрузка файла прошла успешно.
+imageSelector.modal.fileUpload.fail=Загрузка файла не удалась.
+imageSelector.modal.fileUpload.abort=Загрузка файла прервана.
+imageSelector.modal.initialization.fail=Не удалось получить диалог выбора изображения.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+imageEditor.modal.backToEditor.button=Назад
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документов
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

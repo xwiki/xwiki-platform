@@ -19,17 +19,23 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.SeleniumUtils;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.BrowserTestUtils;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
-
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 
 /**
  * Create and execute the browser docker container for driving the tests.
@@ -73,17 +79,41 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         Browser browser = testConfiguration.getBrowser();
 
         // Create a single BrowserWebDriverContainer instance and reuse it for all the tests in the test class.
-        BrowserWebDriverContainer<?> webDriverContainer = new XWikiBrowserWebDriverContainer<>()
+        // Note: The official Selenium dockerhub images don't support ARM64 (they won't work on Mac M1 for example).
+        // Thus we swap them for seleniarm docker images when we notice that the architecture is ARM64.
+        // See https://github.com/SeleniumHQ/docker-selenium#experimental-mult-arch-aarch64armhfamd64-images
+        // TODO: Remove if/when https://github.com/testcontainers/testcontainers-java/issues/5183 is fixed
+        BrowserWebDriverContainer<?> webDriverContainer =
+            new XWikiBrowserWebDriverContainer<>(BrowserTestUtils.getSeleniumDockerImageName(this.testConfiguration))
             // We set the width and height to one of the most used resolution by users so that we can reproduce issues
             // for the larger use case and also we use a relatively large resolution to display the maximum number of
             // elements on screen and reduce the risk of false positives in tests that could be due to elements not
             // visible or missing elements (on small screens we don't display all elements).
             .withEnv("SCREEN_WIDTH", DEFAULT_WIDTH_RESOLUTION)
             .withEnv("SCREEN_HEIGHT", DEFAULT_HEIGHT_RESOLUTION)
+            // TODO: The default session timeout is 300 seconds (i.e. 5mn). We think this is what could cause the
+            // "Unable to find session with ID" error message we see sometimes on the CI. We think that it's possible
+            // that a session timeout of 300s means that the whole test suite of a docker test module must take less
+            // than 5mn or we can get the error. Thus, as a test, we increase the value to 10 times the default value.
+            // If there are still errors happening after this change then it'll mean the problem is elsewhere and we'll
+            // revert this change.
+            .withEnv("SE_NODE_SESSION_TIMEOUT", String.valueOf(10 * 300L))
             .withCapabilities(browser.getCapabilities())
             .withNetwork(Network.SHARED)
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
+
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            // The servlet engine is running on the host so we need to map the servlet engine aliases to the host in
+            // order for the browser to be able to access XWiki using the configured aliases.
+            String host = DockerTestUtils.isInAContainer() ? getXWikiBuildContainerIPAddress() : "host-gateway";
+            if (this.testConfiguration.isVerbose()) {
+                LOGGER.info("Mapping servlet engine network aliases [{}] to [{}].",
+                    testConfiguration.getServletEngineNetworkAliases(), host);
+            }
+            testConfiguration.getServletEngineNetworkAliases()
+                .forEach(alias -> webDriverContainer.withExtraHost(alias, host));
+        }
 
         // In case some test-resources are provided, they need to be available from the browser
         // for example in order to upload some files on the wiki.
@@ -92,9 +122,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("Test resource path mapped: On Host [{}], in Docker: [{}]",
                 getTestResourcePathOnHost(), browser.getTestResourcesPath());
-            LOGGER.info("Docker image used: [{}]", BrowserWebDriverContainer.getDockerImageForCapabilities(
-                this.testConfiguration.getBrowser().getCapabilities(),
-                SeleniumUtils.determineClasspathSeleniumVersion()));
+            LOGGER.info("Docker image used: [{}]", webDriverContainer.getDockerImageName());
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
@@ -105,6 +133,31 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         }
 
         return webDriverContainer;
+    }
+
+    /**
+     * @return the IP address of the Docker container running the XWiki build
+     */
+    private String getXWikiBuildContainerIPAddress()
+    {
+        // This gives the local address that would be used to connect to the specified remote host. There is no real
+        // connection established, hence the specified remote IP can be unreachable.
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            String ipAddress = socket.getLocalAddress().getHostAddress();
+            if (this.testConfiguration.isVerbose()) {
+                LOGGER.info("The IP address of the XWiki build container is [{}].", ipAddress);
+            }
+            return ipAddress;
+        } catch (IOException e) {
+            // We assume the build container runs directly on the Docker host and uses the default bridge network.
+            String defaultIPAddress = "172.17.0.2";
+            LOGGER.warn(
+                "Failed to determine the IP address of the XWiki build container. Root cause: [{}]. "
+                    + "Falling back to the default IP address [{}].",
+                ExceptionUtils.getRootCauseMessage(e), defaultIPAddress);
+            return defaultIPAddress;
+        }
     }
 
     /**

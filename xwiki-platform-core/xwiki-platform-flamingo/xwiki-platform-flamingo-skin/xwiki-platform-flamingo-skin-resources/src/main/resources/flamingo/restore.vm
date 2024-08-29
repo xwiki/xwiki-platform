@@ -1,3 +1,7 @@
+##!source.syntax=xwiki/2.1
+{{template name='refactoringStatus_macros.vm' output='false' /}}
+
+{{velocity}}
 ## ---------------------------------------------------------------------------
 ## See the NOTICE file distributed with this work for additional
 ## information regarding copyright ownership.
@@ -32,23 +36,27 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+{{html clean="false"}}
 #if ($xcontext.action == 'get' && "$!request.jobId" != '')
   #handleStatusRequest()
 #else
   #template("startpage.vm")
   <div class="main">
-    <div id="mainContentArea">
-      #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
-      #set($titleToDisplay = $services.localization.render('core.restore.title', [$title]))
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea">
+      #define($titleLink)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+      #set($titleToDisplay = $services.localization.render('core.restore.title', [$titleLink]))
       <div class="xcontent">
         #template('contentheader.vm')
         #controller()
         <div class="clearfloats"></div>
       </div> ## xcontent
-    </div>## mainContentArea
+    </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end
+{{/html}}
+
 #######################################################
 ##                    CONTROLLER
 #######################################################
@@ -96,11 +104,9 @@
 #macro (outputJobStatusJSON $jobStatus)
   #getJobStatusJSON($jobStatus $json)
   #set ($json.message = "#displayJobFinishedMessage($jobStatus)")
-  $response.setContentType('application/json')
-  $jsontool.serialize($json)
+  #jsonResponse($json)
 #end
 #macro (displayJobFinishedMessage $jobStatus)
-  #template('refactoringStatus_macros.vm')
   #displayRefactoringJobFinishedMessage($jobStatus 'core.restore.status.success' 'core.restore.status.failure')
 #end
 #######################################################
@@ -110,7 +116,10 @@
   <div class="panel $!panelClass">
     <div class="panel-heading">
       $heading
-      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId">
+        <span class="caret"></span>
+        <span class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</span>
+      </a></div>
     </div>
     <div class="panel-body collapse" id="$panelId">
       $body
@@ -126,7 +135,7 @@
   ## Only propose to restore the batch if it also contains other documents than the current one.
   #if ($batchDeletedDocuments.size() > 1)
     #define($heading)
-      <input name="includeBatch" id="includeBatch" type="checkbox" value="true"/><label for="includeBatch">$services.localization.render('core.restore.includeBatch')</label> ($batchDeletedDocuments.size())
+      <input name="includeBatch" id="includeBatch" type="checkbox" value="true"/><label for="includeBatch">$escapetool.xml($services.localization.render('core.restore.includeBatch')) ($batchDeletedDocuments.size())</label>
     #end
     #define($body)
       ##
@@ -144,22 +153,49 @@
         </div>
       </div>
       ##
-      ## List the deleted documents in the batch using a livetable.
+      ## List the deleted documents in the batch using a live data.
       ##
-      #set ($collist = ['doc.name', 'doc.location', '_actions'])
-      #set ($colprops = {
-        'doc.name'     : { 'link' : 'view', 'filterable': false, 'sortable' : 'false' },
-        'doc.location' : { 'type' : 'text', 'link' : false, 'filterable': true, 'html': true},
-        '_actions'     : { 'actions' : ['restore', 'delete'] }
+      #set ($sourceParameters = $escapetool.url({
+        'template': 'getdeleteddocuments.vm',
+        'doc.batchId': $deletedDocument.batchId,
+        'translationPrefix' : 'core.restore.batch.'
+      }))
+      #set ($liveDataConfig = {
+        'meta': {
+          'propertyDescriptors': [
+            {
+              'id': '_actions',
+              'displayer': {
+                'id': 'actions',
+                'actions': ['restore', 'delete']
+              }
+            },
+            {
+              'id': 'doc.name',
+              'filterable': false,
+              'sortable': false
+            }
+          ],
+          'actions': [
+            {
+              'id': 'restore',
+              'icon': 'refresh',
+              'allowProperty': 'doc.hasrestore',
+              'urlProperty': 'doc.restore_url'
+            }
+          ]
+        }
       })
-      #set ($urlParameters = "xpage=getdeleteddocuments&doc.batchId=$!{escapetool.url($deletedDocument.batchId)}")
-      #set ($options = { 
-        'url' : "$doc.getURL('get', $urlParameters)",
-        'translationPrefix' : 'core.restore.batch.',
-        'outputOnlyHtml' : true,
-        'selectedColumn' : 'doc.location'
-      })
-      #livetable('deletedBatch' $collist $colprops $options)
+      {{/html}}
+
+      {{liveData
+        id='deletedBatch'
+        source='liveTable'
+        sourceParameters="$sourceParameters"
+        properties='doc.name,doc.location,_actions'
+        sort='doc.location'}}$jsontool.serialize($liveDataConfig){{/liveData}}
+
+      {{html clean="false"}}
     #end
     #displayPanel('panel-batch', 'panel-default', $heading, $body)
   #end
@@ -178,9 +214,10 @@
   </div>
   <button class="btn btn-primary">$services.localization.render('core.restore.confirm.yes')</button>
   #if("$!{request.xredirect}" != '')
-    #set($cancelUrl = "$request.xredirect")
+    #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelUrl)
   #else
-    #set($cancelUrl = $doc.getURL())
+    #set($cancelUrl = $escapetool.xml($doc.getURL()))
   #end
-  <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('core.restore.confirm.no')</a>
+  <a class="btn btn-default" href="$cancelUrl">$services.localization.render('core.restore.confirm.no')</a>
 #end
+{{/velocity}}

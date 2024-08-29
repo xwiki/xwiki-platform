@@ -103,7 +103,7 @@ public class DefaultHTMLConverterTest
         assertEquals("", this.converter.fromHTML(html, syntaxId));
 
         // Verify the HTML is converted to the specified syntax.
-        StreamParser xhtmlStreamParser = this.componentManager.getInstance(StreamParser.class, "xhtml/1.0");
+        StreamParser xhtmlStreamParser = this.componentManager.getInstance(StreamParser.class, "xhtml/5");
         verify(xhtmlStreamParser).parse(any(StringReader.class), same(printRenderer));
     }
 
@@ -136,7 +136,7 @@ public class DefaultHTMLConverterTest
         assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
-        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
+        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedhtml/5.0");
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
     }
 
@@ -155,7 +155,7 @@ public class DefaultHTMLConverterTest
 
         // Verify the HTML is parsed into XDOM.
         XDOM xdom = new XDOM(Collections.emptyList());
-        Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "xhtml/1.0");
+        Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "xhtml/5");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 
         assertEquals("", this.converter.parseAndRender(html, syntaxId));
@@ -173,7 +173,7 @@ public class DefaultHTMLConverterTest
         assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
-        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
+        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedhtml/5.0");
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
 
         // Verify that the syntax meta data has been set.

@@ -26,17 +26,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.securityfilter.authenticator.FormAuthenticator;
+import org.securityfilter.authenticator.persistent.PersistentLoginManagerInterface;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SimplePrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -79,6 +82,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      */
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+
+    private Provider<PersistentLoginManagerInterface> persistentLoginManagerProvider =
+        Utils.getComponent(new DefaultParameterizedType(null, Provider.class, PersistentLoginManagerInterface.class));
 
     /**
      * Each wiki has its own authenticator.
@@ -153,51 +159,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                         context.getURLFactory().createURL("XWiki", "XWikiLogin", "loginerror", context), context));
                 }
 
-                MyPersistentLoginManager persistent = new MyPersistentLoginManager();
-                if (xwiki.Param("xwiki.authentication.cookieprefix") != null) {
-                    persistent.setCookiePrefix(xwiki.Param("xwiki.authentication.cookieprefix"));
-                }
-                if (xwiki.Param("xwiki.authentication.cookiepath") != null) {
-                    persistent.setCookiePath(xwiki.Param("xwiki.authentication.cookiepath"));
-                }
-                if (xwiki.Param("xwiki.authentication.cookiedomains") != null) {
-                    String[] cdomains = StringUtils.split(xwiki.Param("xwiki.authentication.cookiedomains"), ",");
-                    persistent.setCookieDomains(cdomains);
-                }
-
-                if (xwiki.Param("xwiki.authentication.cookielife") != null) {
-                    persistent.setCookieLife(xwiki.Param("xwiki.authentication.cookielife"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.protection") != null) {
-                    persistent.setProtection(xwiki.Param("xwiki.authentication.protection"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.useip") != null) {
-                    persistent.setUseIP(xwiki.Param("xwiki.authentication.useip"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionalgorithm") != null) {
-                    persistent.setEncryptionAlgorithm(xwiki.Param("xwiki.authentication.encryptionalgorithm"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionmode") != null) {
-                    persistent.setEncryptionMode(xwiki.Param("xwiki.authentication.encryptionmode"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionpadding") != null) {
-                    persistent.setEncryptionPadding(xwiki.Param("xwiki.authentication.encryptionpadding"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.validationKey") != null) {
-                    persistent.setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionKey") != null) {
-                    persistent.setEncryptionKey(xwiki.Param("xwiki.authentication.encryptionKey"));
-                }
-
-                sconfig.setPersistentLoginManager(persistent);
+                sconfig.setPersistentLoginManager(this.persistentLoginManagerProvider.get());
 
                 MyFilterConfig fconfig = new MyFilterConfig();
                 fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY,
@@ -565,7 +527,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * The authentication library we are using (SecurityFilter) requires that its URLs do not contain the context path,
-     * in order to be usable with <tt>RequestDispatcher.forward</tt>. Since our URL factory include the context path in
+     * in order to be usable with {@code RequestDispatcher.forward}. Since our URL factory include the context path in
      * the generated URLs, we use this method to remove (if needed) the context path.
      *
      * @param url The URL to process.

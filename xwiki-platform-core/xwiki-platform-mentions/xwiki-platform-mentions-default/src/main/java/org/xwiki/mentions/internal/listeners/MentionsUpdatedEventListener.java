@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.index.TaskManager;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -36,9 +36,10 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Collections.singletonList;
+import static org.xwiki.mentions.MentionsConfiguration.MENTION_TASK_ID;
 
 /**
- * Listen to entities update. 
+ * Listen to entities update.
  *
  * @version $Id$
  * @since 12.5RC1
@@ -54,7 +55,7 @@ public class MentionsUpdatedEventListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private MentionsEventExecutor executor;
+    private TaskManager taskManager;
 
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
@@ -78,6 +79,7 @@ public class MentionsUpdatedEventListener extends AbstractEventListener
             DocumentUpdatedEvent.class.getName(), source, data);
 
         XWikiDocument doc = (XWikiDocument) source;
-        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
+        this.taskManager.addTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(), doc.getVersion(),
+            MENTION_TASK_ID);
     }
 }

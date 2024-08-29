@@ -6,3 +6,5 @@ org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer
 org.xwiki.annotation.internal.content.filter.WhiteSpaceFilter
 org.xwiki.annotation.internal.renderer.AnnotationXHTMLRenderer
 org.xwiki.annotation.internal.renderer.PlainTextNormalizingRenderer
+org.xwiki.annotation.internal.content.DefaultTextExtractor
+org.xwiki.annotation.internal.content.HTMLTextExtractor

@@ -23,12 +23,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.internal.Utils;
+import javax.inject.Inject;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rest.XWikiResource;
+
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -37,41 +40,46 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public class BaseObjectsResource extends XWikiResource
 {
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
-        com.xpn.xwiki.web.Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    @Inject
+    private DocumentRevisionProvider documentRevisionProvider;
 
     protected BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
     {
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                Utils.getXWikiContext(componentManager));
+        XWikiContext xWikiContext = this.xcontextProvider.get();
+        XWikiDocument xwikiDocument = xWikiContext.getWiki().getDocument(doc.getDocumentReference(), xWikiContext);
 
         return xwikiDocument.getObject(className, objectNumber);
     }
 
-    protected List<BaseObject> getBaseObjects(Document doc) throws XWikiException
+    protected List<BaseObject> getBaseObjects(DocumentReference documentReference, String version)
+        throws XWikiException
     {
-        List<BaseObject> objectList = new ArrayList<BaseObject>();
+        XWikiDocument xwikiDocument = this.documentRevisionProvider.getRevision(documentReference, version);
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                Utils.getXWikiContext(componentManager));
+        return getBaseObjectList(xwikiDocument);
+    }
 
-        for (List<BaseObject> xwikiObjects : xwikiDocument.getXObjects().values()) {
-            objectList.addAll(xwikiObjects);
-        }
+    protected List<BaseObject> getBaseObjects(DocumentReference documentReference) throws XWikiException
+    {
+        XWikiContext xWikiContext = this.xcontextProvider.get();
+        XWikiDocument xwikiDocument = xWikiContext.getWiki().getDocument(documentReference, xWikiContext);
 
-        return objectList;
+        return getBaseObjectList(xwikiDocument);
+    }
+
+    private static List<BaseObject> getBaseObjectList(XWikiDocument xwikiDocument)
+    {
+        return xwikiDocument.getXObjects().values().stream().flatMap(List::stream).toList();
     }
 
     protected List<BaseObject> getBaseObjects(Document doc, String className) throws XWikiException
     {
-        XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-            Utils.getXWikiContext(componentManager));
+        XWikiContext xWikiContext = this.xcontextProvider.get();
+        XWikiDocument xwikiDocument = xWikiContext.getWiki().getDocument(doc.getDocumentReference(), xWikiContext);
 
         List<BaseObject> xwikiObjects = xwikiDocument.getXObjects(xwikiDocument.resolveClassReference(className));
 
         // XWikiDocument#getXObjects return internal list so we make sure to return a safe one
-        return xwikiObjects != null ? new ArrayList<BaseObject>(xwikiObjects) : Collections.<BaseObject>emptyList();
+        return xwikiObjects != null ? new ArrayList<>(xwikiObjects) : Collections.emptyList();
     }
 }

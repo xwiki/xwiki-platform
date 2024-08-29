@@ -30,18 +30,18 @@
     thead, tbody, th, td, tr {
       display: block;
     }
-    
+
     > thead {
       display: none;
     }
-    
+
     > tbody {
       .responsive-table-tbody();
-        
+
       > tr {
         .responsive-table-tbody-tr();
       }
-      
+
       > tr > td, > tr > th {
         .responsive-table-tbody-tr-tdth();
       }
@@ -74,7 +74,7 @@
   text-overflow: ellipsis;
   width: 100%;
   white-space: normal;
-  
+
   // Fake header: display a fake cell to display the title of the current cell
   &:before {
     // Behave like a table header
@@ -98,7 +98,7 @@
     white-space: nowrap;
     width: 45%;
   }
-  
+
   &:last-child {
     border: 0;
   }

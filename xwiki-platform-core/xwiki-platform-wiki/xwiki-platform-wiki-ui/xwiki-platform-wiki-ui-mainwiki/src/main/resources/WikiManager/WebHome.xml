@@ -58,7 +58,8 @@
   'meta': {
     'propertyDescriptors': [
       { 'id': 'wikiprettyname', 'displayer': { 'id': 'link', 'propertyHref': 'wikiprettyname_url' } },
-      { 'id': 'membershipType', 'sortable': false, 'filterable': false },
+      { 'id': 'owner', 'editable': false},
+      { 'id': 'membershipType', 'sortable': false, 'filterable': false, 'editable': false },
       { 
         'id': '_actions',
         'displayer': {
@@ -104,8 +105,8 @@
 #set ($sourceParameters = $escapetool.url({
   'className' : 'XWiki.XWikiServerClass',
   'resultPage' : 'WikiManager.WikisLiveTableResults',
-  'translationPrefix' : 'platform.wiki.browse.'
-
+  'translationPrefix' : 'platform.wiki.browse.',
+  '$doc' : $doc.fullName
 }))
 {{liveData
   id='wikis'

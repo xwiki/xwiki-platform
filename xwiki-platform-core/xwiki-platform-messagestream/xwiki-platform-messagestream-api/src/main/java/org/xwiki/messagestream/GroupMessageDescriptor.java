@@ -33,7 +33,7 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
  * @since 9.11.6
  */
 @Component
-@Named("groupMessage")
+@Named(GroupMessageDescriptor.EVENT_TYPE)
 @Singleton
 public class GroupMessageDescriptor extends AbstractMessageDescriptor
 {

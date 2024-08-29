@@ -1,0 +1,32 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+= Heading
+
+{{context document="Space.Page" transformationContext="current"}}
+{{toc/}}
+{{/context}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginSection
+beginHeader [1, HHeading]
+onWord [Heading]
+endHeader [1, HHeading]
+beginMacroMarkerStandalone [context] [document=Space.Page|transformationContext=current] [{{toc/}}]
+beginMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
+beginMacroMarkerStandalone [toc] []
+beginList [BULLETED] [[class]=[wikitoc]]
+beginListItem
+beginLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [HHeading]]] [false]
+onWord [Heading]
+endLink [Typed = [true] Type = [doc] Parameters = [[anchor] = [HHeading]]] [false]
+endListItem
+endList [BULLETED] [[class]=[wikitoc]]
+endMacroMarkerStandalone [toc] []
+endMetaData [[base]=[Space.Page][source]=[Space.Page][syntax]=[XWiki 2.1]]
+endMacroMarkerStandalone [context] [document=Space.Page|transformationContext=current] [{{toc/}}]
+endSection
+endDocument

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import * as DOMPurify from 'dompurify';
 
 /**
  * The displayerMixin is a vue mixin containing all the needed
@@ -59,6 +60,9 @@ export default {
     value () {
       return this.entry[this.propertyId];
     },
+    safeValue() {
+      return this.sanitizeHtml(this.value)
+    },
     // The property descriptor of `this.propertyId`
     propertyDescriptor () {
       return this.logic.getPropertyDescriptor(this.propertyId);
@@ -83,6 +87,17 @@ export default {
       set(value) {
         this.editedValue = value;
       }
+    },
+    // Checks if the property value is allowed to be edited and if the livedata is in a state where the displayer can
+    // be edited.
+    isEditable() {
+      const editable = this.logic.isEditable({
+        entry: this.entry,
+        propertyId: this.propertyId,
+      });
+      // Checks that no other property is currently being edited.
+      const noOtherEditing = this.logic.getEditBus().isEditable()
+      return editable && noOtherEditing;
     }
   },
 
@@ -95,6 +110,22 @@ export default {
     genericSave(value) {
       const savedValue =  value || this.editedValue;
       this.logic.getEditBus().save(this.entry, this.propertyId, {[this.propertyId]: savedValue})
+    },
+    sanitizeHtml(value) {
+      if (!this.logic.isContentTrusted()) {
+        // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see XWIKI-20249).
+        return DOMPurify.sanitize(value);
+      } else {
+        return value;
+      }
+    },
+    sanitizeUrl(url, subtitute) {
+      // TODO: Take into account xml.htmlElementSanitizer properties when sanitizing (see XWIKI-20249).
+      if (this.logic.isContentTrusted() || DOMPurify.isValidAttribute('a', 'href', url)) {
+        return url;
+      } else {
+        return (subtitute || '#');
+      }
     }
   },
   

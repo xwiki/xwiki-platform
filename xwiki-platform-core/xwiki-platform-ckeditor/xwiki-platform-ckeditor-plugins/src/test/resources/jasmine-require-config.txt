@@ -1,0 +1,57 @@
+paths: {
+  jquery: '/webjars/jquery.min',
+
+  bootstrap: '/webjars/bootstrap',
+  'bootstrap3-typeahead': '/webjars/bootstrap3-typeahead.min',
+
+  // Tree
+  jsTree: '/webjars/jstree',
+  'xwiki-job-runner': '/webjars/jobRunner',
+  'xwiki-tree-finder': '/webjars/finder',
+  'xwiki-tree': '/webjars/tree',
+
+  'fast-diff': '/webjars/diff',
+
+  // We need the full path here because ckeditor.js loads other resources using relative paths.
+  ckeditor: '/webjars/xwiki-platform-ckeditor-webjar/${project.version}/ckeditor',
+
+  testUtils: '/spec/testUtils',
+
+  'xwiki-dialog': 'xwiki-dialog/plugin',
+  'xwiki-filter': 'xwiki-filter/plugin',
+  'xwiki-loading': 'xwiki-loading/plugin',
+  'xwiki-localization': 'xwiki-localization/plugin',
+  'xwiki-macro': 'xwiki-macro/plugin',
+  'xwiki-marker': 'xwiki-marker/plugin',
+  'xwiki-resource': 'xwiki-resource/plugin',
+  'xwiki-table': 'xwiki-table/plugin',
+
+  resource: 'xwiki-resource/resource',
+  'resourcePicker.bundle': 'xwiki-resource/resourcePicker',
+  entityResourcePicker: 'xwiki-resource/entityResourcePicker',
+  entityResourceSuggester: 'xwiki-resource/entityResourceSuggester',
+  entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
+  l10n: 'xwiki-localization/l10n',
+  modal: 'xwiki-dialog/modal',
+
+  textSelection: 'xwiki-selection/plugin',
+  scrollUtils: 'xwiki-selection/plugin'
+},
+shim: {
+  bootstrap: ['jquery'],
+  ckeditor: {
+    exports: 'CKEDITOR'
+  },
+
+  'xwiki-dialog': ['ckeditor'],
+  'xwiki-filter': ['ckeditor'],
+  'xwiki-loading': ['ckeditor'],
+  'xwiki-localization': ['ckeditor'],
+  'xwiki-macro': ['ckeditor', 'xwiki-dialog', 'xwiki-loading', 'xwiki-localization', 'xwiki-marker', 'textSelection'],
+  'xwiki-marker': ['ckeditor'],
+  'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker.bundle', 'l10n', 'xwiki-marker'],
+  'xwiki-table': ['ckeditor'],
+
+  textSelection: ['ckeditor'],
+  scrollUtils: ['ckeditor']
+}

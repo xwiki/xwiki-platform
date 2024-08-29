@@ -123,7 +123,7 @@
 #largepanelheader($services.localization.render('xe.panels.syntax.help'))
 #set ($syntaxDoc = $xwiki.getDocument('XWiki.XWikiSyntax'))
 #if ($syntaxDoc.isNew())
-  #set ($url = 'http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?xpage=print')
+  #set ($url = 'https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?xpage=print')
 #else
   #set ($url = $xwiki.getURL('XWiki.XWikiSyntax', 'view', 'xpage=print'))
 #end

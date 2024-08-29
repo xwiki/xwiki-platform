@@ -1,0 +1,307 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="uk">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=Список Вікі
+platform.wiki.menu.deletewiki=Видалити вікі
+platform.wiki.menu.userwikis=Вікі
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing=Java-компонент "Wiki" не встановлено. Ця сторінка не працюватиме належним чином. Переконайтеся, що встановлено розширення "Wiki API" і "Wiki Script" (за допомогою Менеджера розширень) або що файли 'xwiki-platform-wiki-api-&lt;version&gt;.jar' і 'xwiki-platform-wiki-script -&lt;версія&gt;.jar' знаходяться в папці веб-програми 'WEB-INF/lib/' (у разі інсталяції вручну).
+platform.wiki.dependencies.template.missing=Java-компонент "Wiki Template" не встановлено. Ця сторінка не працюватиме належним чином. Переконайтеся, що встановлено розширення "Wiki Template API" і "Wiki Template Script" (за допомогою Менеджера розширень) або що файли 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' і 'xwiki-platform -wiki-template-script-&lt;version&gt;.jar' знаходяться в папці веб-програми 'WEB-INF/lib/' (у разі інсталяції вручну).
+platform.wiki.dependencies.user.missing=Java-компонент "Wiki User" не встановлено. Ця сторінка не працюватиме належним чином. Переконайтеся, що встановлено розширення "Wiki User API" і "Wiki User Script" (за допомогою Менеджера розширень) або що файли 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' і 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' знаходяться в папці веб-програми 'WEB-INF/lib/' (у разі інсталяції вручну).
+
+## Create
+platform.wiki.create.button=Створити Вікі
+platform.wiki.create.title=Створити нову вікі
+platform.wiki.create.members=УЧАСНИКИ
+platform.wiki.create.prettyname.empty=Читабельна назва не повинна бути порожнім
+platform.wiki.create.error=Не вдалося створити Вікі "{0}": {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=База даних із цим ідентифікатором уже існує
+platform.wiki.create.error.wikiname.wikialreadyexists=Цей ідентифікатор уже використовується
+platform.wiki.create.error.wikiname.empty=Ідентифікатор не може бути порожнім
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Вікі [{0}] не існує
+platform.wiki.error.oneParameterNotSpecified=Параметр ''{0}'' не було вказано.
+platform.wiki.error.parameterAcceptsMultipleValues=Дозволено кілька значень.
+platform.wiki.error.exceptionWithMessage=Виключення: {0}
+platform.wiki.form.requiredField=Обов'язковий
+platform.wiki.csrf.error=Недійсний маркер безпеки. Будь ласка, повторіть свою операцію.
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=Користувач {0}{1}{2} уже є учасником вікі {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=Користувач {0}{1}{2} не є учасником вікі {3}{4}{5}.
+platform.wiki.users.logInToContinue=Щоб продовжити, спершу потрібно {0}увійти{1}.
+platform.wiki.users.invitation.userAcceptedNotification=Користувач ''{0}'' ({1}) прийняв запрошення приєднатися до вікі ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=Користувач {0}{1}{2} успішно прийняв запрошення та приєднався до вікі {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=Користувач {0}{1}{2} успішно відхилив запрошення приєднатися до вікі {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=Ця вікі призначена лише для запрошених користувачів. Для цього вам потрібно отримати запрошення від одного з його адміністраторів.
+platform.wiki.users.join.request.pendingRequestExists=Користувач {0}{1}{2} уже має нерозглянутий запит на приєднання до вікі {3}{4}{5}. Будь ласка, зачекайте, поки вікіадміністратор перегляне його.
+platform.wiki.users.join.request.cancelConfirmation=Ви впевнені, що бажаєте скасувати запит на приєднання до вікі {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Так
+platform.wiki.users.join.request.cancelNo=Ні
+platform.wiki.users.join.request.cancelSuccess=Користувач {0}{1}{2} успішно скасував запит на приєднання до вікі {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=Користувач ''{0}'' ({1}) надіслав запит на приєднання до вікі ''{2}'' ({3}).
+platform.wiki.users.join.request.success=Користувач {0}{1}{2} успішно надіслав запит на приєднання до вікі {3}{4}{5}.
+platform.wiki.users.join.confirmation=Ви впевнені, що бажаєте приєднатися до вікі {0}{1}{2}?
+platform.wiki.users.join.yes=Так
+platform.wiki.users.join.no=Ні
+platform.wiki.users.join.success=Користувач {0}{1}{2} успішно приєднався до вікі {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=Користувач {0}{1}{2} є власником вікі {3}{4}{5}. Власник вікі не може залишити її, доки вікі не буде видалено або власник не змінився.
+platform.wiki.users.leave.confirmation=Ви впевнені, що бажаєте залишити вікі {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Так
+platform.wiki.users.leave.confirmation.no=Ні
+platform.wiki.users.leave.success=Користувач {0}{1}{2} успішно залишив вікі {3}{4}{5}.
+platform.wiki.users.join.title=Приєднатися до Вікі
+platform.wiki.users.leave.title=Залишити Вікі "{0}"
+platform.wiki.users.leave.empty=Залишити Вікі
+platform.wiki.users.delete.title=Видалити Вікі "{0}"
+platform.wiki.users.delete.empty=Видалити Вікі
+platform.wiki.users.invitation.reply.hint=Повідомлення-відповідь для надсилання, яке може переглянути адміністратор вікі, у якому ви можете мотивувати своє рішення.
+platform.wiki.users.join.request.hint=Щоб приєднатися до вікі {0}{1}{2}, ви повинні спочатку надіслати запит на приєднання. Після цього вікіадміністратор розгляне ваш запит.
+platform.wiki.users.join.request.message.hint=Повідомлення для надсилання, яке може переглянути адміністратор вікі, у якому ви можете мотивувати цей запит на приєднання.
+platform.wiki.users.invitation.title=Вас запросили приєднатися до вікі {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Повідомлення із запрошенням
+platform.wiki.users.invitation.reply.title=Відповісти
+platform.wiki.users.invitation.accept.label=Прийняти
+platform.wiki.users.invitation.reject.label=Відхилити
+platform.wiki.users.invitation.postpone.label=Пізніше
+platform.wiki.users.join.request.message.label=Повідомлення
+platform.wiki.users.join.request.send.label=Надіслати запит
+platform.wiki.users.join.request.cancel.label=Назад
+
+## User profile
+platform.wiki.users.profile.joinedwikis.label=Приєднався до вікі
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Ви ще не є учасником жодної вікі.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Користувач ще не є учасником жодної вікі.
+platform.wiki.users.profile.activity.title=Активність вікі {0}
+platform.wiki.users.profile.activity.hint=Створює потік активності для вказаної(их) вікі.
+platform.wiki.users.profile.activity.multipletitle=Активність вікі {0}
+platform.wiki.users.profile.activity.show=показати активність
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=Ви впевнені, що бажаєте видалити вікі {0}{1}{2}? Цю дію не можна відмінити!
+platform.wiki.delete.confirmation.retypeWikiId=Будь ласка, повторіть тут ідентифікатор вікі:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Введіть точний вікі-ідентифікатор вікі, яку слід видалити.
+platform.wiki.delete.success=Користувач {0}{1}{2} успішно видалив вікі ''{3}''.
+
+## Wiki macro
+platform.wiki.macro.noWikis=Наразі не створено жодної вікі (крім основної).
+rendering.macro.wikis.name=Вікі
+rendering.macro.wikis.description=Список усіх вікі
+
+## LegacyWorkspaces macro
+rendering.macro.workspaces.name=Робочі простори (застарілі)
+rendering.macro.workspaces.description=Застарілий макрос, який не слід використовувати тут з причин сумісності. Будь ласка, використовуйте замість цього макрос "wikis".
+
+## Browse
+platform.wiki.browse=Переглянути Вікі
+platform.wiki.browse.emptyvalue=Відсутнє
+platform.wiki.browse.wikiprettyname=Назва
+platform.wiki.browse.description=Опис
+platform.wiki.browse.owner=Власник
+platform.wiki.browse.membershipType=Тип членства
+platform.wiki.browse.doc.creationDate=Дата створення
+platform.wiki.browse._actions=Дії
+platform.wiki.browse._actions.join=Приєднатися
+platform.wiki.browse._actions.requestJoin=Запит на приєднання
+platform.wiki.browse._actions.viewInvitation=Переглянути запрошення
+platform.wiki.browse._actions.cancelJoinRequest=Скасувати запит
+platform.wiki.browse._actions.leave=Залишити
+platform.wiki.browse._actions.delete=Видалити
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=Відкрито для будь-якого користувача, для приєднання
+WikiManager.WikiUserClass_membershipType_request=Будь-який глобальний користувач може надіслати запит на приєднання, але адміністратор має прийняти цей запит
+WikiManager.WikiUserClass_membershipType_invite=Лише адміністратор може надсилати запрошення для приєднання до цієї вікі
+WikiManager.WikiUserClass_userScope_local_only=Лише локальні користувачі доступні у вікі
+WikiManager.WikiUserClass_userScope_global_only=Лише глобальні користувачі доступні у вікі
+WikiManager.WikiUserClass_userScope_local_and_global=Глобальні та локальні користувачі доступні у вікі
+platform.wiki.prop.wikiname=Вікі ідентифікатор
+platform.wiki.prop.wikiprettyname=Читабельна назва
+platform.wiki.prop.wikialias=Псевдонім
+platform.wiki.prop.description=Опис
+platform.wiki.prop.owner=Власник
+platform.wiki.prop.membershipType.label=Тип членства
+platform.wiki.prop.membershipType.hint=Спосіб, у який користувачі можуть приєднуватися до цієї вікі.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=Унікальний ідентифікатор нової вікі.
+platform.wiki.create.wizard.desc.wikiprettyname=Коротка назва вікі.
+platform.wiki.create.wizard.desc.wikialias=Доменне ім'я, яке вказуватиме на вікі.
+platform.wiki.create.wizard.desc.newTemplateHint=Шаблон для використання в цій новій вікі (усі сторінки будуть клоновані).
+platform.wiki.create.wizard.desc.description=Короткий опис вікі та її призначення.
+platform.wiki.create.wizard.desc.owner=Користувач, який завжди матиме всі права на цю вікі, незалежно від прав, налаштованих в Адмініструванні.
+platform.wiki.create.wizard.desc.members=Користувачі, які можуть брати участь у вікі.
+platform.wiki.create.wizard.step.nameAndType=Крок 1 — Виберіть назву
+platform.wiki.create.wizard.step.nameAndType.shortname=Назва
+platform.wiki.create.wizard.step.users=Крок 2 — Виберіть учасників
+platform.wiki.create.wizard.step.users.shortname=Користувачі
+platform.wiki.create.wizard.step.cleaningUp=Очищення
+platform.wiki.create.wizard.step.provisioning.cleanUp=Очистити та видалити цю вікі
+platform.wiki.create.wizard.step.cleaningup.success=Вікі {0} було успішно видалено.
+platform.wiki.create.wizard.step.cleaningup.error=Помилка, вікі {0} не видалено.
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Ви збираєтеся видалити вікі {0}. Підтвердьте, будь ласка.
+platform.wiki.create.wizard.step.cleaningUp.confirm=Підтвердити
+platform.wiki.create.wizard.setAsTemplate.label=Ця вікі буде шаблоном
+platform.wiki.create.wizard.template.noTemplate=Без шаблону (за умовчанням)
+platform.wiki.create.wizard.userScope.label=Область користувача
+platform.wiki.create.wizard.userScope.hint=Виберіть, які користувачі можуть отримати доступ до вікі
+platform.wiki.create.wizard.template.label=Шаблон
+platform.wiki.create.wizard.flavortemplate.label=Flavor / Шаблон
+platform.wiki.create.wizard.flavortemplate.hint=Flavor або шаблон для використання як початкового вмісту нової вікі
+platform.wiki.create.wizard.flavortemplate.flavorTab=Flavor
+platform.wiki.create.wizard.flavortemplate.templateTab=Шаблон
+platform.wiki.create.wizard.step.dw=Після натискання кнопки "Створити" вікі буде створено та запущено майстер встановлення, який допоможе вам ініціалізувати вашу вікі. Якщо ви пропустите майстра, ваша вікі буде порожня.
+platform.wiki.create.wizard.step.previous=Попередній крок
+platform.wiki.create.wizard.step.next=Наступний крок
+platform.wiki.create.wizard.step.create=Створити
+platform.wiki.create.wizard.step.creation=Створення Вікі
+platform.wiki.create.wizard.step.creation.wait=Будь ласка, зачекайте, поки вікі буде створено.
+platform.wiki.create.wizard.step.creation.complete=Вікі {0} успішно створено. Тепер ви можете отримати до неї доступ.
+platform.wiki.create.wizard.step.creation.errorlog=Однак під час цього процесу виникли помилки, і ви можете їх переглянути.
+platform.wiki.create.wizard.step.creation.error=Помилка створення вікі {0}. Рекомендується видалити її.
+platform.wiki.create.wizard.step.creation.go=Перейти до вікі
+
+## Admin
+admin.wikis.description=Управління Вікі.
+admin.wikis.templates=Шаблони Вікі
+admin.wikis.templates.description=Управління вікі-шаблонами
+admin.wikis.templates.hint=Шаблон — це вікі, яка розглядатиметься як модель для створення нових вікі. Коли користувач вибирає шаблон для створення нової вікі, увесь вміст шаблону копіюється до нової вікі.
+admin.wikis.rights=Право на створення
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=Дескриптор вікі "{0}"
+platform.wiki.sheet.erroraliasalreadynotexists=Псевдонім вікі "{0}" вже існує.
+platform.wiki.sheet.erroraliasdoesnotexists=Псевдонім вікі "{0}" не існує.
+platform.wiki.sheet.title.settings=Властивості вікі
+platform.wiki.sheet.title.createnewalias=Створити новий псевдонім
+platform.wiki.sheet.title.viewaliases=Переглянути псевдоніми
+platform.wiki.sheet.desc.wikiprettyname=Коротка назва вікі.
+platform.wiki.sheet.desc.owner=Користувач, який матиме всі права на цю вікі.
+platform.wiki.sheet.desc.secure=Якщо ввімкнути, усі URL-адреси, створені цією вікі, починатимуться з "https".
+platform.wiki.sheet.desc.port=Порт для використання для всіх зовнішніх URL-адрес, створених цією вікі. Якщо не встановлено, воно успадковується від конфігурації та основної вікі. Враховується лише для URL-адрес на основі домену.
+platform.wiki.sheet.desc.iswikitemplate=Вказує, чи можна цю вікі використовувати як шаблон під час створення нової вікі.
+platform.wiki.sheet.desc.server=Псевдонім, використовуваний для доступу до вікі.
+platform.wiki.sheet.desc.description=Короткий опис вікі.
+platform.wiki.sheet.desc.homepage=Домашня сторінка вікі.
+platform.wiki.sheet.prop.wikiprettyname=Читабельна назва
+platform.wiki.sheet.prop.owner=Власник
+platform.wiki.sheet.prop.secure=Захищено (SSL)
+platform.wiki.sheet.prop.port=Порт
+platform.wiki.sheet.prop.description=Опис
+platform.wiki.sheet.prop.server=Псевдонім
+platform.wiki.sheet.prop.homepage=Домашня сторінка
+platform.wiki.sheet.prop.iswikitemplate=Шаблон вікі
+platform.wiki.sheet.descriptor=На цій сторінці описано, як отримати доступ до вікі "{0}", а також деякі властивості щодо неї. Для отримання додаткових налаштувань перейдіть на сторінку
+platform.wiki.sheet.descriptor.admin=адміністрування вікі.
+platform.wiki.sheet.aliases=Псевдонім — інша назва вікі. Ви можете додати псевдоніми для створення різних URL-адрес для вікі.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing={0}Application Manager Plugin{1} не інстальовано. Будь ласка, встановіть його та спробуйте ще раз.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=Вікі
+admin.wikis.template=Шаблон Вікі
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=Система налаштовує вікі.
+platform.wiki.create.wizard.step.provisioning.wait=Будь ласка, зачекайте, поки система підготує вікі.
+platform.wiki.create.wizard.step.provisioning.complete=Вікі майже готова. Натисніть "Завершити", щоб виконати останню операцію.
+platform.wiki.create.wizard.step.provisioning.error=Вікі {0} створено, але деякі сторінки, що містяться в шаблоні, не скопійовано. Ймовірно, вам слід видалити її.
+platform.wiki.create.wizard.step.provisioning.finalize=Завершення
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=Так, будь ласка, видалити цю вікі!
+platform.wiki.delete.confirmation.no=Ні, поверніть мене назад!
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

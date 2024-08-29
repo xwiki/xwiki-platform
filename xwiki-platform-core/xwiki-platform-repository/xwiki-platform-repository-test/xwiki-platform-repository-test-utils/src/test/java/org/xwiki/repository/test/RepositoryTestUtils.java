@@ -32,15 +32,23 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionSupportPlan;
+import org.xwiki.extension.ExtensionSupportPlans;
+import org.xwiki.extension.ExtensionSupporter;
 import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.RepositoryUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
+
+import com.xpn.xwiki.XWiki;
 
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.object;
 import static org.xwiki.test.ui.TestUtils.RestTestUtils.property;
@@ -68,8 +76,6 @@ public class RepositoryTestUtils
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName()));
         extensionObject.getProperties()
             .add(property(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary()));
-        extensionObject.getProperties()
-            .add(property(XWikiRepositoryModel.PROP_EXTENSION_RECOMMENDED, extension.isRecommended() ? 1 : 0));
         if (!extension.getLicenses().isEmpty()) {
             extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME,
                 extension.getLicenses().iterator().next().getName()));
@@ -171,6 +177,57 @@ public class RepositoryTestUtils
         return dependencyObject;
     }
 
+    public static org.xwiki.rest.model.jaxb.Object extensionSupporterObject(ExtensionSupporter extensionSupporter)
+    {
+        org.xwiki.rest.model.jaxb.Object extensionObject = object(XWikiRepositoryModel.EXTENSIONSUPPORTER_CLASSNAME);
+
+        extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_SUPPORTER_ACTIVE, 1));
+
+        if (extensionSupporter.getURL() != null) {
+            extensionObject.getProperties()
+                .add(property(XWikiRepositoryModel.PROP_SUPPORTER_URL, extensionSupporter.getURL()));
+        }
+
+        return extensionObject;
+    }
+
+    public static org.xwiki.rest.model.jaxb.Object extensionSupportPlanObject(ExtensionSupportPlan extensionSupportPlan,
+        TestUtils testUtils)
+    {
+        org.xwiki.rest.model.jaxb.Object extensionObject = object(XWikiRepositoryModel.EXTENSIONSUPPORTPLAN_CLASSNAME);
+
+        extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_SUPPORTER_ACTIVE, 1));
+
+        if (extensionSupportPlan.getURL() != null) {
+            extensionObject.getProperties()
+                .add(property(XWikiRepositoryModel.PROP_SUPPORTPLAN_ACTIVE, extensionSupportPlan.getURL()));
+        }
+
+        extensionObject.getProperties()
+            .add(property(XWikiRepositoryModel.PROP_SUPPORTPLAN_PAYING, extensionSupportPlan.isPaying()));
+
+        extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_SUPPORTPLAN_SUPPORTER,
+            testUtils.serializeLocalReference(toSupporterReference(extensionSupportPlan.getSupporter()))));
+
+        return extensionObject;
+    }
+
+    private static LocalDocumentReference toSupporterReference(ExtensionSupporter supporter)
+    {
+        String cleanSupporterName = new XWiki().clearName(supporter.getName(), null);
+        return new LocalDocumentReference(List.of("Extension", "Support", "Supporter", cleanSupporterName), "WebHome");
+    }
+
+    private static LocalDocumentReference toSupportPlanReference(ExtensionSupportPlan supportPlan)
+    {
+        LocalDocumentReference supporterReference = toSupporterReference(supportPlan.getSupporter());
+
+        String cleanSupportPlanName = new XWiki().clearName(supportPlan.getName(), null);
+
+        return new LocalDocumentReference("WebHome",
+            new EntityReference(cleanSupportPlanName, EntityType.SPACE, supporterReference.getParent()));
+    }
+
     private final TestUtils testUtils;
 
     private RepositoryUtils repositoryUtil;
@@ -193,8 +250,13 @@ public class RepositoryTestUtils
 
     public void init() throws Exception
     {
+        init(new TestEnvironment());
+    }
+
+    public void init(TestEnvironment environment) throws Exception
+    {
         // Initialize extensions and repositories
-        this.repositoryUtil.setup();
+        this.repositoryUtil.setup(environment);
     }
 
     // Test utils
@@ -234,12 +296,39 @@ public class RepositoryTestUtils
         this.testUtils.rest().delete(getExtensionPageReference(extensionName));
     }
 
+    private boolean supporterExist(ExtensionSupporter supporter) throws Exception
+    {
+        return this.testUtils.rest().exists(toSupporterReference(supporter));
+    }
+
+    private boolean supportPlanExist(ExtensionSupportPlan supportPlan) throws Exception
+    {
+        return this.testUtils.rest().exists(toSupportPlanReference(supportPlan));
+    }
+
     public void addExtension(RemoteExtension extension) throws Exception
     {
-        // Delete any pre existing extension
-        this.testUtils.rest().delete(getExtensionPageReference(extension));
+        // Delete any pre-existing extension
+        deleteExtension(extension);
 
-        // Create Page
+        // Create Supporters and Support Plans Pages (if needed)
+        ExtensionSupportPlans supportPlans = extension.getSupportPlans();
+        for (ExtensionSupporter supporter : supportPlans.getSupporters()) {
+            if (!supporterExist(supporter)) {
+                // Create the Supporter Page
+                addExtensionSupporter(supporter);
+            }
+
+            // Create Support Plans Pages (if needed)
+            for (ExtensionSupportPlan supportPlan : supportPlans.getSupportPlans(supporter)) {
+                if (!supportPlanExist(supportPlan)) {
+                    // Create the Support Plan Page
+                    addExtensionSupportPlan(supportPlan);
+                }
+            }
+        }
+
+        // Create Extension Page
         Page extensionPage = this.testUtils.rest().page(getExtensionPageReference(extension));
 
         extensionPage.setObjects(new Objects());
@@ -258,6 +347,40 @@ public class RepositoryTestUtils
 
         // Attach the extension file
         attachFile(extension);
+    }
+
+    public void addExtensionSupporter(ExtensionSupporter supporter) throws Exception
+    {
+        LocalDocumentReference supporterReference = toSupporterReference(supporter);
+
+        // Delete any pre-existing supporter
+        this.testUtils.rest().delete(supporterReference);
+
+        Page supporterPage = this.testUtils.rest().page(supporterReference);
+
+        supporterPage.setTitle(supporter.getName());
+
+        supporterPage.setObjects(new Objects());
+        supporterPage.getObjects().getObjectSummaries().add(extensionSupporterObject(supporter));
+
+        this.testUtils.rest().save(supporterPage, TestUtils.STATUS_CREATED);
+    }
+
+    public void addExtensionSupportPlan(ExtensionSupportPlan supportPlan) throws Exception
+    {
+        LocalDocumentReference supportPlanReference = toSupportPlanReference(supportPlan);
+
+        // Delete any pre-existing supporter plan
+        this.testUtils.rest().delete(supportPlanReference);
+
+        Page supportPlanPage = this.testUtils.rest().page(supportPlanReference);
+
+        supportPlanPage.setTitle(supportPlan.getName());
+
+        supportPlanPage.setObjects(new Objects());
+        supportPlanPage.getObjects().getObjectSummaries().add(extensionSupportPlanObject(supportPlan, this.testUtils));
+
+        this.testUtils.rest().save(supportPlanPage, TestUtils.STATUS_CREATED);
     }
 
     public void addVersionObject(Extension extension)
@@ -323,7 +446,7 @@ public class RepositoryTestUtils
     public void waitUntilReady() throws Exception
     {
         // Make sure Solr queue is empty
-        this.solrUtils.waitEmpyQueue();
+        this.solrUtils.waitEmptyQueue();
     }
 
     /**

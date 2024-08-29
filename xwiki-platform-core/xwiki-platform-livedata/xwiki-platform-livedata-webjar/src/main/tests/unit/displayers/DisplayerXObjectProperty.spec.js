@@ -20,8 +20,8 @@
 
 import DisplayerXObjectProperty from "../../../displayers/DisplayerXObjectProperty.vue";
 import {initWrapper} from "./displayerTestsHelper";
-import Vue from "vue";
 import $ from 'jquery';
+import flushPromises from "flush-promises";
 
 global.$ = global.jQuery = $;
 
@@ -77,10 +77,11 @@ describe('DisplayerXObjectProperty.vue', () => {
       return $(wrapper.element).find('#editField')
     })
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
-    // Send the edit event and wait for the asynchronous operation to finish before testing.
-    await viewerDiv.trigger('dblclick')
-    await Vue.nextTick()
+    // Switch to edit mode and manually call updateEdit, instead of using the actions because accessing the actions
+    // of the popover is not currently possible.
+    await wrapper.setData({isView: false})
+    wrapper.vm.updateEdit()
+    await flushPromises();
 
     // Checks that the edition form is properly retrieved and displayed.
     expect(wrapper.find('#editForm').exists()).toBe(true);

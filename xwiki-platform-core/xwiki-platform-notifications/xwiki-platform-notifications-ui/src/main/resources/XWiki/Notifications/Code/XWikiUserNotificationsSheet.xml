@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.XWikiUserNotificationsSheet" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>XWikiUserNotificationsSheet</name>
   <language/>
@@ -77,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -200,7 +201,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -220,6 +221,7 @@
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -250,6 +252,7 @@
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -294,7 +297,7 @@
       ######################################################
       ### TITLE
       ######################################################
-      = $services.localization.render('notifications.settings.title') =
+      == $services.localization.render('notifications.settings.title') ==
       ######################################################
       ### EMAIL PREFERENCES
       ######################################################
@@ -302,7 +305,7 @@
       (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
       (((
       (% id="Hnotifications.settings.email.title" %)
-      = {{translation key="notifications.settings.email.title" /}} =
+      === {{translation key="notifications.settings.email.title" /}} ===
       {{notificationsEmailPreferences user="$doc.documentReference" /}}
       )))
       #end
@@ -313,7 +316,7 @@
       (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
       (((
       (% id="Hnotifications.settings.watch.title" %)
-      = {{translation key="notifications.settings.watch.title" /}} =
+      === {{translation key="notifications.settings.watch.title" /}} ===
       {{notificationsAutoWatchPreferences user="$doc.documentReference" /}}
       )))
       #end
@@ -323,7 +326,7 @@
       (% class="profile-section highlighted-profile-section column full" %)
       (((
       (% id="Hnotifications.settings.applications.title" %)
-      = {{translation key="notifications.settings.applications.title" /}} =
+      === {{translation key="notifications.settings.applications.title" /}} ===
       {{notificationsApplicationsPreferences user="$doc.documentReference" /}}
       )))
       ######################################################
@@ -337,13 +340,13 @@
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.system.title" %)
-  = {{translation key="notifications.settings.filters.preferences.system.title" /}} =
+  === {{translation key="notifications.settings.filters.preferences.system.title" /}} ===
   {{notificationsSystemFiltersPreferences user="$doc.documentReference" /}}
 )))
 (% class="profile-section highlighted-profile-section column full" %)
 (((
   (% id="Hnotifications.settings.filters.preferences.custom.title" %)
-  = {{translation key="notifications.settings.filters.preferences.custom.title" /}} =
+  === {{translation key="notifications.settings.filters.preferences.custom.title" /}} ===
   {{notificationsCustomFiltersPreferences user="$doc.documentReference" /}}
 )))
 #end
@@ -360,7 +363,7 @@
       <parameters>id=notifications
 icon=bell
 # isActive: The user is seeing her own profile or can administrate the current document
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $services.security.authorization.hasAccess('admin', $doc.documentReference))true#{else}false#end
+isActive=#if($services.notification.isEnabled() &amp;&amp; ($services.model.resolveDocument($xcontext.user) == $doc.documentReference || $services.security.authorization.hasAccess('admin', $doc.documentReference)))true#{else}false#end
 priority=60</parameters>
     </property>
     <property>

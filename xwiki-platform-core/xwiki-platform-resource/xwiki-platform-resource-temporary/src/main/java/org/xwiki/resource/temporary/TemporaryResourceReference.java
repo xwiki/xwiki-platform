@@ -61,7 +61,7 @@ public class TemporaryResourceReference extends EntityResourceReference
 
         setType(TYPE);
         this.moduleId = moduleId;
-        this.resourcePath = Collections.unmodifiableList(new ArrayList<String>(resourcePath));
+        this.resourcePath = Collections.unmodifiableList(new ArrayList<>(resourcePath));
     }
 
     /**
@@ -121,7 +121,10 @@ public class TemporaryResourceReference extends EntityResourceReference
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(super.hashCode(), 5).append(getModuleId()).append(getOwningEntityReference())
+        return new HashCodeBuilder(23, 5)
+            .appendSuper(super.hashCode())
+            .append(getModuleId())
+            .append(getOwningEntityReference())
             .append(getResourcePath()).toHashCode();
     }
 

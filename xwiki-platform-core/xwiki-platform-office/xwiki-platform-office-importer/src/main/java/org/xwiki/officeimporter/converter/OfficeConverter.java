@@ -22,8 +22,6 @@ package org.xwiki.officeimporter.converter;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Interface used to convert documents between various office formats.
  * 
@@ -50,7 +48,6 @@ public interface OfficeConverter
      * @throws OfficeConverterException if an error occurs during the conversion
      * @since 13.1RC1
      */
-    @Unstable
     default OfficeConverterResult convertDocument(Map<String, InputStream> inputStreams, String inputFileName,
         String outputFileName) throws OfficeConverterException
     {
@@ -62,7 +59,6 @@ public interface OfficeConverter
      * @return true if the file name / extension represents an office presentation format
      * @since 13.1RC1
      */
-    @Unstable
     default boolean isPresentation(String officeFileName)
     {
         return false;
@@ -74,7 +70,6 @@ public interface OfficeConverter
      * @return the office document format associated with the given file extension.
      * @since 13.1RC1
      */
-    @Unstable
     default OfficeDocumentFormat getDocumentFormat(String officeFileName)
     {
         return null;
@@ -87,7 +82,6 @@ public interface OfficeConverter
      * @return {@code true} if the specified media type is supported, {@code false} otherwise
      * @since 13.1RC1
      */
-    @Unstable
     default boolean isMediaTypeSupported(String mediaType)
     {
         return false;
@@ -103,7 +97,6 @@ public interface OfficeConverter
      *         {@code false} otherwise
      * @since 13.1RC1
      */
-    @Unstable
     default boolean isConversionSupported(String inputMediaType, String outputMediaType)
     {
         return false;

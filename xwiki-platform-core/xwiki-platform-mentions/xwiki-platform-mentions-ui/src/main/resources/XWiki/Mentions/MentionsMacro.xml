@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Mentions.MentionsMacro" locale="">
   <web>XWiki.Mentions</web>
   <name>MentionsMacro</name>
   <language/>
@@ -127,16 +127,16 @@
     <property>
       <code>require.config({
   paths: {
-    'xwiki-suggestUsers': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', true))
+    'xwiki-suggestUsers': $jsontool.serialize($xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js'))
   }
 });
 require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], function (ckeditorPromise, suggestUsers, $, xm) {
-  
+
   /**
    * Get the current wiki scope for displaying global, local or global and local users
    */
   const userScope = "$!services.wiki.user.userScope";
-  
+
   // see https://stackoverflow.com/a/6248722/657524
   function random6chars() {
     // I generate the UID from two parts here 
@@ -147,7 +147,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     secondPart = ("000" + secondPart.toString(36)).slice(-3);
     return firstPart + secondPart;
   }
-  
+
   /**
    * Compute a new unique anchor for the given reference.
    * The unique anchor is based on the mentionned user id, concatenaed with a random string of 6 alphanumeric
@@ -166,8 +166,8 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       'input': text,
       'limit': 6,
     };
-    $.when(suggestUsers.loadUsers(userScope, params)).then(function (user) {
-      const cct = user.map(function (x) {
+    suggestUsers.loadUsers(userScope, params).then(users =&gt; {
+      const cct = users.map(function (x) {
         // insert an id because that's required by the mentions plugins.
         x.id = x.value;
         // Make sure to display the icon avatar or the image one.
@@ -183,11 +183,11 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
         return x;
       });
       callback(cct);
-    })
+    });
   }
 
-  ckeditorPromise.done(function (ckeditor) {
-    function confMentions(name) {
+  ckeditorPromise.then(ckeditor =&gt; {
+    function getUserMentionsConfig(editor) {
       return {
         feed: function (opts, callback) {
           search(opts.query, callback);
@@ -195,21 +195,21 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
         marker: '@',
         minChars: 0,
         itemsLimit: 6,
-        itemTemplate: '&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;'+
-              '&lt;div&gt;'+
-                '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;'+
-                  '&lt;span class="{cssClass}"&gt;&lt;/span&gt;'+
-                  '&lt;img src="{imgUrl}" class="{imgClass}"/&gt;'+
-                '&lt;/span&gt;'+
-                '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;'+
-              '&lt;/div&gt;'+
-            '&lt;/li&gt;',
+        itemTemplate:
+         `&lt;li data-id="{id}" class="ckeditor-autocomplete-item"&gt;
+            &lt;div&gt;
+              &lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;
+                &lt;span class="{cssClass}"&gt;&lt;/span&gt;
+                &lt;img src="{imgUrl}" class="{imgClass}"/&gt;
+              &lt;/span&gt;
+              &lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/li&gt;`,
         outputTemplate: function (param) {
-          var editor = ckeditor.instances[name];
-          editor.once('afterInsertHtml', function () {
+          editor.once('afterInsertHtml', function() {
             editor.execCommand('xwiki-macro-insert', {
               name: 'mention',
-              inline: true,
+              inline: 'enforce',
               parameters: {
                 reference: param.id,
                 style: 'FULL_NAME',
@@ -224,22 +224,36 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
       };
     }
 
-    function updateConf(config, name) {
-      const newConf = config;
-      newConf.mentions = newConf.mentions || [];
-      newConf.mentions.push(confMentions(name));
-      return newConf;
+    // Enable the user mentions for the CKEditor instances that have been already created.
+    Object.values(ckeditor.instances).forEach(maybeEnableUserMentions);
+    // Enable the user mentions for the CKEditor instances that are going to be created from now on.
+    ckeditor.on('instanceCreated', (event) =&gt; {
+      maybeEnableUserMentions(event.editor);
+    });
+
+    function maybeEnableUserMentions(editor) {
+      return waitForEditorReady(editor).then((editor) =&gt; {
+        // Check if the Mentions plugin is enabled for the given editor instance.
+        // TODO: Add support for disabling the user mentions for a particular editor instance (without disabling all
+        // types of mentions).
+        if (editor.plugins.mentions) {
+          editor.plugins.mentions.instances.push(new ckeditor.plugins.mentions(editor, getUserMentionsConfig(editor)));
+        }
+        return editor;
+      });
     }
 
-    var oldReplace = ckeditor.replace;
-    ckeditor.replace = function (element, config) {
-      return oldReplace.call(this, element, updateConf(config, element.id));
-    };
-
-    var oldInline = ckeditor.inline;
-    ckeditor.inline = function (element, config) {
-      return oldInline.call(this, element, updateConf(config, element.id));
-    };
+    function waitForEditorReady(editor) {
+      return new Promise((resolve, reject) =&gt; {
+        if (editor.status === 'ready') {
+          resolve(editor);
+        } else {
+          editor.once('instanceReady', (event) =&gt; {
+            resolve(event.editor);
+          });
+        }
+      });
+    }
   });
 });</code>
     </property>
@@ -360,7 +374,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], fun
     <property>
       <code>.xwiki-mention {
   background-color: $services.mentions.mentionsColor;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 2px 5px 2px 5px;
 }
 
@@ -409,7 +423,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -422,14 +436,14 @@ blockquote.mention-quote {
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -438,7 +452,7 @@ blockquote.mention-quote {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -504,15 +518,24 @@ blockquote.mention-quote {
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -543,6 +566,16 @@ blockquote.mention-quote {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -595,7 +628,9 @@ blockquote.mention-quote {
 #end
 #set ($link = $xwiki.getURL($reference.reference, 'view'))
 {{html}}
-&lt;a id="$anchor" class="$stringtool.join($cssClasses, ' ')" data-reference="$services.model.serialize($reference.reference, 'default')" href="$link"&gt;$content&lt;/a&gt;
+&lt;a id="$escapetool.xml($anchor)" class="$stringtool.join($cssClasses, ' ')" data-reference="$escapetool.xml($services.model.serialize($reference.reference, 'default'))" href="$escapetool.xml($link)"&gt;##
+  $escapetool.xml($content)## Do not remove this comment as it ensures that the spacing after mention is not broken.
+&lt;/a&gt;
 {{/html}}
 {{/velocity}}</code>
     </property>
@@ -609,16 +644,21 @@ blockquote.mention-quote {
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory/>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
-      <description>Insert a user mention.</description>
+      <description>Inserts a user mention.</description>
     </property>
     <property>
       <id>mention</id>
     </property>
     <property>
       <name>User Mention</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>1</supportsInlineMode>

@@ -26,9 +26,9 @@ import java.net.URL;
 
 /**
  * @version $Id$
- * @deprecated starting with 3.5M1, use the notion of {@link org.xwiki.environment.Environment} instead
+ * @deprecated use the notion of {@link org.xwiki.environment.Environment} instead
  */
-@Deprecated
+@Deprecated(since = "3.5M1")
 public interface ApplicationContext
 {
     InputStream getResourceAsStream(String resourceName);

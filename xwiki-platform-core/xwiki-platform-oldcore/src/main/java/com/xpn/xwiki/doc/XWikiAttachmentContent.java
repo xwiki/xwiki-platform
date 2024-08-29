@@ -98,7 +98,7 @@ public class XWikiAttachmentContent implements Cloneable
         this.setAttachment(attachment);
         this.file = f;
     }
-
+    
     /**
      * @return the underlying storage file.
      * @since 5.2M1
@@ -235,6 +235,17 @@ public class XWikiAttachmentContent implements Cloneable
     }
 
     /**
+     * @return true of the content of this attachment still exist in the store
+     * @since 13.8RC1
+     * @since 13.4.4
+     * @since 12.10.10
+     */
+    public boolean exists()
+    {
+        return true;
+    }
+
+    /**
      * @return an InputStream to read the binary content of this attachment.
      * @since 2.3M2
      */
@@ -329,7 +340,7 @@ public class XWikiAttachmentContent implements Cloneable
     {
         long longSize = getLongSize();
 
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -353,6 +364,21 @@ public class XWikiAttachmentContent implements Cloneable
             if (this.isContentDirty && ownerDocument != null) {
                 ownerDocument.setMetaDataDirty(true);
             }
+        }
+    }
+
+    /**
+     * Delete the temporary file item created to hold the content of the attachment.
+     * This method only performs the deletion if its content is dirty, its purpose is mainly to allow cleaning temporary
+     * attachments.
+     *
+     * @since 14.3RC1
+     */
+    public void dispose()
+    {
+        if (this.file != null && this.isContentDirty()) {
+            this.file.delete();
+            this.file = null;
         }
     }
 }

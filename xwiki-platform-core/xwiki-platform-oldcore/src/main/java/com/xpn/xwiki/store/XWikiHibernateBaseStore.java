@@ -184,16 +184,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Allows to init the hibernate configuration
-     *
-     * @throws org.hibernate.HibernateException
-     */
-    private synchronized void initHibernate() throws HibernateException
-    {
-        this.store.initHibernate();
-    }
-
-    /**
      * This get's the current session. This is set in beginTransaction
      *
      * @param inputxcontext
@@ -471,7 +461,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Initializes hibernate
+     * Initializes Hibernate.
      *
      * @param context
      * @throws HibernateException
@@ -479,7 +469,16 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
         if (getSessionFactory() == null) {
-            initHibernate();
+            // If not already initialized make sure to check/init but protected by a lock this time to make sure it's
+            // not done by several threads
+            checkHibernateSynchronized();
+        }
+    }
+
+    private synchronized void checkHibernateSynchronized() throws HibernateException
+    {
+        if (getSessionFactory() == null) {
+            this.store.initHibernate();
         }
     }
 
@@ -724,7 +723,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Callback (closure) interface for operations in hibernate. spring like.
+     * Callback (closure) interface for operations in Hibernate.
      */
     @FunctionalInterface
     public interface HibernateCallback<T>
@@ -795,7 +794,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Execute method for operations in hibernate. spring like.
+     * Execute method for operations in Hibernate.
      *
      * @param inputxcontext - used everywhere.
      * @param doCommit - should store commit changes(if any), or rollback it.
@@ -807,38 +806,52 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
-        boolean bTransaction = false;
-
         try {
+            MonitorPlugin monitor = Util.getMonitorPlugin(context);
             // Start monitoring timer
             if (monitor != null) {
                 monitor.startTimer(XWikiHibernateBaseStore.HINT);
             }
-            checkHibernate(context);
-            bTransaction = beginTransaction(context);
-            return cb.doInHibernate(this.store.getCurrentSession());
-        } catch (Exception e) {
-            doCommit = false;
-            if (e instanceof XWikiException) {
-                throw (XWikiException) e;
-            }
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Exception while hibernate execute", e);
-        } finally {
+
             try {
-                if (bTransaction) {
-                    this.store.endTransaction(doCommit);
+                // Make sure Hibernate is initialized
+                checkHibernate(context);
+
+                // Create a new transaction if not already the case
+                boolean bTransaction = beginTransaction(context);
+
+                boolean commit = false;
+                try {
+                    // Execute the callback
+                    T result = cb.doInHibernate(this.store.getCurrentSession());
+
+                    // Commit the result only if successful, otherwise rollback in the finally
+                    commit = doCommit;
+
+                    return result;
+                } catch (XWikiException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                        "Exception while hibernate execute", e);
+                } finally {
+                    if (bTransaction) {
+                        try {
+                            this.store.endTransaction(commit);
+                        } catch (Exception e) {
+                            if (LOGGER.isErrorEnabled()) {
+                                LOGGER.error("Exception while close transaction", e);
+                            }
+                        }
+                    }
                 }
+            } finally {
                 if (monitor != null) {
+                    // Stop the monitor
                     monitor.endTimer(XWikiHibernateBaseStore.HINT);
                 }
-            } catch (Exception e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exception while close transaction", e);
-                }
             }
-
+        } finally {
             restoreExecutionXContext();
         }
     }
@@ -922,7 +935,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * Execute method for read-write operations in hibernate. spring like.
+     * Execute method for read-write operations in Hibernate.
      *
      * @param context the current XWikiContext
      * @param cb the callback to execute

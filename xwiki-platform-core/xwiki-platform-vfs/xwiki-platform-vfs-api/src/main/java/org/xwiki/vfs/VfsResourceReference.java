@@ -32,7 +32,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -70,7 +69,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @param reference the reference to copy
      * @since 12.3RC1
      */
-    @Unstable
     public VfsResourceReference(VfsResourceReference reference)
     {
         this(reference.uri, reference.pathSegments);
@@ -84,7 +82,7 @@ public class VfsResourceReference extends EntityResourceReference
     public VfsResourceReference(URI uri, List<String> pathSegments)
     {
         // FIXME: we don't know the wiki of the resource yet, putting main one
-        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
+        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""), uri.getFragment());
 
         setType(TYPE);
         this.uri = uri;
@@ -123,7 +121,6 @@ public class VfsResourceReference extends EntityResourceReference
      * entry inside it, e.g. {@code attach:space.page@attachment/path/to/file}.
      * @since 12.4RC1
      */
-    @Unstable
     public VfsResourceReference(String fullReference)
     {
         super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
@@ -163,7 +160,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the actual reference to the VFS (e.g. {@code attach:space.page@file.zip}).
      * @since 12.4RC1
      */
-    @Unstable
     public String getReference()
     {
         return this.reference;
@@ -173,7 +169,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the scheme of this reference (e.g. {@code attach}).
      * @since 12.4RC1
      */
-    @Unstable
     public String getScheme()
     {
         return this.scheme;
@@ -253,7 +248,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @return the Content-Type to return with the response
      * @since 12.3RC1
      */
-    @Unstable
     public String getContentType()
     {
         return getParameterValue(PARAMETER_CONTENTTYPE);
@@ -263,7 +257,6 @@ public class VfsResourceReference extends EntityResourceReference
      * @param contentType the Content-Type to return with the response
      * @since 12.3RC1
      */
-    @Unstable
     public void setContentType(String contentType)
     {
         setParameter(PARAMETER_CONTENTTYPE, contentType);

@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc.rcs;
 import java.io.Serializable;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
@@ -34,7 +35,12 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable, Cloneable
 {
     /**
-     * @see com.xpn.xwiki.doc.XWikiDocument#getId()
+     * @see #getWikiReference()
+     */
+    private WikiReference wikiReference;
+
+    /**
+     * @see #getDocId()
      */
     private long docId;
 
@@ -51,14 +57,48 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
     }
 
     /**
-     * @param docId = {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
-     * @param version - version of document
+     * @param wikiReference the wiki of the document
+     * @param docId the local identifier of the document
+     * @param version the version of document
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
      */
-    public XWikiRCSNodeId(long docId, Version version)
+    public XWikiRCSNodeId(WikiReference wikiReference, long docId, Version version)
     {
-        super();
+        this.wikiReference = wikiReference;
         this.docId = docId;
         this.version = version;
+    }
+
+    /**
+     * @param docId the local identifier of the document
+     * @param version the version of document
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
+     */
+    @Deprecated(since = "13.10.7")
+    public XWikiRCSNodeId(long docId, Version version)
+    {
+        this(null, docId, version);
+    }
+
+    /**
+     * @return the reference of the wiki where this node is located or null if unknown
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public WikiReference getWikiReference()
+    {
+        return this.wikiReference;
+    }
+
+    /**
+     * @param wikiReference the reference of the wiki where this node is located
+     */
+    public void setWikiReference(WikiReference wikiReference)
+    {
+        this.wikiReference = wikiReference;
     }
 
     /**
@@ -71,7 +111,9 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
 
     /**
      * @param docId = {@link com.xpn.xwiki.doc.XWikiDocument#getId()}
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #XWikiRCSNodeId(WikiReference, long, Version)} instead
      */
+    @Deprecated(since = "13.10.7")
     protected void setDocId(long docId)
     {
         this.docId = docId;

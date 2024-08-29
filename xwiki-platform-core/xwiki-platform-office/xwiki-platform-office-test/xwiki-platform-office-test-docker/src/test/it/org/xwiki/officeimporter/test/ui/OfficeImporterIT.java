@@ -29,17 +29,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.test.po.OfficeImporterPage;
-import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.AttachmentsPane;
-import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.DeletePageConfirmationPage;
 import org.xwiki.test.ui.po.DeletingPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -63,10 +63,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     },
     properties = {
         // Add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin",
+        // Starting or stopping the Office server requires PR (for the current user, on the main wiki reference)
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.OfficeImporterAdmin"
     }
 )
-public class OfficeImporterIT
+class OfficeImporterIT
 {
     private TestUtils setup;
 
@@ -90,7 +92,7 @@ public class OfficeImporterIT
     }
 
     @Test
-    public void verifyImport(TestInfo info)
+    void verifyImport(TestInfo info)
     {
         verifyImports(info);
         verifySplitByHeadings(info);
@@ -98,8 +100,9 @@ public class OfficeImporterIT
     }
 
     /**
-     * A basic test that imports some documents and verify they are correctly imported TODO: do a more advanced check
-     * about styling and content
+     * A basic test that imports some documents and verify they are correctly imported.
+     * <p>
+     * TODO: Do a more advanced check about styling and content.
      */
     private void verifyImports(TestInfo info)
     {
@@ -111,7 +114,7 @@ public class OfficeImporterIT
 
         // Test power point file
         resultPage = importFile(testName, "msoffice.97-2003/Test.ppt");
-        AttachmentsPane attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
@@ -128,20 +131,20 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         WikiEditPage wikiEditPage = resultPage.editWiki();
-        String regex = "(?<imageName>Test_html_[\\w]+\\.png)";
+        String regex = "(?<imageName>Test_[\\w]+\\.png)";
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());
         String imageName = matcher.group("imageName");
         resultPage = wikiEditPage.clickCancel();
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageName));
         deletePage(testName);
 
         // Test ODP file
         resultPage = importFile(testName, "ooffice.3.0/Test.odp");
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide0.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide1.jpg"));
         assertTrue(attachmentsPane.attachmentExistsByFileName("Test-slide2.jpg"));
@@ -158,27 +161,28 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+();@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\(\\);\\\\@=_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & é\\$ù !-_\\.\\+\\(\\);\\\\@=_\\w+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        matcher = pattern.matcher(wikiEditPage.getContent());
-        assertTrue(matcher.find());
+        String wikiContent = wikiEditPage.getContent();
+        matcher = pattern.matcher(wikiContent);
+        assertTrue(matcher.find(), String.format("Pattern [%s] not found in [%s]", regex, wikiContent));
         imageName = matcher.group("imageName");
         resultPage = wikiEditPage.clickCancel();
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(4, attachmentsPane.getNumberOfAttachments());
         // the \ before the @ needs to be removed as it's not in the filename
-        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replaceAll("\\\\@", "@")));
+        assertTrue(attachmentsPane.attachmentExistsByFileName(imageName.replace("\\@", "@")));
         deletePage(testName);
 
         // Test power point file with accents
         resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù !-_.+();@=.ppt");
-        attachmentsPane = resultPage.openAttachmentsDocExtraPane();
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide0.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide1.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide2.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+();@=-slide3.jpg"));
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide0.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide1.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide2.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & é$ù !-_.+();@=-slide3.jpg"));
         wikiEditPage = resultPage.editWiki();
-        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u !-_.+();\\@=-slide0.jpg]]"));
+        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & é$ù !-_.+();\\@=-slide0.jpg]]"));
         resultPage = wikiEditPage.clickCancel();
         deletePage(testName);
     }
@@ -279,10 +283,7 @@ public class OfficeImporterIT
         officeImporterPage.setFilterStyle(true);
         officeImporterPage.setSplitDocument(splitByHeadings);
 
-        OfficeImporterResultPage officeImporterResultPage = officeImporterPage.clickImport();
-        assertEquals("Conversion succeeded. You can view the result, or you can Go back to convert another document.",
-            officeImporterResultPage.getMessage());
-        return officeImporterResultPage.viewResult();
+        return officeImporterPage.submit();
     }
 
     /**
@@ -292,7 +293,7 @@ public class OfficeImporterIT
      */
     private void deletePageWithChildren(ViewPage pageToDelete)
     {
-        ConfirmationPage confirmationPage = pageToDelete.delete();
+        DeletePageConfirmationPage confirmationPage = pageToDelete.deletePage();
         if (confirmationPage.hasAffectChildrenOption()) {
             confirmationPage.setAffectChildren(true);
         }

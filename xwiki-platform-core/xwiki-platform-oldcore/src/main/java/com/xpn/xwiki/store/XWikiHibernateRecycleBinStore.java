@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +40,12 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -58,6 +65,13 @@ import com.xpn.xwiki.internal.store.hibernate.XWikiHibernateDeletedDocumentConte
 @Singleton
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
     /**
      * {@link HibernateCallback} used to retrieve from the recycle bin store the deleted versions of a document.
      */
@@ -429,5 +443,32 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 
             return null;
         });
+    }
+
+    @Override
+    public void checkAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument)
+        throws AuthorizationException
+    {
+        if (!this.hasAccess(right, userReference, deletedDocument)) {
+            throw new AuthorizationException(
+                String.format("[%s] cannot access deleted document [%s] for right [%s]: "
+                    + "only admin or deleter of the document are authorized",
+                    userReference, deletedDocument, right));
+        }
+    }
+
+    @Override
+    public boolean hasAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument)
+    {
+        DocumentReference documentReference = deletedDocument.getDocumentReference();
+        DocumentReference userDocReference = this.userReferenceSerializer.serialize(userReference);
+
+        boolean result = false;
+        if (this.authorizationManager.hasAccess(Right.ADMIN, userDocReference, documentReference)
+            || (Objects.equals(deletedDocument.getDeleterReference(), userDocReference)
+            && this.authorizationManager.hasAccess(right, userDocReference, documentReference))) {
+            result = true;
+        }
+        return result;
     }
 }

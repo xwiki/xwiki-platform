@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Panels.Applications" locale="">
+<xwikidoc version="1.5" reference="Panels.Applications" locale="">
   <web>Panels</web>
   <name>Applications</name>
   <language/>
@@ -66,16 +66,18 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>8</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>author=Author|doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -93,6 +95,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>category</name>
         <number>1</number>
@@ -140,6 +144,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>type</name>
         <number>4</number>
@@ -221,28 +227,27 @@
 
 {{velocity}}
 #set ($discard = $xwiki.ssx.use('Panels.Applications'))
-## Effects are used by the "More applications" link.
-#set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
 #set ($discard = $xwiki.jsx.use('Panels.Applications'))
 
 #panelheader($services.localization.render('panels.applications.title'))
 
 {{html}}
-&lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+&lt;ul class="applicationsPanel nav"&gt;
   ## Get the blacklist configuration
   #set ($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode',
     'ApplicationsPanelConfiguration')))
   #displayAppPanelEntries('org.xwiki.platform.panels.Applications' $configDoc)
 &lt;/ul&gt;
-&lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
+&lt;ul class="applicationsPanel applicationsPanelMoreList nav"&gt;
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
-        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton" title="$services.localization.render('panels.applications.more')"&gt;
+    #set ($panelId = 'applicationPanelMoreContainer' + $util.generateRandomString(10))
+    &lt;button class='applicationPanelMoreButton' aria-controls="$panelId"
+      title="$services.localization.render('panels.applications.more')" aria-expanded='false' &gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
-    &lt;/a&gt;
-    &lt;div class="applicationPanelMoreContainer hidden"&gt;
-      &lt;ul class="nav nav-pills nav-stacked"&gt;
+    &lt;/button&gt;
+    &lt;div id="$panelId" class="applicationPanelMoreContainer hidden"&gt;
+      &lt;ul class="nav"&gt;
         #displayAppPanelEntries('org.xwiki.platform.panels.Applications.more')
       &lt;/ul&gt;
     &lt;/div&gt;
@@ -282,6 +287,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -329,6 +336,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -357,7 +366,6 @@ panels.MoreApplicationsButtonListener = Class.create({
 
     var moreAppsCount = this.container.select('.application-label').length;
     if (moreAppsCount &gt; 0) {
-      this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
       this.isToggling = false;
       this.button.observe('click', function(e) {
         e.stop();
@@ -381,6 +389,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         duration: 0.1,
         afterFinish: function() {
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','true');
         }.bind(this)
       });
     } else {
@@ -391,6 +400,7 @@ panels.MoreApplicationsButtonListener = Class.create({
         afterFinish: function() {
           this.container.addClassName('hidden');
           this.isToggling = false;
+          this.button.setAttribute('aria-expanded','false');
         }.bind(this)
       });
     }
@@ -400,9 +410,11 @@ panels.MoreApplicationsButtonListener = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-// Activate all buttons already in the DOM
-$$('.applicationPanelMoreButton').each(function(button) {
-  new XWiki.panels.MoreApplicationsButtonListener(button);
+require(['scriptaculous/effects'], function() {
+  // Activate all buttons already in the DOM.
+  document.querySelectorAll('.applicationPanelMoreButton').forEach(function(button) {
+    new XWiki.panels.MoreApplicationsButtonListener(button);
+  });
 });</code>
     </property>
     <property>
@@ -434,6 +446,8 @@ $$('.applicationPanelMoreButton').each(function(button) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -462,6 +476,8 @@ $$('.applicationPanelMoreButton').each(function(button) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -497,6 +513,8 @@ $$('.applicationPanelMoreButton').each(function(button) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -516,17 +534,13 @@ $$('.applicationPanelMoreButton').each(function(button) {
     <property>
       <code>#template('colorThemeInit.vm')
 
-.applicationsPanelMoreList {
-  margin-top: 1em;
-}
-
 .applicationsPanel li img {
   float: left;
   width: 16px;
   height: 16px;
 }
 
-.panel-width-Medium .applicationsPanel li .application-img, 
+.panel-width-Medium .applicationsPanel li .application-img,
 .panel-width-Large .applicationsPanel li .application-img {
   display: block;
   float: left;
@@ -537,6 +551,30 @@ $$('.applicationPanelMoreButton').each(function(button) {
   margin-left: 0.1em;
 }
 
+.applicationPanelMoreButton {
+  padding: 0;
+  margin: 10px 0 0 0;
+  border: 0;
+  color: $theme.linkColor;
+  box-shadow: none;
+  background-color: transparent;
+  width: 100%;
+  display: flex;
+  text-align: left;
+}
+
+.applicationPanelMoreButton:hover,
+.applicationPanelMoreButton:focus {
+  background-color: $theme.highlightColor;
+}
+
+.applicationPanelMoreButton .application-label {
+  white-space: normal;
+  text-align: left;
+  display: inline;
+  margin-left: 20px;
+}
+
 .applicationPanelMoreContainer ul {
   margin-left: 5px;
 }
@@ -544,6 +582,24 @@ $$('.applicationPanelMoreButton').each(function(button) {
 .applicationPanelMoreContainer li a {
   font-size: 90%;
   line-height: 16px;
+}
+
+.applicationPanelMoreContainer &gt; ul &gt; li &gt; a {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+}
+
+.panel-width-Small .applicationPanelMoreContainer > ul > li > a {
+  gap: .5em;
+  text-align: left;
+  margin-left: 0;
+}
+
+.panel-width-Small .applicationPanelMoreButton {
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
 }
 
 .panel-width-Small .panel.Applications {
@@ -591,18 +647,9 @@ $$('.applicationPanelMoreButton').each(function(button) {
   padding: 0;
 }
 
-.panel-width-Small .applicationPanelMoreContainer ul {
+.panel .applicationPanelMoreContainer ul {
   padding: 0;
   margin: 0;
-  background-color: $theme.pageContentBackgroundColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover {
-  background-color: $theme.highlightColor;
-}
-
-.panel-width-Small .applicationPanelMoreContainer ul li:hover a {
-  color: $theme.textPrimaryColor;
 }
 
 .panel-width-Small .application-img {
@@ -615,25 +662,25 @@ $$('.applicationPanelMoreButton').each(function(button) {
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a,
 .panel-width-Large .applicationsPanel &gt; li &gt; a,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a {
   padding: 0;
 }
 
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Medium .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; button:focus,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:hover,
 .panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:focus,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:hover,
 .panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
-.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
-.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover 
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:hover,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; button:focus,
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover,
 .panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;
   text-decoration: underline;
@@ -641,7 +688,7 @@ $$('.applicationPanelMoreButton').each(function(button) {
 
 /* Phone case */
 @media (max-width: 768px) {
-  .panel-width-Small .applicationsPanel li {
+  .panel-width-Small .applicationsPanel &gt; li {
     float: left;
     width: 33%;
   }
@@ -654,7 +701,7 @@ $$('.applicationPanelMoreButton').each(function(button) {
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
-  .panel-width-Small .applicationsPanel li{
+  .panel-width-Small .applicationsPanel &gt; li {
     float: left;
     width: 20%;
   }
@@ -668,29 +715,20 @@ $$('.applicationPanelMoreButton').each(function(button) {
 
 /* for colibri */
 
-.skin-colibri .applicationPanelMoreContainer ul {
-  margin-left: 0;
-}
-
-.skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,
-.skin-colibri .panel-width-Large .applicationPanelMoreContainer ul {
-  margin-left: 20px;
-}
-
 .skin-colibri .panel-width-Small .applicationsPanel {
   margin: 0;
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li {
   padding: 15px 0;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  -moz-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  border-radius: 7px;
   margin: 1px 0;
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li.active {
-  background-color: $theme.buttonPrimaryBackgroundColor;  
+  background-color: $theme.buttonPrimaryBackgroundColor;
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li.active a {
@@ -702,7 +740,7 @@ $$('.applicationPanelMoreButton').each(function(button) {
 }
 
 .skin-colibri .panel-width-Small .applicationsPanel li:hover a {
-  color: $theme.textPrimaryColor; 
+  color: $theme.textPrimaryColor;
 }
 </code>
     </property>

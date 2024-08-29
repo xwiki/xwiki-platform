@@ -80,9 +80,16 @@ rendering.macro.menu.name=Menu
 rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+rendering.macro.menu.parameter.label.name=Label
+rendering.macro.menu.parameter.label.description=Optional menu label used to describe the content of the menu. Especially important for assistive technologies and accessibility of the menu.
 rendering.macro.menu.parameter.type.name=Type
 rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
 rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+
+# Menu UI
+menu.ui.openSubMenu=Open the submenu.
+menu.ui.closeSubMenu=Close the submenu.
+menu.ui.horizontal.toggler.description=Toggle the horizontal menu.
 
 # Menu WebHome
 menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>

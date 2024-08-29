@@ -22,8 +22,12 @@ package org.xwiki.livedata.test.po;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -33,6 +37,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
@@ -43,9 +48,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.DateRangePicker;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
+import org.xwiki.text.StringUtils;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -57,9 +65,29 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class TableLayoutElement extends BaseElement
 {
+    /**
+     * Option for {@link #filterColumn(String, String, boolean, Map)} to wait for selectize fields suggestions before
+     * continuing. The default behavior being to use the typed text as the selected value without waiting.
+     */
+    public static final String FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS = "selectized.waitForSuggestions";
+
     private static final String INNER_HTML_ATTRIBUTE = "innerHTML";
 
     private static final String CLASS_HTML_ATTRIBUTE = "class";
+
+    private final LiveDataElement liveData;
+
+    private static final Pattern PAGINATION_SENTENCE_PATTERN =
+        Pattern.compile("^Entries (?<firstEntry>\\d+) - (?<lastEntry>\\d+) out of (?<totalEntries>\\d+)$");
+
+    /**
+     * @return the list of rows {@link WebElement}s
+     * @since 16.1.0RC1
+     */
+    public List<WebElement> getRows()
+    {
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
+    }
 
     /**
      * A matcher for the cell containing links. The matcher assert of a given {@link WebElement} contains a {@code a}
@@ -164,7 +192,7 @@ public class TableLayoutElement extends BaseElement
         }
     }
 
-    private static class DatePatternMatcher extends TypeSafeMatcher<WebElement>
+    private static final class DatePatternMatcher extends TypeSafeMatcher<WebElement>
     {
         private static final String REGEX = "\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}";
 
@@ -191,17 +219,15 @@ public class TableLayoutElement extends BaseElement
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableLayoutElement.class);
 
-    private final String liveDataId;
-
     /**
      * Default constructor. Initializes a live data table layout page object.
      *
-     * @param liveDataId the live data id
-     * @since 12.10.9
+     * @param liveData the live data object corresponding to this table layout
+     * @since 15.5
      */
-    public TableLayoutElement(String liveDataId)
+    public TableLayoutElement(LiveDataElement liveData)
     {
-        this.liveDataId = liveDataId;
+        this.liveData = liveData;
     }
 
     /**
@@ -322,9 +348,9 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until the table has content displayed and loaded. Use {@link #waitUntilReady()} for the default behavior.
+     * Waits until the table is loaded. Use {@link #waitUntilReady()} for the default behavior.
      *
-     * @param expectRows when {@code true} waits for rows to be displayed and loaded, when {@code false} continue
+     * @param expectRows when {@code true} waits for rows to be loaded, when {@code false} continue
      *     without waiting for the content
      * @see #waitUntilReady()
      * @since 12.10.9
@@ -333,15 +359,23 @@ public class TableLayoutElement extends BaseElement
     {
         // Waits for all the live data to be loaded and the cells to be finished loading.
         getDriver().waitUntilCondition(webDriver -> {
-            boolean isWaiting =
-                Arrays.asList(getClasses(getRoot().findElement(By.cssSelector(".layout-loader")))).contains("waiting");
+            WebElement root;
+            try {
+                root = getRoot();
+            } catch (StaleElementReferenceException e) {
+                // If the root element is stale, this means Vue is mounting itself and the table is not ready yet.
+                return false;
+            }
+            List<String> layoutLoaderClasses =
+                Arrays.asList(getClasses(root.findElement(By.cssSelector(".layout-loader"))));
+            boolean isWaiting = layoutLoaderClasses.contains("waiting");
             if (isWaiting) {
                 return false;
             }
             if (!noFiltering()) {
                 return false;
             }
-            return !expectRows || hasLines() && areCellsLoaded();
+            return !expectRows || !layoutLoaderClasses.contains("loading") && areCellsLoaded();
         }, 20);
     }
 
@@ -366,18 +400,18 @@ public class TableLayoutElement extends BaseElement
     {
         getDriver().waitUntilCondition(webDriver -> {
             // Cells are displayed and they are loaded.
-            if (!hasLines() || !areCellsLoaded()) {
+            if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
             return count >= minimalExpectedRowCount;
         }, timeout);
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
@@ -388,21 +422,50 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Waits until a the number of rows displayed in the live data matches the expected count.
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param refresh when {@code true}, the Live Data is reloaded before each count
+     * @see #waitUntilRowCountEqualsTo(int, int) if you want to define a custom timeout
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, boolean refresh)
+    {
+        waitUntilRowCountEqualsTo(expectedRowCount, getDriver().getTimeout(), refresh);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
      *
      * @param expectedRowCount the number of expected rows
      * @param timeout a custom timeout before stopping the wait and raising an error
      */
     public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout)
     {
+        waitUntilRowCountEqualsTo(expectedRowCount, timeout, false);
+    }
+
+    /**
+     * Waits until the number of rows displayed in the live data matches the expected count.
+     *
+     * @param expectedRowCount the number of expected rows
+     * @param timeout a custom timeout before stopping the wait and raising an error
+     * @param refresh if {@code true}, the
+     */
+    public void waitUntilRowCountEqualsTo(int expectedRowCount, int timeout, boolean refresh)
+    {
         getDriver().waitUntilCondition(webDriver -> {
+            if (refresh) {
+                this.liveData.refresh();
+            }
+
             // Cells are displayed. And they are loaded.
-            if (!hasLines() || !areCellsLoaded()) {
+            if (isEmpty() || !areCellsLoaded()) {
                 return false;
             }
+
             // And the count of row is greater than the expected count.
             int count = countRows();
-            LOGGER.info("LiveTableElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
+            LOGGER.info("TableLayoutElement#waitUntilRowCountEqualsTo/refresh(): count = [{}]", count);
             return count == expectedRowCount;
         }, timeout);
     }
@@ -432,21 +495,59 @@ public class TableLayoutElement extends BaseElement
      */
     public void filterColumn(String columnLabel, String content, boolean wait)
     {
-        int columnIndex = findColumnIndex(columnLabel);
-        WebElement element = getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        filterColumn(columnLabel, content, wait, Map.of());
+    }
+
+    /**
+     * Set the value in the filter of a column. Waits for the new filtered values to be displayed before continuing when
+     * {@code waits} is {@code true}.
+     *
+     * @param columnLabel the label of the column to filter, for instance {@code "Creation Date"}
+     * @param content the content to set on the filter
+     * @param wait when {@code true} waits for the filtered results to be displayed before continuing, otherwise
+     *     continues without waiting (useful when updating several filters in a row).
+     * @param options additional options that are only relevant for specific type of fields (e.g., for selectize
+     *     based fields only)
+     * @see #filterColumn(String, String)
+     * @see #filterColumn(String, String, boolean)
+     * @since 14.8RC1
+     */
+    public void filterColumn(String columnLabel, String content, boolean wait, Map<String, Object> options)
+    {
+        WebElement element = getFilter(columnLabel);
 
         List<String> classes = Arrays.asList(getClasses(element));
         if (classes.contains("filter-list")) {
             if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
-                suggestInputElement.sendKeys(content).selectTypedText();
+                // Wait for the suggestions on selectize fields only if this is explicitly asked.
+                suggestInputElement.clearSelectedSuggestions().sendKeys(content);
+                if (Objects.equals(options.get(FILTER_COLUMN_SELECTIZE_WAIT_FOR_SUGGESTIONS), Boolean.TRUE)) {
+                    suggestInputElement.waitForSuggestions().selectByVisibleText(content);
+                } else {
+                    suggestInputElement.selectTypedText();
+                }
             } else {
                 new Select(element).selectByVisibleText(content);
             }
         } else if (classes.contains("filter-text")) {
             element.clear();
-            element.sendKeys(content);
+            if (content.isEmpty()) {
+                // Make sure we generate some actual key events so LD notices the empty filter.
+                element.sendKeys(" ", Keys.BACK_SPACE);
+            } else {
+                element.sendKeys(content);
+            }
+        } else if (classes.contains("filter-date")) {
+            element.click();
+            DateRangePicker picker = new DateRangePicker(element);
+            if (StringUtils.isNotBlank(content)) {
+                element.clear();
+                element.sendKeys(content);
+                picker.applyRange();
+            } else {
+                picker.clearRange();
+            }
         }
 
         if (wait) {
@@ -455,12 +556,69 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Sort by the specified column and wait for the data to load.
+     *
+     * @param columnLabel the label of the column to sort
+     * @since 15.9RC1
+     */
+    public void sortBy(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+
+        WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
+            + "(%d) .handle", columnIndex)));
+        element.click();
+
+        waitUntilReady();
+    }
+
+    /**
+     * Return the current values of the filter of a given column. We return a list of values because some filters can
+     * have several values (e.g., a selectized field).
+     *
+     * @param columnLabel the label of the column (for instance, {@code Name})
+     * @return the current values of the filter
+     * @since 13.9
+     * @since 13.10RC1
+     * @since 13.4.4
+     */
+    public List<String> getFilterValues(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+        WebElement element = getRoot()
+            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        List<String> classes = Arrays.asList(getClasses(element));
+        List<String> ret;
+        if (classes.contains("filter-list")) {
+            if (element.getAttribute(CLASS_HTML_ATTRIBUTE).contains("selectized")) {
+                ret = new SuggestInputElement(element)
+                    .getSelectedSuggestions()
+                    .stream()
+                    .map(SuggestInputElement.SuggestionElement::getLabel)
+                    .collect(Collectors.toList());
+            } else {
+                ret = new Select(element)
+                    .getAllSelectedOptions()
+                    .stream()
+                    .map(WebElement::getText)
+                    .collect(Collectors.toList());
+            }
+        } else if (classes.contains("filter-text")) {
+            ret = singletonList(element.getText());
+        } else {
+            ret = Collections.emptyList();
+        }
+
+        return ret;
+    }
+
+    /**
      * @return the number of rows currently displayed in the live data
      * @since 12.10.9
      */
     public int countRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody tr td:first-child")).size();
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody tr td:first-child")).size();
     }
 
     /**
@@ -479,6 +637,83 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * Return the list of {@link WebElement} of a column by its label.
+     *
+     * @param columnLabel the label of the column to get, for instance {@code "Title"}
+     * @return the list of {@link WebElement} of the request column
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public List<WebElement> getAllCells(String columnLabel)
+    {
+        int columnNumber = findColumnIndex(columnLabel);
+        return getRoot().findElements(By.cssSelector(String.format("tbody tr td:nth-child(%d)", columnNumber)));
+    }
+
+    /**
+     * Get the 1-based row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the 1-based row index where the element was found, or 0 if it doesn't exist
+     * @since 14.8RC1
+     */
+    public int getRowIndexForElement(By by)
+    {
+        WebElement rowElement = getDriver().findElementWithoutWaiting(getRoot(), by);
+        if (rowElement.isDisplayed()) {
+            // Count the preceding rows without waiting.
+            return getDriver().findElementsWithoutWaiting(rowElement,
+                By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
+    }
+
+    /**
+     * Get the filter for the given column.
+     *
+     * @param columnLabel the label of the column to get the filter element for, for instance {@code "Title"}
+     * @return The {@link WebElement} for the given column filter.
+     * @since 13.10RC1
+     */
+    public WebElement getFilter(String columnLabel)
+    {
+        int columnIndex = findColumnIndex(columnLabel);
+        By cssSelector = By.cssSelector(String.format(
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
+        return getRoot().findElement(cssSelector);
+    }
+
+    /**
+     * @return the list of pagination size choices proposed by the pagination select field
+     * @since 14.7RC1
+     */
+    public Set<String> getPaginationSizes()
+    {
+        return new Select(getRoot().findElement(By.cssSelector(".pagination-page-size select"))).getOptions().stream()
+            .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
+    }
+
+    private String getPaginationEntriesString()
+    {
+        return getRoot().findElement(By.className("pagination-current-entries")).getText().trim();
+    }
+
+    private java.util.regex.Matcher getPaginationMatcher()
+    {
+        return PAGINATION_SENTENCE_PATTERN.matcher(getPaginationEntriesString());
+    }
+
+    public long getTotalEntries()
+    {
+        java.util.regex.Matcher paginationMatcher = getPaginationMatcher();
+        if (!paginationMatcher.matches()) {
+            throw new IllegalStateException("Matcher does not match: " + getPaginationEntriesString());
+        }
+        return Long.parseLong(paginationMatcher.group("totalEntries"));
+    }
+
+    /**
      * Clicks on an action button identified by its name, on a given row.
      *
      * @param rowNumber the row number, for instance 3 for the third row
@@ -486,9 +721,29 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        getRoot().findElement(By.cssSelector(
-            String.format("tbody tr:nth-child(%d) [name='%s']", rowNumber, actionName)))
-            .click();
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
+    }
+
+    /**
+     * Clicks on an action based on a row and the provided selector.
+     *
+     * @param rowNumber the row number, for instance 3 for the third row
+     * @param selector the selector to find the action element in the row
+     */
+    public void clickAction(int rowNumber, By selector)
+    {
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -502,10 +757,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void editCell(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
-        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
-            // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
-            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
-        });
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, true);
     }
 
     /**
@@ -520,10 +772,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void editAndCancel(String columnLabel, int rowNumber, String fieldName, String newValue)
     {
-        internalEdit(columnLabel, rowNumber, fieldName, newValue, () -> {
-            // Press escape to cancel the edition.
-            new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
-        });
+        internalEdit(columnLabel, rowNumber, fieldName, newValue, false);
     }
 
     /**
@@ -536,8 +785,25 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)))
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2.0RC1
+     */
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
+    }
+
+    private WebElement getRowElement(int rowNumber)
+    {
+        return getRoot().findElement(By.cssSelector(String.format("tbody tr:nth-child(%d)", rowNumber)));
     }
 
     /**
@@ -585,6 +851,28 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
+     * @param columnLabel The label of the column to check for
+     * @return If the given column exists
+     * @since 15.9RC1
+     */
+    public boolean hasColumn(String columnLabel)
+    {
+        return findColumnIndex(columnLabel) >= 0;
+    }
+
+    /**
+     * Return the {@link WebElement} of the dropdown button.
+     *
+     * @return the {@link WebElement} of the dropdown button
+     * @since 13.10RC1
+     * @since 13.4.5
+     */
+    public WebElement getDropDownButton()
+    {
+        return getRoot().findElement(By.cssSelector("a.dropdown-toggle"));
+    }
+
+    /**
      * Returns the column index of the given column. The indexes start at {@code 1}, corresponding to the leftest
      * column.
      *
@@ -617,11 +905,11 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * @return {@code true} if the live data contains some result lines, {@code false} otherwise
+     * @return {@code false} if the live data contains some result lines, {@code true} otherwise
      */
-    private boolean hasLines()
+    private boolean isEmpty()
     {
-        return !getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
+        return getRoot().findElements(By.cssSelector("tbody tr td.cell .livedata-displayer")).isEmpty();
     }
 
     /**
@@ -646,7 +934,7 @@ public class TableLayoutElement extends BaseElement
 
     private WebElement getRoot()
     {
-        return getDriver().findElementById(this.liveDataId);
+        return getDriver().findElement(By.id(this.liveData.getId()));
     }
 
     private int findColumnIndex(String columnLabel)
@@ -668,47 +956,73 @@ public class TableLayoutElement extends BaseElement
     }
 
     /**
-     * Does the steps for the edition of a cell, until the {@code newValue} is set on the requested field. Then call an
-     * {@code userAction} (for instance a click outside of the cell, or pressing escape). The {@code userAction} is
-     * expected to switch the Live Data back to the view mode (i.e., not cells are edited). Finally, waits for the
-     * result of the user action to be completed before continuing.
+     * Does the steps for the edition of a cell and then returning the cell to view mode either by clicking on a h1
+     * tag or by pressing escape if {@code save} is false.
      *
      * @param columnLabel the label of the column
      * @param rowNumber the number of the row to update (the first line is number 1)
      * @param fieldName the name of the field to edit, in other word the name of the corresponding XClass property
      * @param newValue the new value set of the field, but never saved because we cancel the edition
-     * @param userAction an user action to perform after the field values has been set. This action is expected to
-     *     bring the Live Data back to the view mode
+     * @param save if the edit shall be saved (if false, the edit is cancelled)
      */
-    private void internalEdit(String columnLabel, int rowNumber, String fieldName, String newValue, Runnable userAction)
+    private void internalEdit(String columnLabel, int rowNumber, String fieldName, String newValue, boolean save)
     {
         int columnIndex = getColumnIndex(columnLabel);
         WebElement element = getCellsByColumnIndex(columnIndex).get(rowNumber - 1);
 
-        // Double click on the cell.
-        new Actions(getDriver().getWrappedDriver()).doubleClick(element).perform();
-
+        // Hover on the property and click on the edit button on the displayed popover. We move slightly at the right of
+        // the center of the targeted element, then slightly to the left, towards the center of the element. This
+        // simulates the mouse trajectory of a real user hovering the cell above the one he/she wants to edit.
+        new Actions(getDriver().getWrappedDriver())
+            .moveToElement(element, 50, 0)
+            .moveToElement(element, 0, 0)
+            .perform();
+        By editActionSelector = By.cssSelector(".displayer-action-list span[title='Edit']");
+        // Waits to have at least one popover visible and click on the edit action of the last one. While it does not
+        // seem to be possible in normal conditions, using selenium and moveToElement, several popover can be visible
+        // at the same time (especially on Chrome). We select the latest edit action, which is the one of the targeted
+        // property because the popover actions are appended at the end of the document.
+        getDriver().waitUntilCondition(input -> !getDriver().findElementsWithoutWaiting(editActionSelector).isEmpty());
+        // Does not use findElementsWithoutWaiting to let a chance for the cursor to move to the targeted cell, and for
+        // its edit action popover to be displayed.
+        List<WebElement> popoverActions = getDriver().findElements(editActionSelector);
+        popoverActions.get(popoverActions.size() - 1).click();
+        
         // Selector of the edited field.
         By selector = By.cssSelector(String.format("[name$='_%s']", fieldName));
 
         // Waits for the text input to be displayed.
-        getDriver().waitUntilCondition(input -> !element.findElements(selector).isEmpty());
+        getDriver().waitUntilElementIsVisible(element, selector);
 
         // Reuse the FormContainerElement to avoid code duplication of the interaction with the form elements 
         // displayed in the live data (they are the same as the one of the inline edit mode).
-        new FormContainerElement(By.cssSelector(".livedata-displayer.edit"))
+        new FormContainerElement(By.cssSelector(".livedata-displayer .edit"))
             .setFieldValue(element.findElement(selector), newValue);
 
-        userAction.run();
+        if (save) {
+            // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
+            // Click close to the left border of the h1 to avoid clicking on a potential date picker that is
+            // hopefully not that close to the left.
+            WebElement h1 = getDriver().findElement(By.tagName("h1"));
+            int width = h1.getRect().getWidth();
+            // Calculate the offset from the center to be close to the left border of the h1.
+            int xOffset = -(width / 2 - 2);
+            new Actions(getDriver().getWrappedDriver()).moveToElement(h1, xOffset, 0).click().perform();
+        } else {
+            // Press escape to cancel the edition.
+            new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
+        }
 
-        // Waits for the field to be reload before continuing.
+        // Waits for the field to disappear.
         getDriver().waitUntilCondition(input -> {
-            // Nothing is loading.
-            boolean noLoader = element.findElements(By.cssSelector(".xwiki-loader")).isEmpty();
-            // And the edited field is not displayed anymore.
-            boolean noInput = element.findElements(selector).isEmpty();
-            return noLoader && noInput;
+            // The edited field is not displayed anymore.
+            return element.findElements(selector).isEmpty();
         });
+
+        // Wait for reload after saving.
+        if (save) {
+            waitUntilReady();
+        }
     }
 
     private String[] getClasses(WebElement element)
@@ -742,5 +1056,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

@@ -8,18 +8,24 @@
   background: $theme.highlightColor none 2px .8em no-repeat;
   margin: .5em 0;
   clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2em 1em;
 }
-.upload-inprogress {
+.upload-status .status-icon {
+  display: none;
+}
+.upload-status.upload-inprogress .status-icon.icon-inprogress,
+.upload-status.upload-done .status-icon.icon-done,
+.upload-status.upload-canceled .status-icon.icon-canceled,
+.upload-status.upload-error .status-icon.icon-error {
+  display: inherit;
+}
+.status-icon.icon-inprogress {
+  height: 14px;
+  width: 17px;
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-}
-.upload-done {
-  background-image: url("$xwiki.getSkinFile('icons/silk/tick.png')");
-}
-.upload-canceled {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cancel.png')");
-}
-.upload-error {
-  background-image: url("$xwiki.getSkinFile('icons/silk/delete.png')");
 }
 .progress-info, .file-info {
   font-size: .91em;
@@ -39,7 +45,7 @@
   margin: 0;
 }
 .progress-info {
-  clear: right;
+  flex-basis: 100%;
   opacity: 0.5;
 }
 .upload-inprogress .progress-info {
@@ -54,7 +60,7 @@
 }
 .progress-info .progress, .progress-info .progress-container {
   height: 6px;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 .progress-info .progress {
   background-color: $theme.notificationSuccessColor;
@@ -63,7 +69,7 @@
 }
 .progress-info .progress-container {
   border: 1px solid $theme.notificationSuccessColor;
-  border-radius: 4px;
+  border-radius: 7px;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   box-shadow: 0 0 5px rgba(0,0,0,.2), inset 0 0 5px rgba(0,0,0,.2);
@@ -71,7 +77,13 @@
   margin: 0.3em 0;
   width: 100%;
 }
-.upload-canceled .file-info .file-name, .upload-error .file-info .file-name {
+.upload-done .status-icon.icon-done {
+  color: $theme.notificationSuccessColor;
+}
+.upload-canceled .file-info .file-name,
+.upload-canceled .status-icon.icon-canceled,
+.upload-error .file-info .file-name,
+.upload-error .status-icon.icon-error {
   color: $theme.notificationErrorColor;
 }
 .upload-canceled .progress-info .progress-container {

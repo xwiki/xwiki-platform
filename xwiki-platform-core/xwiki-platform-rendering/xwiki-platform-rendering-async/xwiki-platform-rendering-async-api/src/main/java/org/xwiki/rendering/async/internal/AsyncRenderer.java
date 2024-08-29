@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Execute a task and return a {@link AsyncRendererResult} containing the resulting String (and possibly other more
@@ -69,7 +68,6 @@ public interface AsyncRenderer
      * @return the {@link JobGroupPath} to be used for this renderer: if null a single job executor will be used.
      * @since 12.5RC1
      */
-    @Unstable
     default JobGroupPath getJobGroupPath()
     {
         return null;

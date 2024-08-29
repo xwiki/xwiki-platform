@@ -19,6 +19,7 @@
  */
 package org.xwiki.store.merge;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,5 +78,31 @@ public class MergeDocumentResultScriptTest
         assertSame(mergedXDocument.newDocument(xcontext), result.getMergedDocument());
         assertSame(nextXDocument.newDocument(xcontext), result.getNextDocument());
         assertSame(previousXDocument.newDocument(xcontext), result.getPreviousDocument());
+    }
+
+    @Test
+    void hasOnlyContentConflicts()
+    {
+        MergeDocumentResult mergeDocumentResult = mock(MergeDocumentResult.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        XWikiDocument currentXDocument = mockDocument(xcontext);
+        when(mergeDocumentResult.getCurrentDocument()).thenReturn(currentXDocument);
+        XWikiDocument mergedXDocument = mockDocument(xcontext);
+        when(mergeDocumentResult.getMergeResult()).thenReturn(mergedXDocument);
+        XWikiDocument nextXDocument = mockDocument(xcontext);
+        when(mergeDocumentResult.getNextDocument()).thenReturn(nextXDocument);
+        XWikiDocument previousXDocument = mockDocument(xcontext);
+        when(mergeDocumentResult.getPreviousDocument()).thenReturn(previousXDocument);
+
+        MergeDocumentResultScript result = new MergeDocumentResultScript(mergeDocumentResult, xcontext);
+        assertFalse(result.hasOnlyContentConflicts());
+
+        when(mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT))
+            .thenReturn(Collections.singletonList(mock(Conflict.class)));
+        when(mergeDocumentResult.getConflictsNumber()).thenReturn(2);
+        assertFalse(result.hasOnlyContentConflicts());
+
+        when(mergeDocumentResult.getConflictsNumber()).thenReturn(1);
+        assertTrue(result.hasOnlyContentConflicts());
     }
 }

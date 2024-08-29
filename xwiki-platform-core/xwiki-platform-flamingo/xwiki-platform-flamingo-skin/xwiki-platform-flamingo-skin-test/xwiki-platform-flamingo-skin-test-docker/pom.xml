@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -110,6 +110,36 @@
       <artifactId>xwiki-platform-wiki-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Required to create wikis -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Needed for PDFExportIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-dashboard-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-sandbox</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <!-- Needed for CompareIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-diff-xml</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -139,6 +169,25 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed or PDFExportIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-export-pdf-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed for HibernateStoreAPIIT -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -167,14 +216,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables>
                 <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
                      WEB-INF/lib -->
-                <property>
-                  <name>xwiki.test.ui.profiles</name>
-                  <value>clover</value>
-                </property>
-              </systemProperties>
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

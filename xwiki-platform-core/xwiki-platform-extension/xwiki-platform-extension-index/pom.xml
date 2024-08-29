@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-index</artifactId>
   <name>XWiki Platform - Extension - Index</name>
   <packaging>jar</packaging>
   <description>Local index of extension coming from various repositories</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.26</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.34</xwiki.jacoco.instructionRatio>
 
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
@@ -57,6 +57,11 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flavor-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>us.springett</groupId>
+      <artifactId>cvss-calculator</artifactId>
+      <version>${cvssCalculator.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -100,7 +105,8 @@
             <configuration>
               <excludes>
                 org/xwiki/extension/index/internal/ExtensionIndexStore.java,
-                org/xwiki/extension/index/internal/job/ExtensionIndexJob.java
+                org/xwiki/extension/index/internal/job/ExtensionIndexJob.java,
+                org/xwiki/extension/index/internal/DefaultExtensionIndex.java
               </excludes>
             </configuration>
           </execution>

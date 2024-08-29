@@ -22,7 +22,6 @@ package org.xwiki.store.filesystem.internal;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.WikiDeletedEvent;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class WikiDeletedListenerTest
+class WikiDeletedListenerTest
 {
     @InjectMockComponents
     private WikiDeletedListener wikiDeletedListener;
@@ -45,7 +44,7 @@ public class WikiDeletedListenerTest
     private FilesystemStoreTools filesystemStoreTools;
 
     @Test
-    public void onEvent() throws IOException
+    void onEvent() throws IOException
     {
         WikiDeletedEvent wikiDeletedEvent = mock(WikiDeletedEvent.class);
         String wikiId = "foo";

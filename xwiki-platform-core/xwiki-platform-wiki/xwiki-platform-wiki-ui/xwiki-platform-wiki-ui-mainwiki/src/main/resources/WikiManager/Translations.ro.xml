@@ -226,7 +226,6 @@ platform.wiki.create.wizard.step.cleaningUp.confirm=Confirmă
 platform.wiki.create.wizard.step.previous=Pasul anterior
 platform.wiki.create.wizard.step.next=Pasul următor
 platform.wiki.create.wizard.step.create=Creează
-
 ### Missing: platform.wiki.create.wizard.step.creation=Wiki creation
 ### Missing: platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
 ### Missing: platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
@@ -244,7 +243,7 @@ platform.wiki.create.wizard.step.create=Creează
 ## XWikiServer Sheet
 ### Missing: platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 ### Missing: platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+### Missing: platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exist.
 ### Missing: platform.wiki.sheet.title.settings=Wiki properties
 ### Missing: platform.wiki.sheet.title.createnewalias=Create new alias
 ### Missing: platform.wiki.sheet.title.viewaliases=View aliases
@@ -263,7 +262,7 @@ platform.wiki.sheet.prop.owner=Posesor
 platform.wiki.sheet.prop.description=Descriere
 ### Missing: platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Pagina de start
-### Missing: platform.wiki.sheet.prop.iswikitemplate=Wiki template
+platform.wiki.sheet.prop.iswikitemplate=Șablon Wiki
 ### Missing: platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
 ### Missing: platform.wiki.sheet.descriptor.admin=administration page of the wiki.
 ### Missing: platform.wiki.sheet.aliases=An alias is another name for the wiki. You can add aliases to create different URLs for the wiki.
@@ -303,5 +302,6 @@ platform.wiki.delete.confirmation.yes=Da
 platform.wiki.delete.confirmation.no=Nu
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

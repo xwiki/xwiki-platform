@@ -22,15 +22,11 @@ package org.xwiki.tree.test.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -87,10 +83,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement openTo(String nodeId)
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) getDriver()).executeScript(
-                "jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element, nodeId);
-        }
+        getDriver().executeScript("jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element,
+            nodeId);
         waitForNodeSelected(nodeId);
 
         return this;
@@ -104,10 +98,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement clearSelection()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            ((JavascriptExecutor) getDriver()).executeScript(
-                "jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
-        }
+        getDriver().executeScript("jQuery.jstree.reference(jQuery(arguments[0])).deselect_all()", this.element);
+
         return this;
     }
 
@@ -122,15 +114,12 @@ public class TreeElement extends BaseElement
         // being initialized, so its presence guarantees that the tree initialization has started.
         getDriver().waitUntilElementIsVisible(this.element, By.cssSelector(".jstree-container-ul"));
         // Wait for the root node to be loaded.
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                // The tree element is marked as busy while the tree nodes are being loaded.
-                return !Boolean.valueOf(element.getAttribute("aria-busy"));
-            }
-        });
+        getDriver().waitUntilCondition(driver ->
+            // The tree element is marked as busy while the tree nodes are being loaded.
+            !Boolean.parseBoolean(this.element.getAttribute("aria-busy"))
+                // Check if there is any descendant of the element that is marked as busy.
+                && this.element.findElements(By.cssSelector("[aria-busy = 'true']")).isEmpty()
+        );
         return this;
     }
 
@@ -143,7 +132,8 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForNodeSelected(String nodeId)
     {
-        String selectedNodeXPath = String.format(".//*[@id = '%s' and @aria-selected = 'true']", nodeId);
+        String selectedNodeXPath =
+            String.format(".//*[@id = '%s_anchor' and contains(@class, 'jstree-clicked')]", nodeId);
         getDriver().waitUntilElementIsVisible(this.element, By.xpath(selectedNodeXPath));
         return this;
     }
@@ -156,17 +146,11 @@ public class TreeElement extends BaseElement
     /**
      * @return the list of selected node IDs.
      */
+    @SuppressWarnings("unchecked")
     public List<String> getSelectedNodeIDs()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            List<String> selectedNodeIDs =
-                (List<String>) ((JavascriptExecutor) getDriver()).executeScript(
-                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
-
-            return selectedNodeIDs;
-        }
-
-        return new ArrayList<String>();
+        return (List<String>) getDriver()
+            .executeScript("return jQuery.jstree.reference(jQuery(arguments[0])).get_selected()", this.element);
     }
 
     /**
@@ -174,21 +158,17 @@ public class TreeElement extends BaseElement
      */
     public List<String> getNodeIDs()
     {
-        if (getDriver() instanceof JavascriptExecutor) {
-            String[] selectedNodeIDs =
-                (String[]) ((JavascriptExecutor) getDriver()).executeScript(
-                    "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
-                        + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
-                    this.element);
+        String[] selectedNodeIDs = (String[]) getDriver().executeScript(
+            "return jQuery.jstree.reference(jQuery(arguments[0])).get_json('#', "
+                + "{flat:true, no_data:true, no_state:true})" + ".map(function(element) {return element.id});",
+            this.element);
 
-            return Arrays.asList(selectedNodeIDs);
-        }
-
-        return new ArrayList<String>();
+        return Arrays.asList(selectedNodeIDs);
     }
 
     /**
      * Allow to select multiple nodes at once by maintaining ctrl key pressed while clicking on nodes.
+     * 
      * @param nodes the nodes to select.
      * @since 13.3RC1
      */
@@ -216,8 +196,8 @@ public class TreeElement extends BaseElement
     {
         return getDriver()
             .findElementsWithoutWaiting(this.element,
-                By.cssSelector(".jstree-node[aria-level=\"1\"]:not(.jstree-hidden)"))
+                By.cssSelector(".jstree-container-ul > .jstree-node:not(.jstree-hidden)"))
             .stream().map(nodeElement -> By.id(nodeElement.getAttribute("id")))
-            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).collect(Collectors.toList());
+            .map(nodeLocator -> new TreeNodeElement(this.element, nodeLocator)).toList();
     }
 }

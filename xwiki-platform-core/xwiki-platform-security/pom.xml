@@ -23,29 +23,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security</artifactId>
-  <name>XWiki Platform - Security</name>
-  <description>XWiki Platform - Security is a replacement for the old xwiki rights service (experimental)</description>
+  <name>XWiki Platform - Security - Parent POM</name>
+  <description>Security APIs (Authentication, Authorization, and more)</description>
   <packaging>pom</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+  <!-- Sorted Alphabetically -->
   <modules>
     <module>xwiki-platform-security-api</module>
-    <module>xwiki-platform-security-bridge</module>
-    <module>xwiki-platform-security-script</module>
     <module>xwiki-platform-security-authentication</module>
+    <module>xwiki-platform-security-authorization</module>
+    <module>xwiki-platform-security-requiredrights</module>
   </modules>
 </project>

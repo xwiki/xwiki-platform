@@ -1,0 +1,124 @@
+#blueimp-gallery {
+  /* This breakage of the codestyle (no hard coded colors) is intended and
+      has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+  background-color: rgba(0, 0, 0, 0.9);
+
+  > div.slides {
+    padding: 2% 0;
+  }
+
+  > .indicator {
+    bottom: 7%;
+
+    /* Make the thumbnails bigger. */
+    > li {
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+    }
+  }
+
+  .controls {
+    position: absolute;
+    top: 3%;
+    right: 3%;
+    opacity: .8;
+    cursor: pointer;
+  }
+
+  .lightboxDescription {
+    /* This breakage of the codestyle (no hard coded colors) is intended and
+        has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    overflow-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    max-width: 25%;
+    max-height: 43%;
+    top: 2%;
+    left: 2%;
+    padding: 2%;
+
+    .caption {
+      overflow-y: auto;
+    }
+
+    .descriptionMetadata {
+      padding-top: 1%;
+
+      .copyImageId {
+        width: fit-content;
+      }
+    }
+  }
+}
+.blueimp-gallery {
+  .action:hover , span.btn:hover {
+    /* This breakage of the codestyle (no hard coded colors) is intended and
+        has been discussed in https://forum.xwiki.org/t/lightbox-modal-background/13114 */
+    border-color: #fff;
+    color: #fff;
+  }
+
+  .action {
+    color: #fff;
+    display: none;
+  }
+
+  .tooltip-inner {
+    white-space:nowrap;
+  }
+}
+
+.blueimp-gallery-controls {
+  .action {
+    display: block;
+    /* Fix z-index issues (controls behind slide element) on Android: */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+img + .lightbox-toggle {
+  min-width: @target-size-minimum;
+  min-height: @target-size-minimum;
+  vertical-align: top;
+  margin: 0 0 0 -@target-size-minimum;
+}
+
+#imageToolbarTemplate {
+  display: none;
+}
+
+#imagePopoverContainer {
+  position: absolute;
+
+  .popover {
+    white-space: nowrap;
+  }
+
+  .popover-content {
+    padding: 0;
+  }
+
+  .imageToolbar {
+    display: flex;
+
+    & > *, & a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: @target-size-recommended;
+      min-height: @target-size-recommended;
+    }
+
+    .tooltip-inner {
+      white-space: nowrap;
+    }
+  }
+}

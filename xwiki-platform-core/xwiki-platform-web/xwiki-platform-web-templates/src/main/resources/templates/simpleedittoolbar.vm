@@ -18,7 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 <script src="$xwiki.getSkinFile("js/xwiki/wikieditor/wikibits.js")"></script>
-<script>
+
 ## Syntax elements is a list of: [identifier, start markup, end markup, image name].
 ## The identifier is used to display the button title, and the sample text.
 ## The image is retrieved from /resources/icons/silk/imageName.png
@@ -74,13 +74,25 @@
 #set($discard = $confluence10Elements.add(['h4', '\nh4. ', '\n', 'text_heading_4']))
 #set($discard = $confluence10Elements.add(['hr', '\n----\n', '', 'text_horizontalrule']))
 #set($discard = $confluence10Elements.add(['img', '!', '!', 'image']))
-#if($doc.syntax.toIdString() == 'xwiki/1.0')
+## Ensure $edit is defined in the current context. It's normally the case if this template is called from
+## an AbstractEditor call, but that might not be the case if the template is included, like it is in AWM.Content.
+## Here we ensure to preserve backward compatibility.
+#if (!$edit.data)
+  #set ($edit = {
+    'data': {
+    'syntax': $doc.syntax
+  }
+  })
+#end
+#if($edit.data.syntax.toIdString() == 'xwiki/1.0')
   #set($syntaxElements = $syntax10Elements)
-#elseif($doc.syntax.toIdString() == "xwiki/2.0" || $doc.syntax.toIdString() == "xwiki/2.1")
+#elseif($edit.data.syntax.toIdString() == "xwiki/2.0" || $edit.data.syntax.toIdString() == "xwiki/2.1")
   #set($syntaxElements = $syntax20Elements)
-#elseif($doc.syntax.toIdString() == "confluence/1.0")
+#elseif($edit.data.syntax.toIdString() == "confluence/1.0")
   #set ($syntaxElements = $confluence10Elements)
 #end
+#if ($syntaxElements)
+<script>
 // <![CDATA[
 document.writeln("<div class='leftmenu2'>");
 #foreach($item in $syntaxElements)
@@ -94,3 +106,4 @@ document.writeln("<div class='leftmenu2'>");
 document.writeln("<" + "/div>");
 // ]]>
 </script>
+#end

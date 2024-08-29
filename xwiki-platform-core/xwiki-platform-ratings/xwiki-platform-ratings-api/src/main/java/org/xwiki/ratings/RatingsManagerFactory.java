@@ -22,7 +22,6 @@ package org.xwiki.ratings;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow to create dedicated instances of {@link RatingsManager} for any rating usage.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.9RC1
  */
 @Role
-@Unstable
 public interface RatingsManagerFactory
 {
     /**

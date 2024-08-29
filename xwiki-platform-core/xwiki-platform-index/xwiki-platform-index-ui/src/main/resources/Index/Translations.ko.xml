@@ -36,13 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=스페이스
+  <content>index.spacesMacro.title=Spaces
 index.spacesMacro.spaceIndex.title=스페이스 목록 보기
 index.spacesMacro.spaceIndex.alt=스페이스 목록
 index.spacesMacro.spaceAdministration.title=스페이스 관리자 보기
 index.spacesMacro.spaceAdministration.alt=관리자 스페이스
 index.spacesMacro.createSpace.link=스페이스 생성
 index.spacesMacro.createSpace.defaultSpaceName=스페이스 이름
-index.spacesMacro.createSpace.submit=생성
-index.deletedDocuments.deleteAll=전체 삭제</content>
+index.spacesMacro.createSpace.submit=글쓰기
+index.deletedDocuments.deleteAll=전체 삭제
+index.administration.remainingTasks.heading=나머지 문서 분석 작업
+index.administration.remainingTasks.emptyQueue=남은 작업이 없습니다.
+admin.documentanalysis=문서 분석
+</content>
 </xwikidoc>

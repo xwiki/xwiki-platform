@@ -34,11 +34,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -51,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @since 12.9RC1
  */
 @ComponentTest
-public class DefaultRatingsManagerFactoryTest
+class DefaultRatingsManagerFactoryTest
 {
     @InjectMockComponents
     private DefaultRatingsManagerFactory factory;
@@ -99,6 +97,8 @@ public class DefaultRatingsManagerFactoryTest
         expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        expectedComponentDescriptor.setRoleHintPriority(0);
+        expectedComponentDescriptor.setRoleTypePriority(0);
 
         assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);
@@ -123,6 +123,8 @@ public class DefaultRatingsManagerFactoryTest
         expectedComponentDescriptor.setImplementation(SolrRatingsManager.class);
         expectedComponentDescriptor.setRoleHint(hint);
         expectedComponentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        expectedComponentDescriptor.setRoleHintPriority(0);
+        expectedComponentDescriptor.setRoleTypePriority(0);
 
         assertSame(this.ratingsManager, this.factory.getRatingsManager(hint));
         verify(this.currentComponentManager).registerComponent(expectedComponentDescriptor, this.ratingsManager);

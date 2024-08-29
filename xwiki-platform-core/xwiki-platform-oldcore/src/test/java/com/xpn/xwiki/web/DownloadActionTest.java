@@ -20,29 +20,32 @@
 package com.xpn.xwiki.web;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
-import javax.inject.Named;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.environment.Environment;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -73,7 +76,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-public class DownloadActionTest
+class DownloadActionTest
 {
     /** The name of the attachment being downloaded in most of the tests. */
     private static final String DEFAULT_FILE_NAME = "file.txt";
@@ -104,7 +107,8 @@ public class DownloadActionTest
     private ServletOutputStream out;
 
     /** The action being tested. */
-    private DownloadAction action = new DownloadAction();
+    @InjectMockComponents
+    private DownloadAction action;
 
     /** The content of the file being downloaded in most of the tests. */
     private byte[] fileContent = "abcdefghijklmn".getBytes(XWiki.DEFAULT_ENCODING);
@@ -127,7 +131,6 @@ public class DownloadActionTest
     @BeforeEach
     public void before() throws Exception
     {
-        this.oldcore.registerMockEnvironment();
         this.oldcore.getXWikiContext().setRequest(this.request);
         this.oldcore.getXWikiContext().setResponse(this.response);
         this.oldcore.getXWikiContext().setEngineContext(this.engineContext);
@@ -144,7 +147,6 @@ public class DownloadActionTest
         when(this.response.getOutputStream()).thenReturn(this.out);
         when(this.oldcore.getMockRightService().hasAccessLevel(eq("programming"), any(), any(),
             any(XWikiContext.class))).thenReturn(false);
-
     }
 
     // Helpers for the tests
@@ -771,5 +773,138 @@ public class DownloadActionTest
 
         verifyOutputExpectations(0, this.fileContent.length);
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
+    }
+
+    private static final class StubServletOutputStream extends ServletOutputStream
+    {
+        public ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        public void write(int i) throws IOException
+        {
+            baos.write(i);
+        }
+
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener)
+        {
+            // Nor needed
+        }
+    }
+
+    @Test
+    void renderWhenAttachmentIsInANestedSpace() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        // Setup the returned attachment
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getContentLongSize(xcontext)).thenReturn(100L);
+        Date now = new Date();
+        when(attachment.getDate()).thenReturn(now);
+        when(attachment.getFilename()).thenReturn("file.ext");
+        when(attachment.getContentInputStream(xcontext)).thenReturn(new ByteArrayInputStream("test".getBytes()));
+        when(attachment.getMimeType(xcontext)).thenReturn("mimetype");
+
+        // Set the current doc
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getAttachment("file.ext")).thenReturn(attachment);
+        xcontext.setDoc(document);
+
+        // Set the Plugin Manager
+        XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
+        when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
+        doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
+
+        // Set the Response
+        StubServletOutputStream ssos = new StubServletOutputStream();
+        when(response.getOutputStream()).thenReturn(ssos);
+
+        // Set the Resource Reference Manager used to parse the URL and extract the attachment name
+        ResourceReferenceManager rrm = this.oldcore.getMocker().registerMockComponent(ResourceReferenceManager.class);
+        when(rrm.getResourceReference()).thenReturn(new EntityResourceReference(new AttachmentReference("file.ext",
+            new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page")), EntityResourceAction.VIEW));
+
+        // Note: we don't give PR and the attachment is not an authorized mime type.
+
+        assertNull(action.render(xcontext));
+
+        // This is the test, we verify what is set in the response
+        verify(response).setContentType("mimetype");
+        verify(response).setHeader("Accept-Ranges", "bytes");
+        verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.ext");
+        verify(response).setDateHeader("Last-Modified", now.getTime());
+        verify(response).setContentLengthLong(100);
+        assertEquals("test", ssos.baos.toString());
+    }
+
+    @Test
+    void renderWhenZipExplorerPluginURL() throws Exception
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        when(request.getRequestURI())
+            .thenReturn("http://localhost:8080/xwiki/bin/download/space/page/file.ext/some/path");
+
+        // Set the current doc and current wiki
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getAttachment("path")).thenReturn(null);
+        xcontext.setDoc(document);
+        xcontext.setWikiId("wiki");
+        xcontext.setAction("download");
+
+        // Set the Response
+        StubServletOutputStream ssos = new StubServletOutputStream();
+        when(response.getOutputStream()).thenReturn(ssos);
+
+        // Set the Resource Reference Manager used to parse the URL and extract the attachment name
+        ResourceReferenceManager rrm = this.oldcore.getMocker().registerMockComponent(ResourceReferenceManager.class);
+        when(rrm.getResourceReference()).thenReturn(new EntityResourceReference(new AttachmentReference("path",
+            new DocumentReference("wiki", Arrays.asList("space", "page", "file.ext"), "some")),
+            EntityResourceAction.VIEW));
+
+        // Setup the returned attachment
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getContentLongSize(xcontext)).thenReturn(100L);
+        Date now = new Date();
+        when(attachment.getDate()).thenReturn(now);
+        when(attachment.getFilename()).thenReturn("file.ext");
+        when(attachment.getContentInputStream(xcontext)).thenReturn(new ByteArrayInputStream("test".getBytes()));
+        when(attachment.getMimeType(xcontext)).thenReturn("mimetype");
+        when(attachment.clone()).thenReturn(attachment);
+
+        // Configure an existing doc in the store
+        XWiki xwiki = this.oldcore.getSpyXWiki();
+        XWikiDocument backwardCompatDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        backwardCompatDocument.addAttachment(attachment);
+        xwiki.saveDocument(backwardCompatDocument, xcontext);
+
+        // Make sure the user has permission to access the doc
+        doReturn(true).when(xwiki).checkAccess(eq("download"), any(XWikiDocument.class), any(XWikiContext.class));
+
+        // Setup ExecutionContextManager & VelocityManager using in the context backup
+        ExecutionContextManager ecm = this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
+        ExecutionContext ec = this.oldcore.getExecutionContext();
+        when(ecm.clone(ec)).thenReturn(ec);
+        VelocityManager vm = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+
+        // Set the Plugin Manager
+        XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
+        when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
+        doReturn(pluginManager).when(this.oldcore.getSpyXWiki()).getPluginManager();
+
+        assertNull(action.render(xcontext));
+
+        // This is the test, we verify what is set in the response
+        verify(response).setContentType("mimetype");
+        verify(response).setHeader("Accept-Ranges", "bytes");
+        verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.ext");
+        verify(response).setDateHeader("Last-Modified", now.getTime());
+        verify(response).setContentLengthLong(100);
+        assertEquals("test", ssos.baos.toString());
     }
 }

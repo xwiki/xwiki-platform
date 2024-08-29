@@ -19,6 +19,8 @@
  */
 package org.xwiki.template;
 
+import java.time.Instant;
+
 /**
  * A template.
  *
@@ -36,6 +38,15 @@ public interface Template
      * @return the path of the template
      */
     String getPath();
+
+    /**
+     * @return the instant the cached content of that template was last modified or null if it's unknown
+     * @since 15.8RC1
+     */
+    default Instant getInstant()
+    {
+        return null;
+    }
 
     /**
      * Parse and return the template content.

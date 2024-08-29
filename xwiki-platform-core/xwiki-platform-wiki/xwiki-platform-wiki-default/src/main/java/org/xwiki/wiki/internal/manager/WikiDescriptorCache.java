@@ -85,7 +85,9 @@ public class WikiDescriptorCache implements Initializable
 
         // Update the wiki alias cache
         for (String alias : descriptor.getAliases()) {
-            addFromAlias(alias, descriptor);
+            if (alias != null) {
+                addFromAlias(alias, descriptor);
+            }
         }
     }
 

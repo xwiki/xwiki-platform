@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
- * Represents the live table that lists the existing applications on the AppWithinMinuts home page.
+ * Represents the live table that lists the existing applications on the AppWithinMinutes home page.
  * 
  * @version $Id$
  * @since 4.2M1
@@ -133,7 +133,9 @@ public class ApplicationsLiveTableElement extends LiveTableElement
             "//tr[td[contains(@class, 'doc_title') and . = '" + escapedAppName
                 + "']]/td[@class = 'actions']//a[contains(@class, 'action" + action + "')]";
         WebElement liveTableBody = getDriver().findElement(By.id("livetable-display"));
-        return liveTableBody.findElements(By.xpath(actionLinkXPath)).size() > 0;
+        // Don't wait as this needs significant time when the action doesn't exist and actions should be available
+        // after waiting for the LiveTable to be ready.
+        return !getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath(actionLinkXPath)).isEmpty();
     }
 
     /**

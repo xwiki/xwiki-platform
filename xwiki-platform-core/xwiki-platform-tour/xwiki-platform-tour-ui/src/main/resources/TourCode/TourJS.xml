@@ -1,0 +1,624 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="TourCode.TourJS" locale="">
+  <web>TourCode</web>
+  <name>TourJS</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>TourJS</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b31091c4-0138-41e8-b366-bbc7ca201b61</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>##----------------------------------
+## Manage translations
+##----------------------------------
+#**
+ * Used to display a rendered translation with proper escapes.
+ *#
+#macro(tr $key)$escapetool.javascript($escapetool.xml($services.localization.render($key)))#end
+//----------------------------------
+// RequireJS configuration
+//----------------------------------
+require.config({
+  paths: {
+    #if ("$!request.minify" == 'false')
+      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.js', {'wiki':$xcontext.database})"
+    #else
+      'bootstrap-tour': "$services.webjars.url('bootstrap-tour', 'js/bootstrap-tour.min.js', {'wiki':$xcontext.database})"
+    #end
+  },
+  shim: {
+    'bootstrap-tour': {
+      deps: ['bootstrap', 'jquery'],
+      exports : 'Tour'
+    }
+  }
+});
+//----------------------------------
+// Display a tour if needed
+//----------------------------------
+require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
+
+  /**
+   * Escape strings so they respect the Tour API constraints.
+   */
+  var escapeTourName = function (tourName) {
+    // The Tour API says tour name must contain only alphanumerics, underscores and hyphens.
+    // So we replace any forbidden character by its ASCII value, surrounded by an underscore (that we forbid too to 
+    // avoid collisions).
+    return tourName.replace(/[^a-zA-Z0-9\-]/g, function(character) {
+      return '_'+character.charCodeAt(0)+'_';
+    });
+  };
+
+  /**
+   * Add a resume button to start the tour again when it has been closed
+   */
+  var createResumeButton = function (tour, showPopover) {
+    // Create a container when the button will be displayed. This container will also contains the "popover", so the "popover" stay near the button when the page is resized.
+    // (see http://getbootstrap.com/javascript/#popovers-options 'container')
+    var buttonContainer = $('&lt;div id="tourResumeContainer"&gt;&lt;/div&gt;').appendTo($(document.body));
+    // Create the popover
+    var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
+    // Create the button that will start the tour again
+    const button = $('&lt;button id=\'tourResume\' class=\'btn btn-default btn-xs\'&gt;&lt;/button&gt;')
+      .html("$escapetool.javascript($services.icon.renderHTML('info')) #tr('tour.popover.show')")
+      .appendTo(buttonContainer);
+
+    if (showPopover) {
+      buttonContainer.addClass('opened');
+      button.removeAttr('hidden');
+      popover.attr('open','open');
+    }
+
+    button.on('click', function() {
+      if (showPopover) {
+        popover.removeAttr('open');
+        button.attr('hidden', true);
+        buttonContainer.removeClass('opened');
+      }
+
+      if (window.localStorage.getItem(tour._options.name + '_current_step') != tour._options.steps.length - 1) {
+        // Make sure we can redirect again to the current step.
+        window.localStorage.removeItem(tour._options.name + '_redirect_to');
+        // We don't rely on the force parameter because it is lost on redirect. Instead, we just remove the flag that
+        // marks the tour as finished.
+        window.localStorage.removeItem(tour._options.name + '_end');
+        tour.start(true);
+      } else {
+        tour.restart();
+      }
+      button.attr('hidden', true);
+      buttonContainer.removeClass('opened');
+    });
+  }
+
+  /**
+   * The template to display a step.
+   */
+  var getTemplate = function (index, step) {
+    var idPrefix = 'bootstrap_tour';
+    var template = '&lt;div class="popover tour" style="min-width: 300px;"&gt;\n'
+                 + ' &lt;a class="btn btn-xs btn-default" href="#" id="'+idPrefix+'_close" aria-label="#tr("tour.popover.quit")" title="#tr("tour.popover.quit")"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
+                 + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
+                 + '  &lt;h2 class="popover-title"&gt;&lt;/h2&gt;\n'
+                 + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
+                 + '  &lt;div class="popover-navigation row"&gt;\n'
+                 + '    &lt;div class="col-xs-6 text-left"&gt;\n';
+    if (step.prev &gt; -1) {
+      template  += '      &lt;a class="btn btn-default btn-sm" href="#" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
+    }
+    template    += '    &lt;/div&gt;\n'
+                 + '    &lt;div class="col-xs-6 text-right"&gt;\n';
+    if (step.next &gt; -1) {
+      template  += '      &lt;a class="btn btn-primary btn-sm" href="#" id="'+idPrefix+'_next"&gt;#tr("tour.popover.next")&lt;/a&gt;\n';
+    } else {
+      template  += '      &lt;a class="btn btn-success btn-sm" href="#" id="'+idPrefix+'_end"&gt;#tr("tour.popover.end")&lt;/a&gt;\n'
+    }
+    template    += '    &lt;/div&gt;\n'
+                 + '  &lt;/div&gt;'
+                 + '&lt;/div&gt;';
+    return template;
+  }
+
+  /**
+   * Associate the template buttons to their actions on the tour
+   */
+  var onShown = function (tour) {
+      var idPrefix = 'bootstrap_tour';
+      var closeButtonSelector = '#' + idPrefix + '_close';
+      var endButtonSelector = '#' + idPrefix + '_end';
+      var prevButtonSelector = '#' + idPrefix + '_prev';
+      var nextButtonSelector = '#' + idPrefix + '_next';
+
+    $(closeButtonSelector)
+      .on('click', function (event) {
+        tour.end();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        if (event.which === 32 || event.which === 13) {
+          tour.end();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      })
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.contains(event.relatedTarget)) {
+          $(nextButtonSelector + ', ' + endButtonSelector).focus();
+        }
+      });
+
+    $(endButtonSelector)
+      .on('click', function (event) {
+        tour.end();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.end();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      });
+
+    $(prevButtonSelector)
+      .on('click', function (event) {
+        tour.prev();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.prev();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      })
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
+          $(nextButtonSelector + ', ' + endButtonSelector).focus();
+        }
+      });
+
+    $(nextButtonSelector)
+      .on('click', function (event) {
+        tour.next();
+        event.preventDefault();
+      })
+      .on('keypress', function (event) {
+        // Activate the anchor/button when space or enter are pressed down
+        if (event.which === 32 || event.which === 13) {
+          tour.next();
+        }
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      });
+
+    // Wrap around in tab order when the popover is opened, and focus the 'Next' button when the tour step is opened.
+    $(nextButtonSelector + ', ' + endButtonSelector)
+      .on('focusout', function (event) {
+        if (event.relatedTarget !== null &amp;&amp; !event.currentTarget.parentNode.parentNode.parentNode.contains(event.relatedTarget)) {
+          $(closeButtonSelector).focus();
+        }
+      })
+      .focus();
+
+    // Avoid having the close button on top of the title
+    $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
+    $('.tour').on('keydown', function (event) {
+      // Exit the tour if the escape key is pressed down.
+      if (event.which === 27) {
+        tour.end();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        $('.tour').off('keydown');
+      }
+    });
+  }
+
+  /**
+   * Create a tour from a JSON file
+   */
+  var createTour = function (jsonData) {
+    // Add stylesheet only when needed
+    var cssURL = "$services.webjars.url('bootstrap-tour', 'css/bootstrap-tour.min.css', {'wiki':$xcontext.database})";
+    $('&lt;link/&gt;').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', cssURL).appendTo($(document.head));
+
+    // Require 'bootstrap-tour' only when needed
+    require(['bootstrap-tour'], function(Tour) {
+
+      // Create the tour
+      var tourName = escapeTourName('tour_' + jsonData.name);
+      var tour     = new Tour({
+        name    : tourName,
+        storage : window.localStorage,
+        onEnd   : function() {
+          let buttonContainer = $('#tourResumeContainer');
+          if (buttonContainer.length === 0) {
+            createResumeButton(tour, true);
+          } else {
+            buttonContainer.addClass('opened');
+            let button = $('#tourResume');
+            button.removeAttr('hidden');
+            // Show the popover
+            let popover = buttonContainer.find('.popover-content').first();
+            popover.attr('open','open');
+            // Hide it after 7 seconds
+            setTimeout(function() {
+              buttonContainer.removeClass('opened');
+              popover.removeAttr('open');
+            }, 7000);
+          }
+        },
+        onShown : onShown,
+        orphan  : false,
+        container: "#contentcontainer",
+        template: getTemplate
+      });
+
+      // Create the steps
+      for (var i = 0; i &lt; jsonData.steps.length; i++) {
+        tour.addStep(jsonData.steps[i]);
+      }
+
+      // Look if the tour should be started regardless of its status on the local storage
+      var getQueryStringParameterByName = function (name) {
+        var match = RegExp('[?&amp;]' + name + '=([^&amp;]*)').exec(window.location.search);
+        return match &amp;&amp; decodeURIComponent(match[1].replace(/\+/g, ' '));
+      }
+      var forceStart = getQueryStringParameterByName('startTour') == 'true';
+
+      var tourEnded = window.localStorage.getItem(tourName + '_end') === 'yes';
+      // Initialize the current step index from local storage.
+      tour.setCurrentStep();
+      var currentStep = tour.getStep(tour.getCurrentStep() || 0);
+      var tourNeedsRedirect = tour._isRedirect(currentStep.host, currentStep.path, document.location);
+      var tourAutoStart = !tourEnded &amp;&amp; !tourNeedsRedirect;
+
+      // Launch the tour.
+      if (forceStart) {
+        tour.restart();
+      } else if (tourAutoStart) {
+        tour.start();
+      }
+
+      // Create a resume button if the tour has already been closed by the user in the past.
+      if (!tourAutoStart) {
+        createResumeButton(tour, false);
+      }
+    });
+  };
+
+  /**
+   * Load asynchronously the list of steps concerning the current page.
+   * It's done asynchronously so it does not improve the page rendering time. It's important since this code is used
+   * everywhere.
+   */
+  $(function() {
+
+    /**
+     * The tour is not adapted for little screen sizes like mobile phones have.
+     * The value 768 is taken from bootstrap in order to be consistent with their media queries.
+     */
+    if ($(window).innerWidth() &lt;= 768) {
+      return;
+    }
+
+    $.getJSON(new XWiki.Document('TourJson', 'TourCode').getURL('get'), {
+      xpage: 'plain',
+      outputSyntax: 'plain',
+      tourDoc: xm.document
+    }).done(function(json) {
+      for (var i = 0; i &lt; json.tours.length; ++i) {
+        var tour = json.tours[i];
+        if (tour.steps.length &gt; 0) {
+          createTour(tour);
+        }
+      }
+    });
+  });
+});</code>
+    </property>
+    <property>
+      <name>Definition of a Bootstrap Tour module</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>TourCode.TourJS</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4457314f-90d1-4678-af4c-399211bc3362</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#tourResumeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  align-content: stretch;
+  gap: 1em;
+
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 2000;
+
+  &amp; &gt; #tourResume {
+    width: fit-content;
+    &amp;[hidden] {
+      display: none;
+    }
+  }
+
+  &amp; &gt; .popover-content {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out, visibility 0s 0.2s;
+    position: relative;
+    max-width: 276px;
+    padding: 1px;
+    line-break: auto;
+    text-align: left;
+    padding: 0.5em;
+    background-color: @dropdown-bg;
+    border: solid 0.2em @dropdown-border;
+    border-radius: 1em 1em 0 1em;
+    width: 100%;
+
+    &amp;::after {
+      position: absolute;
+      right: 0em;
+      content: '';
+      bottom: -1em;
+      width: 0;
+      height: 0;
+      border-left: 1em solid transparent;
+      border-right: 1em solid transparent;
+      border-top: 1em solid @dropdown-bg;
+      clear: both;
+    }
+  }
+}
+
+#tourResumeContainer.opened {
+  &amp; &gt; .popover-content {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
+}
+
+@media print {
+  #tourResumeContainer {
+    display: none;
+  }
+}
+
+#bootstrap_tour_close {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+}
+</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+</xwikidoc>

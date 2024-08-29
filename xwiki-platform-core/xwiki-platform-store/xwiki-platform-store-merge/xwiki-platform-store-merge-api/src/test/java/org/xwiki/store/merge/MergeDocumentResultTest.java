@@ -23,16 +23,20 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
+import org.xwiki.logging.LogQueue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link MergeDocumentResult}.
@@ -128,5 +132,112 @@ public class MergeDocumentResultTest
             mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, new MergeManagerResult());
         });
         assertEquals("The merge result of document part [CONTENT] has already been put.", exception.getMessage());
+    }
+
+    @Test
+    void equalsAndHashCode()
+    {
+        DocumentModelBridge currentDoc = mock(DocumentModelBridge.class);
+        DocumentModelBridge previousDoc = mock(DocumentModelBridge.class);
+        DocumentModelBridge nextDoc = mock(DocumentModelBridge.class);
+        DocumentModelBridge mergeResult = mock(DocumentModelBridge.class);
+
+        MergeDocumentResult mergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        mergeDocumentResult.setMergeResult(mergeResult);
+
+        MergeManagerResult contentResult = mock(MergeManagerResult.class);
+        when(contentResult.getLog()).thenReturn(new LogQueue());
+        mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+
+        MergeManagerResult xObjectsResult = mock(MergeManagerResult.class);
+        when(xObjectsResult.getLog()).thenReturn(new LogQueue());
+        mergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+
+        mergeDocumentResult.getLog().info("Something");
+
+        MergeDocumentResult otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        // adding logs doesn't change equality, unless it's an error log
+        mergeDocumentResult.getLog().warn("Another log");
+        assertEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult.getLog().error("SOmething's wrong");
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        MergeManagerResult titleResult = mock(MergeManagerResult.class);
+        when(titleResult.getLog()).thenReturn(new LogQueue());
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.TITLE, titleResult);
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(mock(DocumentModelBridge.class), previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, mock(DocumentModelBridge.class), nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, mock(DocumentModelBridge.class));
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mock(DocumentModelBridge.class));
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
+
+        otherMergeDocumentResult = new MergeDocumentResult(currentDoc, previousDoc, nextDoc);
+        otherMergeDocumentResult.setMergeResult(mergeResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.CONTENT, contentResult);
+        otherMergeDocumentResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, xObjectsResult);
+        otherMergeDocumentResult.getLog().info("Something");
+        otherMergeDocumentResult.setModified(true);
+
+        assertNotEquals(mergeDocumentResult, otherMergeDocumentResult);
+        assertNotEquals(mergeDocumentResult.hashCode(), otherMergeDocumentResult.hashCode());
     }
 }

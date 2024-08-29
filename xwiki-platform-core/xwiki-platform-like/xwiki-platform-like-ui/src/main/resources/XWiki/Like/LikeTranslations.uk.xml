@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Like.LikeTranslations" locale="uk">
+  <web>XWiki.Like</web>
+  <name>LikeTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LikeTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rightsmanager.like=Уподобання
+like.unlike.modal.title=Підтвердження не уподобання
+like.unlike.modal.body=Ви впевнені, що бажаєте видалити уподобання зі сторінки {0}?
+like.unlike.modal.closeButton=Закрити
+like.unlike.modal.unlikeButton=Не вподобати сторінку
+like.unlike.modal.viewLikersButton=Уподобання
+like.newlike.success=Сторінка вподобана.
+like.newlike.error=Помилка під час спроби уподобати сторінку.
+like.unlike.success=Уподобання сторінки було скасоване.
+like.unlike.error=Помилка під час спроби скасовувати уподобання сторінки.
+like.userprofile.menu=Сторінки, які сподобалися
+like.button.title=Кількість уподобань на цій сторінці: {0}
+like.button.title.like=Натисніть, щоб уподобати поточну сторінку. Кількість уподобань на цій сторінці: {0}.
+like.button.title.unlike=Натисніть, щоб скасувати уподобання поточної сторінки. Кількість уподобань на цій сторінці: {0}.
+like.likers.empty=Ця сторінка ще нікому не сподобалась.
+like.likers.number={0} особі(ам) подобається ця сторінка:
+like.likers.title=Користувачі, яким подобається {0}
+like.livetable.column.title=Назва
+like.livetable.column.location=Розташування
+like.livetable.column.likes=Уподобання
+like.configuration.heading=Налаштування Уподобань
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton=Завжди показувати кнопку Уподобання
+XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Відображати кнопку, навіть якщо у користувача немає прав на її взаємодію. Використовуйте це, якщо бажаєте завжди відображати лічильник уподобань.
+XWiki.Like.LikeConfigurationClass_cacheCapacity=Ємність кешу
+XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Кількість уподобань, які зберігаються в кеші. Зауважте, що вам потрібно перезапустити XWiki, щоб ця зміна опції була врахована.
+XWiki.Like.LikeConfigurationClass_enabled=Увімкнути функцію Уподобання
+XWiki.Like.LikeConfigurationClass_enabled.hint=Якщо не обрано, функція Уподобання буде вимкнена, а інформація, пов'язана з цим, буде прихована.
+</content>
+</xwikidoc>

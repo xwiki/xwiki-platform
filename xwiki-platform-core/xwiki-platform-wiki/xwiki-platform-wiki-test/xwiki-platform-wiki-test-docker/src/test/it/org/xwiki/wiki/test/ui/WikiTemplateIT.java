@@ -53,21 +53,17 @@ import static org.xwiki.wiki.test.po.WikiIndexPage.WIKI_NAME_COLUMN_LABEL;
     properties = {
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
-        // Prevent the DW from starting. This is needed because xwiki-platform-extension-distribution is provisioned
-        // transitively by org.xwiki.platform:xwiki-platform-wiki-creationjob and will cause a ClassNotFoundException
-        // since Struts is in the webapp CL and will not see the DistributionAction located in the extension CL. And
-        // even if the class was found the DW would start which is not something we want.
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+        // Deleting a wiki through a script service currently requires that the document hold the script
+        // has programming rights, see https://tinyurl.com/2p8u5mhu
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:WikiManager\\.DeleteWiki"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
-        // Notifications, as otherwise even streams won't have a store.
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        // We need it since the Tag UI requires Notifications, as otherwise even streams won't have a store.
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr",
         // Required by components located in a core extensions
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
@@ -143,14 +139,13 @@ class WikiTemplateIT
         WikiEditPage wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent(TEMPLATE_CONTENT);
         wikiEditPage.clickSaveAndView();
-        wikiEditPage.waitUntilPageIsLoaded();
 
         // Go back to the wiki creation wizard, and verify the template is in the list of templates in the wizard.
         createWikiPage = wikiHomePage.createWiki();
         assertTrue(createWikiPage.getTemplateList().contains("mynewtemplate"));
 
         // Verify the wiki is in the wiki index page.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         WikiLink wikiLink = wikiIndexPage.getWikiLink("My new template");
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -170,7 +165,7 @@ class WikiTemplateIT
     private void deleteTemplateWiki() throws Exception
     {
         // Go to the template wiki.
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -178,7 +173,7 @@ class WikiTemplateIT
         DeleteWikiPage deleteWikiPage = wikiIndexPage.deleteWiki("My new template").confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         assertNull(wikiIndexPage.getWikiLink("My new template", false));
     }
 
@@ -219,7 +214,7 @@ class WikiTemplateIT
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
         // Verify the wiki has been deleted.
-        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
+        wikiIndexPage = WikiIndexPage.gotoPage();
         assertNull(wikiIndexPage.getWikiLink("My new wiki", false));
     }
 

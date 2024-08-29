@@ -57,7 +57,6 @@ import com.xpn.xwiki.internal.export.OfficeExporterURLFactory;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
@@ -112,7 +111,7 @@ public class ExportAction extends XWikiAction
      * @return always return null.
      * @throws XWikiException error when exporting HTML ZIP package.
      * @throws IOException error when exporting HTML ZIP package.
-     * @since XWiki Platform 1.3M1
+     * @since 1.3M1
      */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
@@ -153,6 +152,10 @@ public class ExportAction extends XWikiAction
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException
     {
+        // Put the specified document revision in the context early so that it can be used even when the export format
+        // is unknown (e.g. when performing client-side PDF export).
+        handleRevision(context);
+
         // We currently use the PDF export infrastructure but we have to redesign the export code.
         XWikiURLFactory urlFactory = new OfficeExporterURLFactory();
         PdfExport exporter = new OfficeExporter();
@@ -161,9 +164,7 @@ public class ExportAction extends XWikiAction
         // Note 1: exportType will be null if no office server is started or it doesn't support the passed format
         // Note 2: we don't use the office server for PDF exports since it doesn't work OOB. Instead we use FOP.
         if ("pdf".equalsIgnoreCase(format)) {
-            // The export format is PDF or the office converter can't be used (either it doesn't support the specified
-            // format or the office server is not started).
-            urlFactory = new PdfURLFactory();
+            urlFactory = new ExternalServletURLFactory();
             exporter = new PdfExportImpl();
             exportType = ExportType.PDF;
         } else if (exportType == null) {
@@ -173,7 +174,6 @@ public class ExportAction extends XWikiAction
 
         urlFactory.init(context);
         context.setURLFactory(urlFactory);
-        handleRevision(context);
 
         XWikiDocument doc = context.getDoc();
         context.getResponse().setContentType(exportType.getMimeType());
@@ -269,52 +269,55 @@ public class ExportAction extends XWikiAction
             InputFilterStreamFactory inputFilterStreamFactory =
                 Utils.getComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
 
-            InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(inputProperties);
+            try (InputFilterStream inputFilterStream
+                 = inputFilterStreamFactory.createInputFilterStream(inputProperties))
+            {
+                // Create output wiki stream
+                XAROutputProperties xarProperties = new XAROutputProperties();
 
-            // Create output wiki stream
-            XAROutputProperties xarProperties = new XAROutputProperties();
+                // We don't want to log the details
+                xarProperties.setVerbose(false);
+                if (optimized) {
+                    xarProperties.setOptimized(optimized);
+                }
 
-            // We don't want to log the details
-            xarProperties.setVerbose(false);
-            if (optimized) {
-                xarProperties.setOptimized(optimized);
+                XWikiResponse response = context.getResponse();
+
+                xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+                xarProperties.setPackageName(name);
+                if (description != null) {
+                    xarProperties.setPackageDescription(description);
+                }
+                if (licence != null) {
+                    xarProperties.setPackageLicense(licence);
+                }
+                if (author != null) {
+                    xarProperties.setPackageAuthor(author);
+                }
+                if (version != null) {
+                    xarProperties.setPackageVersion(version);
+                }
+                xarProperties.setPackageBackupPack(backup);
+                xarProperties.setPreserveVersion(backup || history);
+
+                BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
+                    .getComponent((Type) OutputFilterStreamFactory.class,
+                        FilterStreamType.XWIKI_XAR_CURRENT.serialize());
+
+                try (OutputFilterStream outputFilterStream
+                         = xarFilterStreamFactory.createOutputFilterStream(xarProperties))
+                {
+                    // Export
+                    response.setContentType("application/zip");
+                    response.addHeader("Content-disposition",
+                        "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
+
+                    inputFilterStream.read(outputFilterStream.getFilter());
+                }
+
+                // Flush
+                response.getOutputStream().flush();
             }
-
-            XWikiResponse response = context.getResponse();
-
-            xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
-            xarProperties.setPackageName(name);
-            if (description != null) {
-                xarProperties.setPackageDescription(description);
-            }
-            if (licence != null) {
-                xarProperties.setPackageLicense(licence);
-            }
-            if (author != null) {
-                xarProperties.setPackageAuthor(author);
-            }
-            if (version != null) {
-                xarProperties.setPackageVersion(version);
-            }
-            xarProperties.setPackageBackupPack(backup);
-            xarProperties.setPreserveVersion(backup || history);
-
-            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory = Utils
-                .getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
-
-            OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
-
-            // Export
-            response.setContentType("application/zip");
-            response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
-
-            inputFilterStream.read(outputFilterStream.getFilter());
-
-            inputFilterStream.close();
-            outputFilterStream.close();
-
-            // Flush
-            response.getOutputStream().flush();
 
             // Indicate that we are done with the response so no need to add anything
             context.setFinished(true);

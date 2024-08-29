@@ -80,7 +80,6 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
     public PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
         throws XWikiRestException
     {
-        XWikiContext xcontext = xcontextProvider.get();
 
         String reference = "";
         if (rawValue != null) {
@@ -93,7 +92,7 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         DocumentReference documentReference = this.documentReferenceResolver.resolve(reference, propertyReference);
 
         PropertyValue propertyValue = null;
-        if (xcontext.getWiki().exists(documentReference, xcontext)) {
+        if (exists(documentReference)) {
             propertyValue = super.getValue(propertyReference, documentReference);
         }
 
@@ -104,6 +103,18 @@ public abstract class AbstractDocumentListClassPropertyValuesProvider<T extends 
         propertyValue.setValue(reference);
 
         return propertyValue;
+    }
+
+    private boolean exists(DocumentReference documentReference) throws XWikiRestException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        try {
+            return xcontext.getWiki().exists(documentReference, xcontext);
+        } catch (Exception e) {
+            throw new XWikiRestException(
+                "Failed to check the existence of the document with reference [" + documentReference + "]", e);
+        }
     }
 
     /**

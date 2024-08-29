@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsAutoWatchPreferencesMacro</name>
   <language/>
@@ -140,10 +140,10 @@
       target: target,
       user: input.data('user'),
       csrf: xm.form_token
-    }).done(function() {
+    }).then(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.saved')), 'done'));
-    }).error(function() {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.savingfailed')), 'error'));
     });
@@ -200,7 +200,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -275,15 +275,24 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -366,8 +375,8 @@
       <code>{{velocity}}
 #if (!$services.notification.watch.isEnabled())
   {{warning}}
-    {{localization key="notifications.settings.watch.disabled" /}}
-  {{warning}}
+    {{translation key="notifications.settings.watch.disabled" /}}
+  {{/warning}}
 #elseif (!$xcontext.userReference)
   {{info}}
     {{translation key="notifications.settings.watch.forGuest" /}}
@@ -382,7 +391,7 @@
   {{/error}}
 #elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
   {{error}}
-    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="$wikimacro.parameters.user" /}}
+    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="~"${services.rendering.escape($escapetool.java($wikimacro.parameters.user), 'xwiki/2.1')}~"" /}}
   {{/error}}
 #else
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsAutoWatchPreferencesMacro'))
@@ -394,18 +403,18 @@
 #set ($dataUser = "")
 #if ($wikimacro.parameters.target == 'user')
   #set ($mode = $services.notification.watch.getAutomaticWatchMode($targetUser))
-  #set ($dataUser = "data-user=""$services.model.serialize($targetUser)""")
+  #set ($dataUser = "data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #else
   #set ($mode = $services.notification.watch.defaultAutomaticWatchMode)
 #end
 {{html clean="false"}}
   &lt;div class="xform"&gt;
     &lt;dl&gt;
-      &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode'))&lt;/label&gt;
-      &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
+      &lt;dt&gt;&lt;label for='preference_notification_autowatch'&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode'))&lt;/label&gt;
+        &lt;p id='preference_notification_autowatch_hint' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.watch.autowatchmode.hint'))&lt;/p&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;select class="notificationAutoWatchMode" data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;
+        &lt;select id='preference_notification_autowatch' class="notificationAutoWatchMode" aria-describedby='preference_notification_autowatch_hint' data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;
           &lt;option value="NONE" #if($mode == 'NONE')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE'))&lt;/option&gt;
           &lt;option value="ALL"  #if($mode == 'ALL')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL'))&lt;/option&gt;
           &lt;option value="MAJOR" #if($mode == 'MAJOR')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR'))&lt;/option&gt;
@@ -428,7 +437,9 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description/>

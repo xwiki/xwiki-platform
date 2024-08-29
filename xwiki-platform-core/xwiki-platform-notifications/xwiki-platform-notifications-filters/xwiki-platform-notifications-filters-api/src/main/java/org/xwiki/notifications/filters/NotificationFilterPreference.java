@@ -20,9 +20,15 @@
 package org.xwiki.notifications.filters;
 
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.stability.Unstable;
+
+import static com.xpn.xwiki.doc.XWikiDocument.DB_SPACE_SEP;
 
 /**
  * Define the preference of a notification filter.
@@ -43,6 +49,13 @@ import org.xwiki.notifications.NotificationFormat;
 public interface NotificationFilterPreference
 {
     /**
+     * Prefix to be used for the ID only when the preference is stored in database.
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    String DB_ID_FILTER_PREFIX = "NFP_";
+    
+    /**
      * @return the unique identifier of the filter preference.
      * @since 10.8RC1
      * @since 9.11.8
@@ -53,11 +66,6 @@ public interface NotificationFilterPreference
      * @return the name of the filter corresponding to this preference.
      */
     String getFilterName();
-
-    /**
-     * @return the name of the {@link NotificationFilterPreferenceProvider} associated with this preference.
-     */
-    String getProviderHint();
 
     /**
      * @return true if the current notification preference is enabled.
@@ -72,8 +80,14 @@ public interface NotificationFilterPreference
      * notifications.
      *
      * @return true if the filter preference is active.
+     * @deprecated this behaviour doesn't make sense anymore with usage of prefiltering as there's no trigger for
+     * retrieving the notifications nowadays.
      */
-    boolean isActive();
+    @Deprecated(since = "16.5.0RC1")
+    default boolean isActive()
+    {
+        return true;
+    }
 
     /**
      * @return the type of the filter described by this preference.
@@ -138,4 +152,49 @@ public interface NotificationFilterPreference
      * @since 9.11.8
      */
     void setEnabled(boolean enabled);
+
+    /**
+     * Return {@code true} if the filter preference is related to a given wiki. This is the case if {@link #getWiki()}
+     * returns {@code wikiId}, or if {@link #getPage()}, {@link #getPageOnly()} or {@link #getUser()} are containing the
+     * wiki identifier.
+     *
+     * @param wikiId a wiki identifier
+     * @return {@code true} if the notification filter preference is related to a given wiki, {@code false} otherwise
+     * @since 14.5
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    default boolean isFromWiki(String wikiId)
+    {
+        String wikiIdWithPrefix = wikiId + DB_SPACE_SEP;
+        return Objects.equals(getWiki(), wikiId)
+            || StringUtils.startsWith(getPage(), wikiIdWithPrefix)
+            || StringUtils.startsWith(getPageOnly(), wikiIdWithPrefix)
+            || StringUtils.startsWith(getUser(), wikiIdWithPrefix);
+    }
+
+    /**
+     * {@link #getWiki()}, {@link #getPage()}, {@link #getPageOnly()} and {@link #getUser()} are analyzed (in this
+     * order) to find the wiki identifier. The first non-null value is used.
+     *
+     * @return the wiki identifier of the resource concerned by the filter preference, {@link Optional#empty()} if no
+     *     wiki identifier can be found
+     * @since 14.5
+     * @since 14.4.1
+     * @since 13.10.7
+     */
+    default Optional<String> getWikiId()
+    {
+        String wikiId = null;
+        if (getWiki() != null) {
+            wikiId = getWiki();
+        } else if (getPage() != null) {
+            wikiId = StringUtils.substringBefore(getPage(), DB_SPACE_SEP);
+        } else if (getPageOnly() != null) {
+            wikiId = StringUtils.substringBefore(getPageOnly(), DB_SPACE_SEP);
+        } else if (getUser() != null) {
+            wikiId = StringUtils.substringBefore(getUser(), DB_SPACE_SEP);
+        }
+        return Optional.ofNullable(wikiId);
+    }
 }

@@ -1,0 +1,102 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+### Move attachment template
+###
+
+#set ($attachment = $request.attachment)
+#if ("$!attachment" == '')
+  ## Retrieve the value from the submitted form on error.
+  #set ($attachment = $request.targetAttachmentName)
+#end
+#set ($attachment = $services.model.resolveAttachment($attachment))
+
+#if (!$services.security.authorization.hasAccess('view', $doc.documentReference) && "$!request.moveId" == '')
+  #template("accessdenied.vm")
+#elseif ($xcontext.action == 'get' && "$!request.moveId" != '')
+  #template('job_macros.vm')
+  #set ($moveJobStatus = $services.job.getJobStatus(['refactoring', 'moveAttachment', $request.moveId]))
+  #outputJobStatusJSON($moveJobStatus)
+#else
+  #template("startpage.vm")
+  #if ("$!step" == '')
+    #set ($step = "$!request.step")
+    #if ("$!step" == '')
+      #set ($step = '1')
+    #end
+  #end
+  <div class="main layoutsubsection">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
+    #if ("$!request.moveId" != '')
+      ## Display the move status
+      #template("attachment/moveStatus.vm")
+    #elseif ($step == 1)
+      ## Display the move form
+      #template("attachment/moveStep1.vm")
+    #elseif (!$services.csrf.isTokenValid($request.form_token))
+      ## CSRF protection
+      $response.sendRedirect("$!services.csrf.resubmissionURL")
+    #else
+      #set ($sourceLocation = $request.sourceLocation)
+      #set ($sourceAttachmentName = $request.sourceAttachmentName)
+      #set ($targetLocation = $request.targetLocation)
+      #set ($targetAttachmentName = $request.targetAttachmentName)
+      #set ($autoRedirect = $request.autoRedirect == 'true')
+      #set ($updateReferences = $request.updateReferences == 'true')
+      ## Do the move. It's the form in attachment/moveStep1.vm page that calls this page with step=2.
+      #if ("$!targetAttachmentName.trim()" == '' || "$!targetLocation.trim()" == '')
+        $response.setStatus(400)
+        #error($escapetool.xml($services.localization.render('attachment.move.emptyName')))
+        #template("attachment/moveStep1.vm")
+      #else
+        #template('attachment/refactoring_macros.vm')
+        #if (!$services.attachment.locationAvailable($targetLocation, $targetAttachmentName)) 
+          $response.setStatus(409)
+          #error($services.localization.render('attachment.move.alreadyExists', [
+            ${escapetool.xml($targetAttachmentName)}, ${escapetool.xml($targetLocation)}, 
+            $xwiki.getURL($targetLocation)]))
+          #template("attachment/moveStep1.vm")
+        #elseif (!$services.security.authorization.hasAccess('edit', $targetLocation))
+          $response.setStatus(403)
+          #error($escapetool.xml($services.localization.render('attachment.move.targetNotWritable')))
+          #template('attachment/moveStep1.vm')
+        #else
+          #try("moveJobException")
+            #set ($moveRequest = $services.attachment.createMoveRequest($sourceLocation, $sourceAttachmentName, 
+              $targetLocation, $targetAttachmentName, $xcontext.user, $autoRedirect, $updateReferences))
+            #set ($moveJob = $services.attachment.createMoveJob($moveRequest))
+          #end
+          #if ("$!moveJobException" != '')
+            #displayException($escapetool.xml($services.localization.render('attachment.job.creation.error')), $moveJobException)
+          #else
+            $response.sendRedirect($doc.getURL($xcontext.action, $escapetool.url({
+              'xpage': 'attachment/move',
+              'moveId': $moveRequest.id.get($mathtool.sub($moveRequest.id.size(), 1))
+            })))
+          #end
+        #end
+      #end
+    #end
+    <div class="clearfloats"></div>
+  </main>## mainContentArea
+  </div>## main
+  #template("endpage.vm")
+#end

@@ -1,0 +1,3 @@
+org.xwiki.extension.security.notifications.NewExtensionSecurityVulnerabilityTargetableEventDescriptor
+org.xwiki.extension.security.notifications.ExtensionSecurityIndexationEventListener
+org.xwiki.extension.security.notifications.internal.NewExtensionSecurityVulnerabilityRecordableEventConverter

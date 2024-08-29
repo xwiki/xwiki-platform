@@ -19,15 +19,20 @@
  */
 package org.xwiki.model.internal.reference;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AbstractLocalizedEntityReference;
@@ -82,6 +87,13 @@ public class DefaultSymbolScheme implements SymbolScheme
     private static final char CESCAPE = '\\';
 
     /**
+     * The separator used between the entity type and the reference.
+     * 
+     * @since 14.8RC1
+     */
+    private static final char CENTITYTYPESEP = ':';
+
+    /**
      * A colon character. Colon is used to separate wiki name.
      */
     private static final char CWIKISEP = ':';
@@ -128,11 +140,11 @@ public class DefaultSymbolScheme implements SymbolScheme
 
     private static final Map<EntityType, Map<EntityType, Character>> SEPARATORS = new EnumMap<>(EntityType.class);
 
-    private static final Map<EntityType, ParameterConfiguration> PARAMETER_SEPARATORS = new EnumMap<>(EntityType.class);
-
     private static final Map<EntityType, String> KEYWORDS_CURRENT = new EnumMap<>(EntityType.class);
 
     private static final Map<EntityType, String> KEYWORDS_PARENT = new EnumMap<>(EntityType.class);
+
+    private static final Map<String, Type> PARAMETER_TYPES = new HashMap<>();
 
     static {
         SEPARATORS.put(EntityType.WIKI, Collections.emptyMap());
@@ -142,19 +154,13 @@ public class DefaultSymbolScheme implements SymbolScheme
         pageSeparators.put(EntityType.WIKI, CWIKISEP);
         pageSeparators.put(EntityType.PAGE, CPAGESEP);
         SEPARATORS.put(EntityType.PAGE, pageSeparators);
-        PARAMETER_SEPARATORS.put(EntityType.PAGE,
-            new ParameterConfiguration(CPARAMETERSEP, AbstractLocalizedEntityReference.LOCALE));
         KEYWORDS_CURRENT.put(EntityType.PAGE, ".");
         KEYWORDS_PARENT.put(EntityType.PAGE, "..");
 
         SEPARATORS.put(EntityType.PAGE_ATTACHMENT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
-        PARAMETER_SEPARATORS.put(EntityType.PAGE_ATTACHMENT, new ParameterConfiguration(CPARAMETERSEP));
         SEPARATORS.put(EntityType.PAGE_OBJECT, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
-        PARAMETER_SEPARATORS.put(EntityType.PAGE_OBJECT, new ParameterConfiguration(CPARAMETERSEP));
         SEPARATORS.put(EntityType.PAGE_OBJECT_PROPERTY, Collections.singletonMap(EntityType.PAGE_OBJECT, CPAGESEP));
-        PARAMETER_SEPARATORS.put(EntityType.PAGE_OBJECT_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
         SEPARATORS.put(EntityType.PAGE_CLASS_PROPERTY, Collections.singletonMap(EntityType.PAGE, CPAGESEP));
-        PARAMETER_SEPARATORS.put(EntityType.PAGE_CLASS_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
 
         // Documents
         Map<EntityType, Character> spaceSeparators = new EnumMap<>(EntityType.class);
@@ -167,7 +173,11 @@ public class DefaultSymbolScheme implements SymbolScheme
         SEPARATORS.put(EntityType.OBJECT, Collections.singletonMap(EntityType.DOCUMENT, COBJECTSEP));
         SEPARATORS.put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(EntityType.OBJECT, CPROPERTYSEP));
         SEPARATORS.put(EntityType.CLASS_PROPERTY, Collections.singletonMap(EntityType.DOCUMENT, CCLASSPROPSEP));
+
+        PARAMETER_TYPES.put(AbstractLocalizedEntityReference.LOCALE, Locale.class);
     }
+
+    private Map<EntityType, ParameterConfiguration> parameterSeparators;
 
     private Map<EntityType, String[]> escapes;
 
@@ -178,14 +188,29 @@ public class DefaultSymbolScheme implements SymbolScheme
      */
     public DefaultSymbolScheme()
     {
-        initialize();
+        initialize(false);
     }
 
     /**
      * Initialize internal data structures.
+     * 
+     * @param withParameters true if the parameters syntax should be supported for all entity types
      */
-    public void initialize()
+    public DefaultSymbolScheme(boolean withParameters)
     {
+        initialize(withParameters);
+    }
+
+    /**
+     * Initialize internal data structures.
+     * 
+     * @param withParameters true if the parameters syntax should be supported for all entity types
+     */
+    private void initialize(boolean withParameters)
+    {
+        // Initialize parameters setup
+        initializeParameters(withParameters);
+
         // Dynamically create the escape/replacement maps.
         // The characters to escape are all the characters that are separators between the current type and its parent
         // type + the escape symbol itself.
@@ -206,8 +231,8 @@ public class DefaultSymbolScheme implements SymbolScheme
             }
 
             // Add parameter escaping
-            ParameterConfiguration parameter = PARAMETER_SEPARATORS.get(type);
-            if (parameter != null  && parameter.separator != null) {
+            ParameterConfiguration parameter = parameterSeparators.get(type);
+            if (parameter != null && parameter.separator != null) {
                 charactersToEscape.add(parameter.separator.toString());
                 replacementCharacters.add(escape + parameter.separator);
             }
@@ -222,7 +247,7 @@ public class DefaultSymbolScheme implements SymbolScheme
             this.replacements.put(type, replacementCharacters.toArray(replacementsArray));
         }
 
-        for (Map.Entry<EntityType, ParameterConfiguration> entry : PARAMETER_SEPARATORS.entrySet()) {
+        for (Map.Entry<EntityType, ParameterConfiguration> entry : parameterSeparators.entrySet()) {
             EntityType type = entry.getKey();
             ParameterConfiguration configuration = entry.getValue();
 
@@ -237,10 +262,38 @@ public class DefaultSymbolScheme implements SymbolScheme
         }
     }
 
+    private void initializeParameters(boolean withParameters)
+    {
+        this.parameterSeparators = new EnumMap<>(EntityType.class);
+        this.parameterSeparators.put(EntityType.PAGE,
+            new ParameterConfiguration(CPARAMETERSEP, AbstractLocalizedEntityReference.LOCALE));
+        this.parameterSeparators.put(EntityType.PAGE_ATTACHMENT, new ParameterConfiguration(CPARAMETERSEP));
+        this.parameterSeparators.put(EntityType.PAGE_OBJECT, new ParameterConfiguration(CPARAMETERSEP));
+        this.parameterSeparators.put(EntityType.PAGE_OBJECT_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+        this.parameterSeparators.put(EntityType.PAGE_CLASS_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+
+        if (withParameters) {
+            this.parameterSeparators.put(EntityType.WIKI, new ParameterConfiguration(CPARAMETERSEP));
+            this.parameterSeparators.put(EntityType.SPACE, new ParameterConfiguration(CPARAMETERSEP));
+            this.parameterSeparators.put(EntityType.DOCUMENT,
+                new ParameterConfiguration(CPARAMETERSEP, AbstractLocalizedEntityReference.LOCALE));
+            this.parameterSeparators.put(EntityType.ATTACHMENT, new ParameterConfiguration(CPARAMETERSEP));
+            this.parameterSeparators.put(EntityType.OBJECT, new ParameterConfiguration(CPARAMETERSEP));
+            this.parameterSeparators.put(EntityType.OBJECT_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+            this.parameterSeparators.put(EntityType.CLASS_PROPERTY, new ParameterConfiguration(CPARAMETERSEP));
+        }
+    }
+
     @Override
     public Character getEscapeSymbol()
     {
         return CESCAPE;
+    }
+
+    @Override
+    public Character getEntityTypeSeparator()
+    {
+        return CENTITYTYPESEP;
     }
 
     @Override
@@ -264,7 +317,7 @@ public class DefaultSymbolScheme implements SymbolScheme
     @Override
     public Character getParameterSeparator(EntityType type)
     {
-        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+        ParameterConfiguration configuration = parameterSeparators.get(type);
 
         return configuration != null ? configuration.separator : null;
     }
@@ -272,7 +325,7 @@ public class DefaultSymbolScheme implements SymbolScheme
     @Override
     public String getDefaultParameter(EntityType type)
     {
-        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+        ParameterConfiguration configuration = parameterSeparators.get(type);
 
         return configuration != null ? configuration.defaultParameter : null;
     }
@@ -280,7 +333,7 @@ public class DefaultSymbolScheme implements SymbolScheme
     @Override
     public String[] getParameterSymbolsRequiringEscapes(EntityType type)
     {
-        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+        ParameterConfiguration configuration = parameterSeparators.get(type);
 
         return configuration != null ? configuration.escapes : null;
     }
@@ -288,9 +341,21 @@ public class DefaultSymbolScheme implements SymbolScheme
     @Override
     public String[] getParameterReplacementSymbols(EntityType type)
     {
-        ParameterConfiguration configuration = PARAMETER_SEPARATORS.get(type);
+        ParameterConfiguration configuration = parameterSeparators.get(type);
 
         return configuration != null ? configuration.replacements : null;
+    }
+
+    @Override
+    public Serializable resolveParameter(String parameter, String value)
+    {
+        Type type = PARAMETER_TYPES.get(parameter);
+
+        if (type == Locale.class) {
+            return LocaleUtils.toLocale(value);
+        }
+
+        return value;
     }
 
     @Override

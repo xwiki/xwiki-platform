@@ -20,7 +20,6 @@
 package org.xwiki.refactoring;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the configurations for the refactoring module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.8RC1
  */
 @Role
-@Unstable
 public interface RefactoringConfiguration
 {
     /**

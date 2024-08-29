@@ -23,13 +23,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model</artifactId>
-  <name>XWiki Platform - Model</name>
+  <name>XWiki Platform - Model - Parent POM</name>
   <description>XWiki Platform - Model - Parent POM</description>
   <packaging>pom</packaging>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-model-api</module>
     <module>xwiki-platform-model-validation</module>
   </modules>

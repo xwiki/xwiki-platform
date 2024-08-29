@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @version $Id$
  * @since 11.3RC1
  */
-public class PropertiesMergerTest
+class PropertiesMergerTest
 {
     @Test
-    public void mergeWhenXWikiCfgPlugins() throws Exception
+    void mergeWhenXWikiCfgPlugins() throws Exception
     {
         PropertiesMerger merger = new PropertiesMerger();
 
@@ -70,7 +70,7 @@ public class PropertiesMergerTest
     }
 
     @Test
-    public void mergeWhenXWikiCfgPluginsButWithOverrideListProperty() throws DockerTestException
+    void mergeWhenXWikiCfgPluginsButWithOverrideListProperty() throws DockerTestException
     {
         PropertiesMerger merger = new PropertiesMerger();
 
@@ -91,7 +91,7 @@ public class PropertiesMergerTest
     }
 
     @Test
-    public void mergeWhenXWikiCfgPluginsAndNoOverride() throws Exception
+    void mergeWhenXWikiCfgPluginsAndNoOverride() throws Exception
     {
         PropertiesMerger merger = new PropertiesMerger();
 
@@ -121,7 +121,7 @@ public class PropertiesMergerTest
     }
 
     @Test
-    public void mergeWhenXWikiCfgPluginsAndNoOverrideAndConflict()
+    void mergeWhenXWikiCfgPluginsAndNoOverrideAndConflict()
     {
         PropertiesMerger merger = new PropertiesMerger();
 
@@ -134,5 +134,22 @@ public class PropertiesMergerTest
         Throwable exception = assertThrows(DockerTestException.class, () -> merger.merge(original, override, false));
         assertEquals("Cannot merge property [xwikiCfgVirtualUsepath] = [1] since it was already specified with value "
             + "[0]", exception.getMessage());
+    }
+
+    @Test
+    void mergeWhenXWikiPropertiesAdditionalProperties() throws Exception
+    {
+        PropertiesMerger merger = new PropertiesMerger();
+
+        Properties original = new Properties();
+        original.setProperty("xwikiPropertiesAdditionalProperties", "a=b");
+
+        Properties override = new Properties();
+        override.setProperty("xwikiPropertiesAdditionalProperties", "c=d");
+
+        Properties merge = merger.merge(original, override, false);
+
+        assertEquals(1, merge.size());
+        assertEquals("a=b\nc=d", merge.getProperty("xwikiPropertiesAdditionalProperties"));
     }
 }

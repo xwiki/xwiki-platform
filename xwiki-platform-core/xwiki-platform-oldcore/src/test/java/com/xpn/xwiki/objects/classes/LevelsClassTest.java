@@ -30,11 +30,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -98,5 +101,32 @@ public class LevelsClassTest
             + "<option value='delete' label='delete'>delete</option>"
             + "</select><input name='authorizationrights' type='hidden'/>";
         assertEquals(expectedString, stringBuffer.toString());
+    }
+
+    @Test
+    void fromList()
+    {
+        BaseProperty baseProperty = mock(LargeStringProperty.class);
+        List<String> list = Arrays.asList("admin", null, "view", "");
+        LevelsClass levelsClass = new LevelsClass();
+        levelsClass.setMultiSelect(true);
+        levelsClass.fromList(baseProperty, list);
+        verify(baseProperty).setValue("admin,view");
+    }
+
+    @Test
+    void fromStringArray()
+    {
+        String[] array = new String[] {"admin", null, "view", ""};
+        LevelsClass levelsClass = new LevelsClass();
+        levelsClass.setMultiSelect(true);
+        StringProperty expectedProperty = new StringProperty();
+        expectedProperty.setValue("admin,view");
+        expectedProperty.setName("levelslist");
+        assertEquals(expectedProperty, levelsClass.fromStringArray(array));
+
+        array = new String[] { "edit,script" };
+        expectedProperty.setValue("edit,script");
+        assertEquals(expectedProperty, levelsClass.fromStringArray(array));
     }
 }

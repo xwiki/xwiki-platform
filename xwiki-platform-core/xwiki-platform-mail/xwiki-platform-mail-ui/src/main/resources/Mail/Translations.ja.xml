@@ -1,0 +1,80 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=メール
+admin.email.description=メールの送信に関するパラメーターの設定と、メールのステータスの閲覧。
+admin.emailgeneral=高度
+admin.emailgeneral.description=メールアドレスの難読化など、メールの高度なパラメータの設定。
+admin.emailsend=メールの送信
+admin.emailsend.description=メールの送信に関するパラメーターを設定。
+admin.emailstatus=メール送信の状態
+admin.emailstatus.description=送信済のメールの状態を確認し、送信できなかったメールを再送信。
+admin.emailstatus.hint=メールに関する状態が見つからない場合、おそらくメールを送信したプロパティーが、メールの状態を保存するように設定されていなかったことが理由です。
+Mail.GeneralMailConfigClass_obfuscate=Eメールアドレスの難読化
+Mail.GeneralMailConfigClass_obfuscate.hint=これは「Eメール」の種類のオブジェクトプロパティーのカスタム表示機能が上書きされていない限りで、そのプロパティーに保存されたEメールアドレスにのみ適用されます。例：a...@domain.org
+Mail.SendMailConfigClass_from=送信元のEメールアドレス
+Mail.SendMailConfigClass_from.hint=通知メールの送信元に使用する既定のEメールアドレス
+Mail.SendMailConfigClass_bcc=BCCのEメールアドレス
+Mail.SendMailConfigClass_bcc.hint=メールを送信する際に既定で使用するBCCのEメールアドレスのリスト（コンマで分割）
+Mail.SendMailConfigClass_host=Eメールサーバー
+Mail.SendMailConfigClass_host.hint=送信先のSMTPサーバー。既定の値は"localhost"です
+Mail.SendMailConfigClass_port=Eメールサーバーのポート
+Mail.SendMailConfigClass_port.hint=使用するSMTPサーバーのポート。既定の数値は25です
+Mail.SendMailConfigClass_username=Eメールサーバーのユーザー名
+Mail.SendMailConfigClass_username.hint=SMTPサーバーに接続する際のユーザー名。認証が必要な場合のみ
+Mail.SendMailConfigClass_password=Eメールサーバーのパスワード
+Mail.SendMailConfigClass_password.hint=SMTPサーバーに接続する際のパスワード。認証が必要な場合のみ
+Mail.SendMailConfigClass_properties=追加のプロパティー
+Mail.SendMailConfigClass_properties.hint=追加で使用するJavaMailのプロパティーの一覧（例：TLSには"mail.smtp.starttls.enable=true")
+Mail.SendMailConfigClass_sendWaitTime=送信するまでの待機時間
+Mail.SendMailConfigClass_sendWaitTime.hint=各メールを送信するまでの待機時間（ミリ秒。既定の値は8秒です）
+Mail.SendMailConfigClass_discardSuccessStatuses=成功についての状態を破棄しますか？
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=正常に送信されたメールに関する状態が保持されているかは関係ありません（既定の値は真です）
+Mail.SendMailStatus_livetable.date=日付
+Mail.SendMailStatus_livetable.batchId=バッチID
+Mail.SendMailStatus_livetable.type=種類
+Mail.SendMailStatus_livetable.recipients=受信者
+Mail.SendMailStatus_livetable.state=状態
+Mail.SendMailStatus_livetable.wiki=ウィキ
+Mail.SendMailStatus_livetable.error=エラー
+Mail.SendMailStatus_livetable.actions=アクション
+Mail.SendMailStatus_livetable.resend=再送
+mailSender.admin.resendSuccess=メールは正常に再送されました
+mailSender.admin.resendFailure=再送できませんでした。クリックすると詳細を表示します。
+</content>
+</xwikidoc>

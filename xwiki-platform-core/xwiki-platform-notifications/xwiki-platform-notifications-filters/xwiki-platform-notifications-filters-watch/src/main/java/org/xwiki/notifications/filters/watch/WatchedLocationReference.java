@@ -19,15 +19,19 @@
  */
 package org.xwiki.notifications.filters.watch;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
@@ -37,7 +41,9 @@ import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPrefere
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationStateComputer;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
-import org.xwiki.notifications.preferences.internal.UserProfileNotificationPreferenceProvider;
+import org.xwiki.notifications.filters.internal.scope.WatchedLocationState;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * Reference of a location to watch.
@@ -47,60 +53,155 @@ import org.xwiki.notifications.preferences.internal.UserProfileNotificationPrefe
  */
 public class WatchedLocationReference implements WatchedEntityReference
 {
-    private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS
-            = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(NotificationFormat.values())));
+    private static final Set<NotificationFormat> ALL_NOTIFICATION_FORMATS = Set.of(NotificationFormat.values());
 
-    private EntityReference entityReference;
+    private final ComponentManager componentManager;
 
-    private String serializedReference;
+    private final EntityReference entityReference;
 
-    private EntityReferenceResolver<String> resolver;
+    private final String serializedReference;
 
-    private ScopeNotificationFilterLocationStateComputer stateComputer;
+    private final EntityReferenceResolver<String> resolver;
 
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+    private final ScopeNotificationFilterLocationStateComputer stateComputer;
+
+    private final NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    private final UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     /**
      * Construct a WatchedLocationReference.
      * @param entityReference the reference of the location to watch
-     * @param serializedReference the serialized reference of the location to watch
-     * @param resolver the default entity reference resolver
-     * @param stateComputer the default ScopeNotificationFilterLocationStateComputer
-     * @param notificationFilterPreferenceManager the notification filter preference manager
-     * @since 10.9
+     * @param componentManager the component manager for loading needed components
      */
-    public WatchedLocationReference(EntityReference entityReference, String serializedReference,
-            EntityReferenceResolver<String> resolver,
-            ScopeNotificationFilterLocationStateComputer stateComputer,
-            NotificationFilterPreferenceManager notificationFilterPreferenceManager)
+    public WatchedLocationReference(EntityReference entityReference, ComponentManager componentManager)
+        throws ComponentLookupException
     {
         this.entityReference = entityReference;
-        this.serializedReference = serializedReference;
-        this.resolver = resolver;
-        this.stateComputer = stateComputer;
-        this.notificationFilterPreferenceManager = notificationFilterPreferenceManager;
+        this.componentManager = componentManager;
+        EntityReferenceSerializer<String> serializer;
+        this.resolver = componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceResolver.class, String.class));
+        serializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
+        this.stateComputer = componentManager.getInstance(ScopeNotificationFilterLocationStateComputer.class);
+        this.notificationFilterPreferenceManager =
+            componentManager.getInstance(NotificationFilterPreferenceManager.class);
+        this.userReferenceSerializer = componentManager.getInstance(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class), "document");
+
+        this.serializedReference = serializer.serialize(entityReference);
     }
 
     @Override
     public boolean isWatched(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatched(notificationFilterPreferenceManager.getFilterPreferences(userReference),
-                this.entityReference);
+        WatchedLocationState locationWatched =
+            stateComputer.isLocationWatched(notificationFilterPreferenceManager.getFilterPreferences(userReference),
+                this.entityReference, null, null, false, true, false);
+        return locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED
+            || locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED_BY_ANCESTOR
+            || locationWatched.getState() == WatchedLocationState.WatchedState.WATCHED_WITH_CHILDREN;
     }
 
     @Override
     public boolean isWatchedWithAllEventTypes(DocumentReference userReference) throws NotificationException
     {
-        return stateComputer.isLocationWatchedWithAllEventTypes(
-            notificationFilterPreferenceManager.getFilterPreferences(userReference),
+        return getWatchedStatus(userReference) == WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+    }
+
+    @Override
+    public WatchedStatus getWatchedStatus(UserReference userReference) throws NotificationException
+    {
+        DocumentReference userDocReference = this.userReferenceSerializer.serialize(userReference);
+        return getWatchedStatus(userDocReference);
+    }
+
+    /**
+     * Retrieve the specific watched status of an entity for the given user.
+     *
+     * @param userReference the user for whom to check if the entity is watched or not
+     * @return the specific watched status of the entity by the given user
+     * @throws NotificationException in case of errors
+     * @since 15.5RC1
+     */
+    public WatchedStatus getWatchedStatus(DocumentReference userReference) throws NotificationException
+    {
+        Collection<NotificationFilterPreference> filterPreferences =
+            notificationFilterPreferenceManager.getFilterPreferences(userReference);
+        WatchedLocationState locationWatched = stateComputer.isLocationWatchedWithAllTypesAndFormats(filterPreferences,
             this.entityReference);
+        return switch (locationWatched.getState()) {
+            case CUSTOM -> WatchedStatus.CUSTOM;
+            case WATCHED -> WatchedStatus.WATCHED_FOR_ALL_EVENTS_AND_FORMATS;
+            case WATCHED_BY_ANCESTOR -> WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
+            case WATCHED_WITH_CHILDREN -> WatchedStatus.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED -> WatchedStatus.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED_BY_ANCESTOR -> WatchedStatus.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS;
+            case BLOCKED_WITH_CHILDREN -> WatchedStatus.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS;
+            default -> WatchedStatus.NOT_SET;
+        };
+    }
+
+    @Override
+    public Optional<Pair<EntityReference, WatchedStatus>> getFirstFilteredAncestor(UserReference userReference)
+        throws NotificationException
+    {
+        Optional<Pair<EntityReference, WatchedStatus>> result = Optional.empty();
+
+        WatchedStatus watchedStatus = getWatchedStatus(userReference);
+        if (watchedStatus.isBlocked() || watchedStatus.isWatched()) {
+            EntityReference currentReference = entityReference;
+            WatchedStatus parentWatchedStatus = null;
+            do {
+                EntityReference parent = currentReference.getParent();
+                if (parent != null) {
+                    WatchedLocationReference parentWatchedLocationReference =
+                        null;
+                    try {
+                        parentWatchedLocationReference = new WatchedLocationReference(parent, componentManager);
+                    } catch (ComponentLookupException e) {
+                        throw new NotificationException("Error when creating a new reference", e);
+                    }
+                    parentWatchedStatus = parentWatchedLocationReference.getWatchedStatus(userReference);
+                }
+                currentReference = parent;
+            } while (currentReference != null && !keepAncestor(parentWatchedStatus));
+            if (currentReference != null) {
+                result = Optional.of(
+                    Pair.of(currentReference, parentWatchedStatus));
+            }
+        }
+
+        return result;
+    }
+
+    private boolean keepAncestor(WatchedStatus ancestorWatchedStatus)
+    {
+        return (ancestorWatchedStatus.isWatched() || ancestorWatchedStatus.isBlocked())
+            && !(ancestorWatchedStatus == WatchedStatus.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS
+            || ancestorWatchedStatus == WatchedStatus.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS);
     }
 
     @Override
     public boolean matchExactly(NotificationFilterPreference notificationFilterPreference)
     {
         if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())
-            && notificationFilterPreference.getEventTypes().isEmpty()) {
+            && notificationFilterPreference.getEventTypes().isEmpty()
+            && notificationFilterPreference.getNotificationFormats().containsAll(
+                Set.of(NotificationFormat.values()))) {
+            ScopeNotificationFilterPreference scope
+                    = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
+            return entityReference.equals(scope.getScopeReference());
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean match(NotificationFilterPreference notificationFilterPreference)
+    {
+        if (ScopeNotificationFilter.FILTER_NAME.equals(notificationFilterPreference.getFilterName())) {
             ScopeNotificationFilterPreference scope
                     = new ScopeNotificationFilterPreference(notificationFilterPreference, resolver);
             return entityReference.equals(scope.getScopeReference());
@@ -132,8 +233,6 @@ public class WatchedLocationReference implements WatchedEntityReference
         filterPreference.setFilterType(NotificationFilterType.INCLUSIVE);
         filterPreference.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         filterPreference.setNotificationFormats(ALL_NOTIFICATION_FORMATS);
-        filterPreference.setProviderHint(UserProfileNotificationPreferenceProvider.NAME);
-        filterPreference.setActive(false);
         filterPreference.setStartingDate(new Date());
 
         // Properties

@@ -75,7 +75,7 @@ class AbstractServletResourceReferenceHandlerTest
     private OutputStream outputStream;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     /**
      * Local component to test AbstractServletResourceReferenceHandler even though it is an abstract class.

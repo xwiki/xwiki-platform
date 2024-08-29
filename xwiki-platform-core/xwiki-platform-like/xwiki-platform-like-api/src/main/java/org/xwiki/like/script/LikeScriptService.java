@@ -39,7 +39,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -54,7 +53,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Singleton
 @Named("like")
-@Unstable
 public class LikeScriptService implements ScriptService
 {
     @Inject
@@ -113,7 +111,6 @@ public class LikeScriptService implements ScriptService
      * @return {@code true} if the Like feature is enabled.
      * @since 13.1RC1
      */
-    @Unstable
     public boolean isEnabled()
     {
         return this.likeConfiguration.isEnabled();
@@ -223,7 +220,6 @@ public class LikeScriptService implements ScriptService
      * @return the number of likes performed.
      * @since 12.9RC1
      */
-    @Unstable
     public Optional<Long> countUserLikes(UserReference userReference)
     {
         Optional<Long> result = Optional.empty();
@@ -263,7 +259,6 @@ public class LikeScriptService implements ScriptService
      * @return a list of user references who liked the reference.
      * @since 12.8RC1
      */
-    @Unstable
     public List<UserReference> getLikers(EntityReference target, int offset, int limit)
     {
         try {

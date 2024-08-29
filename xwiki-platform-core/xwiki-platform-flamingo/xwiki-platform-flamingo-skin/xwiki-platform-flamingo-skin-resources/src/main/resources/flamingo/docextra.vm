@@ -21,10 +21,12 @@
 ##
 ## More document related data: comments, attachments ...
 ##
-<div id="xwikidata">
+#template('display_macros.vm')
+## This element is set as an aside because it is related to the main content but not part of it.
+<aside id="xwikidata" aria-label="$escapetool.xml($services.localization.render('docextra.label'))">
 ##
 ## Build the list of documents extras to display, if it does not exist (default).
-## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', ExtraNumberOfItems, 'extratemplate.vm', 'keyboardShortcut']
+## List format : ['ExtraAnchor', 'ExtraName', 'ExtraTabText', 'ExtraNumberOfItems', 'extratemplate.vm', 'keyboardShortcut']
 ##
 #if (!$docextras)
   #set ($docextras = [])
@@ -43,10 +45,6 @@
     #set ($discard = $docextras.add(['Annotations', 'annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'annotationsinline.vm', $services.localization.render('core.shortcuts.view.annotations')]))
   #end
   #if ($showattachments)
-    $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-    $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
-    $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
-    $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ### Support attachment sorting
     #set ($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
     #if ($sortAttachmentsBy != '')
@@ -73,7 +71,8 @@
 #foreach($docExtraExtension in $docExtraExtensions)
   #set ($params = $docExtraExtension.parameters)
   #set ($template = "loaddocextrauix.vm&uix=$docExtraExtension.id")
-  #if ($params.show)
+  ## Params are evaluated as string
+  #if ($params.show && $params.show == 'true')
     #set ($newDocExtra = [$docExtraExtension.id, $params.name, $params.title, $params.itemnumber, $template, $params.shortcut])
     #set ($discard = $docextras.add($newDocExtra))
   #end
@@ -164,4 +163,4 @@
     </script>
   </div> ## xwikidatacontents
 #end
-</div>  ## xwikidata
+</aside>  ## xwikidata

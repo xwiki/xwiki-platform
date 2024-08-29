@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
   LayoutCard.vue is the main file for the Card layout component.
@@ -66,6 +65,7 @@
         v-for="(entry, idx) in entries"
         :key="`card-${logic.getEntryId(entry)}-${idx}`"
         :entry="entry"
+        :entry-idx="idx"
       />
 
       <!-- Component to create a new entry -->
@@ -76,6 +76,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-card">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
+      <LivedataPagination/>
     </LivedataBottombar>
 
   </div>
@@ -161,7 +162,7 @@ export default {
 
 .noentries-card {
   text-align: center;
-  color: #777777;
+  color: @text-muted;
   width: 100%;
   padding-bottom: 1em;
 }

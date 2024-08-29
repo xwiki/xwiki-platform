@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="uk">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=Поточна стратегія іменування
+entitynamevalidation.currentStrategy.hint=Стратегія іменування, що використовуватиметься під час створення, перейменування чи збереження документів.
+entitynamevalidation.useTransformation.label=Автоматичне перетворення імен
+entitynamevalidation.useTransformation.hint=Якщо ввімкнено, стратегія іменування використовуватиметься для автоматичної адаптації імені, коли це можливо.
+entitynamevalidation.useValidation.label=Перевірити імена перед збереженням
+entitynamevalidation.useValidation.hint=Якщо ввімкнути, стратегія іменування перевірятиме ім'я перед збереженням: використовуйте цю функцію з обережністю, оскільки це може перешкодити збереженню деяких наявних документів.
+entitynamevalidation.replacementCharacter.configuration=Налаштування стратегії заміни символів
+entitynamevalidation.testStrategy.label=Протестувати обрану стратегію
+entitynamevalidation.testStrategy.hint=Дозволяє перевірити поведінку обраної вами стратегії іменування
+entitynamevalidation.testStrategy.placeholder=Введіть тут ім'я сторінки, щоб протестувати її
+entitynamevalidation.testStrategy.validName=Чи дійсне це ім'я для вибраної стратегії?
+entitynamevalidation.testStrategy.transformedName=Ім'я після трансформації за обраною стратегією:
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=Заборонені символи
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=Замінені символи
+entitynamevalidation.replacementCharacter.livetable._actions=Дії
+entitynamevalidation.replacementCharacter.add=Додати новий символ
+entitynamevalidation.replacementCharacter.addNewCharacter=Додати новий символ, щоб заборонити або замінити
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=Новий заборонений символ
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=Цей символ буде заборонено використовувати в іменах сторінок
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=Введіть тут новий заборонений символ
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=Новий замінений символ
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=Цей символ замінить заборонений символ в іменах сторінок. Якщо не вказати, заборонений символ буде видалено з імен сторінок.
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Введіть тут новий замінений символ або залиште поле пустим
+entitynamevalidation.replacementCharacter.create.inProgress=Додається новий заборонений символ...
+entitynamevalidation.replacementCharacter.create.done=Новий заборонений символ успішно додано.
+entitynamevalidation.replacementCharacter.create.failed=Помилка під час додавання нового забороненого символу.
+entitynamevalidation.replacementCharacter.removeCharacter=Видалення забороненого символу
+entitynamevalidation.replacementCharacter.removeCharacter.warning=Ви впевнені, що хочете видалити цей заборонений символ?
+entitynamevalidation.replacementCharacter.removeCharacter.remove=Видалити
+entitynamevalidation.replacementCharacter.remove.inProgress=Видаляється заборонений символ...
+entitynamevalidation.replacementCharacter.remove.done=Заборонений символ видалено.
+entitynamevalidation.replacementCharacter.remove.failed=Помилка при видаленні забороненого символу.
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Нічого
+entitynamevalidation.admin.heading=Стратегії іменування
+admin.namestrategies=Стратегії іменування
+</content>
+</xwikidoc>

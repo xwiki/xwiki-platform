@@ -21,6 +21,7 @@ package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -30,21 +31,18 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.internal.SimilarityCalculator;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,9 +56,6 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
 {
     @InjectMockComponents
     private PrefilteringLiveNotificationEmailDispatcher dispatcher;
-
-    @MockComponent
-    private SimilarityCalculator similarityCalculator;
 
     @MockComponent
     private PrefilteringLiveNotificationEmailSender sender;
@@ -80,7 +75,7 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
     }
 
     @Test
-    void addEvent() throws IllegalAccessException, InterruptedException, NotificationException
+    void addEvent() throws IllegalAccessException, NotificationException
     {
         // Force a very short grace period so that the test does not take 1 minute
         FieldUtils.writeField(this.dispatcher, "grace", 100, true);
@@ -95,13 +90,9 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
 
         this.dispatcher.addEvent(event, userReference);
 
-        // Give enough time to wait for the grace period and process the event
-        Thread.sleep(400);
-
-        Map<DocumentReference, CompositeEvent> events = new HashMap<>();
-        events.put(userReference, new CompositeEvent(event));
-
-        verify(this.sender).sendMails(events);
+        Map<DocumentReference, List<Event>> events = new HashMap<>();
+        events.put(userReference, List.of(event));
+        verifySendMailsCalled(events);
 
         //////
         // One event with two users
@@ -115,14 +106,10 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         this.dispatcher.addEvent(event, userReference);
         this.dispatcher.addEvent(sameevent, user2Reference);
 
-        // Give enough time to wait for the grace period and process the event
-        Thread.sleep(400);
-
         events = new HashMap<>();
-        events.put(userReference, new CompositeEvent(event));
-        events.put(user2Reference, new CompositeEvent(event));
-
-        verify(this.sender).sendMails(events);
+        events.put(userReference, List.of(event));
+        events.put(user2Reference, List.of(event));
+        verifySendMailsCalled(events);
 
         //////
         // Two similar events
@@ -135,22 +122,21 @@ public class PrefilteringLiveNotificationEmailDispatcherTest
         otherevent.setDate(new Date());
         event.setDate(new Date());
 
-        when(this.similarityCalculator.computeSimilarity(event, similarevent))
-            .thenReturn(SimilarityCalculator.SAME_DOCUMENT_AND_TYPE);
-
         this.dispatcher.addEvent(event, userReference);
         this.dispatcher.addEvent(similarevent, userReference);
         this.dispatcher.addEvent(otherevent, userReference);
 
-        // Give enough time to wait for the grace period and process the event
-        Thread.sleep(400);
-
+        // Wait until the sendMails() method is called with the right parameters or until it times out.
+        // We need the wait because there's the grace period and processing the event can also take some time.
         events = new HashMap<>();
-        CompositeEvent composite = new CompositeEvent(event);
-        composite.add(similarevent, SimilarityCalculator.SAME_DOCUMENT_AND_TYPE);
-        events.put(userReference, composite);
-        events.put(userReference, new CompositeEvent(otherevent));
+        events.put(userReference, List.of(event, similarevent, otherevent));
+        verifySendMailsCalled(events);
+    }
 
-        verify(this.sender).sendMails(events);
+    private void verifySendMailsCalled(Map<DocumentReference, List<Event>> events)
+    {
+        // Wait until the sendMails() method is called with the right parameters or until it times out.
+        // We need the wait because there's the grace period and processing the event can also take some time.
+        verify(this.sender, timeout(5000).times(1)).sendMails(events);
     }
 }

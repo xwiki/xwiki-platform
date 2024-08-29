@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.container;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,8 +28,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.container.AbstractContainerMacro;
 import org.xwiki.rendering.macro.container.ContainerMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -75,9 +78,9 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
      */
     public ContainerMacro()
     {
-        super("Container", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false),
+        super("Container", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false, Block.LIST_BLOCK_TYPE),
             ContainerMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_LAYOUT));
     }
 
     @Override
@@ -85,6 +88,12 @@ public class ContainerMacro extends AbstractContainerMacro<ContainerMacroParamet
         MacroTransformationContext context) throws MacroExecutionException
     {
         return this.contentParser.parse(content, context, false, false).getChildren();
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.contentParser.prepareContentWiki(macroBlock);
     }
 
     @Override

@@ -52,6 +52,15 @@ public class DefaultWikiConfiguration implements WikiConfiguration
     @Override
     public String getAliasSuffix()
     {
-        return configuration.getProperty(PREFIX + "alias.suffix", "");
+        return this.configuration.getProperty(PREFIX + "alias.suffix", "");
+    }
+
+    /**
+     * @since 14.9RC1
+     */
+    @Override
+    public boolean shouldCreateDatabase()
+    {
+        return this.configuration.getProperty(PREFIX + "createDatabase", true);
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Gives access to the configuration settings of the mentions.
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 @Role
 public interface MentionsConfiguration
 {
@@ -39,8 +37,14 @@ public interface MentionsConfiguration
      *
      * @since 12.10
      */
-    @Unstable
     String USER_MENTION_TYPE = "user";
+
+    /**
+     * The identifier of the mention tasks.
+     *
+     * @since 14.1RC1
+     */
+    String MENTION_TASK_ID = "mention";
 
     /**
      * 

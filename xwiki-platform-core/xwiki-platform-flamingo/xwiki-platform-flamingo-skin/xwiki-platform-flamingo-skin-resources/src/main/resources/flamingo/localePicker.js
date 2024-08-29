@@ -30,8 +30,8 @@
 #set ($currentLocale = $services.localization.currentLocale)
 #foreach ($locale in $collectiontool.sort($services.localization.availableLocales, 'displayName'))
   #if ("$!locale" != '')
-    #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale))) +
-      ' <small class="text-muted">(' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')</small>')
+    #set ($localeName = $escapetool.xml($stringtool.capitalize($locale.getDisplayName($locale)) +
+      ' (' + $stringtool.capitalize($locale.getDisplayName($currentLocale)) + ')'))
     #set ($discard = $locales.add({'code': $locale.toString(), 'name': $localeName}))
   #end
 #end
@@ -54,7 +54,7 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
   });
 
   $.fn.localePicker = function(settings) {
-    return this.each($.proxy(init, null, settings));
+    return this.each((index, input) => init($(input), settings));
   };
 
   var defaultSettings = {
@@ -62,11 +62,10 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     multiple: false
   };
 
-  var init = function(settings) {
-    var input = $(this);
+  var init = function(input, settings) {
     settings = $.extend({}, defaultSettings, input.data('settings'), settings);
     var selectedLocales = getLocalesFromInput(input);
-    var select = $('<select/>');
+    var select = $('<select></select>');
     if (settings.multiple) {
       // Hide the input and insert the select after.
       input.hide().after(select.attr('multiple', 'multiple'));
@@ -82,7 +81,16 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
       }));
     }
     if (settings.allowEmpty) {
-      $('<option/>').attr('value', '').text('None').appendTo(select);
+      $('<option></option>').attr('value', '').text('None').appendTo(select);
+    }
+    if (settings.label) {
+      select.attr('aria-label', settings.label);
+    }
+    if (settings.hint === true) {
+      let hint = select.parents('dd').prev().children('.xHint');
+      let hintId = input.attr('id') + '_select_hint';
+      hint.attr('id', hintId);
+      select.attr('aria-describedby', hintId);
     }
     select.append(locales.map(function(locale) {
       var index = selectedLocales.indexOf(locale.code);
@@ -90,11 +98,11 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
         // Remove it from the list of selected locales so that we can add the remaining ones at the end.
         selectedLocales.splice(index, 1);
       }
-      return $('<option/>').attr('value', locale.code).html(locale.name).prop('selected', index >= 0);
+      return $('<option></option>').attr('value', locale.code).html(locale.name).prop('selected', index >= 0);
     }));
     // Add selected locales that are unknown.
     select.append(selectedLocales.map(function(locale) {
-      return $('<option/>').attr('value', locale).text(locale).prop('selected', true);
+      return $('<option></option>').attr('value', locale).text(locale).prop('selected', true);
     }));
     select.bootstrapSelect();
   };

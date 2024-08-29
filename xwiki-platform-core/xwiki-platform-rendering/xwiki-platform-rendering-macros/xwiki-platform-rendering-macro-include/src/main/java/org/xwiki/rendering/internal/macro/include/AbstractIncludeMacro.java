@@ -57,7 +57,7 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
     protected DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    protected ContextualAuthorizationManager authorization;
+    protected ContextualAuthorizationManager contextualAuthorization;
 
     /**
      * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings

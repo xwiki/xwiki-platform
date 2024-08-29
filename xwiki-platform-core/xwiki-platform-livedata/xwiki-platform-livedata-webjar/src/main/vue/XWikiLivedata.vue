@@ -1,23 +1,22 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   The XWikiLivedata is the root component of the Livedata.
@@ -25,13 +24,13 @@
   totally autonomous.
 -->
 <template>
-  <div class="xwiki-livedata" :id="data.id">
+  <div class="xwiki-livedata">
 
     <!-- Import the Livedata advanced configuration panels -->
     <LivedataAdvancedPanels/>
 
     <!-- Where the layouts are going to be displayed -->
-    <LivedataLayout :layout-id="layoutId"/>
+    <LivedataLayout :layout-id="layoutId" v-if="translationsLoaded"/>
 
     <!-- Displays the footnotes once the layout is loaded. -->
     <LivedataFootnotes v-if="layoutLoaded" />
@@ -50,10 +49,25 @@
 // eslint-disable-next-line camelcase
 __webpack_public_path__ = window.liveDataBaseURL;
 
+import Vue from "vue";
+import VueTippy from "vue-tippy";
+import Vue2TouchEvents from 'vue2-touch-events';
+import 'tippy.js/themes/light-border.css';
 import LivedataAdvancedPanels from "./panels/LivedataAdvancedPanels.vue";
 import LivedataLayout from "./layouts/LivedataLayout.vue";
 import LivedataPersistentConfiguration from "./LivedataPersistentConfiguration.vue";
 import LivedataFootnotes from "./footnotes/LivedataFootnotes";
+
+// Declare vue plugins here
+// We can't declare vue plugins during initialization inside logic.js
+// because we are using in logic.js external webjars dependencies from RequireJs,
+// and not dependencies from nodejs package.json
+Vue.use(VueTippy, {
+  theme: 'light',
+});
+
+Vue.use(Vue2TouchEvents)
+
 
 
 export default {
@@ -90,7 +104,8 @@ export default {
   
   data() {
     return {
-      layoutLoaded: false
+      layoutLoaded: false,
+      translationsLoaded: false
     }
   },
   
@@ -99,6 +114,9 @@ export default {
     this.logic.onEvent("layoutLoaded", () => {
       this.layoutLoaded = true;
     });
+    this.logic.translationsLoaded().finally(() => {
+      this.translationsLoaded = true;
+    })
   }
 
 };

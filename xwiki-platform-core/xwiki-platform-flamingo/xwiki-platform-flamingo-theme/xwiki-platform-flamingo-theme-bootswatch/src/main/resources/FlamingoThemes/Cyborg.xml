@@ -753,19 +753,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
+      <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>panel-default-text</name>
+        <name>panel-header-text</name>
         <number>46</number>
         <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
+        <prettyName>panel-header-text</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
+      </panel-header-text>
       <text-color>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1165,8 +1165,6 @@
 @dropdown-bg:                    @gray-darker;
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(255,255,255,0.1);
-//** Dropdown menu `border-color` **for IE8**.
-@dropdown-fallback-border:       #444;
 //** Divider color for between dropdown items.
 @dropdown-divider-bg:            rgba(255,255,255,0.1);
 
@@ -1471,8 +1469,6 @@
 @popover-max-width:                   276px;
 //** Popover border color
 @popover-border-color:                rgba(0,0,0,.2);
-//** Popover fallback border color
-@popover-fallback-border-color:       #999;
 
 //** Popover title background color
 @popover-title-bg:                    darken(@popover-bg, 3%);
@@ -1486,8 +1482,6 @@
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
 @popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
-//** Popover outer arrow fallback color
-@popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
 
 //== Labels
@@ -1529,8 +1523,6 @@
 @modal-content-bg:                             lighten(@body-bg, 10%);
 //** Modal content border color
 @modal-content-border-color:                   rgba(0,0,0,.2);
-//** Modal content border color **for IE8**
-@modal-content-fallback-border-color:          #999;
 
 //** Modal backdrop background color
 @modal-backdrop-bg:           #000;
@@ -2072,7 +2064,7 @@ a.list-group-item {
       <panel-bg>#060606</panel-bg>
     </property>
     <property>
-      <panel-default-text>#ffffff</panel-default-text>
+      <panel-header-text>#ffffff</panel-header-text>
     </property>
     <property>
       <text-color>#999999</text-color>

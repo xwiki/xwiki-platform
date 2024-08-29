@@ -23,10 +23,7 @@
      this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-  <luceneMatchVersion>${solr.version}</luceneMatchVersion>
-
-  <!-- Register the Solr core in JMX -->
-  <jmx />
+  <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
 
   <!-- The default high-performance update handler -->
   <updateHandler class="solr.DirectUpdateHandler2">

@@ -38,7 +38,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Unstable
 public class LiveDataMeta
 {
     private Collection<LiveDataLayoutDescriptor> layouts;
@@ -64,6 +63,8 @@ public class LiveDataMeta
     private Collection<LiveDataActionDescriptor> actions;
 
     private LiveDataSelectionConfiguration selection;
+
+    private String description;
 
     /**
      * @return the default layout used to display the live data
@@ -287,6 +288,26 @@ public class LiveDataMeta
     public void setSelection(LiveDataSelectionConfiguration selection)
     {
         this.selection = selection;
+    }
+
+    /**
+     * @return an optional textual description of the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * @param description an optional textual description of the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     /**

@@ -138,25 +138,29 @@
  * @param $content the content of the menu
  * @param $titleKey translation key of the link title to use
  * @param $titleAsLabel if the link title should also be used as link label
- * @param $actionUrl the link of the top menu entry. If not provided, the top menu entry will act as an activator for the dropdown
- * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
- *
+ * @param $actionUrl (optional) the link of the top menu entry.
+ *   If not provided, the top menu entry will act as an activator for the dropdown
+ * @param $extraAttribute (optional) additional attributes to add (such as ref="nofollow" for example)
+ *   By default those attribute should fit an anchor.
+ *   Do take care that if the $actionUrl provided is empty,
+ *   the $extraAttributes are going to be used for a `button` instead of an `anchor`
+ *   and should have values fit to a `button`.
  * @since 7.3M2
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <a class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
+    <#if ("$!actionUrl" == '')button#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else
       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
     #end
-    role="button"#if ("$!extraAttribute" != '') ${extraAttribute}#end>
+    #if ("$!extraAttribute" != '') ${extraAttribute}#end>
       $services.icon.renderHTML($icon)
       #if ($titleAsLabel)
         <span class="btn-label">$services.localization.render($titleKey)</span>
       #end
-    </a>
+    </#if ("$!actionUrl" == '')button#{else}a#end>
     #if ($stringtool.isNotBlank("$!menuContent"))
       #if ("$!actionUrl" != '')
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -164,9 +168,9 @@
           <span class="sr-only">$services.localization.render('core.menu.toggleDropdown')</span>
         </button>
       #end
-      <ul class="dropdown-menu #if ("$!actionUrl" == '')dropdown-menu-right#end">
+      <dl class="dropdown-menu #if("$!actionUrl" == '')dropdown-menu-right#end">
         $menuContent
-      </ul>
+      </dl>
     #end
   </div>
 #end
@@ -207,7 +211,7 @@
   #foreach($uix in $collectiontool.sort($extensions, 'order'))
     ## Maybe display a menu separator
     #if ("$!uix.separator" == 'true' && $canHaveMenuSeparator)
-      #submenuseparator()
+      #xwikiactionmenuseparator()
       #set ($canHaveMenuSeparator = false)
     #end
     #set ($content = $uix.content.toString())
@@ -221,7 +225,7 @@
 #end
 
 #macro (submenuheader $titleKey)
-  <li class="dropdown-header">$services.localization.render($titleKey)</li>
+  <dt class="dropdown-header">$escapetool.xml($services.localization.render($titleKey))</dt>
 #end
 
 #**
@@ -306,7 +310,19 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    #displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)
+    #define ($editContent)#displaySecureUIX('org.xwiki.plaftorm.editactions', $staticExtensions)#end
+    ## We need to check that the content is not empty to not generate an empty architecture around it.
+    #if ($stringtool.isNotBlank("$!editContent"))
+      ## Title for the dropdown content
+      <dt class="dropdown-header sr-only">
+        $escapetool.xml($services.localization.render('core.menu.edit.dropdown.hint'))
+      </dt>
+      <dd>
+        <ul>
+          $editContent
+        </ul>
+      </dd>
+    #end
   #end
   #displayMenu('tmEdit', 'pencil', $menuContent, 'core.menu.edit', true, $defaultEditURL, $extraAttributes)
 #end
@@ -330,7 +346,7 @@
   ##
   #if ($canDelete)
     #define ($rename)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'move', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
@@ -396,26 +412,28 @@
   ## Display all the extensions points, including the static ones
   ##
   #define ($menuContent)
-    #set ($needsSeparator = false)
     ## Admin actions UIXP
     #if ($displayAdminMenu)
       #set ($adminActions = "#displayAdminActions()")
       #if ($stringtool.isNotBlank("$!adminActions"))
         #submenuheader('core.menu.actions.main')
-        $adminActions
-        #set ($needsSeparator = true)
+        <dd>
+          <ul>
+            $adminActions
+          </ul>
+        </dd>
       #end
     #end
     ## More actions UIXP
     #if ($displayMoreActionsMenu)
       #set ($moreActions = "#displayMoreActions()")
       #if ($stringtool.isNotBlank("$!moreActions"))
-        #if ($needsSeparator)
-          #submenuseparator()
-        #end
         #submenuheader('core.menu.actions.others')
-        $moreActions
-        #set ($needsSeparator = true)
+        <dd>
+          <ul>
+            $moreActions
+          </ul>
+        </dd>
       #end
       ## ----------------------------
       ## Display the shortcuts
@@ -423,21 +441,21 @@
       #if($xwiki.hasAccessLevel('view') && $displayShortcuts)
         #set ($viewersContent = "#template('shortcuts.vm')")
         ## Only display a separator if at least one menu entry has been displayed before
-        #if ($needsSeparator)
-          #submenuseparator()
-        #end
         #submenuheader('core.menu.actions.viewers')
         ##
         ## VIEW SOURCE
         ##
         #if ("$!request.rev" != '')
-          #set ($revisionParameter = "&rev=$request.rev")
+          #set ($revisionParameter = "&rev=$escapetool.url($request.rev)")
         #end
-        #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
-        $viewersContent
-        ## Display Viewers menu UIX..
-        #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
-        #set ($needsSeparator = true)
+        <dd>
+          <ul>
+            #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            $viewersContent
+            ## Display Viewers menu UIX..
+            #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])
+          </ul>
+        </dd>
       #end
     #end
   #end

@@ -7,18 +7,39 @@
   /* Remove the margin so that the validation message is displayed right below the breadcrumb, for simple users.
      For advanced users the .location-edit element that follows the breadcrumb has a top margin. */
   margin-bottom: 0;
+  /* Keep the same size whatever the content. */
+  flex-grow: 1;
+  /* Remove rounded corners on the right so that the transition is seamless. */
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  /* Combine with .location-actions. */
+  border-right: none;
+  padding-right: 0;
 }
 
-.location-actions {
-  float: right;
-  /* Use the same padding as the breadcrumb. */
-  padding: 8px 15px 0 15px;
+.breadcrumb-container {
+  /* Sets up a flex display for breadcrumbs and location actions. */
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.location-picker > dd > .breadcrumb-container > .location-actions {
+  margin-bottom: 0;
+  /* Keeps all actions on one line. */
+  white-space: nowrap;
+  /* Remove rounded corners on the left so that the transition is seamless. */
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  /* Combine with .breadcrumb. */
+  border-left: none;
+  padding-left: 3px;
 }
 
 .location-action {
   /* Leave some space between the actions. */
   margin-left: 3px;
 }
+
 .location-action:first-of-type {
   margin-left: 0;
 }

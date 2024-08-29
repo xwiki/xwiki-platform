@@ -125,14 +125,17 @@
 #largepanelheader($services.localization.render('xe.panels.includedDocs.title'))
 $services.localization.render('xe.panels.includedDocs.count', [$pages.size()])
 #foreach ($page in $pages)
-  * [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
+  #set ($pageLink = $services.rendering.escape($page, 'xwiki/2.1'))
+  #set ($pageName = $services.rendering.escape($services.rendering.escape($page, 'xwiki/2.1'), 'xwiki/2.1'))
+  #set ($alt = $services.rendering.escape($services.localization.render('panels.documentInformation.editIncluded', [$page]), 'xwiki/2.1'))
+  * [[$pageName&gt;&gt;$pageLink]] [[[[image:icon:page_white_edit||alt="$alt"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
 #end
 #panelfooter()
 #end
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Displays the documents included in the curent document.</description>
+      <description>Displays the documents included in the current document.</description>
     </property>
     <property>
       <name>Included Documents</name>

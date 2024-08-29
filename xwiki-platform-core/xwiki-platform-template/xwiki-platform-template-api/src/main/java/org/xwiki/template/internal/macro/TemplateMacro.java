@@ -21,6 +21,7 @@ package org.xwiki.template.internal.macro;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -61,10 +63,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     {
         super("Template", DESCRIPTION, TemplateMacroParameters.class);
 
-        // The template macro must execute first since if it runs with the current context it needs to bring
-        // all the macros from the template before the other macros are executed.
-        setPriority(10);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_DEVELOPMENT));
     }
 
     @Override
@@ -77,15 +76,16 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     public List<Block> execute(TemplateMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        XDOM result;
+        Block result;
         try {
-            result = this.templates.execute(parameters.getName());
+            result = this.templates.execute(parameters.getName(), context.isInline());
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
         }
 
         if (result != null && parameters.isOutput()) {
-            return result.getChildren();
+            return result instanceof XDOM || result instanceof CompositeBlock ? result.getChildren()
+                : Collections.singletonList(result);
         } else {
             return Collections.emptyList();
         }

@@ -125,6 +125,7 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
 
             // get XML tree
             FileReader fr = new FileReader(file);
+            // This is not subject to XXE attacks since we control the input files and it's used only at build time.
             SAXReader reader = new SAXReader();
             Document domdoc;
             domdoc = reader.read(fr);

@@ -41,11 +41,11 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(RemoteSolr.class)
+@ComponentList({RemoteSolr.class, SolrSchemaUtils.class})
 class RemoteSolrTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @MockComponent
     SolrConfiguration solrConfiguration;
@@ -56,6 +56,8 @@ class RemoteSolrTest
     @Test
     void init() throws ComponentLookupException
     {
+        System.setProperty("xwiki.solr.remote.requestVersion", "false");
+
         RemoteSolr solr = this.componentManager.getInstance(Solr.class, RemoteSolr.TYPE);
 
         assertEquals(RemoteSolr.DEFAULT_BASE_URL, solr.getRootClient().getBaseURL());
@@ -64,6 +66,8 @@ class RemoteSolrTest
     @Test
     void initWithBaseURL() throws ComponentLookupException
     {
+        System.setProperty("xwiki.solr.remote.requestVersion", "false");
+
         when(this.solrConfiguration.getInstanceConfiguration(RemoteSolr.TYPE, "baseURL", null))
             .thenReturn("http://baseurl/");
 
@@ -75,6 +79,8 @@ class RemoteSolrTest
     @Test
     void initWithURL() throws ComponentLookupException
     {
+        System.setProperty("xwiki.solr.remote.requestVersion", "false");
+
         when(this.solrConfiguration.getInstanceConfiguration(RemoteSolr.TYPE, "url", null))
             .thenReturn("http://host/xwiki");
 
@@ -89,6 +95,8 @@ class RemoteSolrTest
     @Test
     void initWithURLandBaseURL() throws ComponentLookupException
     {
+        System.setProperty("xwiki.solr.remote.requestVersion", "false");
+
         when(this.solrConfiguration.getInstanceConfiguration(RemoteSolr.TYPE, "url", null))
             .thenReturn("http://host/xwiki");
         when(this.solrConfiguration.getInstanceConfiguration(RemoteSolr.TYPE, "baseURL", null))

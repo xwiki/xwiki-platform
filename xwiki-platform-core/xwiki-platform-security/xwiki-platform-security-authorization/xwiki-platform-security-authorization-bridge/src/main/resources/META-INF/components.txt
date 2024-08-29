@@ -1,0 +1,9 @@
+500:org.xwiki.security.authorization.internal.BridgeAuthorizationManager
+org.xwiki.security.authorization.internal.DefaultContextualAuthorizationManager
+org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator
+org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidatorListener
+org.xwiki.security.authorization.internal.DefaultSecurityEntryReader
+org.xwiki.security.authorization.internal.RightsFilterListener
+org.xwiki.security.internal.DefaultUserBridge
+org.xwiki.security.internal.DefaultXWikiBridge
+org.xwiki.security.internal.DocumentInitializerRightsManager

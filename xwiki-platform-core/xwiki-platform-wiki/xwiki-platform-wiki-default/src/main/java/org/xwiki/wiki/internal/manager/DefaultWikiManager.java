@@ -30,6 +30,7 @@ import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -69,6 +70,9 @@ public class DefaultWikiManager implements WikiManager
     @Inject
     private WikiDeleter wikiDeleter;
 
+    @Inject
+    private WikiConfiguration wikiConfiguration;
+
     @Override
     public WikiDescriptor create(String wikiId, String wikiAlias, boolean failOnExist) throws WikiManagerException
     {
@@ -79,7 +83,7 @@ public class DefaultWikiManager implements WikiManager
     public WikiDescriptor create(String wikiId, String wikiAlias, String ownerId, boolean failOnExist)
         throws WikiManagerException
     {
-        // Check that the wiki Id is available
+        // Check that the wiki Id is available.
         if (failOnExist && !idAvailable(wikiId)) {
             throw new WikiManagerException(
                 String.format("wiki id [%s] is already used and is thus not available", wikiId));
@@ -147,8 +151,11 @@ public class DefaultWikiManager implements WikiManager
         // Get the forbidden list
         String wikiForbiddenList = xcontextProvider.get().getWiki().Param("xwiki.virtual.reserved_wikis");
         try {
+            // If the DB creation is delegated to a DBA, don't fail on the existence of the DB/schema/user since the
+            // DBA is supposed to have created that prior to this code being called.
             return !wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ")
-                && xwiki.getStore().isWikiNameAvailable(wikiId, xcontext);
+                && (!this.wikiConfiguration.shouldCreateDatabase()
+                    || xwiki.getStore().isWikiNameAvailable(wikiId, xcontext));
         } catch (XWikiException e) {
             throw new WikiManagerException("Fail to look at the databases.");
         }

@@ -19,18 +19,12 @@
  */
 package org.xwiki.test.ui;
 
-import java.io.IOException;
-
-import org.jboss.arquillian.phantom.resolver.ResolvingPhantomJSDriverService;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -45,6 +39,12 @@ public class WebDriverFactory
 {
     public XWikiWebDriver createWebDriver(String browserName)
     {
+        // Tell Webdriver to use Java11+'s bundled HTTP client instead of AsyncHttpClient.
+        // This is to avoid https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-1282482248
+        // See also https://www.selenium.dev/blog/2022/using-java11-httpclient/
+        // To be removed once https://github.com/SeleniumHQ/selenium/issues/9528 is fixed.
+        System.setProperty("webdriver.http.factory", "jdk-http-client");
+
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
             // Note: the Gecko driver needs to be set as a system property under the "webdriver.gecko.driver" key for
@@ -70,14 +70,6 @@ public class WebDriverFactory
             driver = new InternetExplorerDriver();
         } else if (browserName.startsWith("*chrome")) {
             driver = new ChromeDriver();
-        } else if (browserName.startsWith("*phantomjs")) {
-            DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
-            capabilities.setCapability("handlesAlerts", true);
-            try {
-                driver = new PhantomJSDriver(ResolvingPhantomJSDriverService.createDefaultService(), capabilities);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         } else {
             throw new RuntimeException("Unsupported browser name [" + browserName + "]");
         }

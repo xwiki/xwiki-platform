@@ -337,13 +337,11 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 }
 
 .icon-manage {
-  box-sizing: content-box; /* Needed by IE9- */
   cursor: pointer;
   padding-right: 10px;
 }
 
 .icon-manageg {
-  box-sizing: content-box; /* Needed by IE */
   padding-right: 10px;
 }
 
@@ -405,5 +403,11 @@ table.livetable {
 
 .xwiki-livetable-container .docTitleComputed:after {
   content: '\b9';
+}
+
+/* Round the infomessage border and change the padding to uniformize the messages style with Live Data. */
+.xwiki-livetable-container div div.infomessage {
+  border-radius: 7px;
+  padding: 0.1em 1em;
 }
 /* </Decoration> */

@@ -41,9 +41,9 @@
   #set ($shortId = $stringtool.removeStart($id, 'org.xwiki.platform.'))
   #set ($shortId = $stringtool.removeStart($shortId, 'platform.'))
   #if ("$!shortId" != '')
-    $services.localization.render("menu.uix.extensionPoint.value.$shortId")
+    $escapetool.xml($services.localization.render("menu.uix.extensionPoint.value.$shortId"))
   #else
-    $services.localization.render('menu.uix.extensionPoint.value.nowhere')
+    $escapetool.xml($services.localization.render('menu.uix.extensionPoint.value.nowhere'))
   #end
 #end
 ##
@@ -56,12 +56,17 @@
   ## Prepare the extension point map.
   #set ($menuPanel = "{{velocity}}
     ${escapetool.h}panelheader(""$doc.plainTitle"")
-    {{menu type=""vertical collapsible open""}}{{include reference=""${escapetool.d}xcontext.uix.doc.documentReference"" /}}{{/menu}}
+    {{menu type=""vertical collapsible open""
+      label=""$escapetool.velocity($services.rendering.escape($doc.plainTitle, 'xwiki/2.1'))""}}{{include
+      reference=""${escapetool.d}uix.doc.documentReference"" /}}
+    {{/menu}}
     ${escapetool.h}panelfooter()
     {{/velocity}}")
   #set ($menuBar = "{{velocity}}
-    ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, ${escapetool.d}xcontext.uix.doc.documentReference))
-      {{menu type=""horizontal fixedWidth"" id=""menu-horizontal-$doc.fullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""}}{{include reference=""${escapetool.d}xcontext.uix.doc.documentReference"" /}}{{/menu}}
+    ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, ${escapetool.d}uix.doc.documentReference))
+      {{menu type=""horizontal fixedWidth""
+       id=""menu-horizontal-$doc.fullName.replaceAll('[\s|,|.|:|\[|\]|\[\/\]|\[\\\]|=|@|#]', '-')""
+       label=""$escapetool.velocity($services.rendering.escape($doc.plainTitle, 'xwiki/2.1'))""}}{{include reference=""${escapetool.d}uix.doc.documentReference"" /}}{{/menu}}
     ${escapetool.h}end
     {{/velocity}}")
   #set ($extensionPoints = {
@@ -85,7 +90,7 @@
         &lt;option value=""&gt;$services.localization.render('menu.uix.extensionPoint.value.nowhere')&lt;/option&gt;
         #foreach ($extensionPointId in $extensionPoints.keySet())
           #set ($selected = $extensionPointId == $selectedExtensionPointId)
-          &lt;option value="$extensionPointId"#if ($selected) selected="selected"#end&gt;
+          &lt;option value="$escapetool.xml($extensionPointId)"#if ($selected) selected="selected"#end&gt;
             #displayExtensionPointTitle($extensionPointId)
           &lt;/option&gt;
         #end

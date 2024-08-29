@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
  * @version $Id$
  */
 @ComponentTest
-public class LegacyParentFieldUpdaterListenerTest
+class LegacyParentFieldUpdaterListenerTest
 {
     @InjectMockComponents
     private LegacyParentFieldUpdaterListener listener;
@@ -51,7 +51,7 @@ public class LegacyParentFieldUpdaterListenerTest
     private ModelBridge modelBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private DocumentReference oldReference = new DocumentReference("wiki", "Users", "Alice");
 
@@ -62,7 +62,7 @@ public class LegacyParentFieldUpdaterListenerTest
     private MoveRequest renameRequest = new MoveRequest();
 
     @Test
-    public void onDocumentRenamedWithUpdateParentField()
+    void onDocumentRenamedWithUpdateParentField()
     {
         renameRequest.setUpdateParentField(true);
 
@@ -75,7 +75,7 @@ public class LegacyParentFieldUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutUpdateParentField()
+    void onDocumentRenamedWithoutUpdateParentField()
     {
         renameRequest.setUpdateParentField(false);
 
@@ -85,7 +85,7 @@ public class LegacyParentFieldUpdaterListenerTest
     }
 
     @Test
-    public void onDocumentRenamedWithoutRenameRequest()
+    void onDocumentRenamedWithoutRenameRequest()
     {
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -93,13 +93,5 @@ public class LegacyParentFieldUpdaterListenerTest
 
         assertEquals("Updating the document parent fields from [wiki:Users.Alice] to [wiki:Users.Bob].",
             logCapture.getMessage(0));
-    }
-
-    @Test
-    public void onOtherEvents()
-    {
-        this.listener.onEvent(null, null, null);
-
-        verify(this.modelBridge, never()).updateParentField(any(), any());
     }
 }

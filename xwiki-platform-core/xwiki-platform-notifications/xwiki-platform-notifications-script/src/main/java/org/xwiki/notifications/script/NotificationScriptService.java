@@ -35,7 +35,6 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.script.internal.NotificationScriptEventHelper;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script services for the notifications.
@@ -143,7 +142,6 @@ public class NotificationScriptService implements ScriptService
      * @throws Exception if an error occurs
      * @since 12.1RC1
      */
-    @Unstable
     public void clearAllStatus(Date startDate) throws Exception
     {
         this.notificationScriptEventHelper.clearAllStatus(startDate);

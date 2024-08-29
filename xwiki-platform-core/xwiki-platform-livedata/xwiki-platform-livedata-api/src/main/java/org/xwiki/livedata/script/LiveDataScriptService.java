@@ -19,6 +19,7 @@
  */
 package org.xwiki.livedata.script;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -34,21 +36,23 @@ import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.LiveDataSourceManager;
+import org.xwiki.livedata.internal.LiveDataRenderer;
+import org.xwiki.livedata.internal.LiveDataRendererParameters;
 import org.xwiki.livedata.internal.script.LiveDataConfigHelper;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
 
 /**
  * Scripting APIs for the Live Data component.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
 @Component
 @Named(LiveDataScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class LiveDataScriptService implements ScriptService
 {
     /**
@@ -68,9 +72,12 @@ public class LiveDataScriptService implements ScriptService
     @Inject
     private ScriptServiceManager scriptServiceManager;
 
+    @Inject
+    private LiveDataRenderer liveDataRenderer;
+
     /**
      * Executes a live data query.
-     * 
+     *
      * @param queryConfig the live data query configuration
      * @return the live data entries that match the given query
      */
@@ -87,7 +94,7 @@ public class LiveDataScriptService implements ScriptService
 
     /**
      * Executes a live data query.
-     * 
+     *
      * @param queryConfigJSON the live data query configuration
      * @return the live data entries that match the given query
      */
@@ -120,7 +127,7 @@ public class LiveDataScriptService implements ScriptService
     /**
      * Computes the effective live data configuration by normalizing the given configuration (i.e. transforming it to
      * match the format expected by the live data widget) and adding the (missing) default values.
-     * 
+     *
      * @param liveDataConfig the live data configuration to start with
      * @return the effective live data configuration, using the standard format and containing the default values
      */
@@ -138,7 +145,7 @@ public class LiveDataScriptService implements ScriptService
     /**
      * Computes the effective live data configuration by normalizing the given configuration (i.e. transforming it to
      * match the format expected by the live data widget) and adding the (missing) default values.
-     * 
+     *
      * @param liveDataConfigJSON the live data configuration to start with
      * @return the effective live data configuration, using the standard format and containing the default values
      */
@@ -155,6 +162,64 @@ public class LiveDataScriptService implements ScriptService
     }
 
     /**
+     * Execute the Live Data and return a {@link Block}.
+     *
+     * @param parameters the parameters to pass to the Live Data renderer
+     * @return the Live Data {@link Block}
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public Block execute(Map<String, Object> parameters) throws LiveDataException
+    {
+        return execute(parameters, null);
+    }
+
+    /**
+     * Execute the Live Data and return a {@link Block}.
+     *
+     * @param parameters the parameters to pass to the Live Data renderer
+     * @param advancedParameters the advanced parameters to pass to the Live Data renderer
+     * @return the Live Data {@link Block}
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public Block execute(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
+    {
+        return this.liveDataRenderer.execute(convertParams(parameters), advancedParameters, false);
+    }
+
+    /**
+     * Renders a Live Data.
+     * 
+     * @param parameters the parameters to pass to the Live Data executor
+     * @return the result of {@link #execute(Map)} in the current syntax
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public String render(Map<String, Object> parameters) throws LiveDataException
+    {
+        return render(parameters, null);
+    }
+
+    /**
+     * Renders a Live Data.
+     * 
+     * @param parameters the parameters to pass to the Live Data executor
+     * @param advancedParameters the advanced parameters to pass to the Live Data executor
+     * @return the result of {@link #execute(Map, Map)} in the current syntax
+     * @throws LiveDataException in case of error when rendering the Live Data
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    public String render(Map<String, Object> parameters, Map<?, ?> advancedParameters) throws LiveDataException
+    {
+        return this.liveDataRenderer.render(convertParams(parameters), advancedParameters, false);
+    }
+
+    /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
@@ -163,5 +228,20 @@ public class LiveDataScriptService implements ScriptService
     public <S extends ScriptService> S get(String serviceName)
     {
         return (S) this.scriptServiceManager.get(ROLEHINT + '.' + serviceName);
+    }
+
+    private LiveDataRendererParameters convertParams(Map<String, Object> parameters) throws LiveDataException
+    {
+        LiveDataRendererParameters liveDataRendererParameters = new LiveDataRendererParameters();
+        for (Map.Entry<String, Object> stringObjectEntry : parameters.entrySet()) {
+            try {
+                PropertyUtils.setProperty(liveDataRendererParameters, stringObjectEntry.getKey(),
+                    stringObjectEntry.getValue());
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new LiveDataException(String.format("Failed to set property [%s] with value [%s] in object [%s]",
+                    stringObjectEntry.getKey(), stringObjectEntry.getValue(), liveDataRendererParameters), e);
+            }
+        }
+        return liveDataRendererParameters;
     }
 }

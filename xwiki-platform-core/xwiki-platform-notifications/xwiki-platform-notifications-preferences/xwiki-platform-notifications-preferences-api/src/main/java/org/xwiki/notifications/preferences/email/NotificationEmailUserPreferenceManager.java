@@ -20,6 +20,9 @@
 package org.xwiki.notifications.preferences.email;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
  * Configuration for the emails for each user.
@@ -38,6 +41,51 @@ public interface NotificationEmailUserPreferenceManager
     /**
      * @param userId id of a user
      * @return the diff type configured for the given user
+     * @deprecated since 14.10, use {@link #getDiffType(UserReference)} instead
      */
+    @Deprecated(since = "14.10")
     NotificationEmailDiffType getDiffType(String userId);
+
+    /**
+     * @param userReference reference of a user
+     * @return the diff type configured for the given user
+     * @since 14.10
+     */
+    default NotificationEmailDiffType getDiffType(UserReference userReference)
+    {
+        return getDiffType();
+    }
+
+    /**
+     * @return the notification interval configured for the current user
+     * @since 14.10
+     */
+    default NotificationEmailInterval getInterval()
+    {
+        return NotificationEmailInterval.DAILY;
+    }
+
+    /**
+     * @param userReference reference of a user
+     * @return the notification interval configured for the given user
+     * @since 14.10
+     */
+    default NotificationEmailInterval getInterval(UserReference userReference)
+    {
+        return this.getInterval();
+    }
+
+    /**
+     * Retrieve the preferences related to email grouping strategy for the given user and the given interval.
+     * This method fallbacks on user's wiki preferences, then main wiki preferences, then global configuration.
+     * @param userReference the user for which to take the preferences
+     * @param interval the interval strategy for which to find the strategy to use
+     * @return the hint of the strategy to use
+     * @since 15.6RC1
+     */
+    @Unstable
+    default String getEmailGroupingStrategy(UserReference userReference, NotificationEmailInterval interval)
+    {
+        return "default";
+    }
 }

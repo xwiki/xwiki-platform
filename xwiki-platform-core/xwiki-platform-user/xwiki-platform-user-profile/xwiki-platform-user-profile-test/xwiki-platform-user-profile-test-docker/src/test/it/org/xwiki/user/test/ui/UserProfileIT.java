@@ -31,6 +31,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.GroupsUserProfilePage;
@@ -49,10 +50,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.10
  */
-@UITest(extraJARs = {
-    // The Solr store is not ready yet to be installed as an extension so we need to add it to WEB-INF/lib manually
-    "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-})
+@UITest(properties = {
+    // We need the notifications feature because the User Profile UI draws the Notifications Macro used in the user
+    // profile for the user's activity stream. As a consequence, when a user is created in the test, the
+    // UserAddedEventListener is called and global default user notifications filters are copied for the new user,
+    // requiring the notifications HBM mapping file.
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    // Remove once https://jira.xwiki.org/browse/XWIKI-21238 is fixed. Right now XWikiUserProfileSheet requires
+    // Programming Rights to enable/disable a user.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.XWikiUserProfileSheet"
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default",
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
+    }
+)
 class UserProfileIT
 {
     private static final String IMAGE_NAME = "avatar.png";
@@ -66,6 +82,8 @@ class UserProfileIT
     private static final String USER_ABOUT = "This is some example text to type into the text area";
 
     private static final String USER_EMAIL = "webmaster@xwiki.org";
+
+    private static final String USER_EMAIL_OBFUSCATED = "w...@xwiki.org";
 
     private static final String USER_PHONE = "0000-000-000";
 
@@ -109,8 +127,13 @@ class UserProfileIT
     /** Functionality check: changing profile information. */
     @Test
     @Order(1)
-    void editProfile()
+    void editProfile(TestUtils setup)
     {
+        // Turn on email Obfuscation to verify that the email displayed in the user profile is obfuscated.
+        setup.loginAsSuperAdmin();
+        setup.updateObject("Mail", "MailConfig", "Mail.GeneralMailConfigClass", 0, "obfuscate", "1");
+        setup.login(this.userName, DEFAULT_PASSWORD);
+
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ProfileEditPage profileEditPage = userProfilePage.editProfile();
         profileEditPage.setUserFirstName(USER_FIRST_NAME);
@@ -130,11 +153,19 @@ class UserProfileIT
         assertEquals(USER_LAST_NAME, userProfilePage.getUserLastName());
         assertEquals(USER_COMPANY, userProfilePage.getUserCompany());
         assertEquals(USER_ABOUT, userProfilePage.getUserAbout());
-        assertEquals(USER_EMAIL, userProfilePage.getUserEmail());
+        assertEquals(USER_EMAIL_OBFUSCATED, userProfilePage.getUserEmail());
         assertEquals(USER_PHONE, userProfilePage.getUserPhone());
         assertEquals(USER_ADDRESS, userProfilePage.getUserAddress());
         assertEquals(USER_BLOG, userProfilePage.getUserBlog());
         assertEquals(USER_BLOGFEED, userProfilePage.getUserBlogFeed());
+
+        // Turn of email obfuscation and verify that the displayed email is not obfuscated anymore.
+        setup.loginAsSuperAdmin();
+        setup.updateObject("Mail", "MailConfig", "Mail.GeneralMailConfigClass", 0, "obfuscate", "0");
+        setup.login(this.userName, DEFAULT_PASSWORD);
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertEquals(USER_EMAIL, userProfilePage.getUserEmail());
     }
 
     /** Functionality check: changing the profile picture. */
@@ -274,7 +305,7 @@ class UserProfileIT
         assertFalse(userProfilePage.isDisableButtonAvailable());
         assertFalse(userProfilePage.isEnableButtonAvailable());
 
-        // Buttons should be available with super admin
+        // Buttons should be available with a user having admin rights (which is the case for superadmin)
         setup.loginAsSuperAdmin();
         userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         assertTrue(userProfilePage.isDisableButtonAvailable());
@@ -300,4 +331,26 @@ class UserProfileIT
         assertFalse(userProfilePage.isEnableButtonAvailable());
     }
 
+    @Test
+    @Order(9)
+    void disabledUserTest(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        setup.setGlobalRights("", "XWiki.XWikiGuest", "edit", false);
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        userProfilePage.clickDisable();
+
+        setup.login(this.userName, DEFAULT_PASSWORD);
+        boolean gotException = false;
+        try {
+            setup.rest().savePage(testReference, "Some content", "A title");
+        } catch (Throwable e) {
+            assertTrue(e.getMessage().startsWith("Unexpected code [401], was expecting one of [[201, 202]] for "));
+            gotException = true;
+        }
+        setup.loginAsSuperAdmin();
+        ViewPage viewPage = setup.gotoPage(testReference);
+        assertFalse(viewPage.exists());
+        assertTrue(gotException);
+    }
 }

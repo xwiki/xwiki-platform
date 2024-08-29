@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-test-docker</artifactId>
   <name>XWiki Platform - Index - Tests - Functional Tests in Docker</name>
@@ -69,6 +69,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>
@@ -97,14 +103,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables>
                 <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
                      WEB-INF/lib -->
-                <property>
-                  <name>xwiki.test.ui.profiles</name>
-                  <value>clover</value>
-                </property>
-              </systemProperties>
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

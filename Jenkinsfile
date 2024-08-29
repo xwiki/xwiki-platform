@@ -30,8 +30,7 @@ def builds = [
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true -DskipITs'
     )
   },
   // Can be used to manually trigger the main build with integration tests on the CI.
@@ -40,8 +39,7 @@ def builds = [
       name: 'Main with Integration Tests',
       profiles: 'legacy,integration-tests,snapshot',
       properties:
-        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
+        '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
     )
   },
   'Distribution' : {
@@ -68,7 +66,6 @@ def builds = [
     buildFunctionalTest(
       name: 'Flavor Test - UI',
       pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
   },
   'Flavor Test - Misc' : {
@@ -102,19 +99,24 @@ def builds = [
       mavenOpts: '-Xmx2048m -Xms512m -XX:ThreadStackSize=2048'
     )
   },
+  'Flavor Test - Security' : {
+    buildFunctionalTest(
+      name: 'Flavor Test - Security',
+      pom: 'xwiki-platform-distribution-flavor-test-security/pom.xml'
+    )
+  },
   'TestRelease': {
     build(
       name: 'TestRelease',
       goals: 'clean install',
-      profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Ddoclint=all'
+      profiles: 'release,hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Dxwiki.revapi.skip=true -Dxwiki.enforcer.skip=true -Dxwiki.spoon.skip=true -Ddoclint=all'
     )
   },
   'Quality' : {
     // Run the quality checks.
     // Sonar notes:
-    // - we need sonar:sonar to perform the analysis
-    // - we need sonar = true to push the analysis to Sonarcloud
+    // - we need sonar:sonar to perform the analysis and push the results to Sonarcloud
     // - we need jacoco:report to execute jacoco and compute test coverage
     // - we need -Pcoverage and -Dxwiki.jacoco.itDestFile to tell Jacoco to compute a single global Jacoco
     //   coverage for the full reactor (so that the coverage percentage computed takes into account module tests
@@ -123,73 +125,20 @@ def builds = [
       name: 'Quality',
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'quality,legacy,coverage',
-      // Note: We specify the "jvm" system property to to execute the tests with Java 8 in order to limit problems
-      // with more recent versions of Java. In the future, we'll need to be able to also execute the tests with
-      // Java 14+. Remove that when we support it. See for example https://jira.xwiki.org/browse/XCOMMONS-2136
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec -Djvm=/home/hudsonagent/java8/bin/java',
-      sonar: true,
-      // Build with Java 14 since Sonar requires Java 11+ and we want at the same time to verify that XWiki builds
-      // with the latest Java version.
-      javaTool: 'java14'
+      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
     )
   }
 ]
 
-// Decide whether to execute the standard builds or the Docker ones.
-// See the build() method below and the definition of the "type" job parameter.
-if (!params.type || params.type == 'standard') {
-  stage('Platform Builds') {
-    def choices = builds.collect { k,v -> "$k" }.join('\n')
-    // Add the docker scheduled jobs so that we can trigger them manually too
-    choices = "${choices}\nDocker Latest\nDocker All\nDocker Unsupported"
-    def selection = askUser(choices)
-    if (selection == 'All') {
-      buildStandardAll(builds)
-    } else if (selection == 'Docker Latest') {
-      buildDocker('docker-latest')
-    } else if (selection == 'Docker All') {
-      buildDocker('docker-all')
-    } else if (selection == 'Docker Unsupported') {
-      buildDocker('docker-unsupported')
-    } else {
-      buildStandardSingle(builds[selection])
-    }
-  }
-} else {
-  // If the build is docker-latest, only build if the previous build was triggered by some source code changes, 
-  // to save agent build time and save the planet! (We don't need to re-run docker tests if there's been no
-  // source changes).	
-  // Also always build if triggered manually by a user.
-  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
-    // We trigger the build under two conditions:
-    // - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
-    //   seems we need that too since it happens when we push changes to master)
-    // - The previous build was triggered by an upstream job (like rendering triggering platform)
-    def shouldExecute = false
-    currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
-      echoXWiki "Build trigger cause: [${it.toString()}]"
-      if (it.toString().contains('SCMTriggerCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
-        shouldExecute = true
-      }
-      if (it.toString().contains('BranchEventCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
-        shouldExecute = true
-      }
-      if (it.toString().contains('UpstreamCause')) {
-        echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
-        shouldExecute = true
-      }
-    }
-    if (shouldExecute) {
-      buildDocker(params.type)
-    } else {
-      echoXWiki "No SCM trigger nor upstream job trigger, thus not executing the docker latest tests (since there's been no source changes; this saves agent build time and help save humanity!). Aborting."
-      // Aborting so that the build isn't displayed as successful without doing anything.
-      currentBuild.result = 'ABORTED'
-    }
+// Let the user select the build to execute if manually triggered. Otherwise, build everything.
+stage('Platform Builds') {
+  def choices = builds.collect { k,v -> "$k" }.join('\n')
+  // askUser() will check if the build was triggered manually or not. If not, it'll default to 'All'.
+  def selection = askUser(choices)
+  if (selection == 'All') {
+    buildStandardAll(builds)
   } else {
-    buildDocker(params.type)
+    buildStandardSingle(builds[selection])
   }
 }
 
@@ -265,6 +214,10 @@ private void buildStandardAll(builds)
             'flavor-test-upgrade': {
               // Run the Flavor Upgrade tests
               builds['Flavor Test - Upgrade'].call()
+            },
+            'flavor-test-security': {
+              // Run the Flavor Security tests
+              builds['Flavor Test - Security'].call()
             }
           )
         }
@@ -284,44 +237,14 @@ private void buildStandardAll(builds)
 private void runIntegrationTests()
 {
   def itModuleList
-  def customJobProperties
   node() {
     // Checkout platform to find all IT modules so that we can then parallelize executions across Jenkins agents.
     checkout skipChangeLog: true, scm: scm
     itModuleList = itModules()
-    customJobProperties = getCustomJobProperties()
   }
 
   xwikiITBuild {
     modules = itModuleList
-    // Make sure that we don't reset the job properties!
-    jobProperties = customJobProperties
-  }
-}
-
-private void buildDocker(type)
-{
-  def dockerConfigurationList
-  def dockerModuleList
-  def customJobProperties
-  node() {
-    // Checkout platform to find all docker configurations and test modules so that we can then parallelize executions
-    // of configs and modules across Jenkins agents.
-    checkout skipChangeLog: true, scm: scm
-    dockerConfigurationList = dockerConfigurations(type)
-    if (type == 'docker-unsupported') {
-      dockerModuleList = ['xwiki-platform-core/xwiki-platform-menu']
-    } else {
-      dockerModuleList = dockerModules()
-    }
-    customJobProperties = getCustomJobProperties()
-  }
-
-  xwikiDockerBuild {
-    configurations = dockerConfigurationList
-    modules = dockerModuleList
-    // Make sure that we don't reset the job properties!
-    jobProperties = customJobProperties
   }
 }
 
@@ -349,7 +272,6 @@ private void buildInsideNode(map)
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
       javadoc = false
-      jobProperties = getCustomJobProperties()
       if (map.goals != null) {
         goals = map.goals
       }
@@ -359,9 +281,11 @@ private void buildInsideNode(map)
       if (map.properties != null) {
         properties = map.properties
       }
-      if (map.daysToKeepStr != null) {
-        daysToKeepStr = map.daysToKeepStr
-      }
+      // Keep builds for 30 days since we want to be able to see all builds if there are a lot at a given time, to be
+      // able to identify flickers, etc.
+      daysToKeepStr = '30'
+      // We don't need to trigger xwiki-platform monthly since it's already the case of xwiki-commons
+      monthlyTrigger = false
       if (map.pom != null) {
         pom = map.pom
       }
@@ -402,32 +326,5 @@ private void buildFunctionalTest(map)
     pom: "${sharedPOMPrefix}/${map.pom}",
     properties: map.properties
   )
-}
-
-private def getCustomJobProperties()
-{
-  // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
-  // take time to execute and thus we cannot run them all the time.
-  // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
-  // we run the standard builds or the docker ones.
-  // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
-  // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
-  // found a way to merge properties and calling the properties() step will override any pre-existing properties.
-  //
-  // Notes:
-  // - docker-latest: We start them at 10PM to have more time available for them so that we're sure they're finished on
-  //   the next morning when committers start pushing code. That's why we don't use @midnight.
-  // - docker-all: We don't use @weekly for docker-all since we want them to execute on weekends only so that they
-  //   don't execute at the same time as docker-latest during standard week days, as it'll mean that all agents will
-  //   be used and be available for standard builds during the working days.
-  return [
-    parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
-    pipelineTriggers([
-      parameterizedCron('''H 22 * * * %type=docker-latest
-H 0 * * 6 %type=docker-all
-@monthly %type=docker-unsupported'''),
-      cron("@monthly")
-    ])
-  ]
 }
 

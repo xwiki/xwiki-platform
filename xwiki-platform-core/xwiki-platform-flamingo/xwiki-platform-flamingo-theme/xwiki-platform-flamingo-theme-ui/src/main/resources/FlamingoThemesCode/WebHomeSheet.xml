@@ -180,9 +180,21 @@
     ## Display the informations
     (% class="theme-info" %)
     (((
-      === [[$themeDoc.displayTitle&gt;&gt;$fullName]] #if ($isSubWiki &amp;&amp; $scope == 'local') ($services.wiki.currentWikiId)#end===
+      #set ($themeDocTitle = $services.rendering.escape($services.rendering.escape($themeDoc.displayTitle, 'xwiki/2.1'),
+        'xwiki/2.1'))
+      #set ($themeDocLink = $services.rendering.escape($fullName, 'xwiki/2.1'))
+      === [[$themeDocTitle&gt;&gt;$themeDocLink]] #if ($isSubWiki &amp;&amp; $scope ==
+        'local') ($services.rendering.escape($services.wiki.currentWikiId, 'xwiki/2.1'))#end===
       #if ($hasAdmin &amp;&amp; !$isCurrentTheme)
-        $services.icon.render('bullet_go') [[$services.localization.render('platform.flamingo.themes.home.useThisTheme')&gt;&gt;path:$doc.getURL('view', "action=setTheme&amp;theme=${fullName}&amp;form_token=$services.csrf.token")]]
+        #set ($useThisThemeTitle = $services.rendering.escape($services.rendering.escape($services.localization.render(
+          'platform.flamingo.themes.home.useThisTheme'), 'xwiki/2.1'), 'xwiki/2.1'))
+        #set ($viewThemeUrl = $doc.getURL('view', $escapetool.url({
+          'action': 'setTheme',
+          'theme': $fullName,
+          'form_token': $services.csrf.token
+        })))
+        #set ($useThisThemePath = "path:$viewThemeUrl")
+        $services.icon.render('bullet_go') [[$useThisThemeTitle&gt;&gt;$useThisThemePath]]
       #end
     )))
   )))
@@ -196,7 +208,7 @@
     #if("$!value" == '')
       #set($value = $fallback)
     #end
-    $value##
+    $escapetool.xml($value)##
   #end
 
   {{html}}
@@ -256,6 +268,7 @@
     {{html}}
       &lt;div class="theme-creation-form" &gt;
         &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
+          $services.icon.renderHTML('add')
           &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
           &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
@@ -280,20 +293,21 @@
     #creationForm()
   #elseif(!$services.csrf.isTokenValid($request.form_token))
     {{error}}
-      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="$request.newThemeName" /}}
+      #set ($newThemeName = $services.rendering.escape($escapetool.java($request.newThemeName), 'xwiki/2.1'))
+      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="~"$newThemeName~""/}}
     {{/error}}
     
     {{html}}
       &lt;form action="$doc.getURL()" method="post"&gt;
         &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
         &lt;input type="hidden" name="action" value="create"/&gt;
-        &lt;input type="hidden" name="newThemeName" id="newThemeName" value="$request.newThemeName" /&gt;
+        &lt;input type="hidden" name="newThemeName" id="newThemeName" value="$escapetool.xml($request.newThemeName)" /&gt;
         &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create.confirm')" class="button"/&gt;
       &lt;/form&gt;
     {{/html}}
   #else
     ## Let's do it
-    $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference('', 'FlamingoThemes', $request.newThemeName)).getURL('edit', "template=FlamingoThemesCode.ThemeTemplate&amp;title=$escapetool.url($request.newThemeName)&amp;parent=$doc.fullName&amp;xhidden=1"))
+    $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference('', 'FlamingoThemes', $request.newThemeName)).getURL('edit', "template=FlamingoThemesCode.ThemeTemplate&amp;title=$escapetool.url($request.newThemeName)&amp;parent=$doc.fullName&amp;xhidden=1&amp;form_token=${request.form_token}"))
   #end
 #end
 ####################################
@@ -607,10 +621,8 @@
 }
 
 .theme-creation-form form {
-  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
-  border: 1px dotted $theme.borderColor;
   display: inline-block;
-  padding: .5em .5em .5em 22px;
+  padding: .5em;
   margin-bottom: 1em;
 }
 

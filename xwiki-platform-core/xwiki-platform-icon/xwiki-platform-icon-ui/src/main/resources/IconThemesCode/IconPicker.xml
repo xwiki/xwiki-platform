@@ -38,30 +38,28 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ###########################
-## GLOBALS
-###########################
-#set($xwikiIcons = ['home', 'wiki', 'space', 'page', 'check', 'add', 'anchor', 'terminal', 'list', 'branch', 'down', 'up', 'left', 'right', 'arrows', 'repeat', 'undo', 'refresh', 'rotate-left', 'rotate-right', 'switch', 'random', 'attach', 'shopping-cart', 'bell', 'trash', 'bomb', 'book', 'cube', 'cubes', 'briefcase', 'bug', 'building', 'caret-down', 'caret-up', 'caret-right', 'calculator', 'calendar', 'camera', 'remove', 'cross', 'car', 'truck', 'chart-bar', 'chart-organisation', 'cloud', 'clock', 'cog', 'comment', 'comments', 'desktop', 'contrast', 'eject', 'step-forward', 'step-backward', 'fast-forward', 'backward', 'play', 'pause', 'stop', 'gamepad', 'credit-card', 'coffee', 'cut', 'database', 'delete', 'floppy-disk', 'glass', 'drive', 'envelope', 'warning', 'error', 'info', 'eye', 'rss', 'female', 'male', 'film', 'flag', 'search', 'search-plus', 'search-minus', 'folder', 'user', 'group', 'heart', 'question', 'image', 'key', 'keyboard', 'lightbulb', 'link', 'unlink', 'lock', 'unlock', 'money', 'dollar', 'euro', 'gbp', 'yen', 'music', 'file', 'file-white', 'file-pdf', 'file-code', 'file-archive', 'file-word', 'file-excel', 'file-powerpoint', 'file-text', 'paste', 'pencil', 'print', 'shield', 'certificate', 'volume-up', 'volume-down', 'volume-off', 'soccer', 'star', 'table', 'phone', 'font', 'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'underline', 'align-center', 'align-justify', 'align-left', 'align-right', 'columns', 'indent-left', 'indent-right', 'list-bullets', 'list-numbers', 'sun', 'world', 'wrench'])
-###########################
 ## DATA: ICON THEMES
 ###########################
 #if($request.action == 'data_iconthemes')
   #set($map = {})
   #set($discard = $map.put('iconThemes', $services.icon.iconSetNames))
   #set($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
-  $jsontool.serialize($map)
+  #jsonResponse($map)
 ###########################
 ## DATA: ICONS
 ###########################
 #elseif($request.action == 'data_icons')
   #set($icons = [])
   #set($iconTheme = $request.iconTheme)
+  #set($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
   #foreach($xwikiIcon in $xwikiIcons)
     #set($icon = {})
     #set($discard = $icon.put('name', $xwikiIcon))
     #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
+    #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
     #set($discard = $icons.add($icon))
   #end
-  $jsontool.serialize($icons)
+  #jsonResponse($icons)
 #else
 = Presentation =
 The Icon Picker is a jQuery plugin written by XWiki to help user selecting an icon. See [[IconPickerMacro]] for using this picker easily. If you want to use it manually, read the following.
@@ -233,23 +231,30 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
    * Display the list of icons
    */
   var displayList = function(iconTheme) {
+    // Filter the icons we display based on the value of the input field.
+    let selectedIconName = '';
+    if (currentInput.data('xwikiIconPickerSettings') !== '') {
+      selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
+    }
     // For each icon
     for (var i=0; i &lt; iconTheme.length; ++i) {
       // Display the icon
-      var displayer = $(document.createElement('div'));
-      iconListSection.append(displayer);
-      displayer.addClass('xwikiIconPickerIcon');
-      var imageDiv = $(document.createElement('div'));
-      imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
-      displayer.append(imageDiv);
-      var iconNameDiv = $(document.createElement('div'));
-      iconNameDiv.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
-      displayer.append(iconNameDiv);
-      // Change the input value when the icon is clicked
-      displayer.click(function(event) {
-        currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text() );
-        closePicker();
-      });
+      if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
+        var displayer = $(document.createElement('div'));
+        iconListSection.append(displayer);
+        displayer.addClass('xwikiIconPickerIcon');
+        var imageDiv = $(document.createElement('div'));
+        imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+        displayer.append(imageDiv);
+        var iconNameSpan = $(document.createElement('span'));
+        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        displayer.append(iconNameSpan);
+        // Change the input value when the icon is clicked
+        displayer.on('click', function(event) {
+          currentInput.val(currentInput.data('xwikiIconPickerSettings').prefix + $(event.currentTarget).children('.xwikiIconPickerIconName').text());
+          closePicker();
+        });
+      }
     }
   }
   
@@ -257,7 +262,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
    * Load the icon list (get the JSON from the server) and display it afterwards
    */
   var loadIconList = function(iconTheme) {
-    $.getJSON(getResourceURL('data_icons', 'iconTheme='+iconTheme), function(dataIcons) {
+    $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme), function(dataIcons) {
       // Put the result in the icons map
       icons[iconTheme] = dataIcons;
       // Display the list
@@ -308,7 +313,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   var createIconThemeSelector = function() {
     iconThemeSelector = $(document.createElement('select'));
     // Change the current icon theme where the selector is used
-    iconThemeSelector.change(function() {
+    iconThemeSelector.on('change', function() {
       currentIconTheme = iconThemeSelector.val();
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
@@ -420,15 +425,27 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         loadIconList(currentIconTheme);
       }
     }
-    // Close the picker when the user press 'escape'.
-    currentInput.keyup(function (event) {
+    var lastTimeout = 0;
+    var reloadIconList = function () {
+      // Remove all the displayed icons
+      $('.xwikiIconPickerIcon').remove();
+      // Display the new ones. We always reload because the filter results are unrelated.
+      displayList(icons[currentIconTheme]);
+    };
+    currentInput.on('keyup', function(event) {
+      // Close the picker when the user press 'escape'.
       // See: http://stackoverflow.com/questions/1160008/which-keycode-for-escape-key-with-jquery
       if (event.which == 27) {
         closePicker();
+      } else {
+        if (lastTimeout!==0) {
+          clearTimeout(lastTimeout);
+        }
+        lastTimeout = setTimeout(reloadIconList, 500);
       }
     });
   }
-  
+
   /**
    * Create the jQuery plugin
    */
@@ -437,7 +454,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     var settings = $.extend({
       prefix: 'icon:image:'
     }, options);
-  
+
     // Enable the picker on focus
     this.each(function() {
       var elem = $(this);
@@ -448,25 +465,25 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Attach the settings to the input
       $(this).data('xwikiIconPickerSettings', settings);
       // Create the picker on focus
-      $(this).focusin(function(event) {
+      $(this).on('focusin', function(event) {
         createPicker($(event.currentTarget));
       });
     });
-    
+
     // Because the picker uses the 'fixed' position, we must recompute its position everytime the user scrolls the page
     // Otherwise, the picker would stay in the same position *on the screen* without staying close to the input.
-    $(window).scroll(function() {
+    $(window).on('scroll', function() {
       setPickerPosition();
     });
-    
+
     // Close the picker if the input and the picker itself have lost the focus
-    $(window).click(function(event) {
+    $(window).on('click', function(event) {
       if (xwikiCurrentIconsPicker &amp;&amp; document.activeElement != currentInput[0] &amp;&amp;
           !$.contains(xwikiCurrentIconsPicker[0], document.activeElement)) {
         closePicker();
       }
     });
-    
+
     // Return this object to enable the jQuery chaining
     return this;
   }
@@ -600,7 +617,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   height: 80px;
   width: 100px;
   text-align: center;
-  border-radius: 4px;
+  border-radius: 7px;
   vertical-align: middle;
   overflow: hidden;
   padding: 10px;

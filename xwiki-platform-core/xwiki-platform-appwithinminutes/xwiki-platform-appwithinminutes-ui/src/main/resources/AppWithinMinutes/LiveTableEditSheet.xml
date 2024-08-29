@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.LiveTableEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.LiveTableEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>LiveTableEditSheet</name>
   <language/>
@@ -42,7 +42,7 @@
 
 {{velocity output="false"}}
 #macro (listAvailableColumns $classReference)
-  &lt;select id="availableColumns"&gt;
+  &lt;select id="availableColumns" aria-describedby='availableColumnsHint'&gt;
     #set ($classFields = $xwiki.getDocument($classReference).getxWikiClass().properties)
     #if ($classFields.size() &gt; 0)
       &lt;optgroup label="$escapetool.xml($services.localization.render(
@@ -150,8 +150,8 @@
     &lt;/dt&gt;
     &lt;dd&gt;#displayPropertyValue('description')&lt;/dd&gt;
     &lt;dt&gt;
-      &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
-      &lt;span class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
+      &lt;label id='availableColumnsLabel' for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;
+      &lt;span id='availableColumnsHint' class="xHint"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;#displayPropertyValue('columns')&lt;/dd&gt;
   &lt;/dl&gt;
@@ -208,8 +208,6 @@
   {{html clean="false"}}
   #set ($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
   #set ($discard = $doc.use($liveTableObj))
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
   #if ("$!request.wizard" == 'true')
@@ -233,7 +231,9 @@
   ## Grant space administration rights only if the space is new. Don't overwrite existing space preferences.
   #set ($spaceHomeRef = $services.model.resolveDocument('', 'default', $spaceRef))
   #set ($spacePrefsRef = $services.model.resolveDocument('WebPreferences', 'explicit', $spaceRef))
-  #if (!$xwiki.exists($spaceHomeRef) &amp;&amp; !$xwiki.exists($spacePrefsRef))
+  ## Verify that the current user has script right on the current space home.
+  #set ($hasScript = $services.security.authorization.hasAccess('script',  $xcontext.userReference, $spaceHomeRef))
+  #if ($hasScript &amp;&amp; !$xwiki.exists($spaceHomeRef) &amp;&amp; !$xwiki.exists($spacePrefsRef))
     #set ($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
     #set ($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
     #set ($discard = $spacePrefsDoc.set('allow', 1))
@@ -355,6 +355,10 @@
 {{/velocity}}
 
 {{velocity}}
+#if (!$services.security.authorization.hasAccess('script', $xcontext.userReference, $doc.documentReference))
+  {{error}}{{translation key="platform.appwithinminutes.appHomePageNoScriptRight" /}}{{/error}}
+
+#end
 #if ("$!request.wizard" == 'true')
   {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
@@ -398,6 +402,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -445,6 +451,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -530,6 +538,7 @@ XWiki.LiveTableEditor = Class.create({
 
     var picker = new Element('div', {'class': 'columnPicker'}).insert(this.columnsSelect).insert(addButton);
     this.columnsInput.up().insert(picker);
+    $('availableColumnsLabel').setAttribute('for', 'availableColumns');
   },
   _onAddColumn : function(event) {
     event.stop();
@@ -585,11 +594,7 @@ XWiki.LiveTableEditor = Class.create({
   }
 });
 
-function init() {
-  var form = $('inline');
-  if (!form) {
-    return false;
-  }
+function initForm(form) {
   // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
   // request to the save action if the save button is detected on the request parameters. By submitting to the edit
   // action the edit sheet is evaluated and thus it can handle the save by itself.
@@ -618,9 +623,18 @@ function init() {
   }.bindAsEventListener(window));
 
   new XWiki.LiveTableEditor();
-
-  return true;
 }
+
+function init() {
+  var form = $('inline');
+  if (form) {
+    require(['scriptaculous/dragdrop'], function() {
+      initForm(form);
+    });
+  }
+  return form;
+}
+
 (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 
 // Allow widgets to catch the save event before the form is submitted when the 'Save &amp; Continue' button is clicked. We
@@ -733,6 +747,8 @@ return XWiki;
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -761,6 +777,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -796,6 +814,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

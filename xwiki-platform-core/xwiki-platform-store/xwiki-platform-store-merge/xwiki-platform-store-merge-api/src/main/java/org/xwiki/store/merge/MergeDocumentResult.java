@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
 
@@ -204,5 +207,50 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
             return this.mergeResults.get(documentPart).getConflicts();
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MergeDocumentResult that = (MergeDocumentResult) o;
+
+        return new EqualsBuilder()
+            .appendSuper(super.equals(o))
+            .append(currentDocument, that.currentDocument)
+            .append(previousDocument, that.previousDocument)
+            .append(nextDocument, that.nextDocument)
+            .append(mergeResults, that.mergeResults)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(95, 23)
+            .appendSuper(super.hashCode())
+            .append(currentDocument)
+            .append(previousDocument)
+            .append(nextDocument)
+            .append(mergeResults)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("currentDocument", currentDocument)
+            .append("previousDocument", previousDocument)
+            .append("nextDocument", nextDocument)
+            .append("mergeResults", mergeResults)
+            .toString();
     }
 }

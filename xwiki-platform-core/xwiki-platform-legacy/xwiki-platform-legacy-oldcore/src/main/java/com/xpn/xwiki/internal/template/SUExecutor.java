@@ -75,7 +75,7 @@ public class SUExecutor
      * @param author the user to check rights on
      * @return computed result
      * @throws Exception if unable to compute a result
-     * @param <V> the result type of method <tt>call</tt>
+     * @param <V> the result type of method {@code call}
      */
     public <V> V call(Callable<V> callable, DocumentReference author) throws Exception
     {

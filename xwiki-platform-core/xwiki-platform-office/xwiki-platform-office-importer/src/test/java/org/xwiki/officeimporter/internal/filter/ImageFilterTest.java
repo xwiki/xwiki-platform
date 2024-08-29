@@ -22,6 +22,7 @@ package org.xwiki.officeimporter.internal.filter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,16 +38,18 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLMarkerResourceReferenceSerializer;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.ooxi.jdatauri.DataUri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ImageFilter}.
@@ -54,14 +57,11 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({ XHTMLMarkerResourceReferenceSerializer.class })
 public class ImageFilterTest extends AbstractHTMLFilterTest
 {
     @MockComponent
     private DocumentAccessBridge dab;
-
-    @MockComponent
-    @Named("xhtmlmarker")
-    private ResourceReferenceSerializer xhtmlMarkerSerializer;
 
     @MockComponent
     @Named("currentmixed")
@@ -91,7 +91,6 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
 
         ResourceReference resourceReference = new ResourceReference("-foo--bar.png-", ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
-        when(this.xhtmlMarkerSerializer.serialize(resourceReference)).thenReturn("false|-|attach|-|-foo--bar.png-");
 
         filterAndAssertOutput("<img src=\"../../some/path/-foo--b%61r.png-\"/>",
             Collections.singletonMap("targetDocument", "Path.To.Page"),
@@ -110,7 +109,6 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         ResourceReference resourceReference = new ResourceReference(imageName, ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
         String imageNameEscaped = "foo&+_bar\\\\@.png";
-        when(this.xhtmlMarkerSerializer.serialize(resourceReference)).thenReturn("false|-|attach|-|" + imageName);
 
         filterAndAssertOutput(String.format( "<img src=\"../../some/path/%s\"/>", imageNameUrl),
             Collections.singletonMap("targetDocument", "Path.To.Page"),
@@ -136,7 +134,6 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
 
         ResourceReference resourceReference = new ResourceReference("foo.png", ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
-        when(this.xhtmlMarkerSerializer.serialize(resourceReference)).thenReturn("false|-|attach|-|foo.png");
 
         String fileName =
             DataUri.parse("data:image/jpeg;base64,GgoAAAAN==", Charset.forName("UTF-8")).hashCode() + ".jpg";
@@ -145,7 +142,6 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
 
         resourceReference = new ResourceReference(fileName, ResourceType.ATTACHMENT);
         resourceReference.setTyped(false);
-        when(this.xhtmlMarkerSerializer.serialize(resourceReference)).thenReturn("false|-|attach|-|" + fileName);
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("targetDocument", "Path.To.Page");
@@ -162,5 +158,26 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
         @SuppressWarnings("unchecked")
         Map<String, byte[]> embeddedImages = (Map<String, byte[]>) document.getUserData("embeddedImages");
         assertEquals(new HashSet<>(Arrays.asList("foo.png", fileName)), embeddedImages.keySet());
+    }
+
+    @Test
+    void rewriteImagePrefix() throws UnsupportedEncodingException
+    {
+        Map<String, String> configuration = Map.of(
+            "targetDocument", "Path.To.Page",
+            "replaceImagePrefix", "output_",
+            "replacementImagePrefix", "re@placement_"
+        );
+
+        String imageName = "re\\@placement_image.png";
+        String encodedImageName = URLEncoder.encode(imageName.replace("\\@", "@"), StandardCharsets.UTF_8);
+        AttachmentReference attachmentReference = new AttachmentReference(imageName, this.documentReference);
+        when(this.dab.getAttachmentURL(attachmentReference, false)).thenReturn("/path/to/" + encodedImageName);
+
+        filterAndAssertOutput("<img src=\"output_image.png\" />", configuration,
+            "<!--startimage:false|-|attach|-|re\\\\@placement_image.png-->"
+                + "<img src=\"/path/to/re%40placement_image.png\"/><!--stopimage-->");
+
+        verify(this.dab).getAttachmentURL(attachmentReference, false);
     }
 }

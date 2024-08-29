@@ -9,14 +9,8 @@ set -e
 
 ## Make sure Tomcat is able to write in the data folder
 if [ ! 'tomcat' = `stat -c '%U' /var/lib/xwiki/data` ]; then
-  chown -R tomcat.tomcat /var/lib/xwiki/data
+  chown -R tomcat:tomcat /var/lib/xwiki/data
 fi
-
-#########################
-# Configuration
-#########################
-
-. /usr/share/debconf/confmodule
 
 #########################
 # Restart Tomcat

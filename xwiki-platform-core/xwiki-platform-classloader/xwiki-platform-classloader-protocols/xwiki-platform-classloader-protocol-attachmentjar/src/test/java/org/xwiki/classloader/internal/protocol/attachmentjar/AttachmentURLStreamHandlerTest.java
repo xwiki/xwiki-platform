@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLStreamHandler;
 
 import javax.inject.Named;
 
@@ -63,7 +62,7 @@ public class AttachmentURLStreamHandlerTest
     @Test
     void invalidAttachmentJarURL() throws Exception
     {
-        URL url = new URL(null, "http://invalid/url", (URLStreamHandler) this.handler);
+        URL url = new URL(null, "http://invalid/url", this.handler);
 
         try {
             url.openConnection();
@@ -77,7 +76,7 @@ public class AttachmentURLStreamHandlerTest
     @Test
     void attachmentJarURL() throws Exception
     {
-        URL url = new URL(null, "attachmentjar://Space.Page@filename", (URLStreamHandler) this.handler);
+        URL url = new URL(null, "attachmentjar://Space.Page@filename", this.handler);
 
         final AttachmentReference attachmentReference = new AttachmentReference("filename",
             new DocumentReference("wiki", "space", "page"));
@@ -105,7 +104,7 @@ public class AttachmentURLStreamHandlerTest
     @Test
     void attachmentJarURLWithEncodedChars() throws Exception
     {
-        URL url = new URL(null, "attachmentjar://some%20page", (URLStreamHandler) this.handler);
+        URL url = new URL(null, "attachmentjar://some%20page", this.handler);
         url.openConnection();
         verify(this.arf).resolve("some page");
     }

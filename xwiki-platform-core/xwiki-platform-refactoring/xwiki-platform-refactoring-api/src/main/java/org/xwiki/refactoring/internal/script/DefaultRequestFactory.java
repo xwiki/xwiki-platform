@@ -42,6 +42,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
+import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
@@ -170,7 +171,7 @@ public class DefaultRequestFactory implements RequestFactory
     @Override
     public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences)
     {
-        EntityRequest request = new EntityRequest();
+        DeleteRequest request = new DeleteRequest();
         initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
         return request;
     }

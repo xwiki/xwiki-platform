@@ -25,89 +25,12 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Search - Solr - Parent POM</name>
   <description>Parent project for the Solr search engine.</description>
-  <properties>
-    <solr.version>8.8.0</solr.version>
-  </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-solrj</artifactId>
-        <version>${solr.version}</version>
-        <exclusions>
-          <!-- We want a different version of Woodstox and the id changed -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-          <!--
-            The version of the Jetty client libraries used by solrj often conflict with the version of Jetty used by XWiki.
-            The reason is generally that upgrading Jetty is always a pain and tend to lack behind.
-          -->
-          <exclusion>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-core</artifactId>
-        <version>${solr.version}</version>
-        <exclusions>
-          <!-- We want a different version of Woodstox and the id changed -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-          <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-graphite</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-jetty9</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-jvm</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty.http2</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <!-- We use slf4j in XWiki -->
-          <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <modules>
     <module>xwiki-platform-search-solr-server</module>
     <module>xwiki-platform-search-solr-api</module>
@@ -115,12 +38,4 @@
     <module>xwiki-platform-search-solr-rest</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-search-solr-test-utils</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

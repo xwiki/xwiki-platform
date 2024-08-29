@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,7 +58,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
  * @version $Id: 31e2e0d488d6f5dbc1fcec1211d30dc30000b5eb
  */
 @OldcoreTest
-public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
+class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
     @InjectMockComponents
     private WikiPreferencesConfigurationSource source;

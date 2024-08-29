@@ -40,7 +40,10 @@ import org.xwiki.model.reference.InvalidEntityReferenceException;
  */
 public abstract class AbstractEntityReferenceResolver
 {
-    protected static final Map<EntityType, EntityType> TYPE_CONVERT_MAPPING = new EnumMap<>(EntityType.class);
+    /**
+     * The mapping between the PAGE and the DOCUMENT based worlds.
+     */
+    public static final Map<EntityType, EntityType> TYPE_CONVERT_MAPPING = new EnumMap<>(EntityType.class);
 
     static {
         TYPE_CONVERT_MAPPING.put(EntityType.WIKI, EntityType.WIKI);

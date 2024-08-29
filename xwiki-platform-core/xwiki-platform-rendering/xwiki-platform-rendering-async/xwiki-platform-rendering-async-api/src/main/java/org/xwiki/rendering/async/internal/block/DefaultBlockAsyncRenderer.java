@@ -36,6 +36,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
+import org.xwiki.rendering.util.ParserUtils;
 
 /**
  * Helper to execute Block based asynchronous renderer.
@@ -46,6 +47,10 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = DefaultBlockAsyncRenderer.class)
 public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
+    private static final String TM_FAILEDASYNC = "rendering.async.error.failed";
+
+    private static final ParserUtils PARSERUTILS = new ParserUtils();
+
     @Inject
     private AsyncContext asyncContext;
 
@@ -106,11 +111,17 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
             }
 
+            // Get the block to transform
             Block block = this.configuration.getBlock();
-            XDOM xdom;
-            if (block instanceof XDOM) {
-                xdom = (XDOM) block;
-            } else {
+
+            // Make sure the source is inline if needed
+            if (this.configuration.isInline()) {
+                block = PARSERUTILS.convertToInline(block, true);
+            }
+
+            // Get the XDOM instance for the transformation context
+            XDOM xdom = this.configuration.getXDOM();
+            if (xdom == null) {
                 Block rootBlock = block.getRoot();
 
                 if (rootBlock instanceof XDOM) {
@@ -126,8 +137,8 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
             resultBlock = tranform(xdom, block);
         } catch (Exception e) {
             // Display the error in the result
-            resultBlock = new CompositeBlock(this.errorBlockGenerator
-                .generateErrorBlocks("Failed to execute asynchronous content", e, this.configuration.isInline()));
+            resultBlock = new CompositeBlock(this.errorBlockGenerator.generateErrorBlocks(this.configuration.isInline(),
+                TM_FAILEDASYNC, "Failed to execute asynchronous content", null, e));
         }
 
         return resultBlock;
@@ -136,7 +147,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     private Block tranform(XDOM xdom, Block block) throws RenderingException
     {
         TransformationContext transformationContext =
-            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), false);
+            new TransformationContext(xdom, this.configuration.getDefaultSyntax(), this.configuration.isResricted());
         transformationContext.setTargetSyntax(this.configuration.getTargetSyntax());
         transformationContext.setId(this.configuration.getTransformationId());
 

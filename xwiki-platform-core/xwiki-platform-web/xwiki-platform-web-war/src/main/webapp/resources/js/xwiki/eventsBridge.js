@@ -19,6 +19,11 @@
  */
 // Bridge custom XWiki events between Prototype.js and jQuery.
 define(['jquery'], function($) {
+  if (!window.Prototype) {
+    // Prototype.js is not loaded so there's no need to bridge the events.
+    return;
+  }
+
   var oldJQueryTrigger = $.event.trigger;
   var oldPrototypeFire = Element.fire;
 
@@ -38,7 +43,7 @@ define(['jquery'], function($) {
     var immediatePropagationStopped = jQueryEvent && typeof(jQueryEvent.isImmediatePropagationStopped) === 'function'
       && jQueryEvent.isImmediatePropagationStopped();
     if (!immediatePropagationStopped && element && shouldBridgeEvent(eventName)) {
-      var memo = $.isArray(data) ? data[0] : data;
+      var memo = Array.isArray(data) ? data[0] : data;
       var propagationStopped = jQueryEvent && typeof(jQueryEvent.isPropagationStopped) === 'function'
         && jQueryEvent.isPropagationStopped();
       // Execute only the event listeners registered directly on the event target if the jQuery event was stopped.

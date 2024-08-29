@@ -1,0 +1,160 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.ConfigTemplate" locale="">
+  <web>CKEditor</web>
+  <name>ConfigTemplate</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>CKEditor.ConfigTemplate</name>
+    <number>0</number>
+    <className>CKEditor.ConfigClass</className>
+    <guid>d5f6ba45-f7eb-499d-81c3-bedf2099c5b9</guid>
+    <class>
+      <name>CKEditor.ConfigClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <advanced>
+        <contenttype>PureText</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>advanced</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>Advanced Configuration</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </advanced>
+      <linkShowAdvancedTab>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>linkShowAdvancedTab</name>
+        <number>3</number>
+        <prettyName>Link: Show Advanced Tab</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </linkShowAdvancedTab>
+      <linkShowTargetTab>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>linkShowTargetTab</name>
+        <number>4</number>
+        <prettyName>Link: Show Target Tab</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </linkShowTargetTab>
+      <loadJavaScriptSkinExtensions>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>loadJavaScriptSkinExtensions</name>
+        <number>5</number>
+        <prettyName>Load JavaScript Skin Extensions</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </loadJavaScriptSkinExtensions>
+      <removeButtons>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>removeButtons</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Disabled Toolbar Features</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </removeButtons>
+      <removePlugins>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>removePlugins</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Disabled Plugins</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </removePlugins>
+    </class>
+    <property>
+      <advanced>// Define changes to default configuration here. For example:
+// config.uiColor = '#AADC6E';
+// config.linkShowTargetTab = true;</advanced>
+    </property>
+    <property>
+      <linkShowAdvancedTab>0</linkShowAdvancedTab>
+    </property>
+    <property>
+      <linkShowTargetTab>0</linkShowTargetTab>
+    </property>
+    <property>
+      <loadJavaScriptSkinExtensions>0</loadJavaScriptSkinExtensions>
+    </property>
+    <property>
+      <removeButtons/>
+    </property>
+    <property>
+      <removePlugins/>
+    </property>
+  </object>
+</xwikidoc>

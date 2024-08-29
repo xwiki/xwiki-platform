@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro.velocity.filter;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.velocity.VelocityTemplate;
 
 /**
  * Component called before and after velocity execution in velocity macro to modify the content to execute or parse. It
@@ -40,6 +41,38 @@ public interface VelocityMacroFilter
      * @return the modified content
      */
     String before(String content, VelocityContext velocityContext);
+
+    /**
+     * @return true of the filter support preparation
+     * @since 15.9RC1
+     */
+    default boolean isPreparationSupported()
+    {
+        return false;
+    }
+
+    /**
+     * Called just before the velocity script is executed in the case of a prepared macro.
+     * 
+     * @param content the velocity script
+     * @param velocityContext the velocity context. this method can inject here bindings usable in the script like
+     *            <code>$somebinding</code>.
+     * @since 15.9RC1
+     */
+    default void before(VelocityTemplate content, VelocityContext velocityContext)
+    {
+
+    }
+
+    /**
+     * @param content the velocity script
+     * @return the modified content
+     * @since 15.9RC1
+     */
+    default String prepare(String content)
+    {
+        return content;
+    }
 
     /**
      * Called just before the result of the velocity script execution is parsed.

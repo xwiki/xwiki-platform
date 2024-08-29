@@ -17,32 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($jsExtension = '.min.js')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '.js')
-#end
-#set ($paths = {
-  'jsTree': $services.webjars.url('jstree', "jstree$jsExtension"),
-  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension"),
-  'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder$jsExtension"),
-  'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree$jsExtension")
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths) {
-  "use strict";
-
-require.config({
-  paths,
-  shim: {
-    jsTree: {
-      deps: ['jquery']
-    }
-  }
-});
-
-require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
+require(['jquery', 'xwiki-meta', 'xwiki-tree'], function($, xm) {
   /**
    * Called when a question is being asked
    */
@@ -123,7 +98,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         deleteTree.xtree({plugins: ['checkbox'], core: {themes: {icons: true, dots: true}}});
 
         // Called when the user click on "select all"
-        questionForm.find('.btSelectAllTree').click(function(event){
+        questionForm.find('.btSelectAllTree').on('click', function(event) {
           event.preventDefault();
           deleteTree.jstree().check_all();
           hideObjectsCheckbox();
@@ -133,7 +108,7 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
         deleteTree.on('after_open.jstree', hideObjectsCheckbox);
 
         // Called when the user click on "select none"
-        questionForm.find('.btUnselectAllTree').click(function(event){
+        questionForm.find('.btUnselectAllTree').on('click', function(event) {
           event.preventDefault();
           deleteTree.jstree().uncheck_all();
           hideObjectsCheckbox();
@@ -152,6 +127,3 @@ require(['jquery', 'xwiki-meta', 'tree'], function($, xm) {
     initQuestion.bind(uiQuestion)(null);
   });
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));

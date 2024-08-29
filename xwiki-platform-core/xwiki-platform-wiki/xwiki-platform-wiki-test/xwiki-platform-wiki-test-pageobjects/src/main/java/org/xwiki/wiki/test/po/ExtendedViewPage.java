@@ -26,12 +26,12 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class ExtendedViewPage extends ViewPage
 {
-    @FindBy(xpath = "//div[contains(@class, 'drawer-menu-item-text') and contains(text(), 'Wiki Index')]/..")
+    @FindBy(xpath = "//span[contains(@class, 'drawer-menu-item-text') and contains(text(), 'Wiki Index')]/..")
     private WebElement wikiIndex;
 
     public WikiIndexPage goToWikiIndex()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         // Calling click() doesn't have the expected result: the mouse is moved over the link (we can see that the
         // link is hovered because it gets underlined and the link URL is displayed in the browser status bar) but
         // the link does not seems to be clicked. If we pause the test and click the link ourselves everything

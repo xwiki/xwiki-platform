@@ -19,9 +19,8 @@
  */
 package org.xwiki.officeimporter.document;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -34,6 +33,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -52,7 +52,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     /**
      * Artifacts for this office document.
      */
-    private Set<File> artifactFiles;
+    private final Map<String, OfficeDocumentArtifact> artifactsMap;
 
     /**
      * {@link ComponentManager} used to lookup for various renderers.
@@ -65,17 +65,18 @@ public class XDOMOfficeDocument implements OfficeDocument
      * Creates a new {@link XDOMOfficeDocument}.
      *
      * @param xdom {@link XDOM} corresponding to office document content.
-     * @param artifactFiles artifacts for this office document.
+     * @param artifacts artifacts for this office document.
      * @param componentManager {@link ComponentManager} used to lookup for various renderers.
      * @param converterResult the {@link OfficeConverterResult} used to build that object.
-     * @since 13.1RC1
+     * @since 14.10.8
+     * @since 15.3RC1
      */
     @Unstable
-    public XDOMOfficeDocument(XDOM xdom, Set<File> artifactFiles, ComponentManager componentManager,
-        OfficeConverterResult converterResult)
+    public XDOMOfficeDocument(XDOM xdom, Map<String, OfficeDocumentArtifact> artifacts,
+        ComponentManager componentManager, OfficeConverterResult converterResult)
     {
         this.xdom = xdom;
-        this.artifactFiles = artifactFiles;
+        this.artifactsMap = artifacts;
         this.componentManager = componentManager;
         this.converterResult = converterResult;
     }
@@ -89,7 +90,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     @Override
     public String getContentAsString()
     {
-        return getContentAsString("xwiki/2.0");
+        return getContentAsString(Syntax.XWIKI_2_1.toIdString());
     }
 
     /**
@@ -112,9 +113,9 @@ public class XDOMOfficeDocument implements OfficeDocument
     }
 
     @Override
-    public Set<File> getArtifactsFiles()
+    public Map<String, OfficeDocumentArtifact> getArtifactsMap()
     {
-        return this.artifactFiles;
+        return this.artifactsMap;
     }
 
     /**

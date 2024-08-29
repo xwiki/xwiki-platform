@@ -35,56 +35,42 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Velkommen til din wiki =
+  <content>== Velkommen til din wiki ==
 
 XWiki er det bedste værktøj til at organisere din viden og erfaring. En //wiki// er en ordnet samling af //sider//. Du kan opretter flere Wikier, med hver sit sæt af sider..
 
 XWiki kan være en vidensbase (support, dokumentation, salg, o.s.v.), et fælles arbejdsrum eller enda et helt intranet.
 
-= The basics =
+== The basics ==
 
 For at få det bedst ud af din wiki så log ind og:
 
-Brug {{velocity}}$services.icon.render('pencil'){{/velocity}} knappen herover til at //redigere// denne side og begynd at tilpasse din wiki efter dine ønsker.
+Brug {{displayIcon name="pencil"/}} knappen herover til at //redigere// denne side og begynd at tilpasse din wiki efter dine ønsker.
 
-Brug {{velocity}}$services.icon.render('add'){{/velocity}} knappen herover til at //tilføje// flere sider til din wiki og opret den //struktur// der bedst organisere din viden.
+Brug {{displayIcon name="add"/}} knappen herover til at //tilføje// flere sider til din wiki og opret den //struktur// der bedst organisere din viden.
 
-Brug {{velocity}}$services.icon.render('home'){{/velocity}} "brødkrumme-linien" ovenover titlen til at //navigerer// i mellem siderne. Man kan let fare vild i en stor wiki uden den.
+Brug {{displayIcon name="home"/}} "brødkrumme-linien" ovenover titlen til at //navigerer// i mellem siderne. Man kan let fare vild i en stor wiki uden den.
 
 På siden [[Sandbox&gt;&gt;Sandbox.WebHome]] kan du se eksempler på mere indhold og det et godt sted at eksperimentere med wikiens mange funktioner. 
 
  {{box}}
-Lær mere om XWiki med en engelske {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+Lær mere om XWiki med en engelske [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (%class="row"%)
 (((
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Udvid din wiki =
+== Udvid din wiki ==
 
-Wikien kan udbygges med masser af funktionalitet, som du måske står og mangler. Derfor - kig  på {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} hvor der kan søges og installeres udvidelser.
+Wikien kan udbygges med masser af funktionalitet, som du måske står og mangler. Derfor - kig  på [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] hvor der kan søges og installeres udvidelser.
 
-For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+For at finde mere om de 900+ udvidelser, som andre XWiki-brugere har delt, gå til [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Opret et nyt værktøj =
+== Opret et nyt værktøj ==
 
 Foruden disse mange udvidelser, har du mulighed for selv at definere //struktur// på dine data efter //dit// behov, ved at oprette dine egne værktøj med [[Minut-Apps&gt;&gt;AppWithinMinutes]] (AWM). 
 

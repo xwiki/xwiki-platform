@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 
 /**
  * Initialize wiki component class.
@@ -53,5 +54,9 @@ public class ComponentClassInitializer extends AbstractMandatoryClassInitializer
         xclass.addTextField(COMPONENT_ROLE_HINT_FIELD, "Component Role Hint", 30);
         xclass.addStaticListField(COMPONENT_SCOPE_FIELD, "Component Scope", 1, false,
             "wiki=Current Wiki|user=Current User|global=Global", "select");
+        xclass.addNumberField(COMPONENT_ROLE_TYPE_PRIORITY_FIELD, "Component Role Type Priority", 30,
+            NumberClass.TYPE_INTEGER);
+        xclass.addNumberField(COMPONENT_ROLE_HINT_PRIORITY_FIELD, "Component Role Hint Priority", 30,
+            NumberClass.TYPE_INTEGER);
     }
 }

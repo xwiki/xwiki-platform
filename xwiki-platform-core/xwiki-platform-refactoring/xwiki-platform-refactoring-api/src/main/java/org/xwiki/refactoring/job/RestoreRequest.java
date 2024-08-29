@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
+
 /**
  * A job request that can be used to restore a list of deleted documents and/or an entire batch of deleted documents
  * from the recycle bin.
@@ -29,4 +31,22 @@ package org.xwiki.refactoring.job;
 public class RestoreRequest extends AbstractDeletedDocumentsRequest
 {
     private static final long serialVersionUID = 7738465742607715013L;
+
+    /**
+     * Default constructor.
+     */
+    public RestoreRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public RestoreRequest(Request request)
+    {
+        super(request);
+    }
 }

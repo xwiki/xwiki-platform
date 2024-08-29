@@ -23,7 +23,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.like.test.po.LikeButton;
+import org.xwiki.like.test.po.LikersPage;
 import org.xwiki.like.test.po.UserProfileLikedPagesPage;
+import org.xwiki.livedata.test.po.LiveDataElement;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -43,15 +45,15 @@ import static org.xwiki.like.test.po.UserProfileLikedPagesPage.TITLE_COLUMN_NAME
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as extension
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    }, resolveExtraJARs = true)
+    },
+    resolveExtraJARs = true
+)
 class LikeIT
 {
     private static final String USER1 = "LikeUser1";
@@ -73,8 +75,8 @@ class LikeIT
     }
 
     /**
-     * Check that guest user can only see the button if the configuration is set to force displaying it and
-     * can never interact with it.
+     * Check that guest user can only see the button if the configuration is set to force displaying it and can never
+     * interact with it.
      */
     @Test
     @Order(1)
@@ -101,6 +103,8 @@ class LikeIT
     @Order(2)
     void likeUnlikeDefaultConfiguration(TestUtils testUtils, TestReference testReference)
     {
+        DocumentReference subPageReference = new DocumentReference("SubPage", testReference.getLastSpaceReference());
+
         testUtils.login(USER1, USER1);
         testUtils.createPage(testReference, "some content");
         LikeButton likeButton = new LikeButton();
@@ -118,14 +122,40 @@ class LikeIT
         likeButton.clickToLike();
         assertEquals(2, likeButton.getLikeNumber());
 
-        // Goes to the user profile and verify that the liked pages tables displays the liked pages. 
-        UserProfileLikedPagesPage userProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
-        userProfileLikedPagesPage.gotoPage();
-        TableLayoutElement tableLayout = userProfileLikedPagesPage.getLiveData().getTableLayout();
+        // Create another page and like it only with user 2.
+        testUtils.createPage(subPageReference, "some other content");
+        likeButton = new LikeButton();
+        likeButton.clickToLike();
+        assertEquals(1, likeButton.getLikeNumber());
+
+        // Go to its own user profile and verify that the liked pages tables displays the liked pages.
+        UserProfileLikedPagesPage user2ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER2);
+        user2ProfileLikedPagesPage.gotoPage();
+        TableLayoutElement tableLayout = user2ProfileLikedPagesPage.getLiveData().getTableLayout();
+        assertEquals(2, tableLayout.countRows());
+        tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
+            testUtils.getURL(testReference.getLastSpaceReference()));
+        tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(subPageReference),
+            testUtils.getURL(subPageReference));
+        tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
+        tableLayout.assertRow(LIKES_COLUMN_NAME, "1");
+
+        // Go to the profile of user 1 and verify that the liked pages are displayed and valid.
+        UserProfileLikedPagesPage user1ProfileLikedPagesPage = new UserProfileLikedPagesPage(USER1);
+        user1ProfileLikedPagesPage.gotoPage();
+        tableLayout = user1ProfileLikedPagesPage.getLiveData().getTableLayout();
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertCellWithLink(TITLE_COLUMN_NAME, testUtils.serializeReference(testReference),
             testUtils.getURL(testReference.getLastSpaceReference()));
         tableLayout.assertRow(LIKES_COLUMN_NAME, "2");
+
+        // Go to the likers of the page and verify the Live Data is accurate.
+        LikersPage likersPage = LikersPage.goToLikers(testReference);
+        LiveDataElement likersLiveData = likersPage.getLiveData();
+        TableLayoutElement likersTableLayout = likersLiveData.getTableLayout();
+        assertEquals(2, likersTableLayout.countRows());
+        likersTableLayout.assertRow("User", "LikeUser1");
+        likersTableLayout.assertRow("User", "LikeUser2");
 
         testUtils.login(USER1, USER1);
         testUtils.gotoPage(testReference);

@@ -28,10 +28,12 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +46,7 @@ import static org.mockito.Mockito.when;
  * @since 2.1M1
  */
 @ComponentTest
-public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
+class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporterTest
 {
     /**
      * Parser for building XDOM instances.
@@ -57,9 +59,9 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
     private XDOMOfficeDocumentSplitter officeDocumentSplitter;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp() throws Exception
     {
-        this.xwikiSyntaxParser = this.componentManager.getInstance(Parser.class, "xwiki/2.0");
+        this.xwikiSyntaxParser = this.componentManager.getInstance(Parser.class, Syntax.XWIKI_2_1.toIdString());
         this.officeDocumentSplitter = this.componentManager.getInstance(XDOMOfficeDocumentSplitter.class);
     }
 
@@ -69,7 +71,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
      * @throws Exception if it fails to parse the wiki syntax or if it fails to split the document
      */
     @Test
-    public void documentSplitting() throws Exception
+    void documentSplitting() throws Exception
     {
         // Create xwiki/2.0 document.
         StringBuffer buffer = new StringBuffer();
@@ -85,35 +87,39 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
 
         // Create xdom office document.
         XDOMOfficeDocument officeDocument =
-            new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
+            new XDOMOfficeDocument(xdom, Collections.emptyMap(), this.componentManager, null);
         final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
         // Add expectations to mock document name serializer.
         when(this.mockCompactWikiStringEntityReferenceSerializer.serialize(baseDocument)).thenReturn("Test.Test");
-        when(this.mockCompactWikiStringEntityReferenceSerializer.serialize(
-            new DocumentReference("xwiki", "Test", "Heading1"))).thenReturn("Test.Heading1");
-        when(this.mockCompactWikiStringEntityReferenceSerializer.serialize(
-            new DocumentReference("xwiki", "Test", "Heading11"))).thenReturn("Test.Heading11");
-        when(this.mockCompactWikiStringEntityReferenceSerializer.serialize(
-            new DocumentReference("xwiki", "Test", "Heading12"))).thenReturn("Test.Heading12");
-        when(this.mockCompactWikiStringEntityReferenceSerializer.serialize(
-            new DocumentReference("xwiki", "Test", "Heading2"))).thenReturn("Test.Heading2");
+        when(this.mockCompactWikiStringEntityReferenceSerializer
+            .serialize(new DocumentReference("xwiki", "Test", "Heading1"))).thenReturn("Test.Heading1");
+        when(this.mockCompactWikiStringEntityReferenceSerializer
+            .serialize(new DocumentReference("xwiki", "Test", "Heading11"))).thenReturn("Test.Heading11");
+        when(this.mockCompactWikiStringEntityReferenceSerializer
+            .serialize(new DocumentReference("xwiki", "Test", "Heading12"))).thenReturn("Test.Heading12");
+        when(this.mockCompactWikiStringEntityReferenceSerializer
+            .serialize(new DocumentReference("xwiki", "Test", "Heading2"))).thenReturn("Test.Heading2");
 
         // Add expectations to mock document name factory.
-        when(this.mockDocumentReferenceResolver.resolve("Test.Test")).thenReturn(
-            new DocumentReference("xwiki", "Test", "Test"));
-        when(this.mockDocumentReferenceResolver.resolve("Test.Heading1")).thenReturn(
-            new DocumentReference("xwiki", "Test", "Heading1"));
-        when(this.mockDocumentReferenceResolver.resolve("Test.Heading11")).thenReturn(
-            new DocumentReference("xwiki", "Test", "Heading11"));
-        when(this.mockDocumentReferenceResolver.resolve("Test.Heading12")).thenReturn(
-            new DocumentReference("xwiki", "Test", "Heading12"));
-        when(this.mockDocumentReferenceResolver.resolve("Test.Heading2")).thenReturn(
-            new DocumentReference("xwiki", "Test", "Heading2"));
+        when(this.mockDocumentReferenceResolver.resolve("Test.Test"))
+            .thenReturn(new DocumentReference("xwiki", "Test", "Test"));
+        when(this.mockDocumentReferenceResolver.resolve("xwiki:Test.Heading1"))
+            .thenReturn(new DocumentReference("xwiki", "Test", "Heading1"));
+        when(this.mockDocumentReferenceResolver.resolve("xwiki:Test.Heading11"))
+            .thenReturn(new DocumentReference("xwiki", "Test", "Heading11"));
+        when(this.mockDocumentReferenceResolver.resolve("xwiki:Test.Heading12"))
+            .thenReturn(new DocumentReference("xwiki", "Test", "Heading12"));
+        when(this.mockDocumentReferenceResolver.resolve("xwiki:Test.Heading2"))
+            .thenReturn(new DocumentReference("xwiki", "Test", "Heading2"));
 
         // Perform the split operation.
-        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result = this.officeDocumentSplitter.split(officeDocument,
-            new int[] {1, 2, 3, 4, 5, 6}, "headingNames", baseDocument);
+        OfficeDocumentSplitterParameters parameters = new OfficeDocumentSplitterParameters();
+        parameters.setHeadingLevelsToSplit(new int[] {1, 2, 3, 4, 5, 6});
+        parameters.setNamingCriterionHint("headingNames");
+        parameters.setBaseDocumentReference(baseDocument);
+        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
+            this.officeDocumentSplitter.split(officeDocument, parameters);
 
         // There should be five XDOM office documents.
         assertEquals(5, result.size());

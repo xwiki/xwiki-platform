@@ -1,0 +1,106 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.OfficeImporter" locale="">
+  <web>CKEditor</web>
+  <name>OfficeImporter</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>CKEditor.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity wiki="false"}}
+#if ("$!request.fileName" != '')
+  #set ($attachmentReference = $services.model.createAttachmentReference($doc.documentReference, $request.fileName))
+  #set ($parameters = {
+    'filterStyles': $request.filterStyles,
+    'useOfficeViewer': $request.useOfficeViewer
+  })
+  #ckeditor_initRequiredSkinExtensions()
+  #set ($output = $services.wysiwyg.importOfficeAttachment($attachmentReference, $parameters))
+  #if ($output != '' &amp;&amp; "$!output" == '')
+    ## Null output means an error has occured.
+    $response.sendError(500)
+  #else
+    ## When importing presentations using the Office Viewer macro the slides are displayed using the gallery widget for
+    ## which we need to load the required CSS and JavaScript resources.
+    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', "#ckeditor_getRequiredSkinExtensions()"))
+    $output
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.fileName" == '' &amp;&amp; $xcontext.action == 'get')
+  {{html clean="false"}}
+  &lt;form class="xform"&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath'))
+          &lt;span class="xRequired"&gt;
+            ($escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.required')))
+          &lt;/span&gt;
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filePath.hint'))
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="file" name="filePath" /&gt;
+      &lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label&gt;
+          &lt;input type="checkbox" name="filterStyles" value="true" checked="checked" /&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles'))
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.filterStyles.hint'))
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;&lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label&gt;
+          &lt;input type="checkbox" name="useOfficeViewer" value="true" /&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer'))
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;
+          $escapetool.xml($services.localization.render('ckeditor.plugin.office.importer.useOfficeViewer.hint'))
+        &lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

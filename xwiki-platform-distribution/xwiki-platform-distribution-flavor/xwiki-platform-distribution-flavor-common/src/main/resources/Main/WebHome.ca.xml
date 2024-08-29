@@ -35,50 +35,36 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="Video a YouTube de XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Benvinguts al vostre wiki =
+  <content>== Benvinguts al vostre wiki ==
 
 XWiki es la millor eina per organitzar el vostre coneixement. Un //wiki// s'organitza en una jerarquia de //pàgines//. Podeu crear múltiples wikis, cada un amb la seva col·lecció de pàgines.
 
 XWiki pot ser utilitzat com una base de dades de coneixement (suport, documentació, vendes, etc.), per a espais col·laboratius o fins i tot com una intranet complerta.
 
-= Les bases =
+== Les bases ==
 
 Per treure el màxim profit del vostre wiki, registreu-vos i:
 
-Utilitzeu el botó {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} a dalt per //editar// aquesta pagina i començar a personalitzar el vostre wiki,adaptant-lo a les vostres necessitats.
+Utilitzeu el botó {{displayIcon name="pencil"/}} a dalt per //editar// aquesta pagina i començar a personalitzar el vostre wiki,adaptant-lo a les vostres necessitats.
 
-Utilitzeu el botó {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} a dalt per //afegir// mes pàgines al vostre wiki i crear la //jerarquia// que millor organitzi el vostre contingut.
+Utilitzeu el botó {{displayIcon name="add"/}} a dalt per //afegir// mes pàgines al vostre wiki i crear la //jerarquia// que millor organitzi el vostre contingut.
 
-Utilitzeu l'explorador {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} situat sobre el títol, per //navegar// dins les vostres pàgines. Es fàcil perdre's dins d'un wiki gran sense aquesta eina.
+Utilitzeu l'explorador {{displayIcon name="home"/}} situat sobre el títol, per //navegar// dins les vostres pàgines. Es fàcil perdre's dins d'un wiki gran sense aquesta eina.
 
 També podeu utilitzar el [[Sandbox&gt;&gt;Sandbox.WebHome]] per a mes exemples de contingut i en general com a lloc per experimentar amb les prestacions del vostres wiki. 
 
- {{box}}Conegueu més sobre com utilitzar XWiki amb la {{velocity}}[[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+ {{box}}Conegueu més sobre com utilitzar XWiki amb la [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
-|(%class="row"%)(((
+(%class="row"%)(((
 (%class="col-xs-12 col-sm-6"%)(((
-= Expandiu el vostre wiki =
+== Expandiu el vostre wiki ==
 
-Per ampliar la potencia i funcionalitats del vostre wiki amb mòduls que //vostè// necessiti, adreceu-vos al {{velocity}}[[Gestor d'Extensions &gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} on podreu cercar i instal·lar extensions.
+Per ampliar la potencia i funcionalitats del vostre wiki amb mòduls que //vostè// necessiti, adreceu-vos al [[Gestor d'Extensions &gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] on podreu cercar i instal·lar extensions.
 
-Per fullejar entre les més de 900 extensions de la comunitat XWiki, adreceu-vos al [[Repositori d'Extensions&gt;&gt;http://extensions.xwiki.org]].
-)))|
+Per fullejar entre les més de 900 extensions de la comunitat XWiki, adreceu-vos al [[Repositori d'Extensions&gt;&gt;https://extensions.xwiki.org]].
+)))
 (%class="col-xs-12 col-sm-6"%)(((
-= Creeu la vostra aplicació =
+== Creeu la vostra aplicació ==
 
 Aneu mes enllà de les extensions disponibles i definiu la //estructura// de les vostres dades a partir de les //vostres// necessitats, creant la //vostre// pròpia aplicació amb [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
 

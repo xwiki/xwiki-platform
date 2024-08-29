@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="ja">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+core.menu.type.wiki=ウィキ
+core.menu.watchlist.add.wiki=ウィキを監視
+core.menu.watchlist.remove.wiki=ウィキの監視を解除
+core.menu.admin.wiki=ウィキを管理
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=ウィキの情報
+
+# MESSAGES
+platform.wiki.currentwiki.welcome={0}{1}{2} ウィキにようこそ。
+platform.wiki.currentwiki.currentUserIsOwner=あなたはこのウィキの所有者です。
+platform.wiki.currentwiki.currentUserIsAdmin=あなたはこのウィキの管理者です。
+platform.wiki.currentwiki.joinNeedToLogin=このウィキに参加するには、ログインする必要があります。
+platform.wiki.currentwiki.currentUserNotMember=あなたはこのウィキのメンバーではありません。
+platform.wiki.currentwiki.currentuserCanJoin=あなたは{0}このウィキに参加できます{1}。
+platform.wiki.currentwiki.currentUserIsMember=あなたはこのウィキのメンバーです。
+platform.wiki.currentwiki.currentUserCanLeave=あなたは{0}このウィキから退出できます{1}。
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=ウィキのメンバーの一覧全体は{0}ユーザーディレクトリー{1}を参照してください。
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=あなたはこのウィキに招待されました。
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=このウィキへの参加を要求しました。
+platform.wiki.currentwiki.joinRequestAcceptedNotification=ウィキ ''{0}'' への参加リクエストは許可されました。
+platform.wiki.currentwiki.joinRequestRejectedNotification=ウィキ ''{0}'' への参加リクエストは拒否されました。
+platform.wiki.currentwiki.candidateHandledSaveComment=処理される候補 {0}（{1}）
+platform.wiki.currentwiki.candidateHandledComment=コメント：
+platform.wiki.currentwiki.candidateAcceptedSuccess=リクエストを許可しました。
+platform.wiki.currentwiki.candidateRejectedSuccess=リクエストを拒否しました。
+platform.wiki.currentwiki.inviteUserAlreadyMember={0}は既にウィキのメンバーです。
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0}は保留中のリクエストがあります。そのリクエストに対応してください。
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0}は保留中の招待があります。
+platform.wiki.currentwiki.inviteSaveComment=ユーザー ''{0}'' をこのウィキに招待しています。
+platform.wiki.currentwiki.inviteNotification=ウィキ ''{0}'' に招待されました。
+platform.wiki.currentwiki.inviteSuccess={0}を招待しました。
+platform.wiki.currentwiki.invitationCancelSaveComment=キャンセルした招待 {0}（{1}）
+platform.wiki.currentwiki.invitationCancelNotification=招待はキャンセルされたため、有効ではありません。
+platform.wiki.currentwiki.invitationCancelSuccess=招待をキャンセルしました。
+platform.wiki.currentwiki.invitationCancelFailure=エラーです。この招待をキャンセルできません。
+platform.wiki.currentwiki.candidateReviewFailure=エラーです。この招待をキャンセルできません。
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=名前
+platform.wiki.currentwiki.prop.description.label=詳細
+platform.wiki.currentwiki.prop.owner.label=所有者
+platform.wiki.currentwiki.prop.membershipType.label=メンバーシップの種類
+platform.wiki.currentwiki.prop.secure.label=安全（SSL）
+platform.wiki.currentwiki.member.add=ユーザーをウィキに追加あるいは招待
+platform.wiki.currentwiki.gadget.wikiInformation.label=ウィキの情報
+platform.wiki.currentwiki.gadget.topActiveUsers.label=最もアクティブな投稿者
+platform.wiki.currentwiki.panel.information.name.label=名前
+platform.wiki.currentwiki.panel.information.description.label=詳細
+platform.wiki.currentwiki.panel.information.members.label=メンバー
+platform.wiki.currentwiki.invitation.view.label=招待を閲覧
+platform.wiki.currentwiki.joinrequest.cancel.label=リクエストをキャンセル
+platform.wiki.currentwiki.joinreques.request.label=参加をリクエスト
+platform.wiki.currentwiki.join.label=参加
+platform.wiki.currentwiki.leave.label=ウィキから退出
+platform.wiki.currentwiki.invite.username.label=ユーザー名
+platform.wiki.currentwiki.invite.message.label=メッセージ
+platform.wiki.currentwiki.invite.button.label=招待
+platform.wiki.currentwiki.candidates.label=候補
+platform.wiki.currentwiki.candidates.status.label=状態：
+platform.wiki.currentwiki.candidates.type.label=種類：
+platform.wiki.currentwiki.candidates.reviewer.label=管理者：
+platform.wiki.currentwiki.candidates.reviewermessage.label=管理者のメッセージ：
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=コメント（プライベート）：
+platform.wiki.currentwiki.candidates.accept.label=許可
+platform.wiki.currentwiki.candidates.reject.label=拒否
+platform.wiki.currentwiki.candidates.invitation.cancel.label=招待をキャンセル
+platform.wiki.currentwiki.wikiusers.title=ウィキのユーザー
+platform.wiki.currentwiki.managewikis.title=ウィキ
+WikiManager.WikiCandidateMemberClass_status_pending=保留中
+WikiManager.WikiCandidateMemberClass_status_accepted=許可済
+WikiManager.WikiCandidateMemberClass_status_rejected=拒否済
+WikiManager.WikiCandidateMemberClass_type_request=リクエスト
+WikiManager.WikiCandidateMemberClass_type_invitation=招待
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=ウィキの表示名。
+platform.wiki.currentwiki.prop.description.hint=ウィキとその目的の簡単な説明。
+platform.wiki.currentwiki.prop.owner.hint=ウィキの全ての権限をもっているユーザー。
+platform.wiki.currentwiki.prop.membershipType.hint=このウィキにユーザーが参加できる方法。
+platform.wiki.currentwiki.prop.secure.hint=有効にすると、このウィキで生成する外部リンクは全て{0}https:~/~/{1}から始まるようになります。
+platform.wiki.currentwiki.invite.username.hint=ウィキに追加するユーザーの名前。
+platform.wiki.currentwiki.invite.message.hint=ユーザーに送信するメッセージ。
+platform.wiki.currentwiki.candidates.hint=ウィキへの参加を要求したユーザー、またはウィキに招待されたユーザー。
+platform.wiki.currentwiki.candidates.empty=ウィキへの参加を要求したユーザー、またはウィキに招待されたユーザーはいません。
+
+# ADMIN
+admin.xwiki.manageworkspace.description=ウィキの名称、詳細、所有者、メンバーシップの種類などの設定を管理。
+admin.xwiki.workspaceusers.description=ウィキのメンバーの管理：追加、削除、招待、ウィキのメンバーの招待の受け入れと拒否。
+admin.xwiki.usersconfiguration.title=設定
+admin.xwiki.members.title=現在のメンバー
+admin.xwiki.users.title=全てのユーザー
+
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=ホーム
+</content>
+</xwikidoc>

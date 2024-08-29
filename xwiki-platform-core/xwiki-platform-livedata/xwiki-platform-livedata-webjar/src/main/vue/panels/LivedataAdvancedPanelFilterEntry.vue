@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
   The LivedataAdvancedPanelFilterEntry component is used by the
@@ -62,7 +61,7 @@
       @click.prevent="logic.removeFilter(propertyId, filterIndex)"
       :title="$t('livedata.panel.filter.delete')"
     >
-      <span class="fa fa-trash-o"></span>
+      <XWikiIcon :icon-descriptor="{name: 'trash'}"/>
     </a>
 
   </div>
@@ -71,6 +70,7 @@
 
 <script>
 import LivedataFilter from "../filters/LivedataFilter.vue";
+import XWikiIcon from "../utilities/XWikiIcon";
 
 export default {
 
@@ -78,6 +78,7 @@ export default {
 
   components: {
     LivedataFilter,
+    XWikiIcon
   },
 
   inject: ["logic"],
@@ -113,14 +114,14 @@ export default {
   visibility: hidden;
   margin-left: 5px;
   padding: 6px 10px;
-  border-radius: 3px;
+  border-radius: @border-radius-small;
   color: currentColor;
 }
 .livedata-filter-container:hover .delete-filter {
   visibility: visible;
 }
 .livedata-filter-container .delete-filter:hover {
-  background-color: #ccc4;
+  background-color: @panel-default-heading-bg;
 }
 .livedata-filter-container .delete-filter:active {
   background-color: unset;

@@ -51,6 +51,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -134,7 +135,7 @@ public class DocumentTitleDisplayerTest
         this.mocker.getComponentUnderTest().display(document, params);
 
         // Check that the context is set.
-        verify(dab).pushDocumentInContext(any(), eq(documentReference));
+        verify(dab).pushDocumentInContext(any(), same(document));
         verify(modelContext).setCurrentEntityReference(documentReference.getWikiReference());
 
         // Check that the context is restored.

@@ -46,7 +46,7 @@ function showtip(node, txt, w, align){
   tipobj.style.display = "none";
   tipobj.style.visibility="visible";
   enabletip = true;
-  return false
+  return false;
 }
 
 function positionTip(e){

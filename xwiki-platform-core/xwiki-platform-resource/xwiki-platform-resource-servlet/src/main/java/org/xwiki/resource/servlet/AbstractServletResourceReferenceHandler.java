@@ -22,12 +22,16 @@ package org.xwiki.resource.servlet;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -42,7 +46,6 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.tika.internal.TikaUtils;
 
 /**
@@ -195,7 +198,6 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
      * @throws IOException in case of error during the content type analysis
      * @since 13.3RC1
      */
-    @Unstable
     protected String getContentType(InputStream resourceStream, R resourceReference)
         throws IOException
     {
@@ -223,9 +225,13 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
      */
     private void setResponseHeaders(Response response, R resourceReference)
     {
+        if (!(response instanceof ServletResponse)) {
+            return;
+        }
+        HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+
         // Cache the resource if possible.
-        if (response instanceof ServletResponse && isResourceCacheable(resourceReference)) {
-            HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+        if (isResourceCacheable(resourceReference)) {
             httpResponse.setHeader(HttpHeaders.CACHE_CONTROL, "public");
             httpResponse.setDateHeader(HttpHeaders.EXPIRES, new Date().getTime() + CACHE_DURATION);
             // Even if the resource is cached permanently, most browsers are still sending a request if the user reloads
@@ -234,6 +240,39 @@ public abstract class AbstractServletResourceReferenceHandler<R extends Resource
             // return a 304 to tell the browser to use its cached version.
             httpResponse.setDateHeader(HttpHeaders.LAST_MODIFIED, new Date().getTime());
         }
+
+        // Use a different file name if specified.
+        String fileName = getFileName(resourceReference);
+        if (!StringUtils.isEmpty(fileName)) {
+            try {
+                // See https://httpwg.org/specs/rfc6266.html
+                fileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+            } catch (UnsupportedEncodingException e) {
+                // Shouldn't happen.
+            }
+            httpResponse.setHeader("Content-Disposition", ";filename*=utf-8''" + fileName);
+        }
+    }
+
+    /**
+     * @param resourceReference the resource that is being served
+     * @return the file name that should be used when the requested resource is saved on the user's file system
+     */
+    private String getFileName(R resourceReference)
+    {
+        String fileName = resourceReference.getParameterValue("fileName");
+        if (fileName != null) {
+            // The file name should not contain any path separator.
+            fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+            fileName = fileName.substring(fileName.lastIndexOf('\\') + 1);
+            // The file name should not change the file type indicated by the resource name.
+            if (!Objects.equals(StringUtils.substringAfterLast(fileName, '.'),
+                StringUtils.substringAfterLast(getResourceName(resourceReference), '.'))) {
+                fileName = null;
+            }
+        }
+
+        return fileName;
     }
 
     /**

@@ -30,7 +30,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
@@ -51,9 +50,6 @@ import org.xwiki.notifications.script.NotificationScriptService;
 @Singleton
 public class NotificationScriptEventHelper
 {
-    @Inject
-    private EventStatusManager eventStatusManager;
-
     @Inject
     private EventStore eventStore;
 
@@ -77,8 +73,8 @@ public class NotificationScriptEventHelper
      */
     public List<EventStatus> getEventStatuses(List<Event> events) throws Exception
     {
-        return eventStatusManager.getEventStatus(events,
-                Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
+        return this.eventStore.getEventStatuses(events,
+            Arrays.asList(entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference())));
     }
 
     /**

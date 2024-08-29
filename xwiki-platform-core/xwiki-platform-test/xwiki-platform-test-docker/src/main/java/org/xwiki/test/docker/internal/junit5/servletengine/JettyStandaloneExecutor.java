@@ -23,9 +23,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +52,7 @@ public class JettyStandaloneExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyStandaloneExecutor.class);
 
-    private static final String XWIKI_SUBDIR = "xwiki";
-
     private static final String DATA_SUBDIR = "data";
-
-    private static final String PARENT_DIR = "..";
 
     private ArtifactResolver artifactResolver;
 
@@ -87,6 +80,14 @@ public class JettyStandaloneExecutor
     }
 
     /**
+     * @return the directory where the exploded XWiki WAR will be created
+     */
+    public File getWARDirectory()
+    {
+        return new File(new File(getJettyDirectory(), "webapps"), "xwiki");
+    }
+
+    /**
      * Create a Jetty Standalone packaging on the file system and start Jetty.
      *
      * @throws Exception when an error occurs
@@ -95,7 +96,8 @@ public class JettyStandaloneExecutor
     {
         // For performance reason, skip creating the jetty packaging if it already exists
         File jettyDirectory = new File(getJettyDirectory());
-        if (!jettyDirectory.exists()) {
+        File jettyJettyDirectory = new File(getJettyDirectory(getJettyDirectory()));
+        if (!jettyJettyDirectory.exists()) {
             // Step: Resolve the jetty resources
             String xwikiVersion = this.mavenResolver.getPlatformVersion();
             Artifact jettyArtifact =
@@ -117,16 +119,6 @@ public class JettyStandaloneExecutor
                     writer.write(replaceProperty(content, velocityContext));
                 }
             }
-
-            // Step: Link the generated WAR to the Jetty webapp dir.
-            Path webapps = jettyDirectory.toPath().resolve("webapps");
-            Path link = webapps.resolve(XWIKI_SUBDIR);
-            Files.createDirectories(webapps);
-            Path target = Paths.get(PARENT_DIR, PARENT_DIR, XWIKI_SUBDIR);
-            Files.createSymbolicLink(link, target);
-
-            // Step: Remove root webapp since we don't need it
-            FileUtils.forceDelete(new File(jettyDirectory, "jetty/contexts/root.xml"));
         }
 
         // Step: Remove data directory since we will provision again the extensions to account for source changes.
@@ -177,13 +169,18 @@ public class JettyStandaloneExecutor
         String result = content;
         for (Object key : velocityContext.getKeys()) {
             Object value = velocityContext.get(key.toString());
-            result = StringUtils.replace(result, String.format("${%s}", key.toString()), value.toString());
+            result = StringUtils.replace(result, String.format("${%s}", key), value.toString());
         }
         return result;
     }
 
     private String getJettyDirectory()
     {
-        return String.format("%s/jetty", this.testConfiguration.getOutputDirectory());
+        return getJettyDirectory(this.testConfiguration.getOutputDirectory());
+    }
+
+    private String getJettyDirectory(String directory)
+    {
+        return String.format("%s/jetty", directory);
     }
 }

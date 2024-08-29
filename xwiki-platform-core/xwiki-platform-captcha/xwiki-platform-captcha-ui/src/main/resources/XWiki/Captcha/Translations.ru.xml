@@ -36,7 +36,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>admin.captcha=CAPTCHA
-captcha.admin.defaultCaptchaName.label=CAPTCHA по умолчанию
-captcha.admin.defaultCaptchaName.hint=Используемая по умолчанию реализация CAPTCHA. Используйте Extension Manager для поиска других реализаций, которые вы можете установить и использовать.</content>
+  <content>admin.captcha=Капча
+captcha.admin.defaultCaptchaName.label=Капча по умолчанию
+captcha.admin.defaultCaptchaName.hint=Используемая по умолчанию реализация капчи. Используйте Менеджер расширений для поиска других реализаций, которые вы сможете установить и использовать.
+captcha.admin.configure.title=Настройка {0}
+captcha.admin.sample.title=Пример капчи
+captcha.admin.sample.description=Так будет выглядеть настроенная капча, когда она будет отображаться.
+</content>
 </xwikidoc>

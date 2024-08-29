@@ -120,7 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('xe.panels.quicklinks'))
+#navigationPanelHeader($services.localization.render('xe.panels.quicklinks'))
 #if ($xwiki.hasAdminRights())
 
 [[$services.localization.render('xe.panels.edit')&gt;&gt;path:${xwiki.getURL('Panels.QuickLinks', 'edit')}]]

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="Invitation.InvitationConfig" locale="">
+<xwikidoc version="1.5" reference="Invitation.InvitationConfig" locale="">
   <web>Invitation</web>
   <name>InvitationConfig</name>
   <language/>
@@ -34,7 +34,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}{{info}}$services.localization.render('xe.invitation.internalDocument', ['Invitation.WebHome']){{/info}}{{/velocity}}</content>
   <attachment>
@@ -373,7 +373,7 @@
       <messageBodyTemplate>{{velocity}}
 #set($discard = "#template('colorThemeInit.vm')")
 #if("$!theme" == "")
- #set($theme = {"linkColor":"#4791BC"})
+ #set($theme = {"linkColor":"#4791BC", "notificationErrorColor":"#ca302c"})
 #end
 #set($userName = $xwiki.getUserName($xcontext.getUser(), false))
 #set($wikiName = $xwiki.getRequestURL().replaceAll("http://([^/:]*).*$", "$1"))
@@ -381,7 +381,8 @@
 #set($linkStyle = "color:$theme.get('linkColor');text-decoration:none;")
 #set($bigText = "font-size:130%;")
 #set($joinLink = "float:left;")
-#set($declineLink = "color:#f88;float:right;text-decoration:none;")
+#set($dangerColor = $theme.notificationErrorColor)
+#set($declineLink = "color:$dangerColor;float:right;text-decoration:none;")
 
 $services.localization.render('xe.invitation.emailContent.userHasInvitedYouToJoinWiki', [$userName, $wikiName])
 
@@ -420,7 +421,7 @@ $services.localization.render('xe.invitation.emailContent.reportMessage', ["&lt;
       <smtp_server_username/>
     </property>
     <property>
-      <subjectLineTemplate>{{velocity}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
+      <subjectLineTemplate>{{velocity wiki='false'}}$services.localization.render('xe.invitation.emailContent.subjectLine', [$xcontext.getUser().replaceAll("^[^\.]*.", ""), $xwiki.getRequestURL().replaceAll("https?://([^/:]*).*$", "$1"), $!subjectLine]){{/velocity}}</subjectLineTemplate>
     </property>
     <property>
       <usersMayPersonalizeMessage>1</usersMayPersonalizeMessage>

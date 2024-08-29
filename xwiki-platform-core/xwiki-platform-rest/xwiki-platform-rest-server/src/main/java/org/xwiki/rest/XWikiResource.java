@@ -28,9 +28,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
@@ -269,6 +266,13 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         // Get a specific version if requested to
         if (version != null) {
             doc = doc.getDocumentRevision(version);
+
+            // This could be access denied or unauthorized, just always throw a not found as it should be the more
+            // frequent case, and it could even be considered to be more secure to not show the user if something
+            // exists or not if it is inaccessible.
+            if (doc == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
         }
 
         // Check if the doc is locked.
@@ -277,31 +281,6 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         }
 
         return new DocumentInfo(doc, doc.isNew());
-    }
-
-    /**
-     * A special GET method that produces the ad-hoc "uritemplate" media type used for retrieving the URI template
-     * associated to a resource. This is an auxiliary method that is used for documenting the REST API.
-     *
-     * @return the URI template string associated to the requested resource
-     */
-    @GET
-    @Produces("uritemplate")
-    public String getUriTemplate()
-    {
-        if (this.getClass().getAnnotation(Path.class) != null) {
-            return this.getClass().getAnnotation(Path.class).value();
-        }
-
-        Class<?>[] interfaces = this.getClass().getInterfaces();
-
-        for (Class<?> i : interfaces) {
-            if (i.getAnnotation(Path.class) != null) {
-                return i.getAnnotation(Path.class).value();
-            }
-        }
-
-        return null;
     }
 
     /**

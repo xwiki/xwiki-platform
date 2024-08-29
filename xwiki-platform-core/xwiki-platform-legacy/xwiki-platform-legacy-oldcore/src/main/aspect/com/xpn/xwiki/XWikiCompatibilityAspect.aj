@@ -30,10 +30,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.net.InetAddress;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
@@ -55,6 +59,7 @@ import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
@@ -78,6 +83,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -187,6 +193,16 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.getWebCopyright(XWikiContext context)
     {
         return this.getSpaceCopyright(context);
+    }
+
+    /**
+     * @deprecated since 7.4M1, use {@link #getSpacePreference(String, SpaceReference, String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWiki.getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
+    {
+        return getSpacePreference(preference, new SpaceReference(space, context.getWikiReference()), defaultValue,
+            context);
     }
 
     /**
@@ -1382,10 +1398,106 @@ public privileged aspect XWikiCompatibilityAspect
         if (this.configuredSyntaxes == null) {
             ExtendedRenderingConfiguration extendedRenderingConfiguration =
                 Utils.getComponent(ExtendedRenderingConfiguration.class);
-            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes",
-                extendedRenderingConfiguration.getDefaultContentSyntax().toIdString());
-            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+            this.configuredSyntaxes = extendedRenderingConfiguration.getConfiguredSyntaxes()
+              .stream()
+              .map(Syntax::toIdString)
+              .collect(Collectors.toList());
         }
         return this.configuredSyntaxes;
+    }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     * 
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
+    {
+        HttpServletRequest servletRequest = xwikiContext.getRequest();
+        HttpServletResponse servletResponse = xwikiContext.getResponse();
+
+        try {
+            return IncludeServletAsString.invokeServletAndReturnAsString(url, servletRequest, servletResponse);
+        } catch (Exception e) {
+            LOGGER.warn("Exception including url: " + url, e);
+            return "Exception including \"" + url + "\", see logs for details.";
+        }
+    }
+
+    /**
+     * Perform a rename of document by copying the document and deleting the old one.
+     * This operation must be used only in case of document rename from one wiki to another, since it's not supported
+     * by the atomic store operation.
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *            modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *            document reference
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     * @since 12.5
+     * @deprecated Old implementation of the rename by copy and delete. Since 12.5 the implementation using
+     * {@link XWikiStoreInterface#renameXWikiDoc(XWikiDocument, DocumentReference, XWikiContext)} should be preferred.
+     */
+    @Deprecated
+    public void XWiki.renameByCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
+        List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
+        XWikiContext context) throws XWikiException
+    {
+        // Step 1: Copy the document and all its translations under a new document with the new reference.
+        copyDocument(sourceDoc.getDocumentReference(), newDocumentReference, false, context);
+
+        // Step 2: For each child document, update its parent reference.
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
+        updateLinksForRename(sourceDoc, newDocumentReference, backlinkDocumentReferences, childDocumentReferences,
+            context);
+
+        // Step 5: Delete the old document
+        deleteDocument(sourceDoc, context);
+
+        // Get new document
+        XWikiDocument newDocument = getDocument(newDocumentReference, context);
+
+        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
+        // invalid XWikiDocument object as it's been deleted...
+        sourceDoc.clone(newDocument);
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, String params, XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
+        buffer.append(params);
+        buffer.append("; return escape('");
+        buffer.append(message.replaceAll("'", "\\'"));
+        buffer.append("');\">");
+        buffer.append(html);
+        buffer.append("</span>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltipJS(XWikiContext context)
+    {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("<script src=\"");
+        buffer.append(getSkinFile("ajax/wzToolTip.js", context));
+        buffer.append("\"></script>");
+        // buffer.append("<div id=\"dhtmltooltip\"></div>");
+
+        return buffer.toString();
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, XWikiContext context)
+    {
+        return addTooltip(html, message, "this.WIDTH='300'", context);
     }
 }

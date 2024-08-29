@@ -59,7 +59,13 @@ import static org.xwiki.flamingo.skin.test.po.ChildrenPage.LIVE_DATA_TITLE;
  * @version $Id$
  * @since 12.5
  */
-@UITest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since 
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
 class WizardIT
 {
     private static final String USER_NAME = "Wizard";
@@ -135,14 +141,16 @@ class WizardIT
         // Step 1
         // Set the application location.
         appCreatePage.getLocationPicker().browseDocuments();
-        new DocumentPickerModal().selectDocument(getClass().getSimpleName(), testReference.getName(), "WebHome");
+        new DocumentPickerModal().selectDocument(getClass().getSimpleName(),
+            testReference.getLastSpaceReference().getName(), "WebHome");
         appCreatePage.getLocationPicker().waitForLocation(
-            Arrays.asList("", getClass().getSimpleName(), testReference.getName(), ""));
+            Arrays.asList("", getClass().getSimpleName(), testReference.getLastSpaceReference().getName(), ""));
 
         // Enter the application name, making sure we also use some special chars.
         // See XWIKI-11747: Impossible to create new entry with an application having UTF8 chars in its name
         String appName = "Cities âé";
-        String[] appPath = new String[] { getClass().getSimpleName(), testReference.getName(), appName };
+        String[] appPath = new String[] { getClass().getSimpleName(), testReference.getLastSpaceReference().getName(),
+            appName };
         appCreatePage.setApplicationName(appName);
 
         // Move to the next step.
@@ -221,9 +229,9 @@ class WizardIT
         childrenTableLayout.assertRow(LIVE_DATA_TITLE, firstEntryName);
 
         // Go back to the application home edit page.
-        testUtils
-            .gotoPage(Arrays.asList(getClass().getSimpleName(), testReference.getName(), appName), "WebHome", "edit",
-                "");
+        testUtils.gotoPage(
+            Arrays.asList(getClass().getSimpleName(), testReference.getLastSpaceReference().getName(), appName),
+            "WebHome", "edit", "");
         homeEditPage = new ApplicationHomeEditPage();
 
         // Change the application description.
@@ -342,13 +350,11 @@ class WizardIT
 
     private ApplicationCreatePage goToAppCreatePage(TestUtils testUtils, TestReference testReference)
     {
-        // Register a simple user, login and go to the App Within Minutes home page.
-        String userName = "SimpleUser";
-        String password = "SimplePassword";
-        testUtils.createUserAndLogin(userName, password);
+        // Login and go to the App Within Minutes home page.
+        testUtils.login(USER_NAME, PASSWORD);
         // Make sure the application location exists so that we can select it with the location picker.
-        testUtils.createPage(Arrays.asList(getClass().getSimpleName(), testReference.getName()), "WebHome", null,
-            null);
+        testUtils.createPage(Arrays.asList(getClass().getSimpleName(), testReference.getLastSpaceReference().getName()),
+            "WebHome", null, null);
         AppWithinMinutesHomePage appWithinMinutesHomePage = AppWithinMinutesHomePage.gotoPage();
 
         // Click the Create Application button.

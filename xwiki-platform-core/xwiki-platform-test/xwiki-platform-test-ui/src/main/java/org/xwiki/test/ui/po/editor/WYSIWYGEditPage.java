@@ -21,7 +21,8 @@ package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Represents the actions possible in WYSIWYG edit mode.
@@ -45,7 +46,15 @@ public class WYSIWYGEditPage extends PreviewableEditPage
      */
     public static WYSIWYGEditPage gotoPage(String space, String page)
     {
-        getUtil().gotoPage(space, page, "edit", "editor=wysiwyg");
+        return gotoPage(new LocalDocumentReference(space, page));
+    }
+
+    /**
+     * Go to the passed page in WYSIWYG edit mode.
+     */
+    public static WYSIWYGEditPage gotoPage(EntityReference targetPageReference)
+    {
+        getUtil().gotoPage(targetPageReference, "edit", "editor=wysiwyg");
         return new WYSIWYGEditPage();
     }
 
@@ -66,67 +75,5 @@ public class WYSIWYGEditPage extends PreviewableEditPage
     {
         this.contentTextArea.clear();
         this.contentTextArea.sendKeys(content);
-    }
-
-    @Override
-    public WYSIWYGEditPage waitUntilPageIsLoaded()
-    {
-        // Nothing at the moment but we'll have to wait for the actual WYSIWYG editor when we implement the common
-        // editor interface.
-        return this;
-    }
-
-    @Override
-    public WikiEditPage editWiki()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editWiki();
-    }
-
-    @Override
-    public WYSIWYGEditPage editWYSIWYG()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editWYSIWYG();
-    }
-
-    @Override
-    public <T extends InlinePage> T editInline()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editInline();
-    }
-
-    @Override
-    public RightsEditPage editRights()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editRights();
-    }
-
-    @Override
-    public ObjectEditPage editObjects()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editObjects();
-    }
-
-    @Override
-    public ClassEditPage editClass()
-    {
-        // Make sure the editor is loaded before we try to click the edit menu entry.
-        this.waitUntilPageIsLoaded();
-
-        return super.editClass();
     }
 }

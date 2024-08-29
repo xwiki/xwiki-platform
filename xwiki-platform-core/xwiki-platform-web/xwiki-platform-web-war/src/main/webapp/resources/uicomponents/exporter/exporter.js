@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-#set ($paths = {
-  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    {'evaluate': true, 'minify': $services.debug.minify})
-})
 #set ($l10nKeys = [
   'core.exporter.selectChildren',
   'core.exporter.unselectChildren'
@@ -37,13 +33,13 @@
 #end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n, icons) {
+(function(l10n, icons) {
   "use strict";
 
 /**
  * Export Tree
  */
-define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], function($) {
+define('xwiki-export-tree', ['jquery', 'xwiki-tree', 'xwiki-entityReference'], function($) {
   var selectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     selectNodes(tree, parentNode.children);
@@ -167,7 +163,7 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
     // * if there's no pagination child node then we decide based on whether the parent node is selected or not. If the
     //   parent node is selected then we use excludes (select the parent except for ...). Otherwise, we use includes
     //   (this has the effect that the child pages that don't appear in the tree, for any reason, are not included).
-    var paginationNode = findPaginationNode(childNodes);
+    var paginationNode = childNodes.find(childNode => childNode.data.type === 'pagination');
     var useExcludes = (!tree.is_loaded(parentNode) && tree.is_undetermined(parentNode)) ||
       (paginationNode && tree.is_checked(paginationNode)) ||
       (!paginationNode && tree.is_checked(parentNode));
@@ -197,16 +193,6 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
     });
   };
 
-  // Just because IE11 doesn't support Array.find() ...
-  var findPaginationNode = function(nodes) {
-    for (var i = nodes.length - 1; i >= 0; i--) {
-      var node = nodes[i];
-      if (node.data.type === 'pagination') {
-        return node;
-      }
-    }
-  };
-
   var exportTreeAPI = {
     getExportPages: function() {
       var exportPages = {};
@@ -232,6 +218,9 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
         }
       }
       return true;
+    },
+    deselectChildNodes: function(node) {
+      deselectChildNodes(this, this.get_node(node));
     }
   };
 
@@ -300,10 +289,10 @@ define('xwiki-export-tree', ['jquery', 'tree', 'xwiki-entityReference'], functio
       // Select all the pages by default.
       tree.select_all();
       // Handle the Select All / Node actions.
-      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').click(function(event) {
+      $(this).closest('.export-tree-container').find('.export-tree-action.selectAll').on('click', function(event) {
         event.preventDefault();
         tree.select_all();
-      }).addBack().find('.export-tree-action.selectNone').click(function(event) {
+      }).addBack().find('.export-tree-action.selectNone').on('click', function(event) {
         event.preventDefault();
         tree.deselect_all();
       });
@@ -405,10 +394,29 @@ define('xwiki-export-tree-filter', ['jquery', 'bootstrap', 'xwiki-export-tree'],
   });
 });
 
-require(['jquery', paths.treeRequireConfig], function ($) {
+require(['jquery'], function ($) {
   // Fill the form with the selected pages from the export tree.
-  var createHiddenInputsFromExportTree = function(exportTree, container) {
+  var createHiddenInputsFromExportTree = function(exportTree, container, filterHiddenPages) {
     var exportPages = exportTree.getExportPages();
+    if (filterHiddenPages) {
+      // Make sure that all the pages that were checked (selected explicitly) are submitted also using an exact match
+      // because otherwise they might be left out by the hidden pages filter (in case they are hidden). Note that hidden
+      // nested pages are sometimes displayed in the page tree, even if the current user has opted for not showing
+      // hidden pages, because they have descendant pages that are not hidden.
+      exportTree.get_checked()
+        // Get the JSON for the corresponding tree node because we want to check the node type.
+        .map(selectedNodeId => exportTree.get_node(selectedNodeId))
+        .filter(selectedNode => {
+          // Keep only the selected page nodes that don't have an entry already in exportedPages.
+          return selectedNode.data.type === 'document' && !exportPages.hasOwnProperty(selectedNode.data.id);
+        })
+        // Map to the corresponding page reference.
+        .map(selectedPageNode => selectedPageNode.data.id)
+        // Add an explicit match to the exported pages.
+        .forEach(selectedDocumentReference => {
+          exportPages[selectedDocumentReference] = [];
+        });
+    }
     for (var pages in exportPages) {
       // Includes
       $('<input/>').attr({
@@ -431,7 +439,7 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   //
 
   // Enable / disable the corresponding settings when the target XWiki version changes.
-  $('#targetXWikiVersion').change(function() {
+  $('#targetXWikiVersion').on('change', function() {
     // Disable all settings.
     $('#targetXWikiVersionSettings fieldset').prop('disabled', true);
     // Enable the settings that correspond to the selected value.
@@ -439,15 +447,16 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   });
 
   // Enable / disable the submit buttons whenever the selection changes in the tree.
-  $('.export-tree').on('ready.jstree, changed.jstree', function (event, data) {
-    var tree = data.instance;
-    $(this).closest('form#export').find('input[type="submit"]').prop('disabled', !tree.hasExportPages()); 
+  $('.export-tree').on('ready.jstree changed.jstree', function (event, data) {
+    const tree = data.instance;
+    const disabled = typeof tree.hasExportPages !== 'function' || !tree.hasExportPages();
+    $(this).closest('form#export').find('input[type="submit"]').prop('disabled', disabled);
   });
 
   // Create the container for the hidden inputs used to submit the selected pages from the export tree.
-  var hiddenContainer = $('<div class="hidden"/>').insertAfter('.export-tree');
+  var hiddenContainer = $('<div class="hidden"></div>').insertAfter('.export-tree');
 
-  $('form#export').submit(function() {
+  $('form#export').on('submit', function() {
     var exportTree = $.jstree.reference($(this).find('.export-tree'));
     // We submit only the tree filter when all nodes are selected (in order to optimize the final database query).
     if (exportTree && !exportTree.isExportingAllPages()) {
@@ -459,11 +468,122 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   // Export Modal
   //
 
+  const exportModal = $('#exportModal').on('show.bs.modal', function() {
+    $(this).find('.xwiki-select.xwiki-export-formats').xwikiSelectWidget('clearSelection');
+  });
+
+  // Catch the event on the document in order to allow export formats to prevent the default behavior.
+  $(document).on('xwiki:select:updated', '.xwiki-select.xwiki-export-formats', function() {
+    const exportFormat = $(this).find('.xwiki-select-option-selected input[name=exportFormat]');
+    if (exportFormat.length) {
+      const exportURL = exportFormat.attr('data-url');
+      if ($('#exportTreeModal').length && exportFormat.attr('data-multipage') === 'true') {
+        // Switch to export tree modal to allow the user to select the pages to export.
+        switchToExportTreeModal({
+          id: exportFormat.val(),
+          label: exportFormat.parent('.xwiki-select-option').find('label').text(),
+          icon: exportFormat.parent('.xwiki-select-option').find('.xwiki-select-option-icon').children().clone(),
+          url: exportURL,
+          filterHiddenPages: !!exportFormat.data('filterHiddenPages'),
+          excludeNestedPagesByDefault: !!exportFormat.data('excludeNestedPagesByDefault')
+        });
+      } else {
+        // Export the current page.
+        window.location.href = exportURL;
+      }
+    }
+  });
+
+  const switchToExportTreeModal = (config) => {
+    // Show the export tree modal only after the export modal is completely hidden, otherwise the code that hides the
+    // export modal can revert changes done by the code that shows the export tree modal (e.g. we loose the 'modal-open'
+    // CSS class on the BODY element which is needed in order to hide the page scrollbars).
+    exportModal.one('hidden.bs.modal', () => {
+      // Enable the animation back for the next time the export modal is shown.
+      exportModal.addClass('fade');
+      openExportTreeModal(config);
+    // Disable the animation when moving to the next step (export tree modal) in order to have a smooth transition.
+    }).removeClass('fade').modal('hide');
+  };
+
+  const exportTreeModal = $('#exportTreeModal');
+  const openExportTreeModal = (config) => {
+    exportTreeModal.find('.modal-title-icon').empty().append(config.icon);
+    exportTreeModal.find('.modal-title span.export-format').text(config.label);
+    // Set the export tree modal configuration.
+    exportTreeModal.data('config', config);
+    // Disable the animation on show in order to have a smooth transition from the previous modal.
+    exportTreeModal.removeClass('fade').modal();
+  };
+
+  //
+  // Export Tree Modal
+  //
+
+  // Reload the export tree whenever the tree configuration changes (different export formats may require different
+  // export tree configuration).
+  exportTreeModal.on('show.bs.modal', () => {
+    const treeElement = exportTreeModal.find('.export-tree').attr('data-ready', 'false');
+    waitForExportTreeReady().then(maybeFilterHiddenPages).then(maybeExcludeNestedPagesByDefault).catch((e) => {
+      console.log('Failed to update the export tree. Reason: ' + e);
+    }).finally(() => {
+      treeElement.attr('data-ready', 'true');
+    });
+  });
+
+  const waitForExportTreeReady = () => {
+    const treeElement = exportTreeModal.find('.export-tree');
+    const tree = treeElement.jstree(true);
+    if (typeof tree.getExportPages === 'function') {
+      return Promise.resolve();
+    } else {
+      return new Promise((resolve, reject) => {
+        treeElement.one('ready.jstree', resolve);
+      });
+    }
+  };
+
+  const maybeFilterHiddenPages = () => {
+    const treeElement = exportTreeModal.find('.export-tree');
+    const config = exportTreeModal.data('config');
+    let treeURL = new URL(treeElement.attr('data-url'), window.location.href);
+    const treeURLParams = new URLSearchParams(treeURL.search);
+    const filterHiddenPages = treeURLParams.get('filterHiddenDocuments') === 'true';
+    if (filterHiddenPages !== config.filterHiddenPages) {
+      // We need to reload the tree with the new configuration.
+      return new Promise((resolve, reject) => {
+        treeURLParams.set('filterHiddenDocuments', config.filterHiddenPages);
+        treeURL = new URL('?' + treeURLParams.toString(), treeURL);
+        treeElement.attr('data-url', treeURL.toString());
+        treeElement.one('refresh.jstree', resolve).jstree('refresh');
+      });
+    } else {
+      return Promise.resolve();
+    }
+  };
+
+  const maybeExcludeNestedPagesByDefault = () => {
+    const config = exportTreeModal.data('config');
+    if (config.excludeNestedPagesByDefault) {
+      return new Promise((resolve, reject) => {
+        const tree = exportTreeModal.find('.export-tree').jstree(true);
+        const currentPageNodeId = 'document:' + XWiki.Model.serialize(XWiki.currentDocument.documentReference);
+        tree.open_node(currentPageNodeId, () => {
+          tree.select_node(currentPageNodeId);
+          tree.deselectChildNodes(currentPageNodeId);
+          resolve();
+        });
+      });
+    } else {
+      return Promise.resolve();
+    }
+  };
+
   // Enable / disable the submit buttons whenever the selection changes in the tree.
-  $('.export-tree').on('ready.jstree, changed.jstree', function (event, data) {
-    var tree = data.instance;
-    $(this).closest('#exportModalOtherCollapse').find('.export-buttons a.btn').toggleClass('disabled',
-      !tree.hasExportPages());
+  exportTreeModal.find('.export-tree').on('ready.jstree changed.jstree refresh.jstree', function (event, data) {
+    const tree = data.instance;
+    const disabled = typeof tree.hasExportPages !== 'function' || !tree.hasExportPages();
+    exportTreeModal.find('.modal-footer .btn-primary').prop('disabled', disabled);
   });
 
   // Useful to create quickly the right String given an array of page names.
@@ -474,25 +594,22 @@ require(['jquery', paths.treeRequireConfig], function ($) {
   };
 
   // Create the hidden form that we're going to use.
-  var form = $('<form/>').attr({
+  var form = $('<form></form>').attr({
     id: 'export-modal-form',
     method: 'post'
   }).appendTo("body");
 
   // Export modal submit.
-  $('#exportModalOtherCollapse a.btn-primary').click(function (event) {
-    var exportTree = $(this).closest('#exportModalOtherCollapse').find('.export-tree');
-    if (exportTree.length > 0) {
-      event.preventDefault();
-      if (!$(this).hasClass('disabled')) {
-        // Make sure to remove any preselected page from the submit URL since we're going to take the pages from the tree.
-        form.empty().attr('action', $(this).attr('href').replace(/pages=.*?(&|$)/g, ''));
-        // Fill the form and submit.
-        createHiddenInputsFromExportTree($.jstree.reference(exportTree), form);
-        $(this).closest('#exportModalOtherCollapse').find('input[type="hidden"][name="filter"]').clone().appendTo(form);
-        form.submit();
-      }
-    }
+  exportTreeModal.find('.modal-footer .btn-primary').on('click', function (event) {
+    var exportTree = exportTreeModal.find('.export-tree');
+    // Make sure to remove any preselected page from the export URL since we're going to take the pages from the tree.
+    const exportURL = exportTreeModal.data('config').url;
+    form.empty().attr('action', exportURL.replace(/pages=.*?(&|$)/g, ''));
+    // Fill the form and submit.
+    const filterHiddenPages = exportTreeModal.data('config').filterHiddenPages;
+    createHiddenInputsFromExportTree($.jstree.reference(exportTree), form, filterHiddenPages);
+    exportTreeModal.find('input[type="hidden"][name="filter"]').clone().appendTo(form);
+    form.submit();
   });
 
   //
@@ -505,4 +622,4 @@ require(['jquery', paths.treeRequireConfig], function ($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

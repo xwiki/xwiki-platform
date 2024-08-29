@@ -21,19 +21,18 @@ package org.xwiki.office.viewer.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -49,6 +48,7 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.document.ByteArrayOfficeDocumentArtifact;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
@@ -66,6 +66,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -73,10 +75,15 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLSecurityManager;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -148,6 +155,9 @@ class DefaultOfficeResourceViewerTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * The mock {@link XDOMOfficeDocumentBuilder} instance used in tests.
      */
@@ -155,7 +165,7 @@ class DefaultOfficeResourceViewerTest
     private XDOMOfficeDocumentBuilder officeDocumentBuilder;
 
     @MockComponent
-    private ResourceReferenceTypeSerializer resourceReferenceSerializer;
+    private ResourceReferenceTypeSerializer resourceReferenceTypeSerializer;
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -174,12 +184,16 @@ class DefaultOfficeResourceViewerTest
     private PresentationBuilder presentationBuilder;
 
     @MockComponent
-    @Named("standard/tmp")
-    private ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
-        urlTemporaryResourceReferenceSerializer;
+    private ResourceReferenceSerializer<org.xwiki.resource.ResourceReference, ExtendedURL> resourceReferenceSerializer;
 
     @MockComponent
     private TemporaryResourceStore temporaryResourceStore;
+
+    @MockComponent
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @MockComponent
+    private URLSecurityManager urlSecurityManager;
 
     @XWikiTempDir
     private File tempDir;
@@ -194,6 +208,7 @@ class DefaultOfficeResourceViewerTest
      */
     private Cache<OfficeDocumentView> externalCache;
 
+    private XWikiContext context;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
@@ -218,7 +233,7 @@ class DefaultOfficeResourceViewerTest
             STRING_DOCUMENT_REFERENCE);
 
         when(attachmentReferenceResolver.resolve(STRING_ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_REFERENCE);
-        when(this.resourceReferenceSerializer.serialize(ATTACHMENT_RESOURCE_REFERENCE)).thenReturn(
+        when(this.resourceReferenceTypeSerializer.serialize(ATTACHMENT_RESOURCE_REFERENCE)).thenReturn(
             STRING_ATTACHMENT_RESOURCE_REFERENCE);
 
         when(converterManager.convert(boolean.class, null)).thenReturn(false);
@@ -227,6 +242,8 @@ class DefaultOfficeResourceViewerTest
 
         OfficeConverter officeConverter = mock(OfficeConverter.class);
         when(this.officeServer.getConverter()).thenReturn(officeConverter);
+        this.context = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(this.context);
     }
 
     /**
@@ -263,7 +280,37 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
+
+        this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+
+        verify(attachmentCache).set(eq(CACHE_KEY), any(AttachmentOfficeDocumentView.class));
+    }
+
+    /**
+     * Tests creating a view for an existing office attachment.
+     *
+     * @throws Exception if an error occurs
+     */
+    @Test
+    void viewTemporaryUploadedOfficeAttachmentWithCacheMiss(MockitoComponentManager componentManager) throws Exception
+    {
+        when(attachmentCache.get(CACHE_KEY)).thenReturn(null);
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Collections.emptyList());
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(null);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(temporaryAttachmentSessionsManager.getUploadedAttachment(ATTACHMENT_REFERENCE))
+            .thenReturn(Optional.of(attachment));
+
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -294,6 +341,40 @@ class DefaultOfficeResourceViewerTest
     }
 
     /**
+     * Tests creating a view for an office attachment which has already been viewed and cached.
+     *
+     * @throws Exception if an error occurs.
+     */
+    @Test
+    void viewTemporaryUploadedOfficeAttachmentWithCacheHit(MockitoComponentManager componentManager) throws Exception
+    {
+        AttachmentOfficeDocumentView officeDocumentView =
+            new AttachmentOfficeDocumentView(ATTACHMENT_RESOURCE_REFERENCE, ATTACHMENT_REFERENCE, ATTACHMENT_VERSION,
+                new XDOM(new ArrayList<Block>()), new HashSet<File>());
+        when(attachmentCache.get(CACHE_KEY)).thenReturn(officeDocumentView);
+
+        when(documentAccessBridge.getAttachmentReferences(ATTACHMENT_REFERENCE.getDocumentReference())).thenReturn(
+            Collections.emptyList());
+        when(documentAccessBridge.getAttachmentVersion(ATTACHMENT_REFERENCE)).thenReturn(null);
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(temporaryAttachmentSessionsManager.getUploadedAttachment(ATTACHMENT_REFERENCE))
+            .thenReturn(Optional.of(attachment));
+
+        ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
+        when(attachment.getContentInputStream(this.context)).thenReturn(attachmentContent);
+
+        XDOMOfficeDocument xdomOfficeDocument =
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
+        when(
+            officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
+                ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
+
+        this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS);
+
+        verify(attachmentCache).set(eq(CACHE_KEY), any(AttachmentOfficeDocumentView.class));
+    }
+
+    /**
      * Tests creating a view for an external office file which has already been viewed and cached.
      * 
      * @throws Exception if an error occurs.
@@ -303,7 +384,7 @@ class DefaultOfficeResourceViewerTest
     {
         ResourceReference resourceReference = new ResourceReference("http://resource", ResourceType.URL);
 
-        when(this.resourceReferenceSerializer.serialize(resourceReference)).thenReturn(
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
             "url:" + resourceReference.getReference());
 
         OfficeDocumentView officeDocumentView =
@@ -313,6 +394,27 @@ class DefaultOfficeResourceViewerTest
             .thenReturn(officeDocumentView);
 
         assertNotNull(this.officeResourceViewer.createView(resourceReference, DEFAULT_VIEW_PARAMETERS));
+    }
+
+    @Test
+    void viewExistingOfficeFileWithCacheHitNoOwnerDocument() throws Exception
+    {
+        ResourceReference resourceReference = new ResourceReference("http://resource", ResourceType.URL);
+
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
+            "url:" + resourceReference.getReference());
+
+        Map<String, Object> parameters = Collections.emptyMap();
+        when(this.documentAccessBridge.getCurrentDocumentReference())
+            .thenReturn(ATTACHMENT_REFERENCE.getDocumentReference());
+        OfficeDocumentView officeDocumentView =
+            new OfficeDocumentView(resourceReference, new XDOM(new ArrayList<Block>()), new HashSet<File>());
+        when(
+            externalCache.get(STRING_DOCUMENT_REFERENCE + "/url:http://resource/" + parameters.hashCode()))
+            .thenReturn(officeDocumentView);
+
+        assertNotNull(this.officeResourceViewer.createView(resourceReference, parameters));
+        verify(this.documentAccessBridge).getCurrentDocumentReference();
     }
 
     /**
@@ -337,7 +439,7 @@ class DefaultOfficeResourceViewerTest
         when(documentAccessBridge.getAttachmentContent(ATTACHMENT_REFERENCE)).thenReturn(attachmentContent);
 
         XDOMOfficeDocument xdomOfficeDocument =
-            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptySet(), componentManager, null);
+            new XDOMOfficeDocument(new XDOM(new ArrayList<Block>()), Collections.emptyMap(), componentManager, null);
         when(
             officeDocumentBuilder.build(attachmentContent, ATTACHMENT_REFERENCE.getName(),
                 ATTACHMENT_REFERENCE.getDocumentReference(), false)).thenReturn(xdomOfficeDocument);
@@ -345,7 +447,7 @@ class DefaultOfficeResourceViewerTest
         assertNotNull(this.officeResourceViewer.createView(ATTACHMENT_RESOURCE_REFERENCE, DEFAULT_VIEW_PARAMETERS));
 
         verify(attachmentCache).remove(CACHE_KEY);
-        verify(attachmentCache).set(eq(CACHE_KEY), notNull(AttachmentOfficeDocumentView.class));
+        verify(attachmentCache).set(eq(CACHE_KEY), notNull());
     }
 
     @Test
@@ -368,29 +470,26 @@ class DefaultOfficeResourceViewerTest
         ByteArrayInputStream attachmentContent = new ByteArrayInputStream(new byte[256]);
         when(documentAccessBridge.getAttachmentContent(attachmentReference)).thenReturn(attachmentContent);
 
-        ResourceReference imageReference = new ResourceReference("slide0.png", ResourceType.URL);
+        String imageName = "slide0.png";
+        ResourceReference imageReference = new ResourceReference(imageName, ResourceType.URL);
         ExpandedMacroBlock galleryMacro =
             new ExpandedMacroBlock("gallery", Collections.singletonMap("width", "300px"), null, false);
         galleryMacro.addChild(new ImageBlock(imageReference, true));
         XDOM xdom = new XDOM(Collections.<Block>singletonList(galleryMacro));
 
-        File artifact = new File(this.tempDir, "slide0.png");
-        try (FileOutputStream fos = new FileOutputStream(artifact)) {
-            IOUtils.write(new byte[8], fos);
-        }
         OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
-        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, Collections.singleton(artifact),
-            componentManager, converterResult);
+        XDOMOfficeDocument xdomOfficeDocument = new XDOMOfficeDocument(xdom, Collections.singletonMap(imageName,
+            new ByteArrayOfficeDocumentArtifact(imageName, new byte[8])), componentManager, converterResult);
 
         when(presentationBuilder.build(attachmentContent, attachmentReference.getName(), documentReference))
             .thenReturn(xdomOfficeDocument);
 
         Map<String, ?> viewParameters = Collections.singletonMap("ownerDocument", documentReference);
         TemporaryResourceReference temporaryResourceReference = new TemporaryResourceReference("officeviewer",
-            Arrays.asList(String.valueOf(viewParameters.hashCode()), "slide0.png"), documentReference);
+            Arrays.asList(String.valueOf(viewParameters.hashCode()), imageName), documentReference);
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", "slide0.png"));
-        when(urlTemporaryResourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("url", "to", imageName));
+        when(this.resourceReferenceSerializer.serialize(temporaryResourceReference)).thenReturn(extendedURL);
 
         XDOM output = this.officeResourceViewer.createView(attachResourceRef, viewParameters);
 
@@ -406,5 +505,60 @@ class DefaultOfficeResourceViewerTest
 
         verify(this.temporaryResourceStore).createTemporaryFile(eq(temporaryResourceReference), any(InputStream.class));
         verify(converterResult).close();
+    }
+
+    @Test
+    void viewURLWithLocalFile() throws AccessDeniedException
+    {
+        ResourceReference resourceReference = new ResourceReference("file://resource", ResourceType.URL);
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
+            "url:" + resourceReference.getReference());
+
+        Map<String, Object> parameters = Collections.emptyMap();
+        DocumentReference ownerDocRef = new DocumentReference("xwiki", "Owner", "Document");
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(ownerDocRef);
+
+        Exception expectedException = new Exception("The requested resource [file://resource] uses a protocol [file] "
+            + "that is not supported.");
+
+        Exception exception =
+            assertThrows(Exception.class, () -> this.officeResourceViewer.createView(resourceReference, parameters));
+        assertEquals(expectedException.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void viewURLWithDistantFile() throws Exception
+    {
+        ResourceReference resourceReference = new ResourceReference("http://mydomain.com/myfile", ResourceType.URL);
+        when(this.resourceReferenceTypeSerializer.serialize(resourceReference)).thenReturn(
+            "url:" + resourceReference.getReference());
+
+        Map<String, Object> parameters = Collections.emptyMap();
+        DocumentReference ownerDocRef = new DocumentReference("xwiki", "Owner", "Document");
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(ownerDocRef);
+
+        URL resourceUrl = new URL("http://mydomain.com/myfile");
+        when(this.urlSecurityManager.isDomainTrusted(resourceUrl)).thenReturn(false);
+
+        Exception expectedException = new Exception("The requested resource [http://mydomain.com/myfile] does not "
+            + "belong to the list of trusted domains. "
+            + "Please ask your administrator to add it to the list of trusted domains to access it.");
+
+        Exception exception =
+            assertThrows(Exception.class, () -> this.officeResourceViewer.createView(resourceReference, parameters));
+        assertEquals(expectedException.getMessage(), exception.getMessage());
+
+        when(this.urlSecurityManager.isDomainTrusted(resourceUrl)).thenReturn(true);
+
+        XDOMOfficeDocument xdomOfficeDocument = mock(XDOMOfficeDocument.class);
+        when(this.officeDocumentBuilder.build(any(InputStream.class), eq("myfile"), eq(ownerDocRef), eq(false)))
+            .thenReturn(xdomOfficeDocument);
+
+        XDOM expectedXDOM = mock(XDOM.class);
+        when(xdomOfficeDocument.getContentDocument()).thenReturn(expectedXDOM);
+        when(expectedXDOM.clone()).thenReturn(expectedXDOM);
+        when(expectedXDOM.getBlocks(any(), any())).thenReturn(Collections.emptyList());
+        XDOM xdom = this.officeResourceViewer.createView(resourceReference, parameters);
+        assertSame(expectedXDOM, xdom);
     }
 }

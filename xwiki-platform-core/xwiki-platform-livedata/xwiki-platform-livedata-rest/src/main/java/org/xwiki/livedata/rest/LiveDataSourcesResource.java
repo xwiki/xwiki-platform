@@ -26,7 +26,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Sources;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides the list of existing {@link LiveDataSource} implementations.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources")
-@Unstable
 public interface LiveDataSourcesResource
 {
     /**

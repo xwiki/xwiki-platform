@@ -38,8 +38,8 @@
   <hidden>true</hidden>
   <content>## General settings
 xwiki.iconset.type = image
-xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")]]
-xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" /&gt;
+xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||alt="" data-xwiki-lightbox="false"]]
+xwiki.iconset.render.html = &lt;img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="" data-xwiki-lightbox="false" /&gt;
 xwiki.iconset.icon.url = $xwiki.getSkinFile("icons/silk/${icon}.png")
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
@@ -195,6 +195,10 @@ th=application_view_tile
 translate=page_white_world
 minus-square = bullet_toggle_minus
 plus-square = bullet_toggle_plus
+filter = find
+fast-backward = control_rewind
+arrow_in = arrow_in
+reposition = reposition
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept

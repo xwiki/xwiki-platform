@@ -55,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +66,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class DocumentSelectionResolverTest
+class DocumentSelectionResolverTest
 {
     @InjectMockComponents
     private DocumentSelectionResolver documentSelectionResolver;
@@ -85,6 +86,10 @@ public class DocumentSelectionResolverTest
     private QueryFilter documentQueryFilter;
 
     @MockComponent
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentQueryFilter;
+
+    @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
@@ -99,7 +104,7 @@ public class DocumentSelectionResolverTest
     private XWikiRequest request = mock(XWikiRequest.class);
 
     @BeforeEach
-    private void configure(MockitoComponentManager componentManager)
+    void configure(MockitoComponentManager componentManager)
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(this.xcontextProvider.get()).thenReturn(xcontext);
@@ -113,7 +118,7 @@ public class DocumentSelectionResolverTest
     }
 
     @Test
-    public void isSelectionSpecified()
+    void isSelectionSpecified()
     {
         Map<String, String[]> parameterMap = new HashMap<>();
         when(this.request.getParameterMap()).thenReturn(parameterMap);
@@ -133,7 +138,7 @@ public class DocumentSelectionResolverTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getSelectedDocumentsForSpaceWildcard() throws Exception
+    void getSelectedDocumentsForSpaceWildcard() throws Exception
     {
         createDocumentReference("Shape.%", "test", "Shape", "%");
         when(this.request.getParameterValues("pages")).thenReturn(new String[] {"Shape.%"});
@@ -146,9 +151,10 @@ public class DocumentSelectionResolverTest
         DocumentReference circleReference = new DocumentReference("test", Arrays.asList("Shape", "2D"), "Circle");
         when(query.execute()).thenReturn(Collections.singletonList(circleReference));
 
-        assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments());
+        assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments(true));
 
         verify(query).addFilter(this.documentQueryFilter);
+        verify(query).addFilter(this.hiddenDocumentQueryFilter);
     }
 
     private DocumentReference createDocumentReference(String... args)
@@ -171,7 +177,7 @@ public class DocumentSelectionResolverTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getSelectedDocumentsForSpaceWildcardWithExclusions() throws Exception
+    void getSelectedDocumentsForSpaceWildcardWithExclusions() throws Exception
     {
         createDocumentReference("Shape.%", "test", "Shape", "%");
         when(this.request.getParameterValues("pages")).thenReturn(new String[] {"Shape.%"});
@@ -191,11 +197,14 @@ public class DocumentSelectionResolverTest
         when(query.execute()).thenReturn(Collections.singletonList(circleReference));
 
         assertEquals(Collections.singleton(circleReference), this.documentSelectionResolver.getSelectedDocuments());
+
+        verify(query).addFilter(this.documentQueryFilter);
+        verify(query, never()).addFilter(this.hiddenDocumentQueryFilter);
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getSelectedDocumentsForSpaceWildcardAndExactMatch() throws Exception
+    void getSelectedDocumentsForSpaceWildcardAndExactMatch() throws Exception
     {
         createDocumentReference("Shape.%", "test", "Shape", "%");
         DocumentReference sphereReference = createDocumentReference("Shape.3D.Sphere", "test", "Shape", "3D", "Sphere");
@@ -216,7 +225,7 @@ public class DocumentSelectionResolverTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getSelectedDocumentsFromMultipleWikis() throws Exception
+    void getSelectedDocumentsFromMultipleWikis() throws Exception
     {
         createDocumentReference("Shape.2D.%", "one", "Shape", "2D", "%");
         createDocumentReference("Shape.3D.%", "two", "Shape", "3D", "%");
@@ -252,7 +261,7 @@ public class DocumentSelectionResolverTest
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getSelectedDocumentsWithWildcardAndFilter() throws Exception
+    void getSelectedDocumentsWithWildcardAndFilter() throws Exception
     {
         createDocumentReference("Shape.%", "test", "Shape", "%");
         when(this.request.getParameterValues("pages")).thenReturn(new String[] {"Shape.%"});
@@ -275,7 +284,7 @@ public class DocumentSelectionResolverTest
     }
 
     @Test
-    public void getSelectedDocumentsWithFilterOnly() throws Exception
+    void getSelectedDocumentsWithFilterOnly() throws Exception
     {
         when(this.request.getParameter("filter")).thenReturn("test");
         DocumentReference shapeReference = createDocumentReference("Shape.WebHome", "test", "Shape", "WebHome");
@@ -294,7 +303,7 @@ public class DocumentSelectionResolverTest
     }
 
     @Test
-    public void getSelectedDocumentsWithFilterWithoutConstraints() throws Exception
+    void getSelectedDocumentsWithFilterWithoutConstraints() throws Exception
     {
         when(this.request.getParameter("filter")).thenReturn("test");
 

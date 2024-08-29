@@ -139,7 +139,7 @@ administration.section.users.deleteUser.newAuthor.hint=Sélectionnez un utilisat
 administration.section.users.deleteUser.newAuthor.error=L''utilisateur sélectionné n''a pas les droits {0} !
 administration.section.users.deleteUser.newAuthor.programming=de programmation
 administration.section.users.deleteUser.newAuthor.script=script
-admin.usersgroups.extensionrights=Permissions des extensions
+admin.usersgroups.extensionrights=Droits des extensions
 
 # Other Category
 admin.other=Divers
@@ -150,6 +150,25 @@ administration.section.analytics.status.hint=Définit si le suivi Google Analyti
 # Social category
 admin.social=Social
 admin.social.description=Paramétrage des fonctionnalités sociales.
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Afficher dans la section
+XWiki.ConfigurableClass_heading=Titre
+XWiki.ConfigurableClass_configurationClass=Classe de configuration
+XWiki.ConfigurableClass_linkPrefix=Préfixe du lien
+XWiki.ConfigurableClass_propertiesToShow=Propriétés à afficher
+XWiki.ConfigurableClass_codeToExecute=Code à exécuter
+XWiki.ConfigurableClass_iconAttachment=Icône de pièce jointe
+XWiki.ConfigurableClass_displayInCategory=Afficher dans la catégorie
+XWiki.ConfigurableClass_displayBeforeCategory=Afficher avant la catégorie
+XWiki.ConfigurableClass_categoryIcon=Icône de catégorie
+XWiki.ConfigurableClass_scope=Portée
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Espace courant
+XWiki.ConfigurableClass_scope_ALL_SPACES=Tous les espaces
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki et tous les espaces
+XWiki.ConfigurableClass_sectionOrder=Rang de la section
+
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart

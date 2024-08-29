@@ -21,7 +21,6 @@ package org.xwiki.like.events;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.xwiki.eventstream.RecordableEvent;
-import org.xwiki.stability.Unstable;
 
 /**
  * Default event for Like notifications.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.7RC1
  */
-@Unstable
 public class LikeRecordableEvent implements RecordableEvent
 {
     @Override

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,6 +35,7 @@ import org.xwiki.notifications.filters.watch.AutomaticWatchMode;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesConfiguration;
 import org.xwiki.notifications.filters.watch.WatchedEntitiesManager;
 import org.xwiki.notifications.filters.watch.WatchedEntityFactory;
+import org.xwiki.notifications.filters.watch.WatchedEntityReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
@@ -104,6 +106,45 @@ public class NotificationWatchScriptService implements ScriptService
     }
 
     /**
+     * Retrieve the specific watched status of a location for the current user.
+     *
+     * @param location the location for which to compute the watched status
+     * @return the specific watched status of the location by the current user
+     * @throws NotificationException in case of errors
+     * @since 15.5RC1
+     */
+    @Unstable
+    public WatchedEntityReference.WatchedStatus getLocationWatchedStatus(EntityReference location)
+            throws NotificationException
+    {
+        return watchedEntityFactory.createWatchedLocationReference(location)
+                .getWatchedStatus(CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * Try to retrieve the first ancestor of the location which have a status whose status is watched or blocked.
+     * This method returns {@code null} if current watch status is already watched or blocked, and if
+     * no ancestor can be found. The first matching ancestor reference is returned along with its computed
+     * {@link WatchedEntityReference.WatchedStatus}.
+     * @param location the location for which to find an ancestor with a watched status
+     * @return a pair containing the watched entity reference of the matching ancestor and its watched status or
+     * {@code null}.
+     * @see WatchedEntityReference.WatchedStatus#isWatched()
+     * @see WatchedEntityReference.WatchedStatus#isBlocked()
+     * @throws NotificationException in case of problem for computing the status
+     * @since 16.5.0RC1
+     */
+    @Unstable
+    public Pair<EntityReference, WatchedEntityReference.WatchedStatus> getFirstFilteredAncestor(EntityReference
+        location) throws NotificationException
+    {
+        return watchedEntityFactory
+            .createWatchedLocationReference(location)
+            .getFirstFilteredAncestor(CurrentUserReference.INSTANCE)
+            .orElse(null);
+    }
+
+    /**
      * @param location the location
      * @return either or not the location is already watched by the current user for any event type.
      * @throws NotificationException if an error happens
@@ -121,7 +162,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @throws NotificationException if an error happens
      * @since 12.8RC1
      */
-    @Unstable
     public boolean isLocationWatchedWithAllEventTypes(EntityReference location) throws NotificationException
     {
         return watchedEntityFactory.createWatchedLocationReference(location).isWatchedWithAllEventTypes(
@@ -214,7 +254,6 @@ public class NotificationWatchScriptService implements ScriptService
      * @return the automatic watch mode configured for the given user
      * @since 13.2RC1
      */
-    @Unstable
     public AutomaticWatchMode getAutomaticWatchMode(UserReference userReference)
         throws NotificationException
     {

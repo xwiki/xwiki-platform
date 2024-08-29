@@ -25,8 +25,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.TemplateProviderInlinePage;
 import org.xwiki.administration.test.po.TemplatesAdministrationSectionPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -51,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 12.9RC1
  */
 @UITest
-public class PageTemplatesIT
+class PageTemplatesIT
 {
     /**
      * Name of the template.
@@ -69,7 +71,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(1)
-    public void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
+    void createPagesFromTemplate(TestUtils setup, TestReference testReference) throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
@@ -191,7 +193,7 @@ public class PageTemplatesIT
         createPagePage.getDocumentPicker().setParent("Foo");
         createPagePage.getDocumentPicker().setName("Bar");
         String currentURL = setup.getDriver().getCurrentUrl();
-        createPagePage.clickCreate();
+        createPagePage.clickCreate(false);
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
         // and check that an error is displayed to the user
         createPagePage.waitForFieldErrorMessage();
@@ -208,7 +210,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(2)
-    public void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
+    void createExistingPageAndSpace(TestUtils setup, TestReference testReference) throws Exception
     {
         // Step 0: Setup the correct environment for the test
 
@@ -238,7 +240,7 @@ public class PageTemplatesIT
         createPage.getDocumentPicker().setParent(testSpace);
         createPage.getDocumentPicker().setName("ExistingPage");
         String currentURL = setup.getDriver().getCurrentUrl();
-        createPage.clickCreate();
+        createPage.clickCreate(false);
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
         // error
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
@@ -253,7 +255,7 @@ public class PageTemplatesIT
         createPage.getDocumentPicker().setName("ExistingPage");
         createPage.setTemplate(templateProviderFullName);
         currentURL = setup.getDriver().getCurrentUrl();
-        createPage.clickCreate();
+        createPage.clickCreate(false);
         // make sure that we stay on the same page and that an error is displayed to the user. Maybe we should check the
         // error
         assertEquals(currentURL, setup.getDriver().getCurrentUrl());
@@ -274,7 +276,7 @@ public class PageTemplatesIT
         // Try to create the a space (non-terminal document) that already exist.
         createSpace.getDocumentPicker().toggleLocationAdvancedEdit();
         createSpace.fillForm(existingSpaceName, "", null, false);
-        createSpace.clickCreate();
+        createSpace.clickCreate(false);
         String urlAfterSubmit = setup.getDriver().getCurrentUrl();
         urlAfterSubmit = urlAfterSubmit.substring(0,
             urlAfterSubmit.indexOf('?') > 0 ? urlAfterSubmit.indexOf('?') : urlAfterSubmit.length());
@@ -289,7 +291,7 @@ public class PageTemplatesIT
      */
     @Test
     @Order(3)
-    public void createPageWithSaveAndEditTemplate(TestUtils setup, TestReference testReference) throws Exception
+    void createPageWithSaveAndEditTemplate(TestUtils setup, TestReference testReference) throws Exception
     {
         cleanUp(setup, testReference);
 
@@ -320,6 +322,64 @@ public class PageTemplatesIT
         assertEquals(templateContent, newPage.getContent());
         // and the parent, it should be the template provider, since that's where we created it from
         assertEquals("/" + testSpace.replace('.', '/') + "/NewPage", newPage.getBreadcrumbContent());
+    }
+
+    /**
+     * The goal of this test is to check that if a template is forbidden for a user then:
+     *   1. the template content won't be displayed in the editor
+     *   2. the page will still be created properly from an empty template
+     */
+    @Test
+    @Order(4)
+    void createPageFromForbiddenTemplate(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        DocumentReference templateReference = new DocumentReference("Template", testReference.getLastSpaceReference());
+        DocumentReference newDoc = new DocumentReference("Document", testReference.getLastSpaceReference());
+
+        setup.createPage(templateReference, "A forbidden template");
+        String userName = testReference.getLastSpaceReference().getName();
+        setup.createUser(userName, userName, "");
+
+        // Prevent the user to see the template
+        setup.setRights(templateReference, "", userName, "view", false);
+
+        setup.login(userName, userName);
+        ViewPage viewPage = setup.gotoPage(templateReference);
+        assertTrue(viewPage.isForbidden());
+
+        setup.gotoPage(newDoc, "edit", "template=" + templateReference.toString());
+        WikiEditPage wikiEditPage = new WikiEditPage();
+
+        assertTrue(wikiEditPage.getContent().isEmpty());
+        wikiEditPage.setContent("Some content in that page");
+
+        viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("Some content in that page", viewPage.getContent());
+    }
+
+    /**
+     * The goal of this test is to check that the template provider's title is correctly escaped.
+     */
+    @Test
+    @Order(5)
+    void templateProviderTitleEscaping(TestUtils setup, TestReference testReference) throws Exception
+    {
+        cleanUp(setup, testReference);
+
+        // Create a template
+        String templateContent = "Templates are fun";
+        String providerName = "{{html}}<span>HTML</span>{{/html}}";
+        LocalDocumentReference templateProviderReference = new LocalDocumentReference(providerName,
+            testReference.getLocalDocumentReference().getParent());
+        createTemplateAndTemplateProvider(setup, templateProviderReference, templateContent,
+            "Funny templates", true);
+
+        TemplatesAdministrationSectionPage adminPage = TemplatesAdministrationSectionPage.gotoPage();
+        List<WebElement> links = adminPage.getExistingTemplatesLinks();
+        assertFalse(links.stream().anyMatch(element -> element.getText().equals("HTML")));
+        assertTrue(links.stream().anyMatch(element -> providerName.equals(element.getText())));
     }
 
     /**

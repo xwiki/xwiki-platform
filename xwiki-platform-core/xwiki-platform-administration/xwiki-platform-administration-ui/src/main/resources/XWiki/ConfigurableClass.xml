@@ -34,7 +34,7 @@
   <title>$services.localization.render('xe.admin.configurable.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.ConfigurableClassMacros" /}}
 
@@ -161,6 +161,9 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
             {{warning}}{{translation key="xe.admin.configurable.cannotLockNoJavascript"/}}{{/warning}}
 
           &lt;/noscript&gt;
+        {{/html}}
+
+        {{html clean=false}}
           &lt;script&gt;
             document.observe("xwiki:dom:loaded", function() {
               XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.prefixedFullName)').lock();
@@ -184,33 +187,31 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
         ## Internal error, not translated.
         #showHeading($appName, $headingShowing)
 
-        {{error}}Internal error: All objects were filtered out for application: $appName.{{/error}}
+        {{error}}Internal error: All objects were filtered out for application:
+        $services.rendering.escape($appName, 'xwiki/2.1').{{/error}}
 
       #else
         #set($formAction = $xwiki.getURL($app.getFullName(), 'save'))
         #set($formId = "${section.toLowerCase()}_${app.getFullName()}")
         #set($escapedAppName = $escapetool.xml($app.getFullName()))
         #foreach($configurableObj in $configurableObjs)
-          ## Execute the content code if any
-          ## FIXME: we have to do that before the title before of the dropPermissions
-          #set($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
-          #if($codeToExecute != '')
-            #set($codeToExecuteResult = $configurableObj.display('codeToExecute', 'view', false))
+          #set ($heading = $app.getValue('heading', $configurableObj))
+          #set ($codeToExecute = "$!app.getValue('codeToExecute', $configurableObj)")
+          ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
+          #set ($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
+          #if (!$app.restricted)
+            #set ($evaluatedConfigurableObj = $configurableObj.evaluate())
+            #set ($heading = $evaluatedConfigurableObj.heading)
+            #set ($linkPrefix = $evaluatedConfigurableObj.linkPrefix)
           #end
           ## Display the header if one exists.
-          #set($heading = $app.getValue('heading', $configurableObj))
           #if($heading &amp;&amp; $heading != '')
-            ## This application should not run with programming rights because it evaluates code which may not be trustworthy.
-            ## Removing the next line will open a security hole.
-            ## Can't use $configurableObj.display('heading', 'view', false) to have proper heading id (because of the html macro)
-            ## FIXME: find a cleaner solution
-            #set($void = $doc.dropPermissions())
-            == #evaluate($heading) ==
+            == $services.rendering.escape($heading, 'xwiki/2.1') ==
           #end
           ## Display code to execute
-          #if($codeToExecute != '')
+          #if ($codeToExecute != '')
             (%class="codeToExecute"%)(((##
-              $codeToExecuteResult
+              $configurableObj.display('codeToExecute', 'view', false)
             )))
           #end
           ##
@@ -219,9 +220,6 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
           #if(!$propertiesToShow || $propertiesToShow.getClass().getName().indexOf('List') == -1)
             #set($propertiesToShow = [])
           #end
-          ##
-          ## If linkPrefix is set, then we will make each property label a link which starts with that prefix.
-          #set($linkPrefix = "$!app.getValue('linkPrefix', $configurableObj)")
           ##
           ## If the Configurable object specifies a configuration class, use it,
           ## otherwise assume custom forms are used instead.
@@ -241,7 +239,12 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
                 #showHeading($appName, $headingShowing)
 
                 {{error}}
-                  {{translation key="xe.admin.configurable.noObjectOfConfigurationClassFound" parameters="$objClass.getName(), $app.getFullName()"/}}
+                  #set($escapedObjClassName =
+                    $services.rendering.escape($escapetool.java($objClass.getName()), 'xwiki/2.1'))
+                  #set($translationEscapedAppName =
+                    $services.rendering.escape($escapetool.java($app.getFullName()), 'xwiki/2.1'))
+                  {{translation key="xe.admin.configurable.noObjectOfConfigurationClassFound"
+                    parameters="~"$escapedObjClassName~", ~"$translationEscapedAppName~""/}}
                 {{/error}}
 
               #else
@@ -317,7 +320,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   &lt;/script&gt;
   {{/html}}##
   ##
-#else
+#elseif ($currentDoc != 'XWiki.ConfigurableClass')
   ##
   ##------------------------------------------------------------------------------------------------------------
   ## If section is not set then we are viewing the main administration page.
@@ -392,7 +395,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #if($globaladmin)
     #set($queryString = "editor=globaladmin&amp;amp;section=")
   #else
-    #set($queryString = "space=${currentSpace}&amp;amp;section=")
+    #set($queryString = "space=$escapetool.url($currentSpace)&amp;amp;section=")
     #if($request.getParameter('editor'))
       #set($queryString = "editor=$escapetool.url($request.getParameter('editor'))&amp;amp;$queryString")
     #end
@@ -434,8 +437,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 
   ## Finally we display an error message if there are any applications which we were unable to view.
   #if($appsUserCannotView.size() &gt; 0)
-
-    {{error}}$services.localization.render('xe.admin.configurable.noViewAccessSomeApplications', [$appsUserCannotView]){{/error}}
+    {{error}}$services.localization.render('xe.admin.configurable.noViewAccessSomeApplications',
+      'xwiki/2.1', [$appsUserCannotView]){{/error}}
 
   #end
 #end## If we should be looking at the main administration page.

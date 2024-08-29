@@ -1,0 +1,2 @@
+org.xwiki.notifications.sources.internal.DefaultNotificationManager
+500:org.xwiki.notifications.sources.internal.LegacyDefaultNotificationParametersFactory

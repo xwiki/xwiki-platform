@@ -22,9 +22,10 @@ package org.xwiki.xclass.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.DocumentPicker;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 
@@ -98,7 +99,7 @@ public class ClassSheetPage extends ViewPage
     /**
      * The live table that lists the existing class entries.
      */
-    private LiveTableElement classEntriesLiveTable = new LiveTableElement("classEntries");
+    private final TableLayoutElement classEntriesLiveTable = (new LiveDataElement("classEntries")).getTableLayout();
 
     /**
      * Clicks on the template link and returns the template page
@@ -218,7 +219,11 @@ public class ClassSheetPage extends ViewPage
      */
     public InlinePage clickCreateDocumentButton()
     {
+        // The create document form is submitted by JavaScript code in case the create button is clicked before the
+        // asynchronous validation ends, and in this case Selenium doesn't wait for the new page to load.
+        getDriver().addPageNotYetReloadedMarker();
         createDocumentButton.click();
+        getDriver().waitUntilPageIsReloaded();
         return new InlinePage();
     }
 
@@ -243,15 +248,8 @@ public class ClassSheetPage extends ViewPage
      */
     public boolean hasDocument(String documentName)
     {
-        this.classEntriesLiveTable.filterColumn("xwiki-livetable-classEntries-filter-2", documentName);
+        this.classEntriesLiveTable.filterColumn("Location", documentName);
         // This can lead to false positives, but it should be fine if the passed document name is specific enough.
-        return this.classEntriesLiveTable.getRowCount() > 0;
-    }
-
-    @Override
-    public ClassSheetPage waitUntilPageIsLoaded()
-    {
-        this.classEntriesLiveTable.waitUntilReady();
-        return this;
+        return this.classEntriesLiveTable.countRows() > 0;
     }
 }

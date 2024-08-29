@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsSystemFiltersPreferencesMacro</name>
   <language/>
@@ -41,7 +41,7 @@
     <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>7e7d151b-e4dd-498b-8e50-f213104fa256</guid>
+    <guid>2655cc69-aa63-4958-b919-91d15f6589c9</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -77,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -124,398 +125,97 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>'use strict';
-/**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
+      <code>define('notifications-system-filters-preferences-macro', {
+  prefix: 'notifications.',
+  keys: [
+    'settings.saving',
+    'filters.preferences.setEnabled.done',
+    'filters.preferences.setEnabled.error'
+  ]
 });
-/**
- * Start the real script.
- */
-require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($) {
 
-  /**
-   * Page initialization
-   */
-  $(document).ready(function() {
-    var initBootstrapSwitches = function () {
-      $('#notificationSystemFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationSystemFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
-        size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
-      });
-    };
-    $(document).on('xwiki:livetable:displayComplete', function (event, data) {
-      // Enable bootstrap switches
-      initBootstrapSwitches();
-    });
-    initBootstrapSwitches();
+require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 'vue', 'xwiki-platform-notifications-webjar'], function ($, l10n, Vue, notifications) {
+  Vue.component('DisplayerToggle', notifications.DisplayerToggle)
+  Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
 
-  });
-});
-</code>
-    </property>
-    <property>
-      <name>JS</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
-    <number>2</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>f3d87be8-97d5-490f-b519-952b54fc3e69</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>define('SystemToggleableFilterPreference', ['jquery', 'bootstrap-switch'], function($) {
-  /**
-  * Construct the Toggleable Filter Preference object.
-  */
-  return function(domElement, docURL, row) {
-    var self               = this;
-    self.domElement        = $(domElement);
-    self.docURL           = docURL;
-    self.row               = row;
-    /**
-     * Initialization
-     */
-    self.init = function () {
-      // On change
-      self.domElement.off('switchChange.bootstrapSwitch.systemFilter')
-        .on('switchChange.bootstrapSwitch.systemFilter', function(event, state) {
-          setTimeout(function() { self.save(state); }, 1);
-        });
-    };
-
-    /**
-     * Save the filter preference
-     */
-    self.save = function(state) {
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var filterName = self.domElement.attr('data-filterName');
-      var objectNumber = self.domElement.attr('data-objectNumber');
-      if (objectNumber == '') {
-        // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.docURL + '/objects?media=json&amp;minorRevision=true';
-        var params = {
+  function save(checked, filterName, objectNumber, docURL) {
+    return new Promise((resolve) =&gt; {
+      const notification = new XWiki.widgets.Notification(l10n['settings.saving'], 'inprogress');
+      if (objectNumber === '') {
+        // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default,
+        // in notifications)
+        const restURL = docURL + '/objects?media=json&amp;minorRevision=true';
+        const params = {
           'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
           'property#filterName': filterName,
-          'property#isEnabled': state ? '1' : '0'
+          'property#isEnabled': checked ? '1' : '0'
         };
-        $.post(restURL, params).done(function (data) {
-          self.domElement.attr('data-objectNumber', data.number);
+        $.post(restURL, params).then(data =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        }).fail(function () {
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          resolve({objectNumber: data.number, checked})
+        }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          resolve({checked: !checked});
         });
-      } else if (objectNumber != '') {
-        // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.docURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
+      } else if (objectNumber !== '') {
+        // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by
+        // default, in notifications)
+        const restURL = docURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
           + '/properties/isEnabled?media=json&amp;minorRevision=true';
         $.ajax(restURL, {
           method: 'PUT',
           contentType: 'text/plain',
-          data: state ? '1' : '0'
-        }).done(function (data) {
+          data: checked ? '1' : '0'
+        }).then(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-          $(document).trigger('xwiki:livetable:notifications-filters-system:toggle', {'row': self.row, 'state': state});
-        }).fail(function () {
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done');
+          resolve({checked});
+        }).catch(() =&gt; {
           notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
+          new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error');
+          resolve({checked: !checked});
         });
       }
-    };
+    })
+  }
 
-    // Call init
-    self.init();
-  };
-});
-</code>
-    </property>
-    <property>
-      <name>System Toggleable Filter Preference</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
-    <number>3</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>2ce1c5a8-4fdb-479f-85f7-7cbfe9b7d646</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require([
-  'jquery',
-  'SystemToggleableFilterPreference',
-  'xwiki-meta',
-  'bootstrap-switch',
-  'xwiki-events-bridge'
-], function ($, SystemToggleableFilterPreference, xm) {
-  $(document).on('xwiki:livetable:notifications-filters-system:toggle', function(event, data) {
-    var changedRow = $(data.row.isEnabled);
-    if (changedRow.length &gt; 0) {
-      if (data.state) {
-        changedRow.attr("checked", "checked");
-      } else {
-        changedRow.removeAttr("checked");
-      }
-      data.row.isEnabled = changedRow.get(0).outerHTML;
-    }
-  });
+  const docURL = $('.systemFilterPreferences').attr('data-doc-url');
 
-  // Globals
-  var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
-    XWiki.EntityType.DOCUMENT);
-  var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
-  var target = $('.systemFilterPreferences').attr('data-target');
-
-  var docURL = $('.systemFilterPreferences').attr('data-doc-url');
-  var postParams = {
-    action: 'setFilterPreferenceEnabled',
-    csrf: xm.form_token,
-    target: target
-  };
-  if (target == 'user') {
-    var targetUser = $('.systemFilterPreferences').attr('data-user');
-    postParams['user'] = targetUser;
-  };
-
-  var enhanceRow = function(row, data) {
-    // Enable / Disable action for classic filter preferences
-    $(row).find('.notificationFilterPreferenceCheckbox').off('switchChange.bootstrapSwitch.systemFilter')
-    .on('switchChange.bootstrapSwitch.systemFilter', function(event, state) {
-      var notif = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-        'notifications.filters.preferences.setEnabled.inProgress')), 'inprogress');
-      var params = {
-        filterPreferenceId: data.filterPreferenceId,
-        enabled: state
-      };
-      $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
-        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-          'notifications.filters.preferences.setEnabled.done')), 'done'));
-        $(document).trigger('xwiki:livetable:notifications-filters-system:toggle', {'row': data, 'state': state});
-      }).fail(function() {
-        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-          'notifications.filters.preferences.setEnabled.error')), 'error'));
+  $(document).on('xwiki:livedata:toggle', '#notificationSystemFilterPreferencesLiveData', (event) =&gt; {
+    const detail = event.detail;
+    const data = detail.data
+    save(detail.checked, data.filterName, data.objectNumber, docURL).then(({checked, objectNumber}) =&gt; {
+      detail.callback({
+        ...detail,
+        data: {
+          ...data,
+          objectNumber: objectNumber !== undefined ? objectNumber : data.objectNumber
+        },
+        checked: checked
       });
     });
-    // Enable / Disable action for toggleable filter preferences
-    $(row).find('.toggleableFilterPreferenceCheckbox').each(function() {
-      new SystemToggleableFilterPreference(this, docURL, data);
-    });
-  };
-
-  // Callback on livetable row printing
-  $(document).on('xwiki:livetable:notificationSystemFilterPreferencesLiveTable:newrow', function(event, data) {
-    enhanceRow(data.row, data.data);
   });
-
-  // Initializer
-  $(function() {
-    // This script is usually loaded after the live table is displayed and so the previous callback might not be called.
-    $('#notificationSystemFilterPreferencesLiveTable-display &gt; tr[data-index]').each(function() {
-      var data = window.livetable_notificationSystemFilterPreferencesLiveTable.fetchedRows[$(this).data('index')];
-      enhanceRow(this, data);
-    });
-  });
-});</code>
+})</code>
     </property>
     <property>
-      <name>Filter Preferences Livetable Callback</name>
+      <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>
     <name>XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro</name>
     <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>0dbeaf20-9549-4eb2-99b9-95dc3fef916d</guid>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>bc0fe9a6-4900-4c4a-849f-a62918a47493</guid>
     <class>
-      <name>XWiki.StyleSheetExtension</name>
+      <name>XWiki.UIExtensionClass</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -523,112 +223,132 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       <defaultWeb/>
       <nameField/>
       <validationScript/>
-      <cache>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
         <cache>0</cache>
-        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
         <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
-        <size>1</size>
+        <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
         <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
         <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
+      </content>
+      <extensionPointId>
         <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
         <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
-      <parse>
+      <parameters>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
         <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
+      </scope>
     </class>
     <property>
-      <cache>long</cache>
+      <async_cached>0</async_cached>
     </property>
     <property>
-      <code>#notificationSystemFilterPreferencesLiveTable select.pagesizeselect {
-  width: auto;
-}</code>
+      <async_context/>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
-      <name>NotificationFilterPreferences</name>
+      <content/>
     </property>
     <property>
-      <parse/>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <use>currentPage</use>
+      <name>org.xwiki.notifications.requirejs.module</name>
+    </property>
+    <property>
+      <parameters>id=xwiki-platform-notifications-webjar
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar', 'main.umd')</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
   <object>
@@ -671,7 +391,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -691,6 +411,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <name>code</name>
         <number>10</number>
         <prettyName>Macro code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -703,6 +424,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <name>contentDescription</name>
         <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -746,15 +468,24 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -762,6 +493,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -847,46 +579,39 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
   #else
     #set ($targetUser = $xcontext.userReference)
   #end
-  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$services.model.serialize($targetUser)""")
+  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #end
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro'))
-#set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsSystemFiltersPreferencesMacro'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 ######################################################
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+&lt;div class="systemFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;div class="row"&gt;
-    &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
+    &lt;p class="xHint col-xs-12 col-sm-12 col-md-12 col-lg-12"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.system.hint'))
     &lt;/p&gt;
   &lt;/div&gt;
-  #set($collist  = ['name', 'filterType', 'notificationFormats', 'isEnabled'])
-  #set($colprops = {
-    'name':                { 'sortable': false, 'html': true, 'filterable': false },
-    'filterType':          { 'sortable': false, 'filterable': false },
-    'notificationFormats': { 'sortable': false, 'html': true, 'filterable': false },
-    'isEnabled':           { 'sortable': false, 'html' : true, 'filterable': false }
-  })
-  #set ($extraParams = "eventType=&amp;format=&amp;type=system")
-  #if ($wikimacro.parameters.target == 'user')
-    #set ($extraParams = "$extraParams&amp;user=${services.model.serialize($targetUser, 'default')}")
-  #end
-  #set($options  = {
-    'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'rowCount'          : 10,
-    'description'       : 'This table lists every system filter registered in the wiki.',
-    'translationPrefix' : 'notifications.settings.filters.preferences.system.table.',
-    'extraParams'       : $extraParams,
-    'outputOnlyHtml'    : true
-  })
-
-  #livetable("notificationSystemFilterPreferencesLiveTable" $collist $colprops $options)
+#set ($sourceParameters = {
+  'target': $wikimacro.parameters.target
+})
+#if ($wikimacro.parameters.target == 'user')
+    #set ($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+#else
+    #set ($discard = $sourceParameters.put('wiki', $services.model.serialize($services.wiki.getCurrentWikiReference(), 'default')))
+#end
+$services.liveData.render({
+  'id': 'notificationSystemFilterPreferencesLiveData',
+  'properties': 'name,filterDescription,notificationFormats,isEnabled',
+  'source': 'notificationSystemFilters',
+  'sourceParameters': $escapetool.url($sourceParameters),
+  'limit': 10
+})
 &lt;/div&gt;
 {{/html}}
 #end
@@ -902,7 +627,9 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Display the preferences of the given user about system notification filters.</description>
@@ -951,6 +678,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -976,13 +704,24 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -1029,6 +768,7 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1054,13 +794,24 @@ require(['jquery', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], func
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>

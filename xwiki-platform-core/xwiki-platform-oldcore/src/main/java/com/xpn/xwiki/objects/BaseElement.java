@@ -361,12 +361,36 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        MergeManagerResult<String, String> prettyNameManagerResult =
-            getMergeManager().mergeObject(((BaseElement) previousElement).getPrettyName(),
+        MergeManagerResult<ElementInterface, Object> mergeManagerResult =
+            this.merge(previousElement, newElement, configuration, context);
+        mergeResult.getLog().addAll(mergeManagerResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || mergeManagerResult.isModified());
+    }
+
+    @Override
+    public MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context)
+    {
+        MergeManagerResult<ElementInterface, Object> mergeManagerResult = new MergeManagerResult<>();
+        if (configuration.isProvidedVersionsModifiables()) {
+            mergeManagerResult.setMergeResult(this);
+        } else {
+            mergeManagerResult.setMergeResult(this.clone());
+        }
+        MergeManagerResult<String, Character> mergePrettyNameResult =
+            getMergeManager().mergeCharacters(((BaseElement) previousElement).getPrettyName(),
                 ((BaseElement) newElement).getPrettyName(), getPrettyName(), configuration);
-        mergeResult.getLog().addAll(prettyNameManagerResult.getLog());
-        mergeResult.setModified(mergeResult.isModified() || prettyNameManagerResult.isModified());
-        setPrettyName(prettyNameManagerResult.getMergeResult());
+
+        // Note that we're loosing conflicts information about prettyname, but it's probably ok, at least it's not a
+        // regression since we were not getting that info in the past.
+        // Now it might not be a good idea to mix those info with the conflicts related to the value of the element
+        // we might need improvment in the design here...
+        mergeManagerResult.setLog(mergePrettyNameResult.getLog());
+        if (mergePrettyNameResult.isModified()) {
+            mergeManagerResult.setModified(true);
+            ((BaseElement)mergeManagerResult.getMergeResult()).setPrettyName(mergePrettyNameResult.getMergeResult());
+        }
+        return mergeManagerResult;
     }
 
     @Override

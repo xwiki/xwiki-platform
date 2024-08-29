@@ -22,7 +22,6 @@ package org.xwiki.refactoring.internal.listener;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -43,11 +42,9 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -67,7 +64,7 @@ import static org.mockito.Mockito.when;
  * @since 11.9RC1
  */
 @OldcoreTest
-public class UpdateRightsOnDocumentRenameListenerTest
+class UpdateRightsOnDocumentRenameListenerTest
 {
     @InjectMockComponents
     private UpdateRightsOnDocumentRenameListener listener;
@@ -130,7 +127,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithUserOnly() throws XWikiException
+    void processOnRenameWithUserOnly() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) userClassDocumentReference)).thenReturn(new BaseObject());
         DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(sourceUserDocumentReference,
@@ -152,7 +149,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithGroupOnly() throws XWikiException
+    void processOnRenameWithGroupOnly() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) groupClassDocumentReference)).thenReturn(new BaseObject());
         DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(sourceUserDocumentReference,
@@ -174,7 +171,7 @@ public class UpdateRightsOnDocumentRenameListenerTest
     }
 
     @Test
-    public void processOnRenameWithUserAndGroup() throws XWikiException
+    void processOnRenameWithUserAndGroup() throws XWikiException
     {
         when(targetUserDocument.getXObject((EntityReference) userClassDocumentReference)).thenReturn(new BaseObject());
         when(targetUserDocument.getXObject((EntityReference) groupClassDocumentReference)).thenReturn(new BaseObject());

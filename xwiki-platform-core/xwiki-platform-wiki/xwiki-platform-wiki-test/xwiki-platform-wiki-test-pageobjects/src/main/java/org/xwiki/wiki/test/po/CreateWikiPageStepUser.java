@@ -47,13 +47,4 @@ public class CreateWikiPageStepUser extends ExtendedViewPage
     {
         return new SuggestInputElement(this.ownerInput);
     }
-
-    @Override
-    public CreateWikiPageStepUser waitUntilPageIsLoaded()
-    {
-        // Wait for the owner picker to be ready.
-        getOwnerPicker();
-
-        return this;
-    }
 }

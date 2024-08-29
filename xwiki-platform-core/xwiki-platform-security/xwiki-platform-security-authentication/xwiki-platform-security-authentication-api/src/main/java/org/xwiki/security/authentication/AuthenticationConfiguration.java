@@ -19,6 +19,9 @@
  */
 package org.xwiki.security.authentication;
 
+import java.util.List;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -28,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.1RC1
  * @version $Id$
  */
-@Unstable
 @Role
 public interface AuthenticationConfiguration
 {
@@ -55,5 +57,44 @@ public interface AuthenticationConfiguration
     default boolean isAuthenticationSecurityEnabled()
     {
         return true;
+    }
+
+    /**
+     * @return the list of cookie domains to use for the authentication cookies. Domains are prefix with a dot.
+     * @since 14.10.15
+     * @since 15.5.1
+     * @since 15.6
+     */
+    @Unstable
+    default List<String> getCookieDomains()
+    {
+        return List.of();
+    }
+
+    /**
+     * Get from the configuration or generate a Validation Key used to generate hash values for the the cookies.
+     * 
+     * @return the Validation Key
+     * @since 15.9
+     * @since 15.5.4
+     * @since 14.10.19
+     */
+    default String getValidationKey()
+    {
+        return RandomStringUtils.random(32);
+    }
+
+    /**
+     * Get from the configuration of generate Encryption Key used to create a secret key used to encrypt/decrypt value
+     * for the cookies.
+     * 
+     * @return the Encryption Key
+     * @since 15.9
+     * @since 15.5.4
+     * @since 14.10.19
+     */
+    default String getEncryptionKey()
+    {
+        return RandomStringUtils.random(32);
     }
 }

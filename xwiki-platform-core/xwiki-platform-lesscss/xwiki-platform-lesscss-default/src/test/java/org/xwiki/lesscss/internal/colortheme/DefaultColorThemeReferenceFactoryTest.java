@@ -84,7 +84,6 @@ public class DefaultColorThemeReferenceFactoryTest
         DocumentReference colorThemeDocRef = new DocumentReference("otherWiki", "ColorThemes", "colorTheme");
         when(documentReferenceResolver.resolve(eq("colorTheme"), eq(new WikiReference("wikiId")))).thenReturn(
                 colorThemeDocRef);
-        when(xwiki.exists(colorThemeDocRef, xcontext)).thenReturn(true);
         XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
         when(colorThemeDoc.getXObjectSize(eq(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))).
@@ -102,7 +101,6 @@ public class DefaultColorThemeReferenceFactoryTest
         DocumentReference colorThemeDocRef = new DocumentReference("otherWiki", "ColorThemes", "colorTheme");
         when(documentReferenceResolver.resolve(eq("colorTheme"), eq(new WikiReference("wikiId")))).thenReturn(
                 colorThemeDocRef);
-        when(xwiki.exists(colorThemeDocRef, xcontext)).thenReturn(true);
         XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
         when(colorThemeDoc.getXObjectSize(eq(new DocumentReference("otherWiki", "ColorThemes", "ColorThemeClass")))).
@@ -120,8 +118,10 @@ public class DefaultColorThemeReferenceFactoryTest
     {
         // Mocks
         DocumentReference colorThemeDocRef = new DocumentReference("wikiId", "Main", "default");
-        when(documentReferenceResolver.resolve("default")).thenReturn(colorThemeDocRef);
-        when(xwiki.exists(colorThemeDocRef, xcontext)).thenReturn(false);
+        when(documentReferenceResolver.resolve("default", new WikiReference("wikiId"))).thenReturn(colorThemeDocRef);
+        XWikiDocument colorThemeDoc = mock(XWikiDocument.class);
+        when(xwiki.getDocument(colorThemeDocRef, xcontext)).thenReturn(colorThemeDoc);
+        when(colorThemeDoc.isNew()).thenReturn(true);
 
         // Test
         assertEquals(new NamedColorThemeReference("default"),

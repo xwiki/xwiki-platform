@@ -29,7 +29,10 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,6 +61,9 @@ public class XWikiUser
      */
     public static final String EMAIL_CHECKED_PROPERTY = "email_checked";
 
+    public static final LocalDocumentReference ACCOUNT_VALIDATION_DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "AccountValidation");
+
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
@@ -66,6 +72,8 @@ public class XWikiUser
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
+
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
@@ -110,7 +118,7 @@ public class XWikiUser
     /**
      * Create a XWikiUser for the given user.
      * 
-     * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
+     * @param user the full name of the user on the form {@code XWiki.Foo}.
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
      */
     @Deprecated
@@ -122,7 +130,7 @@ public class XWikiUser
     /**
      * Create a XWikiUser for the given user.
      * 
-     * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
+     * @param user the full name of the user on the form {@code XWiki.Foo}.
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
      */
@@ -171,7 +179,7 @@ public class XWikiUser
     }
 
     /**
-     * @return the fullname of the user like <tt>XWiki.Foo</tt>.
+     * @return the fullname of the user like {@code XWiki.Foo}.
      */
     public String getFullName()
     {
@@ -198,6 +206,15 @@ public class XWikiUser
             localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         }
         return localEntityReferenceSerializer;
+    }
+
+    private UserReferenceResolver<DocumentReference> getDocumentReferenceUserReferenceResolver()
+    {
+        if (this.documentReferenceUserReferenceResolver == null) {
+            this.documentReferenceUserReferenceResolver =
+                Utils.getComponent(UserReferenceResolver.TYPE_DOCUMENT_REFERENCE, "document");
+        }
+        return this.documentReferenceUserReferenceResolver;
     }
 
     private ContextualLocalizationManager getLocalization()
@@ -333,6 +350,9 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
+                UserReference userReference =
+                    getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
+                userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {
@@ -373,7 +393,7 @@ public class XWikiUser
      *
      * @param groupName The group to check.
      * @param context The current {@link XWikiContext context}.
-     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
+     * @return {@code true} if the user does belong to the specified group, false otherwise or if an exception occurs.
      * @throws XWikiException If an error occurs when checking the groups.
      * @since 1.3
      */
@@ -398,7 +418,7 @@ public class XWikiUser
     /**
      * See if the user is global (i.e. registered in the main wiki) or local to a virtual wiki.
      *
-     * @return <tt>true</tt> if the user is global, false otherwise or if an exception occurs.
+     * @return {@code true} if the user is global, false otherwise or if an exception occurs.
      */
     public boolean isMain()
     {

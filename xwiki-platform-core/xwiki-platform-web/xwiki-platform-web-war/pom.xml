@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>
@@ -84,6 +84,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>prototype</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
@@ -131,8 +136,6 @@
             <configuration>
               <excludes>
                 <!-- See the next execution for the reason we exclude these files. -->
-                <exclude>**/prototype.js</exclude>
-                <exclude>**/scriptaculous/dragdrop.js</exclude>
                 <exclude>**/panelWizard.js</exclude>
               </excludes>
             </configuration>
@@ -145,10 +148,6 @@
             </goals>
             <configuration>
               <includes>
-                <!-- Sets the read-only 'prototype' property of native objects. -->
-                <include>**/prototype.js</include>
-                <!-- Uses "arguments.callee" and "with" statement. -->
-                <include>**/scriptaculous/dragdrop.js</include>
                 <!-- Sets many global variables. -->
                 <include>**/panelWizard.js</include>
               </includes>
@@ -245,38 +244,51 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>com.github.searls</groupId>
-        <artifactId>jasmine-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!-- Run the tests on the minified files in order to verify the minification also. -->
-          <jsSrcDir>${project.build.directory}/${project.build.finalName}/resources</jsSrcDir>
-          <customRunnerConfiguration>
-            ${project.basedir}/src/test/resources/jasmine-require-config.txt
-          </customRunnerConfiguration>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <excludes>
-            <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
-            <exclude>src/**/scriptaculous/**/*.js</exclude>
-            <exclude>src/**/prototype/**/*.js</exclude>
-            <exclude>src/**/xwiki/accordion/accordion.js</exclude>
-            <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
-            <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>
-            <exclude>src/**/uicomponents/widgets/validation/livevalidation_prototype.js</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <excludes>
+                <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
+                <exclude>src/**/xwiki/accordion/accordion.js</exclude>
+                <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
+                <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>
+                <exclude>src/**/uicomponents/widgets/validation/livevalidation_prototype.js</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <!-- We don't use the 'integration-tests' profile because we cannot run the tests on CI (Chrome is not installed)
+        and we're waiting for this issue https://github.com/searls/jasmine-maven-plugin/issues/349 to use docker. -->
+      <id>integration-tests-chrome</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Run the tests on the minified files in order to verify the minification also. -->
+              <jsSrcDir>${project.build.directory}/${project.build.finalName}/resources</jsSrcDir>
+              <customRunnerConfiguration>
+                ${project.basedir}/src/test/resources/jasmine-require-config.txt
+              </customRunnerConfiguration>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

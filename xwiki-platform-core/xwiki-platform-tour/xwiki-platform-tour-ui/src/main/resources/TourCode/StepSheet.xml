@@ -1,0 +1,581 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>TourCode</web>
+  <name>StepSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>TourCode.StepClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>#if($doc.documentReference.name == 'StepSheet')Step Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+{{html wiki=true}}
+#set($isEditing = $xcontext.action == 'edit')
+#set($isNewStep = true)
+#set($tourName = $request.tourName)
+#set($stepID = $request.stepID)
+#set($nbSteps = 0)
+#if ($tourName &amp;&amp; $tourName != '' &amp;&amp; $xwiki.exists($tourName))
+  #set($tourDoc = $xwiki.getDocument($tourName))
+  #set($nbSteps = $tourDoc.getObjects('TourCode.StepClass').size())
+  #if($stepID &amp;&amp; $stepID != '')
+    #set($stepObj = $tourDoc.getObject('TourCode.StepClass', $numbertool.toNumber($stepID).intValue()))
+    #if($stepObj)
+      #set($isNewStep = false)
+    #end
+  #end
+#end
+#if ($isNewStep)
+  #set($vdoc = $xwiki.getDocument('TourCode.StepTemplate'))
+  #set($vobj = $vdoc.getObject('TourCode.StepClass'))
+#else
+  #set($vdoc = $tourDoc)
+  #set($vobj = $stepObj)
+#end
+#set($class = $vobj.xWikiClass)
+#if ($isNewStep)
+  &lt;h3&gt;$services.localization.render('tour.steps.new_step')&lt;/h3&gt;
+#else
+  &lt;h3&gt;$services.localization.render('tour.steps.edit_step')&lt;/h3&gt;
+#end
+&lt;div id="stepForm" class="xform"&gt;
+  #foreach($prop in $class.properties)
+    #if($prop.getName().equals('order'))
+      &lt;dl&gt;
+        &lt;dt&gt;&lt;label for="stepOrderSelect"&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="stepOrderSelect"&gt;
+            #if ($nbSteps &gt; 0)
+              #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
+                &lt;option value="$i" #if ($vobj.getProperty('order').value == $i) selected #end &gt;$mathtool.add($i, 1)&lt;/option&gt;
+              #end
+            #end
+            #if ($isNewStep)
+              &lt;option value="$nbSteps" selected &gt;$mathtool.add($nbSteps, 1)&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      &lt;/dl&gt;
+    #else
+      &lt;dl&gt;
+        &lt;dt&gt;&lt;label #if($isEditing)for="TourCode.StepClass_0_${prop.name}"#end&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+        &lt;dd&gt;$vobj.get($prop.getName())&lt;/dd&gt;
+      &lt;/dl&gt;
+    #end
+  #end
+
+  #if ($xcontext.action == 'edit')
+    #if("!$request.tourName" != '')
+      &lt;input type="hidden" value="${escapetool.xml($request.tourName)}" id="tourName"/&gt;
+    #end
+    #if ($request.stepID)
+      &lt;input type="hidden" value="${escapetool.xml($request.stepID)}" id="stepID"/&gt;
+    #end
+    #if ($isNewStep)
+      &lt;input type="button" value="$services.localization.render('tour.steps.add_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
+    #else
+      &lt;input type="button" value="$services.localization.render('tour.steps.save_step')" class="btn btn-primary" id="saveStepBtn"/&gt;
+    #end
+  #end
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>TourCode.StepSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>de85aee8-fb4e-4642-8790-e094c499b2bd</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>TourCode.StepSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>de85aee8-fb4e-4642-8790-e094c499b2bd</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var bstStepURL = "$xwiki.getURL('TourCode.StepSheet','edit','editor=inline&amp;xpage=plain')";
+var messages   = {  deleting: "${escapetool.javascript($services.localization.render('tour.steps.deleting'))}",
+                    deleteConfirm: "${escapetool.javascript($services.localization.render('tour.steps.delete_confirm'))}",
+                    deleteDone: "${escapetool.javascript($services.localization.render('tour.steps.delete_done'))}"
+                 }
+
+require(['jquery', 'xwiki-meta'], function ($, xm) {
+  'use strict';
+
+  // Initialize add new step button
+  $('#addStep').on('click', function() {
+    var tourName = $('#tourName').val();
+    $('.xdialog-modal-container').remove();
+    new XWiki.widgets.StepPopup({pageURL: bstStepURL + '&amp;tourName=' + tourName});
+  });
+
+  // Initialize save step button
+  $('body').on('click', '#saveStepBtn', function() {
+    var parent = $(this).parent().parent();
+    var stepID = $('#stepID', parent).val();
+    var prefix = 'TourCode.StepClass_';
+    var tourName = $("#tourName",parent).val();
+    var element = $("input[id^='" + prefix + "'][id$='_element']", parent).val();
+    var title = $("input[id^='" + prefix + "'][id$='_title']", parent).val();
+    var backdrop = $("input[id^='" + prefix + "'][id$='_backdrop']", parent).is(':checked');
+    var content = $("textarea[id^='" + prefix + "'][id$='_content']", parent).val();
+    var placement = $("select[id^='" + prefix + "'][id$='_placement']", parent).val();
+    var targetPage = $("input[id^='" + prefix + "'][id$='_targetPage']", parent).val(); 
+    var targetAction = $("input[id^='" + prefix + "'][id$='_action']", parent).val(); 
+    var queryString = $("input[id^='" + prefix + "'][id$='_queryString']", parent).val();
+    var reflex = $("input[id^='" + prefix + "'][id$='_reflex']", parent).is(':checked');
+    var stepOrder = $('#stepOrderSelect').val();
+    var nbSteps = $('#nbsteps').val();
+    var step = {  element     : (element? element: ''),
+                  title       : (title? title: ''),
+                  backdrop    : backdrop,
+                  content     : (content? content: ''),
+                  placement   : (placement? placement: ''),
+                  targetPage  : (targetPage? targetPage: ''),
+                  targetAction: (targetAction? targetAction: ''),
+                  queryString : (queryString? queryString: ''),
+                  reflex      : reflex,
+                  stepOrder   : (stepOrder? stepOrder: ''),
+                  tourName    : (tourName? tourName: ''),
+                  nbSteps     : nbSteps,
+                  stepID      : stepID,
+                  action      : 'editStep',
+                  xpage       : 'plain'
+               };
+    $.ajax({
+      url : "$xwiki.getURL('TourCode.AjaxActions')",
+      type: 'POST',
+      data: step,
+      success: function(rep) {
+        $('#stepsContainer').html(rep);
+        if (xm.refreshVersion) {
+          xm.refreshVersion();
+        }
+      },
+      complete: function() {
+        // Close dialog box
+        $('.xdialog-close').click();
+      }
+    });
+  });
+
+  // Initialize step edit btns
+  $('body').on('click', '.editStep', function() {
+    $('.xdialog-modal-container').remove();
+    var tourName = $('#tourName').val();
+    var stepID = $(this).attr('data-step-id');
+    $('.xdialog-modal-container').remove();
+    new XWiki.widgets.StepPopup({
+      pageURL: bstStepURL + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID)
+    });
+  });
+   
+  // Initialize step delete btns
+  $('body').on('click', '.deleteStep', function() {
+    $('.xdialog-modal-container').remove();
+    var tourName = $('#tourName').val();
+    var stepID = $(this).attr('data-step-id');
+    new XWiki.widgets.ConfirmationBox({
+      onYes: function() {
+        var notif = new XWiki.widgets.Notification(messages.deleting, 'inprogress');
+        $.ajax({
+          url : "$xwiki.getURL('TourCode.AjaxActions', 'view', 'xpage=plain')" + '&amp;action=deleteStep' + '&amp;tourName=' + encodeURIComponent(tourName) + '&amp;stepID=' + encodeURIComponent(stepID),
+          type: 'POST',
+          success: function(rep) {
+            $('#stepsContainer').html(rep);
+            if (xm.refreshVersion) {
+              xm.refreshVersion();
+            }
+          },
+          complete: function() {
+            notif.replace(new XWiki.widgets.Notification(messages.deleteDone, 'done'));
+            //TODO: add "on failure"
+          }
+        });
+      }},
+      {
+        confirmationText: messages.deleteConfirm
+      }
+    );
+  });
+});</code>
+    </property>
+    <property>
+      <name>Add, Edit BootstrapTour step</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>TourCode.StepSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>688b1568-3305-4307-8cb2-584088546df1</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Make sure the XWiki 'namespace' and the ModalPopup class exist.
+if(typeof(XWiki) == 'undefined' || typeof(XWiki.widgets) == 'undefined' || typeof(XWiki.widgets.ModalPopup) == 'undefined') {
+  if (typeof console != 'undefined' &amp;&amp; typeof console.warn == 'function') {
+    console.warn('[MessageBox widget] Required class missing: XWiki.widgets.ModalPopup');
+  }
+} else {
+  XWiki.widgets.StepPopup = Class.create(XWiki.widgets.ModalPopup, {
+    // Default parameters can be added to the custom class.
+    defaultInteractionParameters : {
+    },
+    // Constructor. Registers the key listener that pops up the dialog.
+    initialize : function($super, interactionParameters) {
+      this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+      // call constructor from ModalPopup with params content, shortcuts, options
+      $super(
+        this.createContent(this.interactionParameters),
+        {
+          'show'  : { method : this.showDialog,  keys : [] },
+          'close' : { method : this.closeDialog, keys : ['Esc'] }
+        },
+        {
+          displayCloseButton : true, 
+          verticalPosition : 'top',
+          backgroundColor : '#FFF'
+        }
+      );
+      this.showDialog();
+      this.setClass('my-modal-popup');
+    },
+    // Get the content of the modal dialog using ajax
+    createContent : function (data) {
+      var content =  new Element('div', {'class': 'modal-popup'});
+      // get page content for the pageURL
+      new Ajax.Request(data.pageURL,
+      {
+        method:'get',
+        onSuccess: function(transport){
+          var response = transport.responseText || 'no response text';
+          content.insert(response);
+        },
+        onFailure: function() { content.insert('Something went wrong...'); 
+      }
+      });
+      return content;
+    }
+  });
+} // if the parent widget is defined</code>
+    </property>
+    <property>
+      <name>Use XWiki ModalPopup</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>TourCode.StepSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>9229d70b-e2d0-480a-ab53-cf4dce612d6d</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.xdialog-box-my-modal-popup {
+  width: 800px;
+}
+
+.actionBtn, #addStep {
+  font-size: .8em;
+  text-transform: uppercase;
+}
+
+.actionBtn {
+   background: none no-repeat scroll 0 center transparent;
+   display: block;
+   padding: .3em .3em .3em 20px;
+   float: right;
+}
+.tour-backdrop {
+   opacity: 0.5;
+} </code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

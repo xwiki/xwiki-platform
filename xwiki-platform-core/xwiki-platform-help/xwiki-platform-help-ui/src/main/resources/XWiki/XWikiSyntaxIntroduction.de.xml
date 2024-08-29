@@ -43,7 +43,7 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Introduction ===
 
-Die XWiki Syntax 1.0 war der erste Ansatz, eine Syntax im Wiki-stil in XWiki zu implementieren. Diese hat einige Limitierungen, und manche Formatierungen können nur durch direkten Einsatz von HTML erzeugt werden. Daher empfehlen wir die Verwendung der neueren Syntaxen. XWiki Syntax 1.0 wird nur noch aus Gründen der Rückwärtskompatibilität angeboten.
+Die XWiki Syntax 1.0 war der erste Ansatz, eine Syntax im Wiki-Stil in XWiki zu implementieren. Diese hat einige Limitierungen, und manche Formatierungen können nur durch direkten Einsatz von HTML erzeugt werden. Daher empfehlen wir die Verwendung der neueren Syntaxen. XWiki Syntax 1.0 wird nur noch aus Gründen der Rückwärtskompatibilität angeboten.
 
 Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengenhülle um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 
@@ -53,7 +53,7 @@ Beginnend mit XWiki Enterprise Version 1.7 und darüber haben wir eine neue Wiki
 
 * Die Einschränkungen und Mehrdeutigkeiten der XWiki 1.0 Syntax (welche sowohl durch Radeox - der zugrunde liegenden Rendering-Engine - und TWiki inspiriert wurde) beheben.
 ** Nicht optimale Symbole. Zum Beispiel war das Symbol für Fettdruck ein einzelner Stern. Dies hat Probleme verursacht, wenn der Nutzer Texte eingab, die Sterne beinhalteten, da dieser Text fälschlicherweise als fett angenommen wurde, auch wenn er das nicht war. Daher haben wir die Syntax robuster gemacht, indem überall mindestens doppelte Zeichen verwendet werden.
-** Mehrdeutigkeiten. Zum Beispiel gab es eine Mehrdeutigkeit zwischen einem fettengedruckten Element, dass die Zeile begann, und einer Aufzählungsliste. Diese Mehrdeutigkeiten mussten beseitigt werden, damit u.a. der WYSIWYG Editor  beiden Fälle unterscheiden kann.
+** Mehrdeutigkeiten. Zum Beispiel gab es eine Mehrdeutigkeit zwischen einem fettengedruckten Element, dass die Zeile begann, und einer Aufzählungsliste. Diese Mehrdeutigkeiten mussten beseitigt werden, damit u.a. der WYSIWYG Editor beiden Fälle unterscheiden kann.
 * Um näher an der [[Creole 1.0 Syntax&gt;&gt;http://www.wikicreole.org/]] zu sein, welche ein Standard für Wiki Syntax wird. Zusätzlich hat die Creole Gemeinde sich die Zeit genommen, um alle existierenden Wiki Syntaxen zu analysieren, bevor sie sich für Symbole entschieden haben. Diese Entscheidungen sind daher sehr gut.
 
 Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengen um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
@@ -67,7 +67,5 @@ Die XWiki Syntax 2.1 ist die aktuell empfohlene Wiki Syntax. Gegenüber der XWik
 
 {{info}}
 Da die XWiki Syntax 2.1 auf der XWiki Syntax 2.0 basiert, bleibt die gesamte XWiki Syntax 2.0 gültig, solange die 2.1 Spezifikation nichts anderes besagt.
-{{/info}}
-
-Zusätzlich zu den XWiki-spezifischen Syntaxen haben wir auch unsere zugrunde liegende Rendering-Engine (war vormals Radeox) durch unsere eigene Engine ausgetauscht, welche eine Obermengenhülle um [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] und [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (und möglicherweise weiteren in der Zukunft) bildet. Dies hat es uns erlaubt weitere Syntaxen im Wiki anzubieten: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki und mehr&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
+{{/info}}</content>
 </xwikidoc>

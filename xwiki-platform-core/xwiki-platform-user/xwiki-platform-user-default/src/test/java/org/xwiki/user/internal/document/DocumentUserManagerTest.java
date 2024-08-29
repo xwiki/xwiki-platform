@@ -31,6 +31,9 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -40,6 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,7 +54,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DocumentUserManagerTest
+class DocumentUserManagerTest
 {
     @InjectMockComponents
     private DocumentUserManager userManager;
@@ -58,8 +62,11 @@ public class DocumentUserManagerTest
     @MockComponent
     private Provider<XWikiContext> contextProvider;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
     void exists() throws Exception
@@ -69,6 +76,7 @@ public class DocumentUserManagerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(this.contextProvider.get()).thenReturn(xcontext);
+        when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
         XWikiDocument document = mock(XWikiDocument.class);
         when(xwiki.getDocument(reference, xcontext)).thenReturn(document);
         when(document.isNew()).thenReturn(false);
@@ -119,10 +127,39 @@ public class DocumentUserManagerTest
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(this.contextProvider.get()).thenReturn(xcontext);
         when(xwiki.getDocument(reference, xcontext)).thenThrow(new XWikiException(0, 0, "error"));
+        when(this.wikiDescriptorManager.exists("wiki")).thenReturn(true);
 
+        DocumentUserReference userReference = new DocumentUserReference(reference, true);
+        UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
+        assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. ",
+            userException.getMessage());
+        assertEquals(XWikiException.class, userException.getCause().getClass());
+    }
+
+    @Test
+    void existsWhenUnknownWiki() throws Exception
+    {
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        when(this.wikiDescriptorManager.exists("wiki")).thenReturn(false);
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
         assertFalse(this.userManager.exists(new DocumentUserReference(reference, true)));
+    }
 
-        assertEquals("Failed to check if document [wiki:space.user] holds an XWiki user or not. Considering it's not "
-            + "the case. Root error: [XWikiException: Error number 0 in 0: error]", logCapture.getMessage(0));
+    @Test
+    void existsWhenWikiDescriptorManagerError() throws Exception
+    {
+        XWiki xwiki = mock(XWiki.class);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+        when(this.wikiDescriptorManager.exists("wiki")).thenThrow(WikiManagerException.class);
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+        DocumentUserReference userReference = new DocumentUserReference(reference, true);
+        UserException userException = assertThrows(UserException.class, () -> this.userManager.exists(userReference));
+        assertEquals("Failed to determine if wiki [wiki] exists.", userException.getMessage());
+        assertEquals(WikiManagerException.class, userException.getCause().getClass());
     }
 }

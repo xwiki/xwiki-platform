@@ -54,6 +54,9 @@
 
 #-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
 #-# group's document?
+#-# 0: XWiki.XWikiAllGroup behaves like any other group and, by default, new users are added to it (you can change that using xwiki.users.initialGroups)
+#-# 1: All users are considered members of the XWiki.XWikiAllGroup group no matter what it actually contains
+#-# The default is 0.
 # xwiki.authentication.group.allgroupimplicit=0
 
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
@@ -93,32 +96,32 @@ xwiki.tags=1
 #-# Role hints that differentiate implementations of the various storage components. To add a new implementation for
 #-# one of the storages, implement the appropriate interface and declare it in a components.xml file (using a role-hint
 #-# other than 'default') and put its hint here.
-#
+
 #-# Stores with both "hibernate" and "file" support in XWiki Standard.
 #-# [Since 10.5RC1] The default is "file" for all of them.
 #-# 
 #-# [Since 9.0RC1] The default document content recycle bin storage.
 #-# This property is only taken into account when deleting a document and has no effect on already deleted documents.
 # xwiki.store.recyclebin.content.hint=file
-#-# The attachment storage.
+#-# The attachment content storage.
 # xwiki.store.attachment.hint=file
 #-# The attachment versioning storage. Use 'void' to disable attachment versioning.
 # xwiki.store.attachment.versioning.hint=file
 #-# [Since 9.9RC1] The default attachment content recycle bin storage.
 #-# This property is only taken into account when deleting an attachment and has no effect on already deleted documents.
 # xwiki.store.attachment.recyclebin.content.hint=file
+
+#-# Stores with only "hibernate" support in XWiki Standard
 #-# 
-#-# Stores with only "hibernate" support by default
-#-# 
-#-# The main (documents) storage. [Since 3.4M1] default is hibernate.
+#-# The main (documents) storage.
 # xwiki.store.main.hint=hibernate
-#-# The document versioning storage. [Since 3.4M1] default is hibernate.
+#-# The document versioning storage.
 # xwiki.store.versioning.hint=hibernate
-#-# The document recycle bin storage. [Since 3.4M1] default is hibernate.
+#-# The document recycle bin metadata storage.
 # xwiki.store.recyclebin.hint=hibernate
-#-# The attachment recycle bin storage. [Since 3.4M1] default is hibernate.
+#-# The attachment recycle bin metadata storage.
 # xwiki.store.attachment.recyclebin.hint=hibernate
-#-# [Since 3.4M1] The Migration manager.
+#-# The Migration manager.
 # xwiki.store.migration.manager.hint=hibernate
 
 #-# Whether the document recycle bin feature is activated or not
@@ -313,10 +316,9 @@ xwiki.superadminpassword=$xwikiCfgSuperadminPassword
 #-# 1: the authentication is done for each request.
 # xwiki.authentication.always=0
 
-#-# Cookie encryption keys. You SHOULD replace these values with any random string,
-#-# as long as the length is the same.
-xwiki.authentication.validationKey=totototototototototototototototo
-xwiki.authentication.encryptionKey=titititititititititititititititi
+#-# Cookie encryption keys. They are randomly generated and stored when not specified.
+# xwiki.authentication.validationKey=totototototototototototototototo
+# xwiki.authentication.encryptionKey=titititititititititititititititi
 
 #-# Comma separated list of domains for which authentication cookies are set. This
 #-# concerns mostly wiki farms. The exact meaning is that when a user logs in, if
@@ -325,8 +327,8 @@ xwiki.authentication.encryptionKey=titititititititititititititititi
 #-# is set for the exact domain name of the wiki.
 #-#
 #-# For example, suppose the cookiedomains is set to "mydomain.net". If I log in
-#-# on wiki1.xwiki.com, then the cookie will be set for the entire mydomain.net
-#-# domain, and if I visit wiki2.xwiki.com I will still be authenticated. If I log
+#-# on wiki1.mydomain.net, then the cookie will be set for the entire mydomain.net
+#-# domain, and if I visit wiki2.mydomain.net I will still be authenticated. If I log
 #-# in on wiki1.otherdomain.net, then I will only be authenticated on
 #-# wiki1.otherdomain.net, and not on wiki2.otherdomain.net.
 #-#
@@ -443,17 +445,6 @@ xwiki.plugins=$!xwikiCfgPlugins
 # xwiki.monitor.lastlistsize=20
 
 #---------------------------------------
-# GraphViz Plugin
-#
-
-#-# GraphViz plugin configuration. The GraphViz plugin is not configured by default.
-#-# To enable it, add "com.xpn.xwiki.plugin.graphviz.GraphVizPlugin" to the list of plugins
-#-# in the xwiki.plugins property.
-#-# Uncomment and set the locations of the Dot and Neato executables
-# xwiki.plugin.graphviz.dotpath=c:/Program Files/ATT/GraphViz/bin/dot.exe
-# xwiki.plugin.graphviz.neatopath=c:/Program Files/ATT/GraphViz/bin/neato.exe
-
-#---------------------------------------
 # Image Plugin
 #
 
@@ -520,10 +511,6 @@ xwiki.stats.default=0
 #-# Indicate if Filter module should be used when exporting a XAR in the export action.
 #-# By default Filter module is used, uncomment to use the old system.
 # xwiki.action.export.xar.usefilter=0
-#-# [Since 6.2]
-#-# Indicate if Filter module should be used when importing a XAR in the import action.
-#-# By default Filter module is used, uncomment to use the old system.
-# xwiki.action.import.xar.usefilter=0
 
 #-# [Since 12.0]
 #-# Indicate if the XAR packages should be optimized (from size point of view) by default.

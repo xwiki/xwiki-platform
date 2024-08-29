@@ -33,12 +33,15 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.DocumentEventType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -70,6 +73,13 @@ public class DocumentEventRecorder
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
+    @Inject
+    private EventFactory eventFactory;
+
     /**
      * Record the given event.
      * 
@@ -94,34 +104,34 @@ public class DocumentEventRecorder
         String eventType;
 
         if (event instanceof DocumentCreatedEvent) {
-            eventType = EventType.CREATE;
+            eventType = DocumentEventType.CREATE;
         } else if (event instanceof DocumentUpdatedEvent) {
-            eventType = EventType.UPDATE;
+            eventType = DocumentEventType.UPDATE;
         } else if (event instanceof DocumentDeletedEvent) {
-            eventType = EventType.DELETE;
+            eventType = DocumentEventType.DELETE;
             // When we receive a DELETE event, the given document is blank and does not have version & hidden tag
             // properly set.
             currentDoc.setVersion(originalDoc.getVersion());
             currentDoc.setHidden(originalDoc.isHidden());
         } else if (event instanceof CommentAddedEvent) {
-            eventType = EventType.ADD_COMMENT;
+            eventType = DocumentEventType.ADD_COMMENT;
         } else if (event instanceof CommentDeletedEvent) {
-            eventType = EventType.DELETE_COMMENT;
+            eventType = DocumentEventType.DELETE_COMMENT;
         } else if (event instanceof CommentUpdatedEvent) {
-            eventType = EventType.UPDATE_COMMENT;
+            eventType = DocumentEventType.UPDATE_COMMENT;
         } else if (event instanceof AttachmentAddedEvent) {
-            eventType = EventType.ADD_ATTACHMENT;
+            eventType = DocumentEventType.ADD_ATTACHMENT;
         } else if (event instanceof AttachmentDeletedEvent) {
-            eventType = EventType.DELETE_ATTACHMENT;
+            eventType = DocumentEventType.DELETE_ATTACHMENT;
         } else if (event instanceof AttachmentUpdatedEvent) {
-            eventType = EventType.UPDATE_ATTACHMENT;
+            eventType = DocumentEventType.UPDATE_ATTACHMENT;
         } else if (event instanceof AnnotationAddedEvent) {
-            eventType = EventType.ADD_ANNOTATION;
+            eventType = DocumentEventType.ADD_ANNOTATION;
         } else if (event instanceof AnnotationDeletedEvent) {
-            eventType = EventType.DELETE_ANNOTATION;
+            eventType = DocumentEventType.DELETE_ANNOTATION;
         } else if (event instanceof AnnotationUpdatedEvent) {
             // update annotation
-            eventType = EventType.UPDATE_ANNOTATION;
+            eventType = DocumentEventType.UPDATE_ANNOTATION;
         } else {
             return;
         }
@@ -133,7 +143,7 @@ public class DocumentEventRecorder
     {
         final String msgPrefix = "activitystream.event.";
 
-        DefaultEvent event = new DefaultEvent();
+        org.xwiki.eventstream.Event event = this.eventFactory.createRawEvent();
         event.setStream(streamName);
         event.setDocument(doc.getDocumentReference());
         event.setDate(doc.getDate());
@@ -143,7 +153,9 @@ public class DocumentEventRecorder
         event.setBody(msgPrefix + title);
         event.setDocumentVersion(doc.getVersion());
         // This might be wrong once non-altering events will be logged.
-        event.setUser(doc.getAuthorReference());
+        DocumentReference originalAuthor =
+            this.userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor());
+        event.setUser(originalAuthor);
         event.setHidden(doc.isHidden());
         event.setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, contextProvider.get()));
 

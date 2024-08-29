@@ -92,6 +92,9 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 
         setLocaleAndContentFields(attachment, solrDocument);
 
+        // Extract more metadata
+        this.extractorUtils.extract(attachmentReference, attachment, solrDocument);
+
         return true;
     }
 

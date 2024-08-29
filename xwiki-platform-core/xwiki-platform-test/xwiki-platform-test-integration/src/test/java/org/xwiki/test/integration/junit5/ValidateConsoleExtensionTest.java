@@ -59,7 +59,7 @@ import static org.xwiki.test.integration.junit5.ValidateConsoleExtension.SKIP_PR
  */
 public class ValidateConsoleExtensionTest
 {
-    private static class ValidateConsoleExtensionTestSetup implements BeforeAllCallback, AfterAllCallback
+    private static final class ValidateConsoleExtensionTestSetup implements BeforeAllCallback, AfterAllCallback
     {
         private static String skipValue;
 

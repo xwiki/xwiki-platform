@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -59,7 +60,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
     /**
      * Deletes the specified annotation.
      *
-     * @param space the space of the document to delete the annotation from
+     * @param spaceNames the space names of the document to delete the annotation from
      * @param page the name of the document to delete the annotation from
      * @param wiki the wiki of the document to delete the annotation from
      * @param id the id of the annotation to delete
@@ -69,12 +70,12 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
      * @throws XWikiRestException when failing to parse space
      */
     @DELETE
-    public AnnotationResponse doDelete(@PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationRequest request)
-        throws XWikiRestException
+    public AnnotationResponse doDelete(@PathParam("spaceName") @Encoded String spaceNames,
+        @PathParam("pageName") String page, @PathParam("wikiName") String wiki, @PathParam("id") String id,
+        AnnotationRequest request) throws XWikiRestException
     {
         try {
-            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(spaceNames), page);
 
             // Initialize the context with the correct value.
             updateContext(documentReference);
@@ -102,7 +103,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
     /**
      * Updates the specified annotation with the values of the fields in received collection.
      *
-     * @param space the space of the document to update the annotation from
+     * @param spaceNames the space names of the document to update the annotation from
      * @param page the name of the document to update the annotation from
      * @param wiki the wiki of the document to update the annotation from
      * @param id the id of the annotation to update
@@ -111,12 +112,12 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
      * @throws XWikiRestException when failing to parse space
      */
     @PUT
-    public AnnotationResponse doUpdate(@PathParam("spaceName") String space, @PathParam("pageName") String page,
-        @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationUpdateRequest updateRequest)
-        throws XWikiRestException
+    public AnnotationResponse doUpdate(@PathParam("spaceName") @Encoded String spaceNames,
+        @PathParam("pageName") String page, @PathParam("wikiName") String wiki, @PathParam("id") String id,
+        AnnotationUpdateRequest updateRequest) throws XWikiRestException
     {
         try {
-            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(spaceNames), page);
 
             // Initialize the context with the correct value.
             updateContext(documentReference);
@@ -137,6 +138,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             }
             Map<String, Object> annotationMetaData = getMap(updateRequest.getAnnotation());
 
+            this.handleTemporaryUploadedFiles(documentReference, annotationMetaData);
             // skip these fields as we don't want to overwrite them with whatever is in this map. Setters should be used
             // for these values or constructor
             Collection<String> skippedFields =
@@ -154,6 +156,7 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
             newAnnotation.setAuthor(getXWikiUser());
             // and update
             annotationService.updateAnnotation(documentName, newAnnotation);
+            this.cleanTemporaryUploadedFiles(documentReference);
             // and then return the annotated content, as specified by the annotation request
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, updateRequest);
             return response;

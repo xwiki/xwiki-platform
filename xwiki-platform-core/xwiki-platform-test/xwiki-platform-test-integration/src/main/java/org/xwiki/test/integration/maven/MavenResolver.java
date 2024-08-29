@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookup;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -89,6 +91,16 @@ public class MavenResolver
     /**
      * @return the version of the XWiki platform artifacts to download/resolve
      * @throws Exception if an error occurred during reading and parsing of the POM
+     * @since 16.2.0RC1
+     */
+    public String getCommonsVersion() throws Exception
+    {
+        return getPropertyFromCurrentPOM("commons.version");
+    }
+
+    /**
+     * @return the version of the XWiki platform artifacts to download/resolve
+     * @throws Exception if an error occurred during reading and parsing of the POM
      */
     public String getPlatformVersion() throws Exception
     {
@@ -103,11 +115,21 @@ public class MavenResolver
      */
     public String getPropertyFromCurrentPOM(String propertyName) throws Exception
     {
-        String propertyValue = getModelFromCurrentPOM().getProperties().getProperty(propertyName);
+        String propertyValue = getPropertiesFromCurrentPOM().getProperty(propertyName);
         if (propertyValue == null) {
             throw new Exception(String.format("Missing property [%s] in the current pom.xml", propertyName));
         }
         return propertyValue;
+    }
+
+    /**
+     * @return the resolved POM properties
+     * @throws Exception if the properties cannot be resolved
+     * @since 15.2RC1
+     */
+    public Properties getPropertiesFromCurrentPOM() throws Exception
+    {
+        return getModelFromCurrentPOM().getProperties();
     }
 
     /**
@@ -210,11 +232,9 @@ public class MavenResolver
         boolean resolveExtraJARs)
         throws Exception
     {
-        List<Artifact> artifacts = new ArrayList<>();
-        for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
-            Artifact artifact = artifactCoordinate.toArtifact(resolveVersion(artifactCoordinate, resolveExtraJARs));
+        List<Artifact> artifacts = resolveVersions(artifactCoordinates, resolveExtraJARs);
+        for (Artifact artifact : artifacts) {
             LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}]", artifact);
-            artifacts.add(artifact);
         }
         return artifacts;
     }
@@ -249,8 +269,15 @@ public class MavenResolver
         List<Artifact> artifacts = new ArrayList<>();
         Artifact currentPOMArtifact = new DefaultArtifact(model.getGroupId(), model.getArtifactId(),
             model.getPackaging(), model.getVersion());
+        // Don't include "test" dependencies as they should not be used to resolve extra jar artifact versions.
+        List<Dependency> normalizedDependencies = new ArrayList<>();
+        for (Dependency dependency : model.getDependencies()) {
+            if (!"test".equals(dependency.getScope())) {
+                normalizedDependencies.add(dependency);
+            }
+        }
         Collection<ArtifactResult> results = this.artifactResolver.getArtifactDependencies(currentPOMArtifact,
-            convertToArtifacts(model.getDependencies()));
+            convertToArtifacts(normalizedDependencies));
         for (ArtifactResult artifactResult : results) {
             artifacts.add(artifactResult.getArtifact());
         }
@@ -261,15 +288,16 @@ public class MavenResolver
      * Find the version to use if it's not specified. We look in the current Maven POM's dependencies to try to find
      * a matching artifact and get its version. If not, we default to the version of the current Maven POM module:
      * {@code getModelFromCurrentPOM().getVersion()}. Since resolving takes time and since it'll resolve
-     * SNAPSHOTs and it may not be what you want (you may have modifications done locally that you want to be used),
+     * SNAPSHOTs, and it may not be what you want (you may have modifications done locally that you want to be used),
      * we check if the {@code resolveExtraJARs} parameter is set or not.
      */
-    private String resolveVersion(ArtifactCoordinate artifactCoordinate, boolean resolveExtraJARs) throws Exception
+    private String resolveVersion(ArtifactCoordinate artifactCoordinate, boolean resolveExtraJARs,
+        Collection<Artifact> dependencies, String modelVersion)
     {
-        Model model = getModelFromCurrentPOM();
         String version = null;
-        if (resolveExtraJARs) {
-            for (Artifact dependencyArtifact : getDependencies(model)) {
+        // Only resolve the version if not specified, for performance reasons.
+        if (artifactCoordinate.getVersion() == null && resolveExtraJARs) {
+            for (Artifact dependencyArtifact : dependencies) {
                 if (dependencyArtifact.getGroupId().equals(artifactCoordinate.getGroupId())
                     && dependencyArtifact.getArtifactId().equals(artifactCoordinate.getArtifactId())
                     && dependencyArtifact.getExtension().equals(artifactCoordinate.getType()))
@@ -279,9 +307,48 @@ public class MavenResolver
                 }
             }
         }
-        if (version == null) {
-            version = model.getVersion();
+        if (artifactCoordinate.getVersion() == null && version == null) {
+            version = modelVersion;
         }
         return version;
+    }
+
+    private List<Artifact> resolveVersions(Collection<ArtifactCoordinate> artifactCoordinates, boolean resolveExtraJARs)
+        throws Exception
+    {
+        Model model = getModelFromCurrentPOM();
+        // Compute the dependencies once for performance reasons.
+        Collection<Artifact> dependencies = getDependencies(model);
+        List<Artifact> artifacts = new ArrayList<>();
+        for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
+            Artifact artifact = artifactCoordinate.toArtifact(resolveVersion(artifactCoordinate, resolveExtraJARs,
+                dependencies, model.getVersion()));
+            artifacts.add(artifact);
+        }
+        return artifacts;
+    }
+
+    /**
+     * @param value the value in which to resolve Maven properties
+     * @return the resolved value
+     */
+    public String replacePropertiesFromCurrentPOM(String value)
+    {
+        StringSubstitutor substitutor = new StringSubstitutor(new StringLookup()
+        {
+            @Override
+            public String lookup(String key)
+            {
+                try {
+                    return getPropertyFromCurrentPOM(key);
+                } catch (Exception e) {
+                    LOGGER.error("Failed to resolve Maven property [{}] in value [{}]", key, value, e);
+                }
+
+                return null;
+            }
+        });
+
+        return substitutor.replace(value);
     }
 }

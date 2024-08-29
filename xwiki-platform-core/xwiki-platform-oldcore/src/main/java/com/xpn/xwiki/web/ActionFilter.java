@@ -46,16 +46,16 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * XHTML form has only one target URL. In previous versions of XWiki this was accomplished using javascript code, with a
  * fall-back on a pseudo-dispatcher inside the {@link PreviewAction}, which was on obvious case of bad code design.
  * <p>
- * The filter dispatches requests based on the presence of a request parameter starting with <tt>action_</tt> followed
- * by the name of the struts action that should actually process the request. For example, the button that does
- * <tt>Save and Continue</tt> looks like:
+ * The filter dispatches requests based on the presence of a request parameter starting with {@code action_} followed
+ * by the name of the action that should actually process the request. For example, the button that does
+ * {@code Save and Continue} looks like:
  *
  * <pre>
  * &lt;input type=&quot;submit&quot; name=&quot;action_saveandcontinue&quot; value=&quot;...&quot;/&gt;
  * </pre>
  *
- * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
- * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
+ * As a result, when clicking the button, the request is not sent to the form's target ({@code preview}), but is
+ * actually forwarded internally to {@code /bin/saveandcontinue/The/Document}.
  *
  * @version $Id$
  * @since 1.8M1
@@ -131,12 +131,12 @@ public class ActionFilter implements Filter
     /**
      * Compose a new URL path based on the original request and the specified action. The result is relative to the
      * application context, so that it can be used with {@link HttpServletRequest#getRequestDispatcher(String)}. For
-     * example, calling this method with a request for <tt>/xwiki/bin/edit/Some/Document</tt> and <tt>action_save</tt>,
-     * the result is <tt>/bin/save/Some/Document</tt>.
+     * example, calling this method with a request for {@code /xwiki/bin/edit/Some/Document} and {@code action_save},
+     * the result is {@code /bin/save/Some/Document}.
      *
      * @param request the original request
-     * @param action the action parameter, starting with <tt>action_</tt>
-     * @return The rebuilt URL path, with the specified action in place of the original Struts action. Note that unlike
+     * @param action the action parameter, starting with {@code action_}
+     * @return The rebuilt URL path, with the specified action in place of the original action. Note that unlike
      *         the HTTP path, this does not contain the application context part.
      */
     private String getTargetURL(HttpServletRequest request, String action)
@@ -154,12 +154,12 @@ public class ActionFilter implements Filter
         String servletPath = request.getServletPath();
         path = XWiki.stripSegmentFromPath(path, servletPath);
 
-        // Third step, remove the struts mapping. This step is mandatory, so this filter will fail if the
-        // requested action was a hidden (default) 'view', like in '/bin/Main/'. This is OK, since forms
-        // don't use 'view' as a target.
+        // Third step, remove the action name. This step is mandatory, so this filter will fail if the requested
+        // action was a hidden (default) 'view', like in '/bin/Main/'. This is OK, since forms don't use 'view' as a
+        // target.
         int index = path.indexOf(PATH_SEPARATOR, 1);
 
-        // We need to also get rid of the wiki name in case of a XEM in usepath mode
+        // We need to also get rid of the wiki name in case of a XWiki instance in path-based mode.
         ConfigurationSource configuration =
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {

@@ -82,7 +82,7 @@ public class CompositeWikiConfigurationSource extends CompositeConfigurationSour
             try {
                 newSources.add(this.componentManager.getInstance(ConfigurationSource.class, wikiHint));
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to lookup configuration source with hint [%s]. It won't be used.", wikiHint,
+                this.logger.error("Failed to lookup configuration source with hint [{}]. It won't be used.", wikiHint,
                     e);
             }
         }

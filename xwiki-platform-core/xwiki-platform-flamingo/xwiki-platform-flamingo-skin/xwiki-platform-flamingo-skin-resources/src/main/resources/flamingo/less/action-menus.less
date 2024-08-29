@@ -21,6 +21,11 @@
 
   .navbar-nav {
     float: right;
+    &.navbar-left > li {
+      float: left;
+    }
+    // Should be explicitly defined as "&.navbar-right > li", but leaving this implicit (i.e. as it was)
+    // in order to not increase specificity and break any customizations
     > li {
       float: right;
     }
@@ -76,7 +81,9 @@
 }
 
 #globalsearch {
-
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
   margin: 0;
   padding: 0;
 
@@ -114,34 +121,36 @@
     border-radius: 0;
     border: 0;
     min-width: 0;
-    transition: width 0.3s, padding 0.3s;
+    transition: width 300ms ease-in-out, padding 300ms ease-in-out;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
 
-  // When the global search is close
-  &.globalsearch-close {
-    // The button is taking the normal values
-    .btn {
-      background-color: @navbar-default-bg;
-      color: @navbar-default-link-color;
-      border: 0;
-      // Except when it is hovering
-      &:hover,
-      &:focus {
-        background-color: @navbar-default-link-hover-bg;
-        color: @navbar-default-link-hover-color;
-        box-shadow: none;
-      }
-      &:active {
-        background-color: @navbar-default-link-active-bg;
-        color: @navbar-default-link-active-color;
-      }
+  // When the global search is closed
+  .btn[aria-expanded='false'] {
+    background-color: @navbar-default-bg;
+    color: @navbar-default-link-color;
+    border: 0;
+    // Except when it is hovering
+    &:hover,
+    &:focus {
+      background-color: @navbar-default-link-hover-bg;
+      color: @navbar-default-link-hover-color;
+      box-shadow: none;
+    }
+    &:active {
+      background-color: @navbar-default-link-active-bg;
+      color: @navbar-default-link-active-color;
+    }
+    // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
+    & + #headerglobalsearchinput { // we need to be that specific to be applied
+      width: 0;
+      padding: 0;
     }
 
-    // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
-    #headerglobalsearchinput { // we need to be that specific to be applied
-      padding: 0;
-      width: 0;
+    // Hides the search result when the focus is not on the search field.
+    & ~ .searchSuggest {
+      opacity: 0;
+      max-height: 0;
     }
   }
 }
@@ -163,10 +172,10 @@
     max-height: @navbar-height;
 
     > img {
-      @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
+      @avatar-size: floor((ceil((@navbar-height / 2)) / 2)) * 2;
       border-radius: @thumbnail-border-radius;
       height: @avatar-size;
-      margin-top: -@navbar-padding-vertical+@navbar-height/2-@avatar-size/2;
+      margin-top: -@navbar-padding-vertical + (@navbar-height / 2) - (@avatar-size / 2);
       vertical-align: middle;
       width: @avatar-size;
     }
@@ -217,7 +226,7 @@
     }
     > .dropdown-split-left {
       /* Display it closer to the menu toggle. */
-      padding-right: ceil(@navbar-padding-horizontal / 2);
+      padding-right: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Hide the caret used for extra small screens. */
         display: none;
@@ -245,7 +254,7 @@
     }
     > .dropdown-split-right {
       /* Display it closer to the menu label. */
-      padding-left: ceil(@navbar-padding-horizontal / 2);
+      padding-left: ceil((@navbar-padding-horizontal / 2));
       > .caret {
         /* Reset the left margin for the caret used on large screens. */
         margin-left: 0;
@@ -296,6 +305,7 @@
 
 #contentmenu {
   .text-right();
+  .flat-buttons();
 
   .dropdown {
     display: inline-block;
@@ -307,6 +317,44 @@
       padding: @font-size-large;
     }
   }
+  a.btn.disabled {
+    opacity: 1;
+    .text-muted;
+    background-color: transparent;
+  }
 
-  .flat-buttons();
+  .btn-group > dl.dropdown-menu {
+    & > dt.dropdown-header {
+      &.sr-only {
+        // Overwrite bootstrap default style that would take priority on .sr-only style
+        padding: 0;
+      }
+
+      // Use the bootstrap style for our semantic architecture
+      &:extend(li.dropdown-header);
+      font-weight: initial;
+    }
+
+    & > dd:not(:last-child) {
+      // Add a css separator under the section
+      padding-bottom: 10px;
+      border-bottom: 1px solid @dropdown-divider-bg ;
+      margin-bottom: 10px;
+    }
+
+    & > dd > ul {
+      // Remove default list style
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+
+      & > li > a {
+        // Use the bootstrap style for our semantic architecture
+        &:extend(.dropdown-menu > li > a);
+        &:hover, &:focus-within {
+          &:extend(.dropdown-menu > li > a:hover);
+        }
+      }
+    }
+  }
 }

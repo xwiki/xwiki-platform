@@ -23,8 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.index.TaskManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -49,26 +50,28 @@ import static org.xwiki.test.LogLevel.DEBUG;
 class MentionsCreatedEventListenerTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @InjectMockComponents
     private MentionsCreatedEventListener listener;
 
-    @Mock
-    private XWikiDocument document;
+    @MockComponent
+    private TaskManager taskManager;
 
     @MockComponent
-    private MentionsEventExecutor executor;
+    private RemoteObservationManagerContext remoteObservationManagerContext;
+
+    @Mock
+    private XWikiDocument document;
 
     @Test
     void onEvent()
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
-        DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Author");
         DocumentCreatedEvent event = new DocumentCreatedEvent(documentReference);
 
         when(this.document.getDocumentReference()).thenReturn(documentReference);
-        when(this.document.getAuthorReference()).thenReturn(authorReference);
+        when(this.document.getId()).thenReturn(42L);
         when(this.document.getVersion()).thenReturn("1.1");
 
         this.listener.onEvent(event, this.document, null);
@@ -78,6 +81,6 @@ class MentionsCreatedEventListenerTest
         assertEquals("Event [org.xwiki.bridge.event.DocumentCreatedEvent] received from [document] with data [null].",
             this.logCapture.getMessage(0));
 
-        verify(this.executor).execute(documentReference, authorReference, "1.1");
+        verify(this.taskManager).addTask("xwiki", 42, "1.1", "mention");
     }
 }

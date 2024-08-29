@@ -24,41 +24,59 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
-import org.xwiki.observation.remote.converter.EventConverterManager;
+import org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link DocumentEventConverter};
  * 
  * @version $Id$
  */
-public class DocumentEventConverterTest extends AbstractBridgedComponentTestCase
+@OldcoreTest
+@ComponentList(DocumentEventConverter.class)
+class DocumentEventConverterTest
 {
-    @Test
-    public void testConvertWithOriginalDocNull() throws Exception
-    {
-        EventConverterManager eventConverterManager = getComponentManager().getInstance(EventConverterManager.class);
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
+    @InjectMockComponents
+    private DefaultEventConverterManager converterManager;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @Test
+    void testConvertWithOriginalDocNull() throws Exception
+    {
         // local -> remote
 
         LocalEventData localEvent = new LocalEventData();
-        localEvent.setEvent(new DocumentUpdatedEvent(new DocumentReference("wiki","space","page")));
+        localEvent.setEvent(new DocumentUpdatedEvent(new DocumentReference("wiki", "space", "page")));
         localEvent.setSource(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        localEvent.setData(getContext());
+        localEvent.setData(this.oldcore.getXWikiContext());
 
-        RemoteEventData remoteEvent = eventConverterManager.createRemoteEventData(localEvent);
+        RemoteEventData remoteEvent = this.converterManager.createRemoteEventData(localEvent);
 
-        Assert.assertFalse(remoteEvent.getSource() instanceof XWikiDocument);
-        Assert.assertFalse(remoteEvent.getData() instanceof XWikiContext);
+        assertFalse(remoteEvent.getSource() instanceof XWikiDocument);
+        assertFalse(remoteEvent.getData() instanceof XWikiContext);
 
         // serialize/unserialize
         ByteArrayOutputStream sos = new ByteArrayOutputStream();
@@ -70,13 +88,13 @@ public class DocumentEventConverterTest extends AbstractBridgedComponentTestCase
 
         // remote -> local
 
-        LocalEventData localEvent2 = eventConverterManager.createLocalEventData(remoteEvent);
+        LocalEventData localEvent2 = this.converterManager.createLocalEventData(remoteEvent);
 
-        Assert.assertTrue(localEvent2.getSource() instanceof XWikiDocument);
-        Assert.assertTrue(localEvent2.getData() instanceof XWikiContext);
-        Assert.assertEquals("wiki", ((XWikiDocument) localEvent2.getSource()).getWikiName());
-        Assert.assertEquals("space", ((XWikiDocument) localEvent2.getSource()).getSpaceName());
-        Assert.assertEquals("page", ((XWikiDocument) localEvent2.getSource()).getPageName());
-        Assert.assertTrue(((XWikiDocument) localEvent2.getSource()).getOriginalDocument().isNew());
+        assertTrue(localEvent2.getSource() instanceof XWikiDocument);
+        assertTrue(localEvent2.getData() instanceof XWikiContext);
+        assertEquals("wiki", ((XWikiDocument) localEvent2.getSource()).getWikiName());
+        assertEquals("space", ((XWikiDocument) localEvent2.getSource()).getSpaceName());
+        assertEquals("page", ((XWikiDocument) localEvent2.getSource()).getPageName());
+        assertTrue(((XWikiDocument) localEvent2.getSource()).getOriginalDocument().isNew());
     }
 }

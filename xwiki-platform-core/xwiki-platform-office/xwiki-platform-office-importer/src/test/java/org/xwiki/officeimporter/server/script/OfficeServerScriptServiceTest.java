@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class OfficeServerScriptServiceTest
+class OfficeServerScriptServiceTest
 {
     private final static String ERROR_PRIVILEGES = "Inadequate privileges.";
 
@@ -75,16 +75,16 @@ public class OfficeServerScriptServiceTest
     private ExecutionContext executionContext;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
-    private void setUp()
+    void setUp()
     {
         when (this.execution.getContext()).thenReturn(executionContext);
     }
 
     @Test
-    public void startServer() throws OfficeServerException
+    void startServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -93,7 +93,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerForbidden() throws OfficeServerException
+    void startServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -104,7 +104,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerPrivileges() throws OfficeServerException
+    void startServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
@@ -115,7 +115,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void startServerError() throws OfficeServerException
+    void startServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -129,7 +129,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServer() throws OfficeServerException
+    void stopServer() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -138,7 +138,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerForbidden() throws OfficeServerException
+    void stopServerForbidden() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("subwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);
@@ -149,7 +149,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerPrivileges() throws OfficeServerException
+    void stopServerPrivileges() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(false);
@@ -160,7 +160,7 @@ public class OfficeServerScriptServiceTest
     }
 
     @Test
-    public void stopServerError() throws OfficeServerException
+    void stopServerError() throws OfficeServerException
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
         when(this.documentAccessBridge.hasProgrammingRights()).thenReturn(true);

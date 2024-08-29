@@ -49,19 +49,19 @@ like.unlike.error=Fehler beim Entfernen des "Gefällt mir".
 like.userprofile.menu="Gefällt mir" Seiten
 like.button.title=Anzahl der "Gefällt mir" auf der Seite: {0}
 like.button.title.like=Klicken Sie, um die aktuelle Seite zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
-### Missing: like.button.title.unlike=Click to unlike the current page. Number of likes on this page: {0}.
+like.button.title.unlike=Klicken Sie, um die aktuelle Seite nicht mehr zu "Liken". Anzahl der Likes auf dieser Seite: {0}.
 like.likers.empty=Niemandem gefällt diese Seite bisher.
 like.likers.number={0} Personen gefällt die Seite:
 like.likers.title={0} Gefällt mir
 like.livetable.column.title=Titel
-like.livetable.column.location=Standort
+like.livetable.column.location=Ort
 like.livetable.column.likes=Gefällt mir
-### Missing: like.configuration.heading=Like Preferences
+like.configuration.heading="Gefällt mir"-Einstellungen
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton="Gefällt mir" Schaltfläche immer anzeigen
 XWiki.Like.LikeConfigurationClass_alwaysDisplayButton.hint=Die "Gefällt mir" Schaltfläche immer anzeigen - selbst wenn der Nutzer kein Recht hat diese zu benutzen. Anschalten, um die Anzahl der "Gefällt mir" immer anzuzeigen.
 XWiki.Like.LikeConfigurationClass_cacheCapacity=Cache-Größe
 XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=Anzahl der "Gefällt mir"-Informationen im Cache. Sie müssen XWiki neustarten, damit veränderte Einstellungen angewendet werden.
-XWiki.Like.LikeConfigurationClass_enabled=Aktivieren der Gefällt mir-Funktion
+XWiki.Like.LikeConfigurationClass_enabled=Aktivieren der Gefällt-mir-Funktion
 XWiki.Like.LikeConfigurationClass_enabled.hint=Wenn diese Option nicht aktiviert ist, wird die Funktion "Gefällt mir" deaktiviert und Informationen zu "Likes" werden ausgeblendet.
 </content>
 </xwikidoc>

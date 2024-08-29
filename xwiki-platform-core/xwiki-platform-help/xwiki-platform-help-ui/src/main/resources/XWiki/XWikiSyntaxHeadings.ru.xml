@@ -1,0 +1,93 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ru">
+  <web>XWiki</web>
+  <name>XWikiSyntaxHeadings</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxHeadings</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редактирование =
+
+== Заголовки==
+
+=== 1.0 Headings ===
+
+|=Функциональность|=Синтаксис XWiki 1.0|=Результат
+|Стандартные заголовки|(((
+1 уровень 1
+1.1 уровень 2
+1.1.1 уровень 3
+1.1.1.1 уровень 4
+1.1.1.1.1 уровень 5
+1.1.1.1.1.1 уровень 6
+)))|(((
+= уровень 1 =
+== уровень 2 ==
+=== уровень 3 ===
+==== уровень 4 ====
+===== уровень 5 =====
+====== уровень 6 ======
+)))
+|Параметризованные заголовки|&lt;h1&gt;&lt;span style="color:blue"&gt;Заголовок&lt;/span&gt;&lt;/h1&gt;|(((
+(% style="color:blue" %)
+= заголовок=
+)))
+|Заголовки с синтаксисом XWiki|1.1.1 Заголовок с *полужирным*|(((=== Heading with **bold** ===)))
+
+=== 2.0 Headings ===
+
+|=Функциональность|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|Стандартные заголовки|((({{{
+= уровень 1 =
+== уровень 2 ==
+=== уровень 3 ===
+==== уровень 4 ====
+===== уровень 5 =====
+====== уровень 6 ======
+}}})))|(((
+= уровень 1 =
+== уровень 2 ==
+=== уровень 3 ===
+==== уровень 4 ====
+===== уровень 5 =====
+====== уровень 6 ======
+)))
+|Параметризованные заголовки|{{{(% style="color:blue" %)}}}= заголовок=|(((
+(% style="color:blue" %)
+= заголовок=
+)))
+|Заголовки с синтаксисом XWiki|{{{=== Заголовок с **полужирным** ===}}}|(((=== Заголовок с **полужирным** ===)))</content>
+</xwikidoc>

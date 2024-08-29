@@ -30,9 +30,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.tag.test.po.AddTagsPane;
 import org.xwiki.tag.test.po.TaggablePage;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.FormContainerElement;
@@ -40,14 +41,15 @@ import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
 import org.xwiki.test.ui.po.diff.EntityDiff;
+import org.xwiki.test.ui.po.diff.RawChanges;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the comparison of document versions.
@@ -148,7 +150,7 @@ public class CompareVersionsTest extends AbstractTest
         taggablePage.removeTag("foo");
 
         // Attach files.
-        AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         // TODO: Update this code when we (re)add support for uploading multiple files at once.
         // Version 2.1, 3.1, 4.1
         for (String fileName : new String[] {"SmallAttachment.txt", "SmallAttachment2.txt", "SmallAttachment.txt"}) {
@@ -238,13 +240,15 @@ public class CompareVersionsTest extends AbstractTest
         // Version summary.
         String today = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
         assertTrue(changesPane.getFromVersionSummary().startsWith(
-            "From version 1.1 >\nedited by Administrator\non " + today));
+            "From version 1.1\nedited by Administrator\non " + today));
         assertTrue(changesPane.getToVersionSummary().startsWith(
-            "To version < " + currentVersion + "\nedited by Alice\non " + today));
+            "To version " + currentVersion + "\nedited by Alice\non " + today));
         assertEquals("Change comment: Deleted object", changesPane.getChangeComment());
 
+        RawChanges rawChanges = changesPane.getRawChanges();
+
         // Diff summary.
-        DocumentDiffSummary diffSummary = changesPane.getDiffSummary();
+        DocumentDiffSummary diffSummary = rawChanges.getDiffSummary();
         assertThat(Arrays.asList("Page properties", "Attachments", "Objects", "Class properties"),
             containsInAnyOrder(diffSummary.getItems().toArray()));
         assertEquals("(5 modified, 0 added, 0 removed)", diffSummary.getPagePropertiesSummary());
@@ -258,10 +262,10 @@ public class CompareVersionsTest extends AbstractTest
 
         // Diff details.
         assertThat(Arrays.asList("Page properties", "SmallAttachment.txt", "XWiki.JavaScriptExtension[0]",
-            "XWiki.XWikiComments[0]", "age"), containsInAnyOrder(changesPane.getChangedEntities().toArray()));
+            "XWiki.XWikiComments[0]", "age"), containsInAnyOrder(rawChanges.getChangedEntities().toArray()));
 
         // Page properties changes.
-        EntityDiff pageProperties = changesPane.getEntityDiff("Page properties");
+        EntityDiff pageProperties = rawChanges.getEntityDiff("Page properties");
         assertThat(Arrays.asList("Title", "Parent", "Author", "Tags", "Content"),
             containsInAnyOrder(pageProperties.getPropertyNames().toArray()));
         assertDiff(pageProperties.getDiff("Title"), "-<del>T</del>est",
@@ -274,7 +278,7 @@ public class CompareVersionsTest extends AbstractTest
             "-<del>th</del>r<del>ee</del>", "+<ins>**</ins>two<ins>**</ins>", "+<ins>fou</ins>r");
 
         // Attachment changes.
-        EntityDiff attachmentDiff = changesPane.getEntityDiff("SmallAttachment.txt");
+        EntityDiff attachmentDiff = rawChanges.getEntityDiff("SmallAttachment.txt");
         assertThat(Arrays.asList("Author", "Size", "Content"),
             containsInAnyOrder(attachmentDiff.getPropertyNames().toArray()));
         assertDiff(attachmentDiff.getDiff("Author"), "+XWiki.Admin");
@@ -282,7 +286,7 @@ public class CompareVersionsTest extends AbstractTest
         assertDiff(attachmentDiff.getDiff("Content"), "+This is a small attachment.");
 
         // Object changes.
-        EntityDiff jsxDiff = changesPane.getEntityDiff("XWiki.JavaScriptExtension[0]");
+        EntityDiff jsxDiff = rawChanges.getEntityDiff("XWiki.JavaScriptExtension[0]");
         assertThat(Arrays.asList("Caching policy", "Name", "Use this extension", "Code"),
             containsInAnyOrder(jsxDiff.getPropertyNames().toArray()));
         assertDiff(jsxDiff.getDiff("Caching policy"), "+long");
@@ -291,7 +295,7 @@ public class CompareVersionsTest extends AbstractTest
         assertDiff(jsxDiff.getDiff("Code"), "+var tmp = alice;", "+alice = 2 * bob;", "+bob = tmp;");
 
         // Comment changes.
-        EntityDiff commentDiff = changesPane.getEntityDiff("XWiki.XWikiComments[0]");
+        EntityDiff commentDiff = rawChanges.getEntityDiff("XWiki.XWikiComments[0]");
         assertThat(Arrays.asList("Author", "Date", "Comment"),
             containsInAnyOrder(commentDiff.getPropertyNames().toArray()));
         assertDiff(commentDiff.getDiff("Author"), "+XWiki.Alice");
@@ -299,7 +303,7 @@ public class CompareVersionsTest extends AbstractTest
         assertDiff(commentDiff.getDiff("Comment"), "+first line", "+line in between", "+second line");
 
         // Class property changes.
-        EntityDiff ageDiff = changesPane.getEntityDiff("age");
+        EntityDiff ageDiff = rawChanges.getEntityDiff("age");
         assertThat(Arrays.asList("Name", "Number", "Pretty Name", "Size", "Number Type"),
             containsInAnyOrder(ageDiff.getPropertyNames().toArray()));
         assertDiff(ageDiff.getDiff("Name"), "+age");
@@ -317,7 +321,7 @@ public class CompareVersionsTest extends AbstractTest
         testPage = getUtil().gotoPage(getTestClassName(), pageName);
         HistoryPane historyTab = testPage.openHistoryDocExtraPane();
         String currentVersion = historyTab.getCurrentVersion();
-        assertTrue(historyTab.compare(currentVersion, currentVersion).getChangesPane().hasNoChanges());
+        assertTrue(historyTab.compare(currentVersion, currentVersion).getChangesPane().getRawChanges().hasNoChanges());
     }
 
     /**
@@ -328,7 +332,7 @@ public class CompareVersionsTest extends AbstractTest
         testPage = getUtil().gotoPage(getTestClassName(), pageName);
         ChangesPane changesPane =
             testPage.openHistoryDocExtraPane().showMinorEdits().compare("1.4", "1.5").getChangesPane();
-        EntityDiff jsxDiff = changesPane.getEntityDiff("XWiki.JavaScriptExtension[0]");
+        EntityDiff jsxDiff = changesPane.getRawChanges().getEntityDiff("XWiki.JavaScriptExtension[0]");
         assertDiff(jsxDiff.getDiff("Code"), "@@ -1,3 +1,3 @@", " var tmp = alice;", "-alice = bob;",
             "+alice = <ins>2 * </ins>bob;", " bob = tmp;");
     }

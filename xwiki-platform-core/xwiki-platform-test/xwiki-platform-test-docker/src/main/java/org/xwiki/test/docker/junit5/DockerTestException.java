@@ -44,8 +44,8 @@ public class DockerTestException extends Exception
     }
 
     /**
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt>
-     *            value is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A {@code null}
+     *            value is permitted, and indicates that the cause is nonexistent or unknown
      */
     public DockerTestException(Throwable cause)
     {
@@ -56,8 +56,8 @@ public class DockerTestException extends Exception
      * Constructs a new exception with the specified detail message and cause.
      *
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
-     *            permitted, and indicates that the cause is nonexistent or unknown
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A {@code null}
+     *            value is permitted, and indicates that the cause is nonexistent or unknown
      */
     public DockerTestException(String message, Throwable cause)
     {

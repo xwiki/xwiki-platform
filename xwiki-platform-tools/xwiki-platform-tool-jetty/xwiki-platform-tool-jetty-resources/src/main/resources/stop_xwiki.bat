@@ -19,7 +19,7 @@ REM Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
-REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+REM The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if not defined JETTY_STOP_PORT (
   REM Alternatively, it can be passed to this script as the first argument
   set JETTY_STOP_PORT=%1
@@ -40,7 +40,7 @@ set XWIKI_DATA_DIR=${xwikiDataDir}
 
 REM Specify Jetty's home and base directories
 set JETTY_HOME=jetty
-set JETTY_BASE=%XWIKI_DATA_DIR%\jetty
+set JETTY_BASE=.
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BASE%"
 
 REM Specify port and key to stop a running Jetty instance

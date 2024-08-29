@@ -1,0 +1,192 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.AdminTranslations" locale="uk">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Адміністрування
+administration.title.page=Адміністрування сторінки
+administration.title.wiki=Адміністрування Вікі
+administration.title.global=Глобальне адміністрування
+administration.sectionTitle=Адміністрування: {0}
+administration.sectionTitle.page=Адміністрування сторінки: {0}
+administration.sectionTitle.wiki=Адміністрування Вікі: {0}
+administration.sectionTitle.global=Глобальне адміністрування: {0}
+administration.menu.label=Розділи адміністрування.
+administration.menu.search.hint=Шукати...
+administration.menu.search.noResults=Немає результатів.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Якщо встановлено значення "Так", то на адресу електронної пошти, вказану під час заповнення реєстраційної форми, буде надіслано електронний лист.
+XWiki.XWikiPreferences_validation_email_content.hint=Шаблон електронного листа, який буде надіслано користувачам для підтвердження їхньої адреси електронної пошти.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Шаблон електронного листа, який надсилається після того, як користувач підтвердить свій обліковий запис, натиснувши посилання для підтвердження в першому отриманому електронному листі.
+XWiki.XWikiPreferences_invitation_email_content.hint=Шаблон електронного листа, який буде надіслано користувачам, яких запросили зареєструватися.
+XWiki.Registration_heading.hint=Це рядок у верхній частині сторінки, який бачать люди, які реєструються, і коли вони щойно зареєструвалися. Допускається використання коду синтаксису Velocity та wiki.
+XWiki.Registration_welcomeMessage.hint=Це відображається, лише коли користувачі заповнюють форму. Допускається використання коду синтаксису Velocity та wiki.
+XWiki.Registration_loginButton_enabled.hint=Коли користувач зареєструвався, ми надаємо йому кнопку, яку він може натиснути, яка опублікує його ім’я користувача та пароль у дії входу, і він одразу ввійде в систему. Однак це спричиняє повернення імені користувача та пароля в HTML, що може бути неприйнятним залежно від ваших потреб безпеки.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Якщо ввімкнуто кнопку входу, ви можете мати фрагмент коду JavaScript, який виконує натискання кнопку входу для користувача.
+XWiki.Registration_defaultRedirect.hint=Це URL-адреса, на яку користувач буде переспрямований після натискання кнопки входу, якщо параметр xredirect не вказано. Допускається використання коду Velocity.
+XWiki.Registration_requireCaptcha.hint=Встановіть це значення true, щоб вимагати від користувача проходження CAPTCHA для реєстрації.
+XWiki.Registration_registrationSuccessMessage.hint=Це відображається користувачеві, коли він успішно зареєструвався. Допускається використання коду синтаксису Velocity та wiki.
+XWiki.Registration_passwordLength.hint=Мінімальна довжина пароля. Довший пароль більш безпечний, рекомендується використовувати понад 6 символів.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Якщо обрано, користувач змушений створити пароль принаймні з одним символом у нижньому регістрі.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Якщо обрано, користувач змушений створити пароль принаймні з одним символом у верхньому регістрі.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Якщо обрано, користувач змушений створити пароль принаймні з одним числом.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Якщо обрано, користувач змушений створити пароль принаймні з одним символом.
+
+# Look &amp; Feel Sections
+admin.themes=Теми
+admin.themes.description=Налаштування кольорів та тем піктограм, скіну та логотипу.
+admin.colorthemes.local=Локальні
+admin.colorthemes.global=Загальні
+XWiki.XWikiPreferences_showannotations.hint=Показувати розділ приміток на макеті сторінки.
+XWiki.XWikiPreferences_showcomments.hint=Показувати розділ коментарів на макеті сторінки.
+XWiki.XWikiPreferences_showattachments.hint=Показувати розділ вкладень на макеті сторінки.
+XWiki.XWikiPreferences_showhistory.hint=Показувати розділ історії на макеті сторінки.
+XWiki.XWikiPreferences_showinformation.hint=Показувати розділ інформації на макеті сторінки.
+XWiki.XWikiPreferences_title.hint=Визначте формат заголовка сторінки так, як його бачать браузери.
+XWiki.XWikiPreferences_meta.hint=Визначте метадані, що додадуться до кожної сторінки, вказавши опис сторінки, автора, ключові слова тощо.
+XWiki.XWikiPreferences_webcopyright.hint=Визначте інформацію, що відображатиметься в розділі авторських прав нижнього колонтитула.
+XWiki.XWikiPreferences_version.hint=Визначте інформацію, що відображатиметься в розділі версії нижнього колонтитула.
+XWiki.XWikiPreferences_skin.hint=Вкажіть використовуваний скін за умовчанням. Це може бути скін файлової системи, наприклад «flamingo», або спеціальний скін сторінки, наприклад "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Укажіть тему піктограми, яка буде використовуватися за умовчанням.
+XWiki.XWikiPreferences_colorTheme.hint=Укажіть кольорову тему, яка використовуватиметься за умовчанням.
+
+# Editing Sections
+admin.edit=Редагування
+admin.edit.description=Налаштування режиму редагування, редактор WYSIWYG і доступний синтаксис.
+admin.title=Назва
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Заборонити користувачам створювати вікі-сторінки з порожнім заголовком.
+XWiki.XWikiPreferences_editor.hint=Виберіть тип редактора, який буде використовуватися за умовчанням для редагування вмісту сторінки.
+XWiki.XWikiPreferences_editcomment.hint=Дозволити введення повідомлення під час створення нової версії сторінки.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Сторінка не буде збережена після кожної внесеної зміни, доки не буде надано коротке повідомлення про зміни.
+XWiki.XWikiPreferences_minoredit.hint=Дозволити сторінкам мати основні (x.1) і незначні (1.x) версії. Незначні версії можна переглянути за допомогою кнопки "Показати незначні зміни" у розділі сторінки "Історія".
+admin.wysiwyg.description=Вибір редактора WYSIWYG за умовчанням і його налаштування.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Синтаксис розмітки, що використовується за умовчанням для вмісту сторінки під час створення нової вікі-сторінки.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Увімкніть багатомовний режим, якщо ваша вікі містить вміст кількома мовами. Це дозволить вашим користувачам перекладати вікі-сторінки та переглядати інтерфейс мовою, яку вони вибирають.
+XWiki.XWikiPreferences_languages.hint=Виберіть мови, на яких буде доступний інтерфейс. Користувачі зможуть перекладати сторінки вашої вікі будь-якою з цих мов (якщо багатомовний режим увімкнено).
+XWiki.XWikiPreferences_default_language.hint=Виберіть мову вікі за умовчанням
+XWiki.XWikiPreferences_dateformat.hint=Визначте формат відображення дат (наприклад, дату створення сторінки)
+XWiki.XWikiPreferences_timezone.hint=Глобально встановіть часовий пояс для дат
+
+# Import Section
+administration.section.import.hint=Почніть із завантаження нового пакета або вибору пакета зі списку доступних пакетів. Праворуч відображатиметься вміст вибраного пакета разом із параметрами імпорту.
+
+# Export Section
+administration.section.export.pages=Сторінки
+administration.section.export.pages.all=Усі сторінки
+administration.section.export.withHistory.hint=Додати історію сторінки в експорт. Інакше експортується лише остання версія сторінки.
+administration.section.export.targetXWikiVersion=Цільова версія XWiki
+administration.section.export.targetXWikiVersion.hint=Версія XWiki, куди потрібно імпортувати сторінки. Ваша поточна версія: {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 та вище
+administration.section.export.targetXWikiVersion.below12=Нижче 12.0
+administration.section.export.packageName.hint=Ім'я файлу, яке використовується під час генерації архіву з експортованими вікі-сторінками.
+administration.section.export.moreOptions=Додаткові опції
+administration.section.export.lessOptions=Менше опцій
+administration.section.export.description.hint=Опис пакета, що відображається під час імпортування пакета.
+administration.section.export.author.hint=Автор пакета, що відображається під час імпортування пакета.
+administration.section.export.licence.hint=Ліцензія вмісту. Напр.: LGPL, GPLV2 тощо.
+administration.section.export.version.hint=Версія пакета, що зберігається в дескрипторе пакета.
+administration.section.export.backupPack.hint=Зберігати автора сторінки під час імпорту сторінок. Ця опція не впливає на експортований вміст і може бути змінена перед імпортом.
+
+# Users Section
+administration.section.users.enableUser.inProgress=Увімкнення облікового запису користувача...
+administration.section.users.enableUser.done=Обліковий запис користувача ввімкнено
+administration.section.users.enableUser.failed=Не вдалося ввімкнути обліковий запис користувача
+administration.section.users.disableUser.inProgress=Вимкнення облікового запису користувача...
+administration.section.users.disableUser.done=Обліковий запис користувача вимкнено
+administration.section.users.disableUser.failed=Не вдалося вимкнути обліковий запис користувача
+administration.section.users.deleteUser.confirmationMessage=Користувача {0} буде видалено та вилучено з усіх {1}груп{2}, до яких він належав. Ви впевнені, що бажаєте продовжити?
+administration.section.users.deleteUser.programmingRightsWarning=Користувач, якого ви збираєтесь видалити, має права на програмування та є останнім автором {0}{1,choice,1#1 сторінки|1&lt;{1} сторінок}{2}. Якщо {1,choice,1#ця сторінка має|1&lt;ці сторінки мають} скрипти, які вимагають прав програмування, то ці скрипти перестануть працювати, якщо ви видалите користувача, не замінивши автора.
+administration.section.users.deleteUser.scriptRightsWarning=Користувач, якого ви збираєтеся видалити, має права на виконання скрипту і є останнім автором {0}{1,choice,1#1 сторінки|1&lt;{1} сторінок}{2}. Скрипти на {1,choice,1#цій сторінці|1&lt;цих сторінках} можуть перестати працювати, якщо ви видалите користувача, не замінивши автора.
+administration.section.users.deleteUser.newAuthor=Новий автор
+administration.section.users.deleteUser.newAuthor.hint=Виберіть користувача з правами {0} або залиште це поле порожнім, якщо ви не бажаєте замінити автора.
+administration.section.users.deleteUser.newAuthor.error=У вибраного користувача немає прав {0}!
+administration.section.users.deleteUser.newAuthor.programming=програмування
+administration.section.users.deleteUser.newAuthor.script=скрипт
+admin.usersgroups.extensionrights=Права розширення
+
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=Видалення учасника з групи
+administration.section.groups.deleteUserFromGroup.success=Учасника успішно видалено з групи
+administration.section.groups.deleteUserFromGroup.failure=Не вдалося видалити учасника з групи
+
+# Other Category
+admin.other=Інше
+admin.other.description=Різні налаштування для розширень.
+administration.section.analytics.status=Статус
+administration.section.analytics.status.hint=Визначте, чи відстеження в Google Analytics™ активне чи ні
+
+# Social category
+admin.social=Соціальні
+admin.social.description=Налаштування соціальних функцій.
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Відображення в розділі
+XWiki.ConfigurableClass_heading=Заголовок
+XWiki.ConfigurableClass_configurationClass=Клас налаштування
+XWiki.ConfigurableClass_linkPrefix=Префікс посилання
+XWiki.ConfigurableClass_propertiesToShow=Властивості для відображення
+XWiki.ConfigurableClass_codeToExecute=Код для виконання
+XWiki.ConfigurableClass_iconAttachment=Піктограма вкладення
+XWiki.ConfigurableClass_displayInCategory=Відображення в категорії
+XWiki.ConfigurableClass_displayBeforeCategory=Відображення перед категорією
+XWiki.ConfigurableClass_categoryIcon=Піктограма категорії
+XWiki.ConfigurableClass_scope=Область видимості
+XWiki.ConfigurableClass_scope_WIKI=Вікі
+XWiki.ConfigurableClass_scope_SPACE=Поточний простір
+XWiki.ConfigurableClass_scope_ALL_SPACES=Всі простори
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Вікі та всі простори
+XWiki.ConfigurableClass_sectionOrder=Порядок розділу
+
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Якщо встановлено значення "Так", користувачі не зможуть увійти в систему, не ввівши токен, який раніше було надіслано електронною поштою.
+administration.section.users.deleteUser.markInactiveMessage=Замість того, щоб видаляти користувачів, ви можете позначити їх профілі як неактивні. Це не дозволить їм увійти в систему та збереже права доступу, пов'язані з написаними ними скриптами.
+
+## Deprecated since 11.8RC1
+administration.section.users.deleteUser.markDisabledMessage=Замість того, щоб видаляти користувачів, ви можете вимкнути їх профілі. Це не дозволить їм увійти в систему та збереже права доступу, пов'язані з написаними ними скриптами.
+XWiki.Registration_liveValidation_enabled.hint=Встановіть для цього значення false, щоб вимкнути активну перевірку коду JavaScript (поля все одно перевірятимуться на сервері).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Перевірка в режимі реального часу показує користувачам повідомлення про те, що вони правильно заповнили поле. Це повідомлення, яке вони отримають, якщо його не перевизначено для певного поля. Допускається використання коду Velocity.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

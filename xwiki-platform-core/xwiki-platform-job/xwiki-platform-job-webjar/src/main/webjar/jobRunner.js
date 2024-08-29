@@ -28,22 +28,22 @@ define(['jquery'], function($) {
       var promise = $.post(request.url, request.data);
 
       // Automated progress and failure
-      promise.done(onProgress).fail(onFailure);
+      promise.then(onProgress, onFailure);
 
       return promise;
     };
 
-    var onFailure = $.proxy(promise.reject, promise);
+    var onFailure = promise.reject.bind(promise);
 
     var refresh = function(job) {
       var request = config.createStatusRequest(job.id);
-      $.get(request.url, request.data).done(onProgress).fail(onFailure);
+      $.get(request.url, request.data).then(onProgress, onFailure);
     };
 
     var onProgress = function(job) {
       if (job && job.id && job.state && job.progress) {
         if (job.state == 'WAITING') {
-          promise.notify(job, $.proxy(answerJobQuestion, job));
+          promise.notify(job, answerJobQuestion.bind(job));
 
           // Restart the progress if the question timeout is reached
           var timeout = job.questionTimeLeft;
@@ -89,14 +89,14 @@ define(['jquery'], function($) {
       var promise = $.Deferred();
       var callback = createCallback(config, promise);
       var request = config.createStatusRequest(jobId);
-      $.get(request.url, request.data).done(callback.onProgress).fail(callback.onFailure);
+      $.get(request.url, request.data).then(callback.onProgress, callback.onFailure);
       return promise;
     };
 
     this.run = function(url, data) {
       var promise = $.Deferred();
       var callback = createCallback(config, promise);
-      $.post(url, data).done(callback.onProgress).fail(callback.onFailure);
+      $.post(url, data).then(callback.onProgress, callback.onFailure);
       return promise;
     };
 

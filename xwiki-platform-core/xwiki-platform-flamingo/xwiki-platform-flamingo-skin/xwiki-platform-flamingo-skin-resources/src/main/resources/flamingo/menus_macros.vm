@@ -31,7 +31,9 @@
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)
-  <nav class="navbar navbar-default actionmenu">
+  ## Set as an HTML header for accessibility best practices.
+  <header class="navbar navbar-default actionmenu"
+  aria-label="$escapetool.xml($services.localization.render('core.menu.navbar.label'))">
     <div class="container-fluid">
       ## Brand and toggle get grouped for better mobile display
       <div class="navbar-header">
@@ -49,15 +51,14 @@
 #macro(xwikitopmenuend)
       </div>## /.navbar-collapse
     </div> ## / container-fluid
-  </nav>
+  </header>
 #end
 
 ###
 ###    Toplevel Left Menu
 ###
 #macro(xwikitopmenuleftstart)
-  <ul class="nav navbar-nav navbar-left">
-    #submenuseparator()
+  <ul class='nav navbar-nav navbar-left'>
 #end
 
 ###
@@ -98,7 +99,7 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+  <dd class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
     ## The menu label. On large screens (tablet and desktop) the label is a link that triggers the default menu action
     ## (e.g. navigation) and the menu is opened using a separated caret. On extra small screens (phones) the label opens
     ## the menu and the default menu action is the first item in the menu.
@@ -142,7 +143,10 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="$!class"><a href="$actionurl" #if(!$stringtool.isBlank($linkid))id="$linkid"#end title="$linkTitle" $!extraAttributes>$services.icon.renderHTML($icon) $linkName</a></li>
+  <li #if("$!class" != '')class="$!class"#end>
+    <a href="$actionurl" #if(!$stringtool.isBlank($linkid))id="$linkid"#end title="$escapetool.xml($linkTitle)"
+      $!extraAttributes>$services.icon.renderHTML($icon) $escapetool.xml($linkName)</a>
+  </li>
 #end
 
 ###
@@ -168,6 +172,16 @@
 ###
 #macro(submenuseparator)
   <li class="divider" role="separator"></li>
+#end
+
+###
+### Action menu separator
+###
+#macro(xwikiactionmenuseparator)
+    </ul>
+  </dd>
+  <dd>
+    <ul>
 #end
 
 ###

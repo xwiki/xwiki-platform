@@ -21,15 +21,18 @@ package org.xwiki.eventstream.internal;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.RecordableEvent;
 import org.xwiki.eventstream.UntypedRecordableEvent;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.jgroups.util.Util.assertEquals;
-import static org.jgroups.util.Util.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,27 +42,35 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.6RC1
  */
-public class DefaultUntypedRecordableEventConverterTest
+@ComponentTest
+class DefaultUntypedRecordableEventConverterTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<DefaultUntypedRecordableEventConverter> mocker =
-            new MockitoComponentMockingRule<>(DefaultUntypedRecordableEventConverter.class);
+    @InjectMockComponents
+    private DefaultUntypedRecordableEventConverter converter;
+
+    @MockComponent
+    private EventFactory eventFactory;
+
+    @BeforeEach
+    void beforeEach()
+    {
+        when(this.eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
+    }
 
     @Test
-    public void getSupportedEvents() throws Exception
+    void getSupportedEvents() throws Exception
     {
-        List<RecordableEvent> supportedEvents = this.mocker.getComponentUnderTest().getSupportedEvents();
+        List<RecordableEvent> supportedEvents = this.converter.getSupportedEvents();
 
         assertTrue(supportedEvents.get(0).matches(new DefaultUntypedRecordableEvent()));
     }
 
     @Test
-    public void convert() throws Exception
+    void convert() throws Exception
     {
         UntypedRecordableEvent event = mock(UntypedRecordableEvent.class);
         when(event.getEventType()).thenReturn("some type");
-        Event result = mocker.getComponentUnderTest().convert(event, "source", "data");
+        Event result = this.converter.convert(event, "source", "data");
         assertEquals("some type", result.getType());
     }
-
 }

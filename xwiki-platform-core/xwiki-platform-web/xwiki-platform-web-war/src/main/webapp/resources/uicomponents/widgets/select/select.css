@@ -6,7 +6,7 @@
 
 .xwiki-select-options {
   border: 1px solid #CCC;
-  border-radius: 4px;
+  border-radius: 7px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
   padding: 5px;
   overflow-x: hidden;
@@ -45,18 +45,30 @@
   vertical-align: top;
 }
 
+.xwiki-select-3-columns .xwiki-select-option {
+  width: 32%;
+}
+
+.xwiki-select-3-columns .xwiki-select-option .xHint {
+  display: none;
+}
+
+.xwiki-select-3-columns .xwiki-select-option > div {
+  vertical-align: middle;
+}
+
+.xwiki-select-options > ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+}
+
+.xwiki-select-options > ul > label {
+  flex-basis: 100%;
+}
+
 .xwiki-select-options > ul > li {
-  clear: both;
-}
-
-/* Make sure we create a new line every 2 items (like a grid) */
-.xwiki-select-option:nth-child(2n+1) {
-  clear: both;
-}
-
-.xwiki-select-option-selected {
-  background-color: $theme.highlightColor;
-  border: 1px dotted #CCC;
+  flex-basis: 50%;
 }
 
 .xwiki-select-option, .xwiki-select-option > label {
@@ -78,16 +90,6 @@
 .xwiki-select-option-icon > img{
   height: 20px;
   width: 20px;
-}
-
-.xwiki-select-option:hover {
-  background-color: $theme.highlightColor;
-}
-
-.xwiki-select ul {
-  list-style-type: none;
-  margin: 0;
-  padding-left: 0;
 }
 
 .skin-colibri .xwiki-select-option {

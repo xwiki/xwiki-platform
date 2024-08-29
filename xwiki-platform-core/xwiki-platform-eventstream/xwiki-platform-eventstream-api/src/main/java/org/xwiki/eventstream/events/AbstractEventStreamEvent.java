@@ -22,7 +22,7 @@ package org.xwiki.eventstream.events;
 import java.io.Serializable;
 
 /**
- * Abstract class for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
+ * Abstract class for every event that is related to the event store.
  *
  * @since 9.6RC1
  * @version $Id$

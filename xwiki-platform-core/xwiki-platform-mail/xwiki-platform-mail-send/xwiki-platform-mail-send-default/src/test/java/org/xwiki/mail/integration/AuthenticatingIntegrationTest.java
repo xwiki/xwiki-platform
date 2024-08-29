@@ -119,7 +119,7 @@ public class AuthenticatingIntegrationTest extends AbstractMailIntegrationTest
     private MockitoComponentManager componentManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private MailSenderConfiguration configuration;
 

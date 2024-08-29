@@ -19,8 +19,6 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents the Super Admin user reference, i.e. a virtual user that is not logged in. If you need to verify
  * if a given UserReference is the Guest user, you should use {@code if (myRef == GuestUserReference.INSTANCE)}.
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public final class GuestUserReference implements UserReference
 {
     /**

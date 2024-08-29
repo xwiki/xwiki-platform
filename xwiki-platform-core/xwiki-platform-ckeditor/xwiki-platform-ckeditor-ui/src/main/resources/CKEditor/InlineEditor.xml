@@ -1,0 +1,479 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.InlineEditor" locale="">
+  <web>CKEditor</web>
+  <name>InlineEditor</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>CKEditor.InlineEditor</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>58c55f7c-acf0-440f-888d-1d1f045ba322</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('xwiki-ckeditor-inline', ['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
+  var loadCSS = function(url) {
+    $('&lt;link&gt;').attr({
+      type: 'text/css',
+      rel: 'stylesheet',
+      href: url
+    }).appendTo('head');
+  };
+
+  var css = [
+    // Styles for the editor UI (tool bar, dialogs, etc.).
+    new XWiki.Document('EditSheet', 'CKEditor').getURL('ssx'),
+    // Custom styles for the edited content.
+    new XWiki.Document('ContentSheet', 'CKEditor').getURL('ssx'),
+    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins',
+      'webjar.bundle.min.css', {'evaluate': true})),
+    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+      {'evaluate': true})),
+    $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'finder.min.css',
+      {'evaluate': true}))
+  ];
+  css.forEach(loadCSS);
+
+  $(document).on('xwiki:actions:edit', function(event, config) {
+    if (config &amp;&amp; config.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; config.editMode === 'wysiwyg') {
+      var container = $(event.target);
+      ckeditorPromise.done(function(ckeditor) {
+        createEditors(ckeditor, container, config);
+      });
+    }
+  });
+
+  var startAvoidingCKAndSaveBarOverlap = function(editor) {
+    // CKEDITOR-470 - CKEditor's toolbar may overlap with XWiki's save bar.
+    // This function is a workaround that checks if they overlap when the page
+    // is scrolled and when the CKEditor's toolbar's CSS style is changed
+    // Ideally, we would cooperate with CKEditor's code to position its toolbar,
+    // but the toolbar position is not customizable.
+    //
+    // The CKEditor toolbar (the floatSpace variable) is positioned by this code:
+    // https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L100
+    //
+    // This happens when the editor gains focus, when some text is typed (the
+    // editor's content changes), when the window is scrolled or when the window
+    // is resized.
+    // See https://github.com/ckeditor/ckeditor4/blob/19a386c4691a99d37b43e876e5f5a7ce092c6016/plugins/floatingspace/plugin.js#L310
+
+    function avoidCKAndSaveBarOverlap() {
+      // This callback will be called when the page is scrolled or when the
+      // CKEditor's toolbar position is changed.
+
+      var ckBRC = ckFloatingToolbar.getBoundingClientRect();
+      var saveBRC = saveBar.getBoundingClientRect();
+      var collision = ckBRC.top + ckBRC.height &gt; saveBRC.top;
+      if (saveBar.classList.contains("sticky-buttons-fixed")) {
+          // If XWiki's save bar is sticky, it should not have our custom
+          // padding-top.
+          if (saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = '';
+          }
+
+          if (collision) {
+            // If there is a collision, CKEditor decided to place the toolbar at
+            // the bottom. This is the chosen position if:
+            // - the height of the CKEditor toolbar is not greater than the top of
+            //   the editor relative to the viewport, and
+            // - the height of the CKEditor toolbar is not greater than the
+            //   difference between the bottom of the editor relative to the
+            //   viewport and its height
+            // We put the CKEditor toolbar at the top of the viewport.
+            // Note that CKEditor will try to revert this on the events
+            // previously listed but we will force the position back again
+            // immediately thanks to the mutation observer. This does not
+            // trigger an event that makes CKEditor position the toolbar once
+            // again, so we are not racing with it.
+
+            ckFloatingToolbar.style.position = "fixed";
+            ckFloatingToolbar.style.top = "0px";
+          }
+      } else {
+        // If the XWiki's save bar is not sticky, we add a padding-top
+        // corresponding to the CKEditor toolbar's height if there is a
+        // collision, and we revert to the initial padding-top if there is no
+        // collision.
+        if (collision) {
+          if (!saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = (parseInt(getComputedStyle(saveBar).getPropertyValue('padding-top')) + ckBRC.height) + 'px';
+          }
+        } else {
+          if (saveBar.style.paddingTop) {
+            saveBar.style.paddingTop = '';
+          }
+        }
+      }
+    }
+
+    var ckFloatingToolbar = document.getElementById('cke_' + editor.name);
+    var saveBar = document.getElementsByClassName('inplace-editing-buttons')[0];
+    if (ckFloatingToolbar &amp;&amp; saveBar) {
+      window.addEventListener("scroll", avoidCKAndSaveBarOverlap);
+      var mutationObserver = new MutationObserver(avoidCKAndSaveBarOverlap);
+      mutationObserver.observe(ckFloatingToolbar, {
+        attributes: true,
+        attributeFilter: ['style']
+      });
+
+      return function stopAvoidingCKAndSaveBarOverlap() {
+        window.removeEventListener("scroll", avoidCKAndSaveBarOverlap);
+        mutationObserver.disconnect();
+      };
+    }
+
+    return null;
+  };
+
+  var createEditors = function(ckeditor, container, config) {
+    if (config.editorName) {
+      // We cannot set the editor name through the editor configuration. The editor name is taken by default from the
+      // container id or name. To overcome this we set the editor name just after the editor instance is created.
+      const handler = ckeditor.on('instanceCreated', event =&gt; {
+        if (event.editor.element.$ === container[0]) {
+          event.editor.name = config.editorName;
+          handler.removeListener();
+        }
+      });
+    }
+
+    container.attr({
+      'data-sourceDocumentReference': XWiki.Model.serialize(config.document.documentReference),
+      'data-syntax': config.document.syntax
+    }).each(function() {
+      try {
+        createEditor(ckeditor, this, config).done(config.deferred.resolve.bind(config.deferred, config.document));
+      } catch (e) {
+        console.log(e);
+        new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
+          'ckeditor.inline.failedToInit')), 'error');
+        config.deferred.reject();
+      }
+    });
+  };
+
+  var createEditor = function(ckeditor, element, config, instanceConfig) {
+    var stopAvoidingCKAndSaveBarOverlap = null;
+    var deferred = $.Deferred();
+    var editor = ckeditor.inline(element, $.extend({
+      // It doesn't make sense to resize the editor when editing in-line and it also creates problems with the way
+      // we implemented the maximize feature for the in-line editor.
+      resize_enabled: false
+    }, instanceConfig));
+    // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
+    if (!config.enableSourceMode) {
+      editor.once('configLoaded', function(event) {
+        if (typeof editor.config.removePlugins === 'string') {
+          editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
+        }
+      });
+    }
+    editor.once('instanceReady', function() {
+      deferred.resolve(editor);
+      // Make the content editable after the editor is ready and visible.
+      // See CKEDITOR-390: The inline editor loads as read-only in Safari
+      editor.setReadOnly(false);
+      stopAvoidingCKAndSaveBarOverlap = startAvoidingCKAndSaveBarOverlap(editor);
+    });
+    editor.once('reload', function(event) {
+      $(document).off(['xwiki:actions:view.contentEditor', 'xwiki:actions:beforeSave.contentEditor'].join(' '));
+      event.data.promise = event.data.promise.then(createEditor.bind(null, ckeditor, element, config));
+    });
+    $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
+      config.document[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
+      // Delete the document content field that is not used so that the in-place editor knows what to submit on save.
+      delete config.document[editor.mode === 'source' ? 'renderedContent' : 'content'];
+      config.document.syntax = editor.config.sourceSyntax;
+    });
+    $(document).one('xwiki:actions:view.contentEditor', function(event, data) {
+      $(document).off('xwiki:actions:beforeSave.contentEditor');
+      // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
+      // We also do this because destroying the editor while the edited content has the focus can lead to an error.
+      // See below.
+      $(element).blur().prop('contenteditable', false).removeAttr('contenteditable');
+      // We destroy the editor after the edited content has lost the focus completely because the editor has a
+      // delayed event listener that tries to access the selection even after the editor has been destroyed.
+      setTimeout(function() {
+        // Don't update the edited element with the data from the editor because:
+        // * the editor data might be wiki syntax if the current mode is Source
+        // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
+        //   and we risk overwriting it.
+        editor.destroy(/* noUpdate: */ true);
+        if (stopAvoidingCKAndSaveBarOverlap) {
+          stopAvoidingCKAndSaveBarOverlap();
+          stopAvoidingCKAndSaveBarOverlap = null;
+        }
+      }, 0);
+    });
+    return deferred.promise();
+  };
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.InlineEditor</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>10aa134d-c618-481a-bbda-ea6f810f0f5d</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.requirejs.module.ckeditorInline</name>
+    </property>
+    <property>
+      <parameters>id=xwiki-ckeditor-inline
+path=$xwiki.getURL('CKEditor.InlineEditor', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.platform:xwiki-platform-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value}))</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

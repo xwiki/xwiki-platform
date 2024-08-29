@@ -142,7 +142,14 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+      <code>define('xwiki-like-messages', {
+  prefix: 'like.button.title.',
+  keys: [
+    "unlike",
+    "like"
+  ]
+});
+require(['jquery', 'xwiki-meta', 'xwiki-l10n!xwiki-like-messages'], function ($, xm, l10n) {
   var likeUIXReference = XWiki.Model.resolve('XWiki.Like.LikeUIX', XWiki.EntityType.DOCUMENT);
   var likeUIXurl = new XWiki.Document(likeUIXReference).getURL('get');
   
@@ -161,13 +168,14 @@
         'xaction': 'like',
         'form_token': xm.form_token,
         'document': XWiki.Model.serialize(xm.documentReference)
-     }).done(function(data) {
+     }).then(data =&gt; {
        likeButton.removeClass('btn-primary');
        likeButton.addClass('btn-default');
        likeButton.find('.like-number').text(data.counter);
+       likeButton.attr('title', l10n.get('unlike', data.counter));
        $('#is-liked').val('true');
        new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.success'))", 'done');
-     }).fail(function(data) {
+     }).catch(() =&gt; {
        new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.newlike.error'))", 'error');
      });
   };
@@ -178,17 +186,18 @@
       'xaction': 'unlike',
       'form_token': xm.form_token,
       'document': XWiki.Model.serialize(xm.documentReference)
-    }).done(function(data) {
+    }).then(data =&gt; {
       unlikeButton.removeClass('btn-default');
       unlikeButton.addClass('btn-primary');
       unlikeButton.find('.like-number').text(data.counter);
+      unlikeButton.attr('title', l10n.get('like', data.counter));
       $('#is-liked').val('false');
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.success'))", 'done');
-    }).fail(function(data) {
+    }).catch(() =&gt; {
       new XWiki.widgets.Notification("$escapetool.xml($services.localization.render('like.unlike.error'))", 'error');
     });
   };
-  $('.like-button:not(.disabled)').on('click', likeClick);
+  $('.like-button').on('click', likeClick);
 });</code>
     </property>
     <property>
@@ -473,14 +482,16 @@
         #set ($btnClass = "btn-primary")
         #set ($titleMessageTranslationKey = "like.button.title.like")
       #end
-      #set ($disabledButton = "")
+      #set ($disabledButton = false)
       #if (!$services.like.isAuthorized($doc))
-        #set ($disabledButton = "disabled")
+        #set ($disabledButton = true)
         #set ($titleMessageTranslationKey = "like.button.title")
       #end
-      &lt;div class="like-button btn $btnClass $disabledButton badge" title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
+      &lt;button class="like-button btn $btnClass badge"
+        #if($disabledButton) disabled #{end}
+        title="$escapetool.xml($services.localization.render($titleMessageTranslationKey, [$likeCount]))"&gt;
           $services.icon.renderHTML('heart') &lt;span class="like-number"&gt;$likeCount&lt;/span&gt;
-      &lt;/div&gt;
+      &lt;/button&gt;
     &lt;/div&gt;
   #end
 #end

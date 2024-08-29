@@ -46,7 +46,7 @@ admin.emailstatus=Mail Sending Status
 admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
 admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
 Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
-Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
+Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 Mail.SendMailConfigClass_from=Email address to send from
 Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
 Mail.SendMailConfigClass_bcc=BCC email addresses
@@ -74,8 +74,11 @@ Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend
+Mail.SendMailStatus_livetable.delete=Delete
 mailSender.admin.resendSuccess=The mail has been resent successfully
-mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+mailSender.admin.resendFailure=Failed to resend mail. Click for more details.
+mailSender.admin.deleteSuccess=The mail has been deleted successfully
+mailSender.admin.deleteFailure=Failed to delete mail. Click for more details.</content>
   <object>
     <name>Mail.Translations</name>
     <number>0</number>

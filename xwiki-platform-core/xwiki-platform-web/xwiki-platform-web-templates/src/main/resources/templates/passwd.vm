@@ -24,11 +24,13 @@
 #template("startpage.vm")
 #template("register_macros.vm")
 #set ($fields = [])
-#loadConfig('XWiki.RegistrationConfig')
+#set ($passwordOptions = $NULL)
+#_loadPasswordOptions($passwordOptions)
 #definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
   #set($userObject = $doc.getObject('XWiki.XWikiUsers'))
   #if($userObject)
     #set($isCurrentUsersProfile = $doc.documentReference.equals($xcontext.userReference))
@@ -78,7 +80,7 @@
 	          'params': {
 	            'type': 'password',
 	            'size': '60',
-	            'autocomplete': 'off'
+	            'autocomplete': 'current-password'
 	          },
 	          'validate': {
 	            'mandatory': {
@@ -122,6 +124,6 @@
     #xwikimessageboxstart($services.localization.render('platform.core.noticeMessageType') $services.localization.render('platform.core.profile.passwd.notaUser'))
     #xwikimessageboxend()
   #end
-  </div>
+  </main>## mainContentArea
 </div>
 #template("endpage.vm")

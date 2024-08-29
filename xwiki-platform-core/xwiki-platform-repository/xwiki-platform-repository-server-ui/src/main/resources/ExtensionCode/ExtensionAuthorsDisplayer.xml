@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+#if ($xcontext.action == 'edit')
   #set($isEditMode = true)
 #else
   #set($isViewMode = true)
@@ -88,7 +88,7 @@
     &lt;/script&gt;
   {{/html}}
 #else
-  #foreach($page in $pageList)#if($foreach.count &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else$page#end#end
+  #foreach($page in $pageList)#if($foreach.count &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else$services.rendering.escape($page, 'xwiki/2.1')#end#end
 #end
 {{/velocity}}</content>
   <object>

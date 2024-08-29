@@ -33,9 +33,11 @@ import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -219,9 +221,9 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
 
         assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
         assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
-        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
         assertEquals(true, document.isMinorEdit());
         assertEquals("comment", document.getComment());
@@ -363,9 +365,10 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
     }
 
     @Test
-    void documentwithoutauthorandcreator() throws FilterException, XWikiException
+    void documentwithoutauthorandcreator() throws Exception
     {
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        UserReference contextUserReference = mockUserReference(contextUser);
         this.oldcore.getXWikiContext().setUserReference(contextUser);
 
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
@@ -380,9 +383,12 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
 
         assertFalse(document.isNew());
 
-        assertEquals(contextUser, document.getCreatorReference());
-        assertEquals(contextUser, document.getAuthorReference());
-        assertEquals(contextUser, document.getContentAuthorReference());
+        DocumentAuthors authors = document.getAuthors();
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getEffectiveMetadataAuthor());
+        assertEquals(contextUserReference, authors.getOriginalMetadataAuthor());
+        assertEquals(contextUserReference, authors.getCreator());
+        assertEquals(contextUserReference, authors.getContentAuthor());
     }
 
     @Test
@@ -548,6 +554,46 @@ class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilterStrea
         assertEquals("42", ((BaseProperty) documentObject.get("prop2")).getValue());
         assertEquals("", ((BaseProperty) documentObject.get("missingprop1")).getValue());
         assertEquals("", ((BaseProperty) documentObject.get("missingprop2")).getValue());
+    }
+
+    @Test
+    void documentwithoutversionsandnocreator() throws Exception
+    {
+        DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        mockUserReference(contextUser);
+        this.oldcore.getXWikiContext().setUserReference(contextUser);
+
+        DocumentReference author1 = new DocumentReference("wiki", "XWiki", "author1");
+        UserReference author1Reference = mockUserReference(author1);
+        DocumentReference author2 = new DocumentReference("wiki", "XWiki", "author2");
+        UserReference author2Reference = mockUserReference(author2);
+
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithoutversionsandnocreator", outputProperties);
+
+        XWikiDocument document2 = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document2.isNew());
+
+        assertEquals("2.1", document2.getVersion());
+        assertEquals(author2Reference, document2.getAuthors().getEffectiveMetadataAuthor());
+        assertEquals(author1Reference, document2.getAuthors().getCreator());
+
+        Version[] versions = document2.getRevisions(this.oldcore.getXWikiContext());
+
+        assertEquals(2, versions.length);
+
+        XWikiDocumentArchive archive = document2.getDocumentArchive(this.oldcore.getXWikiContext());
+
+        XWikiDocument document1 = archive.loadDocument(versions[0], this.oldcore.getXWikiContext());
+
+        assertEquals("1.1", document1.getVersion());
+        assertEquals(author1Reference, document1.getAuthors().getEffectiveMetadataAuthor());
+        assertEquals(author1Reference, document1.getAuthors().getCreator());
     }
 
     @Test

@@ -22,7 +22,6 @@ package org.xwiki.model.validation;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Manage the available {@link EntityNameValidation} components.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.0RC1
  */
 @Role
-@Unstable
 public interface EntityNameValidationManager
 {
     /**

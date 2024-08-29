@@ -46,7 +46,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -94,19 +93,7 @@ public class DefaultNotificationParametersFactory
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private NotificationConfiguration configuration;
-
-    @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
-
-    @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -116,6 +103,15 @@ public class DefaultNotificationParametersFactory
 
     @Inject
     private Logger logger;
+
+    @Inject
+    protected NotificationPreferenceManager notificationPreferenceManager;
+
+    @Inject
+    protected NotificationFilterManager notificationFilterManager;
+
+    @Inject
+    protected NotificationFilterPreferenceManager notificationFilterPreferenceManager;
 
     /**
      * Define the parameters that will be taken into account when creating a {@link NotificationParameters} in
@@ -235,7 +231,9 @@ public class DefaultNotificationParametersFactory
          * Accepted values are identifier of the current wiki. This is used in case of multiple wikis.
          */
         // TODO: not sure we should keep it, I put it since it was already in the REST API.
-        CURRENT_WIKI(false);
+        CURRENT_WIKI(false),
+
+        NOTIFICATION_GROUPING_EVENT_TARGET(true);
 
         private boolean isDirectlyUsed;
 
@@ -355,6 +353,10 @@ public class DefaultNotificationParametersFactory
                         this.handleOnlyUnread(notificationParameters, parameterValue);
                         break;
 
+                    case NOTIFICATION_GROUPING_EVENT_TARGET:
+                        notificationParameters.groupingEventTarget = parameterValue;
+                        break;
+
                     default:
                         logger.error("The notification parameters key [{}] exist but has not been implemented.",
                             actualKey.name());
@@ -393,21 +395,34 @@ public class DefaultNotificationParametersFactory
             parameters.filters = new HashSet<>(notificationFilterManager.getAllFilters(parameters.user, true,
                 NotificationFilter.FilteringPhase.POST_FILTERING));
 
-            // Check if we should pre or post filter events
-            if (this.configuration.isEventPrefilteringEnabled()) {
-                enableAllEventTypes(parameters);
-
-                // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
-                // in it if prefiltering is enabled. Now we are missing the format in this method for now.
-                parameters.filters.add(new ForUserEventFilter(parameters.format, null));
-            } else {
-                parameters.preferences =
-                    notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-
-                parameters.filterPreferences =
-                    notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
-            }
+            enableAllEventTypes(parameters);
+            // TODO: Could be added in the NotificationFilterManager#getAllFilters since we actually know
+            // in it if prefiltering is enabled. Now we are missing the format in this method for now.
+            parameters.filters.add(new ForUserEventFilter(parameters.format, null));
         }
+    }
+
+    /**
+     * Helper method to get a notification parameters for Alert format for the given user and count.
+     * This helper is provided as it used to be a standard call in old APIs of Notifications.
+     *
+     * @param userId a serialization of the user for whom to get notifications
+     * @param expectedCount the number of notifications to retrieve
+     * @return the parameters to use in notification APIs
+     * @throws NotificationException in case of problem
+     * @since 15.5RC1
+     */
+    public NotificationParameters getParametersForUserAndCount(String userId, int expectedCount)
+        throws NotificationException
+    {
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = this.stringDocumentReferenceResolver.resolve(userId);
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = expectedCount;
+        parameters.endDateIncluded = true;
+
+        this.useUserPreferences(parameters);
+        return parameters;
     }
 
     private void dontUseUserPreferences(NotificationParameters notificationParameters,
@@ -428,27 +443,41 @@ public class DefaultNotificationParametersFactory
             && notificationParameters.format == NotificationFormat.ALERT) {
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
-        notificationParameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toSet());
 
         enableAllEventTypes(notificationParameters);
 
         String wikis = parameters.get(ParametersKey.WIKIS);
+        String pages = parameters.get(ParametersKey.PAGES);
+        String spaces = parameters.get(ParametersKey.SPACES);
+
+        // We check if the parameters contain a location, and we remove ScopeNotificationFilter if it doesn't:
+        // this filter would automatically discard all events not matching a given location.
+        boolean noLocationFilter =
+            (StringUtils.isBlank(wikis) && StringUtils.isBlank(pages) && StringUtils.isBlank(spaces));
+        notificationParameters.filters = notificationFilterManager.getAllFilters(true)
+            .stream()
+            .filter(filter -> !excludedFilters.contains(filter.getName())
+                && (!noLocationFilter || !filter.getName().equals(ScopeNotificationFilter.FILTER_NAME)))
+            .collect(Collectors.toSet());
+
+        String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
 
         if (StringUtils.isEmpty(currentWiki)) {
-            currentWiki = wikiDescriptorManager.getCurrentWikiId();
+            currentWiki = currentWikiId;
         }
 
-        handleLocationParameter(parameters.get(ParametersKey.PAGES), notificationParameters,
-            NotificationFilterProperty.PAGE, currentWiki);
-        handleLocationParameter(parameters.get(ParametersKey.SPACES), notificationParameters,
-            NotificationFilterProperty.SPACE, currentWiki);
+        handleLocationParameter(pages, notificationParameters, NotificationFilterProperty.PAGE, currentWiki);
+        handleLocationParameter(spaces, notificationParameters, NotificationFilterProperty.SPACE, currentWiki);
         handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
         handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
 
-        usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        try {
+            usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        } catch (Exception e) {
+            throw new NotificationException("Failed to handler users parameter", e);
+        }
 
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }
@@ -512,7 +541,6 @@ public class DefaultNotificationParametersFactory
                 pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
                 pref.setFilterType(NotificationFilterType.INCLUSIVE);
                 pref.setNotificationFormats(formats);
-                pref.setProviderHint("FACTORY");
                 switch (property) {
                     case WIKI:
                         pref.setWiki(locationArray[i]);
@@ -549,7 +577,7 @@ public class DefaultNotificationParametersFactory
         return entityReferenceSerializer.serialize(entityRef);
     }
 
-    private void enableAllEventTypes(NotificationParameters parameters) throws NotificationException
+    protected void enableAllEventTypes(NotificationParameters parameters) throws NotificationException
     {
         parameters.preferences.clear();
 

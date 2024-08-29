@@ -32,8 +32,8 @@ import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
-import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -57,6 +57,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
     private MockitoOldcore oldcore;
 
     @AfterComponent
+    @Override
     public void afterComponent() throws Exception
     {
         this.componentManager.registerMockComponent(WikiDescriptorManager.class);
@@ -77,7 +78,7 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
 
         // avoid dependency issue with refactoring listeners
         this.componentManager.registerMockComponent(ModelBridge.class);
-        this.componentManager.registerMockComponent(LinkRefactoring.class);
+        this.componentManager.registerMockComponent(ReferenceUpdater.class);
 
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);

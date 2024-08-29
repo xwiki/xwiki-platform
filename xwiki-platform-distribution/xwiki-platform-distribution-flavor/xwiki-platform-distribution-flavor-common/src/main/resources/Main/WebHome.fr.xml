@@ -35,50 +35,36 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Bienvenue sur votre Wiki =
+  <content>== Bienvenue sur votre Wiki ==
 
 XWiki est le meilleur outil pour organiser votre connaissance. Un //Wiki// est organisé suivant une hiérarchie de //pages//. Vous pouvez créer de multiples wikis, chacun avec son propre ensemble de pages.
 
 XWiki peut être utilisé comme base de connaissance (pour le support, la documentation, les ventes, etc.), pour créer des espaces collaboratifs, ou même comme un intranet complet.
 
-= Les bases =
+== Les bases ==
 
 Pour utiliser votre Wiki au maximum de son potentiel, identifiez-vous et :
 
-Utilisez le bouton {{velocity}}$services.icon.render('pencil'){{/velocity}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
+Utilisez le bouton {{displayIcon name="pencil"/}} ci-dessus pour //éditer// cette page et commencer à adapter ce Wiki à vos besoins.
 
-Utilisez le bouton {{velocity}}$services.icon.render('add'){{/velocity}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
+Utilisez le bouton {{displayIcon name="add"/}} ci-dessus pour //ajouter// de nouvelles pages à votre Wiki et créez la //hiérarchie// qui vous convient le mieux pour organiser votre contenu.
 
-Utilisez le fil d'Ariane {{velocity}}$services.icon.render('home'){{/velocity}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
+Utilisez le fil d'Ariane {{displayIcon name="home"/}} localisé au dessus du titre pour //naviguer// parmi vos pages. Vous pouvez être facilement perdu dans un Wiki important sans ce fil d'Ariane.
 
 Vous pouvez aussi utiliser le [[bac à sable&gt;&gt;Sandbox.WebHome]] pour plus de contenu exemple ainsi que comme endroit pour expérimenter les fonctionnalités de votre Wiki.
 
- {{box}}Apprenez à utiliser XWiki avec le {{velocity}}[[Guide "Getting Started" (en anglais)&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+ {{box}}Apprenez à utiliser XWiki avec le [[Guide "Getting Started" (en anglais)&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (%class="row"%)(((
 (%class="col-xs-12 col-sm-6"%)(((
-= Étendez votre Wiki =
+== Étendez votre Wiki ==
 
-Pour étendre les fonctionnalités de votre Wiki avec les modules dont //vous// avez besoin, allez sur le {{velocity}}[[gestionnaire d'extensions&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} où vous pouvez rechercher et installer des extensions.
+Pour étendre les fonctionnalités de votre Wiki avec les modules dont //vous// avez besoin, allez sur le [[gestionnaire d'extensions&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] où vous pouvez rechercher et installer des extensions.
 
-Pour naviguer dans les 900+ extensions contribuées par la communauté XWiki, visitez la [[galerie d'extensions&gt;&gt;http://extensions.xwiki.org]].
+Pour naviguer dans les 900+ extensions contribuées par la communauté XWiki, visitez la [[galerie d'extensions&gt;&gt;https://extensions.xwiki.org]].
 )))
 (%class="col-xs-12 col-sm-6"%)(((
-= Créez votre application =
+== Créez votre application ==
 
 Pour aller plus loin que les extensions disponibles, définissez vos //propres structures// pour vos contenus en fonction de //vos// besoins et créez //vos// propres applications avec [["App Within Minutes"&gt;&gt;AppWithinMinutes.WebHome]] (AWM). 
 

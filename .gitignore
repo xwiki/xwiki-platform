@@ -1,8 +1,32 @@
-# Build
+# ---------------------------------------------------------------------------
+# See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Lesser General Public License as
+# published by the Free Software Foundation; either version 2.1 of
+# the License, or (at your option) any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this software; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+# 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+# ---------------------------------------------------------------------------
+
+# Maven
 target
 target-eclipse
 
-# IDEA
+# Gradle
+build
+.gradle
+
+# IntelliJ IDEA
 *.iml
 *.ipr
 *.iws
@@ -20,25 +44,31 @@ bin
 **/src/main/java/META-INF/
 **/src/test/java/META-INF/
 **/src/META-INF/
-#PyDev
+# PyDev
 .pydevproject
 
 # NetBeans
 nbproject
 
-# Other
+# Visual Studio Code
+.vscode
+
+# Gradle Enterprise/Develocity
+.mvn/.gradle-enterprise
+.mvn/.develocity
+
+# Debugging stuff to not commit
+xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core.zip
+xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core-minimal.zip
+xwiki-platform-core/xwiki-platform-web/xwiki-platform-web-templates/src/main/resources/templates/replication
+
+# XVNC
+.Xauthority-*
+
+# Misc
 *.log.*
 *.log
 .sonar-ide.properties
 .clover
 *~
 **/overlays/*.info
-
-# Debugging stuff to not commit
-xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core.zip
-xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/main/resources/xwiki-platform-search-solr-server-core-minimal.zip
-
-# Weblate
-# This folder is actually used internally by weblate to know if something needs to be committed or not, ignoring it
-# implies that weblate won't trigger any commit anymore.
-#/.translation

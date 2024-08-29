@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
+
 /**
  * A job request that can be used to copy some entities to another place.
  *
@@ -27,4 +29,21 @@ package org.xwiki.refactoring.job;
  */
 public class CopyRequest extends AbstractCopyOrMoveRequest
 {
+    /**
+     * Default constructor.
+     */
+    public CopyRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public CopyRequest(Request request)
+    {
+        super(request);
+    }
 }

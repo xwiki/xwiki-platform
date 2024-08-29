@@ -52,20 +52,9 @@ public interface NotificationConfiguration
     int liveNotificationsGraceTime();
 
     /**
-     * @return true if pre filtering should be used for ALERT user notifications
-     * @since 12.6
-     */
-    @Unstable
-    default boolean isEventPrefilteringEnabled()
-    {
-        return false;
-    }
-
-    /**
      * @return true if the REST/async cache is enabled.
      * @since 12.2
      */
-    @Unstable
     default boolean isRestCacheEnabled()
     {
         return true;
@@ -75,7 +64,6 @@ public interface NotificationConfiguration
      * @return the number of threads to use for computing notifications in REST.
      * @since 12.5RC1
      */
-    @Unstable
     default int getRESTPoolSize()
     {
         return 2;
@@ -85,9 +73,18 @@ public interface NotificationConfiguration
      * @return the number of threads to use for computing notifications in Async renderer.
      * @since 12.5RC1
      */
-    @Unstable
     default int getAsyncPoolSize()
     {
         return 2;
+    }
+
+    /**
+     * @return the hint of the component to be used for the email grouping strategy.
+     * @since 15.5RC1
+     */
+    @Unstable
+    default String getEmailGroupingStrategyHint()
+    {
+        return "default";
     }
 }

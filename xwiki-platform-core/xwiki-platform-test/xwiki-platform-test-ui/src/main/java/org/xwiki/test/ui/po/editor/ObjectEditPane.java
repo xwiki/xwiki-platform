@@ -24,7 +24,6 @@ import java.util.Optional;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
@@ -98,7 +97,6 @@ public class ObjectEditPane extends FormContainerElement
      * @return {@code true} if the object information are displayed (i.e. the object is expanded)
      * @since 13.1RC1
      */
-    @Unstable
     public boolean isObjectDisplayed()
     {
         Optional<WebElement> objectContent = getObjectContent();
@@ -111,7 +109,6 @@ public class ObjectEditPane extends FormContainerElement
      *
      * @since 13.1RC1
      */
-    @Unstable
     public void displayObject()
     {
         String xobjectId = String.format("xobject_%s_%s_title", this.className, this.objectNumber);
@@ -174,7 +171,7 @@ public class ObjectEditPane extends FormContainerElement
      */
     private WebElement getXobjectContainer()
     {
-        return getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
+        return getDriver().findElement(By.id(String.format("%s_%s_%s", "xobject", className, objectNumber)));
     }
 
     /**

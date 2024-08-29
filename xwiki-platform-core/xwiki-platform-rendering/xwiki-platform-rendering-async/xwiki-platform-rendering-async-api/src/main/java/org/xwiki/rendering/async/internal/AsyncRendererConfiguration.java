@@ -19,8 +19,12 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -56,6 +60,44 @@ public class AsyncRendererConfiguration
     public void setContextEntries(Set<String> contextEntries)
     {
         this.contextEntries = contextEntries;
+    }
+
+    /**
+     * @param contextEntries the context entries needed to execute the content
+     * @since 15.0RC1
+     * @since 14.10.3
+     * @since 13.10.11
+     * @since 14.4.8
+     */
+    public void addContextEntries(Set<String> contextEntries)
+    {
+        if (CollectionUtils.isNotEmpty(contextEntries)) {
+            if (!(this.contextEntries instanceof LinkedHashSet)) {
+                this.contextEntries =
+                    this.contextEntries == null ? new LinkedHashSet<>() : new LinkedHashSet<>(this.contextEntries);
+            }
+
+            this.contextEntries.addAll(contextEntries);
+        }
+    }
+
+    /**
+     * @param contextEntries the context entries needed to execute the content
+     * @since 15.0RC1
+     * @since 14.10.3
+     * @since 13.10.11
+     * @since 14.4.8
+     */
+    public void addContextEntries(String... contextEntries)
+    {
+        if (ArrayUtils.isNotEmpty(contextEntries)) {
+            if (!(this.contextEntries instanceof LinkedHashSet)) {
+                this.contextEntries =
+                    this.contextEntries == null ? new LinkedHashSet<>() : new LinkedHashSet<>(this.contextEntries);
+            }
+
+            Collections.addAll(this.contextEntries, contextEntries);
+        }
     }
 
     /**
@@ -104,9 +146,9 @@ public class AsyncRendererConfiguration
     }
 
     /**
-     * Set to {@code true} to force the renderer to return an async placeholder even if the data is available.
-     * This allows to use easily the Async rendering framework with AJAX requests: we can force the async renderers
-     * in an AJAX request to return always placeholders, so they are resolved once added in the current DOM by using
+     * Set to {@code true} to force the renderer to return an async placeholder even if the data is available. This
+     * allows to use easily the Async rendering framework with AJAX requests: we can force the async renderers in an
+     * AJAX request to return always placeholders, so they are resolved once added in the current DOM by using
      * Javascript.
      *
      * @param placeHolderForced {@code true} to force using a placeholder.

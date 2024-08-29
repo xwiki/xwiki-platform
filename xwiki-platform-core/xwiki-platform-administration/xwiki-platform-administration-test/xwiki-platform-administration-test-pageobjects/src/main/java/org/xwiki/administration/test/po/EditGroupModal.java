@@ -20,8 +20,8 @@
 package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.By;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.BaseModal;
-import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents the edit group modal.
@@ -31,10 +31,10 @@ import org.xwiki.test.ui.po.LiveTableElement;
  */
 public class EditGroupModal extends BaseModal
 {
-    private static class ModalContent extends GroupEditPage
+    private static final class ModalContent extends GroupEditPage
     {
         @Override
-        public void waitUntilPageJSIsLoaded()
+        public void waitUntilPageIsReady()
         {
             // There's no need to wait for any JavaScript here because the group edit form is loaded with AJAX inside
             // the modal body, after the page has been loaded.
@@ -52,12 +52,10 @@ public class EditGroupModal extends BaseModal
     {
         // Wait until the modal content is loaded.
         getDriver().waitUntilElementIsVisible(By.cssSelector("#editGroupModal #groupusers"));
-        // Wait until the members live table is loaded.
-        getMembersTable().waitUntilReady();
         return this;
     }
 
-    public LiveTableElement getMembersTable()
+    public TableLayoutElement getMembersTable()
     {
         return this.groupEditPage.getMembersTable();
     }
@@ -86,7 +84,7 @@ public class EditGroupModal extends BaseModal
         return this;
     }
 
-    public LiveTableElement filterMembers(String member)
+    public TableLayoutElement filterMembers(String member)
     {
         this.groupEditPage.filterMembers(member);
         return getMembersTable();

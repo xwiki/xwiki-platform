@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="XWiki.TagCloud" locale="">
   <web>XWiki</web>
   <name>TagCloud</name>
   <language/>
@@ -103,8 +103,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -118,10 +121,13 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -131,6 +137,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -166,6 +174,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -224,6 +234,9 @@ ol.tagCloud .ultraPopular {
 }</code>
     </property>
     <property>
+      <contentType/>
+    </property>
+    <property>
       <name>Tag cloud CSS</name>
     </property>
     <property>
@@ -247,34 +260,101 @@ ol.tagCloud .ultraPopular {
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>13</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>14</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>12</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>code</name>
-        <number>9</number>
+        <number>10</number>
         <prettyName>Macro code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>contentDescription</name>
-        <number>8</number>
+        <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </contentDescription>
+      <contentJavaType>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentJavaType</name>
+        <number>8</number>
+        <picker>1</picker>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentJavaType>
       <contentType>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>7</number>
-        <prettyName>Macro content type</prettyName>
+        <prettyName>Macro content availability</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator>|</separator>
         <separators>|</separators>
@@ -283,20 +363,32 @@ ol.tagCloud .ultraPopular {
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -320,6 +412,16 @@ ol.tagCloud .ultraPopular {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -334,6 +436,8 @@ ol.tagCloud .ultraPopular {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>visibility</name>
         <number>6</number>
@@ -348,11 +452,24 @@ ol.tagCloud .ultraPopular {
       </visibility>
     </class>
     <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
       <code>{{velocity}}
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 #set ($tagCloudSpace = $xcontext.macro.params.get('space'))
 #set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
+#set ($limit = $xcontext.macro.params.get('limit'))
+#if ("$!limit" != '' &amp;&amp; $limit &lt; 0)
+  #set ($limit = 0)
+#end
 ##
 ## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
@@ -376,22 +493,35 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   ## Get tag count map. Key: tag, value: number of occurrences.
   #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
 #end
+## Organize tags as a list of {name, count} object so that it is easier to handle (sorting, limiting, ...)
+#set ($tagCountList = [])
+#foreach ($tagName in $tagCount.keySet())
+  #set ($discard = $tagCountList.add({
+    "name": $tagName,
+    "count": $tagCount[$tagName]
+  }))
+#end
+## If a limit is set, only keep n most occurring tags
+## If tags have the same occurrence, limit them in alphabetical order
+#set ($tagCountListSorted = $collectiontool.sort($tagCountList, ['count:desc', 'name']))
+#if ("$!limit" != '')
+  #set ($tagCountListSorted = $tagCountListSorted.subList(0, $mathtool.min($tagCountListSorted.size(), $limit)))
+#end
 ##
 ## Only build popularity map if at least one tag exists
-#if ($tagCount.size() &gt; 0)
+#if ($tagCountListSorted.size() &gt; 0)
   ##
   ## Store the minimum and maximum number of occurrences.
-  #set ($sortedTagCounts = $collectiontool.sort($tagCount.values()))
-  #set ($maxIndex = $sortedTagCounts.size() - 1)
-  #set ($minCount = $sortedTagCounts[0])
-  #set ($maxCount = $sortedTagCounts[$maxIndex])
+  #set ($maxIndex = $tagCountListSorted.size() - 1)
+  #set ($maxCount = $tagCountListSorted[0].count)
+  #set ($minCount = $tagCountListSorted[$maxIndex].count)
   ##
   ## Calculate the total number of tags in the wiki.
   #set ($totalTagNumber = 0)
-  #foreach ($currentTagCount in $sortedTagCounts)
-    #set ($totalTagNumber = $totalTagNumber + $currentTagCount)
+  #foreach ($currentTag in $tagCountListSorted)
+    #set ($totalTagNumber = $totalTagNumber + $currentTag.count)
   #end
-  #set ($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
+  #set ($countAverage = $mathtool.div($totalTagNumber, $tagCountListSorted.size()))
   ##
   ## Build popularity map using the difference between minimum / maximum tag occurrences counts, and the average tag occurences count.
   #set ($firstHalfIntervalSize = $mathtool.div($mathtool.sub($countAverage, $minCount), $levelsHalf))
@@ -418,17 +548,17 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 ##
 ## Display tag cloud.
 {{html}}
-#if ($tagCount.size() &gt; 0)
+#if ($tagCountListSorted.size() &gt; 0)
   &lt;ol class="tagCloud"&gt;
-  #foreach ($tagEntry in $tagCount.entrySet())
+  #foreach ($tagEntry in $collectiontool.sort($tagCountListSorted, 'name'))
     #foreach ($popularityEntry in $popularityMap.entrySet())
-      #if ($popularityEntry.Key &gt;= $tagEntry.Value)
+      #if ($popularityEntry.Key &gt;= $tagEntry.count)
         #set ($liClass = $popularityEntry.Value)
         #break
       #end
     #end
     &lt;li class="$liClass"&gt;
-      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.Key)")" title="$services.localization.render('xe.tag.tooltip', [$tagEntry.Value])"&gt;$escapetool.xml($tagEntry.Key)&lt;/a&gt;
+      &lt;a class="tag" href="$xwiki.getURL('Main.Tags', 'view', "do=viewTag&amp;amp;tag=$escapetool.url($tagEntry.name)")" title="$services.localization.render('xe.tag.tooltip', [$tagEntry.count])"&gt;$escapetool.xml($tagEntry.name)&lt;/a&gt;
     &lt;/li&gt;
   #end
   &lt;/ol&gt;
@@ -448,10 +578,15 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       <contentDescription/>
     </property>
     <property>
+      <contentJavaType/>
+    </property>
+    <property>
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Content</defaultCategory>
+      <defaultCategories>
+        <value>Content</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Displays the cloud of tags in this wiki or in the specified space, if any.</description>
@@ -461,6 +596,9 @@ $xwiki.ssx.use('XWiki.TagCloud')##
     </property>
     <property>
       <name>Tag Cloud</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>
@@ -497,6 +635,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -521,6 +660,15 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -533,6 +681,9 @@ $xwiki.ssx.use('XWiki.TagCloud')##
     </property>
     <property>
       <name>space</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -563,6 +714,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -587,6 +739,15 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -600,6 +761,88 @@ $xwiki.ssx.use('XWiki.TagCloud')##
     </property>
     <property>
       <name>spaces</name>
+    </property>
+    <property>
+      <type/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.TagCloud</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>7a100bc5-1eeb-4b81-8e64-cf1aeb453eb4</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Max count of tags to be displayed in the cloud</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>limit</name>
+    </property>
+    <property>
+      <type>java.lang.Integer</type>
     </property>
   </object>
 </xwikidoc>

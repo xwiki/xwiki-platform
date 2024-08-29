@@ -53,7 +53,9 @@
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
-       without affecting the whole container (and the other applications hosted). -->
+       without affecting the whole container (and the other applications hosted).
+       The same encoding is also used as default for the response when the encoding is not explicitly
+       specified with the content type. -->
   <filter>
     <filter-name>Set Character Encoding</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SetCharacterEncodingFilter</filter-class>
@@ -128,7 +130,7 @@
   </filter>
   
   <!-- We need this filter because cross domain request for fonts are not allowed if some headers are not set.
-       See https://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
+       See https://jira.xwiki.org/browse/XWIKI-11300 for more information. -->
   <filter>
     <filter-name>Set CORS policy for fonts</filter-name>
     <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
@@ -141,12 +143,6 @@
       <param-value>*</param-value>
     </init-param>
   </filter>
-
-  <!-- The Routing Fitler decides how to route all requests and thus must be mapped to handle all incoming requests -->
-  <filter-mapping>
-    <filter-name>RoutingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
 
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
@@ -162,6 +158,19 @@
   <filter-mapping>
     <filter-name>RequestRestorer</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <!-- The Routing Filter decides how to route all requests and thus must be mapped to handle all incoming requests.
+   It is after the "Set Character Encoding" and "RequestRestorer" so these filters are applied independently of the
+   routing decision. -->
+  <filter-mapping>
+    <filter-name>RoutingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <!-- Users could add other filters that execute before it, like the URLRewriteFilter, and if these filters do a
+    forward, we still want our RoutingFilter to be called. -->
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -185,7 +194,7 @@
 
   <filter-mapping>
     <filter-name>XWikiRESTContextInitializationFilter</filter-name>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -271,17 +280,16 @@
     -->
   </servlet>
 
-  <!-- RESTful API Restlet servlet -->
+  <!-- REST Service -->
   <servlet>
-    <servlet-name>RestletServlet</servlet-name>
-    <servlet-class>
-      org.xwiki.rest.internal.XWikiRestletServlet
-    </servlet-class>
+    <servlet-name>RESTServlet</servlet-name>
+    <servlet-class>org.xwiki.rest.jersey.internal.XWikiRESTServlet</servlet-class>
+    <multipart-config/>
   </servlet>
 
   <!-- RESTful API mapping -->
   <servlet-mapping>
-    <servlet-name>RestletServlet</servlet-name>
+    <servlet-name>RESTServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 

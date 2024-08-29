@@ -27,7 +27,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.icon.rest.model.jaxb.Icons;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes the wiki icon themes and their icons through REST.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 13.4RC1
  */
 @Path("/wikis/{wikiName}/iconThemes")
-@Unstable
 public interface IconThemesResource
 {
     /**

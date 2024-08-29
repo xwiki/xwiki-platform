@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="uk">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+core.menu.type.wiki=Вікі
+core.menu.watchlist.add.wiki=Спостерігати за вікі
+core.menu.watchlist.remove.wiki=Не спостерігати за вікі
+core.menu.admin.wiki=Керування Вікі
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Інформація про вікі
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Ласкаво просимо до вікі {0}{1}{2}.
+platform.wiki.currentwiki.currentUserIsOwner=Ви власник цієї вікі.
+platform.wiki.currentwiki.currentUserIsAdmin=Ви адміністратор цієї вікі.
+platform.wiki.currentwiki.joinNeedToLogin=Щоб приєднатися до цієї вікі, вам потрібно увійти.
+platform.wiki.currentwiki.currentUserNotMember=Ви не є учасником цієї вікі.
+platform.wiki.currentwiki.currentuserCanJoin=Якщо бажаєте, можете {0}приєднатися до цієї вікі{1}.
+platform.wiki.currentwiki.currentUserIsMember=Ви є учасником цієї вікі.
+platform.wiki.currentwiki.currentUserCanLeave=Якщо бажаєте, можете {0}залишити цю вікі{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Щоб переглянути повний список учасників вікі, перегляньте {0}Каталог користувачів{1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Вас запрошено приєднатися до цієї вікі.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Ви подали запит на приєднання до цієї вікі.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Ваш запит на приєднання до вікі ''{0}'' прийнято.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Ваш запит на приєднання до вікі ''{0}'' відхилено.
+platform.wiki.currentwiki.candidateHandledSaveComment=Оброблений кандидат {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Коментар:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Запит прийнято.
+platform.wiki.currentwiki.candidateRejectedSuccess=Запит відхилено.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} уже є учасником вікі.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} вже має запит, який очікує на розгляд. Будь ласка, дайте відповідь на цей запит замість цього.
+platform.wiki.currentwiki.inviteUserAlreadyInvited=У {0} уже є запрошення, що очікує на розгляд.
+platform.wiki.currentwiki.inviteSaveComment=Користувача ''{0}'' запрошено приєднатися до вікі.
+platform.wiki.currentwiki.inviteNotification=Вас запросили приєднатися до вікі ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} успішно запрошено.
+platform.wiki.currentwiki.invitationCancelSaveComment=Скасовано запрошення {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Ваше запрошення було скасовано та більше не дійсне.
+platform.wiki.currentwiki.invitationCancelSuccess=Запрошення успішно скасовано.
+platform.wiki.currentwiki.invitationCancelFailure=Помилка. Ви не можете скасувати запрошення.
+platform.wiki.currentwiki.candidateReviewFailure=Помилка. Ви не можете скасувати запрошення.
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Читабельна назва
+platform.wiki.currentwiki.prop.description.label=Опис
+platform.wiki.currentwiki.prop.owner.label=Власник
+platform.wiki.currentwiki.prop.membershipType.label=Тип членства
+platform.wiki.currentwiki.prop.secure.label=Захищено (SSL)
+platform.wiki.currentwiki.member.add=Додати або запросити користувачів до вікі
+platform.wiki.currentwiki.gadget.wikiInformation.label=Інформація про вікі
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Найактивніші учасники
+platform.wiki.currentwiki.panel.information.name.label=Назва
+platform.wiki.currentwiki.panel.information.description.label=Опис
+platform.wiki.currentwiki.panel.information.members.label=Учасники
+platform.wiki.currentwiki.invitation.view.label=Переглянути запрошення
+platform.wiki.currentwiki.joinrequest.cancel.label=Скасувати запит
+platform.wiki.currentwiki.joinreques.request.label=Запит на приєднання
+platform.wiki.currentwiki.join.label=Приєднатися
+platform.wiki.currentwiki.leave.label=Залишити Вікі
+platform.wiki.currentwiki.invite.username.label=Ім'я користувача
+platform.wiki.currentwiki.invite.message.label=Повідомлення
+platform.wiki.currentwiki.invite.button.label=Запросити
+platform.wiki.currentwiki.candidates.label=Кандидати
+platform.wiki.currentwiki.candidates.status.label=Статус:
+platform.wiki.currentwiki.candidates.type.label=Тип:
+platform.wiki.currentwiki.candidates.reviewer.label=Адміністратор:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Повідомлення від адміністратора:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Приватний коментар:
+platform.wiki.currentwiki.candidates.accept.label=Прийняти
+platform.wiki.currentwiki.candidates.reject.label=Відхилити
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Скасувати запрошення
+platform.wiki.currentwiki.wikiusers.title=Користувачі Вікі
+platform.wiki.currentwiki.managewikis.title=Вікі
+WikiManager.WikiCandidateMemberClass_status_pending=В очікуванні
+WikiManager.WikiCandidateMemberClass_status_accepted=Отримано
+WikiManager.WikiCandidateMemberClass_status_rejected=Відхилено
+WikiManager.WikiCandidateMemberClass_type_request=Запит
+WikiManager.WikiCandidateMemberClass_type_invitation=Запрошення
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Коротка назва вікі.
+platform.wiki.currentwiki.prop.description.hint=Короткий опис вікі та її призначення.
+platform.wiki.currentwiki.prop.owner.hint=Користувач, який володіє всіма правами на вікі.
+platform.wiki.currentwiki.prop.membershipType.hint=Спосіб, у який користувачі можуть приєднуватися до цієї вікі.
+platform.wiki.currentwiki.prop.secure.hint=Якщо ввімкнено, усі URL-адреси, створені цією вікі, починатимуться з {0}https:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Ім'я користувача, якого потрібно додати до вікі.
+platform.wiki.currentwiki.invite.message.hint=Повідомлення, яке потрібно надіслати користувачеві.
+platform.wiki.currentwiki.candidates.hint=Користувачі, які подали запит або були запрошені приєднатися до вікі.
+platform.wiki.currentwiki.candidates.empty=Жоден користувач не подав запит або не був запрошений приєднатися до вікі.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Управління такими параметрами, як назва вікі, опис, власник і тип членства.
+admin.xwiki.workspaceusers.description=Управління вікі-учасниками: додати, видалити, запросити, прийняти або відхилити вікі-учасників.
+admin.xwiki.usersconfiguration.title=Налаштування
+admin.xwiki.members.title=Поточні учасники
+admin.xwiki.users.title=Всі користувачі
+
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=Головна
+</content>
+</xwikidoc>

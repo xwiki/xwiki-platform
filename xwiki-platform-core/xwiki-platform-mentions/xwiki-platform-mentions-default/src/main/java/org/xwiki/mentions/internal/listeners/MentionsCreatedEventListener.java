@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.internal.MentionsEventExecutor;
+import org.xwiki.index.TaskManager;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -36,9 +36,10 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Collections.singletonList;
+import static org.xwiki.mentions.MentionsConfiguration.MENTION_TASK_ID;
 
 /**
- * Listen to entities creation. 
+ * Listen to entities creation.
  *
  * @version $Id$
  * @since 12.5RC1
@@ -54,8 +55,8 @@ public class MentionsCreatedEventListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private MentionsEventExecutor executor;
-    
+    private TaskManager taskManager;
+
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
 
@@ -73,9 +74,11 @@ public class MentionsCreatedEventListener extends AbstractEventListener
         if (!(event instanceof DocumentCreatedEvent) || this.remoteObservationManagerContext.isRemoteState()) {
             return;
         }
-        this.logger.debug("Event [{}] received from [{}] with data [{}].",
-            DocumentCreatedEvent.class.getName(), source, data);
+        this.logger.debug("Event [{}] received from [{}] with data [{}].", DocumentCreatedEvent.class.getName(), source,
+            data);
+
         XWikiDocument doc = (XWikiDocument) source;
-        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
+        this.taskManager.addTask(doc.getDocumentReference().getWikiReference().getName(), doc.getId(), doc.getVersion(),
+            MENTION_TASK_ID);
     }
 }

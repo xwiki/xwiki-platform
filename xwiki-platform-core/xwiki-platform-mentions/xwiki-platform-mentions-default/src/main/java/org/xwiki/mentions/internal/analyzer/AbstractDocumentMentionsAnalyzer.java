@@ -76,7 +76,7 @@ public abstract class AbstractDocumentMentionsAnalyzer
             .filter(it -> Objects.equals(it.getParameter("reference"), reference)
                 && Objects.equals(it.getParameter("anchor"), anchor))
             .findAny()
-            .map(it -> DisplayStyle.valueOf(it.getParameter("style")))
+            .map(it -> DisplayStyle.getOrDefault(it.getParameter("style")))
             .orElse(DisplayStyle.FULL_NAME);
     }
 }

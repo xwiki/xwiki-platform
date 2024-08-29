@@ -30,13 +30,13 @@ import java.util.Map.Entry;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,6 +46,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+
+import static javax.script.ScriptContext.ENGINE_SCOPE;
 
 /**
  * Action that handles uploading document attachments. It saves all the uploaded files whose fieldname start with
@@ -58,11 +60,14 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 @Singleton
 public class UploadAction extends XWikiAction
 {
+    /**
+     * The prefix of the accepted file input field name.
+     * @since 14.10
+     */
+    public static final String FILE_FIELD_NAME = "filepath";
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadAction.class);
-
-    /** The prefix of the accepted file input field name. */
-    private static final String FILE_FIELD_NAME = "filepath";
 
     /** The prefix of the corresponding filename input field name. */
     private static final String FILENAME_FIELD_NAME = "filename";
@@ -75,16 +80,14 @@ public class UploadAction extends XWikiAction
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         // check Exception File upload is large
         if (exception != null) {
-            if (exception instanceof XWikiException) {
-                XWikiException exp = (XWikiException) exception;
-                if (exp.getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE) {
-                    response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-                    getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.maxSize",
-                        ScriptContext.ENGINE_SCOPE);
-                    context.put("message", "fileuploadislarge");
+            if (exception instanceof AttachmentValidationException) {
+                AttachmentValidationException exp = (AttachmentValidationException) exception;
+                response.setStatus(exp.getHttpStatus());
+                getCurrentScriptContext().setAttribute("message", exp.getTranslationKey(), ENGINE_SCOPE);
+                getCurrentScriptContext().setAttribute("parameters", exp.getTranslationParameters(), ENGINE_SCOPE);
+                context.put("message", exp.getContextMessage());
 
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -111,7 +114,7 @@ public class UploadAction extends XWikiAction
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
         if (fileupload == null) {
             getCurrentScriptContext().setAttribute("message", "core.action.upload.failure.noFiles",
-                ScriptContext.ENGINE_SCOPE);
+                ENGINE_SCOPE);
 
             return true;
         }
@@ -153,9 +156,9 @@ public class UploadAction extends XWikiAction
         }
         // Forward to the attachment page
         if (failedFiles.size() > 0 || !wrongFileNames.isEmpty()) {
-            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure", ScriptContext.ENGINE_SCOPE);
-            getCurrentScriptContext().setAttribute("failedFiles", failedFiles, ScriptContext.ENGINE_SCOPE);
-            getCurrentScriptContext().setAttribute("wrongFileNames", wrongFileNames, ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("message", "core.action.upload.failure", ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("failedFiles", failedFiles, ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute("wrongFileNames", wrongFileNames, ENGINE_SCOPE);
 
             return true;
         }
@@ -221,9 +224,9 @@ public class UploadAction extends XWikiAction
             params.add(String.format("%s (%s)", nextRev, attachmentComment));
         }
         if (attachment.isImage(context)) {
-            documentComment = localizePlainOrKey("core.comment.uploadImageComment", params.toArray());
+            documentComment = localizePlainOrReturnKey("core.comment.uploadImageComment", params.toArray());
         } else {
-            documentComment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
+            documentComment = localizePlainOrReturnKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
         // Make sure the user is allowed to make this modification
@@ -306,7 +309,7 @@ public class UploadAction extends XWikiAction
             return null;
         }
 
-        getCurrentScriptContext().setAttribute("viewer", "uploadfailure", ScriptContext.ENGINE_SCOPE);
+        getCurrentScriptContext().setAttribute("viewer", "uploadfailure", ENGINE_SCOPE);
 
         return "view";
     }

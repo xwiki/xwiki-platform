@@ -45,7 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.LargeStringProperty;
 
-import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
+import static org.xwiki.mentions.MentionLocation.TEXT_FIELD;
 import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
 /**
@@ -166,7 +166,7 @@ public class CreatedDocumentMentionsAnalyzer extends AbstractDocumentMentionsAna
                 this.xdomService
                     .parse(content, syntax)
                     .flatMap(xdom -> handleContentOnCreate(xdom, largeStringProperty.getReference(), version,
-                        authorReference, AWM_FIELD))
+                        authorReference, TEXT_FIELD))
                     .ifPresent(mentionNotificationParametersList::add);
             }
         }

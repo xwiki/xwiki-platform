@@ -34,8 +34,6 @@ editors.AutoSave = Class.create({
     frequency: 5, // minutes
     /** Is the UI for configuring the autosave enabled or not? */
     showConfigurationUI: true,
-    /** Disabled text opacity **/
-    disabledOpacity: 0.2,
     /**
      * Form to autosave, either a DOM element or its ID.
      * By default the form containing the element with the "xwikieditcontent" ID is used.
@@ -114,11 +112,12 @@ editors.AutoSave = Class.create({
     this.setTimeUnit();
     frequencyLabel.appendChild(document.createTextNode(" "));
     frequencyLabel.appendChild(this.timeUnit);
-    if (!this.options.enabled) {
-      frequencyLabel.setOpacity(this.options.disabledOpacity);
-    }
     // A paragraph containing the whole thing
     var container = new Element('div', {"id": "autosaveControl"});
+    this.classNameAutosaveDisabled = 'autosaveDisabled';
+    if (!this.options.enabled) {
+      container.addClassName(this.classNameAutosaveDisabled);
+    }
     container.appendChild(autosaveLabel);
     container.appendChild(document.createTextNode(" "));
     container.appendChild(frequencyLabel);
@@ -162,14 +161,6 @@ editors.AutoSave = Class.create({
         // no: restore the previous value in the input
         this.autosaveInput.value = this.options.frequency;
       }
-      // The input element should look like plain text when not focused.
-      // Since IE doesn't understand :focused, use a classname
-      this.autosaveInput.removeClassName('focused');
-    }.bindAsEventListener(this));
-
-    // The input element should look like any input when focused
-    Event.observe(this.autosaveInput, "focus", function() {
-      this.autosaveInput.addClassName('focused');
     }.bindAsEventListener(this));
 
     this._toggleTimerWhenSaveButtonIsEnabledOrDisabled();
@@ -217,12 +208,12 @@ editors.AutoSave = Class.create({
     if (this.options.enabled) {
       this.startTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up('label').setOpacity('1.0');
+        this.autosaveInput.up(1).removeClassName(this.classNameAutosaveDisabled);
       }
     } else {
       this.stopTimer();
       if (this.autosaveInput) {
-        this.autosaveInput.up('label').setOpacity(this.options.disabledOpacity);
+        this.autosaveInput.up(1).addClassName(this.classNameAutosaveDisabled);
       }
     }
   },

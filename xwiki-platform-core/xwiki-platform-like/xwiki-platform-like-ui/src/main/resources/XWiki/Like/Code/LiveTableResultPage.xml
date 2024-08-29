@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{velocity wiki="false"}}
 #if ($xcontext.action == 'get')
   #template('hierarchy_macros.vm')
   #if("$!{request.xpage}" == 'plain')
@@ -123,13 +123,13 @@
   ## ===
   ## JSON
   ## ===
-  {
+  #jsonResponse({
     "totalrows": $totalRows,
-    "returnedrows":  $pagesRows.size(),
+    "returnedrows": $pagesRows.size(),
     "offset": $newOffset,
     "reqNo": $numbertool.toNumber($request.reqNo),
-    "rows": $jsontool.serialize($pagesRows)
-  }
+    "rows": $pagesRows
+  })
 #end
 {{/velocity}}</content>
 </xwikidoc>

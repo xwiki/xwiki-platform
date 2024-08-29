@@ -56,35 +56,48 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
     @Override
     public String serialize(UserReference userReference)
     {
+        return serialize(userReference, new Object[] {});
+    }
+
+    @Override
+    public String serialize(UserReference userReference, Object... parameters)
+    {
         String result;
         if (userReference == null) {
             result = null;
-        } else if (SuperAdminUserReference.INSTANCE == userReference) {
-            result = SUPERADMIN_REFERENCE_STRING;
-        } else if (GuestUserReference.INSTANCE == userReference) {
-            result = GUEST_REFERENCE_STRING;
-        } else if (CurrentUserReference.INSTANCE == userReference) {
-            UserReference resolvedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
-            if (GuestUserReference.INSTANCE == resolvedUserReference) {
+        } else {
+            UserReference resolvedReference;
+            if (CurrentUserReference.INSTANCE == userReference) {
+                resolvedReference = this.currentUserReferenceUserReferenceResolver.resolve(null);
+            } else {
+                resolvedReference = userReference;
+            }
+
+            if (SuperAdminUserReference.INSTANCE == resolvedReference) {
+                result = SUPERADMIN_REFERENCE_STRING;
+            } else if (GuestUserReference.INSTANCE == resolvedReference) {
                 result = GUEST_REFERENCE_STRING;
             } else {
-                result = serializeInternal(resolvedUserReference);
+                result = serializeInternal(resolvedReference, parameters);
             }
-        } else {
-            result = serializeInternal(userReference);
         }
         return result;
     }
 
-    private String serializeInternal(UserReference userReference)
+    private String serializeInternal(UserReference userReference, Object... parameters)
     {
         String result;
         if (!(userReference instanceof DocumentUserReference)) {
             throw new IllegalArgumentException("Only DocumentUserReference are handled");
         } else {
             DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-            result = this.entityReferenceSerializer.serialize(documentUserReference.getReference());
+            result = getEntityReferenceSerializer().serialize(documentUserReference.getReference(), parameters);
         }
         return result;
+    }
+
+    protected EntityReferenceSerializer<String> getEntityReferenceSerializer()
+    {
+        return this.entityReferenceSerializer;
     }
 }

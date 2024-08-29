@@ -26,8 +26,8 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.incava.util.diff.Diff;
-import org.incava.util.diff.Difference;
+import org.incava.diff.Diff;
+import org.incava.diff.Difference;
 import org.xwiki.annotation.maintainer.DiffService;
 import org.xwiki.annotation.maintainer.XDelta;
 import org.xwiki.component.annotation.Component;

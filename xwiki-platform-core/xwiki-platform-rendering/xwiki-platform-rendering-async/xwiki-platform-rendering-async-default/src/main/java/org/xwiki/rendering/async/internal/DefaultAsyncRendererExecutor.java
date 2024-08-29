@@ -37,6 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.cache.CacheControl;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -46,6 +47,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncContextHandler;
@@ -89,6 +91,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     @Inject
     private CacheControl cacheControl;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private Logger logger;
@@ -227,6 +232,18 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
                 // Prepare to catch stuff to invalidate the cache
                 if (this.asyncContext instanceof DefaultAsyncContext) {
                     ((DefaultAsyncContext) this.asyncContext).pushContextUse();
+                }
+
+                // Mark the context document as used if it was explicitly set in the context, unless the context 
+                // document is null.
+                if (configuration.getContextEntries() != null && configuration.getContextEntries()
+                    .contains(XWikiContextContextStore.PROP_DOCUMENT_REFERENCE))
+                {
+                    DocumentReference currentDocumentReference =
+                        this.documentAccessBridge.getCurrentDocumentReference();
+                    if (currentDocumentReference != null) {
+                        this.asyncContext.useEntity(currentDocumentReference);
+                    }
                 }
 
                 AsyncRendererResult result = syncRender(renderer, true, configuration);
@@ -380,11 +397,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             boolean encode = false;
 
             switch (c) {
-                // '/' and '\' has been known to cause issues with various default server setup (Tomcat for example)
-                case '/':
-                case '\\':
+                // '/' and '\' have been known to cause issues with various default server setup (Tomcat for example)
+                case '/', '\\':
                     encode = true;
-
                     break;
 
                 default:

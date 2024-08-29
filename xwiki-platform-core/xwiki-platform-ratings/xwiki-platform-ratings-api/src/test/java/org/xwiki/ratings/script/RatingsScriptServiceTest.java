@@ -28,14 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -47,7 +45,11 @@ import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -94,6 +96,12 @@ public class RatingsScriptServiceTest
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
+    @MockComponent
+    private ContextualAuthorizationManager authorizationManager;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     private RatingsConfiguration ratingsConfiguration;
 
     private UserReference currentUser;
@@ -132,7 +140,7 @@ public class RatingsScriptServiceTest
         RatingsManager ratingsManager = mock(RatingsManager.class);
         when(this.ratingsManagerFactory.getRatingsManager(requestedHint)).thenReturn(ratingsManager);
         DefaultScriptRatingsManager scriptRatingsManager = mock(DefaultScriptRatingsManager.class);
-        when(this.componentManager.getInstance(DefaultScriptRatingsManager.class, requestedHint))
+        when(this.componentManager.getInstance(DefaultScriptRatingsManager.class))
             .thenReturn(scriptRatingsManager);
 
         assertEquals(scriptRatingsManager, this.scriptService.get(requestedHint));
@@ -298,5 +306,16 @@ public class RatingsScriptServiceTest
 
         // Ensure that we stop the loop whenever we found a match.
         verify(inputRef, never()).hasParent(lastExcludedRef);
+    }
+
+    @Test
+    void recomputeAverageRating() throws RatingsException
+    {
+        DocumentReference docRef = mock(DocumentReference.class);
+
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+        AverageRating averageRating = mock(AverageRating.class);
+        when(this.defaultManager.recomputeAverageRating(docRef)).thenReturn(averageRating);
+        assertEquals(Optional.of(averageRating), this.scriptService.recomputeAverageRating(docRef));
     }
 }

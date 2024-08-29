@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -58,7 +57,7 @@ import static org.mockito.Mockito.when;
  * @since 2.1M1
  */
 @ComponentTest
-public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
+class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporterTest
 {
     /**
      * The name of an input file to be used in tests.
@@ -92,12 +91,13 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
      * Test {@link OfficeDocument} building.
      */
     @Test
-    public void xdomOfficeDocumentBuilding() throws Exception
+    void xdomOfficeDocumentBuilding() throws Exception
     {
         // Create & register a mock document converter to by-pass the office server.
         final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
-        final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
-        mockInput.put(INPUT_FILE_NAME, mockOfficeFileStream);
+        final Map<String, InputStream> mockInput = new HashMap<>();
+        String internalInputFilename = "input.doc";
+        mockInput.put(internalInputFilename, mockOfficeFileStream);
         OfficeConverterResult converterResult = mock(OfficeConverterResult.class);
         when(converterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
         File outputFile = new File(this.outputDirectory, OUTPUT_FILE_NAME);
@@ -113,7 +113,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
 
         when(mockOfficeServer.getConverter()).thenReturn(mockDocumentConverter);
-        when(mockDocumentConverter.convertDocument(mockInput, INPUT_FILE_NAME, OUTPUT_FILE_NAME))
+        when(mockDocumentConverter.convertDocument(mockInput, internalInputFilename, "output.html"))
             .thenReturn(converterResult);
         when(mockDocumentReferenceResolver.resolve("xwiki:Main.Test")).thenReturn(documentReference);
         when(mockDefaultStringEntityReferenceSerializer.serialize(documentReference)).thenReturn("xwiki:Main.Test");
@@ -122,7 +122,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
             xdomOfficeDocumentBuilder.build(mockOfficeFileStream, INPUT_FILE_NAME, documentReference, true);
         assertEquals("xwiki:Main.Test", document.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
         assertEquals("**Hello There**", document.getContentAsString());
-        assertEquals(0, document.getArtifactsFiles().size());
+        assertEquals(0, document.getArtifactsMap().size());
 
         verify(mockOfficeServer).getConverter();
     }

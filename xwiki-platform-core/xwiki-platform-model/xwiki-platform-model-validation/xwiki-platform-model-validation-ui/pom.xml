@@ -23,10 +23,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model-validation</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-ui</artifactId>
-  <name>XWiki Platform - Model Validation - UI</name>
-  <description>XWiki Platform - Model Validation UI for module configuration</description>
+  <name>XWiki Platform - Model - Validation - UI</name>
+  <description>Admin UI for Model Validation</description>
   <packaging>xar</packaging>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Model Validation UI</xwiki.extension.name>
+    <!-- Category to display by the Extension Manager -->
+    <xwiki.extension.category>application</xwiki.extension.category>
+  </properties>
 </project>

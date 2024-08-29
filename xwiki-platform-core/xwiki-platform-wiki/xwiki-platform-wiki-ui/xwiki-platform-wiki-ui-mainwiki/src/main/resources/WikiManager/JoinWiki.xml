@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.5" reference="WikiManager.JoinWiki" locale="">
   <web>WikiManager</web>
   <name>JoinWiki</name>
   <language/>
@@ -146,20 +146,28 @@
               &lt;dd&gt;
                 $existingInvitation.get('reviewerComment').getValue()
               &lt;/dd&gt;
-            #end  
+            #end
               &lt;dt&gt;
                 &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.invitation.reply.title"/}}&lt;/label&gt;
                 &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.invitation.reply.hint"/}}&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
-              &lt;span class='buttonwrapper'&gt;
-                &lt;br/&gt;
-                &lt;input type='submit' name='acceptInvitation' value="$services.localization.render('platform.wiki.users.invitation.accept.label')" class='button'/&gt;
-                &lt;input type='submit' name='rejectInvitation' value="$services.localization.render('platform.wiki.users.invitation.reject.label')" class='button'/&gt;
-                &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.invitation.postpone.label"/}}&lt;/a&gt;
-              &lt;/span&gt;
-              &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
-              &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+              &lt;dd&gt;
+                &lt;span class='buttonwrapper'&gt;
+                  &lt;br/&gt;
+                  &lt;input type='submit' name='acceptInvitation'
+                    value="$services.localization.render('platform.wiki.users.invitation.accept.label')"
+                    class='button'/&gt;
+                  &lt;input type='submit' name='rejectInvitation'
+                    value="$services.localization.render('platform.wiki.users.invitation.reject.label')"
+                    class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;
+                    {{translation key="platform.wiki.users.invitation.postpone.label"/}}
+                  &lt;/a&gt;
+                &lt;/span&gt;
+                &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+              &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/form&gt;
           {{/html}}
@@ -228,25 +236,33 @@
            {{/warning}}
 
           #end
-        
-          {{html wiki='true'}}
-            $services.localization.render('platform.wiki.users.join.request.hint', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
 
-            &lt;form class='xform third' method='GET'&gt;
+          {{html wiki='true'}}
+          $services.localization.render('platform.wiki.users.join.request.hint', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+
+          &lt;form class='xform third' method='GET'&gt;
               &lt;dl&gt;
                 &lt;dt&gt;
                   &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.join.request.message.label"/}}&lt;/label&gt;
                   &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.join.request.message.hint"/}}&lt;/span&gt;
                 &lt;/dt&gt;
-                &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
-                &lt;span class='buttonwrapper'&gt;
+                &lt;dd&gt;
+                  &lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;
+                &lt;/dd&gt;
+                &lt;dd&gt;
+                  &lt;span class='buttonwrapper'&gt;
                   &lt;br/&gt;
-                  &lt;input type='submit' name='submit' value="$services.localization.render('platform.wiki.users.join.request.send.label')" class='button'/&gt;
-                  &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.join.request.cancel.label"/}}&lt;/a&gt;
-                &lt;/span&gt;
-                &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
-                &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
-                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                  &lt;input type='submit' name='submit'
+                    value="$services.localization.render('platform.wiki.users.join.request.send.label')"
+                    class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;
+                    {{translation key="platform.wiki.users.join.request.cancel.label"/}}
+                  &lt;/a&gt;
+                  &lt;/span&gt;
+                  &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
+                  &lt;input type='hidden' name='requestJoin' value="$escapetool.xml($!request.requestJoin)"/&gt;
+                  &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                &lt;/dd&gt;
               &lt;/dl&gt;
             &lt;/form&gt;
           {{/html}}

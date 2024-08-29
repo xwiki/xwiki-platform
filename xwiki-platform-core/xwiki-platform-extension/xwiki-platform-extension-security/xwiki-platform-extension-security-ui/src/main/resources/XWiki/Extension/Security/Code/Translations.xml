@@ -1,0 +1,93 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Extension.Security.Code.Translations" locale="">
+  <web>XWiki.Extension.Security.Code</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Extension.Security.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>extension.security.admin.title=Security Vulnerabilities
+extension.security.indexed.started=Index started on {0}.
+extension.security.indexed.on=Indexed on {0}. Any extension installed after this date, or security vulnerabilities released after this date won''t appear. New security scans are performed periodically.
+extension.security.indexed.nojob=Could not find any previous indexation processing.
+extension.security.admin.generalWarning=Please note that this security scan does not include all installed extensions. Extensions that can't be updated through the Extension Manager are currently not included.
+extension.security.admin.configuration.title=Configuration
+extension.security.admin.environment.explanation=Extensions listed in this section have known vulnerabilities, but can't be upgraded from the Extension Manager. This means that they can only be fixed by upgrading XWiki itself or its environment (e.g., servlet engine, or docker container).
+extension.security.notification.message=We have identified {0} extensions with known security vulnerabilities, see the detail in the {1} report
+extension.security.experimental.warning=Be aware that this extension is currently experimental and can lead the presentation of inacurrate analysis. Therefore, the presented results are to be read carefully before taking any action. 
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan Enabled
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=When unchecked, the security scan won't be executed anymore
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scan Delay
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=The number of hours to wait between two security scan (default: 24h)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan URL
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=The url to use as the remote source for the security scan (default value: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=Reviews URL
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=The url to use as the remote source for the security scan reviews (default value: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)</content>
+  <object>
+    <name>XWiki.Extension.Security.Code.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>a14e6010-1aa5-4eb9-b6cf-c1b22a528a30</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

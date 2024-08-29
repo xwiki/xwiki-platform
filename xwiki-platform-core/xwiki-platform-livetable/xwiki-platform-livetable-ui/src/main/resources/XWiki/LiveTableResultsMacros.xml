@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.LiveTableResultsMacros" locale="">
+<xwikidoc version="1.5" reference="XWiki.LiveTableResultsMacros" locale="">
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
@@ -73,7 +73,18 @@
   ##
   #set($tablelist = [])
   #foreach($colname in $collist)
-    #livetable_addColumnToQuery($colname)
+    ## If a classname is defined and the class field corresponding to the column name,
+    ## we check the type of the field and skip it if it's Password.
+    #if ($className != '' &amp;&amp; $class.get($colname))
+      #set ($isPasswordType = $class.get($colname).classType == 'Password')
+      #set ($isEmailType = $class.get($colname).classType == 'Email')
+      #set ($emailObfuscated = $services.mail.general.shouldObfuscate())
+      #if (!($isPasswordType || ($isEmailType &amp;&amp; $emailObfuscated)))
+        #livetable_addColumnToQuery($colname)
+      #end
+    #else
+      #livetable_addColumnToQuery($colname)
+    #end
   #end
   ##
   ## Tag filtering
@@ -127,6 +138,8 @@
   #set($order = "$!request.sort")
   #if ($order == 'doc.location')
     #set ($order = 'doc.fullName')
+  #elseif ($order == 'email' &amp;&amp; $services.mail.general.shouldObfuscate())
+    #set ($order = '')
   #end
   #set ($orderSql = '')
   #if($order != '')
@@ -301,7 +314,13 @@
   ##
   ## TagCloud matching all the documents used by the live table
   ##
-  #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  ## If all the query parameters are the same as for $tagsMatchingFilters, no need to run the query again.
+  ## This optimization allows to divide the time to compute the tagcloud by 2 when the table has no filters applied.  
+  #if ($allMatchingTagsFrom.trim() != $tagsMatchingFiltersFrom.trim() || $allMatchingTagsWhere.trim() != $tagsMatchingFiltersWhere.trim() || $tagsMatchingParams != $allMatchingParams)
+    #set($allMatchingTags = $xwiki.tag.getTagCountForQuery($allMatchingTagsFrom, $allMatchingTagsWhere, $allMatchingParams))
+  #else
+    #set($allMatchingTags = $tagsMatchingFilters)
+  #end
   ## FIXME: We use a list of maps just because the client expects an array, but we should simply return $allMatchingTags..
   #set($tags = [])
   #foreach($tag in $allMatchingTags.keySet())
@@ -336,13 +355,19 @@
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
-  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #if ($limit &gt; 0)
+    #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #else
+    ## When the limit is 0, it's equivalent to no limit at all and the actual number of returned results can be used.
+    #set($discard = $map.put('returnedrows', $items.size()))
+  #end
   #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
   #set($rows = [])
   #foreach($item in $items)
     #gridresult_buildRowJSON($item $rows)
   #end
-  #set($discard = $map.put('rows', $rows))
+  #set ($discard = $map.put('rows', $rows))
+  #livetable_filterObfuscated($map)
 #end
 
 
@@ -365,64 +390,82 @@
     #set($docLanguage = '')
   #end
   #set ($docReference = $services.model.resolveDocument($docName))
-  #set ($row = {
-    'doc_viewable': $services.security.authorization.hasAccess('view', $docReference),
-    'doc_fullName': $services.model.serialize($docReference, 'local'),
-    'doc_space': $services.model.serialize($docReference.parent, 'local'),
-    'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
-    'doc_url': $xwiki.getURL($docReference),
-    'doc_space_url': $xwiki.getURL($docReference.parent),
-    'doc_wiki': $docReference.wikiReference.name,
-    'doc_wiki_url': $xwiki.getURL($docReference.wikiReference),
-    'doc_hasadmin': $xwiki.hasAdminRights(),
-    'doc_hasedit': $services.security.authorization.hasAccess('edit', $docReference),
-    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $docReference),
-    'doc_edit_url': $xwiki.getURL($docReference, 'edit'),
-    'doc_copy_url': $xwiki.getURL($docReference, 'view', 'xpage=copy'),
-    'doc_delete_url': $xwiki.getURL($docReference, 'delete'),
-    'doc_rename_url': $xwiki.getURL($docReference, 'view', 'xpage=rename&amp;step=1')
-  })
-  #set ($isTranslation = "$!docLanguage" != '' &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
-  ## Display the language after the document name so that not all translated documents have the same name displayed.
-  #set ($row.doc_name = "$docReference.name#if ($isTranslation) ($docLanguage)#end")
-  #set ($row.doc_hascopy = $row.doc_viewable)
-  #set ($row.doc_hasrename = $row.doc_hasdelete)
-  #set ($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
-  #if ($docReference.name == 'WebHome')
-    ## For nested pages, use the page administration.
-    #set ($webPreferencesReference = $services.model.createDocumentReference('WebPreferences', $docReference.lastSpaceReference))
-    #set ($row.doc_rights_url = $xwiki.getURL($webPreferencesReference, 'admin', 'editor=spaceadmin&amp;section=PageRights'))
-  #else
-    ## For terminal pages, use the old rights editor.
-    ## TODO: We should create a page administration for terminal pages too.
-    #set ($row.doc_rights_url = $xwiki.getURL($docReference, 'edit', 'editor=rights'))
-  #end
-  #if ($row.doc_viewable)
-    #set ($itemDoc = $xwiki.getDocument($docReference))
-    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
-    ## result is a translation.
-    #if ($isTranslation)
-      #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+  #set ($isViewable = $services.security.authorization.hasAccess('view', $docReference))
+  #if ($isViewable)
+    #set ($row = {
+      'doc_viewable': $isViewable,
+      'doc_fullName': $services.model.serialize($docReference, 'local'),
+      'doc_space': $services.model.serialize($docReference.parent, 'local'),
+      'doc_location': "#hierarchy($docReference, {'limit': 5, 'plain': false, 'local': true, 'displayTitle': false})",
+      'doc_url': $xwiki.getURL($docReference),
+      'doc_space_url': $xwiki.getURL($docReference.parent),
+      'doc_wiki': $docReference.wikiReference.name,
+      'doc_wiki_url': $xwiki.getURL($docReference.wikiReference),
+      'doc_hasadmin': $xwiki.hasAdminRights(),
+      'doc_hasedit': $services.security.authorization.hasAccess('edit', $docReference),
+      'doc_hasdelete': $services.security.authorization.hasAccess('delete', $docReference),
+      'doc_edit_url': $xwiki.getURL($docReference, 'edit'),
+      'doc_copy_url': $xwiki.getURL($docReference, 'view', 'xpage=copy'),
+      'doc_delete_url': $xwiki.getURL($docReference, 'delete'),
+      'doc_rename_url': $xwiki.getURL($docReference, 'view', 'xpage=rename&amp;step=1')
+    })
+    #set ($isTranslation = "$!docLanguage" != '' &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+    ## Display the language after the document name so that not all translated documents have the same name displayed.
+    #set ($row.doc_name = "$docReference.name#if ($isTranslation) ($docLanguage)#end")
+    #set ($row.doc_hascopy = $row.doc_viewable)
+    #set ($row.doc_hasrename = $row.doc_hasdelete)
+    #set ($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
+    #if ($docReference.name == 'WebHome')
+    
+      ## For nested pages, use the page administration.
+      #set ($webPreferencesReference = $services.model.createDocumentReference(
+        'WebPreferences', $docReference.lastSpaceReference))
+      #set ($row.doc_rights_url = $xwiki.getURL($webPreferencesReference, 'admin',
+        'editor=spaceadmin&amp;section=PageRights'))
     #else
-      #set ($translatedDoc = $itemDoc.translatedDocument)
+      ## For terminal pages, use the old rights editor.
+      ## TODO: We should create a page administration for terminal pages too.
+      #set ($row.doc_rights_url = $xwiki.getURL($docReference, 'edit', 'editor=rights'))
     #end
-    #set($discard = $itemDoc.use($className))
-    #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
-    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
-    #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
-    #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
-    #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
-    #set($rawTitle = $translatedDoc.title)
-    #if($rawTitle != $row['doc_title'])
-   #set($discard = $row.put('doc_title_raw', $rawTitle))
+    #if ($row.doc_viewable)
+      #set ($itemDoc = $xwiki.getDocument($docReference))
+      ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+      ## result is a translation.
+      #if ($isTranslation)
+        #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #else
+        #set ($translatedDoc = $itemDoc.translatedDocument)
+      #end
+      #set($discard = $itemDoc.use($className))
+      #set($discard = $row.put('doc_objectCount', $itemDoc.getObjectNumbers($className)))
+      #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
+      #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+      #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+      #set($rawTitle = $translatedDoc.title)
+      #if($rawTitle != $row['doc_title'])
+        #set($discard = $row.put('doc_title_raw', $rawTitle))
+      #end
+      #set ($metadataAuthor = $translatedDoc.authors.originalMetadataAuthor)
+      #if ($metadataAuthor == $services.user.getGuestUserReference())
+        ## Special handling for guest so that it displays unknown user.
+        #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($NULL)))
+      #else
+        #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($metadataAuthor)))
+      #end
+
+      #set($discard = $row.put('doc_author_url', $xwiki.getURL($metadataAuthor)))
+      #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+      #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
+      #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
+      #foreach($colname in $collist)
+        #gridresult_buildColumnJSON($colname $row)
+      #end
     #end
-    #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
-    #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
-    #set($discard = $row.put('doc_hidden', $translatedDoc.isHidden()))
-    #foreach($colname in $collist)
-      #gridresult_buildColumnJSON($colname $row)
-    #end
+  #else
+    #set ($row = {
+      'doc_viewable': $isViewable,
+      'doc_fullName': 'obfuscated'
+    })
   #end
   #set($discard = $rows.add($row))
 #end
@@ -463,10 +506,12 @@
     #set($fieldProperty = $fieldObject.getProperty($colname))
     #if ($fieldProperty.getPropertyClass().classType == 'Password')
       #set($fieldValue = '********')
+    #elseif ($fieldProperty.getPropertyClass().classType == 'Email' &amp;&amp; $services.mail.general.shouldObfuscate())
+      #set ($fieldValue = $services.mail.general.obfuscate("$!fieldProperty.getValue()"))
     #else
       #set($fieldValue = "$!fieldProperty.getValue()")
     #end
-    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
+    #set($fieldDisplayValue = "#unwrapXPropertyDisplay($itemDoc.display($colname, 'view'))")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
@@ -478,7 +523,7 @@
         #set($fieldUrl = '')
       #end
     #end
-    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put($colname, $fieldDisplayValue))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     #set($discard = $row.put("${colname}_url", $fieldUrl))
     ## Reset to the default class
@@ -660,7 +705,7 @@
 
 #**
  * Macro to extend the query to select the properties for the livetable columns.
- * NOTE $colname is filtered (all characters but [a-zA-Z0-9_.] are removed) before use
+ * NOTE $colName is filtered (all characters but [a-zA-Z0-9_.] are removed) before use
  *#
 #macro (livetable_addColumnToQuery $colName)
   ## Safe because / is not allowed in property names
@@ -670,8 +715,8 @@
     #set ($filterValue = "$!request.getParameter($colName)")
     #if ("$!filterValue" != '')
       #set ($discard = $tablelist.add($colName))
-      ## Specifies how the filter value should be matched against the stored value.
-      #set ($matchType = $request.getParameter("${colname}_match"))
+      ## Some columns may support filtering with multiple constraints (multiple filter values).
+      #set ($filterValues = $request.getParameterValues($colName))
       #if ($colName.startsWith('doc.'))
         #if ($colName == 'doc.location')
           #set ($safeColName = 'doc.fullName')
@@ -680,7 +725,7 @@
           ## Also note that we don't call addLocationFilter since we use a Map for $params.
           #filterLocation($whereSql, $whereParams, $filterValue, 'locationFilterValue2', true)
         #elseif ($colName == 'doc.date' || $colName == 'doc.creationDate' || $colName == 'doc.contentUpdateDate')
-          #livetable_getTableAlias($colname)
+          #livetable_getTableAlias($colName)
           #livetable_filterDateProperty()
         #else
           #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
@@ -693,16 +738,47 @@
           #end
         #end
       #else
-        #set ($filterValues = $request.getParameterValues($colname))
-        #set ($valueCount = $filterValues.size())
-        #livetable_filterProperty($colName $filterValue $valueCount)
+        #livetable_filterProperty($colName)
       #end
     #end
   #end
 #end
 
 
-#macro (livetable_filterProperty $colname $filterValue $valueCount)
+#**
+ * Determine how the filter values should be matched against the stored values. This macro sets two variables:
+ * &lt;ul&gt;
+ *   &lt;li&gt;$matchType: use this when the specified column supports only a single filter value&lt;/li&gt;
+ *   &lt;li&gt;$matchTypes: use this when the specified column supports multiple filter values.&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * @param column the column name; each column can have a different match type
+ * @param filterValueCount the number of filter values for which to determine the match type; each filter value can have
+ *          a different match type
+ * @param defaultMatchType the default match type to use for the given column when the request doesn't specify one
+ *#
+#macro (livetable_getMatchTypes $column $filterValueCount $defaultMatchType)
+  #set ($macro.matchTypes = $request.getParameterValues("${column}_match"))
+  #if (!$macro.matchTypes || $macro.matchTypes.isEmpty())
+    ## No match type specified for this column.
+    #set ($matchType = $defaultMatchType)
+    #set ($matchTypes = $stringtool.repeat($matchType, ',', $filterValueCount).split(','))
+  #else
+    ## At least one match type specified for this column.
+    #set ($matchType = $macro.matchTypes.get(0))
+    #set ($matchTypes = [])
+    #set ($discard = $matchTypes.addAll($macro.matchTypes.subList(0, $mathtool.min($macro.matchTypes.size(),
+      $filterValueCount))))
+    #if ($matchTypes.size() &lt; $filterValueCount)
+      ## Add missing match types.
+      #set ($discard = $matchTypes.addAll($stringtool.repeat($matchType, ',', $mathtool.sub($filterValueCount,
+        $matchTypes.size())).split(',')))
+    #end
+  #end
+#end
+
+
+#macro (livetable_filterProperty $colname)
   #livetable_getTableAlias($colname)
   #livetable_getTableName($colname)
   #set ($fromSql = "$fromSql, $tableName as $safe_tableAlias")
@@ -800,6 +876,10 @@
   #end
   #set ($safeDateProperty = $dateProperty.replace('.', '_'))
   #set ($dateRange = {})
+  ## Perform partial string matching by default if no match type is specified.
+  ## Note that for the moment we support only one filter value (e.g. one date range) and thus only the first match type
+  ## is taken into account.
+  #livetable_getMatchTypes($colname $filterValues.size() 'partial')
   #parseDateRange($matchType $filterValue $dateRange)
   #if ($dateRange.start || $dateRange.end)
     ## Date range.
@@ -834,36 +914,14 @@
 #end
 
 
-#macro (parseDateRange $matchType $filterValue $dateRange)
-  ## Transform the filter value into a date range if needed.
-  #if ($matchType == 'after')
-    #set ($dateRangeString = "$filterValue/")
-  #elseif ($matchType == 'before')
-    #set ($dateRangeString = "/$filterValue")
-  #else
-    #set ($dateRangeString = $filterValue)
-  #end
-  ## Try to parse as ISO 8601 time interval (see https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
-  #set ($parts = $dateRangeString.split('/', -1))
-  #if ($parts.size() == 2)
-    #set ($dateRange.start = $datetool.toDate('iso_tz', $parts[0]))
-    #set ($dateRange.end = $datetool.toDate('iso_tz', $parts[1]))
-  #end
-  #if (!$dateRange.start &amp;&amp; !$dateRange.end)
-    ## Try to parse as timestamp range. Note that this doesn't handle well negative timestamps.
-    #set ($parts = $dateRangeString.split('-', -1))
-    #if ($parts.size() == 2)
-      #set ($dateRange.start = $datetool.toDate($numbertool.toNumber($parts[0])))
-      #set ($dateRange.end = $datetool.toDate($numbertool.toNumber($parts[1])))
-    #end
-  #end
-#end
-
-
 #**
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterDBStringListProperty)
+  ## Perform exact matching by default if no match type is specified.
+  ## Note that for DBStringList properties we take into account only the first match type, even if multiple filter
+  ## values are specified. Basically the first match type is used for all filter values.
+  #livetable_getMatchTypes($colname $filterValues.size() 'exact')
   #if ($matchType == 'partial' || $matchType == 'prefix')
     ## We need to join with the list of values in order to be able to use the LIKE operator.
     #set ($matchTarget = "${safe_tableAlias}_item")
@@ -875,7 +933,7 @@
     #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
     #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
   #else
-    ## Perform exact matching by default (if no match type is specified).
+    ## Fall-back on exact matching even if the match type is specified, when its value is not supported.
     #set ($matchType = 'exact')
     #set ($matchTarget = "${safe_tableAlias}.list")
     #if ($whereParams.entrySet())
@@ -884,8 +942,7 @@
       #set ($paramPrefix = $NULL)
     #end
   #end
-  #set ($filterValues = $request.getParameterValues($colname))
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix)")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "$whereSql and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
@@ -897,25 +954,27 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterStringListProperty)
-  #set ($filterValues = $request.getParameterValues($colname))
+  ## From the user point of view we support only exact matching for StringList properties, due to the way the values of
+  ## these properties are stored (concatenated). But when building the actual query, the match type is in fact partial
+  ## because we have to use the like operator in order to match the concatenated list of values.
+  #livetable_getMatchTypes($colname $filterValues.size() 'exact')
   #set ($matchTarget = "concat('|', concat(${safe_tableAlias}.textValue, '|'))")
   #if ($whereParams.entrySet())
     #set ($paramPrefix = "${safe_tableAlias}_textValue_")
   #else
     #set ($paramPrefix = $NULL)
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix)")
+  ## As noted above, we have to use the like operator because the list of values is saved concatenated, so from the
+  ## point of view of the query the match type is always partial.
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix $NULL)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #set ($actualMatchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
-    #if ($actualMatchType == 'empty')
+    #if ($matchTypes.get($foreach.index) == 'empty')
+      ## The client side cannot pass an empty filter value so it specifies that the value is empty using the match type.
       #set ($filterValue = '')
     #end
-    #if ($whereParams.entrySet())
-      #set ($discard = $whereParams.put("${paramPrefix}${foreach.count}", "%|$filterValue|%"))
-    #else
-      #set ($discard = $whereParams.add("%|$filterValue|%"))
-    #end
+    ## As noted above, we can only perform exact matching due to the way the values are stored (concatenated).
+    #livetable_addFilterParam("%|$filterValue|%" 'exact' $whereParams "${paramPrefix}${foreach.count}")
   #end
 #end
 
@@ -924,53 +983,85 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterStringProperty)
-  #if ("$!matchType" == '')
-    #if ($propMetaClass.endsWith('ListClass'))
-      ## Perform exact matching by default for StaticListClass, DBListClass and DBTreeListClass
-      ## when they are stored as StringProperty (i.e. single value and no relational storage).
-      #set ($matchType = 'exact')
-    #else
-      ## Perform partial matching by default otherwise (if no match type is specified).
-      #set ($matchType = 'partial')
-    #end
+  #if ($propMetaClass.endsWith('ListClass'))
+    ## Perform exact matching by default for StaticListClass, DBListClass and DBTreeListClass
+    ## when they are stored as StringProperty (i.e. single value and no relational storage).
+    #set ($defaultStringMatchType = 'exact')
+  #else
+    ## Perform partial matching by default otherwise.
+    #set ($defaultStringMatchType = 'partial')
   #end
+  #livetable_getMatchTypes($colname $filterValues.size() $defaultStringMatchType)
+  ## Group the filter values by match type so that we cann optimize the query.
+  #livetable_groupFilterValuesByMatchType($matchTypes $filterValues)
   #if ($whereParams.entrySet())
     #set ($paramPrefix = "${safe_tableAlias}_value_")
   #else
     #set ($paramPrefix = $NULL)
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount $paramPrefix)")
-  #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
-  #foreach ($filterValue in $filterValues)
-    #set ($actualMatchType = $request.getParameterValues("${colname}_match").get($foreach.count - 1))
-    #livetable_addFilterParam($filterValue $actualMatchType $whereParams "${paramPrefix}${foreach.count}")
+  ## Note that unlike other property types, the String property supports different match types for different filter
+  ## values. This means we have to call livetable_getFilterQuery for each filter value and then join the constraints
+  ## ourselves.
+  #set ($constraints = [])
+  #set ($paramOffset = 1)
+  #foreach ($entry in $filterValuesByMatchType.entrySet())
+    #set ($matchType = $entry.key)
+    #set ($filterValues = $entry.value)
+    #set ($constraint = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $filterValues.size() $paramPrefix $paramOffset)")
+    #set ($discard = $constraints.add($constraint.trim()))
+    #foreach ($filterValue in $filterValues)
+      #livetable_addFilterParam($filterValue $matchType $whereParams
+        "${paramPrefix}${mathtool.add($paramOffset, $foreach.index)}")
+    #end
+    #set ($paramOffset = $paramOffset + $filterValues.size())
+  #end
+  #set ($whereSql = "${whereSql} and ($stringtool.join($constraints, "" $joinOperator ""))")
+#end
+
+#macro (livetable_groupFilterValuesByMatchType $matchTypes $filterValues)
+  #set ($filterValuesByMatchType = {})
+  #foreach ($matchType in $matchTypes)
+    #set ($discard = $filterValuesByMatchType.putIfAbsent($matchType, []))
+    #set ($discard = $filterValuesByMatchType.get($matchType).add($filterValues.get($foreach.index)))
   #end
 #end
 
-#macro (livetable_getFilterQuery $column $matchType $isList $valueCount $paramPrefix)
-  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+#macro (livetable_getJoinOperator $colName)
+  #set ($joinOperator = "$!{request.get(""${colName}${joinModeMarker}"").toUpperCase()}")
   #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
     #set ($joinOperator = 'AND')
   #end
+#end
+
+#macro (livetable_getFilterQuery $column $matchType $isList $valueCount $paramPrefix $paramOffset)
+  #livetable_getJoinOperator($colname)
+  #if (!$paramOffset)
+    #set ($paramOffset = 1)
+  #end
   #if ($matchType == 'partial' || $matchType == 'prefix')
-    #livetable_repeatParams("upper($column) like upper(?)", " $joinOperator ", $valueCount, $paramPrefix)
+    #livetable_repeatParams("upper($column) like upper(?)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)
+  #elseif($matchType == 'empty')
+    ## Check if the value of the column is like the empty parameter (which is often the empty string), or if the value 
+    ## of the column is null (to be compliant with Oracle which stores the empty string as a NULL value).
+    #livetable_repeatParams("($column like ? or $column is null)", " $joinOperator ", $valueCount, $paramPrefix, 
+    $paramOffset)
   #elseif ($isList)
-    #livetable_repeatParams("? in elements($column)", " $joinOperator ", $valueCount, $paramPrefix)
+    #livetable_repeatParams("? in elements($column)", " $joinOperator ", $valueCount, $paramPrefix, $paramOffset)
   #elseif ($valueCount &gt; 1 &amp;&amp; $joinOperator == 'OR')
-    $column in (#livetable_repeatParams('?', ', ', $valueCount, $paramPrefix))
+    $column in (#livetable_repeatParams('?', ', ', $valueCount, $paramPrefix, $paramOffset))
   #else
-    #livetable_repeatParams("$column = ?", ' AND ', $valueCount, $paramPrefix)
+    #livetable_repeatParams("$column = ?", ' AND ', $valueCount, $paramPrefix, $paramOffset)
   #end
 #end
 
-#macro (livetable_repeatParams $str $separator $valueCount $paramPrefix)
+#macro (livetable_repeatParams $str $separator $valueCount $paramPrefix $paramOffset)
   #if ($valueCount &gt; 0)
     #foreach ($count in [1..$valueCount])
       #if ($count &gt; 1)
         $separator##
       #end
       #if ($paramPrefix)
-        $str.replace('?', ":${paramPrefix}${foreach.count}")##
+        $str.replace('?', ":${paramPrefix}${mathtool.add($paramOffset, $foreach.index)}")##
       #else
         $str##
       #end

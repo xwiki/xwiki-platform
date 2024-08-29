@@ -35,7 +35,7 @@ public interface ResourceLoader<T extends ResourceReference>
 {
     /**
      * @param reference the reference to the Resource to load
-     * @return the Resource content as an Input Stream
+     * @return the Resource content as an Input Stream or null if it doesn't exist or cannot be loaded
      */
     InputStream load(T reference);
 }

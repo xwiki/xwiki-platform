@@ -19,13 +19,18 @@
  */
 package com.xpn.xwiki.web;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -37,31 +42,56 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class XWikiServletRequestStubTest
 {
     @Test
-    void copy() throws MalformedURLException
+    void copy() throws Exception
     {
-        URL requestURL = new URL("http://host:42/contextPath/path");
-        String contextPath = "contextPath";
-        Map<String, String[]> requestParameters = new HashMap<>();
-        requestParameters.put("param1", new String[] { "value12", "value12" });
-        requestParameters.put("param2", new String[] { "value22", "value22" });
-
-        XWikiServletRequestStub request = new XWikiServletRequestStub(requestURL, contextPath, requestParameters);
+        XWikiServletRequestStub request = createRequest();
         request.setDaemon(false);
 
         XWikiServletRequestStub copiedRequest = new XWikiServletRequestStub(request);
 
-        assertEquals(requestURL.toString(), copiedRequest.getRequestURL().toString());
-        assertEquals(contextPath, copiedRequest.getContextPath());
+        assertEquals(request.getRequestURL().toString(), copiedRequest.getRequestURL().toString());
+        assertEquals(request.getContextPath(), copiedRequest.getContextPath());
+        assertEquals(request.getParameter("language"), copiedRequest.getParameter("language"));
+        assertArrayEquals(request.getParameterValues("page"), copiedRequest.getParameterValues("page"));
+        assertEquals(Collections.list(request.getHeaderNames()), Collections.list(copiedRequest.getHeaderNames()));
+        assertEquals(request.getHeader("user-agent"), copiedRequest.getHeader("usER-aGent"));
+        assertEquals(Collections.list(request.getHeaders("aCCept")),
+            Collections.list(copiedRequest.getHeaders("AccepT")));
+        assertEquals(request.getCookie("color").getValue(), copiedRequest.getCookie("color").getValue());
+        assertEquals(request.getRemoteAddr(), copiedRequest.getRemoteAddr());
         assertFalse(copiedRequest.isDaemon());
     }
 
     @Test
-    void constructorWithParameters() throws Exception
+    void builder() throws Exception
+    {
+        XWikiServletRequestStub request = createRequest();
+        assertEquals("https://xwiki.org/test/path", request.getRequestURL().toString());
+        assertEquals("/test", request.getContextPath());
+        assertEquals("en", request.getParameter("language"));
+        assertArrayEquals(new String[] {"Some.Page", "Other.Page"}, request.getParameterValues("page"));
+        assertEquals(Arrays.asList("Accept", "User-Agent"), Collections.list(request.getHeaderNames()));
+        assertEquals("Firefox", request.getHeader("usER-aGent"));
+        assertEquals(Arrays.asList("text/html", "application/xhtml+xml"),
+            Collections.list(request.getHeaders("AccepT")));
+        assertEquals("master", request.getCookie("level").getValue());
+        assertEquals("172.12.0.3", request.getRemoteAddr());
+    }
+
+    private XWikiServletRequestStub createRequest() throws Exception
     {
         Map<String, String[]> parameters = new HashMap<>();
-        parameters.put("key", new String[] { "value" });
-        XWikiServletRequestStub request =
-            new XWikiServletRequestStub(new URL("https://xwiki.org"), parameters);
-        assertEquals("value", request.getParameter("key"));
+        parameters.put("language", new String[] {"en"});
+        parameters.put("page", new String[] {"Some.Page", "Other.Page"});
+
+        Map<String, List<String>> headers = new HashMap<>();
+        headers.put("User-Agent", Collections.singletonList("Firefox"));
+        headers.put("Accept", Arrays.asList("text/html", "application/xhtml+xml"));
+
+        Cookie[] cookies = new Cookie[] {new Cookie("color", "red"), new Cookie("level", "master")};
+
+        return new XWikiServletRequestStub.Builder().setRequestURL(new URL("https://xwiki.org/test/path"))
+            .setContextPath("/test").setRequestParameters(parameters).setHeaders(headers).setCookies(cookies)
+            .setRemoteAddr("172.12.0.3").build();
     }
 }

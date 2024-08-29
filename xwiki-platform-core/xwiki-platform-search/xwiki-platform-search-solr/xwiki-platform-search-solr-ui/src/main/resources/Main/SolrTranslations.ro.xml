@@ -1,0 +1,179 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ro">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>ro</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Administrarea motorului de căutare Solr
+solr.admin.submit=Aplică
+solr.admin.error.action={0} a eșuat:
+solr.admin.error.notallowed=Nu ai dreptul să faci această acțiune.
+solr.admin.error.norights=Sunt necesare drepturi de administrare pentru a face această acțiune.
+solr.admin.success.action={0} declanșată cu succes.
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Dimensiunea cozii de așteptare
+solr.admin.status.queueSize.hint=Numărul de entități care au mai rămas de indexat, reindexat sau șters din index (în funcție de acțiunea executată).
+solr.admin.indexing.title=Indexare
+solr.admin.indexing.action.label=Acțiune
+solr.admin.indexing.action.hint=Acțiunea care trebuie efectuată în cadrul indexului.
+solr.admin.indexing.action.select_index=Adaugă în index
+solr.admin.indexing.action.select_delete=Șterge din index
+solr.admin.indexing.action.select_reindex=Reindexează
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Wiki în care acțiunea selectată va viza toate documentele sale.
+solr.admin.indexing.wiki.select_farm=Întreaga fermă
+solr.admin.indexing.query.label=Interogare personalizată
+solr.admin.indexing.query.hint=Interogare opțională pentru a limita documentele care vor fi vizate de acțiunea selectată în index.
+solr.admin.info.affectedDocuments=Documentele vizate din index:
+solr.sortBy=Sortează după:
+solr.sortBy.score=Relevanță
+solr.sortBy.title_sort=Titlu
+solr.sortBy.date=Data ultimei modificări
+solr.sortBy.author_display_sort=Ultimul autor
+solr.sortBy.filename_sort=Numele fișierului
+solr.sortBy.attsize_sort=Dimensiunea fișierului
+solr.sortBy.attdate_sort=Data adăugării
+solr.sortBy.attauthor_display_sort=Adăugat de
+solr.sortOrder.asc=Ascendentă
+solr.sortOrder.desc=Descendentă
+solr.options=Afișează:
+solr.options.highlight=Evidențiază
+solr.options.highlight.title=Afișează un extras din ceea ce corespunde în fiecare rezultat
+solr.options.facet=Fațete
+solr.options.facet.title=Permite filtrarea suplimentară a rezultatului
+solr.result.language=Limbă
+solr.result.locatedIn=Localizat în
+solr.result.author=Modificat de {0} în {1}
+solr.result.mediaType=Fișier de tip {0}
+solr.result.uploadedBy=Adăugat de {0} în {1} ({2})
+solr.result.highlightAll=Evidențiază toate corespondențele
+solr.facets.title=Rafinează căutarea
+solr.facets.hint=Selectează o categorie și activează filtrele pe rezultatele curente
+solr.facets.resetAll=Resetează tot
+solr.facets.expandAll=Extinde tot
+solr.facets.collapseAll=Restrânge tot
+solr.facets.emptyValue=Valoare goală
+solr.facets.moreValues={0} mai mult
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Fișier atașat
+solr.filterBy.type.object=Obiect
+solr.filterBy.type.object_property=Proprietate obiect
+solr.filterBy.fileType.image=Imagine
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Prezentare PowerPoint
+solr.filterBy.fileType.spreadsheet=Foaie de calcul
+solr.filterBy.fileType.archive=Arhivă
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.other=Altele
+solr.facet.fileType.text.plain=Text simplu
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Sursă Java
+solr.facet.fileType.text.sh=Shell Script
+solr.facet.fileType.image.icon=Pictogramă
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Date binare
+solr.facet.date.today=Astăzi
+solr.facet.date.last7Days=Ultimele 7 zile
+solr.facet.date.last30Days=Ultimele 30 zile
+solr.facet.date.olderThan30Days=Mai vechi de 30 de zile
+solr.facet.date.customInterval=Data și intervalul de timp personalizat
+solr.facet.date.start=Data și ora de începere
+solr.facet.date.end=Data și ora de încheiere
+solr.facet.date.applyCustomInterval=Aplică
+solr.facet.date.between=De la {0} la {1}
+solr.facet.date.after=După {0}
+solr.facet.date.before=Înainte {0}
+solr.facet.date.any=Oricare dată
+solr.facet.size.tiny=Micuț
+solr.facet.size.small=Mic
+solr.facet.size.medium=Mediu
+solr.facet.size.large=Mare
+solr.facet.size.between=Între {0} și {1}
+solr.facet.size.lessThan=Mai puțin de {0}
+solr.facet.size.moreThan=Mai mult de {0}
+solr.facet.size.any=Oricare dimensiune
+solr.field.type=Tipul de rezultat
+solr.field.locale=Limbă
+solr.field.locale.emptyValue=Nicio limbă
+solr.field.locale.emptyValue.hint=Unele documente nu au un set de limbi deoarece conțin scripturi (care nu sunt scrise într-o limbă naturală) sau alcătuiesc interfața cu utilizatorul care este afișată în limba curentă (cum ar fi această pagină).
+solr.field.wiki=Wiki
+solr.field.spaces=Locație
+solr.field.space_exact=Locație
+solr.field.space_facet=Locație
+solr.field.name=Pagină
+solr.field.name_exact=Pagină
+solr.field.title=Titlu
+solr.field.author=Ultimul autor
+solr.field.author_display=Ultimul autor
+solr.field.creator=Creator
+solr.field.creator_display=Creator
+solr.field.date=Data ultimei modificări
+solr.field.creationdate=Data creării
+solr.field.doccontent=Conținutul documentului redat
+solr.field.doccontentraw=Conținutul brut al documentului
+solr.field.class=Tipul de obiect
+solr.field.class.definedBy=Definit de {0} » {1}
+solr.field.propertyname=Numele proprietății
+solr.field.propertyvalue=Valoarea proprietății
+solr.field.filename=Numele fișierului atașat
+solr.field.attcontent=Conținutul fișierului atașat
+solr.field.comment=Comentarii
+solr.field.objcontent=Obiecte
+solr.field.mimetype=Tipul de fișier
+solr.field.attauthor=Adăugat de
+solr.field.attauthor_display=Adăugat de
+solr.field.attdate=Data adăugării
+solr.field.attsize=Dimensiunea fișierului
+solr.uix.docdoesnotexist.title=Căutai în schimb una dintre următoarele pagini?
+solr.uix.attachmentdoesnotexist.title=Căutai în schimb unul din fișierele următoare?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location=Localizat în {0} » {1} » {2}
+
+## until 7.2RC1
+solr.field.space=Locație
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

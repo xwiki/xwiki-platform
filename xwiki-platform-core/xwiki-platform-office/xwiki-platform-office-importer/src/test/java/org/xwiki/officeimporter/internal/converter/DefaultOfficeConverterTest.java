@@ -29,11 +29,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.jodconverter.core.job.ConversionJobWithOptionalSourceFormatUnspecified;
 import org.jodconverter.core.job.ConversionJobWithOptionalTargetFormatUnspecified;
 import org.jodconverter.core.office.OfficeException;
-import org.jodconverter.local.LocalConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +45,7 @@ import org.xwiki.test.junit5.XWikiTempDirExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,9 +59,9 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ExtendWith(XWikiTempDirExtension.class)
-public class DefaultOfficeConverterTest
+class DefaultOfficeConverterTest
 {
-    private LocalConverter localConverter;
+    private DocumentConverter localConverter;
 
     @XWikiTempDir
     private File tmpDir;
@@ -68,14 +69,14 @@ public class DefaultOfficeConverterTest
     private DefaultOfficeConverter defaultOfficeConverter;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
-        this.localConverter = mock(LocalConverter.class);
+        this.localConverter = mock(DocumentConverter.class);
         this.defaultOfficeConverter = new DefaultOfficeConverter(localConverter, tmpDir);
     }
 
     @Test
-    public void convertDocument() throws IOException, OfficeException, OfficeConverterException
+    void convertDocument() throws IOException, OfficeException, OfficeConverterException
     {
         OfficeConverterException officeConverterException = assertThrows(OfficeConverterException.class,
             () -> this.defaultOfficeConverter.convertDocument(Collections.emptyMap(), "myFile", "myOutputFile"));
@@ -128,16 +129,26 @@ public class DefaultOfficeConverterTest
     }
 
     @Test
-    public void isConversionSupported() throws Exception
+    void isConversionSupported() throws Exception
     {
         when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
         for (String mediaType : Arrays.asList("application/vnd.oasis.opendocument.text", "application/msword",
             "application/vnd.oasis.opendocument.presentation", "application/vnd.ms-powerpoint",
-            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel")) {
-            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.ms-excel", "text/html")) {
+            assertTrue(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html not supported", mediaType));
         }
         for (String mediaType : Arrays.asList("foo/bar", "application/pdf")) {
-            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"));
+            assertFalse(this.defaultOfficeConverter.isConversionSupported(mediaType, "text/html"),
+                String.format("%s conversion to text/html supported while it shouldn't", mediaType));
         }
+    }
+
+    @Test
+    void getDocumentFormat()
+    {
+        when(this.localConverter.getFormatRegistry()).thenReturn(DefaultDocumentFormatRegistry.getInstance());
+        assertNull(this.defaultOfficeConverter.getDocumentFormat("test.foo"));
+        assertEquals("odt", this.defaultOfficeConverter.getDocumentFormat("test.odt").getExtension());
     }
 }

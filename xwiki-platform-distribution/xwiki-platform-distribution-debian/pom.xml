@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian</artifactId>
   <name>XWiki Platform - Distribution - Debian</name>
@@ -37,10 +37,11 @@
     <module>xwiki-platform-distribution-debian-mysql-common</module>
     <module>xwiki-platform-distribution-debian-pgsql-common</module>
     <module>xwiki-platform-distribution-debian-tomcat</module>
+    <module>xwiki-platform-distribution-debian-xjetty</module>
     <module>xwiki-platform-distribution-debian-solr</module>
   </modules>
   <properties>
-    <jdeb.version>1.8</jdeb.version>
+    <jdeb.version>1.11</jdeb.version>
     <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
     <debian.license>LGPL 2.1</debian.license>
     <debian.licenseFilename>LGPL-2.1</debian.licenseFilename>
@@ -61,12 +62,15 @@
     <debian.bugs>https://jira.xwiki.org</debian.bugs>
     <debian.homepage>http://www.xwiki.org</debian.homepage>
     <debian.controlDir>${project.build.directory}/maven-deb-control-directory</debian.controlDir>
+
+    <debian.xwiki.var>/var/lib/xwiki</debian.xwiki.var>
+    <xwikiDataDir>${debian.xwiki.var}/data</xwikiDataDir>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-resources</artifactId>
-      <version>13.6-SNAPSHOT</version>
+      <version>16.8.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
@@ -185,7 +189,7 @@
             </goals>
             <configuration>
               <rules>
-                <validateDependencyVersion implementation="org.xwiki.tool.enforcer.ValidateDependencyVersion">
+                <validateDependencyVersion>
                   <versionCheck>
                     <groupIdPrefix>org.xwiki.commons</groupIdPrefix>
                     <allowedVersionRegex>\$\{commons.version\}</allowedVersionRegex>

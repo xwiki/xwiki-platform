@@ -67,7 +67,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
     });
 
     // Handle the case when the user types the value.
-    input.keyup(function(event){
+    input.on('keyup', function(event) {
       var element = $(event.target);
       // Update the color preview box.
       element.parent().find('.color-preview').css('background-color', element.val());
@@ -83,7 +83,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
 
   // Hide the color picker if the user scrolls (this is for the color theme editor).
   var scrollTimeout;
-  $('.tab-content').scroll(function() {
+  $('.tab-content').on('scroll', function() {
     clearTimeout(scrollTimeout);
     var container = $(this);
     scrollTimeout = setTimeout(function() {

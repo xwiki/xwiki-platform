@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="uk">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=Стилі зображення
+image.style.admin.heading=Адміністрування стилю зображення
+image.style.administration.imageStyleList.heading=Стилі зображення
+image.style.administation.newImageStyle.button=Створити стиль зображення
+image.style.administation.defaultImageStyle.button=Оновити стиль зображення за умовчанням
+image.style.imageStyleSheet.backToAdministration.link=Назад до адміністрування
+image.style.administration.liveData.doc.title=ідентифікатор
+image.style.administration.liveData._actions=Дії
+image.style.administration.liveData.prettyName=Читабельне ім'я
+image.style.administration.liveData.prettyName.hint=Користувацька назва стилю зображення
+image.style.administration.liveData.type=Тип
+image.style.administration.liveData.type.hint=Тип стилю зображення (використовується як CSS клас)
+### Missing: image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=Новий стиль зображення
+image.style.administation.newImageStyle.hint=Ідентифікатор нового стилю зображення.
+image.style.administation.newImageStyle.placeHolder=Ідентифікатор
+image.style.administation.newImageStyle.normalizedTitle=Новий стиль зображення, згідно з правилами іменування [{0}].
+Image.Style.Code.ImageStyleClass_adjustableAlignment=Регульоване вирівнювання
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Якщо цей пункт позначено, користувачеві дозволено налаштувати вирівнювання зображення.
+Image.Style.Code.ImageStyleClass_adjustableBorder=Регульована межа
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=Якщо цей пункт позначено, користувачеві дозволено налаштовувати межі зображення.
+Image.Style.Code.ImageStyleClass_adjustableSize=Регульований розмір
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=Якщо цей пункт позначено, користувачеві дозволено налаштувати розмір зображення.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=Регульоване обтікання текстом
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=Якщо цей пункт позначено, користувачеві дозволено налаштовувати обтікання текстом зображення.
+Image.Style.Code.ImageStyleClass_defaultAlignment=Вирівнювання за умовчанням
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=По центру
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=Вирівнювання зображення за умовчанням.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=Без
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=Ліворуч
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=По центру
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=Праворуч
+Image.Style.Code.ImageStyleClass_defaultBorder=Межа за умовчанням
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=Якщо цей пункт позначено, зображення за умовчанням має рамку.
+Image.Style.Code.ImageStyleClass_defaultHeight=Висота за умовчанням
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=Висота зображення за умовчанням. Якщо ширину залишити порожньою за умовчанням, її значення буде обчислено відповідно до співвідношення зображень. Інакше зображення буде мати фіксований розмір.
+Image.Style.Code.ImageStyleClass_defaultTextWrap=Обтікання текстом за умовчанням
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=Якщо цей пункт позначено, за умовчанням текст буде обтікати зображення.
+Image.Style.Code.ImageStyleClass_defaultWidth=Ширина за умовчанням
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=Ширина зображення за умовчанням. Якщо висоту залишити порожньою за умовчанням, її буде обчислено відповідно до співвідношення зображення. В іншому випадку зображення матиме фіксований розмір.
+Image.Style.Code.ImageStyleClass_prettyName=Читабельне ім'я
+Image.Style.Code.ImageStyleClass_prettyName_hint=Користувацька назва стилю зображення.
+Image.Style.Code.ImageStyleClass_type=Тип
+Image.Style.Code.ImageStyleClass_type_hint=Тип стилю зображення (використовується як CSS клас).
+Image.Style.Code.ConfigurationClass_defaultStyle=Стиль за умовчанням
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=Стиль зображення за умовчанням для цієї вікі.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Примусово використовувати стиль за умовчанням
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Якщо вибрано, обмеження стилю за умовчанням застосовуються до конфігурації зображення, і користувачі змушені вибирати стиль.
+</content>
+</xwikidoc>

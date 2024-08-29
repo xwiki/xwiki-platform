@@ -1,0 +1,14 @@
+[
+  {
+    "value": "XWiki.G1",
+    "label": "G1",
+    "icon": {
+      "iconSetName": "FakeIconTheme",
+      "cssClass": "",
+      "iconSetType": "IMAGE",
+      "url": "/xwiki/skins/flamingo/icons/silk/group.png"
+    },
+    "url": "/xwiki/bin/view/XWiki/G1",
+    "hint": null
+  }
+]

@@ -67,7 +67,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         assertTrue(administrationPage.hasSection("panels.navigation"));
         administrationPage.clickSection("Look & Feel", "Navigation Panel");
-        return new NavigationPanelAdministrationPage().waitUntilPageIsLoaded();
+        return new NavigationPanelAdministrationPage();
     }
 
     /**
@@ -87,7 +87,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
         queryParameters.put("forceEdit", true);
         getUtil()
             .gotoPage(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"), "admin", queryParameters);
-        return new NavigationPanelAdministrationPage().waitUntilPageIsLoaded();
+        return new NavigationPanelAdministrationPage();
     }
 
     public List<String> getExclusions()
@@ -101,7 +101,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
         WebElement source = null;
         for (String page : pages) {
             source = getDriver().findElementWithoutWaiting(this.treeElement,
-                By.xpath(".//*[@class = 'jstree-anchor' and . = '" + page + "']"));
+                By.xpath(".//*[contains(@class, 'jstree-anchor') and . = '" + page + "']"));
             // If there is more than one page to include we need to select all of them first.
             if (pages.length > 1) {
                 getDriver().createActions().keyDown(Keys.SHIFT).click(source).keyUp(Keys.SHIFT).build().perform();
@@ -171,13 +171,5 @@ public class NavigationPanelAdministrationPage extends ViewPage
     {
         this.saveButton.click();
         waitForNotificationSuccessMessage("Saved");
-    }
-
-    @Override
-    public NavigationPanelAdministrationPage waitUntilPageIsLoaded()
-    {
-        getNavigationTree();
-
-        return this;
     }
 }

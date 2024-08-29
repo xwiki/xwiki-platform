@@ -19,15 +19,12 @@
  */
 package org.xwiki.mentions;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * List the location where mentions can occur.
  *
  * @version $Id$
  * @since 12.5RC1
  */
-@Unstable
 public enum MentionLocation
 {
     /**
@@ -46,12 +43,20 @@ public enum MentionLocation
     ANNOTATION,
 
     /**
-     * In a Application Within Minutes field.
+     * In an Application Within Minutes field.
      */
+    @Deprecated(since = "14.10.7,15.2RC1")
     AWM_FIELD,
 
     /**
      * When the location of the mention is unknown.
      */
-    UNDEFINED
+    UNDEFINED,
+    /**
+     * In a large text field.
+     *
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    TEXT_FIELD
 }

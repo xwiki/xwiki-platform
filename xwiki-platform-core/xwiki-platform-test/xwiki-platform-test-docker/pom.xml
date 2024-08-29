@@ -25,23 +25,43 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <testcontainers.version>1.15.3</testcontainers.version>
+    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back when the XWikiBrowserWebDriverContainer class is removed or when we find a construct that makes
          Spoon pass on it. -->
     <xwiki.spoon.skip>true</xwiki.spoon.skip>
   </properties>
+  <dependencyManagement>
+    <!-- Force our version of Selenium (so that the one coming from TC isn't used for example) -->
+    <dependencies>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-chrome-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-remote-driver</artifactId>
+        <version>${selenium.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- PR Test checker -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-checker</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -96,17 +116,14 @@
     <dependency>
       <groupId>${mysql.groupId}</groupId>
       <artifactId>${mysql.artifactId}</artifactId>
-      <version>${mysql.version}</version>
     </dependency>
     <dependency>
       <groupId>${mariadb.groupId}</groupId>
       <artifactId>${mariadb.artifactId}</artifactId>
-      <version>${mariadb.version}</version>
     </dependency>
     <dependency>
       <groupId>${oracle.groupId}</groupId>
       <artifactId>${oracle.artifactId}</artifactId>
-      <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
@@ -139,6 +156,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-jersey</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -152,6 +174,12 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-extension-plugin</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <!-- Used to create wikis during tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-creationjob</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- Since the minimal dependency list doesn't include the Flamingo resources JAR (see the comment in it for
      more explanations), we need to add a dependency to it since we need to unpack it -->
@@ -218,6 +246,11 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-rest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -232,7 +265,9 @@
             <configuration>
               <excludes>
                 <!-- Cyclomatic complexity > 10 -->
-                **/WARBuilder.java
+                **/WARBuilder.java,
+                <!-- Class Fan-Out Complexity > 20 -->
+                **/DockerTestUtils.java
               </excludes>
             </configuration>
           </execution>

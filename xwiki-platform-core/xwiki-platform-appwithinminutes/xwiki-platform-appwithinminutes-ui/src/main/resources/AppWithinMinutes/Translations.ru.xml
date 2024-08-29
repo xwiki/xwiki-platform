@@ -94,26 +94,22 @@ platform.appwithinminutes.appNameEmptyError=Пожалуйста, введите
 platform.appwithinminutes.classEditorPaletteTitle=Палитра полей
 platform.appwithinminutes.classEditorPaletteHint=Перетяните поля из палитры для создание формы.
 platform.appwithinminutes.classEditorCanvasHint=Перетяните поля из палитры в эту область.
-
 platform.appwithinminutes.classEditorUpdateTemplateLabel=Обновить шаблон класса
 platform.appwithinminutes.classEditorUpdateTemplateHint=Шаблон ({0}) хранит значения полей по умолчанию.
 platform.appwithinminutes.classEditorUpdateSheetLabel=Обновить страницу класса
 platform.appwithinminutes.classEditorUpdateSheetHint=Страница ({0}) используется для отображения и редактирования структурированных данных.
 platform.appwithinminutes.classEditorUpdateTranslationsLabel=Обновить перевод
 platform.appwithinminutes.classEditorUpdateTranslationsHint=Обновить перевод названий полей и список значений ({0}).
-
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Этот класс имеет несколько страниц класса.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=Класс содержит два поля с одинаковыми именами: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Обновить значения по умолчанию
 platform.appwithinminutes.classEditorBindSheetSaveComment=Связать страницу класса
 platform.appwithinminutes.classEditorSheetSaveComment=Обновить страницу класса
 platform.appwithinminutes.classEditorTranslationsSaveComment=Обновить перевод
-
 platform.appwithinminutes.classEditorStandardCategoryName=Стандартное
 platform.appwithinminutes.classEditorPickersCategoryName=Инструмент для выбора
 platform.appwithinminutes.classEditorDocumentCategoryName=Страница
 platform.appwithinminutes.classEditorAdvancedCategoryName=Расширенные
-
 platform.appwithinminutes.classEditorDBListFieldName=Список базы данных
 platform.appwithinminutes.classEditorGroupsFieldName=Группа
 platform.appwithinminutes.classEditorUsersFieldName=Пользователь
@@ -126,14 +122,12 @@ platform.appwithinminutes.classEditorStringFieldName=Короткий текст
 platform.appwithinminutes.classEditorContentFieldName=Содержимое
 platform.appwithinminutes.classEditorTitleFieldName=Название
 platform.appwithinminutes.classEditorPageFieldName=Страница
-
 platform.appwithinminutes.classEditorDeleteFieldLabel=Удалить
 platform.appwithinminutes.classEditorConfigureFieldLabel=Настройка
 platform.appwithinminutes.classEditorPreviewFieldLabel=Предпросмотр
 platform.appwithinminutes.classEditorPreviewFieldHint=Скрыть панель настройки и применить изменения
 platform.appwithinminutes.classEditorMoveFieldLabel=Переместить
 platform.appwithinminutes.classEditorMoveFieldHint=Перетягивайте значения для изменения их порядка
-
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Значение по умолчанию
 
 ### Date Picker
@@ -147,7 +141,6 @@ platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Значен
 platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Идентификатор
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Добавить
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Удалить
-
 appWithinMinutes.templateProviderEditor.hint=Записи приложения - это вики-страницы, которые содержат структурированные данные.
 appWithinMinutes.templateProviderEditor.icon.hint=Значок, связанный с приложением.
 appWithinMinutes.templateProviderEditor.description.hint=Короткое описание приложения.
@@ -210,6 +203,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Редактировать п�
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение
 platform.appwithinminutes.appHomePageDeleteAppLabel=Удалить приложение
 platform.appwithinminutes.appHomePageMovedWarning=Приложение может работать неправильно, так как оно было переименовано или перемещено без обновления кода. Пожалуйста, отредактируйте приложение и следуйте инструкциям, чтобы обновить код.
+platform.appwithinminutes.appHomePageNoScriptRight=У вас нет прав на выполнение сценариев, необходимые для создания или редактирования приложения. Приложение может работать неправильно, когда вы продолжите.
 AppWithinMinutes.LiveTableClass_description=Описание
 AppWithinMinutes.LiveTableClass_columns=Колонки динамической таблицы
 
@@ -219,6 +213,10 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ВСЕ записи пр�
 platform.appwithinminutes.deleteAppDoesNotExistError=Указанное приложение не существует.
 platform.appwithinminutes.deleteAppInvalidAppError=Указанное имя не является действительным приложением.
 platform.appwithinminutes.deleteAppNotSpecifiedError=Имя приложения не указано.
+
+### Rename Application
+appWithinMinutes.renameApp.label=Переименовать приложение
+appWithinMinutes.renameApp.close=Закрыть
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Вы можете изменить название приложения без его переименования, просто отредактируйте домашнюю страницу приложения.
@@ -238,7 +236,6 @@ appWithinMinutes.renameApp.failed=Ошибка при переименовани
 ### Since 8.4
 platform.appwithinminutes.appNamePreviewClassReferenceLabel=Класс приложения
 platform.appwithinminutes.appNamePreviewDataSpaceLabel=Расположение данных приложения
-
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Пространство
 platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Название пространства, которое содержит страницу приложения
 platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Полное имя страницы
@@ -266,5 +263,6 @@ platform.appwithinminutes.wizardStep3Description=Персонализирова�
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Название приложения
 appWithinMinutes.classEditor.title={0} Структура
-appWithinMinutes.templateProviderEditor.title={0} Записей</content>
+appWithinMinutes.templateProviderEditor.title={0} Записей
+</content>
 </xwikidoc>

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -62,18 +63,19 @@ public class ScopeNotificationFilterPreferencesGetter
      * @param format the notification format (can be {@code null} in which cases all formats are accepted)
      * @param onlyGivenType if {@code true} only the given {@code evenType} is taken into account. If {@code false}, the
      *                      given type and filters matching all types are taken into account.
+     * @param onlyGivenFormat if {@code true} the filter preference should match exactly the format requested even if
+     *                        it's {@code null}.
      * @return a hierarchy of scope notification filter preferences
-     * @since 12.8RC1
      */
     public ScopeNotificationFilterPreferencesHierarchy getScopeFilterPreferences(
         Collection<NotificationFilterPreference> filterPreferences, String eventType, NotificationFormat format,
-        boolean onlyGivenType)
+        boolean onlyGivenType, boolean onlyGivenFormat)
     {
         List<ScopeNotificationFilterPreference> results = new ArrayList<>();
 
         // Filter them according to the event type and the filter name
         Stream<NotificationFilterPreference> filterPreferenceStream = filterPreferences.stream().filter(
-            pref -> matchAllCriteria(pref, eventType, format, onlyGivenType)
+            pref -> matchAllCriteria(pref, eventType, format, onlyGivenType, onlyGivenFormat)
         );
 
         Iterator<NotificationFilterPreference> iterator = filterPreferenceStream.iterator();
@@ -85,9 +87,9 @@ public class ScopeNotificationFilterPreferencesGetter
     }
 
     private boolean matchAllCriteria(NotificationFilterPreference pref, String eventType, NotificationFormat format,
-        boolean onlyGivenType)
+        boolean onlyGivenType, boolean onlyGivenFormat)
     {
-        if (!matchFilter(pref) || !matchFormat(pref, format)) {
+        if (!matchFilter(pref) || !matchFormat(pref, format, onlyGivenFormat)) {
             return false;
         } else if (!onlyGivenType && !matchAllEvents(pref) && !matchEventType(pref, eventType)) {
             return false;
@@ -104,9 +106,17 @@ public class ScopeNotificationFilterPreferencesGetter
         return pref.isEnabled() && ScopeNotificationFilter.FILTER_NAME.equals(pref.getFilterName());
     }
 
-    private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
+    private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format,
+                                boolean onlyGivenFormat)
     {
-        return format == null || filterPreference.getNotificationFormats().contains(format);
+        if (!onlyGivenFormat) {
+            return format == null || filterPreference.getNotificationFormats().contains(format);
+        } else if (format == null) {
+            return filterPreference.getNotificationFormats().isEmpty()
+                    || filterPreference.getNotificationFormats().equals(Set.of(NotificationFormat.values()));
+        } else {
+            return filterPreference.getNotificationFormats().equals(Set.of(format));
+        }
     }
 
     /**

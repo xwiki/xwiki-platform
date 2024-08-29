@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="XWiki.AllAttachments" locale="">
   <web>XWiki</web>
   <name>AllAttachments</name>
   <language/>
@@ -37,29 +37,36 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($discard = $xwiki.ssx.use('XWiki.AllAttachments'))
-#set ($discard = $xwiki.jsx.use('XWiki.AllAttachments'))
-#set ($columns = ['mimeType', 'filename', 'doc.fullName', 'filesize', 'date', 'author'])
-#set ($columnsProperties = {
-  'mimeType': {'type': 'list', 'class': 'XWiki.AllAttachments'},
-  'filename': {'type': 'text'},
-  'doc.fullName': {'type': 'text'},
-  'filesize': {'type': 'list', 'class': 'XWiki.AllAttachments'},
-  'date': {'type': 'date'},
-  'author': {'type': 'text'}
-})
-#set ($options = {
+#set ($discard = $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true))
+#set ($sourceParameters = $escapetool.url({
+  'className': 'XWiki.AllAttachments',
   'resultPage': 'XWiki.AllAttachmentsResults',
-  'callback': 'XWiki.index.displayAttachmentEntry',
-  'translationPrefix': 'platform.index.attachments.',
-  'selectedColumn': 'filename'
+  'translationPrefix': 'platform.index.attachments.'
+}))
+#set ($liveDataConfig = {
+  'meta': {
+    'propertyDescriptors': [
+      { 'id': 'mimeType', 'displayer': 'html'},
+      { 'id': 'filename', 'displayer': { 'id': 'link', 'propertyHref': 'fileurl' } },
+      { 'id': 'doc.fullName', 'displayer': 'html' },
+      { 'id': 'filesize', 'displayer': 'html' },
+      { 'id': 'date', 'filter': 'date'},
+      { 'id': 'author', 'displayer': 'html' }
+    ],
+    'actions': [
+      {'id': 'view', 'allowProperty': 'acclev'}
+    ]
+  }
 })
-#livetable('allattachments' $columns $columnsProperties $options)
-{{/velocity}}
 
-(% id="inaccessibleDocsMessage" class="hidden" %)(((
-  {{info}}{{translation key="rightsmanager.documentrequireviewrights" /}}{{/info}}
-)))</content>
+{{liveData
+  id='allattachments'
+  source='liveTable'
+  sourceParameters="$sourceParameters"
+  properties='mimeType,filename,doc.fullName,filesize,date,author'
+  sort='filename:asc'
+}}$jsontool.serialize($liveDataConfig){{/liveData}}
+{{/velocity}}</content>
   <class>
     <name>XWiki.AllAttachments</name>
     <customClass/>
@@ -112,246 +119,4 @@
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </mimeType>
   </class>
-  <object>
-    <name>XWiki.AllAttachments</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>9ad0f248-6336-4543-ae2b-fd41dda77be4</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>(function() {
-  var XWiki = window.XWiki || {};
-  XWiki.index = XWiki.index || {};
-  XWiki.index.displayAttachmentEntry = function (row, i, table) {
-    var tr = new Element('tr');
-    if (row.acclev == true) {
-      tr.appendChild(new Element('td').update(row.mimeType));
-      var fileLink = new Element('a', {'href': row.fileurl}).update(row.filename.escapeHTML());
-      tr.appendChild(new Element('td').update(fileLink));
-      tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName));
-      tr.appendChild(new Element('td').update(row.filesize));
-      tr.appendChild(new Element('td').update(row.date.escapeHTML()));
-      tr.appendChild(new Element('td').update(row.author));
-    } else {
-      tr.appendChild(new Element('td'));
-      tr.appendChild(new Element('td'));
-      tr.appendChild(new Element('td', {'class': 'location'}).update(row.fullName + '*'));
-      tr.appendChild(new Element('td'));
-      tr.appendChild(new Element('td'));
-      tr.appendChild(new Element('td'));
-      $('inaccessibleDocsMessage').removeClassName('hidden');
-    }
-    return tr;
-  }
-})();</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.AllAttachments</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>24dc9320-6ff1-469d-817b-26a4d7057474</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#template('colorThemeInit.vm')
-
-#allattachments .mime {
-  color: $theme.textSecondaryColor;
-  font-size: 32px;
-  height: 32px;
-  line-height: 32px;
-  text-align: center;
-}
-
-#allattachments .mime img {
-  max-height: 32px;
-  max-width: 48px;
-}</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
 </xwikidoc>

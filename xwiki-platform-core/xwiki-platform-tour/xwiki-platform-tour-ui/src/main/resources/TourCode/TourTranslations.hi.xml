@@ -1,0 +1,100 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="TourCode.TourTranslations" locale="hi">
+  <web>TourCode</web>
+  <name>TourTranslations</name>
+  <language>hi</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># App name
+### Missing: tour.app.name=Tour
+
+# Class fields
+TourCode.TourClass_description=विवरण
+TourCode.TourClass_isActive=सक्रिय
+TourCode.TourClass_targetPage=लक्ष्य पृष्ठ
+
+# Live table generic keys
+tour.livetable.doc.title=यात्रा का नाम
+tour.livetable._actions=कार्रवाही
+tour.livetable._actions.edit=संपादित करें
+tour.livetable._actions.delete=हटाएं
+tour.livetable._actions.launch=लॉन्च
+### Missing: tour.livetable.emptyvalue=-
+
+# Live table specific keys
+### Missing: tour.livetable.description=Description
+### Missing: tour.livetable.isActive=Active
+### Missing: tour.livetable.targetPage=Target Page
+### Missing: tour.livetable.targetClass=Target Class
+
+# Tour popover
+### Missing: tour.popover.previous=« Prev
+### Missing: tour.popover.next=Next »
+### Missing: tour.popover.end=End tour
+### Missing: tour.popover.show=Show tour
+### Missing: tour.popover.show.hint=You can restart the tour by clicking this button at anytime
+
+# Steps
+### Missing: TourCode.StepClass_order=Order
+### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
+### Missing: TourCode.StepClass_title=Title
+### Missing: TourCode.StepClass_content=Content
+### Missing: TourCode.StepClass_backdrop=Backdrop
+### Missing: TourCode.StepClass_placement=Placement
+### Missing: TourCode.StepClass_targetPage=Target Page
+### Missing: TourCode.StepClass_action=Target Action
+### Missing: TourCode.StepClass_queryString=Query String
+### Missing: tour.steps=Steps
+### Missing: tour.steps.new_step=New step
+### Missing: tour.steps.add_step=Add step
+### Missing: tour.steps.edit_step=Edit step
+### Missing: tour.steps.save_step=Save
+### Missing: tour.steps.delete_confirm=Are you sure you want to delete the step?
+### Missing: tour.steps.delete_done=Delete step done!
+### Missing: tour.steps.deleting=Deleting step...
+### Missing: tour.steps.yes=Yes
+### Missing: tour.steps.no=No
+### Missing: tour.steps.edit=Edit
+### Missing: tour.steps.delete=Delete
+
+# Upgrade
+### Missing: tour.upgrade.title=Upgrade
+### Missing: tour.upgrade.successList=Successfully converted the following pages:
+### Missing: tour.upgrade.successNothing=You have nothing to upgrade!
+
+# Template
+### Missing: tour.template.name=Tour
+### Missing: tour.template.description=Step by step tour
+</content>
+</xwikidoc>

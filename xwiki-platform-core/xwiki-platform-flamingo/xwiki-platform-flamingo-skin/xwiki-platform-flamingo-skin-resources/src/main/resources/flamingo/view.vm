@@ -37,22 +37,25 @@
   #end
 
   <div class="main">
-  <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')
     #template("contentview.vm")
   #else
-    #template("${viewer}.vm")
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea" class="xcontent">
+      #template("${viewer}.vm")
+    </main>
   #end
   <div class="clearfloats"></div>
-  </div>## mainContentArea
   #if($viewer == 'content')
     #if ($displayContentFooter)
-      <div id="xdocFooter">
+      ## This is an aside element because it is related to the main
+      ## content but not part of it.
+      <aside id="xdocFooter" aria-label="$escapetool.xml($services.localization.render('contentfooter.label'))">
         #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.contentFooter', {'sortByParameter': 'order'}))
           $services.rendering.render($uix.execute(), 'xhtml/1.0')
         #end
-      </div>
+      </aside>
     #end
     #if ($displayDocExtra)
       #template('docextra.vm')

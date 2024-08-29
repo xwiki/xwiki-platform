@@ -22,8 +22,8 @@
 
 <infinispan
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:11.0 https://infinispan.org/schemas/infinispan-config-11.0.xsd"
-      xmlns="urn:infinispan:config:11.0">
+      xsi:schemaLocation="urn:infinispan:config:14.0 https://infinispan.org/schemas/infinispan-config-14.0.xsd"
+      xmlns="urn:infinispan:config:14.0">
 
    <!--
       *****************************************************************************************************************
@@ -69,19 +69,11 @@
          **************************************************************************************************************
      -->
 
-     <!-- Formula Renderer cache -->
-     <local-cache-configuration name="xwiki.plugin.formula">
-        <persistence>
-           <!-- Let XWiki cache module set the proper path -->
-           <file-store segmented="false" purge="true" path="" />
-        </persistence>
-     </local-cache-configuration>
-
      <!-- LESS CSS cache -->
      <local-cache-configuration name="lesscss.skinfiles.cache">
         <persistence>
            <!-- Let XWiki cache module set the proper path -->
-           <file-store segmented="false" purge="false" path="" />
+           <file-store purge="false" path="" />
         </persistence>
      </local-cache-configuration>
 

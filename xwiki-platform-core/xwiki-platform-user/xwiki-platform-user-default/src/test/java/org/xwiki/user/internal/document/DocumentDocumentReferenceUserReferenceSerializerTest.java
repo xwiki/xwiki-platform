@@ -35,6 +35,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,8 +69,7 @@ public class DocumentDocumentReferenceUserReferenceSerializerTest
     @Test
     void serializeWhenGuest()
     {
-        DocumentReference expected = new DocumentReference("xwiki", "XWiki", "XWikiGuest");
-        assertEquals(expected, this.serializer.serialize(GuestUserReference.INSTANCE));
+        assertNull(this.serializer.serialize(GuestUserReference.INSTANCE));
     }
 
     @Test
@@ -91,5 +91,12 @@ public class DocumentDocumentReferenceUserReferenceSerializerTest
             () -> this.serializer.serialize(userReference));
         assertEquals("Passed user reference must be of type [org.xwiki.user.internal.document.DocumentUserReference]",
             exception.getMessage());
+    }
+
+    @Test
+    void serializeWhenCurrentUserReferenceIsGuest()
+    {
+        when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(GuestUserReference.INSTANCE);
+        assertNull(this.serializer.serialize(null));
     }
 }

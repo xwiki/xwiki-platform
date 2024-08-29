@@ -23,12 +23,214 @@
   #set ($jsExtension = '.js')
 #end
 ##
-## JS Libraries.
+## JavaScript libraries
 ##
-<script src="$services.webjars.url('requirejs', "require$jsExtension")"
-  data-wysiwyg="true"></script>
+## We load RequireJS first because it is used by other JavaScript modules to load their dependencies.
+<script src="$escapetool.xml($services.webjars.url('requirejs', "require$jsExtension"))" data-wysiwyg="true"></script>
+## Load the JavaScript module used to determine when the page is ready (no pending HTTP requests or promises).
+<script src="$escapetool.xml($xwiki.getSkinFile('uicomponents/tools/pageReady.js'))" data-wysiwyg="true"></script>
+## Fix some Prototype.js breaking changes. 
+<script src="$escapetool.xml($xwiki.getSkinFile('js/xwiki/prototypeJSPatches.js'))"></script>
+## FIXME: We still have code depending on Prototype.js without declaring it (i.e. without using RequireJS). Short term
+## goal is to stop loading Prototype.js by default and change the existing code to load it when needed. Long term goal is
+## to stop relying on Prototype.js . Note that we load Prototype.js before the following inline script because we have to
+## fix some incompatibilities between Bootstrap and Prototype.js . In the future we should use the 'deferred' RequireJS
+## plugin to fix the incompatibilities only if / when Prototype.js is loaded.
+<script src="$escapetool.xml($services.webjars.url('prototype', 'prototype.js'))"></script>
 ##
-$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
+## Define the global require.js configuration
+##
+<script data-wysiwyg="true">
+// <![CDATA[
+## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
+## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
+## requirejs will add one...
+## Note that we cannot do this generically in the webjars module when exporting in HTML because the webjars module
+## provide generic URLs and they don't all go through requirejs...
+## Note that this comment and code below are not correctly indentend voluntarily in order to generate nicely formatted
+## (and valid) code at runtime!
+#macro(removeJsSuffix $expr)
+## Note that velocity takes argument references by name (see: https://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#velocimacros).
+## So we set the value of the $expr in the $url variable to not execute $expr multiple times.
+#set ($url = $expr)
+#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js')#else$url#{end}
+#end
+##
+## Start the requirejs config.
+## See https://requirejs.org/docs/api.html#config
+## Note that we have to declare momentjs as a RequireJS package in order to be able to load momentjs locales on demand
+## using RequireJS. See https://github.com/requirejs/requirejs/issues/1554 .
+##
+#set ($jqueryMigrateId = 'org.webjars.npm:jquery-migrate')
+#set ($requireConfig = {
+  'packages': [
+    {
+      'name': 'scriptaculous',
+      'location': $stringtool.removeEnd($services.webjars.url('scriptaculous', ''), '/'),
+      'main': 'scriptaculous'
+    }, {
+      'name': 'moment',
+      'location': $stringtool.removeEnd($services.webjars.url('momentjs', ''), '/'),
+      'main': 'min/moment.min'
+    }
+  ],
+  'paths': {
+    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
+    'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
+    'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
+    'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
+    'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
+    'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
+    'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
+    'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",
+    'xwiki-attachments-icon': $xwiki.getSkinFile('uicomponents/attachments/icons.js', true),
+    'xwiki-document-lock': $xwiki.getSkinFile('uicomponents/lock/lock.js'),
+    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
+    'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
+    'xwiki-form-validation-async': $xwiki.getSkinFile('uicomponents/tools/formAsyncValidation.js'),
+    'xwiki-job-runner': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', ""jobRunner${jsExtension}""))",
+    'xwiki-l10n': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-localization-webjar', ""l10n${jsExtension}""))",
+    'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
+    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
+    'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js'),
+    'xwiki-tree-finder': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""finder${jsExtension}""))",
+    'xwiki-tree': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', ""tree${jsExtension}""))"
+  },
+  'shim': {
+    'bootstrap': ['jquery'],
+    'prototype': {
+      'exports': '$'
+    },
+    'scriptaculous/dragdrop': ['scriptaculous/effects'],
+    'selectize': ['jquery'],
+    'xwiki-document-lock': {
+      'exports': 'XWiki.DocumentLock'
+    },
+    'xwiki-entityReference': {
+      'exports': 'XWiki'
+    }
+  },
+  'bundles': {},
+  'config': {}
+})
+#set ($jQueryModuleId = 'jQueryNoConflict')
+#if ($services.extension.installed.getInstalledExtension($jqueryMigrateId, "wiki:$xcontext.database"))
+  #set ($jQueryModuleId = 'jquery-migrate')
+  ## The minified version of jquery-migrate is expecting a global 'jQuery' variable to be defined (even though it also
+  ## uses RequireJS to access jQuery). The unminified version is only relying on RequireJS so it doesn't have this
+  ## problem.
+  var jQuery = {};
+#end
+## momentjs locales depend on '../moment' which gets resolved as 'moment/moment' due to our package configuration, which
+## points to the unminified version. The consequence is that we end up loading both the minified and the unminified
+## version of momentjs and, more importantly, the locales are loaded into the moment instance created by the unminified
+## code. In order to fix this we map the unminified version to the minified version so that we work with a single moment
+## instance (that has the locales loaded).
+## See http://requirejs.org/docs/jquery.html#noconflictmap to understand why this works.
+#set ($requireConfig.map = {
+  '*': {
+    'jquery': $jQueryModuleId,
+    'moment/moment': 'moment'
+  },
+  'jQueryNoConflict': {
+    'jquery': 'jquery'
+  },
+  'jquery-migrate': {
+    'jquery': 'jQueryNoConflict'
+  }
+})
+## Extend the RequireJS configuration.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.requirejs.module'))
+  #set ($module = $uix.parameters)
+  #if ("$!module.id" != '')
+    #if ("$!module.path" != '')
+      #set ($discard = $requireConfig.paths.put($module.id, $module.path))
+    #end
+    #if ("$!module.bundles" != '')
+      #set ($discard = $requireConfig.bundles.put($module.id, $module.bundles.split('\s*,\s*')))
+    #end
+    #if ("$!module.deps" != '' || "$!module.exports" != '')
+      #set ($shim = $requireConfig.shim.getOrDefault($module.id, {}))
+      ## The shim value can be the list of module dependencies. We need to normalize the shim in this case.
+      #if (!$shim.entrySet())
+        #set ($shim = {'deps': $shim})
+      #end
+      #if ("$!module.deps" != '')
+        #set ($shim.deps = $module.deps.split('\s*,\s*'))
+      #end
+      #if ("$!module.exports" != '')
+        #set ($shim.exports = $module.exports)
+      #end
+      #set ($discard = $requireConfig.shim.put($module.id, $shim))
+    #end
+    #if ("$!module.config" != '')
+      #set ($discard = $requireConfig.config.put($module.id, $jsontool.fromString($module.config)))
+    #end
+  #end
+#end
+require.config($jsontool.serialize($requireConfig));
+define('jQueryNoConflict', ['jquery'], function($) {
+  return $.noConflict();
+});
+if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
+  require(['jquery', 'bootstrap'], function ($) {
+    // Fix incompatibilities between BootStrap and Prototype
+    var disablePrototypeJS = function (method, pluginsToDisable) {
+      var handler = function (event) {
+        event.target[method] = undefined;
+        setTimeout(function () {
+            delete event.target[method];
+        }, 0);
+      };
+      pluginsToDisable.each(function (plugin) { 
+          $(window).on(method + '.bs.' + plugin, handler); 
+      });
+    },
+    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip', 'tab', 'popover'];
+    disablePrototypeJS('show', pluginsToDisable);
+    disablePrototypeJS('hide', pluginsToDisable);
+  });
+}
+##
+## Pass useful contextual information from the server to the client using the global XWiki object.
+##
+window.XWiki = window.XWiki || {};
+XWiki.webapppath = "${xwiki.webAppPath}";
+XWiki.servletpath = "${xwiki.servletPath}";
+XWiki.contextPath = "${request.contextPath}";
+XWiki.mainWiki = "$!{escapetool.javascript(${xcontext.mainWikiName})}";
+// Deprecated: replaced by meta data in the HTML element
+XWiki.currentWiki = "$!{escapetool.javascript(${xcontext.database})}";
+XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
+XWiki.currentPage = "$!{escapetool.javascript($doc.documentReference.name)}";
+XWiki.editor = "$!{escapetool.javascript($editor)}";
+XWiki.viewer = "$!{escapetool.javascript($viewer)}";
+XWiki.contextaction = "${xcontext.getAction()}";
+XWiki.skin = '$escapetool.javascript($xwiki.skin)';
+## Special case for when the request is about a resource reference not related to a document.
+## Note that we don't need to do it for the other variables since they are all of type string.
+#if ("$!doc" != "")
+XWiki.docisnew = $!doc.isNew();
+#else
+XWiki.docisnew = null;
+#end
+XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
+XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
+XWiki.hasEdit = $hasEdit;
+XWiki.hasProgramming = $hasProgramming;
+XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
+XWiki.hasRenderer = $services.rendering.availableRendererSyntaxes.contains($!doc.getSyntax());
+window.docviewurl = "${doc.getURL('view')}";
+window.docediturl = "${doc.getURL('edit')}";
+window.docsaveurl = "${doc.getURL('save')}";
+window.docgeturl = "${doc.getURL('get')}";
+// ]]>
+</script>
+##
+## Top-level JavaScript libraries (that are loaded directly)
+##
 ## Required by xwiki.js but we have to load it ourselves because xwiki.js doesn't use Require.js
 $xwiki.jsfx.use('uicomponents/model/entityReference.js', {'defer': false})##
 ## xwiki.bundle.min.js and xwiki.bundle.min.css aggregate a couple of JavaScript and CSS files that are used on each
@@ -62,18 +264,11 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
   #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
-    #set($searchSuggestConfigHash = '')
-    #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if($source.getValue('activated') == 1)
-        #set($sourceId = "${source.getValue('name')}:${source.getValue('url')}:${source.getValue('highlight')}:${source.getValue('icon')}}")
-        #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
-      #end
-    #end
-    $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
-      'forceSkinAction' : true,
-      'h' : $searchSuggestConfigHash.hashCode()
-    })##
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
+    <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension)}" defer="defer"></script>##
+    $xwiki.linkx.use(
+      $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
+      {'type': 'text/css', 'rel': 'stylesheet'})##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])
@@ -83,7 +278,10 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
 #if($services.async.isEnabled())
-  $xwiki.jsfx.use("uicomponents/async/async.js", true)##
+  $xwiki.jsfx.use("uicomponents/async/async.js", {
+    'forceSkinAction': true,
+    'wysiwyg': true
+  })##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions
@@ -93,146 +291,6 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 ## Compatibility "aspect" file for deprecated code.
 ## Placed at the very end of the stream so that skin file extensions code can be deprecated easily as well.
 ##
-<script src="$xwiki.getSkinFile("js/xwiki/compatibility.js", false)" defer="defer"></script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/compatibility.js", false))" defer="defer"></script>
 ## Marker script that signals that all the deferred scripts have indeed been executed, guarding against a premature dom:loaded event
-<script src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
-<script data-wysiwyg="true">
-// <![CDATA[
-## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
-## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
-## requirejs will add one...
-## Note that we cannot do this generically in the webjars module when exporting in HTML because the webjars module
-## provide generic URLs and they don't all go through requirejs...
-## Note that this comment and code below are not correctly indentend voluntarily in order to generate nicely formatted
-## (and valid) code at runtime!
-#macro(removeJsSuffix $expr)
-## Note that velocity takes argument references by name (see: https://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#velocimacros).
-## So we set the value of the $expr in the $url variable to not execute $expr multiple times.
-#set ($url = $expr)
-#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js')#else$url#{end}
-#end
-##
-## Start the requirejs config.
-## See https://requirejs.org/docs/api.html#config
-##
-#set ($requireConfig = {
-  'paths': {
-    'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
-    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
-    'xwiki-meta': $xwiki.getSkinFile('js/xwiki/meta.js'),
-    'xwiki-entityReference': $xwiki.getSkinFile('uicomponents/model/entityReference.js'),
-    'xwiki-events-bridge': $xwiki.getSkinFile('js/xwiki/eventsBridge.js'),
-    'xwiki-locale-picker': $xwiki.getSkinFile('localePicker.js', true),
-    'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
-    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/jquery.drawer${jsExtension}""))",
-    'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js')
-  },
-  'shim': {
-    'bootstrap' : ['jquery'],
-    'drawer': ['jquery', 'iscroll'],
-    'xwiki-entityReference': {
-      'exports': 'XWiki'
-    }
-  },
-  'bundles': {},
-  'config': {}
-})
-## See http://requirejs.org/docs/jquery.html#noconflictmap to understand why this works.
-#set ($requireConfig.map = {
-  '*': {
-    'jquery': 'jQueryNoConflict'
-  },
-  'jQueryNoConflict': {
-    'jquery': 'jquery'
-  }
-})
-## Extend the RequireJS configuration.
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.requirejs.module'))
-  #set ($module = $uix.parameters)
-  #if ("$!module.id" != '')
-    #if ("$!module.path" != '')
-      #set ($discard = $requireConfig.paths.put($module.id, $module.path))
-    #end
-    #if ("$!module.bundles" != '')
-      #set ($discard = $requireConfig.bundles.put($module.id, $module.bundles.split('\s*,\s*')))
-    #end
-    #if ("$!module.deps" != '' || "$!module.exports" != '')
-      #set ($shim = $requireConfig.shim.getOrDefault($module.id, {}))
-      ## The shim value can be the list of module dependencies. We need to normalize the shim in this case.
-      #if (!$shim.entrySet())
-        #set ($shim = {'deps': $shim})
-      #end
-      #if ("$!module.deps" != '')
-        #set ($shim.deps = $module.deps.split('\s*,\s*'))
-      #end
-      #if ("$!module.exports" != '')
-        #set ($shim.exports = $module.exports)
-      #end
-      #set ($discard = $requireConfig.shim.put($module.id, $shim))
-    #end
-    #if ("$!module.config" != '')
-      #set ($discard = $requireConfig.config.put($module.id, $jsontool.fromString($module.config)))
-    #end
-  #end
-#end
-require.config($jsontool.serialize($requireConfig));
-define('jQueryNoConflict', ['jquery'], function ($) {
-  return $.noConflict();
-});
-if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
-  require(['jquery', 'bootstrap'], function ($) {
-    // Fix incompatibilities between BootStrap and Prototype
-    var disablePrototypeJS = function (method, pluginsToDisable) {
-      var handler = function (event) {
-        event.target[method] = undefined;
-        setTimeout(function () {
-            delete event.target[method];
-        }, 0);
-      };
-      pluginsToDisable.each(function (plugin) { 
-          $(window).on(method + '.bs.' + plugin, handler); 
-      });
-    },
-    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip', 'tab', 'popover'];
-    disablePrototypeJS('show', pluginsToDisable);
-    disablePrototypeJS('hide', pluginsToDisable);
-  });
-}
-require(['jquery', 'drawer'], function($) {
-  $(document).ready(function() {
-    $('.drawer-main').closest('body').drawer();
-  });
-});
-window.XWiki = window.XWiki || {};
-XWiki.webapppath = "${xwiki.webAppPath}";
-XWiki.servletpath = "${xwiki.servletPath}";
-XWiki.contextPath = "${request.contextPath}";
-XWiki.mainWiki = "$!{escapetool.javascript(${xcontext.mainWikiName})}";
-// Deprecated: replaced by meta data in the HTML element
-XWiki.currentWiki = "$!{escapetool.javascript(${xcontext.database})}";
-XWiki.currentSpace = "$!{escapetool.javascript($doc.space)}";
-XWiki.currentPage = "$!{escapetool.javascript($doc.documentReference.name)}";
-XWiki.editor = "$!{escapetool.javascript($editor)}";
-XWiki.viewer = "$!{escapetool.javascript($viewer)}";
-XWiki.contextaction = "${xcontext.getAction()}";
-XWiki.skin = '$escapetool.javascript($xwiki.skin)';
-## Special case for when the request is about a resource reference not related to a document.
-## Note that we don't need to do it for the other variables since they are all of type string.
-#if ("$!doc" != "")
-XWiki.docisnew = $!doc.isNew();
-#else
-XWiki.docisnew = null;
-#end
-XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
-XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";
-XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($foreach.count > 1),#end"$space"#end ];
-XWiki.hasEdit = $hasEdit;
-XWiki.hasProgramming = $hasProgramming;
-XWiki.hasBackupPackImportRights =#if ($xwiki.package) $xwiki.package.hasBackupPackImportRights()#else false#end;
-XWiki.hasRenderer = $services.rendering.availableRendererSyntaxes.contains($!doc.getSyntax());
-window.docviewurl = "${doc.getURL('view')}";
-window.docediturl = "${doc.getURL('edit')}";
-window.docsaveurl = "${doc.getURL('save')}";
-window.docgeturl = "${doc.getURL('get')}";
-// ]]>
-</script>
+<script src="$escapetool.xml($xwiki.getSkinFile("js/xwiki/markerScript.js", false))" defer="defer"></script>

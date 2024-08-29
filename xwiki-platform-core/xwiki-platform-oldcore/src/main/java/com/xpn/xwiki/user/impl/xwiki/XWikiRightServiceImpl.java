@@ -126,11 +126,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("plain", "view");
             actionMap.put("raw", "view");
             actionMap.put("attach", "view");
-            actionMap.put("charting", "view");
             actionMap.put("skin", "view");
             actionMap.put("download", "view");
-            actionMap.put("dot", "view");
-            actionMap.put("svg", "view");
             actionMap.put("pdf", "view");
             actionMap.put("delete", "delete");
             actionMap.put("deletespace", "admin");
@@ -285,7 +282,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth =
-                context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                "yes".equalsIgnoreCase(context.getWiki().getXWikiPreference("authenticate_" + right, "", context));
         } catch (Exception e) {
         }
 
@@ -296,7 +293,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth |=
-                context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                "yes".equalsIgnoreCase(context.getWiki().getSpacePreference("authenticate_" + right, "", context));
         } catch (Exception e) {
         }
 
@@ -962,14 +959,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } else {
                 docname = doc.getFullName();
-            }
-
-            // programming rights can only been given for user of the main wiki
-            // FIXME: Isn't this wrong? The main db is context.getMainWikiName(), not context.getWiki().getDatabase()
-            // (which is the current db).
-            String maindb = context.getWiki().getDatabase();
-            if ((maindb == null) || (!username.startsWith(maindb))) {
-                return false;
             }
 
             return hasAccessLevel("programming", username, docname, context);

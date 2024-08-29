@@ -33,7 +33,6 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
@@ -118,7 +117,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     private void registerComponent(Class<?> klass) throws Exception
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass);
+        List<ComponentDescriptor<?>> descriptors = loader.getComponentsDescriptors(klass, 0);
 
         for (ComponentDescriptor<?> descriptor : descriptors) {
             getComponentManager().registerComponent(descriptor);

@@ -38,12 +38,11 @@ import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.ratings.internal.RatingSolrCoreInitializer;
+import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -60,8 +59,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRatingQueryField;
-
 /**
  * Tests for {@link SolrAverageRatingManager}.
  *
@@ -69,7 +66,7 @@ import org.xwiki.ratings.internal.averagerating.AverageRatingManager.AverageRati
  * @since 12.9RC1
  */
 @ComponentTest
-public class SolrAverageRatingManagerTest
+class SolrAverageRatingManagerTest
 {
     @InjectMockComponents
     private SolrAverageRatingManager averageRatingManager;
@@ -95,15 +92,15 @@ public class SolrAverageRatingManagerTest
     @BeforeEach
     void setup()
     {
-        when(this.solrUtils.toFilterQueryString(any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
-        when(this.solrUtils.toFilterQueryString(any(), any()))
+        when(this.solrUtils.toCompleteFilterQueryString(any(), any()))
             .then(invocationOnMock -> invocationOnMock.getArgument(0).toString().replaceAll(":", "\\\\:"));
         when(this.solrUtils.getId(any()))
             .then(invocationOnMock -> ((SolrDocument) invocationOnMock.getArgument(0)).get("id"));
         when(this.solrUtils.get(any(), any()))
             .then(invocationOnMock ->
-                ((SolrDocument) invocationOnMock.getArgument(1)).get((String) invocationOnMock.getArgument(0)));
+                ((SolrDocument) invocationOnMock.getArgument(1)).get(invocationOnMock.getArgument(0)));
         doAnswer(invocationOnMock -> {
             String fieldName = invocationOnMock.getArgument(0);
             Object fieldValue = invocationOnMock.getArgument(1);

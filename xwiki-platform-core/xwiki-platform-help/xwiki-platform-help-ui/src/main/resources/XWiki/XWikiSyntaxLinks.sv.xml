@@ -57,11 +57,11 @@
 |Bildlänk|{{{&lt;a href="$xwiki.getURL("Rum1.Sida1")"&gt;{image:img.png|document=Rum2.Sida2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Bildlänk med bildparametrar|{{{&lt;a href="$xwiki.getURL("Rum1.Sida1")"&gt;{image:img.png|document=Rum2.Sida2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Länk till bilaga på aktuell sida|(((
-{{info}}Se [[Bilagemakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{info}}Se [[Bilagemakrot&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] för detaljer{{/info}}
 {{{{attach:text|file=img.png}}}}
 )))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Länk till bilaga på annan sida|(((
-{{info}}Se [[Bilagemakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{info}}Se [[Bilagemakrot&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] för detaljer{{/info}}
 {{{{attach:text|document=Rum.Sida|file=mg.png}}}}
 )))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 
@@ -84,7 +84,7 @@ Det fullständiga formatet för en länk är **##[etikett {| eller &gt;}]+(resur
 **** **##sidae##**: En obligatorisk sträng som anger namnet på den länkade wikisidan.  Exempel: ##WebHome##
 ** **##querySträng##**: En query-sträng, vilken kan utelämnas.  Används för att ange parametrar till URLen.  Exempel: ##"mindata1=5&amp;amp;mindata2=Hej"##.
 ** **##ankare##**: Ett ankarnamn (vilket får utelämnas) som pekar på en ankardefinition på sidan som refereras av länken.  I XWiki skapas ankare automatiskt för varje rubrik bestående av bokstaven H (som i engelskans heading) följt av rubriknamnet.  De svenska bokstäverna å, ä och ö utelämnas alltid ur ankarnamnet.  Detta gäller även för alla tecken som ej är bokstäver eller siffror, exempelvis blanktecken, punk och komma.  En länk till sektionen XWiki syntax 1.0 Länkspecifikation kan alltså skapas via ankaret ##HXWikisyntax10Lnkspecifikation##.
-* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]).  Exempel: ##wikipedia##
 * **##mål##**: En fakultativ sträng som motstvarar ##target##-attributet för ett ##A##-element i HTML.  Om denna utelämnas öppnas länken i aktuellt fönster eller tabb.  Exempel:  ##_self##, ##_blank##.
 
 === 2.0 Links ===
@@ -114,7 +114,7 @@ Delarna inom ##( )## är obligatoriska och delarna inom ##[ ]## får utelämnas.
 
 Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [@interWikiAlias] [||parametrar]##**
 
-* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Exempel: ##Min Sida##
+* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Exempel: ##Min Sida##
 * **##resurs##**: Den fullständiga länkreferensen på följande syntax: **##(referens) [?querySträng] [#ankare]##**
 ** **##referens##**: Länkreferensen på en av följande format:
 *** **URL**: En URL på formatet **##protokoll:~/~/sökväg##**. Exempel: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
@@ -131,7 +131,7 @@ Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [@in
 **** **##epostadress##**: Den e-postadress som skall vara mål för länken.  Exempel: "##sven@svensson.se##"
 ** **##querySträng##**: En query-sträng (vilken får utelämnas) som anger parametrar som skall vara med i den renderade URL:en.  Exempel: ##mindata1=5&amp;mindata2=Hej##
 ** **##ankare##**: Ett ankarnamn (vilket får utelämnas) som pekar på en ankardefinition på sidan som refereras av länken.  I XWiki skapas ankare automatiskt för varje rubrik bestående av bokstaven H (som i engelskans heading) följt av rubriknamnet.  De svenska bokstäverna å, ä och ö utelämnas alltid ur ankarnamnet.  Detta gäller även för alla tecken som ej är bokstäver eller siffror, exempelvis blanktecken, punk och komma.  En länk till sektionen XWiki syntax 2.0 Länkspecifikation kan alltså skapas via ankaret ##HXWikisyntax20Lnkspecifikation##.
-* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+* **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]).  Exempel: ##wikipedia##
 * **##parameters##**: En utelämningsbar lista med parametrar till länken. Exempel: ##rel="~_~_blank"## (öppna i nytt fönster)
 
 === 2.1 Links ===
@@ -164,7 +164,7 @@ Delarna inom ##( )## är obligatoriska och delarna inom ##[ ]## får utelämnas.
 
 Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [||parametrar]##**
 
-* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Exempel: ##Min Sida##
+* **##etikett##**:  En utelämningsbar sträng som visas som länktext då sidan renderas.  Etiketten får inehålla wikiformattering.  Om ingen etikett anges kommer en länktext att automatgenereras.  Mönstret för den automatgenererade texten kan ställas in.  Se [[Administrationsguiden&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Exempel: ##Min Sida##
 * **##resurs##**: En obligatorisk sträng med länkreferensen på en av följande former:
 ** **URL**: En URL på formatet **##[url:] protokoll:~/~/sökväg##**. Exempel: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** En sträng (vilken får utelämnas) som identifierar resursen som en URL.
@@ -175,7 +175,7 @@ Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [||p
 *** **##sida##**: Namnet på den länkade sidan. Exempel: ##WebHome##
 ** **InterWiki-sidnamn** på formen **##interwiki: {{{(interWikiAlias:)}}} (sida)##**. Exempel: ##interwiki:wikipedia:XWiki##
 *** **##interwiki:##** En obligatorisk sträng som identifierar resursen som en InterWiki-länk.
-*** **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).  Exempel: ##wikipedia##
+*** **##interWikiAlias##**:  Ett [[Inter-wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]]-alias (vilket får utelämnas) som är definierat i interwikikartan  (se [[Administrationsguiden&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]).  Exempel: ##wikipedia##
 *** **##sida##**: En obligatorisk sträng som anger namnet på den länkade sidan. Example: ##XWiki##
 ** **Bilaga** på formatet **##attach~: [wikisidnamn@] (bilagenamn)##**. Exempel: ##attach~:img.png##, ##attach~:minwiki:Main.WebHome@img.png##
 *** **##attach~:##**: Den sträng som identifierar resursen som en bilaga.  (Från engelskans "attachment" vilket betyder "bilaga".)

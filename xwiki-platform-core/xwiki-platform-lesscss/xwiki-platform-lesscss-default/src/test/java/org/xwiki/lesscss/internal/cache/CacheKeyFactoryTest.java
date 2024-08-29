@@ -19,9 +19,15 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
@@ -36,7 +42,7 @@ public class CacheKeyFactoryTest
     @Rule
     public MockitoComponentMockingRule<CacheKeyFactory> mocker =
             new MockitoComponentMockingRule<>(CacheKeyFactory.class);
-    
+
     private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
 
     @Before
@@ -58,8 +64,16 @@ public class CacheKeyFactoryTest
         when(colorTheme.serialize()).thenReturn("colorTheme");
         when(xcontextCacheKeyFactory.getCacheKey()).thenReturn("XWikiContext[Mock]");
 
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        HashMap<String, String[]> parameters = new HashMap<>();
+        parameters.put("test", new String[]{"a", "b"});
+        when(httpRequest.getParameterMap()).thenReturn(parameters);
+        Container container = mocker.getInstance(Container.class);
+        final ServletRequest servletRequest = new ServletRequest(httpRequest);
+        when(container.getRequest()).thenReturn(servletRequest);
+
         // Test
-        assertEquals("12_lessResource_4_skin_10_colorTheme_18_XWikiContext[Mock]",
+        assertEquals("12_lessResource_4_skin_10_colorTheme_test:a|b_18_XWikiContext[Mock]",
                 mocker.getComponentUnderTest().getCacheKey(lessResource, skin, colorTheme, true));
     }
 

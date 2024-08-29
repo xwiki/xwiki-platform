@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.document;
 
 import java.io.StringReader;
 import java.util.Collections;
-import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 2.2.5
  */
 @ComponentTest
-public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
+class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
 {
     /**
      * Tests how document title is extracted from the content of the imported document.
@@ -46,7 +45,7 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
      * @throws Exception if it fails to extract the title
      */
     @Test
-    public void titleExtraction() throws Exception
+    void titleExtraction() throws Exception
     {
         String content = "content before title\n" + "%s Title %s\n" + "content after title.";
         XDOMOfficeDocument doc = createOfficeDocument(String.format(content, "=", "="), "xwiki/2.0");
@@ -80,6 +79,6 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
     {
         Parser parser = this.componentManager.getInstance(Parser.class, syntax);
         XDOM xdom = parser.parse(new StringReader(content));
-        return new XDOMOfficeDocument(xdom, Collections.emptySet(), this.componentManager, null);
+        return new XDOMOfficeDocument(xdom, Collections.emptyMap(), this.componentManager, null);
     }
 }

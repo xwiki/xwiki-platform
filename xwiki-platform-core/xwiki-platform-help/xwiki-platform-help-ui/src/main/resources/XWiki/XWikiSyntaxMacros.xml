@@ -129,7 +129,7 @@ There are two kinds of macros in XWiki Syntax 1.0:
 * Radeox macros (called using the ##{macroname:param1=value1|...|paramN=valueN}## syntax)
 
 {{info}}
-For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+For the full list of available macros check the [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Feature|=XWiki Syntax 1.0
@@ -159,11 +159,7 @@ System.out.println("Hello World!");
 )))|The referenced page is included in the current page
 
 {{info}}
-Radeox macros cannot be used in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. Thus they have been rewritten as Rendering macros.
-{{/info}}
-
-{{info}}
-For the full list of available macros check the [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+For the full list of available macros check the [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 ==== Macros in this wiki ====

@@ -230,6 +230,26 @@ public class DefaultMergeManagerTest
     }
 
     @Test
+    public void mergeCharactersNull()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters(null, null, null, new MergeConfiguration());
+        assertNull(result.getMergeResult());
+        assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
+    public void mergeCharactersEmpty()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters("", "", "", new MergeConfiguration());
+        assertEquals("", result.getMergeResult());
+        assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
     public void mergeCharactersWhileModified()
     {
         MergeManagerResult<String, Character> result =
@@ -284,7 +304,6 @@ public class DefaultMergeManagerTest
         @BeforeEach
         public void before() throws Exception
         {
-            this.oldcore.registerMockEnvironment();
             this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
             this.previousDocument = this.currentDocument.clone();
             this.nextDocument = this.currentDocument.clone();
@@ -447,8 +466,8 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
-            this.currentDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
+            this.currentDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -465,7 +484,7 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -498,9 +517,9 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.previousDocument.addAttachment(attachment);
-            this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.nextDocument.addAttachment(attachment.clone());
 
-            attachment = (XWikiAttachment) attachment.clone();
+            attachment = attachment.clone();
             attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
             attachment.setLongSize(9);
 
@@ -567,7 +586,7 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.currentDocument.addAttachment(attachment);
-            this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.previousDocument.addAttachment(attachment.clone());
 
             MergeDocumentResult result = merge();
 
@@ -588,9 +607,9 @@ public class DefaultMergeManagerTest
             attachment.setFilename("file");
 
             this.currentDocument.addAttachment(attachment);
-            this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+            this.previousDocument.addAttachment(attachment.clone());
 
-            attachment = (XWikiAttachment) attachment.clone();
+            attachment = attachment.clone();
             attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
             attachment.setLongSize(9);
 

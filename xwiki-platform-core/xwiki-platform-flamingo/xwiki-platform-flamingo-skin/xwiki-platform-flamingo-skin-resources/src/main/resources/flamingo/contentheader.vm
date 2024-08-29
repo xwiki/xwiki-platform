@@ -18,7 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 <div class="row document-header">
-  <div class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end">
+  <section class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end"
+    aria-label="$escapetool.xml($services.localization.render('core.document.header.info.label'))">
     ## --------------------------------------------------------
     ## Display UI Extensions before the title element
     ## --------------------------------------------------------
@@ -27,24 +28,36 @@
     #end
     <div id="document-title"><h1>$titleToDisplay</h1></div>
     #if (!$doc.isNew())
+      ## Note that this serialization step is mandatory and we cannot count on the UserReferenceConverter here
+      ## because UserReference#toString does not rely on the serializer so it's not the expected format for
+      ## XWiki#getUserName(String).
+      #set ($authorName = $services.user.serialize($tdoc.authors.originalMetadataAuthor))
       <div class="xdocLastModification">
         #if (!$doc.isMostRecent())
           $services.localization.render(
             'core.document.modificationWithVersion',
             ["<a href='$tdoc.getURL('view', ""rev=$tdoc.version"")'>$tdoc.version</a>",
-            $xwiki.getUserName($tdoc.author),
+            $xwiki.getUserName($authorName),
             $xwiki.formatDate($tdoc.date)
           ])
         #else
-          $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+          $services.localization.render('core.footer.modification', [$xwiki.getUserName($authorName), $xwiki.formatDate($tdoc.date)])
         #end
       </div>
     #end
-  </div>
+  </section>
   #if($displayContentMenu)
-    <div class="document-menu col-xs-12 col-md-5">
+    <nav class="document-menu col-xs-12 col-md-5"
+      aria-label="$escapetool.xml($services.localization.render('core.document.header.menu.nav.label'))">
       #template("menus_content.vm")
-    </div>
+    </nav>
   #end
 </div>
+## Display a warning regarding restricted mode for advanced users or when there is an actual error to not to confuse
+## simple users. Also, only display the warning for the content viewer as other viewers shouldn't display
+## rendered content of old revisions and this would thus only confuse users.
+#if ($viewer == 'content' && $doc.isRestricted()
+  && ($isAdvancedUser || $stringtool.contains($renderedContent, 'xwikirenderingerror')))
+  #warning($escapetool.xml($services.localization.render('core.document.restrictedInfo')))
+#end
 <hr/>

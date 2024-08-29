@@ -20,6 +20,7 @@
 package org.xwiki.security.authentication.script;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,16 +33,18 @@ import javax.mail.internet.InternetAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.security.authentication.AuthenticationAction;
-import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
+import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -58,12 +61,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -97,11 +100,14 @@ class AuthenticationScriptServiceTest
     private ContextualAuthorizationManager authorizationManager;
 
     @MockComponent
+    private RetrieveUsernameManager retrieveUsernameManager;
+
+    @MockComponent
     @Named("contextpath")
     private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private XWikiContext xWikiContext;
 
@@ -167,13 +173,16 @@ class AuthenticationScriptServiceTest
     @Test
     void getAuthenticationURL() throws Exception
     {
-        String action = AuthenticationAction.FORGOT_USERNAME.getRequestParameter();
+        String action = AuthenticationAction.RETRIEVE_USERNAME.getRequestParameter();
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("u", "foo");
         parameters.put("v", "bar");
 
+        WikiReference wikiReference = new WikiReference("current");
+        when(this.xWikiContext.getWikiReference()).thenReturn(wikiReference);
+
         AuthenticationResourceReference resourceReference =
-            new AuthenticationResourceReference(AuthenticationAction.FORGOT_USERNAME);
+            new AuthenticationResourceReference(wikiReference, AuthenticationAction.RETRIEVE_USERNAME);
         resourceReference.addParameter("u", "foo");
         resourceReference.addParameter("v", "bar");
 
@@ -260,5 +269,24 @@ class AuthenticationScriptServiceTest
             () -> this.scriptService.resetPassword(userReference, verificationCode, "some password"));
         assertEquals(expectedException, resetPasswordException);
         verify(this.resetPasswordManager, never()).resetPassword(eq(userReference), any());
+    }
+
+    @Test
+    void retrieveUsernameAndSendEmail() throws Exception
+    {
+        String email = "foo@bar.com";
+        when(this.retrieveUsernameManager.findUsers(email)).thenReturn(Collections.emptySet());
+        this.scriptService.retrieveUsernameAndSendEmail(email);
+
+        verify(this.retrieveUsernameManager).findUsers(email);
+        verify(this.retrieveUsernameManager, never()).sendRetrieveUsernameEmail(any(), any());
+
+        Set<UserReference> userReferences = Collections.singleton(mock(UserReference.class));
+        when(this.retrieveUsernameManager.findUsers(email)).thenReturn(userReferences);
+
+        this.scriptService.retrieveUsernameAndSendEmail(email);
+
+        verify(this.retrieveUsernameManager, times(2)).findUsers(email);
+        verify(this.retrieveUsernameManager).sendRetrieveUsernameEmail(email, userReferences);
     }
 }

@@ -73,6 +73,7 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider;
 import com.xpn.xwiki.internal.debug.DebugConfiguration;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
@@ -81,7 +82,6 @@ import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.mockito.OldcoreMatchers;
-import com.xpn.xwiki.test.mockito.XWikiDocumentMatcher;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -204,21 +204,20 @@ public class XWikiMockitoTest
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
-        when(source.copyDocument(targetReference, context)).thenReturn(target);
-        when(source.getLocalReferenceMaxLength()).thenReturn(255);
+        when(source.copyDocument(targetReference, false, context)).thenReturn(target);
 
-        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(sourceReference), same(context)))
+            .thenReturn(source);
+        when(xwiki.getStore().loadXWikiDoc(OldcoreMatchers.isDocument(targetReferenceWithLocale), same(context)))
+            .thenReturn(target);
 
         assertTrue(xwiki.copyDocument(sourceReference, targetReference, context));
-
-        // The target document needs to be new in order for the attachment version to be preserved on save.
-        verify(target).setNew(true);
 
         verify(xwiki.getStore()).saveXWikiDoc(target, context);
     }
 
     /**
-     * Verify that {@link XWiki#rollback(XWikiDocument, String, XWikiContext)} fires the right events.
+     * Verify that {@link XWiki#rollback(XWikiDocument, String, boolean, boolean, XWikiContext)} fires the right events.
      */
     @Test
     public void rollbackFiresEvents() throws Exception
@@ -238,17 +237,22 @@ public class XWikiMockitoTest
         XWikiDocument result = mock(XWikiDocument.class);
         when(result.getDocumentReference()).thenReturn(documentReference);
 
+        DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "ContextUser");
+        this.context.setUserReference(userReference);
+
         String revision = "3.5";
         when(this.documentRevisionProvider.getRevision(document, revision)).thenReturn(result);
 
         this.componentManager.registerMockComponent(ContextualLocalizationManager.class);
 
-        xwiki.rollback(document, revision, context);
+        xwiki.rollback(document, revision, true, true, context);
 
         verify(observationManager).notify(new DocumentRollingBackEvent(documentReference, revision), document, context);
         verify(observationManager).notify(new DocumentUpdatingEvent(documentReference), document, context);
         verify(observationManager).notify(new DocumentUpdatedEvent(documentReference), document, context);
         verify(observationManager).notify(new DocumentRolledBackEvent(documentReference, revision), document, context);
+        verify(observationManager).notify(new UserUpdatingDocumentEvent(userReference, documentReference),
+            document, context);
     }
 
     @Test

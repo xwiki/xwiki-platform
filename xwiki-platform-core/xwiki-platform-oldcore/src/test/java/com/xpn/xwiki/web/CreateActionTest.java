@@ -30,6 +30,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -40,6 +41,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,6 +72,8 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 class CreateActionTest
 {
+    private static final String CSRF_TOKEN_VALUE = "token4234343";
+
     @InjectMockitoOldcore
     MockitoOldcore oldcore;
 
@@ -77,6 +81,9 @@ class CreateActionTest
 
     @InjectMockComponents
     CreateAction action;
+
+    @MockComponent
+    private CSRFToken csrfToken;
 
     XWikiContext context;
 
@@ -120,6 +127,10 @@ class CreateActionTest
         when(this.mockRequest.get("type")).thenReturn("plain");
 
         this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
+
+        when(this.csrfToken.getToken()).thenReturn(CSRF_TOKEN_VALUE);
+        when(this.csrfToken.isTokenValid(CSRF_TOKEN_VALUE)).thenReturn(true);
+        when(this.mockRequest.getParameter("form_token")).thenReturn(CSRF_TOKEN_VALUE);
     }
 
     @Test
@@ -141,8 +152,41 @@ class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki",
             context);
+    }
+
+    @Test
+    void newDocumentFromURLWithInvalidToken() throws Exception
+    {
+        // new document = xwiki:X.Y
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "Y");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+        when(document.getLocalReferenceMaxLength()).thenReturn(255);
+        this.context.setDoc(document);
+
+        // Submit an invalid token
+        when(this.mockRequest.getParameter("form_token")).thenReturn("fakeToken");
+
+        // Run the action
+        String result = this.action.render(this.context);
+
+        // The tests are below this line!
+
+        // Verify that the create template is rendered, so the UI is displayed for the user to re-submit with the
+        // form token.
+        assertEquals("create", result);
+
+        // Verify that we got until the token validation.
+        verify(this.csrfToken).isTokenValid("fakeToken");
+
+        // We should not get this far so no redirect should be done, just the template will be rendered.
+        verify(this.mockURLFactory, never()).createURL(any(), any(), any(), any(), any(), any(),
+            any(XWikiContext.class));
     }
 
     @Test
@@ -167,7 +211,11 @@ class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        // Verify that the token has been validated.
+        verify(this.csrfToken).isTokenValid(CSRF_TOKEN_VALUE);
+
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null,
             "xwiki", context);
     }
 
@@ -214,7 +262,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: The title is not "WebHome", but "X" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -239,7 +288,8 @@ class CreateActionTest
 
         // Note1: The bebavior is the same for both a top level space and a child space WebHome.
         // Note2: The title is not "WebHome", but "Y" (the space's name) to avoid exposing "WebHome" in the UI.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null,
             "xwiki", context);
     }
 
@@ -266,7 +316,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -348,7 +399,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null,
+        verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null,
             "xwiki", context);
     }
 
@@ -376,7 +428,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit", "template=&parent=Main.WebHome&title=Z", null,
+        verify(mockURLFactory).createURL("X.Y.Z", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + CSRF_TOKEN_VALUE, null,
             "xwiki", context);
     }
 
@@ -405,7 +458,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -434,7 +488,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.Z instead of X.Y.Z.WebHome because the tocreate parameter says "terminal".
-        verify(mockURLFactory).createURL("X.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+        verify(mockURLFactory).createURL("X.Y", "Z", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -561,7 +616,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y.WebHome since we default to non-terminal documents.
-        verify(mockURLFactory).createURL("Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -593,7 +649,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.Y since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=&parent=Main.WebHome&title=Y", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -622,7 +679,8 @@ class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.Z since the deprecated parameters were creating terminal documents by default.
-        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit", "template=&parent=Main.WebHome&title=Z", null, "xwiki",
+        verify(mockURLFactory).createURL("X\\.Y", "Z", "edit",
+            "template=&parent=Main.WebHome&title=Z&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -650,7 +708,8 @@ class CreateActionTest
         assertNull(result);
 
         // Note: We are creating X.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -680,7 +739,8 @@ class CreateActionTest
 
         // Note: We are creating X.WebHome instead of X.Y because the tocreate parameter says "space" and the page
         // parameter is ignored.
-        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&parent=Main.WebHome&title=X", null, "xwiki",
+        verify(mockURLFactory).createURL("X", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
             context);
     }
 
@@ -709,7 +769,8 @@ class CreateActionTest
 
         // Note1: The space parameter was previously considered as space name, not space reference, so it is escaped.
         // Note2: We are creating X\.Y.WebHome because the tocreate parameter says "space".
-        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit", "template=&parent=Main.WebHome&title=X.Y", null,
+        verify(mockURLFactory).createURL("X\\.Y", "WebHome", "edit",
+            "template=&parent=Main.WebHome&title=X.Y&form_token=" + CSRF_TOKEN_VALUE, null,
             "xwiki", context);
     }
 
@@ -871,7 +932,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE, null, "xwiki",
+            context);
     }
 
     @Test
@@ -907,7 +969,8 @@ class CreateActionTest
         // Note1: We are allowed to create anything under space X, be it a terminal or a non-terminal document.
         // Note2: We are creating X.Y and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -945,7 +1008,8 @@ class CreateActionTest
         // document
         // Note2: We are creating X.Y.Z.W and using the template extracted from the template provider.
         verify(mockURLFactory).createURL("X.Y.Z.W", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=W", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=W&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1092,7 +1156,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 
@@ -1128,7 +1193,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1162,7 +1228,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1196,7 +1263,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 
@@ -1233,7 +1301,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y.WebHome and using the template specified in the request.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1269,7 +1338,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal and using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 
@@ -1308,7 +1378,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1345,7 +1416,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y.WebHome as non-terminal and using a template, as specified in the
         // template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1382,7 +1454,8 @@ class CreateActionTest
 
         // Note: We are creating the document X.Y as terminal, even if the template provider says otherwise.
         // Also using a template, as specified in the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 
@@ -1417,7 +1490,8 @@ class CreateActionTest
         // Note: We are creating the document X.Y as terminal, since the template provider did not specify a "terminal"
         // property and it used the old "page" type instead. Also using a template, as specified in the template
         // provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 
@@ -1455,7 +1529,8 @@ class CreateActionTest
         // specify a "terminal" property and it used the old "page" type, the UI explicitly asked for a non-terminal
         // document. Also using a template, as specified in the template provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1492,7 +1567,8 @@ class CreateActionTest
         // property and we fallback on the "type" property's value. Also using the template extracted from the template
         // provider.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit",
-            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y", null, "xwiki", context);
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
+            null, "xwiki", context);
     }
 
     @Test
@@ -1528,7 +1604,8 @@ class CreateActionTest
 
         // Note: We are creating X.Y as terminal, since it is overriden from the UI, regardless of any backwards
         // compatibility resolutions. Also using the template extracted from the template provider.
-        verify(mockURLFactory).createURL("X", "Y", "edit", "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y",
+        verify(mockURLFactory).createURL("X", "Y", "edit",
+            "template=XWiki.MyTemplate&parent=Main.WebHome&title=Y&form_token=" + CSRF_TOKEN_VALUE,
             null, "xwiki", context);
     }
 

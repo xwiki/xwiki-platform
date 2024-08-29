@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -113,7 +114,7 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
     public void initialize() throws InitializationException
     {
         EnvironmentProfile environmentProfile =
-            EnvironmentalProfileFactory.createDefault(new File(".").toURI(), this.resourceResolver);
+            EnvironmentalProfileFactory.createDefault(getBaseURI(), this.resourceResolver);
         FopFactoryBuilder builder = new FopFactoryBuilder(environmentProfile);
 
         // Change the location of the FOP font cache file so that it doesn't use the current user's home directory
@@ -269,6 +270,24 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
         } catch (IOException e) {
             throw new InitializationException(String.format("Failed to create FOP cache directory [%s]", fopDirectory),
                 e);
+        }
+    }
+
+    /**
+     * Use the instance base URL as the FOP base URI so that any relative URLs returned by XWiki when rendering a
+     * page in view mode (for browser consumption - it's a best practice to return relative URLs and let browsers
+     * convert them to full URLs) are properly converted by FOP to full URIs before
+     * {@link org.apache.xmlgraphics.io.ResourceResolver#getResource(URI)} is called. Note that we currently use
+     * {@link com.xpn.xwiki.web.ExternalServletURLFactory} in {@link com.xpn.xwiki.web.ExportAction} and thus all
+     * URLs arriving in FOP should already be absolute.
+     */
+    private URI getBaseURI() throws InitializationException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        try {
+            return xcontext.getURLFactory().getServerURL(xcontext).toURI();
+        } catch (Exception e) {
+            throw new InitializationException("Failed to get the base URI for exporting to PDF", e);
         }
     }
 }

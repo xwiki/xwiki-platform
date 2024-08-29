@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.macro.code;
 
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.code.CodeMacro} Macro.
@@ -39,6 +41,8 @@ public class CodeMacroParameters extends BoxMacroParameters
      * The layout format (e.g. plain or with line numbers)
      */
     private CodeMacroLayout layout = CodeMacroLayout.PLAIN;
+
+    private MacroContentSourceReference source;
 
     /**
      * @param language the language identifier.
@@ -74,5 +78,28 @@ public class CodeMacroParameters extends BoxMacroParameters
     public CodeMacroLayout getLayout()
     {
         return layout;
+    }
+
+    /**
+     * @param source the reference of the content to highlight
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    @PropertyDescription("the reference of the content to highlight instead of the content of the macro"
+        + " (script:myvariable for the entry with name myvariable in the script context)")
+    @PropertyAdvanced
+    public void setSource(MacroContentSourceReference source)
+    {
+        this.source = source;
+    }
+
+    /**
+     * @return the reference of the content to highlight
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public MacroContentSourceReference getSource()
+    {
+        return this.source;
     }
 }

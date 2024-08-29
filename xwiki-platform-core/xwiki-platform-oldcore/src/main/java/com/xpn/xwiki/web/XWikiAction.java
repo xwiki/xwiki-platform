@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 import javax.inject.Inject;
@@ -43,6 +44,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.Request;
@@ -52,10 +55,12 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.internal.web.DocExistValidator;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -64,7 +69,6 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.observation.ObservationManager;
@@ -74,29 +78,33 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
-import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.xml.XMLUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.internal.web.LegacyAction;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.redirection.RedirectionFilter;
 
 /**
  * <p>
@@ -156,15 +164,14 @@ public abstract class XWikiAction implements LegacyAction
     @Inject
     protected ObservationManager observation;
 
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
+
     /**
      * Indicate if the action allow asynchronous display (among which the XWiki initialization).
      */
     protected boolean waitForXWikiInitialization = true;
-
-    /**
-     * Indicate if the XWiki.RedirectClass is handled by the action (see handleRedirectObject()).
-     */
-    protected boolean handleRedirectObject = false;
 
     @Inject
     @Named("currentmixed")
@@ -185,11 +192,17 @@ public abstract class XWikiAction implements LegacyAction
 
     private EntityReferenceSerializer<String> localSerializer;
 
+    @Inject
+    private DocumentRevisionProvider documentRevisionProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
     /**
      * @return the class of the XWikiForm in charge of parsing the request
      * @since 13.0
      */
-    @Unstable
     protected Class<? extends XWikiForm> getFormClass()
     {
         return null;
@@ -222,9 +235,46 @@ public abstract class XWikiAction implements LegacyAction
         return this.autorization;
     }
 
+    /**
+     * @deprecated use {@link #localizePlainOrReturnKey(String, Object...)} instead. The new API doesn't XML-escape
+     *             the translation as it's supposed to be used in a context where the target syntax is plain text.
+     */
+    @Deprecated(since = "14.10.12,15.5RC1")
     protected String localizePlainOrKey(String key, Object... parameters)
     {
-        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+        // TODO: Review all calls to localizePlainOrKey() and once this is done change this method implementation to
+        // use:
+        //   return localizeOrKey(key, Syntax.PLAIN_1_0, parameters)
+        return XMLUtils.escape(Objects.toString(getLocalization().getTranslationPlain(key, parameters), key));
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
+    {
+        String result;
+        try {
+            result = Objects.toString(getLocalization().getTranslation(key, syntax, parameters), key);
+        } catch (LocalizationException e) {
+            // Return the key in case of error but log a warning
+            LOGGER.warn("Error rendering the translation for key [{}] in syntax [{}]. Using the translation key "
+                + "instead. Root cause: [{}]", key, syntax.toIdString(), ExceptionUtils.getRootCauseMessage(e));
+            result = key;
+        }
+        return result;
+    }
+
+    /**
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    protected String localizePlainOrReturnKey(String key, Object... parameters)
+    {
+        return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
     }
 
     protected JobProgressManager getProgress()
@@ -302,7 +352,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return {@code true} if the entity reference name is valid according to the name strategy.
      * @since 12.0RC1
      */
-    @Unstable
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
         if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
@@ -314,6 +363,7 @@ public abstract class XWikiAction implements LegacyAction
                     "Cannot create document {0} because its name does not respect the name strategy of the wiki.", null,
                     args);
                 ScriptContext scontext = getCurrentScriptContext();
+                scontext.setAttribute("invalidNameReference", entityReference, ScriptContext.ENGINE_SCOPE);
                 scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
                 return false;
             }
@@ -546,7 +596,7 @@ public abstract class XWikiAction implements LegacyAction
                 getProgress().startStep(this, "Search and execute entity resource handler");
 
                 // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
+                ResourceReferenceHandler<ResourceType> entityResourceReferenceHandler = Utils.getComponent(
                     new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
                 EntityResourceReference entityResourceReference =
                     (EntityResourceReference) Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
@@ -576,10 +626,7 @@ public abstract class XWikiAction implements LegacyAction
                 getProgress().startStep(this, "Execute action render");
 
                 // Handle the XWiki.RedirectClass object that can be attached to the current document
-                boolean hasRedirect = false;
-                if (handleRedirectObject) {
-                    hasRedirect = handleRedirectObject(context);
-                }
+                boolean hasRedirect = handleRedirect(context);
 
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been
                 // migrated to new Actions yet).
@@ -591,10 +638,8 @@ public abstract class XWikiAction implements LegacyAction
                 }
 
                 if (renderResult != null) {
-                    if (doc.isNew() && "view".equals(context.getAction())
-                        && !"recyclebin".equals(context.getRequest().get("viewer"))
-                        && !"children".equals(context.getRequest().get("viewer"))
-                        && !"siblings".equals(context.getRequest().get("viewer"))) {
+                    // check for doc existence
+                    if (shouldReturnDocDoesNotExist(doc, context)) {
                         String page = Utils.getPage(context.getRequest(), "docdoesnotexist");
 
                         getProgress().startStep(this, "Execute template [" + page + "]");
@@ -737,6 +782,28 @@ public abstract class XWikiAction implements LegacyAction
         }
     }
 
+    /**
+     * Check if the given document exists or not and if it should return a 404 based on the context. A {@link
+     * DocExistValidator} with an hint matching the current action is used to check if the document exists. When no
+     * {@link DocExistValidator} is found, the response is always {@code false} When a {@link DocExistValidator} is
+     * found, the result is delegated to {@link DocExistValidator#docExist(XWikiDocument, XWikiContext)}.
+     *
+     * @param doc the doc for which to check it exists or not
+     * @param context the current context
+     * @return {@code true} if we should return a 404
+     * @throws ComponentLookupException if an error occurs when instantiating a {@link DocExistValidator}
+     */
+    private boolean shouldReturnDocDoesNotExist(XWikiDocument doc, XWikiContext context) throws ComponentLookupException
+    {
+        boolean result = false;
+        String action = context.getAction();
+        if (this.componentManager.hasComponent(DocExistValidator.class, action)) {
+            result = this.componentManager.<DocExistValidator>getInstance(DocExistValidator.class, action)
+                .docExist(doc, context);
+        }
+        return result;
+    }
+
     private void renderInit(XWikiContext xcontext) throws Exception
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
@@ -782,7 +849,6 @@ public abstract class XWikiAction implements LegacyAction
      * @return the name to put in the {@link XWikiContext}, by default the component role hint is used
      * @since 13.0
      */
-    @Unstable
     protected String getName()
     {
         return this.componentDescriptor.getRoleHint();
@@ -864,61 +930,19 @@ public abstract class XWikiAction implements LegacyAction
     }
 
     /**
-     * Redirect the user to an other location if the document holds an XWiki.RedirectClass instance (used when a
-     * document is moved).
+     * Indicate if the action support redirection. The default value is {@code false}.
      *
-     * @param context the XWiki context
-     * @return either or not a redirection have been sent
-     * @throws XWikiException if error occurs
-     * @since 8.0RC1
-     * @since 7.4.2
+     * @return {@code true} if the action supports redirections, {@code false} otherwise
+     * @since 14.0RC1
      */
-    protected boolean handleRedirectObject(XWikiContext context) throws XWikiException
+    protected boolean supportRedirections()
     {
-        WikiReference wikiReference = context.getWikiReference();
+        return false;
+    }
 
-        // Look if the document has a redirect object
-        XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj = doc.getXObject(RedirectClassDocumentInitializer.REFERENCE);
-        if (redirectObj == null) {
-            return false;
-        }
-
-        // Get the location
-        String location = redirectObj.getStringValue("location");
-        if (StringUtils.isBlank(location)) {
-            return false;
-        }
-
-        // Resolve the location to get a reference
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
-        EntityReference locationReference = resolver.resolve(location, wikiReference);
-
-        // Get the type of the current target
-        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
-        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
-        EntityReference entityReference = entityResource.getEntityReference();
-
-        // If the entity is inside a document, compute the new entity with the new document part.
-        if (entityReference.getType().ordinal() > EntityType.DOCUMENT.ordinal()) {
-            EntityReference parentDocument = entityReference.extractReference(EntityType.DOCUMENT);
-            locationReference = entityReference.replaceParent(parentDocument, locationReference);
-        }
-
-        // Get the URL corresponding to the location
-        // Note: the anchor part is lost in the process, because it is not sent to the server
-        // (see: http://stackoverflow.com/a/4276491)
-        String url = context.getWiki().getURL(locationReference, context.getAction(),
-            context.getRequest().getQueryString(), null, context);
-
-        // Send the redirection
-        try {
-            context.getResponse().sendRedirect(url);
-        } catch (IOException e) {
-            throw new XWikiException("Failed to redirect.", e);
-        }
-
-        return true;
+    private UserReference getCurrentUserReference(XWikiContext context)
+    {
+        return this.userReferenceResolver.resolve(context.getUserReference());
     }
 
     protected void handleRevision(XWikiContext context) throws XWikiException
@@ -935,11 +959,32 @@ public abstract class XWikiAction implements LegacyAction
                 Locale locale = LocaleUtils.toLocale(context.getRequest().getParameter("language"), Locale.ROOT);
                 tdoc = new XWikiDocument(tdoc.getDocumentReference(), locale);
             }
-            XWikiDocument rdoc =
-                (!doc.getLocale().equals(tdoc.getLocale())) ? doc : context.getWiki().getDocument(doc, rev, context);
 
-            XWikiDocument rtdoc =
-                (doc.getLocale().equals(tdoc.getLocale())) ? rdoc : context.getWiki().getDocument(tdoc, rev, context);
+            DocumentReference documentReference = doc.getDocumentReference();
+            try {
+                documentRevisionProvider
+                    .checkAccess(Right.VIEW, getCurrentUserReference(context), documentReference, rev);
+            } catch (AuthorizationException e) {
+                Object[] args = { documentReference, rev, context.getUserReference() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access to document {0} with revision {1} has been denied to user {2}", e, args);
+            }
+
+            XWikiDocument rdoc;
+            XWikiDocument rtdoc;
+            if (doc.getLocale().equals(tdoc.getLocale())) {
+                rdoc = this.documentRevisionProvider.getRevision(doc.getDocumentReferenceWithLocale(), rev);
+                rtdoc = rdoc;
+            } else {
+                rdoc = doc;
+                rtdoc = this.documentRevisionProvider.getRevision(tdoc.getDocumentReferenceWithLocale(), rev);
+            }
+            if (rdoc == null) {
+                Object[] args = { doc.getDocumentReferenceWithLocale(), rev };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                    "Version {1} does not exist while reading document {0}", null, args);
+            }
 
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
@@ -1147,11 +1192,15 @@ public abstract class XWikiAction implements LegacyAction
 
         try {
             String jsonAnswerAsString = mapper.writeValueAsString(answer);
-            context.getResponse().setContentType("application/json");
-            context.getResponse().setContentLength(jsonAnswerAsString.length());
-            context.getResponse().setStatus(status);
-            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-            context.getResponse().getWriter().print(jsonAnswerAsString);
+            XWikiResponse response = context.getResponse();
+            String encoding = context.getWiki().getEncoding();
+            response.setContentType("application/json");
+            // Set the content length to the number of bytes, not the
+            // string length, so as to handle multi-byte encodings
+            response.setContentLength(jsonAnswerAsString.getBytes(encoding).length);
+            response.setStatus(status);
+            response.setCharacterEncoding(encoding);
+            response.getWriter().print(jsonAnswerAsString);
             context.setResponseSent(true);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);
@@ -1207,7 +1256,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 12.10.6
      * @since 13.2RC1
      */
-    @Unstable
     protected boolean readFromTemplate(XWikiDocument document, String template, XWikiContext context)
         throws XWikiException
     {
@@ -1219,6 +1267,32 @@ public abstract class XWikiAction implements LegacyAction
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Loop over the {@link RedirectionFilter} components until one of them perform a redirection. If none of the does,
+     * the action continues normally.
+     *
+     * @param context the current wiki content
+     * @return {@code true} if a redirection has been performed, {@code false} otherwise
+     * @throws XWikiException in case of error during the execution of a redirection filter
+     */
+    private boolean handleRedirect(XWikiContext context) throws XWikiException
+    {
+        // If no redirection are expected, this step is skipped.
+        if (this.supportRedirections()) {
+            try {
+                for (RedirectionFilter filter : this.componentManager.<RedirectionFilter>getInstanceList(
+                    RedirectionFilter.class)) {
+                    if (filter.redirect(context)) {
+                        return true;
+                    }
+                }
+            } catch (ComponentLookupException e) {
+                throw new XWikiException("Failed to resolve the redirection filters list", e);
+            }
+        }
         return false;
     }
 }

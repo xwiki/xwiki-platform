@@ -107,7 +107,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
      *
      * @version $Id$
      */
-    private static class R35101Work implements Work
+    private static final class R35101Work implements Work
     {
         @Override
         public void execute(Connection connection) throws SQLException

@@ -1,0 +1,630 @@
+{
+  "vulns": [
+    {
+      "id": "GHSA-4v38-964c-xjmw",
+      "summary": "Code injection via unescaped translations in xwiki-platform",
+      "details": "### Impact\nIn XWiki, every user can add translations that are only applied to the current user. This also allows overriding existing translations. Such translations are often included in privileged contexts without any escaping which allows remote code execution for any user who has edit access on at least one document which could be the user's own profile where edit access is enabled by default.\n\nThe following describes a proof of concept exploit to demonstrate this vulnerability:\n\n1. Edit the user profile with the wiki editor and set the content to\n```\nerror={{/html}} {{async async=\"true\" cached=\"false\" context=\"doc.reference\"}}{{groovy}}println(\"hello from groovy!\"){{/groovy}}{{/async}}\n```\n2. Use the object editor to add an object of type `XWiki.TranslationDocumentClass` with scope `USER`.\n3. Open the document `WikiManager.AdminWikiDescriptorSheet`.\n\nThe expected result would be that a message with title `{{/html}} {{async async=\"true\" cached=\"false\" context=\"doc.reference\"}}{{groovy}}println(\"hello from groovy!\"){{/groovy}}{{/async}}` is displayed while in fact an error that the HTML macro couldn't be executed is displayed, followed by the text \"hello from groovy!\" and some raw HTML, showing that the Groovy macro has been executed.\n\n### Patches\n\nA mitigation for this vulnerability is part of XWiki 14.10.2 and XWiki 15.0 RC1: translations with user scope now require script right. This means that regular users cannot exploit this anymore as users don't have script right by default anymore starting with XWiki 14.10.\n\n### Workarounds\n\nThere are no known workarounds apart from upgrading to a patched versions.\n\n### References\n\n* https://jira.xwiki.org/browse/XWIKI-19749\n* https://github.com/xwiki/xwiki-platform/commit/d06ff8a58480abc7f63eb1d4b8b366024d990643\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n* Open an issue in [Jira XWiki.org](https://jira.xwiki.org/)\n* Email us at [Security Mailing List](mailto:security@xwiki.org)",
+      "aliases": [
+        "CVE-2023-29510"
+      ],
+      "modified": "2023-04-19T18:26:35Z",
+      "published": "2023-04-19T18:26:35Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-74"
+        ],
+        "github_reviewed": true,
+        "severity": "CRITICAL",
+        "github_reviewed_at": "2023-04-19T18:26:35Z",
+        "nvd_published_at": null
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-4v38-964c-xjmw"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29510"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/d06ff8a58480abc7f63eb1d4b8b366024d990643"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/xwiki/xwiki-platform"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-19749"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.3-milestone-2"
+                },
+                {
+                  "fixed": "14.10.2"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-4v38-964c-xjmw/GHSA-4v38-964c-xjmw.json"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-9j36-3cp4-rh4j",
+      "summary": "XWiki vulnerable to Code Injection in template provider administration",
+      "details": "### Impact\n\nAny user with edit rights on any document (e.g., the own user profile) can execute code with programming rights, leading to remote code execution by following these steps:\n\n1. Set the title of any document you can edit (can be the user profile) to\n```\n    {{async async=\"true\" cached=\"false\" context=\"doc.reference\"}}{{groovy}}println(\"Hello \" + \"from groovy!\"){{/groovy}}{{/async}}\n```\n2. Use the object editor to add an object of type `XWiki.TemplateProviderClass` (named \"Template Provider Class\") to that document.\n3. Go to another document you can view (can be the home page) and append `?sheet=XWiki.AdminTemplatesSheet` to the URL.\n\nWhen the attack is successful, a template with name \"Hello from groovy!\" is displayed in the list while on fixed systems, the full title should be displayed.\n\n### Patches\n\nThis vulnerability has been patched in XWiki 13.10.11, 14.4.8, 14.10.1 and 15.0 RC1.\n\n### Workarounds\n\nThe vulnerability can be fixed by patching the code in the affected XWiki document as shown in the [patch](https://github.com/xwiki/xwiki-platform/commit/7bf7094f8ffac095f5d66809af7554c9cc44de09).\n\n### References\n\n* https://jira.xwiki.org/browse/XWIKI-20268\n* https://github.com/xwiki/xwiki-platform/commit/7bf7094f8ffac095f5d66809af7554c9cc44de09\n\n### For more information\n\nIf you have any questions or comments about this advisory:\n* Open an issue in [Jira XWiki.org](https://jira.xwiki.org/)\n* Email us at [Security Mailing List](mailto:security@xwiki.org)",
+      "aliases": [
+        "CVE-2023-29514"
+      ],
+      "modified": "2023-04-20T21:46:57Z",
+      "published": "2023-04-20T21:46:57Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-74"
+        ],
+        "github_reviewed": true,
+        "severity": "CRITICAL",
+        "github_reviewed_at": "2023-04-20T21:46:57Z",
+        "nvd_published_at": null
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-9j36-3cp4-rh4j"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29514"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/7bf7094f8ffac095f5d66809af7554c9cc44de09"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/xwiki/xwiki-platform"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-20268"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform.applications:xwiki-application-administration",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform.applications/xwiki-application-administration"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "1.35"
+                },
+                {
+                  "last_affected": "1.49"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-9j36-3cp4-rh4j/GHSA-9j36-3cp4-rh4j.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.1-milestone-1"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-9j36-3cp4-rh4j/GHSA-9j36-3cp4-rh4j.json",
+            "last_known_affected_version_range": "\u003c 4.2-milestone-1"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2-milestone-1"
+                },
+                {
+                  "fixed": "13.10.11"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-9j36-3cp4-rh4j/GHSA-9j36-3cp4-rh4j.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "14.0-rc-1"
+                },
+                {
+                  "fixed": "14.4.8"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-9j36-3cp4-rh4j/GHSA-9j36-3cp4-rh4j.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "14.5"
+                },
+                {
+                  "fixed": "14.10.1"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-9j36-3cp4-rh4j/GHSA-9j36-3cp4-rh4j.json"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-mgjw-2wrp-r535",
+      "summary": "Remote code execution in xwiki-platform",
+      "details": "### Impact\nIt's possible for an unprivileged user to perform a remote code execution by injecting a groovy script in her own profile and by calling the Reset password feature since the feature is performing a save of the user profile with programming rights in the impacted versions of XWiki.\n\n### Patches\nThe problem has been patched in XWiki 13.1RC1 with a complete refactoring of the Reset password feature.\n\n### Workarounds\nThere's different possible workarounds, all consisting in modifying the XWiki/ResetPassword page.\n  - the Reset password feature can be entirely disabled by deleting the XWiki/ResetPassword page\n  - the script in XWiki/ResetPassword can also be modified or removed: an administrator can replace it with a simple email contact to ask an administrator to reset the password. \n\n### References\nhttps://jira.xwiki.org/browse/XWIKI-16661\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [Jira](https://jira.xwiki.org)\n* Email us at [Security mailing-list](mailto:security@xwiki.org)\n",
+      "aliases": [
+        "CVE-2022-23616"
+      ],
+      "modified": "2022-02-09T21:32:10Z",
+      "published": "2022-02-09T21:32:10Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-74"
+        ],
+        "github_reviewed": true,
+        "severity": "HIGH",
+        "github_reviewed_at": "2022-02-09T21:32:10Z",
+        "nvd_published_at": "2022-02-09T21:15:00Z"
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-mgjw-2wrp-r535"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-23616"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/407caeba05c181bd4835e1dd12e431fa15ff728b#diff-c51a3675b6e312a9385a27566bfb4e5cL340"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/xwiki/xwiki-platform"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-16661"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.1-milestone-1"
+                },
+                {
+                  "fixed": "13.1RC1"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/02/GHSA-mgjw-2wrp-r535/GHSA-mgjw-2wrp-r535.json",
+            "last_known_affected_version_range": "\u003c= 13.0"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-rfh6-mg6h-h668",
+      "summary": "xwiki-platform-administration-ui vulnerable to privilege escalation",
+      "details": "### Impact\nAny user with edit rights on a page (e.g., it's own user page), can execute arbitrary Groovy, Python or Velocity code in XWiki leading to full access to the XWiki installation. The root cause is improper escaping of the section ids in `XWiki.AdminFieldsDisplaySheet`. This page is installed by default.\n\nReproduction steps are described in https://jira.xwiki.org/browse/XWIKI-20261\n\n### Patches\nThe vulnerability has been patched in XWiki  15.0-rc-1, 14.10.1, 14.4.8, and 13.10.11.\n\n### Workarounds\nThe issue can be fixed by applying this [patch](https://github.com/xwiki/xwiki-platform/commit/f1e310826a19acdcdecdecdcfe171d21f24d6ede) on `XWiki.AdminFieldsDisplaySheet`.\n\n### For more information\nIf you have any questions or comments about this advisory:\n\n*    Open an issue in [Jira XWiki.org](https://jira.xwiki.org/)\n*    Email us at [Security Mailing List](mailto:security@xwiki.org)\n",
+      "aliases": [
+        "CVE-2023-29511"
+      ],
+      "modified": "2023-04-26T22:15:50Z",
+      "published": "2023-04-12T20:36:56Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-95"
+        ],
+        "github_reviewed": true,
+        "severity": "CRITICAL",
+        "github_reviewed_at": "2023-04-12T20:36:56Z",
+        "nvd_published_at": "2023-04-16T08:15:00Z"
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-rfh6-mg6h-h668"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-29511"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/f1e310826a19acdcdecdecdcfe171d21f24d6ede"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/xwiki/xwiki-platform"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-20261"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "1.5M2"
+                },
+                {
+                  "fixed": "13.10.11"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-rfh6-mg6h-h668/GHSA-rfh6-mg6h-h668.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "14.0-rc-1"
+                },
+                {
+                  "fixed": "14.4.8"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-rfh6-mg6h-h668/GHSA-rfh6-mg6h-h668.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "14.5"
+                },
+                {
+                  "fixed": "14.10.1"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2023/04/GHSA-rfh6-mg6h-h668/GHSA-rfh6-mg6h-h668.json"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:L"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-v9j2-q4q5-cxh4",
+      "summary": "No CSRF protection on the password change form",
+      "details": "### Impact\nIt's possible for forge an URL that, when accessed by an admin, will reset the password of any user in XWiki.\n\n### Patches\nThe problem has been patched in XWiki 12.10.5, 13.2RC1.\n\n### Workarounds\nIt's possible to apply the patch manually by modifying the `register_macros.vm` template like in https://github.com/xwiki/xwiki-platform/commit/0a36dbcc5421d450366580217a47cc44d32f7257.\n\n### References\nhttps://jira.xwiki.org/browse/XWIKI-18315\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [Jira XWiki](https://jira.xwiki.org)\n* Email us at [security ML](mailto:security@xwiki.org)\n",
+      "aliases": [
+        "CVE-2021-32730"
+      ],
+      "modified": "2021-07-02T16:41:31Z",
+      "published": "2021-07-02T19:19:13Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-352"
+        ],
+        "github_reviewed": true,
+        "severity": "MODERATE",
+        "github_reviewed_at": "2021-07-02T16:41:31Z",
+        "nvd_published_at": "2021-07-01T18:15:00Z"
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-v9j2-q4q5-cxh4"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-32730"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/0a36dbcc5421d450366580217a47cc44d32f7257"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-18315"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "12.10.5"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/07/GHSA-v9j2-q4q5-cxh4/GHSA-v9j2-q4q5-cxh4.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "13.0"
+                },
+                {
+                  "fixed": "13.2"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2021/07/GHSA-v9j2-q4q5-cxh4/GHSA-v9j2-q4q5-cxh4.json"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:N/I:H/A:N"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-vh5c-jqfg-mhrh",
+      "summary": "Cross-Site Request Forgery in xwiki-platform",
+      "details": "### Impact\nIt's possible to know if a user has or not an account in a wiki related to an email address, and which username(s) is actually tight to that email by forging a request to the Forgot username page. Note that since this page does not have a CSRF check it's quite easy to perform a lot of those requests.\n\n### Patches\nThis issue has been patched in XWiki 12.10.5 and 13.2RC1. Two different patches are provided:\n  - a first one to fix the CSRF problem\n  - a more complex one that now relies on sending an email for the Forgot username process.\n\n### Workarounds\nIt's possible to fix the problem without uprading by editing the ForgotUsername page in version below 13.x, to use the following code: https://github.com/xwiki/xwiki-platform/blob/69548c0320cbd772540cf4668743e69f879812cf/xwiki-platform-core/xwiki-platform-administration/xwiki-platform-administration-ui/src/main/resources/XWiki/ForgotUsername.xml#L39-L123\n\nIn version after 13.x it's also possible to edit manually the forgotusername.vm file, but it's really encouraged to upgrade the version here.\n\n### References\n  * https://jira.xwiki.org/browse/XWIKI-18384\n  * https://jira.xwiki.org/browse/XWIKI-18408\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [Jira XWiki](https://jira.xwiki.org)\n* Email us at [security ML](mailto:security@xwiki.org)\n",
+      "aliases": [
+        "CVE-2021-32732"
+      ],
+      "modified": "2022-02-11T21:08:09Z",
+      "published": "2022-02-10T22:42:46Z",
+      "database_specific": {
+        "cwe_ids": [
+          "CWE-352"
+        ],
+        "github_reviewed": true,
+        "severity": "HIGH",
+        "github_reviewed_at": "2022-02-07T16:35:35Z",
+        "nvd_published_at": "2022-02-04T23:15:00Z"
+      },
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/security/advisories/GHSA-vh5c-jqfg-mhrh"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-32732"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/69548c0320cbd772540cf4668743e69f879812cf"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/xwiki/xwiki-platform/commit/f0440dfcbba705e03f7565cd88893dde57ca3fa8"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/xwiki/xwiki-platform/"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-18384"
+        },
+        {
+          "type": "WEB",
+          "url": "https://jira.xwiki.org/browse/XWIKI-18408"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "12.10.5"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/02/GHSA-vh5c-jqfg-mhrh/GHSA-vh5c-jqfg-mhrh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.xwiki.platform:xwiki-platform-administration-ui",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.xwiki.platform/xwiki-platform-administration-ui"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "13.0"
+                },
+                {
+                  "fixed": "13.2RC1"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2022/02/GHSA-vh5c-jqfg-mhrh/GHSA-vh5c-jqfg-mhrh.json",
+            "last_known_affected_version_range": "\u003c= 13.1"
+          }
+        }
+      ],
+      "schema_version": "1.4.0",
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+        }
+      ]
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.filterxml.input.FilterXMLInputProperties;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
@@ -38,7 +39,12 @@ import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
 import org.xwiki.filter.output.OutputFilterStream;
 import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -54,9 +60,14 @@ import static org.mockito.Mockito.doReturn;
  */
 @OldcoreTest
 @AllComponents
-public class AbstractInstanceFilterStreamTest
+public abstract class AbstractInstanceFilterStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
+
+    protected UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @InjectComponentManager
+    protected MockitoComponentManager componentManager;
 
     @InjectMockitoOldcore
     protected MockitoOldcore oldcore;
@@ -78,6 +89,12 @@ public class AbstractInstanceFilterStreamTest
         // XWiki
 
         doReturn(true).when(this.oldcore.getSpyXWiki()).hasAttachmentRecycleBin(anyXWikiContext());
+
+        // Users
+
+        this.userReferenceResolver = this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        //DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        //UserReference contextUserReference = mockUserReference(contextUser);
     }
 
     protected void importFromXML(String resource) throws FilterException
@@ -119,5 +136,10 @@ public class AbstractInstanceFilterStreamTest
     protected Date toDate(String date) throws ParseException
     {
         return DATE_PARSER.parse(date);
+    }
+
+    protected UserReference mockUserReference(DocumentReference documentReference)
+    {
+        return this.userReferenceResolver.resolve(documentReference);
     }
 }

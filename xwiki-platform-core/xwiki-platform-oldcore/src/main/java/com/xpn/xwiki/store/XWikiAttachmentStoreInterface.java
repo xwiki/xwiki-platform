@@ -54,6 +54,22 @@ public interface XWikiAttachmentStoreInterface
     void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
+    /**
+     * @param attachment
+     * @param context the XWiki context
+     * @param bTransaction
+     * @return true of the content of this attachment still exist in the store
+     * @throws XWikiException when it's not possible to check of the content exist
+     * @since 13.8RC1
+     * @since 13.4.4
+     * @since 12.10.10
+     */
+    default boolean attachmentContentExists(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        return true;
+    }
+
     void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 

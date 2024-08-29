@@ -15,7 +15,8 @@ input[type="text"].xtree-finder.loading {
 div.suggestItems.xtree-finder-suggestions {
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
+  // Note: we can't replace the hardcoded radius with a variable here as the file is compiled to css at build time. 
+  border-radius: 7px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
   margin: 2px 0 0;
   padding: 5px 0;

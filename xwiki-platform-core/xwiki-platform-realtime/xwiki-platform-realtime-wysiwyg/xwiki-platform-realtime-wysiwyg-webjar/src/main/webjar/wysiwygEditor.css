@@ -1,0 +1,82 @@
+/**
+ * Realtime editing toolbar.
+ */
+
+div.rt-toolbar {
+  /* We need to increase the line height because the user names have more padding and border. */
+  line-height: 28px;
+  /* Add some space between the real-time toolbar and the standard CKEditor toolbar. */
+  margin-bottom: 5px;
+}
+
+
+div.rt-toolbar * {
+  /* Be consistent with the CKEditor toolbar. */
+  color: #484848;
+  /* Overcome the CKEditor CSS reset. */
+  line-height: inherit;
+}
+
+div.rt-toolbar .rt-user-list a {
+  /* Make it look and behave like the other toolbar buttons. */
+  color: #484848;
+  border: 1px transparent solid;
+  display: inline-block;
+  line-height: auto;
+  padding: 3px 4px;
+}
+
+div.rt-toolbar .rt-user-list a:hover {
+  background: #e5e5e5;
+  border-color: #bcbcbc;
+}
+
+div.rt-toolbar .rt-user-avatar,
+div.rt-toolbar .rt-user-fake-avatar {
+  border-radius: 7px;
+  margin: 0 3px 0 0;
+  vertical-align: middle;
+}
+
+/**
+ * Realtime editing user caret indicators.
+ */
+
+.rt-user-position {
+  position: absolute;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  left: 4px;
+  /* Initial top position, after the editor is loaded. Matches the top padding of the edited content. */
+  top: 15px;
+  margin-top: 3px;
+}
+
+/* User caret indicator based on user name first letter (when the user avatar is missing). */
+div.rt-user-position {
+  display: inline-block;
+  background-color: #CCCCFF;
+  border: 1px solid #AAA;
+  text-align: center;
+  /* We removed 2px from the height, corresponding to the top and bottom border. */
+  line-height: 14px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #3333FF;
+  user-select: none;
+  cursor: default;
+}
+
+/* The rich text area needs a larger padding in order for the user caret indicators to fit on the left side. */
+.xcontent.form > .document-header ~ .row {
+  /* This is for the in-place editor. */
+  position: relative;
+  margin-right: -24px;
+  margin-left: -24px;
+}
+#body[role="textbox"],
+.xcontent.form > .row > #xwikicontent {
+  padding-right: 24px;
+  padding-left: 24px;
+}

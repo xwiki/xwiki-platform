@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxMacros</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxMacros</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Програмування =
+
+== Макроси ==
+
+=== 1.0 Macros ===
+
+У XWiki Syntax 1.0 є два типи макросів:
+
+* Макроси velocity(викликаються за допомогою синтаксису ###macroname(param1 ... paramN)##)
+* Макроси Radeox (викликаються за допомогою синтаксису ##{macroname:param1=value1|...|paramN=valueN}## )
+
+{{info}}
+Повний список доступних макросів див. у [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
+{{/info}}
+
+|=Функція|=Синтаксис XWiki 1.0
+|Макрос velocity|(((
+{{{#info("Some text")}}}
+)))
+|Макрос Radeox|(((
+{{{{code:java}
+вміст java
+{code}
+}}}
+)))
+
+=== 2.0 Macros ===
+
+У синтаксисі XWiki є лише один тип макросу {{velocity}}$crtSyntaxVer{{/velocity}}, який викликається за допомогою синтаксису: ##{{{{{macroname param1="value1" ... paramN=" valueN"}}...{{/macroname}}}}}##. Для макросів без вмісту є коротке позначення: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+
+|=Функція|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|Виконання макросу з вмістом|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+|Виконання макросу без вмісту|(((
+{{{{{include reference="Space.Page"/}}}}}
+)))|Сторінка, на яку посилається, включена до поточної сторінки
+
+{{info}}
+Повний список доступних макросів див. у [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
+{{/info}}
+
+==== Макроси в цій вікі ====
+
+{{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
+</xwikidoc>

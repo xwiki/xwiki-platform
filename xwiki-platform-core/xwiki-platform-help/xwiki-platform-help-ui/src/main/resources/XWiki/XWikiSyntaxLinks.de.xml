@@ -50,18 +50,18 @@
 |Link zu Seite im angegebenen Bereich|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
 |Link zu einem Unterwiki|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
 |Link der in neuem Fenster öffnet|{{{[Linktext&gt;WebHome&gt;_blank]}}}|[[Linktext&gt;&gt;WebHome||rel="__blank"]]
-|Link zu einer URL direkt im Text|{{{Dies ist eine URL: http://xwiki.org}}}|Dies ist eine URL: http://xwiki.org
-|Link zu einer URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
-|Link zu einer URL mit Linktext|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link zu einer URL direkt im Text|{{{Dies ist eine URL: https://xwiki.org}}}|Dies ist eine URL: https://xwiki.org
+|Link zu einer URL|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|Link zu einer URL mit Linktext|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Link zu einer E-Mail-Adresse|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Bild-Link|{{{&lt;a href="$xwiki.getURL("Bereich1.Seite1")"&gt;{image:Bild.png|document=Bereich2.Seite2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Bild-Link mit Bildparametern|{{{&lt;a href="$xwiki.getURL("Bereich1.Seite1")"&gt;{image:Bild.png|document=Bereich2.Seite2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link zu einem Anhang auf der aktuellen Seite|(((
-{{info}}Siehe [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
+{{info}}Siehe [[Anhangsmakro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] für Details{{/info}}
 {{{{attach:Text|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link zu einem Anhang auf einer anderen Seite|(((
-{{info}}Siehe [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
+{{info}}Siehe [[Anhangsmakro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] für Details{{/info}}
 {{{{attach:Text|document=Bereich.Seite|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 
@@ -83,7 +83,7 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 **** **##Seite##**: Eine erforderliche Zeichenkette, die den Namen der verknüpften Wikiseite enthält. Beispiel: ##WebHome##
 ** **##queryString##**: Eine optionale Abfragezeichenkette, die Parameter spezifiziert, die in der gerenderten URL verwendet werden. Beispiel: ##mydata1=5&amp;mydata2=Hallo##
 ** **##Anker##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. Es ist zu beachten, dass XWiki Anker automatisch für Überschriften erstellt werden. Beispiel: ##HInhaltsverzeichnis##
-* **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Dies ist nur für Wikiseitennamen zulässig. Beispiel: ##wikipedia##
+* **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Dies ist nur für Wikiseitennamen zulässig. Beispiel: ##wikipedia##
 * **##Ziel##**: Eine optionale Zeichenkette entsprechend dem HTML ##target## Attribut für ein HTML ##A## Linkelement. Dieses Element wird beim Rendern des Links verwendet. Standardmäßig wird der Link im aktuellen Fenster geöffnet. Beispiele: ##_self##, ##_blank##
 
 
@@ -99,9 +99,9 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 |Link zu Seite im angegebenen Bereich|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Link zu einem Unterwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
 |Link der in neuem Fenster öffnet|{{{[[Linktext&gt;&gt;WebHome||rel="__blank"]]}}}|[[Linktext&gt;&gt;WebHome||rel="__blank"]]
-|Link zu einer URL direkt im Text|{{{Dies ist eine URL: http://xwiki.org}}}|Dies ist eine URL: http://xwiki.org
-|Link zu einer URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Link zu einer URL mit Linktext|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link zu einer URL direkt im Text|{{{Dies ist eine URL: https://xwiki.org}}}|Dies ist eine URL: https://xwiki.org
+|Link zu einer URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Link zu einer URL mit Linktext|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Link zu einer E-Mail-Adresse|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Bild-Link|{{{[[image:Bereich2.Seite2@Bild.png&gt;&gt;Bereich1.Seite1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Bild-Link mit Bildparametern|{{{[[[[image:Bereich2.Seite2@Bild.png||width="26" height="26"]]&gt;&gt;Bereich1.Seite1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
@@ -120,7 +120,7 @@ Der Teil in ##( )## ist erforderlich, während die Teile in ##[ ]## optional sin
 
 Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@interWikiAlias] [||Parameter]##**
 
-* **##Linktext##**: Eine optionale Zeichenkette, welche dem Nutzer beim Rendern als Linkname gezeigt wird. Der Linktext kann XWiki Syntax enthalten. Wenn kein Linktext angegeben ist, wird ein Standartext generiert. Das Erstellungsmuster kann verändert werden, siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Beispiel: ##Meine Seite##
+* **##Linktext##**: Eine optionale Zeichenkette, welche dem Nutzer beim Rendern als Linkname gezeigt wird. Der Linktext kann XWiki Syntax enthalten. Wenn kein Linktext angegeben ist, wird ein Standartext generiert. Das Erstellungsmuster kann verändert werden, siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Beispiel: ##Meine Seite##
 * **##Ressource##**: Die vollständige Linkreferenz in folgender Syntax: ##(Referenz) [?queryString] [#Anker]##
 ** **##Referenz##**: Die Linkreferenz in einer der folgenden Formen:
 *** **URL**: Eine URL in der Form **##Protokoll:~/~/Pfad##**. Beispiele: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
@@ -136,8 +136,8 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@in
 **** **##mailto~:##**: Eine notwendige Zeichenkette, die die Ressource als E-Mail identifiziert.
 **** **##emailAddress##**: Ziel-E-Mail-Adresse. Beispiel: ##john@smith.com##
 ** **##queryString##**: Eine optionale Abfragezeichenkette, die Parameter spezifiziert, die in der gerenderten URL verwendet werden. Beispiel: ##mydata1=5&amp;mydata2=Hallo##
-** **##Anker##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. Es ist zu beachten, dass XWiki Anker automatisch für Überschriften erstellt werden. Beispiel: ##HInhaltsverzeichnis##
-* **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Dies ist nur für Wikiseitennamen zulässig. Beispiel: ##wikipedia##
+** **##Anker##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. In XWiki werden Anker automatisch für Überschriften und Bilder erstellt. Beispiel: ##HInhaltsverzeichnis##
+* **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Dies ist nur für Wikiseitennamen zulässig. Beispiel: ##wikipedia##
 * **##Parameter##**: Eine optionale Liste mit Parametern, die an den Link weitergegeben werden. Beispiel: ##rel="~_~_blank"## (in neuem Fenster öffnen)
 
 
@@ -153,9 +153,9 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@in
 |Link zu Seite im angegebenen Bereich|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Link zu einem Unterwiki|{{{[[subwiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
 |Link der in neuem Fenster öffnet|{{{[[Linktext&gt;&gt;WebHome||rel="__blank"]]}}}|[[Linktext&gt;&gt;WebHome||rel="__blank"]]
-|Link zu einer URL direkt im Text|{{{Dies ist eine URL: http://xwiki.org}}}|Dies ist eine URL: http://xwiki.org
-|Link zu einer URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Link zu einer URL mit Linktext|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Link zu einer URL direkt im Text|{{{Dies ist eine URL: https://xwiki.org}}}|Dies ist eine URL: https://xwiki.org
+|Link zu einer URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Link zu einer URL mit Linktext|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Link zu einer E-Mail-Adresse|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Bild-Link|{{{[[image:Bereich2.Seite2@Bild.png&gt;&gt;Bereich1.Seite1]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Bild-Link mit Bildparametern|{{{[[[[image:Bereich2.Seite2@Bild.png||width="26" height="26"]]&gt;&gt;Bereich1.Seite1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
@@ -175,7 +175,7 @@ Der Teil in ##( )## ist erforderlich, während die Teile in ##[ ]## optional sin
 
 Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [||Parameter]##**
 
-* **##Linktext##**: Eine optionale Zeichenkette, welche dem Nutzer beim Rendern als Linkname gezeigt wird. Der Linktext kann XWiki Syntax enthalten. Wenn kein Linktext angegeben ist, wird ein Standartext generiert. Das Erstellungsmuster kann verändert werden, siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Beispiel: ##Meine Seite##
+* **##Linktext##**: Eine optionale Zeichenkette, welche dem Nutzer beim Rendern als Linkname gezeigt wird. Der Linktext kann XWiki Syntax enthalten. Wenn kein Linktext angegeben ist, wird ein Standartext generiert. Das Erstellungsmuster kann verändert werden, siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Beispiel: ##Meine Seite##
 * **##Ressource##**: Eine erforderliche Zeichenkette mit der Linkreferenz in einer der folgenden Formen
 ** **URL**: Eine URL in der Form **##[url:] (Protokoll:~/~/Pfad)##**. Beispiele: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
 *** **##url:##** Eine optionale Zeichenkette, die die Ressource als URL identifiziert.
@@ -186,11 +186,13 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [||P
 **** **##Seite##**: Eine erforderliche Zeichenkette, die den Namen der verknüpften Wikiseite enthält. Beispiel: ##WebHome##
 ** **InterWiki Seitenname** Referenz in der Form **##interwiki: {{{(interWikiAlias:)}}} (Seite)##**. Beispiel: ##interwiki:wikipedia:XWiki##
 *** **##interwiki:##** Eine erforderliche Zeichenkette, die die Ressource als einen InterWiki Link identifiziert.
-*** **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Beispiel: ##wikipedia##
+*** **##interWikiAlias##**: Ein optionales [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] Alias, entsprechend der Definition in der InterWiki Map (siehe [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Beispiel: ##wikipedia##
 *** **##Seite##**: Eine erforderliche Zeichenkette, die den Namen der verknüpften Wikiseite enthält. Beispiel: ##XWiki##
-** **Anhang** Referenz in der Form **##attach~: [wikiSeitenName @] (anhangsName)##**. Beispiele: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
-*** **##attach~:##**: Eine notwendige Zeichenkette, die die Ressource als Anhang identifiziert.
-*** **##wikiSeitenName##**: Eine optionale Zeichenkette, die das Dokument, an das der Anhang angehängt ist, referenziert, siehe "Wikiseitenname" oben.
+** **Anhang**: Referenz in der Form **##attach~:~{~{~{(wikiName):}(spaceNameListe).}(seitenName)@}(anhangsName)##**
+*** **##attach~:##** Eine erforderliche Zeichenfolge, die die Referenz als XWiki-Dokumentanhang identifiziert.
+*** **##wikiName##**: Eine optionale Zeichenfolge, die den Namen eines Wikis enthält. Die Bildreferenz zeigt auf ein Bild, das an eine Seite innerhalb dieses Wikis angehängt ist. Wenn kein Wiki angegeben ist, wird das aktuelle Wiki verwendet. Beispiel: ##mywiki##.
+*** **##spaceNameListe##**: Eine optionale, durch Punkte getrennte Liste von Wiki-Bereichs-Namen. Wenn kein Bereich angegeben ist, wird der aktuelle Bereich verwendet. Beispiele: ##Main##, ##A.B##, ##A.B.C##
+*** **##seitenName##**: Eine optionale Zeichenfolge, die den Namen der Wiki-Seite enthält, an die das referenzierte Bild angehängt ist. Beispiel: ##Welcome##
 *** **##anhangsName##**: Name des Anhangs, wie er im Wiki gespeichert ist.
 ** **E-Mail-Adresse** in der Form **##mailto~: (emailAdresse)##** (###Anker## ist nicht zulässig). Beispiel: ##mailto~:john@smith.com##
 *** **##mailto~:##**: Eine notwendige Zeichenkette, die die Ressource als E-Mail identifiziert.
@@ -198,11 +200,11 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [||P
 ** **Relativer Pfad** Referenz auf dem Server in der Form **##path: (relPfad)##**. Beispiel: ##path:$doc.getURL('reset')## erzeugt Zieladresse ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## wobei ##/xwiki/bin/reset/Space/Page## durch ##$doc.getURL('reset')## erzeugt wird.
 *** **##path:##** Eine erforderliche Zeichenkette, die die Ressource als relativen Pfad identifiziert.
 *** **##relPfad##**: Eine erforderliche Zeichenkette, die den relativen Pfad der Ressource auf dem Server enthält, die verknüpft werden soll.
-** **UNC (Windows Explorer)** Referenz in der Form **##unc: (Pfad)##**. Der Link wird als ##file:~/~/## gerendet. Beispiele: ##unc:C:\Windows\##, ##unc:~\~\myserver\path\img.png##, ##unc:home/user/somefile##
+** **UNC (Windows Explorer)** Referenz in der Form **##unc: (Pfad)##**. Der Link wird als ##file:~/~/## gerendet. Beispiele: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
 *** **##unc:##** Eine erforderliche Zeichenkette, die die Ressource als UNC (Windows Explorer) Pfad identifiziert.
-*** **##Pfad##**: Eine erforderliche Zeichenkette, die den lokalen Pfad der Ressource, die dem Nutzer zugänglich ist, enthält. Beispiele: ##C:\Windows\##, ##~\~\myserver\path\img.png##, ##home/user/somefile##
+*** **##Pfad##**: Eine erforderliche Zeichenkette, die den lokalen Pfad der Ressource, die dem Nutzer zugänglich ist, enthält. Beispiele: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
 * **##Parameter##**: Eine optionale Liste von Leerzeichen-getrennten Parametern, die an den Link übergeben werden. Beispiel: ##queryString="mydata1=5&amp;mydata2=Hallo" anchor="HInhaltsverzeichnis" rel="~_~_blank"##
 ** **##queryString##**: Eine optionale Abfragezeichenkette, die Parameter spezifiziert, die an die Linkzieladresse angehängt werden und in der gerenderten URL verwendet werden. Beispiel: ##url:http:~/~/domain.com/pfad||queryString="mydata1=5&amp;mydata2=Hello"## erzeugt Zieladresse ##http:~/~/domain.com/pfad?mydata1=5&amp;mydata2=Hello##
-** **##anchor##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. Es ist zu beachten, dass XWiki Anker automatisch für Überschriften erstellt werden. Beispiel: ##url:http:~/~/domain.com/pfad||anchor="HInhaltsverzeichnis"## erzeugt Zieladresse ##http:~/~/domain.com/pfad#HInhaltsverzeichnis##
+** **##anchor##**: Ein optionaler Ankername, der auf einen Anker im referenzierten Link zeigt. In XWiki werden Anker automatisch für Überschriften und Bilder erstellt. Beispiel: ##url:http:~/~/domain.com/pfad||anchor="HInhaltsverzeichnis"## erzeugt Zieladresse ##http:~/~/domain.com/pfad#HInhaltsverzeichnis##
 ** **##rel##**: Ein optionaler Parameter, der es ermöglicht das Linkziel in einem neuen Fenster zu öffnen. Beispiel: ##rel="~_~_blank"##</content>
 </xwikidoc>

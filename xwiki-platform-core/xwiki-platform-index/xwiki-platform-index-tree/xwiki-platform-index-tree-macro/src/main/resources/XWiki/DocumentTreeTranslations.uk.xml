@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="uk">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=Дерево сторінок
+rendering.macro.documentTree.description=Показує дерево сторінок XWiki.
+rendering.macro.documentTree.parameter.readOnly.name=тільки для читання
+rendering.macro.documentTree.parameter.readOnly.description=Чи повинен користувач мати можливість змінювати деревоподібну структуру, якщо він має необхідні права?
+rendering.macro.documentTree.parameter.showWikis.name=Показати Вікі
+rendering.macro.documentTree.parameter.showWikis.description=Показувати вікі-вузли чи ні. Це можна використовувати лише в головній вікі-версії та якщо вихідний код дерева було збережено з правами програмування.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Показати читабельну назву Вікі
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Показувати читабельну назву вікі замість вікі-id при відображенні вікі-вузла.
+rendering.macro.documentTree.parameter.showSpaces.name=Показати простори
+rendering.macro.documentTree.parameter.showSpaces.description=Показувати чи ні вузли простору. Сторінки групуються за простором, якщо відображаються вузли простору.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Показати заголовок сторінки
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Чи показувати заголовок сторінки замість назви сторінки під час відображення вузла сторінки.
+rendering.macro.documentTree.parameter.showTranslations.name=Показати переклади
+rendering.macro.documentTree.parameter.showTranslations.description=Показувати чи ні переклади сторінки.
+rendering.macro.documentTree.parameter.showAttachments.name=Показати вкладення
+rendering.macro.documentTree.parameter.showAttachments.description=Показувати вкладення сторінки чи ні.
+rendering.macro.documentTree.parameter.showObjects.name=Показати об'єкти
+rendering.macro.documentTree.parameter.showObjects.description=Показувати чи ні об'єкти сторінки.
+rendering.macro.documentTree.parameter.showClassProperties.name=Показати властивості класу
+rendering.macro.documentTree.parameter.showClassProperties.description=Чи показувати властивості класу для сторінок, які визначають класи.
+rendering.macro.documentTree.parameter.root.name=Корінь
+rendering.macro.documentTree.parameter.root.description=ID кореневого вузла. Це корисно, якщо ви хочете відобразити лише нащадків даного вузла (для вказаного кореня). У дереві відображаються дочірні елементи кореневого вузла на першому рівні, тому кореневий вузол насправді не відображається. Якщо не вказано кореневий вузол, відображається все дерево. Формат id вузла: entityType:entityReference, де тип сутності може бути, наприклад, вікі, простір, документ. Наприклад: вікі:xwiki, простір:xwiki:Main, документ:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Показати корінь
+rendering.macro.documentTree.parameter.showRoot.description=Показувати кореневий вузол чи ні. Кореневий вузол не відображається за умовчанням, оскільки зазвичай він випливає з контексту, де відображається дерево (наприклад, мітка перед деревом). Хоча в деяких випадках вам може знадобитися відобразити кореневий вузол: щоб створити новий вузол під коренем.
+rendering.macro.documentTree.parameter.compact.name=Компактний
+rendering.macro.documentTree.parameter.compact.description=Якщо ви обмежені у горизонтальному просторі, можливо, вам слід встановити для цього параметра значення true. Ефект полягає в тому, що піктограми вузлів і ребра, які їх з'єднують, будуть приховані. Деякі спеціальні стилі також будуть застосовані, щоб гарантувати, що дерево займає менше горизонтального простору, зберігаючи при цьому мітки вузлів повністю видимими.
+rendering.macro.documentTree.parameter.links.name=Посилання
+rendering.macro.documentTree.parameter.links.description=Визначає, чи повинні мітки вузлів виглядати та поводити як посилання (якорі).
+rendering.macro.documentTree.parameter.checkboxes.name=Прапорці
+rendering.macro.documentTree.parameter.checkboxes.description=Чи потрібно відображати прапорець перед кожним вузлом дерева, щоб дозволити користувачеві вибирати кілька вузлів дерева.
+rendering.macro.documentTree.parameter.openTo.name=Відкрити для
+rendering.macro.documentTree.parameter.openTo.description=ID вузла, до якого потрібно відкрити дерево. Також будуть відкриті всі предки вказаного вузла, аж до кореня дерева. Формат id вузла – це формат кореневого параметра.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Показати лише доступні для перегляду
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Показувати лише вікі, простір і вузли сторінки, для яких поточний користувач має право перегляду. Якщо для цього значення встановлено значення false, вузли вікі, простору та сторінки, які не може переглянути поточний користувач, перераховуються в дереві з використанням їхніх імен. Однак користувач не зможе побачити їх вміст, перейшовши за посиланнями (користувач просто знатиме про їх існування).
+rendering.macro.documentTree.parameter.filterByClass.name=Фільтрувати за класом
+rendering.macro.documentTree.parameter.filterByClass.description=Показувати лише ті сторінки, які мають об'єкт зазначеного типу. Значення цього параметра є повною назвою сторінки XWiki, яка містить визначення класу. Наприклад, 'Blog.CategoryClass' можна використовувати для відображення лише сторінок, які представляють категорії блогу. Залиште цей параметр порожнім, якщо ви не бажаєте обмежувати типи сторінок, що відображаються в дереві.
+rendering.macro.documentTree.parameter.finder.name=Пошук
+rendering.macro.documentTree.parameter.finder.description=Показати текстове введення, яке можна використовувати для пошуку вузлів дерева. Введені дані відображаються над деревом і під час введення пропонуються пропозиції на основі вмісту дерева. Після вибору пропозиції дерево розгортається до відповідного вузла.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Режим ієрархії сторінок
+rendering.macro.documentTree.parameter.hierarchyMode.description=Визначає, яку ієрархію використовувати між сторінками. Можливі значення: "reference" (за умовчанням) і "parentchild". Якщо використовується "reference", то ієрархія сторінки визначається лише за допомогою посилання на сторінку, особливо компонента вкладених просторів посилання на сторінку. Якщо використовується "parentchild", то ієрархія базується на зв'язку батько/дочірній, визначеному полем сторінки "parent" з бази даних.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Фільтрувати приховані документи
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Встановити для цього параметра значення false, якщо ви хочете включити приховані документи в дерево. В іншому випадку, якщо значення true, приховані документи виключаються або включаються відповідно до поточних уподобань користувача.
+rendering.macro.documentTree.parameter.limit.name=Межа
+rendering.macro.documentTree.parameter.limit.description=Максимальна кількість дочірніх вузлів для відображення при розгортанні батьківського вузла вперше. Решта дочірніх вузлів доступні за посиланням "більше ...". Цей параметр в основному використовується для розбиття на сторінки дочірніх вузлів і, таким чином, допомагає масштабувати дерево, коли кількість дочірніх вузлів велика.
+rendering.macro.documentTree.parameter.exclusions.name=Виключення
+rendering.macro.documentTree.parameter.exclusions.description=Список вузлів для виключення з дерева. Вузли вказуються за їх id та відокремлені комами.
+index.documentTree.empty=Нічого не знайдено
+index.documentTree.more=ще {0}...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Показати дочірні документи
+rendering.macro.documentTree.parameter.showChildDocuments.description=Чи показувати дочірні документи на основі батьківського поля документа.
+</content>
+</xwikidoc>

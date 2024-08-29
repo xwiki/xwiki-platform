@@ -35,6 +35,9 @@ public class SchedulerEditPage extends EditPage
     @FindBy(id = "XWiki.SchedulerJobClass_0_cron")
     private WebElement cron;
 
+    @FindBy(id = "XWiki.SchedulerJobClass_0_script")
+    private WebElement script;
+
     public void setJobName(String jobName)
     {
         this.jobName.clear();
@@ -53,10 +56,20 @@ public class SchedulerEditPage extends EditPage
         this.cron.sendKeys(cron);
     }
 
+    /**
+     * @since 15.0RC1
+     * @since 14.10.3
+     */
+    public void setScript(String script)
+    {
+        this.script.clear();
+        this.script.sendKeys(script);
+    }
+
     @Override
     public SchedulerPage clickSaveAndView()
     {
-        this.save.click();
+        super.clickSaveAndView();
         return new SchedulerPage();
     }
 }

@@ -35,14 +35,18 @@ import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.WikiLESSResourceReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
 
-import com.github.sommeri.less4j.Less4jException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 
 /**
- * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}.
- * To be used with AbstractCachedCompiler.
+ * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}. To be used
+ * with AbstractCachedCompiler.
  *
  * @since 6.4M2
  * @version $Id$
@@ -66,6 +70,9 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
 
     @Inject
     private LESSConfiguration lessConfiguration;
+
+    @Inject
+    private TemplateManager templateManager;
 
     private Semaphore semaphore;
 
@@ -100,7 +107,18 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
             // Parse the LESS content with Velocity
             String lessCode = source.toString();
             if (useVelocity) {
-                lessCode = executeVelocity(lessCode, skin);
+                DocumentReference authorReference;
+                DocumentReference documentReference;
+                if (lessResourceReference instanceof WikiLESSResourceReference) {
+                    authorReference = ((WikiLESSResourceReference) lessResourceReference).getAuthorReference();
+                    documentReference = ((WikiLESSResourceReference) lessResourceReference).getDocumentReference();
+                } else {
+                    authorReference = InternalTemplateManager.SUPERADMIN_REFERENCE;
+                    documentReference = null;
+                }
+
+                lessCode =
+                    evaluate(lessResourceReference.toString(), lessCode, skin, authorReference, documentReference);
             }
 
             // Compile the LESS code
@@ -110,18 +128,23 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
 
             // Otherwise return the raw LESS code
             return lessCode;
-        } catch (Less4jException | InterruptedException e) {
-            throw new LESSCompilerException(String.format("Failed to compile the resource [%s] with LESS.",
-                    lessResourceReference), e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+
+            throw new LESSCompilerException("Current thread has been interrupted", e);
+        } catch (Exception e) {
+            throw new LESSCompilerException(
+                String.format("Failed to compile the resource [%s] with LESS.", lessResourceReference), e);
         } finally {
             semaphore.release();
         }
     }
 
-    private String executeVelocity(String source, String skin)
+    private String evaluate(String id, String source, String skin, DocumentReference authorReference,
+        DocumentReference documentReference) throws Exception
     {
         // Get the XWiki object
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
         String currentSkin = xwiki.getSkin(xcontext);
 
@@ -132,8 +155,12 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>, Init
                 xcontext.put(SKIN_CONTEXT_KEY, skin);
             }
 
-            return xwiki.evaluateVelocity(source, xcontext.getDoc().getPrefixedFullName());
+            Template template =
+                this.templateManager.createStringTemplate(id, source, authorReference, documentReference);
 
+            StringWriter result = new StringWriter();
+            this.templateManager.renderNoException(template, result);
+            return result.toString();
         } finally {
             // Reset the current skin to the old value
             if (!currentSkin.equals(skin)) {

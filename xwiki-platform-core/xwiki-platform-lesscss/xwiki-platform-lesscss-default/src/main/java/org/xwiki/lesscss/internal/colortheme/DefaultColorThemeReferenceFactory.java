@@ -70,29 +70,26 @@ public class DefaultColorThemeReferenceFactory implements ColorThemeReferenceFac
         DocumentReference colorThemeDocRef =
             documentReferenceResolver.resolve(colorThemeName, new WikiReference(currentWikiId));
 
-        if (xwiki.exists(colorThemeDocRef, xcontext)) {
-            try {
-                XWikiDocument colorThemeDoc = xwiki.getDocument(colorThemeDocRef, xcontext);
+        try {
+            XWikiDocument colorThemeDoc = xwiki.getDocument(colorThemeDocRef, xcontext);
 
+            if (!colorThemeDoc.isNew()) {
                 // Is there any color theme?
-                DocumentReference colorThemeClassRef =
-                    new DocumentReference(colorThemeDocRef.getWikiReference().getName(),
-                            "ColorThemes", "ColorThemeClass");
+                DocumentReference colorThemeClassRef = new DocumentReference(
+                    colorThemeDocRef.getWikiReference().getName(), "ColorThemes", "ColorThemeClass");
                 if (colorThemeDoc.getXObjectSize(colorThemeClassRef) > 0) {
                     return createReference(colorThemeDocRef);
                 }
 
                 // Is there any flamingo theme?
-                DocumentReference flamingoThemeClassRef =
-                    new DocumentReference(colorThemeDocRef.getWikiReference().getName(),
-                            "FlamingoThemesCode", "ThemeClass");
+                DocumentReference flamingoThemeClassRef = new DocumentReference(
+                    colorThemeDocRef.getWikiReference().getName(), "FlamingoThemesCode", "ThemeClass");
                 if (colorThemeDoc.getXObjectSize(flamingoThemeClassRef) > 0) {
                     return createReference(colorThemeDocRef);
                 }
-
-            } catch (XWikiException e) {
-                throw new LESSCompilerException(String.format("Unable to read document [%s]", colorThemeDocRef));
             }
+        } catch (XWikiException e) {
+            throw new LESSCompilerException(String.format("Unable to read document [%s]", colorThemeDocRef));
         }
 
         // Not an XWiki page so probably a file system color theme

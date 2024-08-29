@@ -45,10 +45,6 @@
 
 Absätze sind Textelemente, die durch zwei oder mehr neue Zeilen getrennt sind.
 
-{{info}}
-In XWiki Syntax 2.0 werden neue Zeilen beachtet, was in XWiki Syntax 1.0 und Creole Syntax nicht der Fall ist.
-{{/info}}
-
 (% style="width:100%" %)
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
 |Einfacher Absatz|Dies ist ein Absatz|Dies ist ein Absatz|

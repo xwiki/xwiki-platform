@@ -37,9 +37,11 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if ("$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
+#if ($hasAdmin &amp;&amp; "$!request.userId" != "" &amp;&amp; ($request.action == "disable" || $request.action == "enable") &amp;&amp; $services.csrf.isTokenValid($request.csrf))
 #set ($user = $xwiki.getUser($request.userId))
-#if ($user.getUser().exists($xcontext.context))
+## TODO: User#getUser() requires Programming Rights. To be fixed, see https://jira.xwiki.org/browse/XWIKI-21238
+#set ($isCurrentUser = $user.getUser().userReference.equals($xcontext.userReference))
+#if (!$isCurrentUser &amp;&amp; $user.getUser().exists($xcontext.context))
   #set ($disabled = ($request.action == "disable"))
   #set ($discard = $user.setDisabledStatus($disabled))
   #set ($success = ($disabled &amp;&amp; $user.isDisabled()) || (!$disabled &amp;&amp; !$user.isDisabled()))
@@ -140,7 +142,46 @@
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
-  $(document).ready(function() {
+  
+   $(function() {
+    /** Add autocomplete attributes to ease form filling. */
+    var fieldsPurposes = [
+        {
+          'name': 'first_name',
+          'purpose': 'given-name'
+        },
+        {
+          'name': 'last_name',
+          'purpose': 'family-name'
+        },
+        {
+          'name': 'company',
+          'purpose': 'organization'
+        },
+        {
+          'name': 'email',
+          'purpose': 'email'
+        },
+        {
+          'name': 'phone',
+          'purpose': 'tel'
+        },
+        {
+          'name': 'address',
+          'purpose': 'street-address'
+        },
+        {
+          'name': 'blog',
+          'purpose': 'url'
+        }
+      ];
+    fieldsPurposes.forEach(function (entry) {
+      var inputField = $('[name$="' + entry.name + '"]');
+      if (inputField.length === 1) {
+        inputField.attr('autocomplete', entry.purpose);
+      }
+    });
+
     /**
      * Save the new user status.
      */
@@ -152,7 +193,7 @@
         'csrf': xm.form_token,
         'user': XWiki.Model.serialize(xm.documentReference),
         'target': 'user'
-      }).done(function() {
+      }).then(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
         if (action == 'watchUser') {
@@ -162,7 +203,7 @@
           $('.notificationWatchUserFollowing').addClass('hidden');
           $('.notificationWatchUserNotFollowing').removeClass('hidden');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
@@ -175,7 +216,7 @@
         'action': action,
         'csrf': xm.form_token,
         'userId': XWiki.Model.serialize(xm.documentReference)
-      }).done(function(data) {
+      }).then(data =&gt; {
         notification.hide();
         if (data.success) {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.done'))", 'done');
@@ -189,27 +230,27 @@
         } else {
           new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
         }
-      }).fail(function() {
+      }).catch(() =&gt; {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.status.error'))", 'error');
       });
     };
 
-    $('#disable').click(function (event) {
+    $('#disable').on('click', function(event) {
       setUserDisableStatus('disable');
     });
 
-    $('#enable').click(function (event) {
+    $('#enable').on('click', function(event) {
       setUserDisableStatus('enable');
     });
 
     /**
      * DOM events
      */
-    $('.notificationWatchUserAdd').click(function (event) {
+    $('.notificationWatchUserAdd').on('click', function(event) {
       changeUserStatus('watchUser');
     });
-    $('.notificationWatchUserRemove').click(function (event) {
+    $('.notificationWatchUserRemove').on('click', function(event) {
       changeUserStatus('unwatchUser');
     });
   });
@@ -355,7 +396,7 @@
 
 .activity-follow .follow, .activity-follow .following {
   background: $theme.menuAddEntryBackgroundColor 2px center url("$xwiki.getSkinFile('icons/silk/accept.png')") no-repeat;
-  border-radius: 4px;
+  border-radius: 7px;
   color: $theme.menuAddEntryLinkColor !important;
   display: inline-block;
   font-size: 83.3%;
@@ -525,7 +566,7 @@
 #set ($obj = $doc.getObject($xwikiUsersClassName))
 ##
 #if (!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
+== $services.localization.render('xe.admin.users.sheet') ==
 
 {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
 
@@ -567,8 +608,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
-        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
-              href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
+        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))"
+           href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')" class="btn btn-xs btn-default"&gt;
+          $services.icon.renderHTML('pencil')
           &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
         &lt;/a&gt;
       &lt;/div&gt;

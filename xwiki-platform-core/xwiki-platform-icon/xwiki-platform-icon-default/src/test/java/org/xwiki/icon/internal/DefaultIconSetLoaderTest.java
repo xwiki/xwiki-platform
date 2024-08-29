@@ -32,16 +32,19 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconType;
+import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +55,7 @@ import static org.mockito.Mockito.when;
  * @since 6.2M1
  */
 @ComponentTest
-public class DefaultIconSetLoaderTest
+class DefaultIconSetLoaderTest
 {
     @InjectMockComponents
     private DefaultIconSetLoader iconSetLoader;
@@ -64,9 +67,9 @@ public class DefaultIconSetLoaderTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
-    public void setUp() throws Exception
+    void setUp()
     {
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
     private void verifies(IconSet result) throws Exception
@@ -85,12 +88,12 @@ public class DefaultIconSetLoaderTest
     }
 
     @Test
-    public void loadIconSet() throws Exception
+    void loadIconSet() throws Exception
     {
         Reader content = new InputStreamReader(getClass().getResourceAsStream("/test.iconset"));
 
         // Test
-        IconSet result = iconSetLoader.loadIconSet(content, "FontAwesome");
+        IconSet result = this.iconSetLoader.loadIconSet(content, "FontAwesome");
 
         // Verify
         verifies(result);
@@ -98,20 +101,22 @@ public class DefaultIconSetLoaderTest
     }
 
     @Test
-    public void loadIconSetFromWikiDocument() throws Exception
+    void loadIconSetFromWikiDocument() throws Exception
     {
         DocumentReference iconSetRef = new DocumentReference("xwiki", "IconThemes", "Default");
         DocumentReference iconClassRef = new DocumentReference("wikiId", "IconThemesCode", "IconThemeClass");
-        when(documentAccessBridge.getProperty(eq(iconSetRef), eq(iconClassRef), eq("name"))).thenReturn("MyIconTheme");
+        when(this.documentAccessBridge.getProperty(iconSetRef, iconClassRef, "name")).thenReturn("MyIconTheme");
         DocumentModelBridge doc = mock(DocumentModelBridge.class);
-        when(documentAccessBridge.getDocumentInstance(iconSetRef)).thenReturn(doc);
+        when(this.documentAccessBridge.getDocumentInstance(iconSetRef)).thenReturn(doc);
 
         StringWriter content = new StringWriter();
         IOUtils.copyLarge(new InputStreamReader(getClass().getResourceAsStream("/test.iconset")), content);
         when(doc.getContent()).thenReturn(content.toString());
 
+        when(doc.getAuthors()).thenReturn(new DefaultDocumentAuthors(new XWikiDocument(iconSetRef)));
+
         // Test
-        IconSet result = iconSetLoader.loadIconSet(iconSetRef);
+        IconSet result = this.iconSetLoader.loadIconSet(iconSetRef);
 
         // Verify
         verifies(result);
@@ -119,43 +124,30 @@ public class DefaultIconSetLoaderTest
     }
 
     @Test
-    public void loadIconSetWithException() throws Exception
+    void loadIconSetWithException() throws Exception
     {
         Reader content = mock(Reader.class);
         IOException exception = new IOException("test");
         when(content.read(any(char[].class))).thenThrow(exception);
 
         // Test
-        Exception caughException = null;
-        try {
-            iconSetLoader.loadIconSet(content, "FontAwesome");
-        } catch (IconException e) {
-            caughException = e;
-        }
+        Exception caughtException = assertThrows(IconException.class, () ->
+            this.iconSetLoader.loadIconSet(content, "FontAwesome"));
 
-        assertNotNull(caughException);
-        assert (caughException instanceof IconException);
-        assertEquals(exception, caughException.getCause());
-        assertEquals("Failed to load the IconSet [FontAwesome].", caughException.getMessage());
+        assertEquals(exception, caughtException.getCause());
+        assertEquals("Failed to load the IconSet [FontAwesome].", caughtException.getMessage());
     }
 
     @Test
-    public void loadIconSetFromWikiDocumentWithException() throws Exception
+    void loadIconSetFromWikiDocumentWithException() throws Exception
     {
         Exception exception = new Exception("test");
-        when(documentAccessBridge.getDocumentInstance(any(DocumentReference.class))).thenThrow(exception);
+        when(this.documentAccessBridge.getDocumentInstance(any(DocumentReference.class))).thenThrow(exception);
 
-        // Test
-        Exception caughException = null;
-        try {
-            iconSetLoader.loadIconSet(new DocumentReference("a", "b", "c"));
-        } catch (IconException e) {
-            caughException = e;
-        }
+        IconException caughtException = assertThrows(IconException.class, () ->
+            this.iconSetLoader.loadIconSet(new DocumentReference("a", "b", "c")));
 
-        assertNotNull(caughException);
-        assert (caughException instanceof IconException);
-        assertEquals(exception, caughException.getCause());
-        assertEquals("Failed to load the IconSet [a:b.c].", caughException.getMessage());
+        assertEquals(exception, caughtException.getCause());
+        assertEquals("Failed to load the IconSet [a:b.c].", caughtException.getMessage());
     }
 }

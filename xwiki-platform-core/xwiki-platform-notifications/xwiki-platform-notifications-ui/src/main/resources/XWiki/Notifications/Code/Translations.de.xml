@@ -55,9 +55,9 @@ notifications.filters.advanced.modal.close=Schließen
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Systemfilter
-notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen vom System-Benutzer verbergen
+notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen des Systembenutzers ausblenden, es sei denn, das Ereignis richtet sich speziell an Sie
 notifications.filters.name.ownEventsNotificationFilter=Filter zu eigenen Ereignissen
-notifications.filters.description.ownEventsNotificationFilter=Verberge Benachrichtigungen über meine eigenen Aktivitäten
+notifications.filters.description.ownEventsNotificationFilter=Blenden Sie Benachrichtigungen über Ihre eigene Aktivität aus, es sei denn, das Ereignis richtet sich speziell an Sie
 notifications.filters.name.eventReadAlertFilter=Gelesene Benachrichtigungen filtern (Alarm)
 notifications.filters.description.eventReadAlertFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
 notifications.filters.name.eventReadEmailFilter=Gelesene Benachrichtigungen filtern (E-Mail)
@@ -67,32 +67,12 @@ notifications.filters.description.minorEventAlertNotificationFilter=Verberge Ben
 notifications.filters.name.minorEventEmailNotificationFilter=Kleines Ereignis (E-Mail)
 notifications.filters.description.minorEventEmailNotificationFilter=Verberge Benachrichtigungen betreffend kleinen Änderungen von Seiten
 
-## Filter Types
-notifications.filters.type.inclusive=Eingeschlossen
-notifications.filters.type.exclusive=Ausgeschlossen
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Benachrichtigungsfilter Geltungsbereich
 notifications.filters.preferences.scopeNotificationFilter.page=Nur Seite
 notifications.filters.preferences.scopeNotificationFilter.space=Seite und Unterseiten
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
-notifications.filters.preferences.allEvents=-
-
-notifications.filters.preferences.addPreference.filterType.inclusive=Eingeschlossen
-notifications.filters.preferences.addPreference.filterType.exclusive=Ausgeschlossen
-notifications.filters.preferences.addPreference.notificationFormat.label=Benachrichtigungsformat
-notifications.filters.preferences.addPreference.notificationFormat.hint=Auf welches Format von Benachrichtigung soll der Filter angewendet werden?
-notifications.filters.preferences.addPreference.eventType.label=Ereignisart
-notifications.filters.preferences.addPreference.eventType.hint=Welche Art(en) von Ereignis soll der Filter beachten?
-notifications.filters.preferences.addPreference.location.label=Filter Geltungsbereich
-notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) soll der Filter beachten?
-notifications.filters.preferences.delete.inProgress=Wird gelöscht…
-notifications.filters.preferences.delete.done=Filtereinstellung gelöscht!
-notifications.filters.preferences.delete.error=Fehler beim Löschen der Filtereinstellung
-notifications.filters.preferences.setEnabled.inProgress=Wird gespeichert…
-notifications.filters.preferences.setEnabled.done=Filtereinstellung gespeichert!
-notifications.filters.preferences.setEnabled.error=Fehler beim Speichern der Filtereinstellung
+notifications.filters.preferences.scopeNotificationFilter.user=Benutzer
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einstellungen aktivieren, wenn Sie diese Seiten abonnieren möchten
@@ -100,26 +80,56 @@ notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einst
 ## Notifications formats
 notifications.format.alert=Alarm
 notifications.format.email=E-Mail
+notifications.filters.preferences.delete.inProgress=Wird gelöscht…
+notifications.filters.preferences.delete.done=Filtereinstellung gelöscht!
+notifications.filters.preferences.delete.error=Fehler beim Löschen der Filtereinstellung
+notifications.filters.preferences.setEnabled.inProgress=Wird gespeichert…
+notifications.filters.preferences.setEnabled.done=Filtereinstellung gespeichert!
+notifications.filters.preferences.setEnabled.error=Fehler beim Speichern der Filtereinstellung
+notifications.filters.preferences.allEvents=Alle Ereignisse (auch deaktiviert)
 
-## Filter preferences settings
-notifications.settings.filters.preferences.title=Filter
-notifications.settings.filters.preferences.hint=Legen Sie Filter an, um genauer anzugeben, wann Ereignisse Benachrichtigungen erzeugen.
-notifications.settings.filters.preferences.forGuest=Melden Sie sich an, um Ihre Benachrichtigungen zu konfigurieren.
-
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Systemfilter
+notifications.settings.filters.preferences.system.hint=Systemfilter, die Sie umschalten können, um eine genauere Kontrolle über die Benachrichtigungen zu haben, die Sie erhalten möchten.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=Name
-notifications.settings.filters.preferences.table.filterType=Filter Art
-notifications.settings.filters.preferences.table.eventTypes=Ereignisse
-notifications.settings.filters.preferences.table.notificationFormats=Format
-notifications.settings.filters.preferences.table.isEnabled=Aktiv?
-notifications.settings.filters.preferences.table._actions=Aktionen
+notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterDescription=Beschreibung
+notifications.settings.filters.preferences.system.table.filterType=Beschreibung
+notifications.settings.filters.preferences.system.table.notificationFormats=Formate
+notifications.settings.filters.preferences.system.table.isEnabled=Aktiviert?
 
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Benutzerdefinierte Filter
+notifications.settings.filters.preferences.custom.hint=Erstellen Sie Filter, um die Benachrichtigungen zu steuern, die Sie erhalten möchten.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.scope=Geltungsbereich
+notifications.settings.filters.preferences.custom.table.location=Ort
+notifications.settings.filters.preferences.custom.table.filterType=Filteraktion
+notifications.settings.filters.preferences.custom.table.eventTypes=Events
+notifications.settings.filters.preferences.custom.table.notificationFormats=Formate
+notifications.settings.filters.preferences.custom.table.isEnabled=Aktiviert?
+notifications.settings.filters.preferences.custom.table._actions=Aktionen
+notifications.filters.type.custom.inclusive=Für dieses Event benachrichtigen
+notifications.filters.type.custom.exclusive=Das Event ignorieren
+notifications.settings.addFilter=Filter hinzufügen
+notifications.settings.addFilter.hint=Erstellen Sie einen Filter für Ereignisse, die an bestimmten Orten stattfinden. Je nach Ereignis und Benachrichtigungskanal kann der Filter das Versenden einer Benachrichtigung auslösen oder verhindern.
+notifications.filters.preferences.custom.addFilter.location.label=Ort
+notifications.filters.preferences.custom.addFilter.location.hint=Dieser Filter gilt für die Ereignisse, die an den hier ausgewählten Orten stattfinden. Wählen Sie einen oder mehrere Orte aus.
+notifications.filters.preferences.custom.addFilter.type.label=Aktion
+notifications.filters.preferences.custom.addFilter.type.hint=Dieser Filter kann die Ereignisse an den ausgewählten Orten entweder durchlassen oder entfernen. Wählen Sie die Aktion aus, die Sie für die Ereignisse ausführen möchten.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Für dieses Event benachrichtigen
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Das Event ignorieren
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Kanal
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Dieser Filter gilt nur für die Benachrichtigungen, die auf den unten ausgewählten Kommunikationskanälen gesendet werden. Wählen Sie einen oder mehrere Kommunikationskanäle aus.
+notifications.filters.preferences.custom.addFilter.eventType.label=Events / Ereignisse
+notifications.filters.preferences.custom.addFilter.eventType.hint=Dieser Filter gilt für die hier ausgewählten Events an den oben ausgewählten Orten. Wählen Sie ein oder mehrere Ereignisse aus.
 notifications.menu.header=Benachrichtigungen
 notifications.menu.header.settings=Einstellungen
 notifications.menu.clear=Alle löschen
 notifications.menu.clearing=Benachrichtigungen löschen
 notifications.menu.cleared=Benachrichtigungen gelöscht
-notifications.settings.title=Einstellungen für die  Benachrichtigungen
+notifications.settings.title=Einstellungen für die Benachrichtigungen
 notifications.settings.error.notAdmin=Sie müssen Administrator-Rechte haben, um diese Einstellungen zu sehen.
 notifications.settings.menu=Benachrichtigungen
 notifications.settings.menu.hint=Die Benachrichtigungen werden in der rechten oberen Ecke der Seite gesammelt, und Sie können sie anzeigen, indem Sie auf das Glocken-symbol ({0}) klicken
@@ -132,17 +142,17 @@ notifications.settings.email.frequency=E-Mail Zustellhäufigkeit
 notifications.settings.email.frequency.hint=Wählen Sie hier aus, wie oft Sie eine Zusammenfassung der Änderungen im Wiki bekommen wollen.
 notifications.settings.email.diffType.hint=Wählen Sie hier die Detailtiefe der Änderungen in der E-Mail aus.
 notifications.settings.saving=Ihre Einstellungen werden gespeichert…
-notifications.settings.saved=Einstellungen gespeichert.
+notifications.settings.saved=Einstellungen gespeichert!
 notifications.settings.savingfailed=Fehler beim Speichern der Einstellungen
 notifications.settings.filters=Filter ({0})
-notifications.settings.addFilter=Filter hinzufügen
 notifications.settings.errorFilterWiki=Fehler: bitte wählen Sie ein Wiki aus und keine Seite
 notifications.settings.preferences=Einstellungen
-### Missing: notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
+notifications.settings.preferences.hint=Erfassen Sie, welche Ereignisse stattfinden, und stellen Sie sie im Stream oder per E-Mail bereit.
 notifications.settings.applications.title=Anwendungen
 notifications.settings.applications.hint=Hier ist die Liste der Anwendungen, welche Ihnen Benachrichtigungen schicken können. Sie können diese aktivieren oder deaktivieren.
 notifications.settings.applications.forGuest=Melden Sie sich an oder registrieren Sie sich, um die Einstellungen für Ihre Benachrichtigungen zu ändern.
 notifications.settings.applications.appName=Name
+notifications.settings.applications.table.dropdown.toggle.label=Die Details für Benachrichtigungen von der Anwendung {0} umschalten.
 notifications.settings.events=Ereignisse
 notifications.settings.watch.title=Verfolgte Seiten
 notifications.settings.watch.autowatchmode=Automatisches Abonnieren von Seiten
@@ -182,6 +192,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Jedesmal
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Jedes mal, wenn ich eine größere Änderung vornehme
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Nur wenn ich eine Seite neu anlege
 
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=Die angegebene Benutzerreferenz wird nicht unterstützt, derzeit werden nur DocumentUserReference unterstützt.
+notifications.settings.error.userReferenceAdminForbidden=Sie haben keine Administratorrechte für den angegebenen Benutzer: {0}.
+notifications.settings.error.badCSRF=Ungültiges CSRF-Token.
+notifications.settings.badParameters=Ungültige Anforderungsparameter.
+
 ## User profile
 notifications.userprofile.following=Folgend
 notifications.userprofile.notfollowing=Nicht folgend
@@ -192,11 +208,10 @@ notifications.userprofile.saving=Wird gespeichert…
 notifications.userprofile.error=Fehler beim Speichern der Benachrichtigungseinstellungen
 
 ## Macros description
-rendering.macro.notificationsApplicationsPreferences.name=Einstellungen für die  Benachrichtigungen
+rendering.macro.notificationsApplicationsPreferences.name=Einstellungen für die Benachrichtigungen
 rendering.macro.notificationsApplicationsPreferences.description=Zeigt die Einstellungen des aktuellen Benutzers zu Benachrichtigungen an.
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Ziel
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Ziel des Makros (kann "user" für den aktuellen Benutzer oder "wiki" für das aktuelle Wiki sein)
-
 rendering.macro.notificationsAutoWatchPreferences.name=Einstellungen für automatische Benachrichtigungen
 rendering.macro.notificationsAutoWatchPreferences.description=Zeigt die Einstellungen des aktuellen Benutzers zu automatischen Benachrichtigungen an.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Ziel
@@ -212,5 +227,90 @@ notifications.switches.tooltip.page=Diese Seite abonnieren
 notifications.switches.tooltip.pageAndChildren=Diese Seite mitsamt Unterseiten abonnieren
 notifications.switches.tooltip.space=Die übergeordnete Seite und deren Unterseiten abonnieren
 notifications.switches.tooltip.wiki=Dieses Wiki abonnieren
-notifications.switches.changeStatusError=Fehler beim Ändern des Status der Benachrichtigungen.</content>
+notifications.switches.changeStatusError=Fehler beim Ändern des Status der Benachrichtigungen.
+
+## Watch button and modal
+
+notifications.watch.button.title=Aktuelle Benachrichtigungseinstellung für diese Seite: {0} - Klicke, um sie zu ändern
+notifications.watch.button.status.notset=Nicht eingestellt
+notifications.watch.button.status.followed=Gefolgt
+notifications.watch.button.status.blocked=Blockiert
+notifications.watch.button.status.custom=Benutzerdefiniert
+notifications.watch.modal.title=Benachrichtigungseinstellungen für diese Seite
+notifications.watch.modal.description.options=Du kannst die aktuellen Benachrichtigungseinstellungen mit den folgenden Optionen ändern 
+notifications.watch.modal.description.ancestoroption=Du kannst entweder zu {0} gehen und die Benachrichtigungseinstellungen dort ändern oder die Einstellungen direkt auf der aktuellen Seite mit den folgenden Optionen anwenden: 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Seite gefolgt
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite: Du erhältst dafür Benachrichtigungen.
+notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Seite durch übergeordnete Seite gefolgt
+notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite über eine übergeordnetes Seite in der Hierarchie: Du erhältst Benachrichtigungen für sie.
+notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Seite und untergeordnete Seiten gefolgt
+notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite und ihren untergeordneten Seiten: Du erhältst dafür Benachrichtigungen.
+notifications.watch.modal.title.NOT_SET=Keine Beobachtung eingestellt
+notifications.watch.modal.description.NOT_SET=Du hast noch keine Einstellungen für die Beobachtung dieser Seite vorgenommen und folgst ihr daher nicht: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Seite blockiert
+notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Seite durch übergeordnete Seite geblockt
+notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite durch eine übergeordnete Seite in der Hierarchie: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Seite und untergeordnete Seiten geblockt
+notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite und ihre untergeordneten Seiten: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.CUSTOM=Benutzerdefinierte Einstellungen zur Seitenbeobachtung
+notifications.watch.modal.description.CUSTOM=Du verwendest benutzerdefinierte Benachrichtigungseinstellungen für diese Seite: Möglicherweise folgst Du bestimmten Ereignissen auf der Seite oder blockierst sie, oder Du wählst nur bestimmte Kanäle für die Benachrichtigungen aus. Wir laden Dich ein, Deine Benachrichtigungseinstellungen in Deinem Profil zu überprüfen.
+notifications.watch.modal.option.watchpage.title=Seite folgen
+notifications.watch.modal.option.watchpage.hint=Du wirst nur für diese Seite benachrichtigt.
+notifications.watch.modal.option.watchspace.title=Aktueller Seite und ihren Unterseiten folgen
+notifications.watch.modal.option.watchspace.hint=Du erhältst Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.watchwiki.title=Ganzem Wiki folgen
+notifications.watch.modal.option.watchwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du erhältst Benachrichtigungen für jede Seite des Wikis.
+notifications.watch.modal.option.blockpage.title=Seite blocken
+notifications.watch.modal.option.blockpage.hint=Du blockierst alle Benachrichtigungen ausschließlich für diese Seite.
+notifications.watch.modal.option.blockspace.title=Aktuelle Seite und ihre Unterseiten blockieren
+notifications.watch.modal.option.blockspace.hint=Du blockierst alle Benachrichtigungen für diese Seite und alle ihre Unterseiten.
+notifications.watch.modal.option.unwatchpage.title=Aktueller Seite nicht mehr folgen
+notifications.watch.modal.option.unwatchpage.hint=Du beendest den Erhalt von Benachrichtigungen ausschließlich für diese Seite.
+notifications.watch.modal.option.unwatchspace.title=Aktueller Seite und ihre Unterseiten nicht folgen
+notifications.watch.modal.option.unwatchspace.hint=Du beendest den Empfang von Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.unwatchwiki.title=Gesamtem Wiki nicht folgen
+notifications.watch.modal.option.unwatchwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du erhältst dann keine Benachrichtigungen mehr für jede Seite im Wiki.
+notifications.watch.modal.option.unblockpage.title=Aktuelle Seite entblocken
+notifications.watch.modal.option.unblockpage.hint=Du wirst nur für diese Seite benachrichtigt.
+notifications.watch.modal.option.unblockspace.title=Aktuelle Seite und ihre Unterseiten entblocken
+notifications.watch.modal.option.unblockspace.hint=Du erhältst Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.unblockwiki.title=Gesamtes Wiki entblocken
+notifications.watch.modal.option.unblockwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du hörst auf, Benachrichtigungen für jede Seite im Wiki zu ignorieren.
+notifications.watch.modal.close=Schließen ohne Speichern
+notifications.watch.modal.savechanges=Änderungen speichern
+notifications.watch.modal.gotosettings=Verwalte alle Einstellungen für Benachrichtigungen
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filter
+notifications.settings.filters.preferences.hint=Legen Sie Filter an, um genauer anzugeben, wann Ereignisse Benachrichtigungen erzeugen.
+notifications.settings.filters.preferences.forGuest=Melden Sie sich an, um Ihre Benachrichtigungen zu konfigurieren.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Name
+notifications.settings.filters.preferences.table.filterType=Filter Art
+notifications.settings.filters.preferences.table.eventTypes=Ereignisse
+notifications.settings.filters.preferences.table.notificationFormats=Format
+notifications.settings.filters.preferences.table.isEnabled=Aktiv?
+notifications.settings.filters.preferences.table._actions=Aktionen
+notifications.filters.preferences.addPreference.filterType.inclusive=Eingeschlossen
+notifications.filters.preferences.addPreference.filterType.exclusive=Ausgeschlossen
+notifications.filters.preferences.addPreference.notificationFormat.label=Benachrichtigungsformat
+notifications.filters.preferences.addPreference.notificationFormat.hint=Auf welches Format von Benachrichtigung soll der Filter angewendet werden?
+notifications.filters.preferences.addPreference.eventType.label=Ereignisart
+notifications.filters.preferences.addPreference.eventType.hint=Welche Art(en) von Ereignis soll der Filter beachten?
+notifications.filters.preferences.addPreference.location.label=Filter Geltungsbereich
+notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) soll der Filter beachten?
+
+## Filter Types
+notifications.filters.type.inclusive=Eingeschlossen
+notifications.filters.type.exclusive=Ausgeschlossen
+notifications.settings.filters.preferences.custom.table.description=Hier werden alle selbst erstellten Filter dieses Nutzenden oder Wikis angezeigt.
+notifications.settings.filters.preferences.system.table.description=Hier werden alle Systemfilter dieses Wikis angezeigt.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Ort
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

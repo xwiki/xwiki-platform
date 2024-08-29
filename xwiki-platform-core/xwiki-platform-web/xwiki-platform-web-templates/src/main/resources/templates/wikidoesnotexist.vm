@@ -53,7 +53,7 @@ $response.setStatus(404)
       ## Display the standard error message or the custom XWiki.WikiDoesNotExist page from the main wiki
       ##
       <div class='main layoutsubsection'>
-        <div id='mainContentArea'>
+        <main id='mainContentArea'>
           ## Allow the wiki admin to specify a custom wiki error page in the main wiki
           #if ($xwiki.exists('XWiki.WikiDoesNotExist'))
             $xwiki.includeForm('XWiki.WikiDoesNotExist', false)
@@ -63,6 +63,6 @@ $response.setStatus(404)
             #xwikimessageboxend()
           #end
           <div class="clearfloats"></div>
-        </div>## mainContentArea
+        </main>## mainContentArea
       </div>## main
 #template('endpage.vm')

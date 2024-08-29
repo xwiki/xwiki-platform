@@ -1,0 +1,29 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validates that the code macro can take the content as parameter
+.#-----------------------------------------------------
+{{code source="string:<b>bold</b>"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [source=string:<b>bold</b>]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpecialSymbol [<]
+onWord [b]
+onSpecialSymbol [>]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [bold]
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpecialSymbol [<]
+onSpecialSymbol [/]
+onWord [b]
+onSpecialSymbol [>]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [source=string:<b>bold</b>]
+endDocument

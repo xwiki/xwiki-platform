@@ -38,6 +38,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.eventstream.UntypedRecordableEvent;
 import org.xwiki.eventstream.UntypedRecordableEventDescriptor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.AllEvent;
@@ -99,7 +102,7 @@ public class UntypedEventListener extends AbstractEventListener
     private BlockRenderer renderer;
 
     @Inject
-    @Named("wiki")
+    @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
@@ -107,6 +110,12 @@ public class UntypedEventListener extends AbstractEventListener
 
     @Inject
     private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> entitySerializer;
+
+    @Inject
+    private DocumentReferenceResolver<EntityReference> documentResolver;
 
     @Inject
     private Logger logger;
@@ -125,41 +134,37 @@ public class UntypedEventListener extends AbstractEventListener
         try {
             // Get every UntypedEventDescriptor registered in the ComponentManager
             List<UntypedRecordableEventDescriptor> descriptors =
-                    this.componentManagerProvider.get().getInstanceList(UntypedRecordableEventDescriptor.class);
+                this.componentManagerProvider.get().getInstanceList(UntypedRecordableEventDescriptor.class);
 
             // Filter the event descriptors concerned by the event, then create the concerned events
             for (UntypedRecordableEventDescriptor descriptor : descriptors) {
                 // If the event is expected by our descriptor
                 if (eventMatchesDescriptor(event, source, descriptor)) {
-                    Set<String> target = getTarget(event, source, descriptor.getAuthorReference(),
-                            descriptor.getTargetExpression());
-                    observationManager.notify(
-                            new DefaultUntypedRecordableEvent(descriptor.getEventType(), target),
-                            EVENT_STREAM_MODULE, source);
+                    Set<String> target = getTarget(event, source, descriptor);
+                    observationManager.notify(new DefaultUntypedRecordableEvent(descriptor.getEventType(), target),
+                        EVENT_STREAM_MODULE, source);
                 }
             }
         } catch (ComponentLookupException e) {
             logger.error("Unable to retrieve a list of registered UntypedRecordableEventDescriptor "
-                    + "from the ComponentManager.", e);
+                + "from the ComponentManager.", e);
         }
     }
 
     private boolean eventMatchesDescriptor(Event event, Object source, UntypedRecordableEventDescriptor descriptor)
     {
         return descriptor.getEventTriggers().contains(event.getClass().getCanonicalName())
-                && checkXObjectCondition(descriptor, source)
-                && isValidated(event, source, descriptor.getAuthorReference(), descriptor.getValidationExpression());
+            && checkXObjectCondition(descriptor, source) && isValidated(event, source, descriptor);
     }
 
     /**
-     * Ensure that the given source matches what the descriptor needs.
-     * If the source is an instance of XWikiDocument, will check if the document contains the XObject specified in
-     * the descriptor.
+     * Ensure that the given source matches what the descriptor needs. If the source is an instance of XWikiDocument,
+     * will check if the document contains the XObject specified in the descriptor.
      *
      * @param descriptor the event descriptor
      * @param source the event source
      * @return true if the source contains one of the XObjects contained in the descriptor. If no XObject is specified
-     * in the descriptor, returns true
+     *         in the descriptor, returns true
      */
     private boolean checkXObjectCondition(UntypedRecordableEventDescriptor descriptor, Object source)
     {
@@ -168,28 +173,23 @@ public class UntypedEventListener extends AbstractEventListener
 
     /**
      * Evaluate the given velocity template and return a boolean.
-     *
-     * @param event the event that should be bound to the script context
-     * @param source the source object of the event that should be bound to the template
-     * @param userReference a user reference used to build context
-     * @param templateContent the velocity template that should be evaluated
-     * @return true if the template evaluation returned «true» or if the template is empty
      */
-    private boolean isValidated(Event event, Object source, DocumentReference userReference,
-            String templateContent)
+    private boolean isValidated(Event event, Object source, UntypedRecordableEventDescriptor descriptor)
     {
         try {
+            String expression = descriptor.getValidationExpression();
+
             // When no validation expression is defined, then it's always valid
-            if (StringUtils.isBlank(templateContent)) {
+            if (StringUtils.isBlank(expression)) {
                 return true;
             }
 
             // Execute the template
-            XDOM xdom = evaluateVelocity(event, source, userReference, templateContent);
+            XDOM xdom = evaluateVelocity(event, source, expression, descriptor);
 
             // First check if the "xreturn" attribute has been set
-            Object xreturn = scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
-            if (xreturn != null && xreturn instanceof Boolean) {
+            Object xreturn = this.scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
+            if (xreturn instanceof Boolean) {
                 return (Boolean) xreturn;
             }
 
@@ -206,19 +206,20 @@ public class UntypedEventListener extends AbstractEventListener
         }
     }
 
-    private Set<String> getTarget(Event event, Object source, DocumentReference userReference,
-            String templateContent)
+    private Set<String> getTarget(Event event, Object source, UntypedRecordableEventDescriptor descriptor)
     {
         try {
+            String expression = descriptor.getTargetExpression();
+
             // No target if the template is empty
-            if (StringUtils.isBlank(templateContent)) {
+            if (StringUtils.isBlank(expression)) {
                 return Collections.emptySet();
             }
 
             // Evaluate the template and look for the "xreturn" binding
-            evaluateVelocity(event, source, userReference, templateContent);
-            Object xreturn = scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
-            if (xreturn != null && xreturn instanceof Iterable) {
+            evaluateVelocity(event, source, expression, descriptor);
+            Object xreturn = this.scriptContextManager.getCurrentScriptContext().getAttribute(XRETURN_BINDING);
+            if (xreturn instanceof Iterable) {
                 Set<String> target = new HashSet<>();
                 for (Object o : (Iterable) xreturn) {
                     if (o instanceof String) {
@@ -236,15 +237,26 @@ public class UntypedEventListener extends AbstractEventListener
         return Collections.emptySet();
     }
 
-    private XDOM evaluateVelocity(Event event, Object source, DocumentReference userReference,
-            String templateContent) throws Exception
+    private XDOM evaluateVelocity(Event event, Object source, String expression,
+        UntypedRecordableEventDescriptor descriptor) throws Exception
     {
         ScriptContext currentScriptContext = scriptContextManager.getCurrentScriptContext();
         currentScriptContext.setAttribute(EVENT_BINDING_NAME, event, ScriptContext.ENGINE_SCOPE);
         currentScriptContext.setAttribute(SOURCE_BINDING_NAME, source, ScriptContext.ENGINE_SCOPE);
         try {
+            String templateName;
+            DocumentReference documentReference;
+            EntityReference reference = descriptor.getEntityReference();
+            if (reference != null) {
+                templateName = this.entitySerializer.serialize(reference);
+                documentReference = this.documentResolver.resolve(reference);
+            } else {
+                templateName = descriptor.toString();
+                documentReference = null;
+            }
 
-            Template customTemplate = templateManager.createStringTemplate(templateContent, userReference);
+            Template customTemplate = templateManager.createStringTemplate(templateName, expression,
+                descriptor.getAuthorReference(), documentReference);
             return templateManager.execute(customTemplate);
 
         } finally {

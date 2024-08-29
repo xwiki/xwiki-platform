@@ -31,7 +31,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -87,6 +87,6 @@ public class LESSExportActionListenerTest
         // The test is here: we verify that the we do not disable the LESS cache (since the export is not an HTML
         // export). Actually that the context object was not called at all...
         LESSContext lessContext = mocker.getInstance(LESSContext.class);
-        verifyZeroInteractions(lessContext);
+        verifyNoInteractions(lessContext);
     }
 }

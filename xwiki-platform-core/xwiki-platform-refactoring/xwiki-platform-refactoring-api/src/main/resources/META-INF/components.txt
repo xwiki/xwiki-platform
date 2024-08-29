@@ -1,4 +1,5 @@
 org.xwiki.refactoring.internal.batch.DefaultBatchOperationExecutor
+org.xwiki.refactoring.internal.event.DocumentCopyOrMoveEventConverter
 org.xwiki.refactoring.internal.job.CreateJob
 org.xwiki.refactoring.internal.job.DeleteJob
 org.xwiki.refactoring.internal.job.MoveJob
@@ -10,7 +11,9 @@ org.xwiki.refactoring.internal.job.CopyAsJob
 org.xwiki.refactoring.internal.listener.AutomaticRedirectCreatorListener
 org.xwiki.refactoring.internal.listener.BackLinkUpdaterListener
 org.xwiki.refactoring.internal.listener.LegacyParentFieldUpdaterListener
-org.xwiki.refactoring.internal.listener.RelativeLinkUpdaterListener
-org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter
-org.xwiki.refactoring.script.RefactoringScriptService
 org.xwiki.refactoring.internal.script.DefaultRequestFactory
+org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter
+org.xwiki.refactoring.internal.splitter.criterion.naming.MainPageNameAndHeadingNamingCriterion
+org.xwiki.refactoring.script.RefactoringScriptService
+org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion
+org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion

@@ -16,14 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
-  LivedataDropdownMenu is a component that propose different actions
-  to the user: chaging layout, opning advance configuration panels, ...
+  LivedataDropdownMenu is a component that provides different actions
+  to the user: switching layouts, opening advanced configuration panels, ...
   It should be included once in every layout component,
-  generaly on the leftmost of its topbar so that it stay a consistent place.
+  generally at the very left of its top bar so it stays at a consistent place.
 -->
 <template>
   <!--
@@ -38,10 +37,10 @@
       :title="$t('livedata.dropdownMenu.title')"
       data-toggle="dropdown"
       aria-haspopup="true"
-      aria-expanded="true"
+      aria-expanded="false"
       role="button"
     >
-      <span class="fa fa-ellipsis-v"></span>
+      <XWikiIcon :icon-descriptor="{name: 'more-vertical'}" />
     </a>
 
     <!-- Drowpdown body -->
@@ -52,8 +51,9 @@
 
       <li>
         <!-- Refresh -->
-        <a href="#" @click.prevent="logic.updateEntries()">
-          <span class="fa fa-repeat"></span> {{ $t('livedata.action.refresh') }}
+        <a href="#" @click.prevent="logic.updateEntries()" class="livedata-action-refresh">
+          <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
+          {{ $t('livedata.action.refresh') }}
         </a>
       </li>
 
@@ -68,10 +68,10 @@
         v-for="layout in data.meta.layouts"
         :key="layout.id"
         :class="{
-          'disabled': logic.currentLayoutId === layout.id,
+          'disabled': isCurrentLayout(layout.id),
         }"
       >
-        <a href="#" @click.prevent="logic.changeLayout(layout.id)">
+        <a href="#" @click.prevent="changeLayout(layout.id)">
           <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
           {{ layout.name }}
         </a>
@@ -82,24 +82,10 @@
 
       <li class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</li>
 
-      <!-- Properties Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'propertiesPanel')">
-          <span class="fa fa-list-ul"></span> {{ $t('livedata.dropdownMenu.panels.properties') }}
-        </a>
-      </li>
-
-      <!-- Sort Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'sortPanel')">
-          <span class="fa fa-sort"></span> {{ $t('livedata.dropdownMenu.panels.sort') }}
-        </a>
-      </li>
-
-      <!-- Filter Panel -->
-      <li>
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, 'filterPanel')">
-          <span class="fa fa-filter"></span> {{ $t('livedata.dropdownMenu.panels.filter') }}
+      <li v-for="panel in logic.panels" :key="panel.id">
+        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, panel.id)">
+          <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
+          {{ panel.name }}
         </a>
       </li>
 
@@ -126,19 +112,37 @@ export default {
     data () { return this.logic.data; },
   },
 
+  methods: {
+    isCurrentLayout(layoutId) {
+      return this.logic.currentLayoutId === layoutId
+    },
+    changeLayout(layoutId) {
+      if (!this.isCurrentLayout(layoutId)) {
+        this.logic.changeLayout(layoutId)
+      }
+    }
+  }
+
 };
 </script>
 
 
 <style>
 
-.livedata-dropdown-menu .btn-default {
-  background-color: #f8f8f8;
-  background-image: none;
-  border-color: #e5e5e5;
-  box-shadow: none;
-  color: #333333;
-  text-shadow: none;
+.livedata-dropdown-menu {
+  // Similar to .flat-buttons()
+  .btn-default {
+    background-color: @breadcrumb-bg;
+    background-image: none;
+    border-color: @dropdown-divider-bg;
+    box-shadow: none;
+    color: @dropdown-link-color;
+    text-shadow: none;
+  }
+
+  .btn-default:hover, .btn-default:active, .btn-default:focus, .open .dropdown-toggle {
+      border-color: darken(@dropdown-divider-bg, 10%);
+  }
 }
 
 .livedata-dropdown-menu .btn-default span {

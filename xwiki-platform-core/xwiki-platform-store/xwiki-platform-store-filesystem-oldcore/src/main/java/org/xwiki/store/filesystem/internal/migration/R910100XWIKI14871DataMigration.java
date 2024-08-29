@@ -122,6 +122,10 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         File pathByIdStore = new File(storageLocationFile, "~GLOBAL_DELETED_ATTACHMENT_ID_MAPPINGS.xml");
         if (pathByIdStore.exists()) {
             try (FileInputStream stream = new FileInputStream(pathByIdStore)) {
+                // No need to protect against XXE attacks since the XML file is controlled.
+                // Note that if a user were able to change that XML file content, and modify the <path> element then
+                // it would be possible to access any local file content since the path is displayed in the logs below.
+                // That would still need server access though.
                 XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(stream);
 
                 // <deletedattachmentids>
@@ -147,8 +151,8 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
 
                     if (!this.migratedDeletedAttachment.contains(path)) {
                         File directory = new File(path);
-                        if (!directory.exists()) {
-                            this.logger.warn("[{}] does not exist, trying to find the new location", directory);
+                        if (!directory.getCanonicalPath().startsWith(getStoreRootDirectory().getCanonicalPath())) {
+                            this.logger.warn("[{}] is the wrong path, trying to find the new location", directory);
 
                             directory = findNewPath(path);
 

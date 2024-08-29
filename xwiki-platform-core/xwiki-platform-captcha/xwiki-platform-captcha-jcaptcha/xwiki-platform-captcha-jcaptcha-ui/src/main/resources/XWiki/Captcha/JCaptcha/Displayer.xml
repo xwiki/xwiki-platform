@@ -45,22 +45,22 @@
 {{html clean='false'}}
 #if ($type == 'image')
   ## Most of the time, the caching policy is respected, but in cases like the comments section (when the tab is reloaded) we are still forced to use a "cache buster".
-  &lt;img src='$services.jcaptcha.getURL($type, $engine, $params)' class='captcha captcha-challenge' alt="$services.localization.render('captcha.jcaptcha.displayer.image.alt')" /&gt;
+  &lt;img src='$services.jcaptcha.getURL($type, $engine, $params)' class='captcha captcha-challenge' alt="$escapetool.xml($services.localization.render('captcha.jcaptcha.displayer.image.alt'))" /&gt;
 #elseif ($type == 'sound')
   ## Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1129121 on Firefox is to use a "cache busting" parameter to force a GET every time.
   &lt;audio src='$services.jcaptcha.getURL($type, $engine, $params)' class="captcha captcha-challenge"&gt;
-    #error($services.localization.render('captcha.jcaptcha.displayer.audio.error.audioElementNotSupported'))
+    #error($escapetool.xml($services.localization.render('captcha.jcaptcha.displayer.audio.error.audioElementNotSupported')))
   &lt;/audio&gt;
-  &lt;a class='btn btn-link captcha captcha-play' href='#playCaptcha'&gt;$services.icon.renderHTML('play') $services.localization.render('captcha.jcaptcha.displayer.audio.play')&lt;/a&gt;
+  &lt;a class='btn btn-link captcha captcha-play' href='#playCaptcha'&gt;$services.icon.renderHTML('play') $escapetool.xml($services.localization.render('captcha.jcaptcha.displayer.audio.play'))&lt;/a&gt;
 #elseif ($type == 'text')
   &lt;iframe src='$services.jcaptcha.getURL($type, $engine, $params)' class="captcha captcha-challenge" frameborder="0"&gt;&lt;/iframe&gt;
 #else
   #set ($jCaptchaError = true)
-  #error($services.localization.render('captcha.jcaptcha.displayer.error.unsupportedType'))
+  #error($escapetool.xml($services.localization.render('captcha.jcaptcha.displayer.error.unsupportedType')))
 #end
 #if (!$jCaptchaError)
   &lt;a class='btn btn-link captcha captcha-refresh' href='#refreshCaptcha'&gt;
-    $services.icon.renderHTML('refresh') $services.localization.render('captcha.jcaptcha.displayer.refresh')
+    $services.icon.renderHTML('refresh') $escapetool.xml($services.localization.render('captcha.jcaptcha.displayer.refresh'))
   &lt;/a&gt;
   ## Use autocomplete="off" so that when pressing the back button, the old answer is discarded.
   ## Use an explicit empty value="" to avoid caching.

@@ -42,8 +42,6 @@ entitynamevalidation.useTransformation.label=Transform names automatically
 entitynamevalidation.useTransformation.hint=If enabled, the name strategy will be used to automatically adapt the name when possible.
 entitynamevalidation.useValidation.label=Validate names before saving
 entitynamevalidation.useValidation.hint=If enabled, the name strategy will validate the name before saving: use this feature with caution since it might prevent saving some existing documents.
-entitynamevalidation.ReplaceCharacterEntityNameValidation.name=Character replacement
-entitynamevalidation.SlugEntityNameValidation.name=Preformatted names (no accents, no space, no special characters)
 entitynamevalidation.replacementCharacter.configuration=Character Replacement Strategy Configuration
 entitynamevalidation.testStrategy.label=Test the strategy you selected
 entitynamevalidation.testStrategy.hint=Allows you to check the behaviour of the name strategy you chose
@@ -71,7 +69,8 @@ entitynamevalidation.replacementCharacter.remove.inProgress=The forbidden charac
 entitynamevalidation.replacementCharacter.remove.done=The forbidden character has been deleted.
 entitynamevalidation.replacementCharacter.remove.failed=Error when deleting a forbidden character.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None
-entitynamevalidation.admin.heading=Name Strategies</content>
+entitynamevalidation.admin.heading=Name Strategies
+admin.namestrategies=Name Strategies</content>
   <object>
     <name>XWiki.EntityNameValidation.Translations</name>
     <number>0</number>

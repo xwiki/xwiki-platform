@@ -1,0 +1,203 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.Translations" locale="uk">
+  <web>Help.Code</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>help.applications.blog.description=Додаток Блог дозволяє вам публікувати свою інформацію та ділитися нею зі світом.
+help.applications.blog.title=Блог
+help.applications.browse.description=Вибрати додатки, надані спільнотою, і встановити їх у свою вікі.
+help.applications.browse.tip={0}Менеджер розширень{1} допомагає керувати (установлювати, оновлювати, видаляти) будь-які додатки.
+help.applications.browse.title=Огляд додатків
+help.applications.create.demo.label=Демоверсія
+help.applications.create.description=Визначити структуру своїх даних, налаштувати їх та створити потрібний додаток.
+help.applications.create.tip={0}Додаток За Хвилину{1} допомагає створювати додатки без технічних навичок.
+help.applications.create.title=Створити додаток
+help.applications.description=Додатки, що дозволяють групувати пов'язані структуровані сторінки разом.
+help.applications.description1=Потрібна допомога чи ви заплуталися з деякими з наших додатків? Перегляньте їхню документацію та дізнайтеся більше про їх функціональні можливості.
+help.applications.fileManager.description=Файловий менеджер керує вашими файлами, забезпечуючи перегляд підтримуваних файлів, хмару тегів і дозволяє фільтрацію.
+help.applications.fileManager.title=Файловий менеджер
+help.applications.forum.description=Додаток Форум дозволяє вам створювати нові категорії та обговорювати теми в них.
+help.applications.forum.title=Форум
+help.applications.ideas.description=Додаток Ідеї заохочує вас подавати ідеї, за які ваша команда може проголосувати.
+help.applications.ideas.title=Ідеї
+help.applications.link=Переглянути інші додатки
+help.applications.meetings.description=Додаток Зустрічі керує вашими зустрічами, нагадуючи дату, місце, учасників тощо.
+help.applications.meetings.title=Зустрічі
+help.applications.menu.description=Додаток Меню допомагає створювати навігаційні меню та відображати їх у вашій вікі.
+help.applications.menu.title=Меню
+help.applications.movie.title=Фільми
+help.applications.title=Додатки
+help.applications.title1=Приклади
+help.browse.label=Переглянути
+help.description1=XWiki пропонує широкий спектр потужних функцій, які дозволять вам створювати, організовувати та знаходити вміст. У цьому розділі ви дізнаєтеся, як користуватися основними функціями XWiki.
+help.description2=Вітаємо з завантаженням та успішним встановленням екземпляра XWiki. XWiki є дуже універсальним і може бути використаний для створення баз знань, внутрішніх мереж або будь-якого типу бізнес-додатків, які ви хочете. Це можливо завдяки можливостям налаштування XWiki, які починаються на рівні сторінки, від простого до більш розширеного використання.
+help.edit.description=Використовувати потужний редактор вмісту {0}WYSIWYG{1} або {2}синтаксис{1}, щоб створювати розширені вікі-сторінки.
+help.edit.title=Редагування сторінки
+help.example.label=Переглянути приклади
+help.history.description=Перегляд попередніх версій сторінки, порівняння різних версій або повернення до будь-якої попередньої версії.
+help.history.title1=Історія
+help.history.title=Контроль версій
+help.history.version11.content=Перевірка
+help.history.version11.comment=Початкова версія
+help.history.version21.title=Історія сторінки
+help.history.version21.content=Перевірка партнера
+help.history.version22.title=Історія
+help.history.version22.content=Перевірка {0}історії{0}.
+help.history.version22.comment=Незначні зміни
+help.history.version31.content=Перевірка вкладки {0}історія{0}.
+help.history.version31.content1=Порівняння версій.
+help.import.description=Імпортувати вміст із різних джерел і експортувати його у відкритому форматі (XML, HTML, PDF, ODT).
+help.import.title=Імпорт / Експорт
+help.macros.box=Макрос рамки
+help.macros.box.description=Відображає повідомлення в стилізованій рамці.
+help.macros.box.description1={0}Макрос рамки{1} відображає повідомлення в стилізованій рамці.
+help.macros.box.description2=Існує кілька спеціалізованих макросів рамки:
+help.macros.box.message=Це рамка повідомлення
+help.macros.box.subtitle=Назва рамки
+help.macros.box.title=Рамка
+help.macros.browseMacros.description=Вибрати макроси, надані спільнотою, і встановити їх у своїй вікі.
+help.macros.browseMacros.tip=У {0}Індексі макросів{1} перераховано макроси, які вже встановлено та готові до використання на ваших сторінках.
+help.macros.browseMacros.title=Огляд макросів
+help.macros.chart={0}Макрос діаграми{1} відображає графічні діаграми, згенеровані з різних джерел даних.
+help.macros.chart.bar=Стовпчаста діаграма
+help.macros.chart.description=Створювати графічні діаграми з джерел даних.
+help.macros.chart.pie=Кругова діаграма
+help.macros.chart.time=Діаграма часових рядів
+help.macros.chart.title=Графік
+help.macros.description=Макроси — це функції багаторазового використання, які можна інтегрувати всередину сторінки.
+help.macros.error=Макрос помилки
+help.macros.error.message=Це повідомлення про помилку
+help.macros.example=Приклад
+help.macros.examples.description=Потрібна допомога чи ви заплуталися з деякими з наших макросів? Перегляньте їхню документацію та дізнайтеся більше про їх функціональні можливості.
+help.macros.examples.title=Приклади
+help.macros.gallery={0}Макрос галереї{1} відображає список зображень у галереї слайд-шоу.
+help.macros.gallery.description=Відображає список зображень у галереї слайд-шоу.
+help.macros.gallery.title=Галерея
+help.macros.header=Розділ
+help.macros.header1=Підрозділ
+help.macros.info=Макрос інформації
+help.macros.info.message=Це інформаційне повідомлення
+help.macros.more=Переглянути інші макроси
+help.macros.notifications.activity.title1=Активність вікі
+help.macros.notifications.activity.title2=Поточна активність користувача
+help.macros.notifications.content={0}Макрос сповіщень{0} надає інформацію про останні дії, виконані користувачами.
+help.macros.notifications.description=Відображає останні дії користувачів на сторінках.
+help.macros.notifications.title=Сповіщення
+help.macros.success=Макрос успіху
+help.macros.success.message=Це повідомлення про успіх
+help.macros.title=Макроси
+help.macros.toc={0}Макрос змісту{0} генерує зміст для заголовків сторінок.
+help.macros.toc.description.content=У наведених нижче прикладах використовується поточна структура сторінки, яка складається з двох розділів і трьох підрозділів. Дізнайтеся більше про структурування сторінки із заголовками {0}на сторінці синтаксису.{1}
+help.macros.toc.description=Створює зміст для заголовків сторінок.
+help.macros.toc.description.title=Опис
+help.macros.toc.examples.title=Приклади макросів змісту
+help.macros.toc.insideBox=Зміст у рамці
+help.macros.toc.simple=Простий зміст
+help.macros.toc.startingPoint=Зміст з початковою точкою
+help.macros.toc.title=Зміст
+help.macros.tree.description=Відображає ієрархію сторінок.
+help.macros.tree.subtitle=Дерево
+help.macros.tree.pageDescription={0}Макрос дерева сторінок{0} відображає ієрархію сторінок.
+help.macros.tree.title=Дерево сторінок
+help.macros.tree.header1=Дерево ієрархії сторінок
+help.macros.tree.header2=Компактне дерево ієрархії сторінок
+help.macros.tree.header3=Вікі {0} Простір {0} Дерево сторінок
+help.macros.tree.header4=Повна структура дерева
+help.macros.useMacros.description=Макроси — це функції багаторазового використання, які можна інтегрувати всередину сторінок.
+help.macros.useMacros.tip={0}Редактор WYSIWYG{1} дозволяє вставляти макроси та налаштовувати їхні параметри під час редагування сторінок. На панелі інструментів знайдіть кнопку {2}.
+help.macros.useMacros.title=Використовуйте макроси
+help.macros.warning=Макрос попередження
+help.macros.warning.message=Це попереджувальне повідомлення
+help.more.label=Читати більше
+help.organization.description=Упорядкуйте свій вміст на ієрархічних сторінках, згрупованих у кілька (під)вікі.
+help.organization.title=Організація контенту
+help.start.description=Прості кроки, які допоможуть вам почати роботу з XWiki.
+help.start.title=Починаємо роботу
+help.templates.article.description=Сторінка статті
+help.templates.article.title=Стаття
+help.templates.create.description=Інтегруйте структуру та макроси в наявну сторінку та трансформуйте її в шаблон.
+help.templates.create.tip={0}Постачальники шаблонів{1} надають шаблони в діалоговому вікні Створити сторінку, щоб користувачі могли ними користуватися.
+help.templates.create.title=Створити свій шаблон
+help.templates.description=Шаблони — це попередньо визначені сторінки, які копіюються при створенні нової сторінки.
+help.templates.encyclopedia.description=Сторінка енциклопедії
+help.templates.encyclopedia.title=Енциклопедія
+help.templates.examples.description=Бажаєте розпочати з попередньо визначеного шаблону? Ось декілька прикладів доступних шаблонів усередині XWiki
+help.templates.examples.title=Приклади
+help.templates.meeting.title=Звіт зустрічі
+help.templates.meeting.description=Порядок денний та замітки
+help.templates.simple.description=Зі змістом
+help.templates.simple.title=Проста сторінка
+help.templates.more=Переглянути інші шаблони
+help.templates.title=Шаблони
+help.templates.useTemplates.description=Шаблони — це попередньо визначені сторінки, які можна скопіювати під час створення нової сторінки.
+help.templates.useTemplates.tip={0}Створення сторінок{1} на основі шаблонів прискорює адаптацію попередньо визначеного вмісту до ваших потреб.
+help.templates.useTemplates.title=Використовуйте шаблони
+help.title=Допомога
+help.title1=Як використовувати XWiki?
+help.title2=Головні можливості XWiki
+help.try.label=Спробуємо!
+help.videos.description=Перегляньте нашу колекцію відеопосібників.
+help.videos.more=Переглянути інші відео
+help.videos.title=Відео
+help.videos.videoCard1.title=Огляд домашньої сторінки
+help.videos.videoCard1.topic1=Відкрийте для себе елементи, відображені на вашій домашній сторінці
+help.videos.videoCard1.topic2=Почніть переглядати вашу вікі
+help.videos.videoCard2.title=Персоналізація домашньої сторінки
+help.videos.videoCard2.topic1=Дізнайтеся, як змінити колірну тему вікі
+help.videos.videoCard2.topic2=Дізнайтеся, як додавати панелі та стовпці до зовнішнього вигляду вашої вікі
+help.videos.videoCard2.topic3=Дізнайтеся, як додати віджети до вікі
+help.videos.videoCard3.title=Створення сторінки та вмісту
+help.videos.videoCard3.topic1=Дізнайтеся, як створити сторінку
+help.videos.videoCard3.topic2=Дізнайтеся, як користуватися редактором WYSIWYG
+help.videos.videoCard3.topic3=Дізнайтесь про режими перегляду та редагування
+help.videos.videoCard4.title=Імпортування документів Office до XWiki
+help.videos.videoCard4.topic1=Дізнайтеся, як імпортувати документи Office у свою вікі
+help.videos.videoCard4.topic2=Дізнайтеся, як використовувати макрос "Зміст"
+help.videos.videoCard5.title=Додаток За Хвилину
+help.videos.videoCard5.topic1=Дізнайтеся, як створити додаток
+help.videos.videoCard5.topic2=Дізнайтеся, як користуватися своїм додатком
+help.videos.videoCard6.title=Додавання / видалення розширень
+help.videos.videoCard6.topic1=Дізнайтеся, як додавати/видаляти розширення за допомогою Менеджера розширень
+help.videos.videoCard6.topic2=Відкрийте для себе інтерфейс адміністрування XWiki
+help.videos.hint=У цьому відео демонструються функції XWiki за допомогою скрінкасту з субтитрами без звукових індикацій. За наведеними нижче посиланнями на документацію можна знайти текстову альтернативу цього відео.
+help.videos.watch=Спостереження
+
+## Example Macro
+rendering.macro.example.name=Приклад
+rendering.macro.example.description=Показує приклад і його вихідний код.
+rendering.macro.example.content.description=Приклад коду.
+</content>
+</xwikidoc>

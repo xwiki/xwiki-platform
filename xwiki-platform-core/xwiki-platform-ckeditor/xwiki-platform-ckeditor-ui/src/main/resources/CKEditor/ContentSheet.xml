@@ -1,0 +1,280 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.ContentSheet" locale="">
+  <web>CKEditor</web>
+  <name>ContentSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>CKEditor.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity output="false"}}
+#**
+ * Includes the specified template without empty or blank lines. This is useful when the empty/blank lines have no value
+ * for the WYSIWYG editor as it reduces the size of the edited content and thus speeds up the editing.
+ *#
+#macro (ckeditor_templateWithoutEmptyLines $templateName)
+  #set ($macro.templateOutput = "#template($templateName)")
+  $macro.templateOutput.replaceAll('(?m)^\s*\n', '')##
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($doc.fullName == 'CKEditor.ContentSheet')
+  This is the sheet used to obtain the content that is passed to the [[CKEditor&gt;&gt;http://ckeditor.com/]].
+#else
+  {{html clean="false"}}
+  #if ($services.wysiwyg.HTMLSyntax.version.startsWith("5"))
+    &lt;!DOCTYPE html&gt;
+  #else
+    &lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+  #end
+  &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()"&gt;
+    &lt;head&gt;
+      &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
+      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
+      ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
+      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
+        $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      #end
+      ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
+      &lt;!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin --&gt;
+      ## Fix some issues caused by the fact that we put the content directly under the BODY element.
+      #set ($discard = $xwiki.ssx.use('CKEditor.ContentSheet'))
+      ## Include the stylesheets that affect the content in view mode.
+      #ckeditor_templateWithoutEmptyLines("stylesheets.vm")
+      #if ($xwiki.getDocument('CKEditor.Config').getValue('loadJavaScriptSkinExtensions') == 1)
+        #ckeditor_templateWithoutEmptyLines("javascript.vm")
+      #end
+    &lt;/head&gt;
+    #if (!$source)
+      #set ($source = $tdoc)
+    #end
+    #set ($serializedSpaceReference = $services.model.serialize($source.documentReference.parent, 'local'))
+    &lt;body id="body" class="skin-flamingo viewbody main wiki-$xcontext.database
+        space-$escapetool.xml($serializedSpaceReference.replaceAll(' ', '_'))"&gt;##
+      #ckeditor_getRenderedContent($source)
+      ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
+      ## The result must be unescaped before being passed to the CKEditor as input.
+      ## CKEDITOR-134: Unclosed {{html}} results in addition of closing tag even when macro isn't actually evaluated
+      $!html.replace('{{', '&amp;amp;#123;&amp;amp;#123;')##
+    &lt;/body&gt;
+  &lt;/html&gt;
+  {{/html}}
+#end
+{{/velocity}}</content>
+  <object>
+    <name>CKEditor.ContentSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>1e6c31f6-95c8-4c03-b996-df842b78f0cb</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>body[role="textbox"] {
+  /* We use padding (instead of margin) in order to support Bootstrap grid layouts and accomodate for the use of
+  negative margins used by the .row class. */
+  /* We need more space at the bottom in order to be sure that the magic line is visible all the time (see CKEDITOR-283:
+    Cannot add content after a DIV located at the end of the document) */
+  padding: 15px 15px 30px;
+}
+
+/* Fix the link styles. The HTML structure is a bit different in edit mode. Note that these styles have been added to
+  the XWiki skin (for in-place editing) in 12.2 and 11.10.4 but we have to keep them here for older versions of XWiki
+  where the CKEditor can be installed. */
+a[data-linktype="external"] {
+  background: url("$xwiki.getSkinFile('icons/xwiki/external-link.png')") no-repeat scroll right center transparent;
+  padding-right: 12px;
+}
+a[data-linktype="create"] {
+  text-decoration: underline;
+}
+a[data-linktype="create"]::after {
+  background-color: #08C;
+  border-radius: 10px;
+  color: white;
+  content: "?";
+  display: inline-block;
+  font-size: 80%;
+  margin-left: 4px;
+  padding: 0 4px;
+  text-decoration: none;
+}
+
+[contenteditable="true"] [data-xwiki-focusedplaceholder]::before {
+  /* Show the value of the focused line placeholder attribute */
+  position: absolute;
+  opacity: .8;
+  color: #aaa;
+  content: attr(data-xwiki-focusedplaceholder);
+}
+
+.macro-placeholder {
+  /* Hide the placeholder by default and show it only if the macro is editable. */
+  display: none;
+  font-family: monospace;
+  font-size: smaller;
+}
+.macro[data-widget="xwiki-macro"] &gt; span.macro-placeholder {
+  display: inline;
+}
+.macro[data-widget="xwiki-macro"] &gt; div.macro-placeholder {
+  display: block;
+}
+
+/* Inline widgets (macros) have display:inline-block and thus don't inherit the text-decoration styles. We fix this by
+  applying the styles directly for the text-decoration values that are commonly used.
+  See CKEDITOR-282: Strikethrough not displayed for macros */
+ins span.cke_widget_inline {
+  text-decoration-line: underline;
+}
+del span.cke_widget_inline {
+  text-decoration-line: line-through;
+}
+ins del span.cke_widget_inline,
+del ins span.cke_widget_inline {
+  text-decoration-line: underline line-through;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Content Styles</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

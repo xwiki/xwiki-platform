@@ -23,7 +23,13 @@ import java.io.Reader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -92,5 +98,49 @@ public privileged aspect UtilCompatibilityAspect
             throw new IOException("Access denied.");
         }
         return IOUtils.toByteArray(is);
+    }
+
+    /**
+     * API to obtain a DOM document for the specified string
+     *
+     * @param str The parsed text
+     * @return A DOM document element corresponding to the string, or null on error
+     * @deprecated use {@code $services.xml.parse()} instead
+     */
+    @Deprecated(since = "14.10")
+    public org.w3c.dom.Document Util.getDOMForString(String str)
+    {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            // Prevent XXE attacks
+            dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            return dbFactory.newDocumentBuilder().parse(new InputSource(new StringReader(str)));
+        } catch (SAXException ex) {
+            LOGGER.warn("Cannot parse string:" + str, ex);
+        } catch (IOException ex) {
+            LOGGER.warn("Cannot parse string:" + str, ex);
+        } catch (ParserConfigurationException ex) {
+            LOGGER.warn("Cannot parse string:" + str, ex);
+        }
+
+        return null;
+    }
+
+    /**
+     * API to get a new DOM document
+     *
+     * @return a new DOM document element, or null on error
+     * @deprecated use {@code XMLScriptService#createDOMDocument()} instead
+     */
+    @Deprecated(since = "14.10")
+    public org.w3c.dom.Document Util.getDOMDocument()
+    {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            LOGGER.warn("Cannot create DOM tree", ex);
+        }
+
+        return null;
     }
 }

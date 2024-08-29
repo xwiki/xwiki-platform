@@ -20,6 +20,9 @@
 package org.xwiki.eventstream.internal.observation;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,7 +32,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.events.AbstractEventStreamEvent;
+import org.xwiki.eventstream.events.EventStreamAddedEvent;
+import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -47,6 +51,9 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 @Named("eventstreamevent")
 public class EventStreamEventConverter extends AbstractEventConverter
 {
+    private static final Set<Class<? extends Event>> EVENTS =
+        new HashSet<>(Arrays.asList(EventStreamAddedEvent.class, EventStreamDeletedEvent.class));
+
     @Inject
     private EventStore store;
 
@@ -56,7 +63,7 @@ public class EventStreamEventConverter extends AbstractEventConverter
     @Override
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (localEvent.getEvent() instanceof AbstractEventStreamEvent) {
+        if (EVENTS.contains(localEvent.getEvent().getClass())) {
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
             remoteEvent.setSource(serializeEvent((org.xwiki.eventstream.Event) localEvent.getSource()));
 
@@ -78,7 +85,7 @@ public class EventStreamEventConverter extends AbstractEventConverter
     @Override
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (remoteEvent.getEvent() instanceof AbstractEventStreamEvent) {
+        if (EVENTS.contains(remoteEvent.getEvent().getClass())) {
             try {
                 localEvent.setEvent((Event) remoteEvent.getEvent());
                 localEvent.setSource(unserializeEvent(remoteEvent.getSource()));

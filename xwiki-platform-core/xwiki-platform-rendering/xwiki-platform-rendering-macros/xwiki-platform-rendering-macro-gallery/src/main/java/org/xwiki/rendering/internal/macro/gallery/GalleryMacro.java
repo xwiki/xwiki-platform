@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,9 +33,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.gallery.GalleryMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -91,7 +94,7 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
     public GalleryMacro()
     {
         super("Gallery", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), GalleryMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_LAYOUT));
     }
 
     @Override
@@ -115,6 +118,8 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
 
             Map<String, String> groupParameters = new HashMap<>();
             groupParameters.put("class", ("gallery " + StringUtils.defaultString(parameters.getClassNames())).trim());
+            // Disable lightbox for the gallery macro since the two features are very similar and it produces confusion.
+            groupParameters.put("data-xwiki-lightbox", "false");
             if (inlineStyle.length() > 0) {
                 groupParameters.put("style", inlineStyle.toString());
             }
@@ -126,6 +131,12 @@ public class GalleryMacro extends AbstractMacro<GalleryMacroParameters>
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.contentParser.prepareContentWiki(macroBlock);
     }
 
     @Override

@@ -45,11 +45,11 @@
         so we create an explicit "no value" message in that case
       -->
       <a v-if="linkContent && hasViewRight"
-        :href="href"
+        :href="sanitizeUrl(href)"
         :class="{'explicit-empty-value': !html && !htmlValue}"
-        v-html="linkContent"
+        v-html="sanitizeHtml(linkContent)"
       ></a>
-      <span v-else v-html="linkContent"></span>
+      <span v-else v-html="sanitizeHtml(linkContent)"></span>
     </template>
 
 

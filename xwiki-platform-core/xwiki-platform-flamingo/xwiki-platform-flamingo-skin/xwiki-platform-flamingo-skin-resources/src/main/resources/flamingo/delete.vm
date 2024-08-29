@@ -32,21 +32,26 @@
 #######################################################
 ##                     DISPLAY
 #######################################################
+#set ($discard = $xwiki.jsfx.use('js/xwiki/delete.js'))
 #template('refactoringStatus_macros.vm')
+#template('refactoring_macros.vm')
+#template('xwikivars.vm')
 
 #controller()
 #macro(displayContent $deletecontent)
 #template("startpage.vm")
 <div class="main">
-  <div id="mainContentArea">
-    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
-    #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
-    <div class="xcontent">
-      #template('contentheader.vm')
-      $deletecontent
-      <div class="clearfloats"></div>
-    </div> ## xcontent
-  </div>## mainContentArea
+  #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
+  #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
+  #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
+  <div class="xcontent">
+    #template('contentheader.vm')
+    $deletecontent
+    <div class="clearfloats"></div>
+  </div> ## xcontent
+  </main> ##mainContentArea
 </div>## main
 #template("endpage.vm")
 #end
@@ -85,7 +90,7 @@
 ##            DISPLAY RUNNING JOB
 #######################################################
 #macro (displayDeleteJobStatus $deleteJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   ## TODO: allows question templates to inject the web resources they need
   #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
     {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -117,11 +122,15 @@
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
-  <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+  <form id="delete" action="$doc.getURL('delete', "$!{languageparams}")" method="post">
     #getChildren()
-    #getBacklinks()
-    #getChildren_legacy()
-    #displayConfirmMessage()
+    ## If xform is a parent of getChildren, the ".xform field" css is also applied on the page size limit select, making it 
+    ## badly displayed.
+    <div class="xform">
+      #displayNewTargetOption()
+      #getChildren_legacy()
+      #displayConfirmMessage()
+    </div>
   </form>
 #end
 #######################################################
@@ -131,7 +140,10 @@
   <div class="panel $!panelClass">
     <div class="panel-heading">
       $heading
-      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId"><span class="caret"></span></a></div>
+      <div class="pull-right"><a class="panel-collapse-carret" role="button" data-toggle="collapse" href="#$panelId" aria-expanded="false" aria-controls="$panelId">
+        <span class="caret"></span>
+        <span class='sr-only'>$escapetool.xml($services.localization.render('core.delete.affectChildren.dropDown.label'))</span>
+      </a></div>
     </div>
     <div class="panel-body collapse" id="$panelId">
       $body
@@ -147,7 +159,9 @@
     #set ($query = $services.query.xwql($childCountXWQL))
     #set ($query = $query.bindValue('space').literal("${doc.space}.").anyChars().query())
     #set ($query = $query.bindValue('fullName', $doc.fullName))
-    #set($childCount = $query.addFilter('unique').count())
+    ## Note: we don't use any filter since we display all documents including translations and hidden documents in the
+    ## table below.
+    #set($childCount = $query.count())
     #if ($childCount > 0)
       ## Check if we should propose by default to affect children when the only remaining children (after the delete) would be the WebPreferences document.
       #set ($webPreferencesDocumentReference = $services.model.createDocumentReference('WebPreferences', $doc.documentReference.lastSpaceReference))
@@ -155,25 +169,25 @@
         #set ($forceAffectChildren = " checked='checked'")
       #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$services.localization.render('core.delete.affectChildren')</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$escapetool.xml($services.localization.render('core.delete.affectChildren')) ($childCount)</label>
       #end
       #define($body)
         ##
         ## List the documents to be deleted using a livetable
         ##
-        #set ($collist = ['doc.title', 'doc.location', 'doc.date', 'doc.author'])
-        #set ($colprops = {
-          'doc.title'    : { 'link' : 'view' },
-          'doc.location' : { 'type': 'text', 'filterable': true, 'html': true},
-          'doc.author'   : { 'link' : 'author' }
-        })
-        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
-        #set ($options = { 
-          'url' : "$doc.getURL('get', $urlParameters)",
+        #set ($sourceParameters = {
           'translationPrefix' : 'platform.index.',
-          'outputOnlyHtml' : true
+          'template' : 'getdocuments.vm',
+          'childrenOf': $doc.space,
+          'queryFilters': 'unique',
+          '$doc': $doc.documentReference
         })
-        #livetable('deleteSpaceIndex' $collist $colprops $options)
+        $services.liveData.render({
+          'id': 'deleteSpaceIndex',
+          'source': 'liveTable',
+          'sourceParameters': $escapetool.url($sourceParameters),
+          'properties': 'doc.title,doc.location,doc.date,doc.author'
+        })
       #end
       #displayPanel('panel-children', 'panel-default', $heading, $body)
     #end
@@ -209,29 +223,48 @@
   #end
 #end
 #######################################################
-##                 GET BACKLINKS
+##                 DISPLAY NEW TARGET OPTION
 ##
-## Get the documents having some links to the current 
-## one.
+## Display the possibility to select a new target for existing backlinks and / or to create an automatic redirect to a
+## different page.
 #######################################################
-#macro(getBacklinks)
+#macro(displayNewTargetOption)
   #set($links = $doc.getBacklinks())
-  #if($links && $links.size() > 0)
-    #define($heading)
-     <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
-    #end
-    #define($message)
-      <ul>
-      #foreach($docname in $links)
-        #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
-      #end
-      </ul>
-    #end
-    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
-    #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
-    #set($hasInlinks = true)
+  #set ($hasInlinks = $links && $links.size() > 0)
+  #define($heading)
+    <strong>$escapetool.xml($services.localization.render('core.delete.backlinks'))</strong> ($links.size())
   #end
+  #define($body)
+    <dl>
+      <dt>
+        <label for="newBacklinkTarget">
+          $escapetool.xml($services.localization.render('core.delete.backlinkTarget.label'))
+        </label>
+        <span class="xHint">$escapetool.xml($services.localization.render('core.delete.backlinkTarget.hint'))</span>
+      </dt>
+      <dd>
+        #set ($pagePickerParams = {
+          'id': 'newBacklinkTarget',
+          'name': 'newBacklinkTarget'
+        })
+        #pagePicker($pagePickerParams)
+      </dd>
+      ##------------
+      ## Links field
+      ##------------
+      #displayLinksCheckbox({
+        'label': 'core.delete.updateLinks.label',
+        'hint': 'core.delete.updateLinks.hint',
+        'disabled': true
+      })
+      #displayAutoRedirectCheckbox({
+        'label': 'core.delete.autoRedirect.label',
+        'hint': 'core.delete.autoRedirect.hint',
+        'disabled': true
+      })
+    </dl>
+  #end
+  $body
 #end
 #######################################################
 ##              DISPLAY CONFIRM MESSAGE
@@ -280,11 +313,11 @@
   </div>
   <button class="btn btn-danger confirm">$escapetool.xml($services.localization.render('delete'))</button>
   #if("$!{request.xredirect}" != '')
-    #set($cancelUrl = "$request.xredirect")
+    #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelUrl)
   #else
-    #set($cancelUrl = $doc.getURL())
+    #set($cancelUrl = $escapetool.xml($doc.getURL()))
   #end
-  <a class="btn btn-default cancel" href="$!{escapetool.xml(${cancelUrl})}">$escapetool.xml($services.localization.render('cancel'))</a>
+  <a class="btn btn-default cancel" href="${cancelUrl}">$escapetool.xml($services.localization.render('cancel'))</a>
 #end
 #######################################################
 ##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE
@@ -306,11 +339,11 @@
       </div>
       <input type="submit" class="btn btn-primary" value="$services.localization.render('yes')"/>
       #if("$!{request.xredirect}" != '')
-        #set($cancelUrl = "$request.xredirect")
+        #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelUrl)
       #else
-        #set($cancelUrl = $doc.getURL())
+        #set($cancelUrl = $escapetool.xml($doc.getURL()))
       #end
-      <a class="btn btn-default" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a>
+      <a class="btn btn-default" href="$cancelUrl">$services.localization.render('no')</a>
     </form>
   #xwikimessageboxend()
 #end

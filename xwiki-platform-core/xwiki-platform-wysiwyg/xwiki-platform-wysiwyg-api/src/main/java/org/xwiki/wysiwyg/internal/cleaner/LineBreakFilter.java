@@ -47,7 +47,7 @@ public class LineBreakFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> parameters)
     {
         NodeList brs = document.getElementsByTagName("br");
-        List<Element> emptyLineBRs = new ArrayList<Element>();
+        List<Element> emptyLineBRs = new ArrayList<>();
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = (Element) brs.item(i);
             if ("spacer".equals(br.getAttribute("class"))) {

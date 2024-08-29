@@ -28,10 +28,10 @@
 #set ($orderList = ['name'])
 
 ## The live table offset starts from 1 so we need to subtract 1.
-#if ($request.wiki == 'local')
+#if ($request.wiki == 'local' || $request.scope == 'local')
   #set ($groups = $groupService.getAllMatchedLocalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
   #set ($countGroups = $groupService.countAllMatchedLocalGroups($filterMap))
-#elseif ($request.wiki == 'global')
+#elseif ($request.wiki == 'global' || $request.scope == 'global')
   #set ($groups = $groupService.getAllMatchedGlobalGroups($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
   #set ($countGroups = $groupService.countAllMatchedGlobalGroups($filterMap))
 #else
@@ -48,39 +48,47 @@
   'rows': []
 })
 #foreach ($group in $groups)
-  #set ($wikiName = $group.wiki)
-  #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
-    #set ($wikiName = 'local')
-  #end
-  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
-  #set ($row = {
-    'username': $group.documentReference.name,
-    'fullname': $group.fullName,
-    'wikiname': $wikiName,
-    'userurl': $group.getURL(),
-    'usersaveurl': $group.getURL('save'),
-    'userinlineurl': $group.getURL('edit', 'xpage=plain'),
-    'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
-  })
-  #if ($group.wiki == $xcontext.mainWikiName)
-    #set ($scope = 'global')
+  #if($services.security.authorization.hasAccess('view', $group.documentReference))
+    #set ($wikiName = $group.wiki)
+    #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
+      #set ($wikiName = 'local')
+    #end
+    ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
+    #set ($row = {
+      'username': $group.documentReference.name,
+      'fullname': $group.fullName,
+      'wikiname': $wikiName,
+      'userurl': $group.getURL(),
+      'usersaveurl': $group.getURL('save'),
+      'userinlineurl': $group.getURL('edit', 'xpage=plain'),
+      'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Groups')
+    })
+    #if ($group.wiki == $xcontext.mainWikiName)
+      #set ($scope = 'global')
+    #else
+      #set ($scope = 'local')
+    #end
+    #set ($discard = $row.putAll({
+      'doc_fullName': $group.fullName,
+      'doc_wiki': $group.wiki,
+      'doc_url': $group.getURL(),
+      'doc_viewable': true,
+      'doc_hasadmin': $xwiki.hasAdminRights(),
+      'doc_hasedit': $services.security.authorization.hasAccess('edit', $group.documentReference),
+      'doc_edit_url': $group.getURL('edit'),
+      'doc_hasdelete': $services.security.authorization.hasAccess('delete', $group.documentReference),
+      'doc_delete_url': $group.getURL('delete'),
+      'name': "#displayGroup($group.documentReference {'wrapAvatar': true})",
+      'members': $services.user.group.getMembers($group.documentReference, false).size(),
+      'scope': $services.localization.render("xe.admin.groups.$scope")
+    }))
   #else
-    #set ($scope = 'local')
+    #set($row = {
+      'doc_viewable': false,
+      'doc_fullName': 'obfuscated'
+    })
   #end
-  #set ($discard = $row.putAll({
-    'doc_fullName': $group.fullName,
-    'doc_wiki': $group.wiki,
-    'doc_url': $group.getURL(),
-    'doc_viewable': $services.security.authorization.hasAccess('view', $group.documentReference),
-    'doc_hasadmin': $xwiki.hasAdminRights(),
-    'doc_hasedit': $services.security.authorization.hasAccess('edit', $group.documentReference),
-    'doc_edit_url': $group.getURL('edit'),
-    'doc_hasdelete': $services.security.authorization.hasAccess('delete', $group.documentReference),
-    'doc_delete_url': $group.getURL('delete'),
-    'name': "#displayGroup($group.documentReference {'wrapAvatar': true})",
-    'members': $services.user.group.getMembers($group.documentReference, false).size(),
-    'scope': $services.localization.render("xe.admin.groups.$scope")
-  }))
   #set ($discard = $data.rows.add($row))
 #end
+#livetable_filterObfuscated($data)
 #jsonResponse($data)

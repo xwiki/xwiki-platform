@@ -19,6 +19,7 @@
 ## ---------------------------------------------------------------------------
 ##
 ## @Deprecated since 9.8RC1 use the ClassPropertyValues REST resource instead.
+## TODO: add a warning when the template is not used in XWiki Standard anymore
 ##
 $response.setContentType("text/xml")
 ##
@@ -27,7 +28,8 @@ $response.setContentType("text/xml")
 #set($firCol = "$!{request.get('firCol')}")
 #set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
-#set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($classDocument = $xwiki.getDocument($classname))
+#set($p = $classDocument.getxWikiClass().get($fieldname).getPropertyClass())
 #set($hibquery = "$!p.getSql()")
 ##
 ## Determine what was the input. If the property accepts multiple values and has separators, then
@@ -64,7 +66,8 @@ $response.setContentType("text/xml")
     #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :input ESCAPE '!' and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $services.query.hql($hibquery).setLimit(30).bindValue('input', "%${input}%").execute())
+  ## Make sure the query is executed with the right of its author
+  #set($results = $services.query.hql($hibquery).setQueryAuthor($classDocument.getAuthorReference(), $classDocument.getDocumentReference()).setLimit(30).bindValue('input', "%${input}%").execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -88,10 +91,17 @@ $response.setContentType("text/xml")
     #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, DBStringListProperty as prop join prop.list list
+    where obj.name <> :templateName and obj.className = :className and prop.id.id = obj.id
+    and prop.id.name = :fieldname and list = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
     #foreach($res in $results)
-      <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #end
     #end
     </results>
   ######################### StringListProperty query
@@ -99,26 +109,45 @@ $response.setContentType("text/xml")
     #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, StringListProperty as prop where obj.name <>
+    :templateName and obj.className = :className and prop.id.id = obj.id and prop.name = :fieldname and
+    prop.textValue = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="5">
     #foreach($res in $results)
-      #set($list = $p.getListFromString($res, $sep, false))
-      #set($list = $list.toArray())
-      #foreach($word in $list)
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        #set($list = $p.getListFromString($res, $sep, false))
+        #set($list = $list.toArray())
+        #foreach($word in $list)
           <rs id="$foreach.count" info="">$!{escapetool.xml($word)}</rs>
+        #end
       #end
     #end
     </results>
   ######################### StringProperty query
-  #else
+  #elseif($p && ($p.getClassType() != "Email" || !$services.mail.general.shouldObfuscate()) && $p.getClassType() != "Password")
     #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = :classname and obj.name <> :templatename and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :input ESCAPE '!'")
     #set($queryResult = $services.query.hql($query).setLimit(30).bindValues({'templatename' : ${templatename}, 'classname' : ${classname}, 'fieldname' : ${fieldname}, 'input' : "%${input}%"}).execute())
     #set($results = $queryResult.toArray())
+    #set($documentQuery = 'select obj.name from BaseObject as obj, StringProperty as prop where
+    obj.className = :className and obj.name <> :templateName and prop.id.id = obj.id and prop.id.name = :fieldname and
+    prop.value = :propertyValue')
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">
     #foreach($res in $results)
-      <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #set($documentQueryResult = $services.query.hql($documentQuery).setLimit(1).bindValues({'templateName' :
+        ${templatename}, 'className' : ${classname}, 'fieldname' : ${fieldname}, 'propertyValue' : $res}).execute())
+      #if (!$documentQueryResult.isEmpty() && $xwiki.hasAccessLevel('view', $documentQueryResult.get(0)))
+        <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
+      #end
     #end
+    </results>
+  ## Inaccessible property, return empty results.
+  #else
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="8">
     </results>
   #end
 #end ## if hibquery

@@ -57,6 +57,24 @@ public interface HTMLConverter
     }
 
     /**
+     * Converts the given source text from the specified syntax to HTML.
+     *
+     * @param source the text to be converted
+     * @param syntax the syntax of the source
+     * @param sourceReference the reference of the source
+     * @param restricted true if the content of this property should be executed in a restricted content, false
+     *            otherwise
+     * @return the HTML result of the conversion
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    default String toHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
+    {
+        return toHTML(source, syntax, sourceReference);
+    }
+
+    /**
      * Cleans and converts the given HTML fragment to the specified syntax.
      *
      * @param html the HTML text to be converted
@@ -88,5 +106,23 @@ public interface HTMLConverter
     default String parseAndRender(String html, Syntax syntax, EntityReference sourceReference)
     {
         return parseAndRender(html, syntax.toIdString());
+    }
+
+    /**
+     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
+     *
+     * @param html the HTML fragment to be parsed and rendered
+     * @param syntax the storage syntax
+     * @param sourceReference the reference of the html (where it's coming from)
+     * @param restricted true if the content of this property should be executed in a restricted content, false
+     *            otherwise
+     * @return the XHTML result of rendering the given HTML fragment
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    default String parseAndRender(String html, Syntax syntax, EntityReference sourceReference, boolean restricted)
+    {
+        return parseAndRender(html, syntax, sourceReference);
     }
 }

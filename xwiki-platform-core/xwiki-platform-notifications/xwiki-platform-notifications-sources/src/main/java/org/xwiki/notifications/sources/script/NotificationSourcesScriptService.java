@@ -33,11 +33,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service for the notification sources.
@@ -51,7 +51,7 @@ import org.xwiki.stability.Unstable;
 public class NotificationSourcesScriptService implements ScriptService
 {
     @Inject
-    private NotificationManager notificationManager;
+    private ParametrizedNotificationManager notificationManager;
 
     @Inject
     private DocumentAccessBridge documentAccessBridge;
@@ -70,10 +70,13 @@ public class NotificationSourcesScriptService implements ScriptService
      */
     public List<CompositeEvent> getEvents(int expectedCount) throws NotificationException
     {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                expectedCount
-        );
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentAccessBridge.getCurrentUserReference();
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = expectedCount;
+        parameters.endDateIncluded = true;
+        this.notificationParametersFactory.useUserPreferences(parameters);
+        return notificationManager.getEvents(parameters);
     }
 
     /**
@@ -87,12 +90,15 @@ public class NotificationSourcesScriptService implements ScriptService
     public List<CompositeEvent> getEvents(int expectedCount, Date untilDate, String[] blackList)
             throws NotificationException
     {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                expectedCount,
-                untilDate,
-                Arrays.asList(blackList)
-        );
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentAccessBridge.getCurrentUserReference();
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = expectedCount;
+        parameters.endDate = untilDate;
+        parameters.endDateIncluded = true;
+        parameters.blackList = Arrays.asList(blackList);
+        this.notificationParametersFactory.useUserPreferences(parameters);
+        return notificationManager.getEvents(parameters);
     }
 
     /**
@@ -105,12 +111,15 @@ public class NotificationSourcesScriptService implements ScriptService
     public List<CompositeEvent> getEvents(int expectedCount, Date untilDate, List<String> blackList)
             throws NotificationException
     {
-        return notificationManager.getEvents(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                expectedCount,
-                untilDate,
-                blackList
-        );
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentAccessBridge.getCurrentUserReference();
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = expectedCount;
+        parameters.endDate = untilDate;
+        parameters.endDateIncluded = true;
+        parameters.blackList = blackList;
+        this.notificationParametersFactory.useUserPreferences(parameters);
+        return notificationManager.getEvents(parameters);
     }
 
     /**
@@ -122,10 +131,13 @@ public class NotificationSourcesScriptService implements ScriptService
      */
     public long getEventsCount(int maxCount) throws NotificationException
     {
-        return notificationManager.getEventsCount(
-                entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
-                maxCount
-        );
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = documentAccessBridge.getCurrentUserReference();
+        parameters.format = NotificationFormat.ALERT;
+        parameters.expectedCount = maxCount;
+        parameters.onlyUnread = true;
+
+        return notificationManager.getEvents(parameters).size();
     }
 
     /**
@@ -137,7 +149,6 @@ public class NotificationSourcesScriptService implements ScriptService
      * @throws NotificationException in case of errors.
      * @since 12.2
      */
-    @Unstable
     public NotificationParameters getNotificationParameters(Map<String, String> parameters) throws NotificationException
     {
         return this.notificationParametersFactory.createNotificationParametersWithStringMap(parameters);

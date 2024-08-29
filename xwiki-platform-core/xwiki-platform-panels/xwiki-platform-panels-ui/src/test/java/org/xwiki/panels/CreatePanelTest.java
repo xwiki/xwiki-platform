@@ -34,7 +34,6 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.velocity.tools.EscapeTool;
-import org.xwiki.xml.internal.html.filter.ControlCharactersFilter;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -52,7 +51,6 @@ import static org.mockito.Mockito.when;
 @XWikiSyntax21ComponentList
 @HTML50ComponentList
 @ComponentList({
-    ControlCharactersFilter.class,
     ModelScriptService.class,
     // ModelValidationScriptService and its dependencies.
     ModelValidationScriptService.class,
@@ -74,9 +72,6 @@ class CreatePanelTest extends PageTest
     @Test
     void createPanel() throws Exception
     {
-        EscapeTool tool = new EscapeTool();
-        registerVelocityTool("escapetool", tool);
-
         // Replace the response with a spy to be able to assert sendRedirect parameters.
         this.response = spy(this.response);
         this.context.setResponse(this.response);
@@ -87,24 +82,24 @@ class CreatePanelTest extends PageTest
         this.request.put("create", "1");
         this.request.put("panelTitle", PAGE_TITLE);
         this.request.put("parent", "Panels.WebHome");
+        String formToken = "csrfToken45";
+        this.request.put("form_token", formToken);
 
         renderPage(new DocumentReference("xwiki", "Panels", "CreatePanel"));
 
         // Verify in particular that the document we are redirected to has a name that conforms to the naming strategy.
-        verify(this.response).sendRedirect("/xwiki/bin/inline/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
+        EscapeTool tool = new EscapeTool();
+        verify(this.response).sendRedirect("/xwiki/bin/edit/Panels/" + tool.url(TRANSFORMED_PAGE_TITLE)
             + "?template=Panels.PanelTemplate"
             + "&Panels.PanelClass_0_name=" + tool.url(PAGE_TITLE)
             + "&Panels.PanelClass_0_content=" + tool
             .url("{{velocity}}\n#panelheader('" + PAGE_TITLE + "')\n\n#panelfooter()\n{{/velocity}}")
-            + "&parent=Panels.WebHome");
+            + "&parent=Panels.WebHome&form_token=" + formToken);
     }
 
     @Test
     void createPanelPageAlreadyExist() throws Exception
     {
-        EscapeTool tool = new EscapeTool();
-        registerVelocityTool("escapetool", tool);
-
         // Replace the response with a spy to be able to assert sendRedirect parameters.
         this.response = spy(this.response);
         this.context.setResponse(this.response);

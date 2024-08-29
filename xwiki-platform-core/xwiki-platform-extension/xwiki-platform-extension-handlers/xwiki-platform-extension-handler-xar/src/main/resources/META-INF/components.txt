@@ -1,4 +1,5 @@
 org.xwiki.extension.xar.internal.DefaultXarExtensionConfiguration
+org.xwiki.extension.xar.internal.DefaultXARExtensionIndex
 org.xwiki.extension.xar.internal.delete.DocumentsDeletingListener
 org.xwiki.extension.xar.internal.doc.XarDocumentRevisionProvider
 org.xwiki.extension.xar.internal.doc.InstalledExtensionDocumentCustomizationDetector
@@ -29,3 +30,4 @@ org.xwiki.extension.xar.internal.validator.XarExtensionValidator
 org.xwiki.extension.xar.internal.script.DiffXarJobStatusScriptSafeProvider
 org.xwiki.extension.xar.script.DeprecatedXarExtensionScriptService
 org.xwiki.extension.xar.script.XarExtensionScriptService
+org.xwiki.extension.xar.script.SecurityLevelEditConfirmationChecker

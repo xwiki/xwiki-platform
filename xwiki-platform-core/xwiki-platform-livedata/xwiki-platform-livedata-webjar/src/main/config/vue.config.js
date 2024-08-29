@@ -45,6 +45,7 @@ module.exports = {
   chainWebpack: config => {
     // Provided dependencies (that shouldn't be bundled).
     config.externals({
+      "vue": "vue",
       "vue-i18n": "vue-i18n",
       "jquery": "jquery",
       "daterangepicker": "daterangepicker",

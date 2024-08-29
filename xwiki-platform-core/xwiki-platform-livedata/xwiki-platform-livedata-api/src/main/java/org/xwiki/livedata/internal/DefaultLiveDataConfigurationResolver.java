@@ -22,7 +22,12 @@ package org.xwiki.livedata.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +44,8 @@ import org.xwiki.livedata.LiveDataConfiguration;
 import org.xwiki.livedata.LiveDataConfigurationResolver;
 import org.xwiki.livedata.LiveDataException;
 import org.xwiki.livedata.LiveDataLayoutDescriptor;
+import org.xwiki.livedata.LiveDataMeta;
+import org.xwiki.livedata.LiveDataPaginationConfiguration;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.FilterDescriptor;
 import org.xwiki.livedata.LiveDataPropertyDescriptor.OperatorDescriptor;
 import org.xwiki.livedata.LiveDataQuery.Source;
@@ -109,8 +116,66 @@ public class DefaultLiveDataConfigurationResolver implements LiveDataConfigurati
         // Prevent null values (make the configuration explicit).
         mergedConfig.initialize();
 
+        handleLayouts(config.getMeta().getLayouts(), mergedConfig.getMeta());
+        handlePageSizes(mergedConfig);
+
         // Translate using the context locale.
         return translate(mergedConfig);
+    }
+
+    /**
+     * If the pagination sizes are missing the limit defined in the query, add it to the allowed page limits.
+     *
+     * @param mergedConfiguration the live data configuration
+     */
+    private void handlePageSizes(LiveDataConfiguration mergedConfiguration)
+    {
+        Integer limit = mergedConfiguration.getQuery().getLimit();
+        if (limit != null) {
+            LiveDataMeta meta = mergedConfiguration.getMeta();
+            if (meta == null) {
+                meta = new LiveDataMeta();
+                mergedConfiguration.setMeta(meta);
+            }
+            LiveDataPaginationConfiguration pagination = meta.getPagination();
+            if (pagination == null) {
+                pagination = new LiveDataPaginationConfiguration();
+                meta.setPagination(pagination);
+            }
+            List<Integer> pageSizes = pagination.getPageSizes();
+            if (pageSizes == null) {
+                pageSizes = new ArrayList<>();
+                pagination.setPageSizes(pageSizes);
+            }
+            if (!pageSizes.contains(limit)) {
+                pageSizes.add(limit);
+                Collections.sort(pageSizes);
+            }
+        }
+    }
+
+    /**
+     * Filters and updates the layouts in the merged configuration based on the layout descriptors provided by the
+     * initial configuration.
+     *
+     * @param configuredLayouts the collection of layout descriptors to be matched against the merged configuration
+     *     layouts
+     * @param mergedConfigMeta the merged configuration meta-object containing the layouts to be used to have access
+     *     to the full descriptors
+     */
+    private void handleLayouts(Collection<LiveDataLayoutDescriptor> configuredLayouts, LiveDataMeta mergedConfigMeta)
+    {
+        // Skip this if no layouts are configured explicitly.
+        if (configuredLayouts != null && !configuredLayouts.isEmpty())
+        {
+            // Only keep the layout matching the ids provided by the higher level configuration, preserving the order.
+            mergedConfigMeta.setLayouts(configuredLayouts.stream().map(configLayout -> mergedConfigMeta.getLayouts()
+                    .stream()
+                    .filter(baseConfigLayout -> Objects.equals(baseConfigLayout.getId(), configLayout.getId()))
+                    .findFirst()
+                    .orElse(configLayout))
+                .collect(Collectors.toList()));
+        }
     }
 
     private LiveDataConfiguration translate(LiveDataConfiguration config)

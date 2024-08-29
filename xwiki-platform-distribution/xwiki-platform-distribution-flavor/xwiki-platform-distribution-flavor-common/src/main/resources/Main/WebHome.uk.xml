@@ -35,51 +35,40 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube-видео о XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Ласкаво просимо в вашу вікі =
+  <content>== Ласкаво просимо в вашу вікі ==
 
 XWiki - це найкращий інструмент для організації ваших знань. // Вікі // організована як ієрархія // сторінок //. Ви можете створити кілька вікі, кожна з яких матиме власний набір сторінок.
 
 XWiki може бути використана в якості основи знань (тех, документація, продажу, і т.д.), спільне робоче простір або навіть як повноцінний інтранет.
 
-= Основи =
+== Основи ==
 
 Для максимального використання можливостей вашої вікі, авторизуйтесь і:
 
-Використовуйте кнопку  {{velocity}}$services.icon.render('pencil'){{/velocity}}  вище, щоб // правити // цю сторінку і почати налаштовувати вікі під ваші потреби.
+Використовуйте кнопку {{displayIcon name="pencil"/}} вище, щоб // правити // цю сторінку і почати налаштовувати вікі під ваші потреби.
 
-Використовуйте кнопку {velocity}}$services.icon.render('add'){{/velocity}} вище, щоб // додати // більше сторінок в вашу вікі і створити // ієрархію //, яка найкращим чином впорядкує ваш контент.
+Використовуйте кнопку {{displayIcon name="add"/}} вище, щоб // додати // більше сторінок в вашу вікі і створити // ієрархію //, яка найкращим чином впорядкує ваш контент.
 
-Використовуйте {{velocity}}$services.icon.render('home'){{/velocity}} навігаційні ланцюжки розташовані над заголовком для // навігації // по ваших сторінок. Легко загубитися у великій вікі без них.
+Використовуйте {{displayIcon name="home"/}} навігаційні ланцюжки розташовані над заголовком для // навігації // по ваших сторінок. Легко загубитися у великій вікі без них.
 
-Ви також можете використовувати [[Пісочницю &gt;&gt; Sandbox.WebHome]] для більшої кількості демо-контенту і в цілому як місце для експериментів з можливостями вашої вікі.
+Ви також можете використовувати [[Пісочницю&gt;&gt;Sandbox.WebHome]] для більшої кількості демо-контенту і в цілому як місце для експериментів з можливостями вашої вікі.
 
- {{box}}Дізнайтеся більше про те, як використовувати XWiki з {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+{{box}}Дізнайтеся більше про те, як використовувати XWiki з [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
-(%class="row"%)(((
-(%class="col-xs-12 col-sm-6"%)(((
-= Розширте свою вікі =
+(%class="row"%)
+(((
+(%class="col-xs-12 col-sm-6"%)
+(((
+== Розширте свою вікі ==
 
-Щоб доповнити можливості і функціональність вікі необхідними // вам // функціями, перейдіть до {{velocity}}[[Менеджеру розширень&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, де ви зможете знайти і встановити розширення.
+Щоб доповнити можливості і функціональність вікі необхідними // вам // функціями, перейдіть до [[Менеджеру розширень&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]], де ви зможете знайти і встановити розширення.
 
-Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;http://extensions.xwiki.org]].
+Для перегляду більше 900 створених спільнотою розширень для XWiki, перейдіть в [[Репозиторій розширень&gt;&gt;https://extensions.xwiki.org]].
 )))
-(%class="col-xs-12 col-sm-6"%)(((
-= Створіть свій додаток =
+
+(%class="col-xs-12 col-sm-6"%)
+(((
+== Створіть свій додаток ==
 
 Вийдіть за межі доступних розширень і визначте // структуру // даних на основі // ваших // потреб, створюйте // ваші // власні додатки через [[Додаток за кілька хвилин&gt;&gt;AppWithinMinutes]].
 

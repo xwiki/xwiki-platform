@@ -17,6 +17,9 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#template('attachment_macros.vm')
+#template('display_macros.vm')
+#initRequiredSkinExtensions()
 $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
 $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
@@ -32,20 +35,28 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 <div id="_attachments" class="attachments">
 #template("attachmentslist.vm")
 </div> ## attachments
-#deleteAttachmentModal
 #if($hasEdit || $hasAdmin)
-  <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
+  <form class="xform" action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
   <div>
   ## CSRF prevention
   <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-  ## $redirect is defined in attachmentslist.vm
-  <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
   <fieldset id="attachform">
     <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>
     ## Temporarily disabled, until we fix attachment name handling
     ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
     ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
-    <div class="fileupload-field"><label class="hidden" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" /></div>
+    <div class="fileupload-field">
+      #if ($services.attachment.configuration.commentsEnabled)
+        <dl>
+          <dt>
+            <label for="xwikiuploadcomment">$services.localization.render('core.viewers.attachments.upload.comment')</label>
+            <span class="xHint">$services.localization.render('core.viewers.attachments.upload.comment.hint')</span>
+          </dt>
+          <dd><input type="text" id="xwikiuploadcomment" name="comment" maxlength="1023"></dd>
+        </dl>
+      #end
+      <label class="sr-only" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" size="40" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
+    </div>
     <div>
       <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.attachments.upload.submit')" class="button btn btn-primary"/></span>
       <span class="buttonwrapper"><a class="cancel secondary button btn btn-primary" href="$doc.getURL()">$services.localization.render('core.viewers.attachments.upload.cancel')</a></span>
@@ -56,3 +67,5 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 #end
 </div> ## attw
 </div> ## attachmentscontent
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))

@@ -57,7 +57,7 @@ def var = "whatever"
 
 === 2.0 Scripts ===
 
-{{info}}In XWiki Syntax 1.0 war es möglich Velocity Skripte überall direkt in der Seite einzugeben. Dies hat zu Problemen geführt, beispielsweise wenn ein Nutzer unfreiwillig Velocity Inhalte eingegeben hat. Es war zudem leistungshungrig für Seiten, die keinen Velocity Inhalt benötigten. Es gab zudem etliche weitere technische Einschränkungen. Daher müssen in XWiki Syntax 2.0 Velocity Skripte mittels des ##Velocity## Makros eingegeben werden. Selbiges gilt für Groovy Skripte.{{/info}}
+{{info}}XWiki [[unterstützt verschiedene Skript-Sprachen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
 |=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
 |Velocity Skript|((({{{

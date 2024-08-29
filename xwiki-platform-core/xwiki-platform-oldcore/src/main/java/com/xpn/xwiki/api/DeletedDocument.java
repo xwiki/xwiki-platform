@@ -22,18 +22,22 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.util.Programming;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Information about a deleted document in the recycle bin.
@@ -51,6 +55,8 @@ public class DeletedDocument extends Api
      * The internal object wrapped by this API.
      */
     private final XWikiDeletedDocument deletedDoc;
+
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     /**
      * Simple constructor, initializes a new API object with the current {@link com.xpn.xwiki.XWikiContext context} and
@@ -134,6 +140,22 @@ public class DeletedDocument extends Api
         return this.deletedDoc.getBatchId();
     }
 
+    private UserReferenceResolver<DocumentReference> getUserReferenceResolver()
+    {
+        if (this.userReferenceResolver == null) {
+            this.userReferenceResolver = Utils.getComponent(
+                new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
+        }
+        return this.userReferenceResolver;
+    }
+
+    private boolean hasAccess(Right right)
+    {
+        UserReference userReference = getUserReferenceResolver().resolve(this.context.getUserReference());
+        XWikiRecycleBinStoreInterface recycleBinStore = this.context.getWiki().getRecycleBinStore();
+        return recycleBinStore.hasAccess(right, userReference, this.deletedDoc);
+    }
+
     /**
      * Check if the current user has the right to restore the document.
      *
@@ -141,15 +163,22 @@ public class DeletedDocument extends Api
      */
     public boolean canUndelete()
     {
-        try {
-            return hasAccessLevel(ADMIN_RIGHT, getFullName()) || hasAccessLevel("undelete", getFullName())
-                || (Objects.equals(this.context.getUserReference(), getDeleterReference())
-                    && hasAccess(Right.EDIT, getDocumentReference()));
-        } catch (XWikiException ex) {
-            // Public APIs should not throw exceptions
-            LOGGER.warn("Exception while checking if entry [{}] can be restored from the recycle bin", getId(), ex);
-            return false;
-        }
+        return hasAccess(Right.EDIT);
+    }
+
+    /**
+     * Check if the current user has the right to view the deleted document.
+     * This is allowed either if the user has admin right on the original reference of the doc, or if they were the
+     * original user who deleted it.
+     *
+     * @return {code true} if the current user is allowed to view the deleted document.
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public boolean canView()
+    {
+        return hasAccess(Right.VIEW);
     }
 
     /**

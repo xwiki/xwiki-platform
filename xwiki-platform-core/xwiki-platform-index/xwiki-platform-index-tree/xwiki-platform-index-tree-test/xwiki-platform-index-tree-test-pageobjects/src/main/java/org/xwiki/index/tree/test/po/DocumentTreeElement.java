@@ -91,10 +91,24 @@ public class DocumentTreeElement extends TreeElement
      * 
      * @param path the path used to locate the attachment
      * @return this tree
+     * @see #openToAttachment(AttachmentReference)
      */
     public DocumentTreeElement openToAttachment(String... path)
     {
         return openTo(getAttachmentNodeId(path));
+    }
+
+    /**
+     * Open the tree to the specific attachment.
+     *
+     * @param attachmentReference the attachment reference to open the tree to
+     * @return this tree
+     * @see #openToAttachment(String...)
+     * @since 14.7RC1
+     */
+    public DocumentTreeElement openToAttachment(AttachmentReference attachmentReference)
+    {
+        return openTo(getNodeId(attachmentReference));
     }
 
     @Override
@@ -163,10 +177,22 @@ public class DocumentTreeElement extends TreeElement
     /**
      * @param path the path used to locate the attachment
      * @return the corresponding attachment node
+     * @see #getAttachmentNode(AttachmentReference)
      */
     public TreeNodeElement getAttachmentNode(String... path)
     {
         return getNode(getAttachmentNodeId(path));
+    }
+
+    /**
+     * @param attachmentReference the attachment reference of the attachment node to get
+     * @return the corresponding attachment node
+     * @see #getAttachmentNode(String...)
+     * @since 14.7RC1
+     */
+    public TreeNodeElement getAttachmentNode(AttachmentReference attachmentReference)
+    {
+        return getNode(getNodeId(attachmentReference));
     }
 
     private String getNodeId(EntityReference reference)
@@ -177,7 +203,8 @@ public class DocumentTreeElement extends TreeElement
     private String getSpaceNodeId(String... path)
     {
         if (path.length > 0) {
-            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList(path), "WebHome");
+            DocumentReference documentReference =
+                new DocumentReference(getUtil().getCurrentWiki(), Arrays.asList(path), "WebHome");
             return getNodeId(documentReference.getParent());
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 1 element (space)");
@@ -190,7 +217,7 @@ public class DocumentTreeElement extends TreeElement
             List<String> pathElements = Arrays.asList(path);
             List<String> spaces = pathElements.subList(0, path.length - 1);
             String document = path[path.length - 1];
-            return getNodeId(new DocumentReference("xwiki", spaces, document));
+            return getNodeId(new DocumentReference(getUtil().getCurrentWiki(), spaces, document));
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 2 elements (space/page)");
         }
@@ -203,7 +230,8 @@ public class DocumentTreeElement extends TreeElement
             List<String> spaces = pathElements.subList(0, path.length - 2);
             String document = path[path.length - 2];
             String fileName = path[path.length - 1];
-            return getNodeId(new AttachmentReference(fileName, new DocumentReference("xwiki", spaces, document)));
+            return getNodeId(
+                new AttachmentReference(fileName, new DocumentReference(getUtil().getCurrentWiki(), spaces, document)));
         } else {
             throw new IllegalArgumentException("Incomplete path: it should have at least 3 elements (space/page/file)");
         }

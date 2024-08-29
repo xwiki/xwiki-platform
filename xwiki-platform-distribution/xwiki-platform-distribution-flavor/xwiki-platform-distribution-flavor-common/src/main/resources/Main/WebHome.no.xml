@@ -35,52 +35,38 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass = "floatinginfobox"}}
-{{velocity}}
-{{html clean = "true"}}
-## Chromes XSS Auditor blokkerer forhåndsvisningshandlingen hvis:
-## * det innsendte innholdet har en iframe med en ekstern URL
-## * forhåndsvisningshandlingen viser innsendt iframe
-## Løsningen er å sørge for at det innsendte innholdet (makromarkørene) ikke samsvarer med forhåndsvisning HTML.
-## Se XWIKI-14818: Forhåndsvisning utløser ERR_BLOCKED_BY_XSS_AUDITOR i Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src = "https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube-video av XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/Html}}
-{{/velocity}}
-{{/box}}
-
-= Velkommen til Wiki =
+  <content>== Velkommen til Wiki ==
 
 XWiki er det beste verktøyet for å organisere kunnskapen din. En //wiki// er organisert i et hierarki av //sider//. Du kan lage flere wikier, hver med sitt eget sett med sider.
 
 XWiki kan brukes som kunnskapsbase (support, dokumentasjon, salg, etc.), for samarbeidsarbeidsområder eller til og med som et komplett intranett.
 
-= Det grunnleggende =
+== Det grunnleggende ==
 
 For å få mest mulig ut av wikien din, logg inn og:
 
-Bruk {{velocity}}$services.icon.render('pencil'){{/velocity}} knappen over for å //redigere// denne siden og begynne å tilpasse wiki til dine behov.
+Bruk {{displayIcon name="pencil"/}} knappen over for å //redigere// denne siden og begynne å tilpasse wiki til dine behov.
 
-Bruk {{velocity}}$services.icon.render('add'){{/velocity}} knappen over for å //legge til// flere sider til wikien din og opprette //hierarkiet// som best organiserer innholdet ditt .
+Bruk {{displayIcon name="add"/}} knappen over for å //legge til// flere sider til wikien din og opprette //hierarkiet// som best organiserer innholdet ditt .
 
-Bruk {{velocity}}$services.icon.render('home'){{/velocity}} brødsmulene som ligger over tittelen for å //navigere// inne på sidene dine. Det er lett å gå seg vill i en stor wiki uten dem.
+Bruk {{displayIcon name="home"/}} brødsmulene som ligger over tittelen for å //navigere// inne på sidene dine. Det er lett å gå seg vill i en stor wiki uten dem.
 
-Du kan også bruke [[Sandbox &gt;&gt; Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
+Du kan også bruke [[Sandbox &gt;&gt;Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
 
  {{box}}
-Lær mer om hvordan du bruker XWiki med {{velocity}}[[Komme i gang guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+Lær mer om hvordan du bruker XWiki med [[Komme i gang guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (%class="row"%)(((
 (%class="col-xs-12 col-sm-6"%)(((
-= Utvid wikien =
+== Utvid wikien ==
 
-For å utvide kraften og funksjonalitetene til wikien din med funksjonene //du// trenger, kan du gå over til {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki','XWiki','XWikiPreferences'),'admin','editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} der du kan søke etter og installere utvidelser.
+For å utvide kraften og funksjonalitetene til wikien din med funksjonene //du// trenger, kan du gå over til [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] der du kan søke etter og installere utvidelser.
 
-Hvis du vil bla gjennom 900+ fellesskapsbidragte utvidelser som er tilgjengelige for XWiki, kan du gå til [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+Hvis du vil bla gjennom 900+ fellesskapsbidragte utvidelser som er tilgjengelige for XWiki, kan du gå til [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 (%class="col-xs-12 col-sm-6"%)(((
-= Lag din applikasjon =
+== Lag din applikasjon ==
 
 Gå utover de tilgjengelige utvidelsene og definer //strukturen// av dataene basert på //dine// behov, og lag //dine// egne applikasjoner med [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM).
 

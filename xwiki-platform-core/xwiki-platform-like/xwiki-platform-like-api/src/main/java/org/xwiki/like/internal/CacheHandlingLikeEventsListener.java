@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -38,6 +39,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.async.internal.AsyncRendererCache;
 
@@ -51,6 +53,7 @@ import org.xwiki.rendering.async.internal.AsyncRendererCache;
 @Component
 @Named(CacheHandlingLikeEventsListener.NAME)
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class CacheHandlingLikeEventsListener extends AbstractEventListener
 {
     static final String NAME = "CacheHandlingLikeEventsListener";

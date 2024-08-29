@@ -69,7 +69,7 @@ widgets.FullScreen = Class.create({
         }.bind(this));
       }.bind(this));
     }.bind(this));
-    // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
+    // When coming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
     if (this.maximizedReference && this.maximizedReference.value != "") {
@@ -206,7 +206,7 @@ widgets.FullScreen = Class.create({
   makeFullScreen : function (targetElement) {
     document.fire("xwiki:fullscreen:enter", { "target" : targetElement });
     // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
-    // This is needed so that the full screen can be reactivated when comming back from preview, if it was activate before
+    // This is needed so that the full screen can be reactivated when coming back from preview, if it was activate before
     // the user hit the preview button.
     if (this.maximizedReference) {
       if (targetElement.id) {
@@ -339,9 +339,7 @@ widgets.FullScreen = Class.create({
       parent.siblings().each(function(item) {
         // if the element has been hidden by us, we should rollback its style
         if (item._fullscreenHidden) {
-          // IE8 does not like null values. Default to "" (specific to each element's type) for elements that were added
-          // while in full screen mode (like the Save & Continue notifications) and which don't have the _originalDisplay set.
-          item.style['display'] = item._originalDisplay || "";
+          item.style['display'] = item._originalDisplay;
         }
       });
     }
@@ -359,16 +357,8 @@ widgets.FullScreen = Class.create({
       // Replace the Restore button in the toolbar with the Maximize one
       this.closeButton.replace(targetElement._x_fullScreenActivator);
     }
-    if (Prototype.Browser.IE) {
-      // IE crashes if we try to resize this without a bit of delay.
-      setTimeout(function() {
-        targetElement._x_fullScreenActivator.show();
-        this.setStyle(this._originalStyle);
-      }.bind(targetElement), 500);
-    } else {
-      targetElement._x_fullScreenActivator.show();
-      targetElement.setStyle(targetElement._originalStyle);
-    }
+    targetElement._x_fullScreenActivator.show();
+    targetElement.setStyle(targetElement._originalStyle);
     // No element is maximized anymore
     delete this.maximized;
     if (this.maximizedReference) {

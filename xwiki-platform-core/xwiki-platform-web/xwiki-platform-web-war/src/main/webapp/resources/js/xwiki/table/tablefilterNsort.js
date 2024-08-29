@@ -132,7 +132,6 @@ function ts_resortTable(lnk) {
   for (var ci = 0; ci < lnk.childNodes.length; ++ci) {
     if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
   }
-  var spantext = ts_getInnerText(span);
   var td = lnk.parentNode;
   var column = td.cellIndex;
   var table = getParent(td,'TABLE');
@@ -166,7 +165,6 @@ function ts_resortTable(lnk) {
     sortfn = ts_sort_numeric;
   }
   SORT_COLUMN_INDEX = column;
-  var firstRow = new Array();
   var newRows = new Array();
   var nonSortedRows = new Array();
   // the new rows are added to the array to sort...get all rows from the "sortHeader" to the first sortBottom row.
@@ -235,7 +233,6 @@ function Filter(id) {
   var t = document.getElementById(id);
   var SearchArgs = new Array();
   var ncells = getCellsNb(id);
-  var visibleRows = 1 ;
 
   // Vincent Massol: Modified orinigal line so that it's compatible with Prototype.
   // Note: this is fixed in Max's script at http://mguglielmi.free.fr/scripts/TableFilter/?l=fr
@@ -329,7 +326,7 @@ function ts_getInnerText(el) {
     return el;
   }
   if (typeof el == "undefined") {
-    return ''
+    return '';
   };
   if (typeof el == "object" && el.tagName.toLowerCase() == 'img') {
     // if the contents of the table are images - they can be sorted on the "Alt" text

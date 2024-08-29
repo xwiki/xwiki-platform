@@ -139,19 +139,8 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
             return guestToken;
         }
 
-        // Get the token if it has already been created
-        String token = this.tokens.get(key);
-        if (token != null) {
-            return token;
-        }
-
-        // create fresh token if needed
-        synchronized (this.tokens) {
-            if (!this.tokens.containsKey(key)) {
-                this.tokens.put(key, newToken());
-            }
-            return this.tokens.get(key);
-        }
+        // Return the current token if it exists, or generate a new one and return it.
+        return this.tokens.computeIfAbsent(key, documentReference -> newToken());
     }
 
     private String newToken()

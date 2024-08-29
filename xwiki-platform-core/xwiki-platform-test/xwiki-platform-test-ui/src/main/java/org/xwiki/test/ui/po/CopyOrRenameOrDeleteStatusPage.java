@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -31,27 +30,13 @@ import org.openqa.selenium.support.FindBy;
  * @since 7.4.1
  * @since 8.0M1
  */
-public class CopyOrRenameOrDeleteStatusPage extends BasePage
+public class CopyOrRenameOrDeleteStatusPage extends RefactoringStatusPage
 {
     @FindBy(css = ".job-status .col-lg-6:first-child .breadcrumb > li:last-child a")
     private WebElement oldPage;
 
     @FindBy(css = ".job-status .col-lg-6:last-child .breadcrumb > li:last-child a")
     private WebElement newPage;
-
-    @FindBy(css = ".box.successmessage, .box.errormessage")
-    private WebElement message;
-
-    /**
-     * Wait until the copy operation finishes.
-     * 
-     * @return this page
-     */
-    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
-    {
-        getDriver().waitUntilElementDisappears(By.cssSelector(".job-status .ui-progress"));
-        return this;
-    }
 
     public ViewPage gotoOriginalPage()
     {
@@ -65,8 +50,10 @@ public class CopyOrRenameOrDeleteStatusPage extends BasePage
         return new ViewPage();
     }
 
-    public String getInfoMessage()
+    @Override
+    public CopyOrRenameOrDeleteStatusPage waitUntilFinished()
     {
-        return this.message.getText();
+        super.waitUntilFinished();
+        return this;
     }
 }

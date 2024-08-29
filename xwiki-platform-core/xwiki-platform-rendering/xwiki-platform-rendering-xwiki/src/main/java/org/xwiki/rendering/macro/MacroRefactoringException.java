@@ -19,15 +19,12 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception for the {@link MacroRefactoring} operations.
  *
  * @version $Id$
  * @since 13.4RC1
  */
-@Unstable
 public class MacroRefactoringException extends Exception
 {
     /**

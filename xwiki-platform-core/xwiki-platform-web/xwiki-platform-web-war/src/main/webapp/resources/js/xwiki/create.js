@@ -18,9 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'xwiki-meta'], function($, xm) {
-  $(document).ready(function() {
-
-    var form = $('form#create');
+  let initCreateForm = function(form) {
     var nameField = form.find('input.location-name-field');
     var parentReferenceField = form.find('input.location-parent-field');
     var terminalCheckbox = form.find('input[name="tocreate"]');
@@ -29,7 +27,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
      * Compute the page name of the target
      */
     var computeTargetPageName = function() {
-      var documentReference = new XWiki.DocumentReference();
+      var documentReference;
       // Test if the parent reference field exists
       if (parentReferenceField.length > 0) {
         var parentReference = parentReferenceField.val();
@@ -78,7 +76,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     /**
      * Set the correct template or redirect to the correct page when the form is submitted
      */
-    form.submit(function() {
+    form.on('submit', function() {
       // Get the type of the page to create
       var typeField = $('input[name="type"]:checked');
       var type = typeField.attr('data-type');
@@ -122,7 +120,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       var pageShouldBeTerminalString = input.attr('data-terminal');
       var pageShouldBeTerminal = false;
       if (pageShouldBeTerminalString) {
-        pageShouldBeTerminal = $.parseJSON(input.attr('data-terminal'));
+        pageShouldBeTerminal = JSON.parse(input.attr('data-terminal'));
       }
       // Set the default value for the page type.
       terminalCheckbox.prop('checked', pageShouldBeTerminal);
@@ -143,7 +141,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       var allowedSpacesData = input.attr('data-allowed-spaces');
       var allowedSpaces = [];
       if (allowedSpacesData) {
-        allowedSpaces = $.parseJSON(input.attr('data-allowed-spaces'));
+        allowedSpaces = JSON.parse(input.attr('data-allowed-spaces'));
       }
 
       var newParentReferenceValue = currentParentReferenceValue;
@@ -160,7 +158,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           }
 
           return false;
-        }
+        };
 
         // Determine what new value we will set for the parent reference, which needs to respect the restrictions.
         if (isRestrictionOrChildOfRestriction(currentParentReferenceValue)) {
@@ -199,5 +197,11 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 
     // Initialize the UI with any pre-selected template provider's preferences.
     form.find('.xwiki-select').trigger('xwiki:select:updated');
+  };
+
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    $(containers).find('form#create').each(() => initCreateForm($(this)));
   });
+  $(() => initCreateForm($(document).find('form#create')));
 });

@@ -1,0 +1,6 @@
+org.xwiki.whatsnew.internal.configured.ConfiguredNewsSourceFactory
+org.xwiki.whatsnew.internal.xwikiblog.XWikiBlogNewsSourceFactory
+org.xwiki.whatsnew.internal.xwikiblog.RSSContentCleaner
+org.xwiki.whatsnew.internal.DefaultNewsConfiguration
+org.xwiki.whatsnew.script.NewsScriptService
+org.xwiki.whatsnew.internal.CategoriesConverter

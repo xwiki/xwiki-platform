@@ -21,7 +21,6 @@ package org.xwiki.test.ui.po;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -83,6 +82,23 @@ public class SuggestInputElement extends BaseElement
         public String getHint()
         {
             return this.suggestion.findElement(By.className("xwiki-selectize-option-hint")).getText();
+        }
+
+        /**
+         * @return {@code true} if the hint is present, {@code false} otherwise
+         */
+        public boolean hasHint()
+        {
+            return !getDriver().findElementsWithoutWaiting(this.suggestion, By.className("xwiki-selectize-option-hint"))
+                .isEmpty();
+        }
+
+        /**
+         * @return the text displayed on hover
+         */
+        public String getTooltip()
+        {
+            return this.suggestion.getAttribute("title");
         }
 
         /**
@@ -188,9 +204,21 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestions()
     {
-
         getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
             && !driver.findElements(By.cssSelector(".selectize-dropdown.active")).isEmpty());
+        return this;
+    }
+
+    /**
+     * Waits until the suggestions have disappeared.
+     *
+     * @return the current suggest input element
+     */
+    public SuggestInputElement waitForSuggestionsClearance()
+    {
+        getDriver().waitUntilCondition(driver ->
+            getDriver().findElementsWithoutWaiting(this.container, By.xpath("//*[contains(@class, 'selectize-input') "
+                + "and contains(@class, 'dropdown-active')]")).size() == 0);
         return this;
     }
 
@@ -201,7 +229,7 @@ public class SuggestInputElement extends BaseElement
     {
         return getDriver()
             .findElementsWithoutWaiting(By.cssSelector(".selectize-dropdown.active .xwiki-selectize-option")).stream()
-            .map(SuggestionElement::new).collect(Collectors.toList());
+            .map(SuggestionElement::new).toList();
     }
 
     /**
@@ -268,7 +296,7 @@ public class SuggestInputElement extends BaseElement
     {
         if ("select".equals(this.originalInput.getTagName())) {
             return new Select(this.originalInput).getAllSelectedOptions().stream()
-                .map(option -> option.getAttribute("value")).collect(Collectors.toList());
+                .map(option -> option.getAttribute("value")).toList();
         } else {
             return Arrays.asList(this.originalInput.getAttribute("value").split(","));
         }
@@ -280,7 +308,7 @@ public class SuggestInputElement extends BaseElement
     public List<SuggestionElement> getSelectedSuggestions()
     {
         return getDriver().findElementsWithoutWaiting(this.container, By.className("xwiki-selectize-option")).stream()
-            .map(SuggestionElement::new).collect(Collectors.toList());
+            .map(SuggestionElement::new).toList();
     }
 
     /**
@@ -291,7 +319,7 @@ public class SuggestInputElement extends BaseElement
     public SuggestInputElement hideSuggestions()
     {
         getTextInput().sendKeys(Keys.ESCAPE);
-
+        waitForSuggestionsClearance();
         return this;
     }
 }

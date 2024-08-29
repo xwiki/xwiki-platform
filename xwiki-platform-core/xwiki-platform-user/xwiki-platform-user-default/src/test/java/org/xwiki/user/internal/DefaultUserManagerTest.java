@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class DefaultUserManagerTest
+class DefaultUserManagerTest
 {
     @InjectMockComponents
     private DefaultUserManager userManager;
@@ -58,7 +58,7 @@ public class DefaultUserManagerTest
     @Named("context")
     private ComponentManager contextComponentManager;
 
-    private class TestUserReference implements UserReference
+    private final class TestUserReference implements UserReference
     {
         @Override
         public boolean isGlobal()
@@ -80,13 +80,13 @@ public class DefaultUserManagerTest
     }
 
     @Test
-    void existsWhenSuperAdmin()
+    void existsWhenSuperAdmin() throws Exception
     {
         assertFalse(this.userManager.exists(SuperAdminUserReference.INSTANCE));
     }
 
     @Test
-    void existsWhenGuest()
+    void existsWhenGuest() throws Exception
     {
         assertFalse(this.userManager.exists(GuestUserReference.INSTANCE));
     }
@@ -121,9 +121,8 @@ public class DefaultUserManagerTest
         when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
             .thenThrow(new ComponentLookupException("error"));
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
-            this.userManager.exists(new TestUserReference());
-        });
+        TestUserReference userReference = new TestUserReference();
+        Throwable exception = assertThrows(RuntimeException.class, () -> this.userManager.exists(userReference));
         assertEquals("Failed to find user manager for role [org.xwiki.user.UserManager] and hint "
             + "[org.xwiki.user.internal.DefaultUserManagerTest$TestUserReference]", exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));

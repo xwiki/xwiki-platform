@@ -1,0 +1,142 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('xwikivars.vm')
+#if ($isGuest)
+##  $response.setStatus(401)
+  #error ($services.localization.render('core.viewers.share.error.mustLogin'))
+#elseif ("$!{request.send}" != '')
+  #set ($message = "$!{request.message.trim()}")
+  #set ($sender = $xwiki.getUserName($xcontext.user, false))
+  #set ($display = "$!{request.includeDocument}")
+  #set ($serverName = $request.serverName)
+  #set ($from = $services.mail.sender.configuration.fromAddress)
+  #if ("$!from" != '')
+    ## Since the from can be specified as full address of the type "John Doe<john@doe.net", we need to get the address
+    ## only (i.e. the part inside the "<" and ">" characters)
+    #set ($address = $stringtool.substringBefore($stringtool.substringAfter($from, "<"), ">"))
+    ## If empty it means that the address wasn't specified using "<" and ">", thus we use what the user has entered
+    #if ($stringtool.isEmpty($address))
+      #set ($sender = $from)
+    #else
+      #set ($sender = "$!{escapetool.q($sender)} <$address>")
+    #end
+  #else
+    #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
+      #set ($sender = "$!{escapetool.q($sender)} <noreply@domain.net>")
+    #else
+      #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{serverName}>")
+    #end
+  #end
+  #set ($recipients = [])
+  #set ($errors = {})
+  #set ($successes = [])
+
+  #foreach ($recipientValue in $request.getParameterValues('target'))
+    #foreach ($recipient in $recipientValue.split(','))
+      #set ($recipient = $recipient.trim())
+      #if ($recipient != '')
+        #if ("$!xwiki.getDocument($recipient).getObject('XWiki.XWikiUsers', false)" == '' && $recipient.indexOf('@') > 0)
+          #if ($recipient.indexOf('<') > 0)
+            #set ($recipientName = $recipient.substring(0, $recipient.indexOf('<')).trim())
+            #set ($recipient = "$!{escapetool.q($recipientName)} <${recipient.substring($mathtool.add($recipient.indexOf('<'), 1), $recipient.indexOf('>'))}>")
+          #else
+            #set ($recipientName = $recipient.substring(0, $recipient.indexOf('@')).trim())
+          #end
+          #set ($fullRecipientName = $recipientName)
+        #else ## No @
+          #set ($recipientName = $xwiki.getDocument($recipient).getObject('XWiki.XWikiUsers').getProperty('first_name').value)
+          #set ($fullRecipientName = $xwiki.getUserName($recipient, false))
+          #set ($recipient = $xwiki.getDocument($recipient).getObject('XWiki.XWikiUsers').getProperty('email').value)
+        #end ## @
+        #if (!$recipients.contains($recipient) && "$!recipient" != '')
+          #set ($discard = $recipients.add($recipient))
+          #set ($result = $xwiki.mailsender.sendMessageFromTemplate($sender, $recipient, ${NULL}, ${NULL}, "${xcontext.locale}", 'XWiki.SharePage', {}))
+          #if ($result != 0)
+            #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.serverError')))
+          #else
+            #set ($discard = $successes.add($fullRecipientName))
+          #end
+        #elseif ("$!recipient" == '')
+          #set ($discard = $errors.put($fullRecipientName, $services.localization.render('core.viewers.share.error.unknownEmail')))
+        #end ## Non empty/handled recipient
+      #end ## Non empty recipient
+    #end ## Foreach recipient
+  #end ## Foreach parameter value
+  #if ($successes.size() > 0)
+    #info($services.localization.render('core.viewers.share.send.success', [$successes.toString().replaceAll('^\[', '').replaceAll('\]$', '')]))
+  #end
+  #if ($errors.size() > 0)
+    #foreach ($recipient in $errors.keySet())
+      #set ($errorMessage = $services.localization.render('core.viewers.share.send.error', 
+        [${recipient}, ${errors.get($recipient)}])) 
+      #set ($errorMessage = $escapetool.xml($errorMessage))
+      #error($errorMessage)
+    #end
+  #end
+  <a href='$doc.getURL()' class='share-backlink'>$services.localization.render('core.viewers.share.send.back', ["<em>${doc.displayTitle}</em>"])</a>
+#else ## Form not sent, display the UI
+#userPicker_import()
+#set ($discard = $xwiki.ssx.use('XWiki.SharePage'))
+#set ($discard = $xwiki.jsx.use('XWiki.SharePage'))
+<form class="xform" action="$doc.getURL('view', 'viewer=share')" method="post">
+  <div class="hidden">
+    <input type="hidden" name="form_token" value="$services.csrf.token" />
+    <input type="hidden" name="send" value="1" />
+  </div>
+  <dl>
+    <dt>
+      <label for="shareTarget">$services.localization.render('core.viewers.share.target')</label>
+      <span class="xHint">$services.localization.render('core.viewers.share.target.hint')</span>
+    </dt>
+    <dd>
+      #set ($userPickerParams = {
+        'id': 'shareTarget',
+        'name': 'target',
+        'value': $request.getParameterValues('target')
+      })
+      #userPicker_input(true $userPickerParams)
+    </dd>
+    #set ($ownEmail = "$!{xwiki.getDocument($xcontext.user).getObject('XWiki.XWikiUsers').getProperty('email').value}")
+    #if ($ownEmail != '')
+      <dd><label for="includeSender"><input type="checkbox" id="includeSender" name="target" value="${xwiki.getUserName($xcontext.user, false)} $escapetool.xml("<${ownEmail}>")" /> $services.localization.render('core.viewers.share.target.ccMe')</label></dd>
+    #end
+    <dt><label>$services.localization.render('core.viewers.share.includeMethod')</label></dt>
+    <dd><label><input type="radio" name="includeDocument" value="link" checked="checked"/> $services.localization.render('core.viewers.share.includeMethod.link')</label></dd>
+    <dd><label><input type="radio" name="includeDocument" value="inline"/> $services.localization.render('core.viewers.share.includeMethod.inline')</label></dd>
+    ## <dd><label><input type="radio" name="includeDocument" value="attachment"/> $services.localization.render('core.viewers.share.includeMethod.attachment')</label></dd>
+    ## <dd><label><input type="checkbox" name="includeComments"/> $services.localization.render('core.viewers.share.includeComments')</label></dd>
+
+    #set ($message = "<textarea name='message' rows='3' cols='80'>${services.localization.render('core.viewers.share.defaultMessage')}</textarea>")
+    #set ($fullMessage = $xwiki.getDocument('XWiki.SharePage').getObject('XWiki.Mail', 'language', "${xcontext.locale}", true).getProperty('html').value)
+    #set ($fullMessage = $fullMessage.replace('${recipientName}', $services.localization.render('core.viewers.share.recipientPlaceholder')))
+    #set ($fullMessage = $fullMessage.replaceAll('<pre[^>]*+>[^<]*+</pre>', $message))
+    ## Evaluate the template's content since it contains Velocity code.
+    #set ($fullMessage = "#evaluate($fullMessage)")
+
+    <dt><label for="message">$services.localization.render('core.viewers.share.messagePreviewLabel')</label></dt>
+    <dd class='mail-preview'>$fullMessage</dd>
+
+  </dl>
+  <div class="buttons">
+    <span class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('core.viewers.share.submit')" /></span>
+    <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.viewers.share.cancel')</a></span>
+  </div>
+</form>
+#end

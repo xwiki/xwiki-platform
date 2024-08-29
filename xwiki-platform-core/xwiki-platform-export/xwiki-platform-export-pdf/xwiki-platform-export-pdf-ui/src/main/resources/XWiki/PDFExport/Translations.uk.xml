@@ -1,0 +1,113 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="uk">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=Шаблон
+export.pdf.options.template.hint=Шаблон PDF керує інформацією, що відображається на титульній сторінці, у змісті, а також у верхньому та нижньому колонтитулах кожної сторінки.
+export.pdf.options.loadFailure=Не вдалося завантажити параметри експорту в PDF.
+export.pdf.hint=Експортувати у форматі PDF (Portable Document Format) за допомогою веб-браузер
+export.pdf.modal.close=Закрити
+export.pdf.inProgress=Експорт у форматі PDF...
+export.pdf.failed=Не вдалося експортувати у формат PDF
+export.pdf.lastError=Журнал експорту файлів PDF містить помилки: {0}
+export.pdf.canceling=Скасування експорту у формат PDF...
+export.pdf.canceled=Експорт у формат PDF скасовано
+export.pdf.cancelFailed=Не вдалося скасувати експорт у формат PDF
+export.pdf.loading=Завантаження...
+export.pdf.pageReadyTimeout=Тайм-аут очікування готовності веб-сторінки до друку.
+export.pdf.templates.default=Шаблон за умовчанням
+export.pdf.templates.default.versionInfo=Версія {0}, створена {1} о {2}
+export.pdf.template.name=Шаблон PDF
+export.pdf.template.hint=Шаблон, який використовується для експорту у PDF
+export.pdf.template.provider=Постачальник шаблонів PDF
+export.pdf.template.skinExtensionInfo=Розширення скіну CSS і JavaScript, надані цією сторінкою, також є частиною шаблону PDF і тому завантажуються автоматично, коли використовується шаблон PDF.
+admin.export.pdf=Експорт PDF
+admin.export.pdf.description=Налаштуйте спосіб експорту вікі-сторінок у PDF.
+export.pdf.admin.status=Статус
+export.pdf.admin.configuration=Налаштування
+export.pdf.admin.saveComment=Оновлено конфігурацію експорту PDF з Адміністрування
+export.pdf.admin.reset=Скинути
+export.pdf.admin.reset.hint=Відновити налаштування за умовчанням
+export.pdf.admin.reset.confirmation=Ви впевнені, що хочете відновити налаштування за умовчанням? Усі внесені вами зміни буде втрачено.
+export.pdf.config.default=(за умовчанням)
+export.pdf.config.empty=(пусто)
+export.pdf.generator.label=Генератор
+export.pdf.generator.hint=Інструмент для створення PDF.
+export.pdf.generator.checking=Перевірка наявності PDF-генератора...
+export.pdf.generator.checkFailed=Не вдалося перевірити, чи доступний генератор PDF.
+export.pdf.generator.available=Доступний
+export.pdf.generator.unavailable=Генератор PDF наразі недоступний.
+export.pdf.generator.userBrowser.label=Браузер користувача
+export.pdf.generator.userBrowser.hint=PDF-файл створюється на стороні клієнта за допомогою функції друку, наданої власним веб-браузером користувача.
+export.pdf.generator.chromeDockerContainer.label=Контейнер Chrome Docker
+export.pdf.generator.chromeDockerContainer.hint=PDF-файл створюється на стороні сервера за допомогою headless веб-браузера Chrome, який працює всередині контейнера Docker на тому ж сервері, що й XWiki.
+export.pdf.generator.remoteChrome.label=Віддалений Chrome
+export.pdf.generator.remoteChrome.hint=PDF-файл створюється на сервері за допомогою віддаленого веб-браузера Chrome, який може працювати на іншому сервері, ніж XWiki.
+XWiki.PDFExport.TemplateClass_cover=Обкладинка
+XWiki.PDFExport.TemplateClass_cover.hint=Інформація, що відображається на першій сторінці. Наприклад назва та автор
+XWiki.PDFExport.TemplateClass_toc=Зміст
+XWiki.PDFExport.TemplateClass_toc.hint=Зазвичай містить перелік заголовків вмісту разом із номерами сторінок.
+XWiki.PDFExport.TemplateClass_header=Верхній колонтитул
+XWiki.PDFExport.TemplateClass_header.hint=Інформація відображається у верхній частині кожної сторінки, за винятком титульної сторінки. Наприклад заголовок
+XWiki.PDFExport.TemplateClass_footer=Нижній колонтитул
+XWiki.PDFExport.TemplateClass_footer.hint=Інформація, що відображається нижній частині кожної сторінки, за винятком титульної сторінки. Наприклад номер сторінки
+XWiki.PDFExport.TemplateClass_metadata=Метадані
+XWiki.PDFExport.TemplateClass_metadata.hint=Скрипт, який обчислюється для кожної вікі-сторінки, включеної до експорту PDF, для створення метаданих для відображення у верхньому чи нижньому колонтитулі PDF. Метадані вказуються за допомогою спеціального зв'язування під назвою метадані, значення якого є Map&lt;String, String&gt;. Метадані потрапляють у HTML як атрибути верхнього колонтитула, який використовується для відображення заголовка кожної вікі-сторінки.
+XWiki.PDFExport.ConfigurationClass_templates=Шаблони
+XWiki.PDFExport.ConfigurationClass_templates.hint=Список PDF-шаблонів, які користувач може вибрати під час експорту вікі-сторінок у PDF.
+XWiki.PDFExport.ConfigurationClass_serverSide=Серверна частина
+XWiki.PDFExport.ConfigurationClass_serverSide.hint=Чи слід експортувати PDF-файл на стороні сервера, наприклад за допомогою headless веб-браузера Chrome, що працює всередині контейнера Docker, або на стороні клієнта, використовуючи натомість веб-браузер користувача.
+XWiki.PDFExport.ConfigurationClass_chromeHost=Хост Chrome
+XWiki.PDFExport.ConfigurationClass_chromeHost.hint=Хост, на якому запущено headless веб-браузер Chrome, вказується або його ім'ям, або його IP-адресою.
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=Порт віддаленого налагодження Chrome
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=Номер порту, який використовується для зв’язку з headless веб-браузером Chrome.
+XWiki.PDFExport.ConfigurationClass_xwikiURI=XWiki URI
+XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=Стандартний URI, який headless веб-браузера Chrome має використовувати для доступу до екземпляра XWiki (наприклад, сторінки попереднього перегляду друку). Приклади: localhost, localhost:9293, http://localhost, https://localhost:8080
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage=Образ Chrome Docker
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=Образ Docker, який використовувався для створення контейнера Docker, який запускає headless веб-браузер Chrome.
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Назва контейнера Chrome Docker
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=Назва контейнера Docker, на якому працює headless веб-браузер Chrome. Це особливо корисно під час повторного використання наявного контейнера.
+XWiki.PDFExport.ConfigurationClass_dockerNetwork=Мережа Docker
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=Ім'я або ідентифікатор мережі Docker, до якої потрібно додати контейнер Chrome Docker. Це корисно, коли окремо XWiki працює в контейнері Docker і ви хочете мати контейнер Chrome у тій самій мережі, щоб вони могли обмінюватися даними.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Тайм-аут готовності сторінки
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=Кількість секунд очікування, поки веб-сторінка буде готова до друку, перш ніж закінчиться час тайм-ауту.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Максимальний розмір вмісту
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=Максимальний розмір вмісту в кілобайтах (КБ), який можна включити в один експортований файл PDF. Щоб вимкнути обмеження, використовуйте 0.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=Замінити FOP
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Замінити старий експорт PDF на основі Apache FOP.
+</content>
+</xwikidoc>

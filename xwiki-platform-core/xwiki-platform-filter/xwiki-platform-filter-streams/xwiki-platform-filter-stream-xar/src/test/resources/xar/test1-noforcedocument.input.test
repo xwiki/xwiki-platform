@@ -48,6 +48,10 @@
                 <string>XWiki.author</string>
               </entry>
               <entry>
+                <string>revision_original_author</string>
+                <string>XWiki.originalMetadataAuthor</string>
+              </entry>
+              <entry>
                 <string>customclass</string>
                 <string></string>
               </entry>
@@ -428,6 +432,10 @@
             <entry>
               <string>revision_author</string>
               <string>XWiki.author</string>
+            </entry>
+            <entry>
+              <string>revision_original_author</string>
+              <string>XWiki.originalMetadataAuthor</string>
             </entry>
             <entry>
               <string>customclass</string>

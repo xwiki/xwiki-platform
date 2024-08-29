@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.checker.internal;
 
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -68,7 +70,17 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
     @Override
     public void initialize() throws InitializationException
     {
-        String regex = this.configurationSource.getProperty("test.prchecker.excludePattern");
+        // There can be several properties named "test.prchecker.excludePattern" in the source (in the case of an
+        // AllIT test that merges some IT tests for example). In this case, we get an ArrayList result and not a
+        // String. We need to handle both cases.
+        String regex;
+        Object result = this.configurationSource.getProperty("test.prchecker.excludePattern");
+        if (result instanceof Collection) {
+            // Convert to a single regex string
+            regex = StringUtils.join((Collection<String>) result, "|");
+        } else {
+            regex = (String) result;
+        }
         if (regex != null) {
             this.excludePattern = Pattern.compile(regex);
         }
@@ -127,7 +139,7 @@ public class ProgrammingRightCheckerAuthorizationManager extends BridgeAuthoriza
 
                 return true;
             } else {
-                this.prlogger.debug("PRChecker: Block programming right for page [{}]", sref);
+                this.prlogger.info("PRChecker: Block programming right for page [{}]", sref);
 
                 return false;
             }

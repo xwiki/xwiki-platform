@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsCustomFiltersPreferencesMacro</name>
   <language/>
@@ -77,6 +77,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -125,41 +126,33 @@
     </property>
     <property>
       <code>'use strict';
-/**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
+
+define('notifications-custom-filters-preferences-macro-translation-keys', {
+  prefix: 'notifications.',
+  keys: [
+    'settings.saving',
+    'settings.saved',
+    'settings.savingfailed',
+    'filters.preferences.setEnabled.inProgress',
+    'filters.preferences.setEnabled.done',
+    'filters.preferences.setEnabled.error',
+    'filters.preferences.delete.inProgress',
+    'filters.preferences.delete.done',
+    'filters.preferences.delete.error'
+  ]
 });
+
 /**
  * Start the real script.
  */
-require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, AddCustomNotificationFilterPreferenceLivetable) {
+require(['jquery', 'NewCustomNotificationFilterModal', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, NewCustomNotificationFilterModal) {
 
   /**
-   * Page initialization
+   * Initialize the custom filter modal.
    */
-  $(document).ready(function() {
-
-    new AddCustomNotificationFilterPreferenceLivetable($('#modal-add-custom-filter-preference'), window['livetable_notificationCustomFilterPreferencesLiveTable'], $('.customFilterPreferences button.btn-addfilter'),
+  $(function() {
+    new NewCustomNotificationFilterModal($('#modal-add-custom-filter-preference'), $("#notificationCustomFilterPreferencesLiveData"), $('.customFilterPreferences button.btn-addfilter'),
       $('.customFilterPreferences').attr('data-doc-url'));
-    var initBootstrapSwitches = function () {
-      $('#notificationCustomFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationCustomFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
-        size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
-      });
-    };
-    $(document).on('xwiki:livetable:displayComplete', function (event, data) {
-      // Enable bootstrap switches
-      initBootstrapSwitches();
-    });
-    initBootstrapSwitches();
-
   });
 });
 </code>
@@ -168,7 +161,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <name>JS</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -214,6 +207,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -261,7 +255,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <cache>long</cache>
     </property>
     <property>
-      <code>define('AddCustomNotificationFilterPreferenceLivetable', ['jquery', 'xwiki-meta', 'bootstrap'], function($, xm) {
+      <code>define('NewCustomNotificationFilterModal', ['jquery', 'xwiki-meta', 'xwiki-l10n!notifications-custom-filters-preferences-macro-translation-keys', 'bootstrap'], function($, xm, l10n) {
 
   return function(modal, filterPreferencesLivetable, buttonAddFilter, docURL) {
     var self = this;
@@ -274,16 +268,16 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
     self.filterScopeTree = modal.find('.location-tree');
     self.cancelButton = modal.find('button[data-action="cancel"]');
     self.submitButton = modal.find('button[data-action="submit"]');
-    
+
     self.getFormats = function () {
       return self.modal.find('input[name=notificationFilterNotificationFormatSelector]:checked').map(function () { return $(this).val();}).get().join(',');
     };
-    
+
     /**
      * Initialization
      */
     self.init = function () {
-      self.buttonAddFilter.click(function() {
+      self.buttonAddFilter.on('click', function() {
         self.filterScopeTree.xtree();
         self.submitButton.prop('disabled', 'disabled');
 
@@ -293,9 +287,8 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
           }
         });
       });
-      
 
-      self.submitButton.click(self.onSelectButtonClicked);
+      self.submitButton.on('click', self.onSelectButtonClicked);
     };
 
     /**
@@ -315,7 +308,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         eventTypes = eventTypesSelected.join(',');
       }
       var target = self.modal.data('target');
-      
+
       var params = {
         action: 'createScopeFilterPreference',
         target: target,
@@ -344,21 +337,21 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       }
 
       // Saving
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
+      var notification = new XWiki.widgets.Notification(l10n['settings.saving'], 'inprogress');
       // We use a "traditional: true" argument here to be sure that the argument names are not transformed to wiki[] etc by jquery. For more info see doc about $.param.
       $.post({
         url: serviceURL,
         data: params,
         traditional: true
-      }).done(function (data) {
+      }).then(data =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
+        new XWiki.widgets.Notification(l10n['settings.saved'], 'done');
 
-        // Reload the livetable
-        self.filterPreferencesLivetable.refresh();
-      }).fail(function () {
+        // Reload the Live Data.
+        self.filterPreferencesLivetable.data('liveData').updateEntries();
+      }).catch(() =&gt; {
         notification.hide();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
+        new XWiki.widgets.Notification(l10n['settings.savingfailed'], 'error');
       });
     };
 
@@ -370,10 +363,10 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
 </code>
     </property>
     <property>
-      <name>Add Notification Filter Preference Livetable</name>
+      <name>Custom notifications creation modal</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -419,171 +412,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>define('CustomToggleableFilterPreference', ['jquery', 'bootstrap-switch'], function($) {
-  /**
-  * Construct the Toggleable Filter Preference object.
-  */
-  return function(domElement, docURL, row) {
-    var self               = this;
-    self.domElement        = $(domElement);
-    self.docURL           = docURL;
-    self.row               = row;
-    /**
-     * Initialization
-     */
-    self.init = function () {
-      // On change
-      self.domElement.off('switchChange.bootstrapSwitch.customFilter')
-        .on('switchChange.bootstrapSwitch.customFilter', function(event, state) {
-          setTimeout(function() { self.save(state); }, 1);
-        });
-    };
-
-    /**
-     * Save the filter preference
-     */
-    self.save = function(state) {
-      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saving'))", 'inprogress');
-      var filterName = self.domElement.attr('data-filterName');
-      var objectNumber = self.domElement.attr('data-objectNumber');
-      if (objectNumber == '') {
-        // If the object does not exist yet, create it (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.docURL + '/objects?media=json&amp;minorRevision=true';
-        var params = {
-          'className': 'XWiki.Notifications.Code.ToggleableFilterPreferenceClass',
-          'property#filterName': filterName,
-          'property#isEnabled': state ? '1' : '0'
-        };
-        $.post(restURL, params).done(function (data) {
-          self.domElement.attr('data-objectNumber', data.number);
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-        }).fail(function () {
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
-        });
-      } else if (objectNumber != '') {
-        // If the object already exist, just update its value (make this change a minor edit so it's not displayed, by default, in notifications)
-        var restURL = self.docURL + '/objects/XWiki.Notifications.Code.ToggleableFilterPreferenceClass/' + objectNumber
-          + '/properties/isEnabled?media=json&amp;minorRevision=true';
-        $.ajax(restURL, {
-          method: 'PUT',
-          contentType: 'text/plain',
-          data: state ? '1' : '0'
-        }).done(function (data) {
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.done'))", 'done');
-          $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': self.row, 'state': state});
-        }).fail(function () {
-          notification.hide();
-          new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.filters.preferences.setEnabled.error'))", 'error');
-        });
-      }
-    };
-
-    // Call init
-    self.init();
-  };
-});
-</code>
-    </property>
-    <property>
-      <name>Custom Toggleable Filter Preference</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro</name>
-    <number>3</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>e91b3d46-cc48-4d58-ae70-8303b46b8557</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -634,98 +463,76 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <code>require([
   'jquery',
   'xwiki-meta',
-  'CustomToggleableFilterPreference',
-  'bootstrap-switch',
+  'vue',
+  'xwiki-platform-notifications-webjar',
+  'xwiki-l10n!notifications-custom-filters-preferences-macro-translation-keys',
   'xwiki-events-bridge'
-], function ($, xm, CustomToggleableFilterPreference) {
-
-  $(document).on('xwiki:livetable:notifications-filters-custom:toggle', function(event, data) {
-    var changedRow = $(data.row.isEnabled);
-    if (changedRow.length &gt; 0) {
-      if (data.state) {
-        changedRow.attr("checked", "checked");
-      } else {
-        changedRow.removeAttr("checked");
-      }
-      data.row.isEnabled = changedRow.get(0).outerHTML;
-    }
-  });
+], function ($, xm, Vue, notifications, l10n) {
+  Vue.component('DisplayerToggle', notifications.DisplayerToggle);
+  Vue.component('DisplayerScope', notifications.DisplayerScope);
+  Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
 
   // Globals
   var serviceReference = XWiki.Model.resolve('XWiki.Notifications.Code.NotificationPreferenceService',
     XWiki.EntityType.DOCUMENT);
   var serviceURL = new XWiki.Document(serviceReference).getURL('get', 'outputSyntax=plain');
-  var target = $('.customFilterPreferences').attr('data-target');
+  const customFilterPreferences = $('.customFilterPreferences');
+  var target = customFilterPreferences.attr('data-target');
 
-  var docURL = $('.customFilterPreferences').attr('data-doc-url');
   var postParams = {
     csrf: xm.form_token,
     target: target
   };
-  if (target == 'user') {
-    var targetUser = $('.customFilterPreferences').attr('data-user');
-    postParams['user'] = targetUser;
-  };
+  if (target === 'user') {
+    postParams['user'] = customFilterPreferences.attr('data-user');
+  }
 
-  var enhanceRow = function(row, data) {
-    // Delete action
-    $(row).find('a.actiondelete').off('click.deleteCustomFilter').on('click.deleteCustomFilter', function(event) {
-      event.preventDefault();
-      new XWiki.widgets.ConfirmationBox({
-        onYes: function() {
-          var notif = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-            'notifications.filters.preferences.delete.inProgress')), 'inprogress');
-          var params = {
-            action: 'deleteFilterPreference',
-            filterPreferenceId: data.filterPreferenceId
-          };
-          $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
-            notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-              'notifications.filters.preferences.delete.done')), 'done'));
-            window.livetable_notificationCustomFilterPreferencesLiveTable.refresh();
-          }).fail(function() {
-            notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-              'notifications.filters.preferences.delete.error')), 'error'));
-          });
-        }
-      });
+  $(document).on('click', '#notificationCustomFilterPreferencesLiveData .action_delete', function (event) {
+    event.preventDefault();
+    const liveDataEntryId = $(this).parents('[data-livedata-entry-id]').data('livedata-entry-id');
+    new XWiki.widgets.ConfirmationBox({
+      onYes: function () {
+        var notif = new XWiki.widgets.Notification(l10n['filters.preferences.delete.inProgress'], 'inprogress');
+        var params = {
+          action: 'deleteFilterPreference',
+          filterPreferenceId: liveDataEntryId
+        };
+        $.post(serviceURL, $.extend({}, params, postParams)).then(() =&gt; {
+          notif.replace(new XWiki.widgets.Notification(l10n['filters.preferences.delete.done'], 'done'));
+          $('#notificationCustomFilterPreferencesLiveData').data('liveData').updateEntries();
+        }).catch(() =&gt; {
+          notif.replace(new XWiki.widgets.Notification(l10n['filters.preferences.delete.error'], 'error'));
+        });
+      }
     });
-    // Enable / Disable action for classic filter preferences
-    $(row).find('.notificationFilterPreferenceCheckbox').off('switchChange.bootstrapSwitch.customFilter')
-    .on('switchChange.bootstrapSwitch.customFilter', function(event, state) {
-      var notif = new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-        'notifications.filters.preferences.setEnabled.inProgress')), 'inprogress');
-      var params = {
-        action: 'setFilterPreferenceEnabled',
-        filterPreferenceId: data.filterPreferenceId,
-        enabled: state
-      };
-      $.post(serviceURL, $.extend({}, params, postParams)).done(function() {
-        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-          'notifications.filters.preferences.setEnabled.done')), 'done'));
-        $(document).trigger('xwiki:livetable:notifications-filters-custom:toggle', {'row': data, 'state': state});
-      }).fail(function() {
-        notif.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
-          'notifications.filters.preferences.setEnabled.error')), 'error'));
-      });
-    });
-    // Enable / Disable action for toggleable filter preferences
-    $(row).find('.toggleableFilterPreferenceCheckbox').each(function() {
-      new CustomToggleableFilterPreference(this, docURL, data);
-    });
-  };
-
-  // Callback on livetable row printing
-  $(document).on('xwiki:livetable:notificationCustomFilterPreferencesLiveTable:newrow', function(event, data) {
-    enhanceRow(data.row, data.data);
   });
 
-  // Initializer
-  $(function() {
-    // This script is usually loaded after the live table is displayed and so the previous callback might not be called.
-    $('#notificationCustomFilterPreferencesLiveTable-display &gt; tr[data-index]').each(function() {
-      var data = window.livetable_notificationCustomFilterPreferencesLiveTable.fetchedRows[$(this).data('index')];
-      enhanceRow(this, data);
+  function save(checked, filterPreferenceId, serviceURL) {
+    return new Promise((resolve) =&gt; {
+      const notif = new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.inProgress'], 'inprogress');
+      const params = {
+        action: 'setFilterPreferenceEnabled',
+        filterPreferenceId: filterPreferenceId,
+        enabled: checked
+      };
+      $.post(serviceURL, $.extend({}, params, postParams)).then(() =&gt; {
+        notif.replace(new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.done'], 'done'));
+        resolve({checked})
+      }).catch(() =&gt; {
+        notif.replace(new XWiki.widgets.Notification(l10n['filters.preferences.setEnabled.error'], 'error'));
+        resolve({checked: !checked})
+      });
+    });
+  }
+
+  $(document).on('xwiki:livedata:toggle', '#notificationCustomFilterPreferencesLiveData', (event) =&gt; {
+    const detail = event.detail;
+    const data = detail.data
+    save(detail.checked, data.preferenceId, serviceURL).then(({checked}) =&gt; {
+      detail.callback({
+        ...detail,
+        checked: checked
+      });
     });
   });
 });</code>
@@ -734,135 +541,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <name>Filter Preferences Livetable Callback</name>
     </property>
     <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>78413304-d950-417e-8b11-094a771546e4</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#notificationCustomFilterPreferencesLiveTable select.pagesizeselect {
-  width: auto;
-}
-
-.modal-description {
-   .text-muted-smaller;
-    font-weight: 400;
-    text-transform: none;
-}</code>
-    </property>
-    <property>
-      <contentType>LESS</contentType>
-    </property>
-    <property>
-      <name>NotificationFilterPreferences</name>
-    </property>
-    <property>
-      <parse/>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -908,7 +587,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -928,6 +607,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>code</name>
         <number>10</number>
         <prettyName>Macro code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -940,6 +620,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>contentDescription</name>
         <number>9</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -983,15 +664,24 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -999,6 +689,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1086,21 +777,21 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
   #else
     #set ($targetUser = $xcontext.userReference)
   #end
-  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$services.model.serialize($targetUser)""")
+  #set ($divData = "data-doc-url=""$escapetool.xml($services.rest.url($targetUser))"" data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #end
 ######################################################
 ### CSS and JAVASCRIPTS
 ######################################################
 #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro'))
-#set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsCustomFiltersPreferencesMacro'))
 ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
 #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-notifications-webjar', 'style.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
 ######################################################
 ### MACRO CONTENT
 ######################################################
 {{html clean="false"}}
-&lt;div class="customFilterPreferences xform" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
-  &lt;div class="row"&gt;
+&lt;div class="customFilterPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+  &lt;div class="row xform"&gt;
     &lt;p class="xHint col-xs-12 col-sm-9 col-md-8 col-lg-9"&gt;
       $escapetool.xml($services.localization.render('notifications.settings.filters.preferences.custom.hint'))
     &lt;/p&gt;
@@ -1110,29 +801,22 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       &lt;/button&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  #set($collist  = ['name', 'filterType', 'eventTypes', 'notificationFormats', 'isEnabled', '_actions'])
-  #set($colprops = {
-    'name':                { 'sortable': false, 'html': true, 'filterable': false },
-    'filterType':          { 'sortable': false, 'filterable': false },
-    'eventTypes':          { 'sortable': false, 'html': true, 'filterable': false },
-    'notificationFormats': { 'sortable': false, 'html': true, 'filterable': false },
-    'isEnabled':           { 'sortable': false, 'html' : true, 'filterable': false },
-    '_actions':            { 'sortable': false, 'actions': ['delete'], 'filterable': false}
+  #set ($sourceParameters = {
+    'target': $wikimacro.parameters.target
   })
-  #set ($extraParams = "eventType=&amp;format=&amp;type=custom")
   #if ($wikimacro.parameters.target == 'user')
-    #set ($extraParams = "$extraParams&amp;user=${services.model.serialize($targetUser, 'default')}")
+    #set ($discard = $sourceParameters.put('user', $services.model.serialize($targetUser, 'default')))
+  #else
+    #set ($discard = $sourceParameters.put('wiki', $services.model.serialize($services.wiki.getCurrentWikiReference(), 'default')))
   #end
-  #set($options  = {
-    'resultPage'        : 'XWiki.Notifications.Code.NotificationFilterPreferenceLivetableResults',
-    'rowCount'          : 10,
-    'description'       : 'This table lists every custom filter registered for the given user or current wiki.',
-    'translationPrefix' : 'notifications.settings.filters.preferences.custom.table.',
-    'extraParams'       : $extraParams,
-    'outputOnlyHtml'    : true
+  $services.liveData.render({
+    'id': 'notificationCustomFilterPreferencesLiveData',
+    'properties': 'filterPreferenceId,display,scope,location,filterType,eventTypes,notificationFormats,isEnabled,actions',
+    'source': 'notificationCustomFilters',
+    'sourceParameters': $escapetool.url($sourceParameters),
+    'limit': 10,
+    'sort': 'filterPreferenceId:desc'
   })
-
-  #livetable("notificationCustomFilterPreferencesLiveTable" $collist $colprops $options)
 &lt;/div&gt;
 ######################################################
 ### ADD FILTER MODAL
@@ -1143,7 +827,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       &lt;div class="modal-header"&gt;
         &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;&lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
         &lt;div class="modal-title"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter'))&lt;/div&gt;
-        &lt;div class="modal-description"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter.hint'))&lt;/div&gt;
+        &lt;div class="modal-description text-muted-smaller"&gt;$escapetool.xml($services.localization.render('notifications.settings.addFilter.hint'))&lt;/div&gt;
       &lt;/div&gt;
       &lt;div class="modal-body"&gt;
         &lt;div class="xform"&gt;
@@ -1224,7 +908,9 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Display the preferences of the given user about custom notification filters.</description>
@@ -1273,6 +959,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1298,13 +985,24 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>
@@ -1351,6 +1049,7 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <name>description</name>
         <number>2</number>
         <prettyName>Parameter description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -1376,13 +1075,24 @@ require(['jquery', 'AddCustomNotificationFilterPreferenceLivetable', 'bootstrap'
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <type>
+        <cache>0</cache>
+        <defaultValue>Unknown</defaultValue>
         <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <largeStorage>1</largeStorage>
+        <multiSelect>0</multiSelect>
         <name>type</name>
         <number>5</number>
+        <picker>1</picker>
         <prettyName>Parameter type</prettyName>
-        <size>60</size>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+        <values>Unknown|Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
     <property>

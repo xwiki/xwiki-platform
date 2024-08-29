@@ -206,7 +206,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * Returns the part of the URL identifying the web application. In a normal install, that is <tt>xwiki/</tt>.
+     * Returns the part of the URL identifying the web application. In a normal install, that is {@code xwiki/}.
      *
      * @return The configured context path.
      */
@@ -326,7 +326,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (!StringUtils.isEmpty(anchor)) {
             path.append("#");
-            path.append(encodeWithinQuery(anchor));
+            path.append(encodeFragment(anchor));
         }
 
         URL result;
@@ -478,6 +478,34 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // return encodedName;
 
         return encodeWithinPath(name);
+    }
+
+    /**
+     * Encodes the given fragment identifier so that it can be safely appended to an URL.
+     * 
+     * @param fragment the fragment identifier to be encoded
+     * @return the encoded fragment identifier
+     */
+    private String encodeFragment(String fragment)
+    {
+        try {
+            String encodedFragment =
+                StringUtils.removeStart(new URI(null, null, null, -1, null, null, fragment).toString(), "#");
+            // We encode single quotes (apostrophes) even though they are allowed in the URL fragment component because
+            // we want to avoid breaking HTML links. This is also consistent with the encoding we do for the path URL
+            // component where we also encode single quotes, see #encodeWithinPath().
+            return encodedFragment.replace("'", "%27");
+        } catch (URISyntaxException e) {
+            // This should not happen. The URI constructor documentation says this exception is thrown:
+            // * "if both a scheme and a path are given but the path is relative" => both are missing in our case
+            // * "if the URI string constructed from the given components violates RFC 2396" => we specify a single
+            // component which is supposed to be properly encoded by the URI constructor
+            // * "if the authority component of the string is present but cannot be parsed as a server-based authority"
+            // => user information, host and port components are not specified
+            LOGGER.warn("Failed to encode URL fragment [{}]. Root cause is [{}]", fragment,
+                ExceptionUtils.getRootCauseMessage(e));
+            return fragment;
+        }
     }
 
     @Override

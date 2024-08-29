@@ -6,9 +6,6 @@
   overflow: visible !important;
   width: auto !important;
 }
-* html #body {
-  overflow: auto !important;
-}
 /* Hide unneeded stuff */
 .hidden-print,.edit_section,
 #rightPanels, #leftPanels,
@@ -77,7 +74,7 @@
   overflow: visible !important;
 }
 
-#mainContentArea, #xdocFooter, #docextrapanes {
+#mainContentArea, #xdocFooter, #docextrapanes, #hierarchy_breadcrumb {
   margin: 0;
   padding-left: 0;
   padding-right: 0;
@@ -94,9 +91,4 @@
 }
 .recentChangesMoreActions {
   display: none;
-}
-
-/* Fix XWIKI-5567 */
-.box {
-  overflow: visible;
 }

@@ -22,6 +22,7 @@ package org.xwiki.rendering.script;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +38,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
+import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -80,9 +83,15 @@ public class RenderingScriptService implements ScriptService
 
     @Inject
     private MacroManager macroManager;
+
+    @Inject
+    private MacroCategoryManager macroCategoryManager;
     
     @Inject
     private MacroIdFactory macroIdFactory;
+
+    @Inject
+    private XWikiSyntaxEscaper escaper;
 
     /**
      * @return the list of syntaxes for which a Parser is available
@@ -209,29 +218,7 @@ public class RenderingScriptService implements ScriptService
      */
     public String escape(String content, Syntax syntax)
     {
-        if (content == null || syntax == null) {
-            return null;
-        }
-
-        // Determine the escape character for the syntax.
-        char escapeChar;
-        try {
-            escapeChar = getEscapeCharacter(syntax);
-        } catch (Exception e) {
-            // We don`t know how to proceed, so we just return null.
-            return null;
-        }
-
-        // Since we prefix all characters, the result size will be double the input's, so we can just use char[].
-        char[] result = new char[content.length() * 2];
-
-        // Escape the content.
-        for (int i = 0; i < content.length(); i++) {
-            result[2 * i] = escapeChar;
-            result[2 * i + 1] = content.charAt(i);
-        }
-
-        return String.valueOf(result);
+        return this.escaper.escape(content, syntax);
     }
 
     /**
@@ -302,14 +289,24 @@ public class RenderingScriptService implements ScriptService
         return null;
     }
 
-    private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException
+    /**
+     * Return the list of categories of a given macro.
+     *
+     * @param macroId the macro id
+     * @return the list of categories of the macro
+     * @since 14.6RC1
+     */
+    public Set<String> getMacroCategories(MacroId macroId)
     {
-        if (Syntax.XWIKI_1_0.equals(syntax)) {
-            return '\\';
-        } else if (Syntax.XWIKI_2_0.equals(syntax) || Syntax.XWIKI_2_1.equals(syntax)) {
-            return '~';
-        }
+        return this.macroCategoryManager.getMacroCategories(macroId);
+    }
 
-        throw new IllegalArgumentException(String.format("Escaping is not supported for Syntax [%s]", syntax));
+    /**
+     * @return the set of hidden macro categories
+     * @since 14.8RC1
+     */
+    public Set<String> getHiddenMacroCategories()
+    {
+        return this.macroCategoryManager.getHiddenCategories();
     }
 }

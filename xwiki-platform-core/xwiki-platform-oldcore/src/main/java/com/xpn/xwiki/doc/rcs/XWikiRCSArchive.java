@@ -38,11 +38,15 @@ import org.suigeneris.jrcs.rcs.impl.NodeNotFoundException;
 import org.suigeneris.jrcs.rcs.impl.TrunkNode;
 import org.suigeneris.jrcs.rcs.parse.ParseException;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.doc.rcs.XWikiTrunkNode;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Class for String [de]serialization for {@link com.xpn.xwiki.doc.XWikiDocumentArchive}.
@@ -214,15 +218,34 @@ public class XWikiRCSArchive extends Archive
      * @throws PatchFailedException
      * @throws InvalidFileFormatException
      * @throws NodeNotFoundException
+     * @deprecated since 13.10.7, 14.4.1, 14.5, use {@link #getNodes(WikiReference, long)} instead
      */
+    @Deprecated(since = "13.10.7")
     public Collection getNodes(long docId) throws NodeNotFoundException, InvalidFileFormatException,
+        PatchFailedException
+    {
+        return getNodes(null, docId);
+    }
+
+    /**
+     * @param wikiReference the wiki of the document
+     * @param docId the local identifier of the document
+     * @return Collection of pairs [{@link XWikiRCSNodeInfo}, {@link XWikiRCSNodeContent}]
+     * @throws PatchFailedException
+     * @throws InvalidFileFormatException
+     * @throws NodeNotFoundException
+     * @since 13.10.7
+     * @since 14.4.1
+     * @since 14.5
+     */
+    public Collection getNodes(WikiReference wikiReference, long docId) throws NodeNotFoundException, InvalidFileFormatException,
         PatchFailedException
     {
         Collection result = new ArrayList(this.nodes.values().size());
         for (Iterator it = this.nodes.values().iterator(); it.hasNext(); ) {
             XWikiJRCSNode node = new XWikiJRCSNode((Node) it.next());
             XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo();
-            nodeInfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
+            nodeInfo.setId(new XWikiRCSNodeId(wikiReference, docId, node.getVersion()));
             nodeInfo.setDiff(node.isDiff());
 
             if (!node.hasOldFormat()) {
@@ -237,7 +260,9 @@ public class XWikiRCSArchive extends Archive
                     XWikiDocument doc = new XWikiDocument();
                     doc.fromXML(xml);
                     // set this fields from old document
-                    nodeInfo.setAuthor(doc.getAuthor());
+                    UserReferenceSerializer<String> userReferenceSerializer = Utils.getComponent(
+                        new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class));
+                    nodeInfo.setAuthor(userReferenceSerializer.serialize(doc.getAuthors().getOriginalMetadataAuthor()));
                     nodeInfo.setComment(doc.getComment());
                     nodeInfo.setDate(doc.getDate());
                 } catch (Exception e) {

@@ -28,13 +28,15 @@ import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
- * Page Object for Comments Tab (or pane)
+ * Page Object for Comments Tab (or pane).
  *
  * @version $Id$
  * @since 3.2M3
  */
 public class CommentsTab extends BaseElement
 {
+    private static final String COMMENT_FORM_ID = "openCommentForm";
+
     @FindBy(css = "fieldset#commentform > label > span")
     private WebElement commentAuthor;
 
@@ -69,12 +71,11 @@ public class CommentsTab extends BaseElement
     public void openCommentForm()
     {
         String commentFormId = "AddComment";
-        String openFormId = "openCommentForm";
         XWikiWebDriver driver = getDriver();
         // if the comments has not already been toggled (ie, the comment button is not displayed).
         // we click on the button and wait until the form is visible
         if (!driver.findElementWithoutWaiting(By.id(commentFormId)).isDisplayed()) {
-            driver.findElementWithoutWaiting(By.id(openFormId)).click();
+            driver.findElementWithoutWaiting(By.id(COMMENT_FORM_ID)).click();
             driver.waitUntilElementIsVisible(By.id(commentFormId));
         }
     }
@@ -148,8 +149,7 @@ public class CommentsTab extends BaseElement
     {
         // Comments are handled async so it makes sense to wait for the reply button to be ready if another comment
         // has just been posted for example. That's why we don't use findElementWithoutWaiting here.
-        getDriver().findElement(
-            By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
+        clickOnReplyToCommentByID(id);
         return getAddCommentForm();
     }
 
@@ -233,5 +233,51 @@ public class CommentsTab extends BaseElement
     public boolean hasDeleteButtonForCommentByID(int id)
     {
         return !getDriver().findElementsWithoutWaiting(By.cssSelector("#xwikicomment_" + id + " a.delete")).isEmpty();
+    }
+
+    /**
+     * Cancel the currently open comment form (new comment, edit or reply) by clicking on the cancel button.
+     *
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public void cancelCommentForm()
+    {
+        // Click on the first visible cancel button.
+        getDriver()
+            .findElements(By.cssSelector("#Commentspane .cancel"))
+            .stream()
+            .filter(WebElement::isDisplayed)
+            .findAny()
+            .ifPresent(WebElement::click);
+        getDriver().waitUntilElementIsVisible(By.id(COMMENT_FORM_ID));
+    }
+
+    /**
+     * Click on the reply button of a comment. The comment to reply to is found by its id.
+     *
+     * @param id the id of the comment to reply to
+     * @since 14.1RC1
+     * @since 13.10.3
+     */
+    public void clickOnReplyToCommentByID(int id)
+    {
+        getDriver().findElement(
+            By.xpath(String.format("//div[@id='xwikicomment_%d']//a[contains(@class, 'commentreply')]", id))).click();
+    }
+
+    /**
+     * Click on the annotation of a given id.
+     *
+     * @param id the id of the comment
+     * @since 16.2.0RC1
+     * @since 15.10.7
+     */
+    public void clickOnAnnotationQuote(int id)
+    {
+        getDriver()
+            .findElement(By.id(String.format("xwikicomment_%d", id)))
+            .findElement(By.cssSelector("blockquote.annotatedText"))
+            .click();
     }
 }

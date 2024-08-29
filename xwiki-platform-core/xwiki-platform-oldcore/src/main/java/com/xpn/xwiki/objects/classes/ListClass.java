@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -314,6 +315,21 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @return the first separator of the list of separators, or fallback on {@link #DEFAULT_SEPARATOR}.
+     * @since 14.2RC1
+     */
+    protected String getFirstSeparator()
+    {
+        String separator;
+        if (!StringUtils.isEmpty(getSeparators())) {
+            separator = String.valueOf(getSeparators().charAt(0));
+        } else {
+            separator = DEFAULT_SEPARATOR;
+        }
+        return separator;
+    }
+
+    /**
      * @param value the string holding a serialized list
      * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
      *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
@@ -323,6 +339,22 @@ public abstract class ListClass extends PropertyClass
      * @return the list that was stored in the input string
      */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
+    {
+        return ListClass.getListFromString(value, separators, withMap, false);
+    }
+
+    /**
+     * @param value the string holding a serialized list
+     * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
+     *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
+     *            list items
+     * @param withMap set to true if the list's values contain map entries (key=value pairs) that should also be parsed.
+     *            Only the keys are extracted from such list items
+     * @param filterEmptyValues {@code true} if the result should not contain any empty values.
+     * @return the list that was stored in the input string
+     */
+    protected static List<String> getListFromString(String value, String separators, boolean withMap,
+        boolean filterEmptyValues)
     {
         List<String> list = new ArrayList<>();
         if (StringUtils.isEmpty(value)) {
@@ -370,7 +402,9 @@ public abstract class ListClass extends PropertyClass
                 // in case of two consecutive identical characters different than a whitespace, then it means
                 // we want to record an empty value.
                 if (!inEscape && currentChar == previousSeparator && !StringUtils.isWhitespace(currentChar + "")) {
-                    list.add("");
+                    if (!filterEmptyValues) {
+                        list.add("");
+                    }
                     previousWasSeparator = false;
                 }
                 previousSeparator = currentChar;
@@ -378,7 +412,9 @@ public abstract class ListClass extends PropertyClass
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
-                list.add(currentValue.toString());
+                if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+                    list.add(currentValue.toString());
+                }
                 currentValue = new StringBuilder();
                 inMapValue = false;
                 previousWasSeparator = true;
@@ -403,7 +439,9 @@ public abstract class ListClass extends PropertyClass
             }
         }
         // don't forget to add the latest value in the result.
-        list.add(currentValue.toString());
+        if (!filterEmptyValues || !StringUtils.isEmpty(currentValue.toString())) {
+            list.add(currentValue.toString());
+        }
 
         return list;
     }
@@ -535,6 +573,7 @@ public abstract class ListClass extends PropertyClass
     {
         BaseProperty lprop;
 
+        // FIXME: this if is actually wrong: it means a multiselect static list cannot be stored with a large storage.
         if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
@@ -568,6 +607,7 @@ public abstract class ListClass extends PropertyClass
             return fromString(strings[0]);
         }
         BaseProperty prop = newProperty();
+        // FIXME: this should be probably removed since we can never reach it.
         if (prop instanceof StringProperty) {
             return fromString(strings[0]);
         }
@@ -639,8 +679,9 @@ public abstract class ListClass extends PropertyClass
      * @param map The value=name mapping specified in the "values" parameter of the property.
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     * @since 13.10RC1
      */
-    protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
+    public String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
         return getDisplayValue(value, name, map, value, context);
     }
@@ -743,9 +784,9 @@ public abstract class ListClass extends PropertyClass
         }
 
         Map<String, ListItem> map = getMap(context);
-        if (prop instanceof ListProperty) {
+        if (prop instanceof ListProperty listProperty) {
             String separator = getSeparator();
-            List<String> selectlist = ((ListProperty) prop).getList();
+            List<String> selectlist = listProperty.getList();
             List<String> newlist = new ArrayList<>();
             for (String value : selectlist) {
                 newlist.add(XMLUtils.escapeElementText(getDisplayValue(value, name, map, context)));
@@ -971,10 +1012,36 @@ public abstract class ListClass extends PropertyClass
      */
     public void fromList(BaseProperty<?> property, List<String> list)
     {
-        if (property instanceof ListProperty) {
-            ((ListProperty) property).setList(list);
+        fromList(property, list, false);
+    }
+
+    /**
+     * Set the passed {@link List} into the passed property.
+     *
+     * @param property the property to modify
+     * @param list the list to set
+     * @param filterEmptyValues if {@code true} filter out the empty values from the list.
+     * @since 14.2RC1
+     */
+    protected void fromList(BaseProperty<?> property, List<String> list, boolean filterEmptyValues)
+    {
+        if (list == null && !(property instanceof ListProperty)) {
+            property.setValue(null);
         } else {
-            property.setValue(list == null || list.isEmpty() ? null : list.get(0));
+            List<String> actualList;
+            if (filterEmptyValues && list != null) {
+                actualList = list.stream().filter(item -> !StringUtils.isEmpty(item)).collect(Collectors.toList());
+            } else {
+                actualList = list;
+            }
+
+            if (property instanceof ListProperty) {
+                ((ListProperty) property).setList(actualList);
+            } else if (isMultiSelect()) {
+                property.setValue(getStringFromList(actualList, getFirstSeparator()));
+            } else {
+                property.setValue(actualList.isEmpty() ? null : actualList.get(0));
+            }
         }
     }
 

@@ -32,23 +32,45 @@ import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
 import org.xwiki.cluster.test.framework.AbstractClusterHttpIT;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
+import org.xwiki.component.internal.ContextComponentManager;
+import org.xwiki.component.internal.DocumentComponentManager;
+import org.xwiki.component.internal.SpaceComponentManager;
+import org.xwiki.component.internal.UserComponentManager;
+import org.xwiki.component.internal.WikiComponentManager;
+import org.xwiki.component.internal.embed.EmbeddableComponentManagerFactory;
+import org.xwiki.component.internal.multi.DefaultComponentManagerManager;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.configuration.internal.DefaultConfigurationSourceProvider;
+import org.xwiki.configuration.internal.XWikiPropertiesConfigurationSource;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.job.Request;
+import org.xwiki.properties.internal.DefaultConverterManager;
+import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
+import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.rest.internal.JAXBConverter;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.resources.job.JobsResource;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer;
+import org.xwiki.user.internal.DefaultUserConfiguration;
+import org.xwiki.user.internal.document.DocumentStringUserReferenceSerializer;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 import org.xwiki.xstream.internal.SafeXStream;
 import org.xwiki.xstream.internal.XStreamUtils;
+
+import com.xpn.xwiki.doc.DefaultDocumentAccessBridge;
+import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -74,6 +96,42 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
         componentDeclarations.add(new ComponentDeclaration(DefaultCacheManagerConfiguration.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultConfigurationSourceProvider.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(InfinispanCacheFactory.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(ConfiguredStringUserReferenceSerializer.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DocumentStringUserReferenceSerializer.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultUserConfiguration.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(ContextComponentManager.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(UserComponentManager.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultDocumentAccessBridge.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(CurrentMixedStringDocumentReferenceResolver.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(CurrentMixedEntityReferenceProvider.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(CompactWikiStringEntityReferenceSerializer.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(CurrentEntityReferenceProvider.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(DocumentComponentManager.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(SpaceComponentManager.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(WikiComponentManager.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(DefaultExecution.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(DefaultComponentManagerManager.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(EmbeddableComponentManagerFactory.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(XWikiPropertiesConfigurationSource.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(StandardEnvironment.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(DefaultConverterManager.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(EnumConverter.class.getName()));
+        componentDeclarations.add(
+            new ComponentDeclaration(ConvertUtilsConverter.class.getName()));
 
         componentDeclarations.add(new ComponentDeclaration(JAXBConverter.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(SafeXStream.class.getName()));
@@ -82,7 +140,7 @@ public class InstalledExtensionIndexIT extends AbstractClusterHttpIT
 
         // Make sure extension utils is initialized and set.
         if (AbstractClusterHttpIT.getExtensionTestUtils() == null) {
-            AllITs.initExtensionTestUtils(AbstractTest.context);
+            AllIT.initExtensionTestUtils(AbstractTest.context);
         }
     }
 

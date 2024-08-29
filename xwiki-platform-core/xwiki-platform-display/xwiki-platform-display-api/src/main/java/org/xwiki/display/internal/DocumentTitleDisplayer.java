@@ -68,7 +68,7 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
         // at the moment since it would be too costly to do so. In the future we will even probably remove the feature
         // of generating the title from the content.
         List<HeaderBlock> blocks =
-            document.getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
+            document.getPreparedXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
         if (!blocks.isEmpty()) {
             HeaderBlock heading = blocks.get(0);
             // Check the heading depth after which we should return null if no heading was found.
@@ -77,7 +77,7 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
                 try {
                     TransformationContext txContext =
                         new TransformationContext(headingXDOM, document.getSyntax(),
-                                                  parameters.isTransformationContextRestricted());
+                            parameters.isTransformationContextRestricted() || document.isRestricted());
                     txContext.setTargetSyntax(parameters.getTargetSyntax());
                     transformationManager.performTransformations(headingXDOM, txContext);
 

@@ -1,7 +1,7 @@
 ## General settings
 xwiki.iconset.type = image
-xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")]]
-xwiki.iconset.render.html = <img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" />
+xwiki.iconset.render.wiki = [[image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")||data-xwiki-lightbox="false"]]
+xwiki.iconset.render.html = <img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" data-xwiki-lightbox="false" />
 xwiki.iconset.icon.url = $xwiki.getSkinFile("icons/silk/${icon}.png")
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
@@ -155,6 +155,7 @@ download=application_put
 log-in=user_go
 log-out=user_go
 th=application_view_tile
+reposition=reposition
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = accept
@@ -1158,3 +1159,6 @@ xhtml_valid = xhtml_valid
 zoom = zoom
 zoom_in = zoom_in
 zoom_out = zoom_out
+filter = find
+fast-backward = control_rewind
+arrow_in = arrow_in

@@ -20,7 +20,6 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +35,9 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
@@ -70,12 +71,11 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         new ClassBlockMatcher(MacroBlock.class)
     );
 
-    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES = new HashSet<>(Arrays.asList(
-        ResourceType.DOCUMENT,
-        ResourceType.SPACE,
-        ResourceType.PAGE,
-        ResourceType.ATTACHMENT
-    ));
+    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS = Set.of(ResourceType.DOCUMENT,
+        ResourceType.SPACE, ResourceType.PAGE, ResourceType.ATTACHMENT, ResourceType.PAGE_ATTACHMENT);
+
+    private static final Set<ResourceType> SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS =
+        Set.of(ResourceType.ATTACHMENT, ResourceType.PAGE_ATTACHMENT);
 
     @Inject
     private Provider<MacroRefactoring> macroRefactoringProvider;
@@ -99,9 +99,47 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
     @Inject
     private RenderingContext renderingContext;
 
+    @FunctionalInterface
+    private interface MacroRefactoringLambda
+    {
+        Optional<MacroBlock> call(MacroRefactoring macroRefactoring, MacroBlock macroBlock) throws
+            MacroRefactoringException;
+    }
+
+    @FunctionalInterface
+    private interface RenameResourceLambda
+    {
+        boolean call(ResourceReference reference);
+    }
+
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+    {
+        return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
+            SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS,
+            (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
+                currentDocumentReference, oldTarget, newTarget, relative),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
+                currentDocumentReference, relative));
+    }
+
+    @Override
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+    {
+        return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
+            SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS,
+            (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
+                currentDocumentReference, oldTarget, newTarget, relative),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
+                currentDocumentReference, relative));
+    }
+
+    private boolean innerRenameReferences(Block block, DocumentReference currentDocumentReference,
+        EntityReference oldTarget,
+        EntityReference newTarget, Set<ResourceType> allowedResourceTypes,
+        MacroRefactoringLambda macroRefactoringLambda, RenameResourceLambda renameResourceLambda)
     {
         List<Block> blocks = block.getBlocks(new OrBlockMatcher(DEFAULT_BLOCK_MATCHERS), Block.Axes.DESCENDANT);
 
@@ -110,10 +148,10 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         for (Block matchingBlock : blocks) {
             if (matchingBlock instanceof MacroBlock) {
                 MacroBlock macroBlock = (MacroBlock) matchingBlock;
-                Optional<MacroBlock> optionalMacroBlock = this.handleMacroBlock(macroBlock, currentDocumentReference,
-                    oldTarget, newTarget, relative);
+                Optional<MacroBlock> optionalMacroBlock = handleMacroBlock(macroBlock, currentDocumentReference,
+                    oldTarget, newTarget, macroRefactoringLambda);
                 if (optionalMacroBlock.isPresent()) {
-                    block.replaceChild(optionalMacroBlock.get(), macroBlock);
+                    macroBlock.getParent().replaceChild(optionalMacroBlock.get(), macroBlock);
                     modified = true;
                 }
             } else {
@@ -121,7 +159,6 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 if (matchingBlock instanceof LinkBlock) {
                     LinkBlock linkBlock = (LinkBlock) matchingBlock;
                     reference = linkBlock.getReference();
-
                 } else if (matchingBlock instanceof ImageBlock) {
                     ImageBlock imageBlock = (ImageBlock) matchingBlock;
                     reference = imageBlock.getReference();
@@ -130,8 +167,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                         "Only LinkBlock and ImageBlock can be processed and given class was: [%s]",
                         matchingBlock.getClass().getName()));
                 }
-                modified |= this.renameResourceReference(reference, oldTarget, newTarget,
-                    currentDocumentReference, relative);
+                modified |= this.renameResourceReference(reference, allowedResourceTypes, renameResourceLambda);
             }
         }
 
@@ -139,7 +175,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
     }
 
     private Optional<MacroBlock> handleMacroBlock(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+        EntityReference oldTarget, EntityReference newTarget, MacroRefactoringLambda macroRefactoringLambda)
     {
         MacroRefactoring macroRefactoring = this.macroRefactoringProvider.get();
         if (this.componentManager.hasComponent(MacroRefactoring.class, macroBlock.getId())) {
@@ -147,7 +183,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 macroRefactoring = this.componentManager.getInstance(MacroRefactoring.class,
                     macroBlock.getId());
             } catch (ComponentLookupException e) {
-                logger.warn("Error while getting the macro refactoring component for macro id [{}]: [{}].",
+                this.logger.warn("Error while getting the macro refactoring component for macro id [{}]: [{}].",
                     macroBlock.getId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
@@ -157,7 +193,7 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         try {
             syntax = this.documentAccessBridge.getDocumentInstance(currentDocumentReference).getSyntax();
         } catch (Exception e) {
-            logger.warn("Error while trying to get syntax of the current document reference [{}]: "
+            this.logger.warn("Error while trying to get syntax of the current document reference [{}]: "
                 + "[{}]", currentDocumentReference, ExceptionUtils.getRootCauseMessage(e));
 
             // last fallback in the unlikely case of there's no document syntax
@@ -170,10 +206,9 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
         }
         try {
-            return macroRefactoring
-                .replaceReference(macroBlock, currentDocumentReference, oldTarget, newTarget, relative);
+            return macroRefactoringLambda.call(macroRefactoring, macroBlock);
         } catch (MacroRefactoringException e) {
-            logger.warn("Error while trying to refactor reference from [{}] to [{}] in macro [{}] of "
+            this.logger.warn("Error while trying to refactor reference from [{}] to [{}] in macro [{}] of "
                 + "document [{}]", oldTarget, newTarget, macroBlock.getId(), currentDocumentReference);
         } finally {
             // don't forget to pop the rendering context.
@@ -184,17 +219,16 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
         return Optional.empty();
     }
 
-    private boolean renameResourceReference(ResourceReference reference, DocumentReference oldReference,
-        DocumentReference newReference, DocumentReference currentDocumentReference, boolean relative)
+    private boolean renameResourceReference(ResourceReference reference, Set<ResourceType> allowedResourceTypes,
+        RenameResourceLambda renameResourceLambda)
     {
         if (reference == null) {
             throw new IllegalArgumentException("The reference of  the block cannot be null.");
-        } else if (!SUPPORTED_RESOURCE_TYPES.contains(reference.getType())) {
-            // We are currently only interested in Document or Space references.
+        } else if (!allowedResourceTypes.contains(reference.getType())) {
+            // Skip if the resource type is not allowed.
             return false;
         } else {
-            return this.resourceReferenceRenamer.updateResourceReference(reference, oldReference, newReference,
-                currentDocumentReference, relative);
+            return renameResourceLambda.call(reference);
         }
     }
 }

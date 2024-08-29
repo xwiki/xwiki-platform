@@ -22,7 +22,6 @@ package org.xwiki.like.events;
 import java.io.Serializable;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event sent when a Like action is performed.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.7RC1
  */
-@Unstable
 public class LikeEvent implements Event, Serializable
 {
     @Override

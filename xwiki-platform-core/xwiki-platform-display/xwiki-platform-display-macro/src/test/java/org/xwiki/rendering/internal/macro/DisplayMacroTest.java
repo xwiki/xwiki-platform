@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -44,6 +45,7 @@ import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -81,7 +83,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
+import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
 
 /**
  * Unit tests for {@link DisplayMacro}.
@@ -93,13 +95,10 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
     CurrentMacroEntityReferenceResolver.class,
     DefaultAuthorizationManager.class
 })
-public class DisplayMacroTest
+class DisplayMacroTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
-
-    @MockComponent
-    private DocumentModelBridge displayedDocument;
 
     @MockComponent
     private DocumentAccessBridge dab;
@@ -121,6 +120,9 @@ public class DisplayMacroTest
     @MockComponent
     @Named("macro")
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
+
+    @Mock
+    private DocumentModelBridge displayedDocument;
 
     private DisplayMacro displayMacro;
 
@@ -150,7 +152,7 @@ public class DisplayMacroTest
     }
 
     @Test
-    public void executeShowsVelocityMacrosAreIsolated() throws Exception
+    void executeShowsVelocityMacrosAreIsolated() throws Exception
     {
         // @formatter:off
         String expected =
@@ -176,7 +178,7 @@ public class DisplayMacroTest
     }
 
     @Test
-    public void executeWithNoDocumentSpecified()
+    void executeWithNoDocumentSpecified()
     {
         DisplayMacroParameters parameters = new DisplayMacroParameters();
 
@@ -190,7 +192,7 @@ public class DisplayMacroTest
      * Verify that relative links returned by the display macro as wrapped with a MetaDataBlock.
      */
     @Test
-    public void executeWhenDisplayingDocumentWithRelativeReferences() throws Exception
+    void executeWhenDisplayingDocumentWithRelativeReferences() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -203,7 +205,7 @@ public class DisplayMacroTest
             + "beginLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "endLink [Typed = [true] Type = [attach] Reference = [test.png]] [false]\n"
             + "onSpace\n"
-            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png]\n"
             + "endParagraph\n"
             + "endMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
             + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"
@@ -212,7 +214,9 @@ public class DisplayMacroTest
 
         DocumentReference displayedDocumentReference =
             new DocumentReference("displayedWiki", "displayedSpace", "displayedPage");
+        PageReference displayedPageReference = new PageReference("displayedWiki", "displayedSpace", "displayedPage");
         setupDocumentMocks("displayedWiki:displayedSpace.displayedPage", displayedDocumentReference,
+            "displayedWiki:displayedSpace/displayedPage", displayedPageReference,
             "[[page]] [[attach:test.png]] image:test.png");
         when(this.dab.getCurrentDocumentReference()).thenReturn(displayedDocumentReference);
 
@@ -223,10 +227,18 @@ public class DisplayMacroTest
             this.displayMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
 
         assertBlocks(expected, blocks, this.rendererFactory);
+
+        parameters.setPage("displayedWiki:displayedSpace/displayedPage");
+
+        blocks =
+            this.displayMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+
     }
 
     @Test
-    public void executeWithRecursiveDisplay() throws Exception
+    void executeWithRecursiveDisplay() throws Exception
     {
         // Other tests use the real DocumentDisplayer component implementation but for this test we mock it so that
         // we can control how it behaves.
@@ -259,7 +271,7 @@ public class DisplayMacroTest
     }
 
     @Test
-    public void executeInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
+    void executeInsideBaseMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -290,7 +302,45 @@ public class DisplayMacroTest
     }
 
     @Test
-    public void executeWhenSectionSpecified() throws Exception
+    void adaptIdsOfDisplayedHeadingsAndImages() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, HHeading-1]\n"
+            + "onWord [Heading]\n"
+            + "endHeader [1, HHeading-1]\n"
+            + "beginParagraph\n"
+            + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png-1]\n"
+            + "endParagraph\n"
+            + "endSection\n"
+            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        String documentContent = "= Heading =\n"
+            + "image:test.png";
+
+        DocumentReference includedDocumentReference =
+            new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference,
+            documentContent);
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("includedWiki:includedSpace.includedPage");
+
+        MacroTransformationContext context = createMacroTransformationContext("whatever", false);
+        // Initialize XDOM with ids from the including page.
+        context.setXDOM(getXDOM(documentContent));
+
+        List<Block> blocks = this.displayMacro.execute(parameters, null, context);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeWhenSectionSpecified() throws Exception
     {
         // @formatter:off
         String expected =
@@ -317,7 +367,7 @@ public class DisplayMacroTest
     }
 
     @Test
-    public void executeWhenInvalidSectionSpecified()
+    void executeWhenInvalidSectionSpecified()
     {
         DisplayMacroParameters parameters = new DisplayMacroParameters();
         parameters.setSection("unknown");
@@ -427,14 +477,29 @@ public class DisplayMacroTest
     private void setupDocumentMocks(String displayedReferenceString, DocumentReference displayedReference,
         String displayedContent) throws Exception
     {
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, displayedReference)).thenReturn(true);
-        when(this.macroEntityReferenceResolver.resolve(eq(displayedReferenceString), eq(EntityType.DOCUMENT),
-            any(MacroBlock.class))).thenReturn(displayedReference);
-        when(this.dab.getDocumentInstance((EntityReference) displayedReference)).thenReturn(this.displayedDocument);
+        setupDocumentMocks(displayedReferenceString, displayedReference, null, null, displayedContent);
+    }
+
+    private void setupDocumentMocks(String displayedDocumentReferenceString,
+        DocumentReference displayedDocumentReference, String displayedPageReferenceString,
+        PageReference displayedPageReference, String displayedContent) throws Exception
+    {
+        when(this.macroEntityReferenceResolver.resolve(eq(displayedDocumentReferenceString), eq(EntityType.DOCUMENT),
+            any(MacroBlock.class))).thenReturn(displayedDocumentReference);
+        when(this.dab.getDocumentInstance((EntityReference) displayedDocumentReference))
+            .thenReturn(this.displayedDocument);
+        if (displayedPageReference != null) {
+            when(this.macroEntityReferenceResolver.resolve(eq(displayedPageReferenceString), eq(EntityType.PAGE),
+                any(MacroBlock.class))).thenReturn(displayedPageReference);
+            when(this.dab.getDocumentInstance(displayedPageReference))
+                .thenReturn(this.displayedDocument);
+        }
+
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, displayedDocumentReference)).thenReturn(true);
         when(this.dab.getTranslatedDocumentInstance(this.displayedDocument)).thenReturn(this.displayedDocument);
-        when(this.displayedDocument.getDocumentReference()).thenReturn(displayedReference);
+        when(this.displayedDocument.getDocumentReference()).thenReturn(displayedDocumentReference);
         when(this.displayedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
-        when(this.displayedDocument.getXDOM()).thenReturn(getXDOM(displayedContent));
+        when(this.displayedDocument.getPreparedXDOM()).thenReturn(getXDOM(displayedContent));
         when(this.displayedDocument.getRealLanguage()).thenReturn("");
     }
 

@@ -23,13 +23,23 @@ import java.util.Calendar;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -41,6 +51,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,6 +65,14 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 public class XWikiTest
 {
+    private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "MilkyWay", "Fidis");
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
+    @MockComponent
+    private ObservationManager observationManager;
+
     private Document apiDocument;
     private XWiki apiXWiki;
 
@@ -68,8 +89,7 @@ public class XWikiTest
             .thenReturn(new XWikiDocumentArchive());
 
         xWikiContext.setUser("Redtail");
-        this.apiDocument =
-            new Document(new XWikiDocument(new DocumentReference("xwiki", "MilkyWay", "Fidis")), xWikiContext);
+        this.apiDocument = new Document(new XWikiDocument(DOCUMENT_REFERENCE), xWikiContext);
         this.apiDocument.getDocument().setCreator("c" + xWikiContext.getUser());
         this.apiDocument.getDocument().setAuthor("a" + xWikiContext.getUser());
         this.apiDocument.save();
@@ -123,5 +143,35 @@ public class XWikiTest
         assertEquals(Syntax.PLAIN_1_0, this.apiXWiki.getAvailableRendererSyntax("plain", null));
         assertNull(this.apiXWiki.getAvailableRendererSyntax("plai", "1.0"));
         assertNull(this.apiXWiki.getAvailableRendererSyntax("plai", null));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void getDocumentRevision(boolean allowAccess, MockitoOldcore mockitoOldcore) throws Exception
+    {
+        DocumentRevisionProvider revisionProvider =
+            mockitoOldcore.getMocker().registerMockComponent(DocumentRevisionProvider.class);
+        ContextualAuthorizationManager contextualAuthorizationManager =
+            mockitoOldcore.getMockContextualAuthorizationManager();
+
+        XWikiDocument deletedDocument = new XWikiDocument(DOCUMENT_REFERENCE);
+        deletedDocument.setContent("Deleted");
+        String revision = "deleted:1";
+        when(revisionProvider.getRevision(DOCUMENT_REFERENCE, revision)).thenReturn(deletedDocument);
+
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, DOCUMENT_REFERENCE)).thenReturn(true);
+
+        if (!allowAccess) {
+            doThrow(new AuthorizationException("Denied")).when(revisionProvider)
+                .checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, revision);
+            assertNull(this.apiXWiki.getDocument(DOCUMENT_REFERENCE, revision));
+        } else {
+            assertEquals(new Document(deletedDocument, mockitoOldcore.getXWikiContext()),
+                this.apiXWiki.getDocument(DOCUMENT_REFERENCE, revision));
+        }
+
+        verify(revisionProvider, times(allowAccess ? 1 : 0)).getRevision(DOCUMENT_REFERENCE, revision);
+        verify(revisionProvider).checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, DOCUMENT_REFERENCE, revision);
+        verify(contextualAuthorizationManager).hasAccess(Right.VIEW, DOCUMENT_REFERENCE);
     }
 }

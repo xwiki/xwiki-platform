@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.Select;
@@ -31,15 +32,31 @@ import org.xwiki.test.ui.po.Select;
  */
 public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectionPage
 {
+    private static final String SECTION_ID = "WYSIWYG";
+
     /**
      * The drop down used to select the default WYSIWYG editor.
      */
     @FindBy(name = "XWiki.EditorBindingClass_0_roleHint")
     private WebElement defaultWYSIWYGEditorSelect;
 
+    @FindBy(css = "form#wysiwyg input[name='formactionsac'][type='submit']")
+    private WebElement saveButton;
+
+    /**
+     * Open the WYSIWYG editor administration section.
+     * 
+     * @return the WYSIWYG editor administration section
+     */
+    public static WYSIWYGEditorAdministrationSectionPage gotoPage()
+    {
+        AdministrationSectionPage.gotoPage(SECTION_ID);
+        return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
     public WYSIWYGEditorAdministrationSectionPage()
     {
-        super("WYSIWYG");
+        super(SECTION_ID);
     }
 
     /**
@@ -52,6 +69,14 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
         return new Select(this.defaultWYSIWYGEditorSelect);
     }
 
+    public WYSIWYGEditorAdministrationSectionPage setDefaultWYSIWYGEditor(String editorName)
+    {
+        getDefaultWYSIWYGEditorSelect().selectByVisibleText(editorName);
+        // The save action reloads the page.
+        this.saveButton.click();
+        return new WYSIWYGEditorAdministrationSectionPage();
+    }
+
     /**
      * The configuration properties for each WYSIWYG editor are displayed on separate tabs. Use this method to select
      * the tab that corresponds to the WYSIWYG editor you want to configure.
@@ -61,6 +86,6 @@ public class WYSIWYGEditorAdministrationSectionPage extends AdministrationSectio
      */
     public WebElement getConfigurationTab(String editorId)
     {
-        return getDriver().findElementByCssSelector("a[role='tab'][data-editorid='" + editorId + "']");
+        return getDriver().findElement(By.cssSelector("a[role='tab'][data-editorid='" + editorId + "']"));
     }
 }

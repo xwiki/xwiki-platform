@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.XWikiSyntaxMacrosList" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxMacrosList" locale="">
   <web>XWiki</web>
   <name>XWikiSyntaxMacrosList</name>
   <language/>
@@ -37,6 +37,15 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+## If the translation key exists, use its value, otherwise use to the provided fallback value. 
+#macro (translateOrElse $translationKey $fallback)
+  #if($services.localization.get($translationKey))
+    $services.rendering.escape($services.localization.render($translationKey), 'xwiki/2.1')##
+  #else
+    $services.rendering.escape($fallback, 'xwiki/2.1')##
+  #end
+#end
+
 ## Find all wiki macros sp that we can find if a registered macro is a wiki macro
 #set ($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #set ($wikiMacroMap = {})
@@ -45,18 +54,26 @@
   #set ($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
   #set ($discard = $wikiMacroMap.put($macroObject.id, [$macroDocument.documentReference.toString(), $macroObject.visibility]))
 #end
-|=$services.localization.render('help.macroList.id')|=$services.localization.render('help.macroList.name')|=$services.localization.render('help.macroList.category')|=$services.localization.render('help.macroList.description')|=$services.localization.render('help.macroList.visibility')
-#foreach ($descriptor in $services.rendering.getMacroDescriptors('xwiki/2.1'))
-  #set ($macroId = $macroDescriptor.id)
+|={{translation key='help.macroList.id'/}}|={{translation key='help.macroList.name'/}}|={{translation key='help.macroList.categories'/}}|={{translation key='help.macroList.description'/}}|={{translation key='help.macroList.visibility'/}}
+#foreach ($descriptor in $collectiontool.sort($services.rendering.getMacroDescriptors('xwiki/2.1'), 'id.id:asc'))
   #set ($wikiMacroData = $wikiMacroMap.get($descriptor.id.id))
   #if ("$!wikiMacroData" != '')
-    #set ($displayId = "[[$descriptor.id&gt;&gt;$wikiMacroData.get(0)]]")
+    #set ($displayId = "[[$services.rendering.escape($services.rendering.escape($descriptor.id, 'xwiki/2.1'), 'xwiki/2.1')&gt;&gt;$wikiMacroData.get(0)]]")
     #set ($displayVisibility = $wikiMacroData.get(1))
   #else
-    #set ($displayId = $descriptor.id)
-    #set ($displayVisibility = "Global")
+    #set ($displayId = $services.rendering.escape($descriptor.id, 'xwiki/2.1'))
+    #set ($displayVisibility = $services.localization.render('XWiki.WikiMacroClass_visibility_Global'))
   #end
-  |$displayId|$descriptor.name|$!descriptor.defaultCategory|$descriptor.description|$displayVisibility
+  |$displayId|##
+  #translateOrElse("rendering.macro.${descriptor.id.id}.name", $descriptor.name)
+  |##
+  #foreach($category in $services.rendering.getMacroCategories($descriptor.id))
+    #if($foreach.index&gt;0), #end##
+    #translateOrElse("rendering.macroCategory.$category", $category)
+  #end##
+  |##
+  #translateOrElse("rendering.macro.${descriptor.id.id}.description", $descriptor.description)
+  |$services.rendering.escape($displayVisibility, 'xwiki/2.1')
 #end
 {{/velocity}}</content>
 </xwikidoc>

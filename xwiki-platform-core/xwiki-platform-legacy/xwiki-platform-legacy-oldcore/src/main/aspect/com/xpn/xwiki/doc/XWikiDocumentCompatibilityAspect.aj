@@ -31,6 +31,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,6 +54,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -280,7 +282,8 @@ privileged public aspect XWikiDocumentCompatibilityAspect
                         XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                         // transform
-                        TransformationContext context = new TransformationContext(headerXDOM, getSyntax());
+                        TransformationContext context =
+                            new TransformationContext(headerXDOM, getSyntax(), isRestricted());
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, context);
 
                         // render
@@ -466,4 +469,153 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), backlinkDocumentReferences,
             childDocumentReferences, context);
     }
+
+    /**
+     * Read the document data from the template without performing permission check on the template.
+     *
+     * @param eform the form containing a template information.
+     * @param context current context
+     * @throws XWikiException in case of problem to read the information.
+     * @deprecated Since 14.1RC1 prefer using {@link #readFromTemplate(DocumentReference, XWikiContext)} and be careful
+     *             to check the template rights before.
+     */
+    @Deprecated
+    public void XWikiDocument.readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException
+    {
+        String template = eform.getTemplate();
+        readFromTemplate(template, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #readFromTemplate(DocumentReference, XWikiContext)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.readFromTemplate(String template, XWikiContext context) throws XWikiException
+    {
+        // Keep the same behavior for backward compatibility
+        DocumentReference templateDocumentReference = null;
+        if (StringUtils.isNotEmpty(template)) {
+            templateDocumentReference = getCurrentMixedDocumentReferenceResolver().resolve(template);
+        }
+        readFromTemplate(templateDocumentReference, context);
+    }
+
+    /**
+     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
+     * which list the document we are renaming as their parent.
+     * <p>
+     * See {@link #rename(DocumentReference, List, List, XWikiContext)} for more details.
+     *
+     * @param newDocumentReference the new document reference
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     * @since 2.2M2
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
+     */
+    @Deprecated(since = "12.5RC1")
+    public void XWikiDocument.rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentReference, getBackLinkedReferences(context), context);
+    }
+
+    /**
+     * Rename the current document and all the links pointing to it in the list of passed backlink documents. The
+     * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
+     * all those forms need to be renamed. For example the following links all point to the same page:
+     * <ul>
+     * <li>[Page]</li>
+     * <li>[Page?param=1]</li>
+     * <li>[currentwiki:Page]</li>
+     * <li>[CurrentSpace.Page]</li>
+     * <li>[currentwiki:CurrentSpace.Page]</li>
+     * </ul>
+     * <p>
+     * Note: links without a space are renamed with the space added and all documents which have the document being
+     * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
+     * </p>
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *            modified to point to the new document reference
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     * @since 2.2M2
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
+     */
+    @Deprecated(since = "12.5RC1")
+    public void XWikiDocument.rename(DocumentReference newDocumentReference,
+        List<DocumentReference> backlinkDocumentReferences, XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentReference, backlinkDocumentReferences, getChildrenReferences(context), context);
+    }
+
+    /**
+     * Same as {@link #rename(DocumentReference, List, XWikiContext)} but the list of documents having the current
+     * document as their parent is passed in parameter.
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *            modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *            document reference
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     * @since 2.2M2
+     * @deprecated use
+     *     {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)} instead
+     */
+    @Deprecated(since = "12.5RC1")
+    public void XWikiDocument.rename(DocumentReference newDocumentReference,
+        List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
+        XWikiContext context) throws XWikiException
+    {
+        // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
+        // something fails in the middle...
+
+        // TODO: Why do we verify if the document has just been created and not been saved.
+        // If the user is trying to rename to the same name... In that case, simply exits for efficiency.
+        if (isNew() || getDocumentReference().equals(newDocumentReference)) {
+            return;
+        }
+        context.getWiki().renameByCopyAndDelete(this,
+            newDocumentReference,
+            backlinkDocumentReferences,
+            childDocumentReferences, context);
+    }
+
+    @Deprecated(since = "16.0RC1")
+    public String XWikiDocument.displayTooltip(String fieldname, XWikiContext context)
+        {
+            try {
+                BaseObject object = getXObject();
+                if (object == null) {
+                    object = getFirstObject(fieldname, context);
+                }
+                return displayTooltip(fieldname, object, context);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        @Deprecated(since = "16.0RC1")
+        public String XWikiDocument.displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
+        {
+            String result = "";
+
+            try {
+                PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
+                String tooltip = pclass.getTooltip(context);
+                if ((tooltip != null) && (!tooltip.trim().equals(""))) {
+                    String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
+                        + "\" class=\"tooltip_image\" align=\"middle\" />";
+                    result = context.getWiki().addTooltip(img, tooltip, context);
+                }
+            } catch (Exception e) {
+
+            }
+
+            return result;
+        }
 }

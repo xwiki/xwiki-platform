@@ -3,7 +3,7 @@
 .# Make sure legacy XAR format is properly parsed
 .#------------------------------------------------------------------------------
 <?xml version='1.1' encoding='UTF-8'?>
-<xwikidoc version="1.4" reference="space.page" locale="fr">
+<xwikidoc version="1.5" reference="space.page" locale="fr">
   <web>space</web>
   <name>page</name>
   <language>fr</language>

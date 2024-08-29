@@ -21,6 +21,7 @@ import FilterList from "../../../filters/FilterList.vue";
 import {mount} from '@vue/test-utils';
 import _ from "lodash";
 import $ from "jquery";
+import flushPromises from "flush-promises";
 
 /**
  * Initialize a FilterList component using default values vue test-utils `mount` parameters.
@@ -61,20 +62,33 @@ function initWrapper(mountConfiguration = {}) {
         onEventWhere() {
         },
         getFilterDescriptor() {
-          return {options: ''};
+          return {
+            options: '',
+            operators: []
+          };
+        },
+        translationsLoaded() {
+          return Promise.resolve(true);
         }
       }
+    },
+    mocks: {
+      $t: (key) => key
     }
   }, mountConfiguration));
 }
 
 describe('FilterList.vue', () => {
-  it('Render the filter list when visible', () => {
+  it('Render the filter list when visible', async () => {
     const wrapper = initWrapper();
-    expect(wrapper.html()).toBe("<span><input class=\"filter-list livedata-filter\"></span>")
+    // The loader is displayed until the translations are loaded.
+    expect(wrapper.classes()).toStrictEqual(['xwiki-loader']);
+    await flushPromises()
+    expect(wrapper.html()).toBe("<span><input aria-label=\"livedata.filter.list.label\" " +
+     "class=\"filter-list livedata-filter\"></span>")
   })
 
-  it('Render the filter list when Empty filter and advanced', () => {
+  it('Render the filter list when Empty filter and advanced', async () => {
     const wrapper = initWrapper({
       propsData: {index: 0, isAdvanced: true},
       provide: {
@@ -87,6 +101,10 @@ describe('FilterList.vue', () => {
         }
       }
     });
-    expect(wrapper.html()).toBe('<span style="display: none;"><input class="filter-list livedata-filter"></span>')
+    // The loader is displayed until the translations are loaded.
+    expect(wrapper.classes()).toStrictEqual(['xwiki-loader']);
+    await flushPromises()
+    expect(wrapper.html()).toBe('<span style="display: none;"><input aria-label="livedata.filter.list.label" ' +
+     'class="filter-list livedata-filter"></span>')
   })
 })

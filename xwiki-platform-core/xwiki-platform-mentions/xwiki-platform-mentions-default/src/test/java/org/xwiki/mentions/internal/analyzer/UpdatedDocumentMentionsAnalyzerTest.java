@@ -241,7 +241,7 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("lspfield", baseObjectReference),
-                MentionLocation.AWM_FIELD, "1.1")
+                MentionLocation.TEXT_FIELD, "1.1")
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
                 .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
@@ -307,7 +307,7 @@ class UpdatedDocumentMentionsAnalyzerTest
 
         assertEquals(asList(
             new MentionNotificationParameters(AUTHOR, new ObjectPropertyReference("lspfield", baseObjectReference),
-                MentionLocation.AWM_FIELD, "1.1")
+                MentionLocation.TEXT_FIELD, "1.1")
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))
                 .addMention("user", new MentionNotificationParameter(USER_U1, "anchor2", FIRST_NAME))
                 .addNewMention("user", new MentionNotificationParameter(USER_U1, "anchor1", FIRST_NAME))

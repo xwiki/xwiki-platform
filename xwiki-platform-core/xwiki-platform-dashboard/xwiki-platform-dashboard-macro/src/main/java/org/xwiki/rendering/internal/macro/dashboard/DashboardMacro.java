@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -165,7 +166,7 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
     public DashboardMacro()
     {
         super("Dashboard", DESCRIPTION, DashboardMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_LAYOUT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_LAYOUT));
     }
 
     @Override
@@ -275,9 +276,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
         this.ssfx.use("uicomponents/dashboard/dashboard.css", fxParamsForceSkinAction);
         // include the js resources, for editing, in edit mode only
         if (editMode) {
-            // include the effects.js and dragdrop.js that are needed by the dashboard js
-            this.jsfx.use("js/scriptaculous/effects.js");
-            this.jsfx.use("js/scriptaculous/dragdrop.js");
             this.jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }
     }

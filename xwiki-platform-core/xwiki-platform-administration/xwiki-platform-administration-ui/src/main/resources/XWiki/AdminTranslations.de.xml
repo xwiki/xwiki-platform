@@ -44,19 +44,17 @@ administration.sectionTitle=Administration: {0}
 administration.sectionTitle.page=Seiten-Administration: {0}
 administration.sectionTitle.wiki=Wiki-Administration: {0}
 administration.sectionTitle.global=Globale Administration: {0}
+administration.menu.label=Abschnitte zur Administration.
 administration.menu.search.hint=Suche nach…
 administration.menu.search.noResults=Keine Ergebnisse.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
-XWiki.XWikiPreferences_confirmation_email_content.hint=Die E-Mail-Vorlage für die erste Mail die der Benutzer erhält, nachdem das Konto durch Klicken auf den Validierungslink erstellt wurde.
+XWiki.XWikiPreferences_confirmation_email_content.hint=Die E-Mail-Vorlage, die der E-Mail entspricht, die gesendet wird, nachdem der Benutzer sein Konto bestätigt hat, indem er auf den Bestätigungslink in der ersten E-Mail klickt, die er erhält.
 XWiki.XWikiPreferences_invitation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, die zur Registrierung eingeladen werden.
-
 XWiki.Registration_heading.hint=Dies ist die Zeile oben auf der Seite, die den Personen angezeigt wird, die sich registrieren und die sich gerade registriert haben. Velocity und Wiki-Syntax können verwendet werden.
 XWiki.Registration_welcomeMessage.hint=Dies wird nur angezeigt, wenn Personen das Formular ausfüllen. Velocity und Wiki-Syntax können verwendet werden.
-XWiki.Registration_liveValidation_enabled.hint=Setzen Sie dies auf false, um den JavaScript-Code der Live-Validierung zu deaktivieren (Felder werden serverseitig noch validiert).
-XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Die Live-Validierung zeigt eine Meldung an, die den Benutzern anzeigt, dass sie das Feld zufriedenstellend ausgefüllt haben. Dies ist die Nachricht, die sie erhalten, wenn sie nicht für ein bestimmtes Feld überschrieben wird. Es kann ein Velocity-Code verwendet werden.
 XWiki.Registration_loginButton_enabled.hint=Wenn der Benutzer sich registriert hat, bieten wir ihm eine Schaltfläche an, auf die er klicken kann, die seinen Benutzernamen und sein Passwort in die Login-Aktion einträgt und ihn sofort einloggen lässt. Dies führt jedoch dazu, dass der Benutzername und das Passwort im HTML-Format zurückgegeben werden, was je nach Ihren Sicherheitsanforderungen inakzeptabel sein kann.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Wenn die Login-Taste aktiviert ist, dann können Sie ein Stück JavaScript verwenden, indem Sie die Login-Taste für den Benutzer drücken.
 XWiki.Registration_defaultRedirect.hint=Dies ist die URL, zu der der Benutzer nach dem Drücken der Login-Taste umgeleitet wird, wenn der xredirect-Parameter nicht angegeben ist. Es kann ein Velocity-Code verwendet werden.
@@ -140,6 +138,12 @@ administration.section.users.deleteUser.newAuthor.hint=Wählen Sie einen Benutze
 administration.section.users.deleteUser.newAuthor.error=Der ausgewählte Benutzer hat keine {0} Rechte!
 administration.section.users.deleteUser.newAuthor.programming=Programmieren
 administration.section.users.deleteUser.newAuthor.script=Script
+admin.usersgroups.extensionrights=Extension Rechte
+
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=Mitglied aus der Gruppe entfernen
+administration.section.groups.deleteUserFromGroup.success=Mitglied erfolgreich aus der Gruppe entfernt
+administration.section.groups.deleteUserFromGroup.failure=Das Mitglied konnte nicht aus der Gruppe entfernt werden
 
 # Other Category
 admin.other=Andere
@@ -149,18 +153,40 @@ administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in G
 
 # Social category
 ### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social.description=Konfiguration für soziale Funktionen.
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=Anzeigen in Sektion
+XWiki.ConfigurableClass_heading=Überschriften (Heading)
+XWiki.ConfigurableClass_configurationClass=Configuration class
+XWiki.ConfigurableClass_linkPrefix=Link-Präfix
+XWiki.ConfigurableClass_propertiesToShow=Eigenschaften zum Anzeigen
+XWiki.ConfigurableClass_codeToExecute=Code zum Ausführen
+XWiki.ConfigurableClass_iconAttachment=Icon Anhang
+XWiki.ConfigurableClass_displayInCategory=Anzeigen in der Kategorie
+XWiki.ConfigurableClass_displayBeforeCategory=Anzeigen vor der Kategorie
+XWiki.ConfigurableClass_categoryIcon=Kategorie Icon
+XWiki.ConfigurableClass_scope=Bereich (Scope)
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=Aktueller Space
+XWiki.ConfigurableClass_scope_ALL_SPACES=Alle Spaces
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki und alle Spaces
+XWiki.ConfigurableClass_sectionOrder=Reihenfolge der Sektionen
+
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markInactiveMessage=Anstatt den Benutzer zu löschen, können Sie sein Profil als inaktiv markieren. Dadurch wird verhindert, dass er sich anmelden kann, aber es bleiben die Zugriffsrechte erhalten, die mit den von ihm geschriebenen Skripten verbunden sind.
 
 ## Deprecated since 11.8RC1
 administration.section.users.deleteUser.markDisabledMessage=Anstatt den Benutzer zu löschen, kannst du sein Profil als deaktiviert markieren. Dies verhindert, dass sie sich anmelden, und bewahrt die Zugriffsrechte, die mit den von ihnen geschriebenen Skripten verbunden sind.
+XWiki.Registration_liveValidation_enabled.hint=Setzen Sie dies auf false, um den JavaScript-Code der Live-Validierung zu deaktivieren (Felder werden serverseitig noch validiert).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Die Live-Validierung zeigt eine Meldung an, die den Benutzern anzeigt, dass sie das Feld zufriedenstellend ausgefüllt haben. Dies ist die Nachricht, die sie erhalten, wenn sie nicht für ein bestimmtes Feld überschrieben wird. Es kann ein Velocity-Code verwendet werden.
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

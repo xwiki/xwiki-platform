@@ -1,4 +1,5 @@
 ##!source.syntax=xwiki/2.1
+##!require.action=distribution
 {{template name="extension.vm" output="false"/}}
 
 {{velocity}}

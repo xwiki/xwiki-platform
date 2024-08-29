@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Skin eXtension that allows inserting generic links in the <tt>&lt;head&gt;</tt> section of the resulting XHTML.
+ * Skin eXtension that allows inserting generic links in the {@code <head>} section of the resulting XHTML.
  * Unlike JavaScript or StyleSheet extensions, Link extensions don't pull XDocuments as scripting or styling resources
  * for the current document, but register additional related resources. Examples include:
  * <ul>
@@ -69,7 +69,7 @@ public class LinkExtensionPlugin extends AbstractSkinExtensionPlugin
             result.append(StringEscapeUtils.escapeXml(entry.getValue().toString()));
             result.append("'");
         }
-        result.append("/>");
+        result.append("/>\n");
         return result.toString();
     }
 

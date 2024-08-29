@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="FlamingoThemesCode.LessCodePluginJs" locale="">
+<xwikidoc version="1.5" reference="FlamingoThemesCode.LessCodePluginJs" locale="">
   <web>FlamingoThemesCode</web>
   <name>LessCodePluginJs</name>
   <language/>
@@ -53,8 +53,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -68,7 +71,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -100,6 +105,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -123,21 +130,22 @@ define(function() {
 
   // We define a variable that will hold the content to append to the LESS code of the skin.
   LessCodePlugin.contentToAdd = '';
-  
+
   // The 'install' function is required for every LESS Plugin.
   // It is called during the initialization of LESS.
-  LessCodePlugin.install = function (less, pluginManager) {
+  LessCodePlugin.install = function(less, pluginManager) {
     // The second argument is the 'priority' of the plugin.
     // '1' means: 'before import', we actually execute the plugin before any action.
-    // See: https://github.com/less/less.js/blob/v2.5.3/lib/less/plugin-manager.js#L42 (there is no other doc).
+    // See: https://github.com/less/less.js/blob/v4.1.2/packages/less/src/less/plugin-manager.js#L64 (there is no other
+    // documentation).
     pluginManager.addPreProcessor(this, 1);
   };
-    
+
   // The 'process' function is required for every LESS Plugin.
   // It is called at each LESS computation.
-  LessCodePlugin.process = function (str, options) {
+  LessCodePlugin.process = function(str, options) {
     // If the current processed file is the main one
-    if (options.fileInfo.filename == options.fileInfo.rootFilename) {
+    if (options.fileInfo.filename === options.fileInfo.rootFilename) {
       // We append the content to add to the 'str' variable holding the LESS code to render.
       return str + '\n' + this.contentToAdd;
     }
@@ -145,7 +153,7 @@ define(function() {
     // (the code to add is not supposed to be appended to imported files).
     return str;
   };
-  
+
   return LessCodePlugin;
 });</code>
     </property>

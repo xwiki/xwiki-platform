@@ -21,6 +21,7 @@ package org.xwiki.refactoring.job;
 
 import java.util.List;
 
+import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.WikiReference;
 
@@ -37,6 +38,24 @@ public abstract class AbstractDeletedDocumentsRequest extends AbstractCheckRight
     private static final String DELETED_DOCUMENT_IDS = "deletedDocumentIds";
 
     private static final String WIKI_REFERENCE = "wikiReference";
+
+    /**
+     * Default constructor.
+     */
+    public AbstractDeletedDocumentsRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    protected AbstractDeletedDocumentsRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the ID of the batch of deleted documents to handle. If {@link #setDeletedDocumentIds(List)} is also

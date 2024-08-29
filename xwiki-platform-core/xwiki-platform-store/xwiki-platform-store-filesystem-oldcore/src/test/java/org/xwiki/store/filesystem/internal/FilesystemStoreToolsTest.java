@@ -57,7 +57,7 @@ public class FilesystemStoreToolsTest
     private Environment environment;
 
     @RegisterExtension
-    static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
     void initialize(@XWikiTempDir File configDirectory) throws IOException, InitializationException

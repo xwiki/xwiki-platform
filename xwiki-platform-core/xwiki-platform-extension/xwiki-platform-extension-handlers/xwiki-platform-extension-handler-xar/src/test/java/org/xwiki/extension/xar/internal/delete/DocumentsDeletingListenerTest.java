@@ -25,9 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -41,11 +40,16 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,29 +58,32 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * @version $Id$
  */
-public class DocumentsDeletingListenerTest
+@ComponentTest
+class DocumentsDeletingListenerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DocumentsDeletingListener> mocker =
-            new MockitoComponentMockingRule(DocumentsDeletingListener.class);
+    @InjectMockComponents
+    private DocumentsDeletingListener listener;
 
-    protected XarInstalledExtensionRepository repository;
+    private XarInstalledExtensionRepository repository;
 
-    @Before
-    public void setUp() throws Exception
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeComponent
+    void setUp(MockitoComponentManager mockitoComponentManager) throws Exception
     {
-        repository = mock(XarInstalledExtensionRepository.class);
-        mocker.registerComponent(InstalledExtensionRepository.class, "xar", repository);
+        this.repository = mock(XarInstalledExtensionRepository.class);
+        mockitoComponentManager.registerComponent(InstalledExtensionRepository.class, "xar", this.repository);
     }
 
     @Test
-    public void test() throws Exception
+    void onEvent() throws Exception
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -101,14 +108,14 @@ public class DocumentsDeletingListenerTest
         XarInstalledExtension ext2 = mock(XarInstalledExtension.class);
         when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
         when(ext2.getId()).thenReturn(new ExtensionId("ext2"));
-        when(repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1, ext2));
-        when(repository.isAllowed(doc1, Right.DELETE)).thenReturn(false);
-        when(repository.getXarInstalledExtensions(doc2)).thenReturn(Collections.emptyList());
-        when(repository.isAllowed(doc2, Right.DELETE)).thenReturn(true);
-        when(repository.getXarInstalledExtensions(doc3)).thenReturn(Arrays.asList(ext2));
-        when(repository.isAllowed(doc3, Right.DELETE)).thenReturn(false);
-        when(repository.getXarInstalledExtensions(doc4)).thenReturn(Arrays.asList(ext1));
-        when(repository.isAllowed(doc4, Right.DELETE)).thenReturn(true);
+        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1, ext2));
+        when(this.repository.isAllowed(doc1, Right.DELETE)).thenReturn(false);
+        when(this.repository.getXarInstalledExtensions(doc2)).thenReturn(Collections.emptyList());
+        when(this.repository.isAllowed(doc2, Right.DELETE)).thenReturn(true);
+        when(this.repository.getXarInstalledExtensions(doc3)).thenReturn(Arrays.asList(ext2));
+        when(this.repository.isAllowed(doc3, Right.DELETE)).thenReturn(false);
+        when(this.repository.getXarInstalledExtensions(doc4)).thenReturn(Arrays.asList(ext1));
+        when(this.repository.isAllowed(doc4, Right.DELETE)).thenReturn(true);
 
         doAnswer(invocationOnMock -> {
             ExtensionBreakingQuestion question = invocationOnMock.getArgument(0);
@@ -142,14 +149,16 @@ public class DocumentsDeletingListenerTest
 
         // Test
         DocumentsDeletingEvent event = new DocumentsDeletingEvent();
-        mocker.getComponentUnderTest().onEvent(event, job, concernedEntities);
+        this.listener.onEvent(event, job, concernedEntities);
 
         // Check
         verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
+        assertEquals(1, logCapture.size());
+        assertEquals("The question has been asked, however no answer has been received.", logCapture.getMessage(0));
     }
 
     @Test
-    public void testWhenNonInteractive() throws Exception
+    public void onEventWhenNonInteractive()
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -160,17 +169,18 @@ public class DocumentsDeletingListenerTest
 
         // Test
         DocumentsDeletingEvent event = new DocumentsDeletingEvent();
-        mocker.getComponentUnderTest().onEvent(event, job, null);
+        this.listener.onEvent(event, job, null);
 
         // Verify
-        verify(mocker.getMockedLogger()).warn(
-                "XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.");
-        verifyZeroInteractions(status);
-        verifyZeroInteractions(repository);
+        assertEquals(1, logCapture.size());
+        assertEquals("XAR Extension Documents Deleting Listener will not check the document in non-interactive mode.",
+            logCapture.getMessage(0));
+        verifyNoInteractions(status);
+        verifyNoInteractions(repository);
     }
 
     @Test
-    public void testCancel() throws Exception
+    void onEventWhenCancelled() throws Exception
     {
         Request request = mock(Request.class);
         Job job = mock(Job.class);
@@ -185,18 +195,19 @@ public class DocumentsDeletingListenerTest
 
         XarInstalledExtension ext1 = mock(XarInstalledExtension.class);
         when(ext1.getId()).thenReturn(new ExtensionId("ext1"));
-        when(repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1));
+        when(this.repository.getXarInstalledExtensions(doc1)).thenReturn(Arrays.asList(ext1));
 
         InterruptedException e = new InterruptedException();
         doThrow(e).when(status).ask(any(), anyLong(), any());
 
         // Test
         DocumentsDeletingEvent event = mock(DocumentsDeletingEvent.class);
-        mocker.getComponentUnderTest().onEvent(event, job, concernedEntities);
+        this.listener.onEvent(event, job, concernedEntities);
 
         // Check
         verify(status, times(1)).ask(any(), eq(5L), eq(TimeUnit.MINUTES));
         verify(event).cancel(eq("Question has been interrupted."));
-        verify(mocker.getMockedLogger()).warn("Confirm question has been interrupted.");
+        assertEquals(1, logCapture.size());
+        assertEquals("Confirm question has been interrupted.", logCapture.getMessage(0));
     }
 }

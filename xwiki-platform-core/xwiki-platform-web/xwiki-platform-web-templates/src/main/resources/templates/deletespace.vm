@@ -23,14 +23,16 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     #if ($message)
       <div id="xwikimessage">$message</div>
     #end
     #set ($cancelURL = $doc.getURL())
     #if ($request.xredirect)
+      ## We don't sanitize this as it will be handled by the server
       #set ($redirectparam = "&amp;xredirect=$escapetool.url($request.xredirect)")
-      #set ($cancelURL = $request.xredirect)
+      #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelURL)
     #end
     #if ($xwiki.hasRecycleBin())
       #set ($confirmationMessage = $services.localization.render('core.space.recyclebin.confirm', ["<em>${escapetool.xml($doc.space)}</em>"]))
@@ -63,6 +65,6 @@
     #set ($confirmationMessage = "$confirmationMessage <br /> $spaceIndexLiveTable")
     #xwikimessagebox($services.localization.render('core.delete') $confirmationMessage $doc.getURL('deletespace', "confirm=1$!{redirectparam}&amp;form_token=$!{services.csrf.getToken()}") $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
     <div class="clearfloats"></div>
-  </div>
+  </main>## mainContentArea
 </div>
 #template("endpage.vm")

@@ -41,13 +41,27 @@ help.tipsPanel.noTipMessage=Sem dicas disponíveis!
 help.tipsPanel.gettingStartedTip=Se você está iniciando com XWiki, veja o [[Guia para Iniciantes&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
 help.tipsPanel.jumpToPageTip=Vá para qualquer página dentro do wiki com Ctrl+G ou Meta+G.\nVeja [[mais atalhos&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
 help.tipsPanel.improveXWikiTip=Você sabia que pode melhorar o XWiki? Tire 5 minutos para [[preencher esta avaliação&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] e ajude este projeto de código aberto!
-### Missing: help.tipsPanel.breadcrumbsTip=You can click on the arrows next to the breadcrumb elements to quickly navigate to sibling and children pages.
-### Missing: help.tipsPanel.advancedHiddenShortcutTip=Press the x+x+x+a key combo to toggle the [[Advanced mode&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] and x+x+x+h to toggle the display of [[hidden pages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
-### Missing: help.tipsPanel.linkAutocompleteWYSIWYGTip=When editing in WYSIWYG, type ##[## and then start typing letters to get suggestions for creating a link.
-### Missing: help.macroList.title=Available Macros
+help.tipsPanel.breadcrumbsTip=Você pode clicar nas setas ao lado dos elementos de navegação para navegar rapidamente para as páginas de irmãos e filhos.
+help.tipsPanel.advancedHiddenShortcutTip=Pressione a combinação de teclas x+x+x+a para alternar entre [[Modo avançado&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] e x+x+x+h para alternar a exibição de [[páginas ocultas&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/ Funcionalidades/Edição de Página#HOcultarPáginas]].
+help.tipsPanel.linkAutocompleteWYSIWYGTip=Ao editar em WYSIWYG, digite ##[## e comece a digitar letras para obter sugestões para criar um link.
+help.tipsPanel.WYSIWYGEditorTip=Ao editar no modo WYSIWYG, o atalho {0}Alt + 0{1} ({0}⌥0{1} no macOS) abre um modal de ajuda com informações sobre como usar o teclado para navegar no editor.
+help.macroList.title=Macros Disponíveis
 ### Missing: help.macroList.id=Id
 ### Missing: help.macroList.name=Name
-### Missing: help.macroList.category=Category
+help.macroList.categories=Categorias
 ### Missing: help.macroList.description=Description
-### Missing: help.macroList.visibility=Visibility</content>
+help.macroList.visibility=Visibilidade
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Categoria
+
+#@deprecatedend
+</content>
 </xwikidoc>

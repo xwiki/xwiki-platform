@@ -744,19 +744,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
+      <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>panel-default-text</name>
+        <name>panel-header-text</name>
         <number>46</number>
         <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
+        <prettyName>panel-header-text</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
+      </panel-header-text>
       <text-color>
         <customDisplay/>
         <disabled>0</disabled>
@@ -1156,8 +1156,6 @@
 @dropdown-bg:                    #fff;
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,.15);
-//** Dropdown menu `border-color` **for IE8**.
-@dropdown-fallback-border:       #ccc;
 //** Divider color for between dropdown items.
 @dropdown-divider-bg:            rgba(0,0,0,.2);
 
@@ -1418,11 +1416,11 @@
 //## Define colors for form feedback states and, by default, alerts.
 
 @state-success-text:             @brand-success;
-@state-success-bg:               #dff0d8;
+@state-success-bg:               #e5f3df;
 @state-success-border:           darken(@state-success-text, 5%);
 
 @state-info-text:                @brand-info;
-@state-info-bg:                  #d9edf7;
+@state-info-bg:                  #e1f1f9;
 @state-info-border:              darken(@state-info-text, 7%);
 
 @state-warning-text:             @brand-warning;
@@ -1430,7 +1428,7 @@
 @state-warning-border:           darken(@state-warning-text, 5%);
 
 @state-danger-text:              @brand-danger;
-@state-danger-bg:                #f2dede;
+@state-danger-bg:                #f8ecec;
 @state-danger-border:            darken(@state-danger-text, 5%);
 
 
@@ -1462,8 +1460,6 @@
 @popover-max-width:                   276px;
 //** Popover border color
 @popover-border-color:                transparent;
-//** Popover fallback border color
-@popover-fallback-border-color:       @gray-dark;
 
 //** Popover title background color
 @popover-title-bg:                    @popover-bg;
@@ -1477,8 +1473,6 @@
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
 //** Popover outer arrow color
 @popover-arrow-outer-color:           fadein(@popover-border-color, 5%);
-//** Popover outer arrow fallback color
-@popover-arrow-outer-fallback-color:  darken(@popover-fallback-border-color, 20%);
 
 
 //== Labels
@@ -1520,8 +1514,6 @@
 @modal-content-bg:                             #fff;
 //** Modal content border color
 @modal-content-border-color:                   rgba(0,0,0,.2);
-//** Modal content border color **for IE8**
-@modal-content-fallback-border-color:          #999;
 
 //** Modal backdrop background color
 @modal-backdrop-bg:           #000;
@@ -1633,7 +1625,7 @@
 @panel-inner-border:          @table-border-color;
 @panel-footer-bg:             #f5f5f5;
 
-@panel-default-text:          @gray-dark;
+@panel-default-text:          @text-color;
 @panel-default-border:        @table-border-color;
 @panel-default-heading-bg:    #f5f5f5;
 
@@ -2225,7 +2217,8 @@ input[type="checkbox"] {
   .close {
     color: @text-color;
   }
-}</lessCode>
+}
+</lessCode>
     </property>
     <property>
       <link-color/>
@@ -2261,7 +2254,7 @@ input[type="checkbox"] {
       <panel-bg/>
     </property>
     <property>
-      <panel-default-text/>
+      <panel-header-text/>
     </property>
     <property>
       <text-color/>

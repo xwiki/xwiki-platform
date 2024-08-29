@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 一般 =
+
+== イントロダクション ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0のイントロダクション ===
+
+XWikiシンタックス 1.0は、ウィキ形式のシンタックスをXWikiに導入する最初の試みでした。そこにはいくつかの制限があり、直接HTMLを挿入しなければ実現できないフォーマットもあります。私たちは、新しいシンタックスを使うことを推奨します。XWikiシンタックス 1.0は後方互換性のためにのみサポートされます。
+
+XWiki 1.7では、XWikiに固有のシンタックスに加えて、レンダリングエンジンも[[Wikimodel&gt;&gt;https://code.google.com/p/wikimodel/]]と[[Doxia&gt;&gt;https://maven.apache.org/doxia/]]（将来的には他のものになる可能性があります）の上位セットのラッパーである独自のエンジンに変更しました（以前はRadeoxを使用していました）。その結果、ウィキで他のシンタックス、{{velocity}}[[MediaWiki、Confluence、JSPWiki、Creole、TWikiなど&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}を使用することが可能になりました。
+
+=== 2.0のイントロダクション ===
+
+XWiki 1.7から新しいウィキのシンタックスを導入しました。私たちは、古いシンタックスを//XWikiシンタックス 1.0//、新しいシンタックスを//XWikiシンタックス 2.0//と呼んでいます。新しいシンタックスを導入した主な理由は以下の通りです。
+* XWiki 1.0シンタックス（RadeoxとTWikiの両方により示唆されました）の制限と曖昧な箇所の修正。
+** 最適でないシンボル。たとえば、太字のシンボルは1つのアスタリスクとなっていました。これにはユーザーがアスタリスクを含むテキストを入力する際に、テキストが誤って太字で表現されるという問題がありました。それゆえ、どこでも少なくとも2つ以上の同じ文字を使うことでシンタックスを合理化しました。
+** 曖昧さ。例えば、行の先頭にある太字の項目と箇条書きリストの間には曖昧さがありました。WYSIWYGエディターをより決定論的なものに書き換えるために、この曖昧さを解決する必要がありました。
+* ウィキのシンタックスの標準となりつつある[[Creole 1.0シンタックス&gt;&gt;https://www.wikicreole.org/]]に近づけること。Creoleのコミュニティーは、シンボルに関して決定を行う前に、既存の全てのシンタックスを時間をかけて分析していたため、行われた選択は素晴らしいものでした。
+
+XWikiに固有のシンタックスに加えて、レンダリングエンジンも[[Wikimodel&gt;&gt;https://code.google.com/p/wikimodel/]]と[[Doxia&gt;&gt;https://maven.apache.org/doxia/]]（将来的には他のものになる可能性があります）の上位セットのラッパーである独自のエンジンに変更しました（以前はRadeoxを使用していました）。その結果、ウィキで他のシンタックス、{{velocity}}[[MediaWiki、Confluence、JSPWiki、Creole、TWikiなど&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}を使用することが可能になりました。
+
+=== 2.1のイントロダクション ===
+
+XWikiシンタックス 2.0は非常に使いやすく強力なものでしたが、いくつかの不十分な点もありました。XWikiシンタックス 2.1では、それに対応する改善が導入されました。シンタックスの新しい機能には以下のものなどがあります。
+*リンクと画像のシンタックスを、より明瞭で一貫しており、拡張可能性のあるものへと均質化。
+* アイコンの表示、データURLスキーマによる画像の埋め込み、UNC表記によるファイルへのリンク、相対URLへのリンクを行う機能を追加。
+
+{{info}}XWikiシンタックス 2.1はXWikiシンタックス 2.0に基づくので、無効であることが仕様で示唆されていない限り、XWikiシンタックス 2.0の全てのシンタックスが有効です。{{/info}}</content>
+</xwikidoc>

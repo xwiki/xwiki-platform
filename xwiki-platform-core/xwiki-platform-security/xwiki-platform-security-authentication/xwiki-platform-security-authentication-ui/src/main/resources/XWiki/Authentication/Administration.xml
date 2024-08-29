@@ -36,7 +36,75 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>(% id='HAuthService' %)
+== {{translation key="security.authservice.admin.title"/}}
+
+{{velocity}}
+#if ($request.setauthservice &amp;&amp; $request.authServiceId)
+  #if ($services.csrf.isTokenValid($request.getParameter('form_token')))
+    $services.security.authService.setAuthService($request.authServiceId)
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($authService = $services.security.authService.getAuthService())
+#set ($configuredAuthClass = $services.security.authService.getConfiguredAuthClass())
+#if ($services.security.authService.isAuthServiceComponent())
+  #set ($authServiceType = 'component')
+#elseif ($configuredAuthClass &amp;&amp; ($authService.class.name == $configuredAuthClass || $authService.class.name == 'com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl'))
+  #set ($authServiceType = 'class')
+#else
+  #set ($authServiceType = 'other')
+#end
+
+{{box title="{{translation key=~"security.authservice.admin.currentAuthService~"/}}"}}
+  #set ($authService = $services.security.authService.getAuthService())
+  #set ($authServiceName = $services.localization.get("security.authservice.service.${authService.id}.name"))
+  #if ($authServiceName)
+    **{{translation key="security.authservice.service.${authService.id}.name"/}}** (//$authService.class.name//)
+    #set ($authServiceDescription = $services.localization.get("security.authservice.service.${authService.id}.description"))
+    #if ($authServiceDescription)
+      {{translation key="security.authservice.service.${authService.id}.description"/}}
+    #end
+  #else
+    $authService.class.name
+  #end
+{{/box}}
+
+#if ($authServiceType == 'component')
+  #set ($authServices = $services.security.authService.getAuthServices())
+  #if ($authServices.size() &gt; 1)
+    {{html}}
+      &lt;form action="$xwiki.relativeRequestURL" method="post"&gt;
+        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+        $escapetool.xml($services.localization.render("security.authservice.admin.component.label"))
+        &lt;select name="authServiceId" id="authServiceId"&gt;
+        #foreach ($availableAuthService in $authServices)
+          &lt;option#if ($availableAuthService.id == $authService.id) selected#end value="$escapetool.xml($availableAuthService.id)" title="$escapetool.xml($services.localization.render("security.authservice.service.${availableAuthService.id}.description"))"&gt;
+            $escapetool.xml($services.localization.render("security.authservice.service.${availableAuthService.id}.name"))
+          &lt;/option&gt;
+        #end
+        &lt;/select&gt;
+        &lt;button class="btn btn-danger" name="setauthservice"&gt;$escapetool.xml($services.localization.render("security.authservice.admin.component.save"))&lt;/button&gt;
+      &lt;/form&gt;
+    {{/html}}
+  #else
+    {{info}}{{translation key="security.authservice.admin.component.noService"/}}{{/info}}
+  #end
+#else
+  #if ($authServiceType == 'other')
+    {{warning}}{{translation key="security.authservice.admin.other.warning"/}}{{/warning}}
+  #elseif ($authServiceType == 'class')
+    {{warning}}{{translation key="security.authservice.admin.class.warning"/}}{{/warning}}
+  #end
+#end
+{{/velocity}}
+
+(% id='HAuthenticationSecurity' %)
+== {{translation key="authentication.admin.heading"/}}
+
+{{velocity}}
 #set ($discard = $xwiki.jsx.use('XWiki.Authentication.Administration'))
 #set ($authConfig = $services.security.authentication.authenticationConfiguration)
 #set ($selectedStrategies = {})
@@ -338,7 +406,7 @@
       <displayInSection>Authentication</displayInSection>
     </property>
     <property>
-      <heading>$services.localization.render('authentication.admin.heading')</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>

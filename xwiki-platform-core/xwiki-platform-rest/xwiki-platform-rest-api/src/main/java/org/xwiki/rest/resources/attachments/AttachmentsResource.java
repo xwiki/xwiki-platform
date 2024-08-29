@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.attachments;
 
-import javax.mail.Multipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -31,6 +30,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachments;
 
@@ -57,8 +57,7 @@ public interface AttachmentsResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") @Encoded String spaceName,
             @PathParam("pageName") String pageName,
-            Multipart multipart,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
             @QueryParam("createPage") @DefaultValue("false") Boolean createPage
-    ) throws XWikiRestException;
+    ) throws XWikiRestException, AttachmentValidationException;
 }

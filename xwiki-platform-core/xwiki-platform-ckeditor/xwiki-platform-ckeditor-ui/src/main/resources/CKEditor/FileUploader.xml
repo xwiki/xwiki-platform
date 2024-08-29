@@ -1,0 +1,209 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.FileUploader" locale="">
+  <web>CKEditor</web>
+  <name>FileUploader</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (createAttachment $fileName)
+  #set ($document = $doc)
+  #if ("$!request.document" != '')
+    #set ($document = $xwiki.getDocument($request.document))
+  #end
+  #if ($document &amp;&amp; $document.hasAccessLevel('edit'))
+    ## If the attachment is uploaded to a new document then make sure we create the document with the right default
+    ## locale. See CKEDITOR-316: Document translations are created when uploading a file from the WYSIWYG editor in a
+    ## multi-language wiki. The following code replicates the behavior of the Upload action, but it has the desired
+    ## effect only on XWiki 11.9+
+    #if ($document.isNew())
+      #set ($rootLocale = $services.localization.toLocale(''))
+      #set ($discard = $document.setLocale($rootLocale))
+      #if ($rootLocale.equals($document.getDefaultLocale()))
+        #set ($discard = $document.setDefaultLocale($xwiki.getLocalePreference()))
+      #end
+      ## We also need to make sure the new document is created with the right syntax (e.g. the one coming from the
+      ## template used to create the document rather than the default wiki syntax).
+      #if ("$!request.syntax" != '')
+        #set ($discard = $document.setSyntaxId($request.syntax))
+      #end
+    #end
+    ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
+    ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
+    #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))
+    #if (!$bytes)
+      ## Empty file (unfortunately getFileItemData returns null instead of an empty byte array).
+      #set ($bytes = [])
+    #end
+    #set ($discard = $document.addAttachment($fileName, $bytes))
+    #set ($discard = $document.save($services.localization.render('core.comment.uploadAttachmentComment', [$fileName])))
+    #sendSuccess($document $fileName)
+  #else
+    ## Forbidden
+    #sendError(403 'You are not allowed to perform this action.')
+  #end
+#end
+
+## Old way of uploading, with a save of the document for each upload.
+#macro (handleUploadRequest)
+  #set ($fileName = $xwiki.fileupload.getFileName('upload'))
+  #if ("$!fileName" != '')
+    #if ($services.csrf.isTokenValid($request.form_token))
+      ## Note: This is not useful anymore and files are expected to have their definitive name on upload.
+      ## Kept for legacy.
+      #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
+        ## We need to generate a new name so that we don't overwrite existing attachments.
+        #set ($extension = $stringtool.substringAfter($fileName, '.'))
+        #set ($fileName = "${datetool.date.time}-${mathtool.random(100, 1000)}.$extension")
+      #end
+      #createAttachment($fileName)
+    #else
+      #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")
+    #end
+  #else
+    ## Bad Request
+    #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
+  #end
+#end
+
+## New way of handling attachment without saving immediately the document.
+#macro (handleTemporaryUploadRequest)
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #set ($document = $doc)
+    #if ("$!request.document" != '')
+      #set ($document = $xwiki.getDocument($request.document))
+    #end
+    #set ($reference = $document.documentReference)
+    #try('uploadTemporaryAttachmentException')
+      #if ("$!request.filename" != '')
+        ## If the filename is explicitly provided, no need to recompute it.
+        #set ($fileName = $request.filename)
+      #else
+        #set ($fileName = $request.getPart('upload').getSubmittedFileName())
+        ## Note: this is not useful anymore and files are expected to have their definitive name on upload.
+        ## Kept for legacy.
+        #if ($fileName.startsWith('__fileCreatedFromDataURI__.'))
+          ## We need to generate a new name so that we don't overwrite existing attachments.
+          #set ($extension = $stringtool.substringAfter($fileName, '.'))
+          #set ($fileName = "${datetool.date.time}-${mathtool.random(100, 1000)}.$extension")
+        #end
+      #end
+      #set ($attachment = $services.temporaryAttachments.uploadTemporaryAttachment($reference, 'upload', $fileName))
+    #end
+    #if ($attachment)
+      #sendSuccess($document, $attachment.filename)
+    #elseif ("$!uploadTemporaryAttachmentException" != '')
+      ## The exception is wrapped in an org.apache.velocity.exception.MethodInvocationException
+      #set ($validationException = $uploadTemporaryAttachmentException.cause)
+      #if ($validationException.translationKey)
+        #sendError(400 "$services.localization.render($validationException.translationKey, $validationException.translationParameters)")
+      #else
+        #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
+      #end
+    #else
+      #sendError(400 "$services.localization.render('ckeditor.upload.error.emptyReturn')")
+    #end
+  #else
+    #sendError(403 "$services.localization.render('ckeditor.upload.error.csrf')")
+  #end
+#end
+
+#macro (sendSuccess $document $fileName)
+  #set ($url = $document.getAttachmentURL($fileName))
+  #set ($attachmentReference = $services.model.createAttachmentReference($document.documentReference, $fileName))
+  #set ($resourceReference = {
+    'type': 'attach',
+    'reference': $services.model.serialize($attachmentReference, $document.documentReference)
+  })
+  #set ($discard = $response.setContentType('application/json'))
+  #if ($request.initiator == 'filetools')
+    $jsontool.serialize({
+      'uploaded': 1,
+      'fileName': $fileName,
+      'url': $url,
+      'resourceReference': $resourceReference
+    })
+  #else
+    ## JSON expected by the filebrowser plugin.
+    $jsontool.serialize({
+      'uploaded': 1,
+      'url': $url,
+      'fileName': $fileName,
+      'message': {
+        'resourceReference': $resourceReference
+      }
+    })
+  #end
+#end
+
+#macro (sendError $code $message)
+  #set ($discard = $response.setContentType('application/json'))
+  ## The filetools plugin doesn't display the proper message if we call sendError() or setStatus() on the response.
+  #if ($request.initiator != 'filetools')
+    #set ($discard = $response.setStatus($code))
+  #end
+  $jsontool.serialize({
+    'uploaded': 0,
+    'error': {
+      'number': $code,
+      'message': $message
+    }
+  })
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($xcontext.action == 'get')
+  ## We fallback on the old mechanism also in case of editing a translation to avoid any problem.
+  ## See: XWIKI-20034
+  #set ($document = $tdoc)
+  #if ("$!request.document" != '')
+    #set ($document = $xwiki.getDocument($request.document))
+  #end
+  ## Special handling if we're editing a translation that does not exist yet: in such case we cannot rely on $document.isTranslation because the context $tdoc
+  ## automatically fallback on the default locale in view mode, and we're getting this through a /get/ request.
+  ## See: XWIKI-20537
+  #set ($isNewTranslation = false)
+  #if ($document.locale == "" &amp;&amp; $services.localization.currentLocale != $services.localization.defaultLocale)
+    #set ($docRefWithLocale = $services.model.createDocumentReference($document.documentReference, $services.localization.currentLocale))
+    #set ($isNewTranslation = $xwiki.getDocument($docRefWithLocale).isNew())
+  #end
+  #if ($request.getHeader('X-XWiki-Temporary-Attachment-Support') == 'true' &amp;&amp; !$document.isTranslation() &amp;&amp; !$isNewTranslation)
+    #handleTemporaryUploadRequest()
+  #else
+    #handleUploadRequest()
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

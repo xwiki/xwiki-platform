@@ -19,98 +19,221 @@
 ## ---------------------------------------------------------------------------
 #template('export_macros.vm')
 #**
- * Add export modal
+ * Export modal
  *#
 #macro(exportModal)
-  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+  #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
+  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
+      aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <div class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</div>
-        </div>
-        <div class="modal-body">
-          <div class="panel-group" id="exportModalAccordion" role="tablist" aria-multiselectable="true">
-            #set($exportExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
-            #displayOfficeFormats($exportExtensions)
-            #displayOtherFormats($exportExtensions)
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            $services.icon.renderHTML('cross')
+          </button>
+          <div class="modal-title" id="exportModalLabel">
+            $services.icon.renderHTML('download')
+            $escapetool.xml($services.localization.render('core.menu.export'))
           </div>
         </div>
+        <div class="modal-body xform">
+          <p class="xHint">
+            $escapetool.xml($services.localization.render('core.exporter.formats.hint'))
+          </p>
+          #getExportFormats()
+          #xwikiSelect('exportFormat', $exportFormats, $NULL, false, 'xwiki-export-formats xwiki-select-3-columns', '',
+            true)
+        </div>
       </div>
     </div>
   </div>
+  #if ($doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
+    #exportTreeModal()
+  #end
 #end
 ##
-#macro (displayOfficeFormats $exportExtensions)
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="exportModalHeadingOffice">
-      <div class="panel-title">
-        <a role="button" data-toggle="collapse" data-parent="#exportModalAccordion" href="#exportModelOfficeCollapse" aria-expanded="true" aria-controls="exportModelOfficeCollapse">
-          $escapetool.xml($services.localization.render('core.exporter.headings.officeFormats'))
-        </a>
-      </div>
-    </div>
-    <div id="exportModelOfficeCollapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="exportModalHeadingOffice">
-      <div class="panel-body">
-        <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.pdf')</a>
-        #if($services.officemanager.isConnected())
-          <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.odt')</a>
-          <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary" rel="nofollow">$services.localization.render('core.menu.export.rtf')</a>
-        #end
-        #foreach ($exportExtension in $exportExtensions)
-          #if ($exportExtension.parameters.category == 'office')
-            $services.rendering.render($exportExtension.execute(), 'html/5.0')
-          #end
-        #end
-      </div>
-    </div>
+#macro (getExportFormats)
+  ## Hide by default the output produced by rendering each export format UIX.
+  <div hidden>
+  #set ($exportFormatsByCategory = {})
+  #set ($exportFormatsUIXs = [])
+  #addDefaultExportFormatsUIXs($exportFormatsUIXs)
+  #set ($discard = $exportFormatsUIXs.addAll($services.uix.getExtensions(
+    'org.xwiki.platform.template.exportFormats')))
+  #foreach ($uix in $exportFormatsUIXs)
+    #if ($uix.parameters.enabled == 'true')
+      #set ($categoryId = $uix.parameters.category)
+      #if ("$!categoryId" == '')
+         #set ($categoryId = 'other')
+      #end
+      #set ($exportFormatsForCategory = $exportFormatsByCategory.getOrDefault($categoryId, []))
+      #set ($discard = $exportFormatsByCategory.put($categoryId, $exportFormatsForCategory))
+      #set ($exportFormat = {
+        'name': $services.localization.render($uix.parameters.label),
+        'value': $uix.id,
+        'description': $services.localization.render($uix.parameters.hint),
+        'icon': $uix.parameters.icon,
+        'data': {
+          'url': $uix.parameters.url
+        }
+      })
+      #set ($exportFormat.data.multipage = $uix.parameters.multipage == 'true')
+      #set ($discard = $exportFormat.data.put('filter-hidden-pages', $uix.parameters.filterHiddenPages == 'true'))
+      #set ($discard = $exportFormat.data.put('exclude-nested-pages-by-default',
+        $uix.parameters.excludeNestedPagesByDefault == 'true'))
+      #set ($discard = $exportFormatsForCategory.add($exportFormat))
+      ## Include the resources and configuration required by this export format.
+      $services.rendering.render($uix.execute(), 'html/5.0')
+    #end
+  #end
+  #addLegacyExportFormats($exportFormatsByCategory)
+  #set ($exportFormats = [])
+  #foreach ($entry in $exportFormatsByCategory.entrySet())
+    #set ($exportFormatsForCategory = $collectiontool.sort($entry.value, ['name']))
+    #set ($discard = $exportFormats.add({
+      'name': $services.localization.render("core.exporter.headings.${entry.key}Formats"),
+      'options': $exportFormatsForCategory
+    }))
+  #end
+  #set ($exportFormats = $collectiontool.sort($exportFormats, ['name']))
   </div>
 #end
 ##
-#macro (displayOtherFormats $exportExtensions)
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="exportModalHeadingOther">
-      <div class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#exportModalAccordion" href="#exportModalOtherCollapse" aria-expanded="false" aria-controls="exportModalOtherCollapse">
-          $escapetool.xml($services.localization.render('core.exporter.headings.otherFormats'))
-        </a>
-      </div>
-    </div>
-    <div id="exportModalOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
-      <div class="panel-body xform">
-        #set ($hasExportTree = $doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
-        #if ($hasExportTree)
-          <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
+#macro (addDefaultExportFormatsUIXs $exportFormatsUIXs)
+  #set ($xarExportEnabled = $hasAdmin && $services.xar.isXARExportAvailable())
+  #set ($xarExportParams = {
+    'format': 'xar',
+    'name': $doc.fullName,
+    'pages': [$services.model.serialize($doc.documentReference, 'default')]
+  })
+  #if ($doc.documentReference.name == 'WebHome')
+    ## When nested page also export WebPreferences which contain among other things the right of this entity
+    #set ($preferencesReference = $services.model.createDocumentReference('WebPreferences',
+      $doc.documentReference.lastSpaceReference))
+    #set ($discard = $xarExportParams.pages.add($services.model.serialize($preferencesReference, 'default')))
+  #end
+  #set ($pdfFOPExportEnabled = !$services.export.pdf.configuration.isReplacingFOP())
+  #set ($discard = $exportFormatsUIXs.addAll([
+    {
+      'id': 'org.xwiki.platform.template.exportFormats.pdfFOP',
+      'parameters': {
+        'label': "PDF#if ($services.export.pdf.isEnabled()) (FOP)#end",
+        'hint': $services.localization.render('core.exporter.formats.pdfFOP.hint'),
+        'icon': 'file-pdf',
+        'category': 'office',
+        'url': $doc.getURL('view', "xpage=pdfoptions&qs=$!escapetool.url($request.getQueryString())"),
+        'multipage': false,
+        'enabled': $pdfFOPExportEnabled
+      }
+    }, {
+      'id': 'org.xwiki.platform.template.exportFormats.odt',
+      'parameters': {
+        'label': 'ODT',
+        'hint': $services.localization.render('core.exporter.formats.odt.hint'),
+        'icon': 'file-word',
+        'category': 'office',
+        'url': $doc.getURL('export', "format=odt&$!request.getQueryString()"),
+        'multipage': false,
+        'enabled': $services.officemanager.isConnected()
+      }
+    }, {
+      'id': 'org.xwiki.platform.template.exportFormats.rtf',
+      'parameters': {
+        'label': 'RTF',
+        'hint': $services.localization.render('core.exporter.formats.rtf.hint'),
+        'icon': 'file-word',
+        'category': 'office',
+        'url': $doc.getURL('export', "format=rtf&$!request.getQueryString()"),
+        'multipage': false,
+        'enabled': $services.officemanager.isConnected()
+      }
+    }, {
+      'id': 'org.xwiki.platform.template.exportFormats.html',
+      'parameters': {
+        'label': 'HTML',
+        'hint': $services.localization.render('core.exporter.formats.html.hint'),
+        'icon': 'file-code',
+        'url': $doc.getURL('export', "format=html&$!request.getQueryString()"),
+        'multipage': true,
+        'enabled': true
+      }
+    }, {
+      'id': 'org.xwiki.platform.template.exportFormats.xar',
+      'parameters': {
+        'label': 'XAR',
+        'hint': $services.localization.render('core.exporter.formats.xar.hint'),
+        'icon': 'file-archive',
+        'url': $doc.getURL('export', "$escapetool.url($xarExportParams)&$!docvariant"),
+        'multipage': true,
+        'enabled': $xarExportEnabled
+      }
+    }
+  ]))
+#end
+##
+#macro (addLegacyExportFormats $exportFormatsByCategory)
+  ## Legacy way of providing export formats.
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.menu.export.buttons'))
+    #set ($exportURL = $NULL)
+    #set ($html = $services.rendering.render($uix.execute(), 'html/5.0'))
+    #set ($results = $regextool.find($html, 'href=[''"]([^''"]+)[''"]'))
+    #if ($results.size() == 2)
+      #set ($exportURL = $results.get(1).group)
+    #end
+    #set ($exportName = $services.rendering.render($uix.execute(), 'plain/1.0'))
+    #if ("$!exportName" != '' && "$!exportURL" != '')
+      #set ($categoryId = $uix.parameters.category)
+      #if ("$!categoryId" == '')
+        #set ($categoryId = 'other')
+      #end
+      #set ($multipage = $categoryId != 'office')
+      #set ($exportFormatsForCategory = $exportFormatsByCategory.getOrDefault($categoryId, []))
+      #set ($discard = $exportFormatsByCategory.put($categoryId, $exportFormatsForCategory))
+      #set ($discard = $exportFormatsForCategory.add({
+        'name': $exportName,
+        'value': $uix.id,
+        'icon': 'file-white',
+        'data': {
+          'url': $exportURL,
+          'multipage': $multipage
+        }
+      }))
+    #end
+  #end
+#end
+##
+#macro(exportTreeModal)
+  <div class="modal fade text-left" id="exportTreeModal" tabindex="-1" role="dialog"
+      aria-labelledby="exportTreeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">$services.icon.renderHTML('cross')</button>
+          <div class="modal-title" id="exportTreeModalLabel">
+            <span class="modal-title-icon">$services.icon.renderHTML('download')</span>
+            #set ($title = $escapetool.xml($services.localization.render('core.exporter.exportAs', ['__format__'])))
+            $title.replace('__format__', '<span class="export-format"></span>')
+          </div>
+        </div>
+        <div class="modal-body xform">
+          <p class="xHint">
+            $escapetool.xml($services.localization.render('core.exporter.selectPages'))
+          </p>
           #exportTreeSelector({
             'root': "document:$doc.documentReference",
             'showRoot': true
           })
-        #end
-        <div class="export-buttons">
-          <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")"
-            ## Disable the button until the export tree is ready, if the export tree is available.
-            class="btn btn-primary#if ($hasExportTree) disabled#end"
-            rel="nofollow">$services.localization.render('core.menu.export.html')</a>
-          #if ($hasAdmin && $services.xar.isXARExportAvailable())
-            #set ($exportParams = {
-              'format': 'xar',
-              'name': $doc.fullName,
-              'pages': [$services.model.serialize($doc.documentReference, 'default')]
-            })
-            #if ($doc.documentReference.name == 'WebHome')
-              ## When nested page also export WebPreferences which contain among other things the right of this entity
-              #set ($preferencesReference = $services.model.createDocumentReference('WebPreferences',
-                $doc.documentReference.lastSpaceReference))
-              #set ($discard = $exportParams.pages.add($services.model.serialize($preferencesReference, 'default')))
-            #end
-            <a href="$doc.getURL('export', "$escapetool.url($exportParams)&amp;$!docvariant")"
-              ## Disable the button until the export tree is ready, if the export tree is available.
-              class="btn btn-primary#if ($hasExportTree) disabled#end"
-              rel="nofollow">$services.localization.render('core.menu.export.xar')</a>
-          #end
-          #foreach ($exportExtension in $exportExtensions)
-            $services.rendering.render($exportExtension.execute(), 'html/5.0')
-          #end
+        </div>
+        <div class="modal-footer">
+          ## Disable the button until the export tree is ready.
+          <button type="button" class="btn btn-primary" disabled>
+            $escapetool.xml($services.localization.render('core.menu.export'))
+          </button>
+          <span class="buttonwrapper">
+            <button class="secondary" data-dismiss="modal">
+              $escapetool.xml($services.localization.render('cancel'))
+            </button>
+          </span>
         </div>
       </div>
     </div>

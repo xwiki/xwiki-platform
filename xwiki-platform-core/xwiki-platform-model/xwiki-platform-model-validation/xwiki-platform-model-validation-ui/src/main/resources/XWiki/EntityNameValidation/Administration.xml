@@ -72,7 +72,7 @@
           &lt;/dl&gt;
           &lt;dl&gt;
             &lt;dt&gt;
-              &lt;label for="newForbiddenCharacter"&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.label')&lt;/label&gt;
+              &lt;label for="newReplacementCharacter"&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.label')&lt;/label&gt;
               &lt;span class='xHint'&gt;$services.localization.render('entitynamevalidation.replacementCharacter.newReplacementCharacter.hint')&lt;/span&gt;
             &lt;/dt&gt;
             &lt;dd&gt;
@@ -462,7 +462,7 @@
       <displayInCategory>edit</displayInCategory>
     </property>
     <property>
-      <displayInSection>Name Strategies</displayInSection>
+      <displayInSection>nameStrategies</displayInSection>
     </property>
     <property>
       <heading>$services.localization.render('entitynamevalidation.admin.heading')</heading>
@@ -594,20 +594,19 @@
       $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.create.inProgress')),
       'inprogress'
     );
-    $.get(jsonDoc.getURL("get"), query).done(function (data) {
-      createCharacterModal.modal('hide');
+    Promise.resolve($.get(jsonDoc.getURL("get"), query)).then(() =&gt; {
       window.livetable_replacementCharacters.refresh();
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.create.done')),
         'done'
       ));
-      resetReplaceCharacterModal();
-    }).fail(function (response) {
-      createCharacterModal.modal('hide');
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.create.failed')),
         'error'
       ));
+    }).finally(() =&gt; {
+      createCharacterModal.modal('hide');
       resetReplaceCharacterModal();
     });
   });
@@ -636,12 +635,12 @@
 
       var url = new XWiki.Document().getURL("get");
       $.get(url, {
-          'xpage': 'entitynamevalidation_json',
-          'outputSyntax': 'plain',
-          'name': testText,
-          'strategy': selectedStrategy,
-          'form_token': xm.form_token
-        }).done(function (data) {
+        'xpage': 'entitynamevalidation_json',
+        'outputSyntax': 'plain',
+        'name': testText,
+        'strategy': selectedStrategy,
+        'form_token': xm.form_token
+      }).then(data =&gt; {
         $('#testNameStrategyIsValid_' + data.isOriginalValid).removeClass('hidden');
         $('#testNameStrategyIsValid_' + !data.isOriginalValid).addClass('hidden');
         $('#testNameStrategyTransformedName').text(data.transformedName)
@@ -661,19 +660,19 @@
           $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.remove.inProgress')),
           'inprogress'
         );
-        $.get(event.currentTarget.href).done(function (data) {
-          removeCharacterModal.modal('hide');
+        Promise.resolve($.get(event.currentTarget.href)).then(() =&gt; {
           window.livetable_replacementCharacters.refresh();
           notification.replace(new XWiki.widgets.Notification(
             $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.remove.done')),
             'done'
           ));
-        }).fail(function (response) {
-          removeCharacterModal.modal('hide');
+        }).catch(() =&gt; {
           notification.replace(new XWiki.widgets.Notification(
             $jsontool.serialize($services.localization.render('entitynamevalidation.replacementCharacter.remove.failed')),
             'error'
           ));
+        }).finally(() =&gt; {
+          removeCharacterModal.modal('hide');
         });
       });
       removeCharacterModal.modal('show');

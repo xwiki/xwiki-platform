@@ -62,18 +62,22 @@ public class BasePropertyOutputFilterStream extends AbstractEntityOutputFilterSt
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters) throws FilterException
     {
-        PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXClass.safeget(name);
+        if (this.currentXClass != null) {
+            PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXClass.safeget(name);
 
-        if (propertyclass != null) {
-            BaseProperty property =
-                value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
-
-            if (this.entity == null) {
+            if (propertyclass != null) {
                 // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not
                 // really a String property)
-                this.entity = property;
+                BaseProperty property =
+                    value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
+
+                if (this.entity == null) {
+                    this.entity = property;
+                } else {
+                    this.entity.apply(property, true);
+                }
             } else {
-                this.entity.apply(property, true);
+                // TODO: Log something ?
             }
         } else {
             // TODO: Log something ?

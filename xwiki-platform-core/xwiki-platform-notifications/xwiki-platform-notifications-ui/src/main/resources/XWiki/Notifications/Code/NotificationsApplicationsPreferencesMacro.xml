@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsApplicationsPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsApplicationsPreferencesMacro</name>
   <language/>
@@ -126,20 +126,9 @@
     <property>
       <code>'use strict';
 /**
- * Start the requirejs config.
- */
-require.config({
-  paths: {
-    'bootstrap-switch': '$services.webjars.url('bootstrap-switch', 'js/bootstrap-switch.min')'
-  },
-  shim: {
-    'bootstrap-switch' : ['jquery']
-  }
-});
-/**
  * Start the real script.
  */
-require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
+require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'xwiki-bootstrap-switch', 'xwiki-events-bridge'], function ($, xm, ApplicationWidget) {
 
   /**
    * Page initialization
@@ -190,19 +179,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         var targetUser = $('.notifPreferences').attr('data-user');
       }
       var url = "$xwiki.getURL('XWiki.Notifications.Code.NotificationPreferenceService', 'get', 'outputSyntax=plain')";
-      $.post(url, {
+      Promise.resolve($.post(url, {
         action: 'savePreferences',
         target: $('.notifPreferences').attr('data-target'),
         user: targetUser,
         json: JSON.stringify(data),
         csrf: xm.form_token
-      }).done(function() {
+      })).then(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.saved'))", 'done');
-      }).error(function() {
+      }).catch(function() {
         notification.hide();
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.settings.savingfailed'))", 'error');
-      }).always(function() {
+      }).finally(function() {
         // Enable again the triggers
         toggles.bootstrapSwitch('disabled', false);
       });
@@ -237,8 +226,8 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     });
 
   };
-  
-  $(document).ready(preferenceInit);
+
+  $(preferenceInit);
   $(document).on('xwiki:dom:updated', preferenceInit)
 });
 </code>
@@ -340,7 +329,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'bootstrap-switch'], function($, xm) {
+      <code>define('EventTypeWidget', ['jquery', 'xwiki-meta', 'xwiki-bootstrap-switch'], function($, xm) {
   /**
   * Construct an EventTypeWidget.
   */
@@ -360,8 +349,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      * Initialization
      */
     self.init = function () {
-      // Replace the 'hidden' class by a call to jQuery.hide();
-      self.domElement.removeClass('hidden').hide();
       // Enable bootstrap switches
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'mini',
@@ -403,13 +390,6 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
      */
     self.setEmailState = function (state) {
       self.switchEmail.bootstrapSwitch('state', state);
-    };
-
-    /**
-     * Hide/Show the event type widget
-     */
-    self.toggleVisibility = function () {
-      self.domElement.toggle();
     };
 
     // Call init
@@ -515,7 +495,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <cache>long</cache>
     </property>
     <property>
-      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'bootstrap-switch'], function($, EventTypeWidget) {
+      <code>define('ApplicationWidget', ['jquery', 'EventTypeWidget', 'xwiki-bootstrap-switch'], function($, EventTypeWidget) {
   /**
    * Construct an application widget.
    */
@@ -550,9 +530,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       // Handle collapsing
       // Make sure the click listener is registered only once.
       self.collapseButton.off('click.toggleVisibility').on('click.toggleVisibility', function() {
-        for (var i = 0; i &lt; self.eventTypes.length; ++i) {
-          self.eventTypes[i].toggleVisibility();
-        }
+        this.classList.toggle("collapsed")
       });
 
       // Handle switch change
@@ -723,30 +701,49 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <code>.notifPreferences tbody {
   margin-top: 2em;
 }
+
 .notifPreferences .appOdd {
-  background: #e5e5e5;
+  background: @breadcrumb-bg;
 }
+
 .notifPreferences .appEven {
-  background: #fafafa;
+  background: @xwiki-page-content-bg;
 }
+
 .notifPreferences .rowApp td, .notifPreferences .rowApp th{
   height: 3em;
 }
+
 .notifPreferences th:nth-child(1) {
   vertical-align: top;
   width: 250px;
 }
+
+/* Hide all of the eventType rows that are after a category toggler that is in the collapsed state. */
+.notifPreferences tr:has(&gt; td &gt; button.collapsed) ~ tr {
+  display: none;
+}
+
+.notifPreferences tr &gt; td &gt; button &gt; *:first-child {
+  transition: transform .2s ease-in-out;
+}
+
+.notifPreferences tr &gt; td &gt; button.collapsed &gt; *:first-child {
+  transform: rotate(90deg);
+}
+
 .notificationAppCell {
   vertical-align: top;
   width: 33%;
 }
+
 .notificationCollapseButtonCell {
   vertical-align: top;
   text-align: right;
 }</code>
     </property>
     <property>
-      <contentType>CSS</contentType>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>NotificationPreferencesTable</name>
@@ -798,7 +795,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -873,15 +870,24 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -984,7 +990,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
     #set ($targetUser = $xcontext.userReference)
     #set ($targetUserReference = $services.user.currentUserReference)
   #end
-  #set ($divData = "data-user=""$services.model.serialize($targetUser)""")
+  #set ($divData = "data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
 #end
 #set ($userDoc = $xwiki.getDocument($targetUser))
 ######################################################
@@ -993,7 +999,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
 {{html clean="false"}}
 &lt;div class="xform"&gt;
 &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.hint'))&lt;/p&gt;
-&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $divData&gt;
+&lt;table class="notifPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $!divData&gt;
   &lt;thead&gt;
     &lt;tr&gt;
       &lt;th scope="col"&gt;$escapetool.xml($services.localization.render('notifications.settings.applications.appName'))&lt;/th&gt;
@@ -1007,7 +1013,7 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
         &lt;/th&gt;
         #set ($colsCount = 3)
       #end
-      &lt;th scope="col"&gt;&lt;/th&gt;
+      &lt;td&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   ##
@@ -1046,14 +1052,19 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       #end
       ## Collapse button
       &lt;td class="notificationCollapseButtonCell"&gt;
-        &lt;button type="button" class="btn btn-default btn-sm collapseButton"&gt;$services.icon.renderHTML('caret-down')&lt;/button&gt;
+        &lt;button type="button" class="btn btn-default btn-sm collapseButton collapsed"&gt;
+          $services.icon.renderHTML('caret-down')
+          &lt;span class='sr-only'&gt;
+            $escapetool.xml($services.localization.render('notifications.settings.applications.table.dropdown.toggle.label',[$type.applicationName]))
+          &lt;/span&gt;
+        &lt;/button&gt;
       &lt;/td&gt;
     &lt;/tr&gt;
     ##
     ## Display all events of this application
     ##
     #foreach($type in $app)
-      &lt;tr class="rowEventType hidden" data-eventtype="$type.eventType"&gt;
+      &lt;tr class="rowEventType" data-eventtype="$type.eventType"&gt;
         &lt;td&gt;$escapetool.xml($type.description)&lt;/td&gt;
         #displayPreference($type, 'alert')
         #if ($services.notification.areEmailsEnabled())
@@ -1100,7 +1111,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Display the preferences of the current user about notification applications.</description>

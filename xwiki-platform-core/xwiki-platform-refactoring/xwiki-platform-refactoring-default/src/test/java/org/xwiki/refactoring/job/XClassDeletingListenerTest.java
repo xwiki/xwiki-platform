@@ -63,7 +63,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -91,7 +91,7 @@ class XClassDeletingListenerTest
     private DocumentAccessBridge documentAccessBridge;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private XClassDeletingListener deletingListener;
@@ -220,7 +220,7 @@ class XClassDeletingListenerTest
         // Verify
         assertEquals("XClass deleting listener will not check the document in non-interactive mode.",
             logCapture.getMessage(0));
-        verifyZeroInteractions(status);
+        verifyNoInteractions(status);
     }
 
     @Test

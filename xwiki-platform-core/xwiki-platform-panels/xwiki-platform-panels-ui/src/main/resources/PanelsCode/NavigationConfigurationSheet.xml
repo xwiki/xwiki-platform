@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="PanelsCode.NavigationConfigurationSheet" locale="">
+<xwikidoc version="1.5" reference="PanelsCode.NavigationConfigurationSheet" locale="">
   <web>PanelsCode</web>
   <name>NavigationConfigurationSheet</name>
   <language/>
@@ -52,11 +52,19 @@
   &lt;div class="hidden"&gt;
     &lt;input type="hidden" name="xhidden" value="1" /&gt;
     &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
+    #set ($wikiPreferences = $xwiki.getDocument('XWiki.XWikiPreferences'))
+    #set ($pinnedChildPagesObject = $wikiPreferences.getObject('XWiki.PinnedChildPagesClass'))
+    #set ($pinnedTopLevelPages = $wikiPreferences.getValue('pinnedChildPages', $pinnedChildPagesObject))
+    #if (!$pinnedTopLevelPages)
+      #set ($pinnedTopLevelPages = [])
+    #end
+    &lt;input type="hidden" name="pinnedTopLevelPages" value="$escapetool.xml($jsontool.serialize($pinnedTopLevelPages))" /&gt;
   &lt;/div&gt;
   {{/html}}
   (% class="row" %)(((
     (% class="col-sm-6" %)(((
       #displayNavigationPanel
+      {{info}}{{translation key="index.tree.pinnedChildPages.topLevelHint" /}}{{/info}}
     )))
     (% class="col-sm-6" %)(((
       #displayExcludedPages($configObj)
@@ -67,7 +75,7 @@
 #macro (displayNavigationPanel)
   #set ($navigationPanel = $xwiki.getDocument('Panels.Navigation'))
   $navigationPanel.display('content', 'view').replace('data-dragAndDrop = "false"', 'data-dragAndDrop = "true"'
-    ).replace('class = "xtree"', 'class = "xtree jstree-no-links"')
+    ).replace('class = "xtree"', 'class = "xtree jstree-no-links jstree-xwiki-large"')
 #end
 
 #macro (displayExcludedPages $configObj)
@@ -221,6 +229,8 @@
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -240,6 +250,7 @@
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -268,6 +279,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -285,19 +298,27 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require.config({
-  paths: {
-    'jquery-ui' : "$!services.webjars.url('jquery-ui', 'jquery-ui.min')",
-    // The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
-    // specify the library version when computing the WebJar resource URL.
-    'jquery-ui-touch-punch' : "$!services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min')"
-  },
-  shim: {
-    'jquery-ui' : ['jquery'],
-    'jquery-ui-touch-punch': ['jquery-ui']
-  }
+      <code>define('xwiki-panels-navigation-config-messages', {
+  keys: [
+    'index.documentTree.empty',
+    'index.tree.pinnedChildPages.pin',
+    'index.tree.pinnedChildPages.pin.hint',
+    'index.tree.pinnedChildPages.unpin',
+    'index.tree.pinnedChildPages.unpin.hint',
+    'index.tree.pinnedChildPages.saveComment',
+    'core.editors.saveandcontinue.notification.inprogress',
+    'core.editors.saveandcontinue.notification.error'
+  ]
 });
-require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
+
+require([
+  'jquery',
+  'xwiki-l10n!xwiki-panels-navigation-config-messages',
+  'xwiki-meta',
+  'jquery-ui',
+  'jquery-ui-touch-punch',
+  'xwiki-events-bridge'
+], function($, l10n, xwikiMeta) {
   var getLocalDocumentReference = function(absoluteDocumentReference) {
     var documentReference = XWiki.Model.resolve(absoluteDocumentReference, XWiki.EntityType.DOCUMENT);
     var localDocumentReference = documentReference.relativeTo(new XWiki.WikiReference(XWiki.currentWiki));
@@ -326,7 +347,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       return $('&lt;span/&gt;').text(selectedPages.length + ' pages')[0];
     } else {
       selectedPages.removeClass('selected');
-      var isFromDynamicFilter = draggedPage.closest('.exclusion-filter-dynamic').size() &gt; 0;
+      var isFromDynamicFilter = draggedPage.closest('.exclusion-filter-dynamic').length;
       return (isFromDynamicFilter ? draggedPage.clone() : draggedPage)[0];
     }
   };
@@ -414,7 +435,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   };
 
   var maybeToggleEmptyNode = function(tree) {
-    var visibleTopLevelNodes = tree.get_node('#').children.filter(function(nodeId) {
+    var visibleTopLevelNodes = tree.get_node($.jstree.root).children.filter(function(nodeId) {
       return nodeId !== 'empty' &amp;&amp; !tree.get_node(nodeId).state.hidden;
     });
     if (visibleTopLevelNodes.length === 0) {
@@ -422,7 +443,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
       if (!emptyNode) {
         tree.create_node(null, {
           'id': 'empty',
-          'text': $jsontool.serialize($services.localization.render('index.documentTree.empty')),
+          'text': l10n['index.documentTree.empty'],
           'children': false,
           'data': {
             'type': 'empty',
@@ -439,8 +460,6 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
   // Drop excluded page over the Navigation Panel.
   $('.navigationPanelConfiguration .panel.expanded').droppable({
     accept: '.page',
-    activeClass: 'ui-droppable-active',
-    hoverClass: 'ui-droppable-hover',
     drop: function(event, ui) {
       var tree = $(this).find('.jstree').jstree(true);
       var selectedPages = $('.navigationPanelConfiguration .page.selected');
@@ -475,7 +494,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     });
   };
 
-  $('.exclusion-filter-dynamic input[type="checkbox"]').click(function() {
+  $('.exclusion-filter-dynamic input[type="checkbox"]').on('click', function() {
     var pages = $(this).closest('.exclusion-filter').find('.exclusion-filter-pages').toggleClass('hidden');
     var tree = $('.navigationPanelConfiguration .jstree').jstree(true);
     if ($(this).prop('checked')) {
@@ -513,7 +532,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
 
   var excludeNode = function(tree, nodeId) {
     var node = tree.get_node(nodeId);
-    if (node &amp;&amp; node.data &amp;&amp; node.data.type === 'document') {
+    if (node?.data?.type === 'document') {
       excludePageFromDynamicFilter(tree, node) || excludeOtherPage(tree, node);
       tree.hide_node(nodeId);
     }
@@ -537,31 +556,310 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
     excludedPagesPane.removeClass('dropTarget');
   });
 
+  const $navigationTree = $('.navigationPanelConfiguration .xtree');
+
   // Make sure the root node accepts known node types as children.
-  $('.navigationPanelConfiguration .xtree').on('ready.jstree', function(event, data) {
-    var tree = data.instance;
-    var root = tree.get_node('#');
+  $navigationTree.on('ready.jstree', function(event, data) {
+    const tree = data.instance;
+    const root = tree.get_node($.jstree.root);
     root.data.validChildren = ['document', 'pagination', 'empty'];
+
+    // Make sure top level nodes can't be moved to a lower level. We only allow reordering the top level nodes.
+    const originalCheckCallback = tree.settings.core.check_callback;
+    tree.settings.core.check_callback = function(operation, node, parent, position, more) {
+      if (operation === 'move_node' &amp;&amp; (parent.id !== $.jstree.root || node.parent !== $.jstree.root)) {
+        return false;
+      } else {
+        return originalCheckCallback.apply(this, arguments);
+      }
+    };
 
   // Prevent drag &amp; drop for tree nodes that are not on the top level.
   }).on('model.jstree', function(event, data) {
-    if (data.parent !== '#') {
-      var tree = data.instance;
-      $.each(data.nodes, function(index, nodeId) {
-        var node = tree.get_node(nodeId);
-        if (node &amp;&amp; node.data) {
+    if (data.parent !== $.jstree.root) {
+      const tree = data.instance;
+      data.nodes.forEach(nodeId =&gt; {
+        const node = tree.get_node(nodeId);
+        if (node?.data) {
           node.data.draggable = false;
         }
       });
     }
-  })
+  });
+
+  //
+  // Tree Node Actions
+  //
+
+  let navigationTree = $navigationTree.jstree?.(true);
+  const nodeTemplate = navigationTree?._data?.core?.node;
+  if (!nodeTemplate) {
+    // The tree node template hasn't been initialized yet.
+    $navigationTree.on('loading', function(event, data) {
+      navigationTree = data.instance;
+      modifyNodeTemplate(navigationTree._data.core.node);
+    });
+  } else {
+    modifyNodeTemplate(nodeTemplate);
+    if (navigationTree._data.core.ready) {
+      // Tree nodes have already been created from the template. We have to redraw them in order to use the modified
+      // template.
+      navigationTree.redraw(true);
+    }
+  }
+
+  function modifyNodeTemplate(nodeTemplate) {
+    const $anchor = $(nodeTemplate).find('.jstree-anchor');
+    const $actions = $anchor.nextAll('.jstree-actions');
+    if (!$actions.length) {
+      $anchor.after('&lt;div class="jstree-actions"&gt;&lt;/div&gt;');
+    }
+  }
+
+  $navigationTree.on('focusin mouseenter', '.jstree-actions', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    $navigationTree.jstree(true).hover_node($node);
+    if (event.type === 'focusin') {
+      // Make sure we can get back from the actions to the node anchor (e.g. using Shift + Tab) and continue navigating
+      // the tree using the arrow keys.
+      $node.children('.jstree-anchor').attr('tabindex', 0);
+    }
+  });
+
+  $navigationTree.on('mouseleave', '.jstree-actions', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    $navigationTree.jstree(true).dehover_node($node);
+  });
+
+  $navigationTree.on('hover_node.jstree', function(event, data) {
+    const tree = data.instance;
+    tree.get_node(data.node, true).children('.jstree-anchor').addClass('jstree-active');
+  });
+
+  $navigationTree.on('dehover_node.jstree', function(event, data) {
+    const tree = data.instance;
+    const $nodeAnchor = tree.get_node(data.node, true).children('.jstree-anchor');
+    // We remove the active class with a small delay to allow the user to jump to the action buttons using the Tab key.
+    setTimeout(() =&gt; {
+      // Remove the active class only if the node has not been hovered back in the mean time (which happens when you use
+      // the Tab key to jump to the node action buttons).
+      if (!$nodeAnchor.hasClass('jstree-hovered')) {
+        $nodeAnchor.removeClass('jstree-active');
+      }
+    }, 0);
+  });
+
+  //
+  // Reorder tree nodes using the keyboard.
+  //
+
+  $navigationTree.on('keydown', function(event) {
+    if (event.altKey &amp;&amp; event.shiftKey) {
+      const $node = $(event.target).closest('.jstree-node');
+      const node = navigationTree?.get_node($node);
+      if (node?.data?.draggable) {
+        node.a_attr['data-moving'] = true;
+        $node.children('.jstree-anchor').attr('data-moving', true);
+      }
+    }
+  });
+
+  $navigationTree.on('keyup', function(event) {
+    if (!event.altKey || !event.shiftKey) {
+      const $node = $(event.target).closest('.jstree-node');
+      $node.children('.jstree-anchor').removeAttr('data-moving');
+      const node = navigationTree?.get_node($node);
+      if (node?.a_attr) {
+        delete node.a_attr['data-moving'];
+      }
+    } else if (event.code === 'ArrowUp') {
+      maybeMoveNode(event, 'before');
+    } else if (event.code === 'ArrowDown') {
+      maybeMoveNode(event, 'after');
+    }
+  });
+
+  function maybeMoveNode(event, position) {
+    const $node = $(event.target).closest('.jstree-node');
+    const node = navigationTree?.get_node($node);
+    if (node?.data?.draggable) {
+      let $referenceNode;
+      if (position === 'before') {
+        $referenceNode = navigationTree.get_prev_dom($node, true);
+      } else {
+        $referenceNode = navigationTree.get_next_dom($node, true);
+      }
+      if ($referenceNode.length) {
+        const referenceNode = navigationTree.get_node($referenceNode);
+        // We allow to swap only nodes of the same type (in order to prevent moving a node after the pagination).
+        if (node.data.type === referenceNode?.data?.type) {
+          navigationTree.move_node($node, $referenceNode, position, null, true, true);
+        }
+      }
+    }
+  }
+
+  //
+  // Pinned Top Level Pages
+  //
+
+  const pinActionTemplate = $(`
+    &lt;button class="jstree-action-pin" type="button"&gt;
+      &lt;i class="icon fa fa-thumb-tack"&gt;&lt;/i&gt;
+      &lt;span class="jstree-action-pin-on"&gt;&lt;/span&gt;
+      &lt;span class="jstree-action-pin-off"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+  `);
+  pinActionTemplate.find('.jstree-action-pin-on').text(l10n['index.tree.pinnedChildPages.pin'])
+    .attr('title', l10n['index.tree.pinnedChildPages.pin.hint']);
+  pinActionTemplate.find('.jstree-action-pin-off').text(l10n['index.tree.pinnedChildPages.unpin'])
+    .attr('title', l10n['index.tree.pinnedChildPages.unpin.hint']);
+
+  const pinnedTopLevelPages = JSON.parse($('.navigationPanelConfiguration input[name=pinnedTopLevelPages]').val() || '[]')
+    .map(value =&gt; decodeURIComponent(value.endsWith('/') ? value.substring(0, value.length - 1) : value));
+  let pinnedTopLevelPagesDirty = false;
+
+  $navigationTree.on('model.jstree', function(event, data) {
+    // Mark pinned top level pages.
+    const tree = data.instance;
+    if (data.parent === $.jstree.root) {
+      data.nodes.forEach(nodeId =&gt; {
+        const node = tree.get_node(nodeId);
+        if (node?.data?.type === 'document') {
+          const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+          if (pinnedTopLevelPages.includes(documentReference.parent.name)) {
+            node.a_attr['data-pinned'] = true;
+          }
+        }
+      });
+    }
+  });
+
+  // Add the pin action. The redraw event is triggered only for top level nodes, but that is fine because we allow the
+  // user to pin only the top level pages from the Navigation tree.
+  $navigationTree.on('redraw.jstree', function(event, data) {
+    const tree = data.instance;
+    data.nodes.forEach(nodeId =&gt; {
+      const node = tree.get_node(nodeId);
+      // We allow to pin only top level nodes that correspond to wiki pages.
+      if (node.data.type === 'document' &amp;&amp; node.parent === $.jstree.root) {
+        const $node = tree.get_node(nodeId, true);
+        $node.children('.jstree-actions').append(pinActionTemplate.clone());
+      }
+    });
+  });
+
+  // Pin top level pages when they are manually re-ordered.
+  $navigationTree.on('move_node.jstree', function(event, data) {
+    if (data.instance === data.old_instance &amp;&amp; data.parent === data.old_parent &amp;&amp; data.parent === $.jstree.root) {
+      // The position of a top level page has changed (the page was moved inside the same tree, without changing its
+      // parent, the root). Pin this page and all the pages that appear before it in the page tree.
+      pinTopLevelPages(data.instance, data.node);
+    }
+  });
+
+  $navigationTree.on('click', '.jstree-action-pin', function(event) {
+    const $node = $(event.target).closest('.jstree-node');
+    const node = navigationTree.get_node($node);
+    if (node.a_attr['data-pinned']) {
+      unpinTopLevelPages(navigationTree, node);
+    } else {
+      pinTopLevelPages(navigationTree, node);
+    }
+  });
+
+  function pinTopLevelPages(tree, node) {
+    do {
+      pinTopLevelPage(tree, node);
+      node = tree.get_node(tree.get_prev_dom(node, true));
+    } while (node);
+  }
+
+  function pinTopLevelPage(tree, node) {
+    // We can pin only tree nodes that correspond to wiki pages.
+    if (node.data.type === 'document') {
+      node.a_attr['data-pinned'] = true;
+      tree.get_node(node, true).children('.jstree-anchor').attr('data-pinned', true);
+      pinnedTopLevelPagesDirty = true;
+    }
+  }
+
+  function unpinTopLevelPages(tree, node) {
+    do {
+      unpinTopLevelPage(tree, node);
+      node = tree.get_node(tree.get_next_dom(node, true));
+    } while (node);
+  }
+
+  function unpinTopLevelPage(tree, node) {
+    // We can unpin only tree nodes that correspond to wiki pages.
+    if (node.data.type === 'document') {
+      delete node.a_attr['data-pinned'];
+      tree.get_node(node, true).children('.jstree-anchor').removeAttr('data-pinned');
+      pinnedTopLevelPagesDirty = true;
+    }
+  }
+
+  function getPinnedTopLevelPages() {
+    const pinnedTopLevelPages = navigationTree.get_json()
+      .filter(node =&gt; node.data?.type === 'document' &amp;&amp; node.a_attr['data-pinned'])
+      .map(node =&gt; {
+        const documentReference = XWiki.Model.resolve(node.data.id, XWiki.EntityType.DOCUMENT);
+        const topLevelSpaceName = documentReference.parent.name;
+        // Pinned child pages storage requires partial URL escaping because entries that correspond to nested pages are
+        // suffixed with slash (in order to distinguish them from terminal pages). We don't need to add the slash suffix
+        // here because top level pages are always nested.
+        return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F');
+      });
+    // We need to have at least one value in order to be able to overwrite the value stored on the server.
+    return pinnedTopLevelPages.length ? pinnedTopLevelPages : [''];
+  }
+
+  const $saveButton = $('.admin-buttons input[type=submit]');
+  const submitEvent = 'xwiki:actions:beforeSave.savePinnedTopLevelPages';
+  $saveButton.off(submitEvent).on(submitEvent, savePinnedTopLevelPages);
+
+  async function savePinnedTopLevelPages(event) {
+    if (pinnedTopLevelPagesDirty) {
+      // We want to save the pinned top level pages first.
+      event.preventDefault();
+      const notification = new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.inprogress'],
+        'inprogress');
+      try {
+        const saveURL = new XWiki.Document('XWikiPreferences', 'XWiki').getURL('save');
+        await $.post(saveURL, $.param({
+          form_token: xwikiMeta.form_token,
+          objectPolicy: 'updateOrCreate',
+          action_saveandcontinue: '',
+          minorEdit: 1,
+          ajax: true,
+          comment: l10n['index.tree.pinnedChildPages.saveComment'],
+          'XWiki.PinnedChildPagesClass_0_pinnedChildPages': getPinnedTopLevelPages()
+        }, true));
+        pinnedTopLevelPagesDirty = false;
+        notification.hide();
+
+        // Save the navigation panel configuration.
+        $saveButton.off('click.savePinnedTopLevelPages');
+        $saveButton.click();
+      } catch (response) {
+        notification.replace(new XWiki.widgets.Notification(l10n.get('core.editors.saveandcontinue.notification.error',
+          response.statusText), 'error'));
+      }
+    }
+  }
+
+  $saveButton.on('xwiki:document:saved xwiki:document:saveFailed', (event) =&gt; {
+    // Add back the custom save handler.
+    $saveButton.off(submitEvent).on(submitEvent, savePinnedTopLevelPages);
+  });
 });</code>
     </property>
     <property>
       <name/>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -586,6 +884,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -605,6 +905,7 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -614,6 +915,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -649,6 +952,8 @@ require(['jquery', 'jquery-ui', 'jquery-ui-touch-punch'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -689,7 +994,7 @@ ul.exclusion-filter-pages {
 
 ul.exclusion-filter-pages li {
   border: 1px solid @xwiki-border-color;
-  border-radius: 6px;
+  border-radius: @border-radius-large;
   display: inline-block;
   margin-bottom: .5em;
   margin-right: .5em;
@@ -730,6 +1035,129 @@ ul.exclusion-filter-pages a {
 
 .navigationPanelConfiguration .panel.dropTarget {
   border: 1px dashed darken(@panel-info-border, 20%);
+}
+
+/**
+ * Improve the tree style in order to be able to show node action buttons.
+ */
+
+.navigationPanelConfiguration .jstree-xwiki .jstree-no-icons {
+  .jstree-node {
+    // Using flex display so that the node anchor can take the full width (without changing the HTML structure).
+    display: flex;
+    // We want the children to be displayed on a new flex row, taking the full width.
+    flex-wrap: wrap;
+
+    &amp;.jstree-hidden {
+      display: none;
+    }
+  }
+
+  .jstree-anchor,
+  .jstree-actions {
+    // Leave some space so that the background of the selected and focused node don't merge.
+    margin-top: 1px;
+    margin-bottom: 1px;
+    // We need the border for when the node is moved using the keyboard.
+    border: 1px solid transparent;
+    // Reduce the line height to take into account the border.
+    line-height: 30px;
+  }
+
+  .jstree-anchor {
+    // Take the remaining width, but leave some space for the action buttons.
+    flex: 1 1 0%;
+    // Use a single line and hide the text overflow.
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    // Leave some padding so that the highlight background looks nice.
+    padding: 0 6px;
+    // Disable the animation because it doesn't cover the node actions.
+    transition: none;
+    border-right-width: 0;
+
+    &amp;.jstree-clicked,
+    &amp;.jstree-hovered {
+      // We want the hover/selected background to continue to the node actions (that follows the node anchor) so we
+      // remove the box shadow and rounded corners on the right side.
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      clip-path: inset(-1px 2px -1px -1px);
+    }
+  }
+
+  .jstree-children {
+    // Take the full flex row width.
+    flex: 0 0 100%;
+  }
+
+  .jstree-actions {
+    padding: 0 4px;
+    border-left-width: 0;
+  }
+
+  .jstree-clicked + .jstree-actions,
+  .jstree-hovered + .jstree-actions {
+    // Use the same background color and border radius as the node anchor.
+    background-color: @nav-link-hover-bg;
+    border-radius: 0 5px 5px 0;
+    // Remove the left box shadow so that the background from the node anchor continues smoothly to the node actions.
+    clip-path: inset(-1px -1px -1px 2px);
+    // We clipped 2px from the right of the node anchor and 2px from the left of the node actions in order to hide the
+    // box shadow between them, so we now need to remove the 4px gap.
+    margin-left: -4px;
+  }
+
+  .jstree-hovered + .jstree-actions {
+    // Use the same box shadow as when the node is hovered.
+    box-shadow: inset 0 0 1px #ccc;
+  }
+  .jstree-clicked + .jstree-actions {
+    // Use the same box shadow as when the node is selected.
+    box-shadow: inset 0 0 1px #999;
+  }
+
+  .jstree-anchor[data-moving],
+  .jstree-anchor[data-moving] + .jstree-actions {
+    box-shadow: none;
+    border: 1px dashed black;
+  }
+}
+
+/**
+ * Pin Action
+ */
+
+.navigationPanelConfiguration .jstree-action-pin {
+  // Hide by default. See below for the cases where it is shown.
+  display: none;
+  border-radius: @border-radius-small;
+  border: 0 none;
+  background: none;
+  // Must be less than the height of the tree node (32px).
+  line-height: 22px;
+}
+.navigationPanelConfiguration .jstree-action-pin:hover {
+  background-color: @btn-default-bg;
+}
+// Show when a node is pinned (so that the user can see the state), or when a node is hovered or selected (to that the
+// user can toggle the state).
+.navigationPanelConfiguration [data-pinned=true] + .jstree-actions .jstree-action-pin,
+.navigationPanelConfiguration .jstree-clicked + .jstree-actions .jstree-action-pin,
+.navigationPanelConfiguration .jstree-active + .jstree-actions .jstree-action-pin {
+  display: inline-block;
+}
+.navigationPanelConfiguration .jstree-action-pin-on,
+.navigationPanelConfiguration .jstree-action-pin-off {
+  display: none;
+}
+.navigationPanelConfiguration .jstree-active[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
+.navigationPanelConfiguration .jstree-clicked[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
+.navigationPanelConfiguration .jstree-active:not([data-pinned=true]) + .jstree-actions .jstree-action-pin-on,
+.navigationPanelConfiguration .jstree-clicked:not([data-pinned=true]) + .jstree-actions .jstree-action-pin-on {
+  display: inline;
 }</code>
     </property>
     <property>

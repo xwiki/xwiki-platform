@@ -27,29 +27,40 @@
 ## * outputTitle: if true then also output the title
 ## 
 ############################################################################
-#if ("$!request.outputTitle" == 'true')
-  #set ($displayTitle = true)
+#if ($request.outputTitle == 'true')
   $services.progress.pushLevel(3)
 #else
-  #set ($displayTitle = false)
   $services.progress.pushLevel(1)
 #end
 $services.progress.startStep('Compute the content to display')
-## Make sure we don't escape the content since we want HTML to be rendered
+## Set the content type to text/plain when the output syntax is not HTML to avoid that other content is interpreted
+## as HTML by the browser. This needs to be done before calling contentvars.vm as rendering the content can modify
+## the content type when the document, e.g., produces JSON.
+#if ($response.getContentType() != 'text/plain')
+  #set ($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    #set ($syntaxType = $outputSyntax.type.toIdString())
+    #if ($syntaxType != "xhtml" && $syntaxType != "html")
+      $response.setContentType('text/plain')
+    #end
+  #end
+#end
+## Make sure we don't escape the content since non-HTML output like JSON is produced by some documents when plain
+## output syntax is specified.
 #set ($noEscapeContent = true)
 #template("contentvars.vm")
 $services.progress.endStep()
-#if ($displayTitle)
+#if ($request.outputTitle == 'true')
   $services.progress.startStep('Compute title to display and modify rendered content accordingly')
   #template("titlevars.vm")
   $services.progress.endStep()
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
   <div class="xcontent">
     $xcontext.dropPermissions()
-    #if ($displayTitle)
-      <div class="document-info">
-        <div id="document-title"><h1>$titleToDisplay</h1></div>
-      </div>
-    #end
+    <div class="document-info">
+      <div id="document-title"><h1>$titleToDisplay</h1></div>
+    </div>
     <div id="xwikicontent">
 #end
 #if ("$!exception" != '')
@@ -57,8 +68,9 @@ $services.progress.endStep()
 #else
   $renderedContent
 #end
-#if ($displayTitle)
+#if ($request.outputTitle == 'true')
     </div>
-  </div>
+  </div>## xcontent
+  </main>## mainContentArea
 #end
 $services.progress.popLevel()

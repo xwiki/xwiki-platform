@@ -21,7 +21,6 @@ package org.xwiki.like.script;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -37,8 +36,6 @@ import org.xwiki.like.LikeManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.rendering.async.internal.AsyncRendererCache;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -67,7 +64,7 @@ import static org.mockito.Mockito.when;
  * @since 12.7RC1
  */
 @ComponentTest
-public class LikeScriptServiceTest
+class LikeScriptServiceTest
 {
     @InjectMockComponents
     private LikeScriptService likeScriptService;
@@ -100,7 +97,7 @@ public class LikeScriptServiceTest
     private DocumentReference docUserReference;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setup()

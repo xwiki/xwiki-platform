@@ -753,19 +753,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
+      <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>panel-default-text</name>
+        <name>panel-header-text</name>
         <number>46</number>
         <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
+        <prettyName>panel-header-text</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
+      </panel-header-text>
       <table-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -836,7 +836,7 @@
       <body-bg>#fafafa</body-bg>
     </property>
     <property>
-      <brand-danger/>
+      <brand-danger>#ca302c</brand-danger>
     </property>
     <property>
       <brand-info>#3bb2d0</brand-info>
@@ -845,7 +845,7 @@
       <brand-primary/>
     </property>
     <property>
-      <brand-success>#56b881</brand-success>
+      <brand-success>#077537</brand-success>
     </property>
     <property>
       <brand-warning/>
@@ -854,7 +854,7 @@
       <breadcrumb-bg>#f8f8f8</breadcrumb-bg>
     </property>
     <property>
-      <breadcrumb-color/>
+      <breadcrumb-color>#727272</breadcrumb-color>
     </property>
     <property>
       <breadcrumb-separator/>
@@ -881,10 +881,10 @@
       <btn-info-bg/>
     </property>
     <property>
-      <btn-info-color/>
+      <btn-info-color>#000000</btn-info-color>
     </property>
     <property>
-      <btn-primary-bg>#3E7CBC</btn-primary-bg>
+      <btn-primary-bg>#386da7</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color>#fff</btn-primary-color>
@@ -896,10 +896,10 @@
       <btn-success-color/>
     </property>
     <property>
-      <btn-warning-bg/>
+      <btn-warning-bg>#ffd483</btn-warning-bg>
     </property>
     <property>
-      <btn-warning-color/>
+      <btn-warning-color>#000000</btn-warning-color>
     </property>
     <property>
       <component-active-bg>@list-group-hover-bg</component-active-bg>
@@ -968,9 +968,24 @@
       <lessCode>/* Administration: Vertical Menus */
 @list-group-active-border: @list-group-border;
 
+/* Increasing default contrast for accessibility. */
+/* Slight change on @gray-light to make it pass the 4.5 contrast threshold on a white background. */
+@gray-light: #727272;
+/* Gray-light is too light on a light backgrounds. @gray for muted text is easier to read. */
+@text-muted: @gray;
+/* The boxes background is too dark for links, we make it a lighter shade than bootstrap default. */
+@state-danger-bg: #f8ecec;
+@state-success-bg: #e5f3df;
+@state-info-bg: #e1f1f9;
+/* Input-color-placeholder is hardcoded in bootstrap, we need to override it. */
+@input-color-placeholder: @gray-light;
+
 /* Drawer */
 @xwiki-drawer-menu-item-hover-bg: @list-group-hover-bg;
 @xwiki-drawer-menu-item-hover-color: @list-group-link-hover-color;
+
+/* Headings */
+@headings-font-weight: 500;
 
 /* Other */
 @well-bg: @body-bg;
@@ -979,13 +994,13 @@
 </lessCode>
     </property>
     <property>
-      <link-color>#3173b5</link-color>
+      <link-color>#2f6faf</link-color>
     </property>
     <property>
       <logo>logo.svg</logo>
     </property>
     <property>
-      <navbar-default-bg>#3E7CBC</navbar-default-bg>
+      <navbar-default-bg>#3E79BC</navbar-default-bg>
     </property>
     <property>
       <navbar-default-color>#fff</navbar-default-color>
@@ -1012,7 +1027,7 @@
       <panel-bg>#fafafa</panel-bg>
     </property>
     <property>
-      <panel-default-text/>
+      <panel-header-text/>
     </property>
     <property>
       <table-bg/>
@@ -1024,7 +1039,7 @@
       <table-border-color/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#222222</text-color>
     </property>
     <property>
       <xwiki-page-content-bg/>

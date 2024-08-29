@@ -22,19 +22,18 @@
   <parent>
     <artifactId>xwiki-platform-security-authentication</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>xwiki-platform-security-authentication-script</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Security - Authentication - Script</name>
-  <description>XWiki Platform - Security - Authentication - Script contains the script service related to authentication</description>
-
+  <description>Script services to access the Authentication API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Authentication Script API</xwiki.extension.name>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -43,12 +42,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-authentication-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -67,5 +66,4 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
-
 </project>

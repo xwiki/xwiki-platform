@@ -3,6 +3,7 @@ org.xwiki.url.internal.standard.StandardExtendedURLResourceReferenceSerializer
 org.xwiki.url.internal.standard.StandardExtendedURLResourceReferenceResolver
 org.xwiki.url.internal.standard.StandardExtendedURLResourceTypeResolver
 org.xwiki.url.internal.standard.StandardStringResourceTypeResolver
+org.xwiki.url.internal.standard.StandardURLStringEntityReferenceResolver
 org.xwiki.url.internal.standard.DefaultStandardURLConfiguration
 org.xwiki.url.internal.standard.DomainWikiReferenceExtractor
 org.xwiki.url.internal.standard.PathWikiReferenceExtractor

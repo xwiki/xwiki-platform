@@ -38,13 +38,17 @@ import org.xwiki.test.docker.junit5.DockerTestException;
  */
 public class PropertiesMerger
 {
-    private static final String SEPARATOR = ",";
+    private static final String COMMA = ",";
+
+    private static final String NEWLINE = "\n";
 
     private static final String CARET = "^";
 
     private static final List<String> KNOWN_LIST_KEYS = Arrays.asList(
         "xwikiCfgPlugins",
-        "xwikiDbHbmCommonExtraMappings",
+        "xwikiDbHbmCommonExtraMappings");
+
+    private static final List<String> KNOWN_PROPERTIES_KEYS = Arrays.asList(
         "xwikiPropertiesAdditionalProperties");
 
     /**
@@ -64,15 +68,17 @@ public class PropertiesMerger
         properties.putAll(originalProperties);
 
         // Add user-specified properties (with possible overrides for default properties)
-        for (String key : newProperties.stringPropertyNames()) {
-            String originalValue = properties.getProperty(key);
-            String newValue = newProperties.getProperty(key);
-            // If the property already exists and override is true then replace. Otherwise if the property is a list
-            // type, try to merge it.
-            if (properties.containsKey(key)) {
-                mergeExistingProperty(key, originalValue, newValue, properties, override);
-            } else {
-                properties.setProperty(key, newValue);
+        if (newProperties != null) {
+            for (String key : newProperties.stringPropertyNames()) {
+                String originalValue = properties.getProperty(key);
+                String newValue = newProperties.getProperty(key);
+                // If the property already exists and override is true then replace. Otherwise if the property is a list
+                // type, try to merge it.
+                if (properties.containsKey(key)) {
+                    mergeExistingProperty(key, originalValue, newValue, properties, override);
+                } else {
+                    properties.setProperty(key, newValue);
+                }
             }
         }
 
@@ -85,11 +91,12 @@ public class PropertiesMerger
         if (!originalValue.equals(newValue)) {
             // Not the same value for the same key.
             // If list type, then merge the lists
-            if (isListProperty(key)) {
+            if (isListProperty(key) || isPropertiesProperty(key)) {
                 // Allow full override if key starts with "^" character.
                 if (!newValue.startsWith(CARET)) {
-                    Set<String> merge = mergeCommaSeparatedList(originalValue, newValue);
-                    properties.setProperty(key, StringUtils.join(merge, SEPARATOR));
+                    String separator = isListProperty(key) ? COMMA : NEWLINE;
+                    Set<String> merge = mergeList(originalValue, newValue, separator);
+                    properties.setProperty(key, StringUtils.join(merge, separator));
                 } else {
                     properties.setProperty(key, StringUtils.removeStart(newValue, CARET));
                 }
@@ -111,18 +118,23 @@ public class PropertiesMerger
         return KNOWN_LIST_KEYS.contains(key);
     }
 
-    private Set<String> mergeCommaSeparatedList(String list1, String list2)
+    private boolean isPropertiesProperty(String key)
+    {
+        return KNOWN_PROPERTIES_KEYS.contains(key);
+    }
+
+    private Set<String> mergeList(String list1, String list2, String separator)
     {
         Set<String> result = new LinkedHashSet<>();
-        result.addAll(split(list1));
-        result.addAll(split(list2));
+        result.addAll(split(list1, separator));
+        result.addAll(split(list2, separator));
         return result;
     }
 
-    private List<String> split(String list)
+    private List<String> split(String list, String separator)
     {
         List<String> result = new ArrayList<>();
-        for (String value : StringUtils.split(list, SEPARATOR)) {
+        for (String value : StringUtils.split(list, separator)) {
             result.add(StringUtils.trim(value));
         }
         return result;

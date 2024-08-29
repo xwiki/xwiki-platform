@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.XWikiUserPreferencesSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.XWikiUserPreferencesSheet" locale="">
   <web>XWiki</web>
   <name>XWikiUserPreferencesSheet</name>
   <language/>
@@ -73,11 +73,11 @@
         <number>4</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -97,6 +97,7 @@
         <name>content</name>
         <number>1</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -127,6 +128,7 @@
         <name>parameters</name>
         <number>7</number>
         <prettyName>Extension Parameters</prettyName>
+        <restricted>0</restricted>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -173,25 +175,25 @@
 ###############################
 ##        CONTROLLER
 ###############################
-#if(!$obj)
-  {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
+#if (!$obj)
+  {{info}}{{translation key="xe.admin.users.applyonusers" /}}{{/info}}
 #else
   #displayFields()
 #end
 ###############################
 ##  DISPLAY FIELD OPTION LABEL
 ###############################
-#macro(displayFieldOptionLabel $option)
-  #if ($services.localization.render($option.label) != $option.label)
-    $services.localization.render($option.label)
+#macro (displayFieldOptionLabel $option)
+  #if ($services.localization.get($option.label))
+    $escapetool.xml($services.localization.render($option.label))
   #else
-    $option.value
+    $escapetool.xml($option.value)
   #end
 #end
 ###############################
 ##   DISPLAY SELECT FIELD
 ###############################
-#macro(displaySelectField $fieldName $default)
+#macro (displaySelectField $fieldName $defaultValue)
   #set ($value = $doc.getValue($fieldName, $obj))
   #set ($prop = $xclass.get($fieldName))
   #set ($options = [])
@@ -199,33 +201,33 @@
     #set ($discard = $options.add({'value': 1, 'label': 'yes'}))
     #set ($discard = $options.add({'value': 0, 'label': 'no'}))
   #elseif ($prop.classType == 'Timezone')
-    #foreach($tz in $xwiki.jodatime.serverTimezone.availableIDs)
-      #set ($discard = $options.add({'value': $tz, 'label': $tz}))
-    #end
-    ## If the default value is empty (nothing has been set by the administrator), the fallback is the timezone of the 
-    ## server. But we won't display the "System Default" option, which is technical (it supposes the user knows there 
-    ## is a server with its own timezone, etc...)
-    #if ("$!default" == '')
-      #set ($default = $xwiki.jodatime.serverTimezone)
+    #foreach ($timeZoneId in $xwiki.jodatime.serverTimezone.availableIDs)
+      #set ($discard = $options.add({'value': $timeZoneId, 'label': $timeZoneId}))
     #end
   #else
-    #foreach($v in $prop.listValues)
+    #foreach ($v in $prop.listValues)
       #set ($discard = $options.add({'value': $v, 'label': "XWiki.XWikiUsers_${fieldName}_${v}"}))
     #end
   #end
+  #set ($defaultValueHint = "($escapetool.xml($services.localization.render('userprofile.default')))")
   #if ($isEdit)
-    &lt;select name="XWiki.XWikiUsers_0_${fieldName}" id="XWiki.XWikiUsers_0_${fieldName}" size="1"&gt;
-      #if ($default)
+    #set ($escapedId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
+    &lt;select name="$escapedId" id="$escapedId" size="1"
+      #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
+        #set ($escapedHintId = $escapedSelectId + "_hint")
+        aria-describedby="$escapedHintId"
+      #end&gt;
+      #if ($defaultValue)
         &lt;option value=""&gt;---&lt;/option&gt;
       #end
       #foreach ($option in $options)
         ## Some properties actually have "---" as a possible value, so we don't display it because we have
         ## already displayed it above.
         #if ($option.value != '---')
-          &lt;option value="$option.value" #if($value == $option.value)selected="selected"#end&gt;
+          &lt;option value="$escapetool.xml($option.value)"#if ($value == $option.value) selected#end&gt;
             #displayFieldOptionLabel($option)
-            #if ($default == $option.value)
-              ($services.localization.render('userprofile.default'))
+            #if ($defaultValue == $option.value)
+              $defaultValueHint
             #end
           &lt;/option&gt;
         #end
@@ -233,12 +235,12 @@
     &lt;/select&gt;
   #else
     #if ("$!value" != '')
-      $doc.display($fieldName)
+      #unwrapXPropertyDisplay($doc.display($fieldName))
     #else
       #foreach ($option in $options)
-        #if ("$!default" == "$!option.value")
+        #if ("$!defaultValue" == "$!option.value")
           #displayFieldOptionLabel($option)
-          &lt;small&gt;($services.localization.render('userprofile.default'))&lt;/small&gt;
+          &lt;small&gt;$defaultValueHint&lt;/small&gt;
         #end
       #end
     #end
@@ -247,51 +249,73 @@
 ###############################
 ##      DISPLAY FIELD
 ###############################
-#macro(displayField $fieldName $label $default)
+#macro (displayField $fieldName $label $defaultValue)
   #set ($hintKey = "XWiki.XWikiUsers_${fieldName}.hint")
+  #set ($escapedSelectId = $escapetool.xml("XWiki.XWikiUsers_0_${fieldName}"))
+  #set ($escapedHintId = $escapedSelectId + "_hint")
   &lt;dt&gt;
-    &lt;label&gt;$services.localization.render($label)&lt;/label&gt;
+    &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
     #if ($services.localization.get($hintKey))
-      &lt;span class="xHint"&gt;$services.localization.render($hintKey)&lt;/span&gt;
+      &lt;span id="$escapedHintId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey))&lt;/span&gt;
     #end
   &lt;/dt&gt;
-  &lt;dd&gt;
+  &lt;dd data-user-property="$!escapetool.xml($fieldName)"&gt;
     #if ($fieldName == 'timezone' &amp;&amp; !$xwiki.jodatime)
-      #if ($isEdit)
-        &lt;input id="XWiki.XWikiUsers_0_${fieldName}" name="XWiki.XWikiUsers_0_${fieldName}" type="text" value="$!escapetool.xml($obj.getValue($fieldName))"/&gt;
-      #else
-        #if ("$!obj.getValue('timezone')" == '' &amp;&amp; "$!xwiki.getXWikiPreference('timezone')" != '')
-          $xwiki.getXWikiPreference('timezone') &lt;small&gt;($services.localization.render('userprofile.default'))&lt;/small&gt;
-        #else
-          $doc.display('timezone')
-        #end
-      #end
+      #unwrapXPropertyDisplay($doc.display('timezone'))
     #else
-      #displaySelectField($fieldName, $default)
+      #displaySelectField($fieldName, $defaultValue)
     #end
   &lt;/dd&gt;
 #end
 ###############################
 ##      DISPLAY FIELDS
 ###############################
-#macro(displayFields)
-{{html}}
-  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
+#macro (displayFields)
+{{html clean="false"}}
+  &lt;div class="#if ($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class="userPreferences"&gt;
-      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=preferences')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.preferences.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      #if ($xcontext.action == 'view' &amp;&amp; $hasEdit)
+        &lt;div class="editProfileCategory"&gt;
+          &lt;a title="$!escapetool.xml($services.localization.render('platform.core.profile.category.preferences.edit'))"
+              href="$doc.getURL('edit', 'category=preferences')" class="btn btn-xs btn-default"&gt;
+            $services.icon.renderHTML('pencil')
+            &lt;span class='sr-only'&gt;$!escapetool.xml($services.localization.render(
+              'platform.core.profile.category.preferences.edit'))&lt;/span&gt;
+          &lt;/a&gt;
+        &lt;/div&gt;
       #end
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.displayPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.displayPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #displayField('displayHiddenDocuments', 'platform.core.profile.displayHiddenDocuments', '0')
-        #displayField('accessibility'         , 'platform.core.profile.enableAccessibility'   , '0')
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.localizationPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.accessibilityPreferences'))&lt;/h2&gt;
+      #set ($defaultLegacyValue = $xwiki.getXWikiPreference('accessibility'))
+      &lt;dl&gt;
+        #set ($defaultValue = $xwiki.getXWikiPreference('underline'))
+        #if ("$!defaultValue" == '' &amp;&amp; "$!defaultLegacyValue" == '1')
+          #set ($defaultValue = 'Yes')
+        #end
+        #if ("$!defaultValue" == '')
+          #set ($defaultValue = 'OnlyInlineLinks')
+        #end
+        #displayField('underline', 'platform.core.profile.accessibility.underline', $defaultValue)
+      &lt;/dl&gt;
+      &lt;dl hidden&gt;
+        ## Unset the legacy 'accessibility' parameter
+        #displayField('accessibility', 'platform.core.profile.enableAccessibility', '')
+      &lt;/dl&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.localizationPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('timezone'))
+        ## If the default value is empty (nothing has been set by the administrator), the fallback is the timezone of
+        ## the server. But we won't display the "System Default" option, which is technical (it supposes the user knows
+        ## there is a server with its own timezone, etc.).
+        #if ("$!defaultValue" == '')
+          #set ($defaultValue = $xwiki.jodatime.serverTimezone)
+        #end
         #displayField('timezone'              , 'platform.core.profile.timezone'              , $defaultValue)
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.editorPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('editor'))
         #if ("$!defaultValue" == '')
@@ -300,7 +324,7 @@
         #displayField('editor'                , 'platform.core.profile.editor'                , $defaultValue)
         #displayField('usertype'              , 'platform.core.profile.userType'              , 'Simple')
       &lt;/dl&gt;
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.extensionPreferences')&lt;/h1&gt;
+      &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.extensionPreferences'))&lt;/h2&gt;
       &lt;dl&gt;
         #set ($defaultValue = $xwiki.getXWikiPreference('extensionConflictSetup'))
         #if ("$!defaultValue" == '')
@@ -310,17 +334,20 @@
       &lt;/dl&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  #set($isMyProfile = ($xwiki.getDocument($xcontext.user).prefixedFullName == $doc.prefixedFullName))
-  #if(($isMyProfile || $hasAdmin) &amp;&amp; ($xcontext.action == 'view') &amp;&amp; !$doc.getObject('XWiki.LDAPProfileClass'))
+  #set ($isMyProfile = $xwiki.getDocument($xcontext.user).prefixedFullName == $doc.prefixedFullName)
+  #if (($isMyProfile || $hasAdmin) &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.getObject('XWiki.LDAPProfileClass'))
     &lt;div class="half column"&gt;
       &lt;div class="passwordManagement"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.security')&lt;/h1&gt;
-        &lt;span class="buttonwrapper"&gt;&lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$services.localization.render('platform.core.profile.changePassword')&lt;/a&gt;&lt;/span&gt;
+        &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.security'))&lt;/h2&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$escapetool.xml(
+            $services.localization.render('platform.core.profile.changePassword'))&lt;/a&gt;
+        &lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-{{/html}}##
+{{/html}}
 #end
 {{/velocity}}</content>
     </property>
@@ -334,7 +361,7 @@
       <parameters>id=preferences
 icon=wrench
 # isActive: The user is seeing her own profile or the user is an admin.
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end
+isActive=#if ($xcontext.userReference == $doc.documentReference || $hasAdmin)true#{else}false#end
 priority=20</parameters>
     </property>
     <property>

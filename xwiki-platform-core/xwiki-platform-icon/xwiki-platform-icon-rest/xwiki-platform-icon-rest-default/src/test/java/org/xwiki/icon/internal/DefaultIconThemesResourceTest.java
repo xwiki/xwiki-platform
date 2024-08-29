@@ -22,6 +22,7 @@ package org.xwiki.icon.internal;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBContext;
@@ -42,6 +43,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -50,8 +53,10 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.icon.IconManager.META_DATA_ICON_SET_TYPE;
 
 /**
  * Test of {@link DefaultIconThemesResource}.
@@ -77,10 +82,14 @@ class DefaultIconThemesResourceTest
     @MockComponent
     private IconSetManager iconSetManager;
 
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
         when(this.modelContext.getCurrentEntityReference()).thenReturn(CURRENT_ENTITY);
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenReturn(true);
     }
 
     @Test
@@ -110,22 +119,44 @@ class DefaultIconThemesResourceTest
     }
 
     @Test
+    void getIconCurrentTheme() throws Exception
+    {
+        when(this.iconSetManager.getDefaultIconSet()).thenReturn(new IconSet("testTheme"));
+        when(this.iconManager.hasIcon("testTheme", "plus")).thenReturn(true);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put(META_DATA_ICON_SET_TYPE, "icon");
+        when(this.iconManager.getMetaData("plus", "testTheme")).thenReturn(metadata);
+        Icons response = this.iconThemesResource.getIcons("wikiTest", singletonList("plus"));
+
+        ObjectFactory objectFactory = new ObjectFactory();
+        Icons expected = objectFactory.createIcons();
+        Icon icon = objectFactory.createIcon();
+        icon.setName("plus");
+        icon.setIconSetType("icon");
+        icon.setIconSetName("testTheme");
+        expected.getIcons().add(icon);
+        assertEquals(marshal(expected), marshal(response));
+        verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
+        verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+    }
+
+    @Test
     void getIconsByTheme() throws Exception
     {
-        HashMap<String, Object> iconAMetaData = new HashMap<>();
+        Map<String, Object> iconAMetaData = new HashMap<>();
         iconAMetaData.put("iconSetName", "testTheme");
         iconAMetaData.put("iconSetType", "TYPETEST");
         iconAMetaData.put("url", "");
         iconAMetaData.put("cssClass", "testclass");
-        HashMap<String, Object> iconBMetaData = new HashMap<>();
+        Map<String, Object> iconBMetaData = new HashMap<>();
         iconBMetaData.put("iconSetName", "testTheme");
         iconBMetaData.put("iconSetType", "TYPETEST2");
         iconBMetaData.put("url", "http://test/url");
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getIconSet("testTheme")).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
-        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme","iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -155,20 +186,20 @@ class DefaultIconThemesResourceTest
     @Test
     void getIcons() throws Exception
     {
-        HashMap<String, Object> iconAMetaData = new HashMap<>();
+        Map<String, Object> iconAMetaData = new HashMap<>();
         iconAMetaData.put("iconSetName", "testTheme");
         iconAMetaData.put("iconSetType", "TYPETEST");
         iconAMetaData.put("url", "");
         iconAMetaData.put("cssClass", "testclass");
-        HashMap<String, Object> iconBMetaData = new HashMap<>();
+        Map<String, Object> iconBMetaData = new HashMap<>();
         iconBMetaData.put("iconSetName", "testTheme");
         iconBMetaData.put("iconSetType", "TYPETEST2");
         iconBMetaData.put("url", "http://test/url");
         iconBMetaData.put("cssClass", "");
 
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
-        when(this.iconManager.hasIcon("iconA")).thenReturn(true);
-        when(this.iconManager.hasIcon("iconB")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconA")).thenReturn(true);
+        when(this.iconManager.hasIcon("testTheme", "iconB")).thenReturn(true);
         when(this.iconManager.getMetaData("iconA", "testTheme")).thenReturn(iconAMetaData);
         when(this.iconManager.getMetaData("iconB", "testTheme")).thenReturn(iconBMetaData);
 
@@ -192,14 +223,15 @@ class DefaultIconThemesResourceTest
         assertEquals(marshal(expected), marshal(response));
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconSetManager, never()).getDefaultIconSet();
     }
 
     @Test
     void getIconsIconManagerException() throws Exception
     {
-        IconException iconException = new IconException("icon error", null);
+        IconException iconException = new IconException("icon error");
 
-        when(this.iconManager.hasIcon(any())).thenThrow(iconException);
+        when(this.iconManager.hasIcon(any(), any())).thenThrow(iconException);
         when(this.iconSetManager.getCurrentIconSet()).thenReturn(new IconSet("testTheme"));
 
         List<String> names = asList("iconA", "unknownIcon", "iconB");
@@ -211,6 +243,27 @@ class DefaultIconThemesResourceTest
 
         verify(this.modelContext).setCurrentEntityReference(new WikiReference("wikiTest"));
         verify(this.modelContext).setCurrentEntityReference(CURRENT_ENTITY);
+        verify(this.iconSetManager, never()).getIconSet(any());
+        verify(this.iconSetManager, never()).getDefaultIconSet();
+    }
+
+    @Test
+    void getIconsWikiDoesNotExist() throws Exception
+    {
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenReturn(false);
+        WebApplicationException webApplicationException =
+            assertThrows(WebApplicationException.class, () -> this.iconThemesResource.getIcons("unknown", null));
+        assertEquals(NOT_FOUND.getStatusCode(), webApplicationException.getResponse().getStatus());
+    }
+
+    @Test
+    void getIconsWikiManagerFail() throws Exception
+    {
+        when(this.wikiDescriptorManager.exists(any(String.class))).thenThrow(WikiManagerException.class);
+        WebApplicationException webApplicationException =
+            assertThrows(WebApplicationException.class, () -> this.iconThemesResource.getIcons("unknown", null));
+        assertEquals(INTERNAL_SERVER_ERROR.getStatusCode(), webApplicationException.getResponse().getStatus());
+        assertEquals(WikiManagerException.class, webApplicationException.getCause().getClass());
     }
 
     private String marshal(Icons icons) throws JAXBException

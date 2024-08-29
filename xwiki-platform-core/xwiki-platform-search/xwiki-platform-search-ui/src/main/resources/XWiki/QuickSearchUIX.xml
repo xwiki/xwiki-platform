@@ -118,39 +118,55 @@
     </property>
     <property>
       <code>require(['jquery', 'bootstrap'], function($) {
-  $(document).ready(function() {
+  $(function() {
 
     // Some variables used in the next 2 functions
     var globalSearch = $('#globalsearch');
     var globalSearchInput = globalSearch.find('input');
     var globalSearchButton = globalSearch.find('button');
 
+    //Expand or retract the global search
+    function showSearchInput() {
+      globalSearchInput.removeAttr('disabled');
+      globalSearch.removeClass('globalsearch-close');
+      globalSearchButton.attr('aria-expanded', 'true');
+      globalSearchInput.trigger('focus');
+    }
+    function hideSearchInput() {
+      globalSearch.addClass('globalsearch-close');
+      globalSearchButton.attr('aria-expanded', 'false');
+      globalSearchInput.attr('disabled','');
+    }
+
     // Open the global search when the user click on the global search button
-    globalSearchButton.click(function(event) {
+    globalSearchButton.on('click', function() {
       if (!globalSearch.hasClass('globalsearch-close') &amp;&amp; globalSearchInput.val().length &gt; 0) {
         return true;
       }
-      globalSearch.removeClass('globalsearch-close');
-      globalSearchInput.focus();
+      if (globalSearch.hasClass('globalsearch-close')) {
+        showSearchInput();
+      } else {
+        hideSearchInput();
+      }
       return false;
     });
 
     // Close the global search when the focus is lost
-    globalSearchInput.focusout(function() {
+    globalSearch.on('focusout', function() {
       // In order to let the main thread setting the focus to the new element, we execute the following code
       // in a callback.
       setTimeout( function () {
         // We close the global search only if the focus is not on the search input or the search button.
         // Without this, the global search would be close each time the user click on the button (even when it's for
         // actually performing the search).
-        if (document.activeElement !== globalSearchButton[0] &amp;&amp; document.activeElement !== globalSearchInput[0]) {
-          globalSearch.addClass('globalsearch-close');
+        if (!document.getElementById('globalsearch').contains(document.activeElement)) {
+          hideSearchInput();
         }
       }, 1);
     });
-    
+
     // Close dropdown menus when the search button is clicked
-    globalSearchButton.click(function(event) {
+    globalSearchButton.on('click', function() {
       $('[data-toggle="dropdown"][aria-expanded="true"]').dropdown('toggle');
     });
 
@@ -246,12 +262,13 @@
       #set ($searchURL = $xwiki.getURL('Main.WebSearch'))
     #end
     &lt;li&gt;
-      &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="$searchURL" 
-          role="search"&gt;
-        &lt;label class="hidden" for="headerglobalsearchinput"&gt;$services.localization.render('search')&lt;/label&gt;
-        &lt;input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" /&gt;
-        &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/button&gt;
-      &lt;/form&gt;
+      &lt;form class='navbar-form globalsearch globalsearch-close form-inline' id='globalsearch' action='$searchURL'
+        role='search'&gt;
+        &lt;label class='hidden' for='headerglobalsearchinput'&gt;$services.localization.render('search')&lt;/label&gt;
+        &lt;button type='submit' class='btn' title="$services.localization.render('search')"
+        aria-expanded='false' aria-controls='headerglobalsearchinput'&gt;$services.icon.renderHTML('search')&lt;/button&gt;
+        &lt;input type='text' name='text' placeholder="$services.localization.render('panels.search.inputText')" id='headerglobalsearchinput' disabled /&gt;
+        &lt;/form&gt;
     &lt;/li&gt;
   #end
 {{/html}}{{/velocity}}

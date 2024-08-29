@@ -45,13 +45,12 @@ public class AllTests extends TestCase
         // think the tests are all running fine. I haven't found a simple solution to this yet
         // (there are complex solutions like searching for all tests by parsing the source tree).
         // I think there are TestSuite that do this out there but I haven't looked for them yet.
-        addTestCase(suite, PDFTest.class);
         addTestCase(suite, SuggestTest.class);
 
         return new XWikiTestSetup(suite);
     }
 
-    private static void addTestCase(TestSuite suite, Class< ? > testClass) throws Exception
+    private static void addTestCase(TestSuite suite, Class< ? > testClass)
     {
         if (testClass.getName().matches(PATTERN)) {
             suite.addTest(new TestSuite(testClass));

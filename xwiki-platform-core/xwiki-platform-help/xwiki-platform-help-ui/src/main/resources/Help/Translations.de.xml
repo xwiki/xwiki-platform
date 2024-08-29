@@ -44,10 +44,24 @@ help.tipsPanel.improveXWikiTip=Wussten Sie, dass Sie XWiki verbessern können? N
 help.tipsPanel.breadcrumbsTip=Sie können auf die Pfeile neben den Breadcrumb-Elementen klicken, um schnell zu anderen und Unterseiten zu navigieren.
 help.tipsPanel.advancedHiddenShortcutTip=Drücken Sie die Tastenkombination x+x+x+a um in den [[Fortgeschrittenen Modus&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] zu wechseln und x+x+x+h, um die Anzeige von [[versteckten Seiten&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] umzuschalten.
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Geben Sie beim Bearbeiten im WYSIWYG-Editor ## [## ein gefolgt von Buchstaben, um Vorschläge zum Erstellen eines Links zu erhalten.
+help.tipsPanel.WYSIWYGEditorTip=Wenn Du im WYSIWYG-Modus arbeitest, öffnet die Tastenkombination {0}Alt + 0{1} ({0}⌥0{1} unter macOS) ein Hilfemodal mit Informationen über die Verwendung der Tastatur zum Navigieren im Editor.
 help.macroList.title=Verfügbare Makros
 help.macroList.id=Id
 help.macroList.name=Name
-help.macroList.category=Kategorie
+help.macroList.categories=Kategorien
 help.macroList.description=Beschreibung
-help.macroList.visibility=Sichtbarkeit</content>
+help.macroList.visibility=Sichtbarkeit
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Kategorie
+
+#@deprecatedend
+</content>
 </xwikidoc>

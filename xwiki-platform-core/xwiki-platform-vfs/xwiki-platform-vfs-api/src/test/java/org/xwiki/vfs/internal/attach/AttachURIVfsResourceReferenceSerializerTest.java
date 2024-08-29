@@ -32,8 +32,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.URLNormalizer;
 import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @since 12.4RC1
  */
 @ComponentTest
-public class AttachURIVfsResourceReferenceSerializerTest
+class AttachURIVfsResourceReferenceSerializerTest
 {
     @InjectMockComponents
     private AttachURIVfsResourceReferenceSerializer vfsResourceReferenceSerializer;
@@ -59,7 +57,7 @@ public class AttachURIVfsResourceReferenceSerializerTest
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Test
-    public void serialize() throws Exception
+    void serialize() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/test.txt");
@@ -76,7 +74,7 @@ public class AttachURIVfsResourceReferenceSerializerTest
     }
 
     @Test
-    public void serializeWithSpace() throws Exception
+    void serializeWithSpace() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/xwiki logo.png");

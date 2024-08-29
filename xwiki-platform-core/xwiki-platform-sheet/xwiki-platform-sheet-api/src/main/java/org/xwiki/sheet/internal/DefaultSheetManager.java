@@ -186,10 +186,17 @@ public class DefaultSheetManager implements SheetManager
      * @param expectedAction the expected value of the action sheet property
      * @return {@code true} if the given document reference points to a sheet that matches the action and display
      *         constraints
+     * @throws  when failing to check of if the sheet exist
      */
     private boolean matchSheet(DocumentReference sheetReference, String expectedAction)
     {
-        if (!documentAccessBridge.exists(sheetReference)) {
+        try {
+            if (!documentAccessBridge.exists(sheetReference)) {
+                return false;
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to check for the existance of the sheet with reference [{}]", sheetReference, e);
+
             return false;
         }
 

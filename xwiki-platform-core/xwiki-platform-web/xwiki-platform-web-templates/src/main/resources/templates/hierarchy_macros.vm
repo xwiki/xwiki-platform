@@ -140,7 +140,8 @@
     ## Tag the breadcrumb as expandable, so the JS can enable the 'expand' feature
     #set ($breadCrumbClassNames = "${breadCrumbClassNames} breadcrumb-expandable")
     ## Store the entity reference into the breadcrumb, so the JS can retreive the full hierarchy
-    #set ($breadCrumbParameters = "data-entity='$escapetool.xml($services.model.serialize($entityReference, 'local'))'")
+    #set ($entityReferenceName = $services.model.serialize($entityReference, 'local'))
+    #set ($breadCrumbParameters = "data-entity='$escapetool.xml($entityReferenceName)'")
     ## Store the options into the breadcrumb, so the JS can have all informations
     #foreach ($option in $options.keySet())
       #set ($breadCrumbParameters = "$breadCrumbParameters data-${option.toLowerCase()}='$escapetool.xml($options.get($option))'")
@@ -163,7 +164,10 @@
         #set ($closingTag = '')
       #end
       class="$stringtool.join($classNames, ' ')">#if ($item.url)<a href="$item.url"
-        >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
+      #if ($foreach.index == 0 && !$options.plain)
+        title="$escapetool.xml($services.localization.render('core.menu.type.home'))"
+      #end
+      >#end$item.label#if ($item.url)</a>#end$treeNavigation$closingTag##
     #end##
   </li></ol>
 #end
@@ -217,8 +221,8 @@
       'showTranslations': $xwiki.isMultiLingual(),
       'showWikis': $showWikis
     })
-    #set ($treeToggle = "<span class='dropdown-toggle' data-toggle='dropdown'>" +
-      "$services.icon.renderHTML('caret-down')</span>")
+    #set ($treeToggle = "<button class='dropdown-toggle' data-toggle='dropdown'>" +
+      "$services.icon.renderHTML('caret-down')</button>")
     #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end
 #end
@@ -243,14 +247,18 @@
 #end
 
 #macro (getHierarchyPathData_url $reference)
-  #if ($reference.type == 'OBJECT')
+  ## Extract the closest parent of type OBJECT (can be self), and if found use it to generate a link directly
+  ## to the object. We extract the reference so that entity reference with an OBJECT parent (e.g., an OBJECT_PROPERTY)
+  ## also generate a link to their object. 
+  #set ($objectReference = $!reference.extractFirstReference('OBJECT'))
+  #if ("$!objectReference" != "")
     #if ($services.security.authorization.hasAccess('edit', $reference))
-      #if ($reference.objectNumber)
-        #set ($objectNumber = $reference.objectNumber)
-        #set ($objectType = $services.model.serialize($reference.xClassReference, 'local'))
+      #if ($objectReference.objectNumber)
+        #set ($objectNumber = $objectReference.objectNumber)
+        #set ($objectType = $services.model.serialize($objectReference.xClassReference, 'local'))
       #else
-        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($reference.name, ']'), '['))
-        #set ($objectType = $stringtool.substringBeforeLast($reference.name, '['))
+        #set ($objectNumber = $stringtool.substringAfterLast($stringtool.removeEnd($objectReference.name, ']'), '['))
+        #set ($objectType = $stringtool.substringBeforeLast($objectReference.name, '['))
       #end
       #set ($url = $xwiki.getURL($reference, 'edit', $escapetool.url({
         'editor': 'object',

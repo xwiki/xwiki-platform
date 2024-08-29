@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -46,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 11.3RC1
  */
 @UITest
-public class EditTranslationIT
+class EditTranslationIT
 {
     @BeforeAll
     public void setup(TestUtils setup) throws Exception
@@ -63,7 +64,7 @@ public class EditTranslationIT
 
     @Test
     @Order(1)
-    public void translateDocument(TestUtils setup, TestReference testReference) throws Exception
+    void translateDocument(TestUtils setup, TestReference testReference) throws Exception
     {
         LocalDocumentReference referenceDEFAULT = new LocalDocumentReference(testReference);
         LocalDocumentReference referenceFR = new LocalDocumentReference(referenceDEFAULT, Locale.FRENCH);
@@ -175,31 +176,41 @@ public class EditTranslationIT
         // Make sure three locales are listed for this page in the UI
         assertEquals(new HashSet<>(Arrays.asList(Locale.ROOT, Locale.ENGLISH, Locale.FRENCH)), new HashSet<>(viewPage.getLocales()));
 
+        // Switch to en by switching language in the Drawer to test the feature
+        viewPage.clickLocale(Locale.ENGLISH);
+
         // Verify edit mode informations in edit page
         setup.gotoPage(referenceDEFAULT, "edit", "language=");
         editPage = new WikiEditPage();
-        editPage.waitUntilPageJSIsLoaded();
 
         assertEquals(new HashSet<>(), editPage.getNotExistingLocales());
         assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), editPage.getExistingLocales());
     }
 
+    /**
+     * Tests that saving a panel always updates the default page translation even when another locale is specified,
+     * because all panel information is stored on the default panel page translation using an xobject (which is shared
+     * by all panel page translations but editable only through the default translation).
+     */
     @Test
     @Order(2)
-    public void testTranslatePanel(TestUtils setup, TestReference testReference) throws Exception
+    @Disabled("It's possible to create a panel page translation from the UI, e.g. using the Wiki edit mode or from the"
+        + " Information tab for user-created panels, but editing it doesn't update the panel meta data from the default"
+        + " page translation, meaning that all changes are lost. See XWIKI-9617: Object properties are not saved when"
+        + " editing a document translation inline")
+    void testTranslatePanel(TestUtils setup, TestReference testReference) throws Exception
     {
         // Create a new Panel with a content and set the wiki as multilingual en/fr.
         setup.addObject(testReference, "Panels.PanelClass", "content", "custom panel");
         setup.setWikiPreference("multilingual", "true");
         setup.setWikiPreference("languages", "en,fr");
 
-        setup.gotoPage(testReference, "inline", "language=en");
+        setup.gotoPage(testReference, "edit", "language=en&editor=inline");
         InlinePage inlinePage = new InlinePage();
-        inlinePage.waitUntilPageJSIsLoaded();
         assertEquals("custom panel", inlinePage.getValue("content"));
         inlinePage.setValue("content", "another value");
         inlinePage.clickSaveAndView();
-        setup.gotoPage(testReference, "inline", "language=en");
+        setup.gotoPage(testReference, "edit", "language=en&editor=inline");
         assertEquals("another value", inlinePage.getValue("content"));
     }
 }

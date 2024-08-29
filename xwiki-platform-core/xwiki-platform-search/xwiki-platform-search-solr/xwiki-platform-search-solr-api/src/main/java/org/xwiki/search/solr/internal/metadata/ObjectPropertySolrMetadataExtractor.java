@@ -36,6 +36,7 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Extract the metadata to be indexed from object properties.
@@ -81,7 +82,23 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
 
         setLocaleAndContentFields(documentReference, solrDocument, objectProperty);
 
+        // TODO: Add links found in the property
+
+        // Extract more metadata
+        this.extractorUtils.extract(objectPropertyReference, objectProperty, solrDocument);
+
         return true;
+    }
+
+    @Override
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+        TypedValue typedValue, Locale locale)
+    {
+        String fieldName = FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, locale);
+        // The current method can be called multiple times for the same property value (but with a different type).
+        // Since we don't care about the value type here (all the values are collected in a localized field) we need to
+        // make sure we don't add the same value twice. Derived classes can override this method and use the value type.
+        addFieldValueOnce(solrDocument, fieldName, typedValue.getValue());
     }
 
     /**
@@ -98,16 +115,16 @@ public class ObjectPropertySolrMetadataExtractor extends AbstractSolrMetadataExt
     protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
         BaseProperty<ObjectPropertyReference> objectProperty) throws Exception
     {
+        PropertyClass propertyClass = objectProperty.getPropertyClass(this.xcontextProvider.get());
         // Do the work for each locale.
         for (Locale documentLocale : getLocales(documentReference, null)) {
             solrDocument.addField(FieldUtils.LOCALES, documentLocale);
 
-            solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, documentLocale),
-                objectProperty.getValue());
+            setPropertyValue(solrDocument, objectProperty, propertyClass, documentLocale);
         }
 
         // We can`t rely on the schema's copyField here because we would trigger it for each locale. Doing the copy to
         // the text_general field manually.
-        solrDocument.setField(FieldUtils.getFieldName(FieldUtils.PROPERTY_VALUE, null), objectProperty.getValue());
+        setPropertyValue(solrDocument, objectProperty, propertyClass, null);
     }
 }

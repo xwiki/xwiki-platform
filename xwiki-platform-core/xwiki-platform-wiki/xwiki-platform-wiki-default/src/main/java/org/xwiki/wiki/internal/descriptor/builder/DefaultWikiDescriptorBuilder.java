@@ -168,14 +168,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     {
         DefaultWikiDescriptor descriptor = null;
 
-        // If the server property is empty then consider we have an invalid Wiki
-        String serverProperty = extractWikiAlias(serverClassObject);
-        if (!StringUtils.isBlank(serverProperty)) {
-            // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
-            String wikiId = extractWikiId(document);
-            if (wikiId != null) {
-                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty);
-            }
+        // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
+        String wikiId = extractWikiId(document);
+        if (wikiId != null) {
+            descriptor = new DefaultWikiDescriptor(wikiId, extractWikiAlias(serverClassObject));
         }
 
         return descriptor;

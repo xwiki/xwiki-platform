@@ -23,7 +23,6 @@ import javax.mail.internet.InternetAddress;
 
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents all the properties of an XWiki user. It can represent direct properites or inherited properties.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.2
  */
-@Unstable
 public interface UserProperties extends ConfigurationSource
 {
     /**

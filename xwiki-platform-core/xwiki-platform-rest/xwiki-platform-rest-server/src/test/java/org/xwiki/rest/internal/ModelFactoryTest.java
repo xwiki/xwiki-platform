@@ -29,16 +29,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Stream;
+
+import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.mail.EmailAddressObfuscator;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -54,7 +62,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -65,17 +72,22 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.EmailClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import ch.qos.logback.classic.Level;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -91,10 +103,7 @@ class ModelFactoryTest
     private static final String TEST_PASSWORD_VALUE = "secret";
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
-    @InjectComponentManager
-    private ComponentManager componentManager;
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @MockComponent
     private ContextualAuthorizationManager authorizationManager;
@@ -107,6 +116,12 @@ class ModelFactoryTest
 
     @MockComponent
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @MockComponent
+    private GeneralMailConfiguration generalMailConfiguration;
+
+    @MockComponent
+    private EmailAddressObfuscator emailAddressObfuscator;
 
     @InjectMockComponents
     private ModelFactory modelFactory;
@@ -206,8 +221,99 @@ class ModelFactoryTest
 
         Map<String, String> expectedValues = new HashMap<>();
         expectedValues.put(TEST_STRING_FIELD, TEST_STRING_VALUE);
-        expectedValues.put(TEST_PASSWORD_FIELD, TEST_PASSWORD_VALUE);
+        expectedValues.put(TEST_PASSWORD_FIELD, null);
         assertExpectedPropertyValues(result.getProperties(), expectedValues);
+    }
+
+    public static Stream<Arguments> toRestObjectWithObfuscatedMailSource()
+    {
+        return Stream.of(
+            // no mail obfuscation
+            Arguments.of(false, true, "user@domain.tld", "user@domain.tld", null),
+            // mail obfuscation activated but the current user has edit rights
+            Arguments.of(true, true, "user@domain.tld", "user@domain.tld", null),
+            // mail obfuscation activated and the current user does not have edit rights 
+            Arguments.of(true, false, "user@domain.tld", "u...@domain.tld", null),
+            // mail obfuscation activated, the current user does not have edit rights and the mail is badly formatted
+            Arguments.of(true, false, "wrong@", "",
+                "Failed to parse [wrong@] to an email address. Cause: [AddressException: Missing domain]")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("toRestObjectWithObfuscatedMailSource")
+    void toRestObjectWithObfuscatedMail(boolean shouldObfuscate, boolean hasEditRight, String inputMail,
+        String expectedEmail, String expectedWarning) throws Exception
+    {
+        ObjectReference objectReference = mock(ObjectReference.class);
+        when(this.generalMailConfiguration.shouldObfuscate()).thenReturn(shouldObfuscate);
+        when(this.authorizationManager.hasAccess(Right.EDIT, objectReference)).thenReturn(hasEditRight);
+        when(this.emailAddressObfuscator.obfuscate(any(InternetAddress.class))).thenReturn(expectedEmail);
+
+        BaseObject xwikiObject = mock(BaseObject.class);
+        BaseClass xwikiClass = mock(BaseClass.class);
+
+        when(xwikiObject.getPropertyNames()).thenReturn(new String[] {});
+        when(xwikiObject.getXClass(this.xcontext)).thenReturn(xwikiClass);
+        when(xwikiObject.getClassName()).thenReturn("Some.XClass");
+        when(xwikiObject.getNumber()).thenReturn(0);
+
+        EmailClass emailField = new EmailClass();
+        emailField.setName("emailValue");
+        StringProperty emailElement = new StringProperty();
+        emailElement.setName("emailValue");
+        emailElement.setClassType("Password");
+        emailElement.setValue(inputMail);
+        BaseCollection baseCollection = mock(BaseCollection.class);
+        when(baseCollection.getReference()).thenReturn(objectReference);
+        emailElement.setObject(baseCollection);
+        when(xwikiObject.get("emailValue")).thenReturn(emailElement);
+
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { emailField });
+
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
+
+        assertExpectedPropertyValues(result.getProperties(), Map.of("emailValue", expectedEmail));
+
+        if (expectedWarning != null) {
+            assertEquals(expectedWarning, this.logCapture.getMessage(0));
+            assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        }
+    }
+
+    @Test
+    void toRestObjectWithObfuscatedMailInHeader() throws Exception
+    {
+        ObjectReference objectReference = mock(ObjectReference.class);
+        when(this.generalMailConfiguration.shouldObfuscate()).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.EDIT, objectReference)).thenReturn(false);
+        when(this.emailAddressObfuscator.obfuscate(any(InternetAddress.class))).thenReturn("u...@domain.tld");
+
+        BaseObject xwikiObject = mock(BaseObject.class);
+        BaseClass xwikiClass = mock(BaseClass.class);
+
+        when(xwikiObject.getPropertyNames()).thenReturn(new String[] {});
+        when(xwikiObject.getXClass(this.xcontext)).thenReturn(xwikiClass);
+        when(xwikiObject.getClassName()).thenReturn("Some.XClass");
+        when(xwikiObject.getNumber()).thenReturn(0);
+
+        EmailClass emailField = new EmailClass();
+        emailField.setName("emailValue");
+        StringProperty emailElement = new StringProperty();
+        emailElement.setName("emailValue");
+        emailElement.setClassType("Password");
+        emailElement.setValue("user@domain.tld");
+        BaseCollection baseCollection = mock(BaseCollection.class);
+        when(baseCollection.getReference()).thenReturn(objectReference);
+        emailElement.setObject(baseCollection);
+        when(xwikiObject.get("emailValue")).thenReturn(emailElement);
+
+        when(xwikiClass.getProperties()).thenReturn(new java.lang.Object[] { emailField });
+        when(xwikiObject.getPropertyNames()).thenReturn(new String[] { "emailValue" });
+
+        Object result = this.modelFactory.toRestObject(this.baseURI, this.testDocument, xwikiObject, false, false);
+
+        assertExpectedPropertyValues(result.getProperties(), Map.of("emailValue", "u...@domain.tld"));
     }
 
     private void assertExpectedPropertyValues(List<Property> properties, Map<String, String> expectedValues)

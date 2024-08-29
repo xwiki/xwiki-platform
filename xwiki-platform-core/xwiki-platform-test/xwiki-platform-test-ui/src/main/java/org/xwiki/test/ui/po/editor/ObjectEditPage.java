@@ -29,7 +29,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -183,7 +182,6 @@ public class ObjectEditPage extends EditPage
      * @return the list of {@link ObjectEditPane} corresponding to all objects of the given class.
      * @since 13.1RC1
      */
-    @Unstable
     public List<ObjectEditPane> getObjectsOfClass(String className, boolean displayAllObjects)
     {
         WebElement classElement;
@@ -193,8 +191,9 @@ public class ObjectEditPage extends EditPage
             // if we cannot find the class elements it means there's no object of this class.
             return Collections.emptyList();
         }
+        // Don't wait for objects, when the class is there, the objects should be there, too.
         List<WebElement> elements =
-            classElement.findElements(By.className("xobject-content"));
+            getDriver().findElementsWithoutWaiting(classElement, By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
         for (WebElement element : elements) {
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);

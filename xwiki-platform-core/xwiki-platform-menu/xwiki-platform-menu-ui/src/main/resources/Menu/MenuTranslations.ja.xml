@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="ja">
+  <web>Menu</web>
+  <name>MenuTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>MenuClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Menu.MenuClass_content1=メニューの構造
+
+# Live table generic keys
+menu.livetable.doc.title=ページのタイトル
+menu.livetable.doc.name=ページの名称
+menu.livetable.doc.location=場所
+menu.livetable.doc.space=スペース
+menu.livetable.doc.fullname=ページの完全な名称
+menu.livetable.doc.author=最終更新者
+menu.livetable.doc.creator=作者
+menu.livetable.doc.date=更新日
+menu.livetable.doc.creationDate=作成日
+menu.livetable._avatar=アバター
+menu.livetable._images=画像
+menu.livetable._attachments=添付ファイル
+menu.livetable._actions=アクション
+menu.livetable._actions.edit=編集
+menu.livetable._actions.delete=削除
+menu.livetable.emptyvalue=-
+
+# Live table specific keys
+menu.livetable.content1=メニューの構造
+
+# Administration keys
+admin.menu.name=メニュー
+
+# UIX keys
+menu.uix.extensionPoint.label=メニューの表示場所
+menu.uix.extensionPoint.hint=メニューを表示する場所を指定。メニューは指定した場所に、水平または垂直に表示されます。
+menu.uix.extensionPoint.value.nowhere=表示しない
+menu.uix.extensionPoint.value.template.header.after=ページのヘッダーの後
+menu.uix.extensionPoint.value.panels.rightPanels=右のパネルの内側
+menu.uix.extensionPoint.value.panels.leftPanels=左のパネルの内側
+menu.uix.content.label=UI拡張機能の内容
+menu.uix.content.hint=これが表示されている場合、おそらくJavaScriptが無効化されています。メニューの表示場所と同じ値を選択してください。
+menu.uix.scope.label=メニューの見え方のスコープ
+menu.uix.scope.hint=どのコンテクストでメニューを表示するかを指定。
+
+# Menu Macro
+rendering.macro.menu.name=メニュー
+rendering.macro.menu.description=単純なウィキシンタックス（入れ子式のリストとリンク）で作成したメニューを表示。
+rendering.macro.menu.parameter.id.name=ID
+rendering.macro.menu.parameter.id.description=メニューを囲むHTMLの要素に設定する識別子（オプション）。この識別子は、メニューのDOMにアクセスするJavaScriptのコードや、メニューの項目をアサートする機能テストで使用できます。
+rendering.macro.menu.parameter.type.name=種類
+rendering.macro.menu.parameter.type.description=メニューの種類は、メニューの表示と動作を決定します（オプション）。サポートする値はhorizontal（既定値）とverticalです。
+rendering.macro.menu.content.description=メニューの構造をウィキのシンタックスで規定。メニューの各項目はリストの項目とし、メニュー項目のラベルあるいはリンクを含めてください。サブメニューの項目には入れ子式のリストが使えます。
+
+# Menu WebHome
+menu.description=これはナビゲーションのメニューを、ページのヘッダーの直後にトップバーとして水平に、あるいはサイドパネルの中で垂直に表示するためのシンプルなアプリケーションです。
+</content>
+</xwikidoc>

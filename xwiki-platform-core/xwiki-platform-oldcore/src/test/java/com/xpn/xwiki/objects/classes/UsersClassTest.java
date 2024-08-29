@@ -23,23 +23,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,13 +52,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 5.1M2
  */
-public class UsersClassTest
+@ComponentTest
+class UsersClassTest
 {
-    @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void getMap() throws Exception
+    void getMap() throws Exception
     {
         XWikiContext context = mock(XWikiContext.class);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
@@ -75,5 +80,32 @@ public class UsersClassTest
         assertEquals(1, results.size());
         assertEquals("XWiki.Admin", results.get("XWiki.Admin").getId());
         assertEquals("Administrator", results.get("XWiki.Admin").getValue());
+    }
+
+    @Test
+    void fromList()
+    {
+        BaseProperty baseProperty = mock(LargeStringProperty.class);
+        List<String> list = Arrays.asList("XWiki.Foo", null, "XWiki.Bar", "");
+        UsersClass usersClass = new UsersClass();
+        usersClass.setMultiSelect(true);
+        usersClass.fromList(baseProperty, list);
+        verify(baseProperty).setValue("XWiki.Foo,XWiki.Bar");
+    }
+
+    @Test
+    void fromStringArray()
+    {
+        String[] array = new String[] {"XWiki.Foo", null, "XWiki.Bar", ""};
+        UsersClass usersClass = new UsersClass();
+        usersClass.setMultiSelect(true);
+        LargeStringProperty expectedProperty = new LargeStringProperty();
+        expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
+        expectedProperty.setName("userslist");
+        assertEquals(expectedProperty, usersClass.fromStringArray(array));
+
+        array = new String[] {"XWiki.Foo,XWiki.Bar,"};
+        expectedProperty.setValue("XWiki.Foo,XWiki.Bar");
+        assertEquals(expectedProperty, usersClass.fromStringArray(array));
     }
 }

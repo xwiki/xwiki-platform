@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
   LayoutTableNewRow is a component for the Table layout that can be used
@@ -45,7 +44,7 @@
         href="#"
         @click.prevent="logic.addEntry()"
       >
-        <span class="fa fa-plus-circle"></span>
+        <XWikiIcon :icon-descriptor="{name: 'add'}"/>
         {{ $t('livedata.action.addEntry') }}
       </a>
     </td>
@@ -55,9 +54,13 @@
 
 
 <script>
+import XWikiIcon from "../../utilities/XWikiIcon";
+
 export default {
 
   name: "LayoutTableNewRow",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 

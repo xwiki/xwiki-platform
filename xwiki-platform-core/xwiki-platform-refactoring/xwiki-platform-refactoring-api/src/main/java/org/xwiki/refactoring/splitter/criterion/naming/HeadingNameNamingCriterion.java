@@ -21,8 +21,19 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -33,6 +44,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.stability.Unstable;
 
 /**
  * A {@link NamingCriterion} based on the opening heading (if present) of the document.
@@ -40,74 +52,92 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingNameNamingCriterion implements NamingCriterion
+@Component
+@Named("headingNames")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class HeadingNameNamingCriterion extends AbstractNamingCriterion
 {
-    /**
-     * Used to render block to plain text.
-     */
-    private BlockRenderer plainSyntaxRenderer;
+    public static final String PARAM_PREPEND_BASE_PAGE_NAME = "prependBasePageName";
 
     /**
-     * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
+     * Plain text renderer used for rendering heading names.
      */
-    private DocumentAccessBridge docBridge;
+    @Inject
+    @Named("plain/1.0")
+    private BlockRenderer plainTextRenderer;
 
     /**
      * In case if we cannot find a heading name present in the document, we will revert back to
      * {@link PageIndexNamingCriterion}.
      */
+    @Inject
+    @Named("mainPageNameAndNumbering")
     private NamingCriterion mainPageNameAndNumberingNamingCriterion;
 
     /**
-     * A list containing all the document names generated so far. This is used to avoid name clashes.
+     * A list containing all the document references generated so far. This is used to avoid name clashes.
      */
-    private List<String> documentNames;
-
-    /**
-     * Name of the base page name.
-     */
-    private String basePageName;
-
-    /**
-     * Space name to be used with generated page names.
-     */
-    private String spaceName;
-
-    /**
-     * Flag indicating if each generated page name should be prepended with base page name.
-     */
-    private boolean prependBasePageName;
+    private final List<DocumentReference> documentReferences = new ArrayList<>();
 
     /**
      * Constructs a new {@link HeadingNameNamingCriterion}.
      * 
      * @param baseDocumentName name of the document that is being split.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @param plainSyntaxRenderer the renderer to convert to plain text
+     * @param plainTextRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
+     * @deprecated since 14.10.2, 15.0RC1 inject this as a component instead and set the base reference through
+     *             {@link #getParameters()}
      */
+    @Deprecated
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
-        BlockRenderer plainSyntaxRenderer, boolean prependBasePageName)
+        BlockRenderer plainTextRenderer, boolean prependBasePageName)
     {
-        this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
+        getParameters().setBaseDocumentReference(RefactoringUtils.resolveDocumentReference(baseDocumentName));
+        getParameters().setParameter(PARAM_PREPEND_BASE_PAGE_NAME, prependBasePageName);
+
         this.docBridge = docBridge;
-        this.plainSyntaxRenderer = plainSyntaxRenderer;
-        this.documentNames = new ArrayList<String>();
-        int dot = baseDocumentName.lastIndexOf('.');
-        this.spaceName = (dot != -1) ? baseDocumentName.substring(0, dot) : "Main";
-        this.basePageName = baseDocumentName.substring(dot + 1);
-        this.prependBasePageName = prependBasePageName;
+        this.plainTextRenderer = plainTextRenderer;
+        this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
+    }
+
+    /**
+     * Implicit constructor. Don't use it directly. Use the component manager instead (e.g. through injection).
+     * 
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public HeadingNameNamingCriterion()
+    {
     }
 
     @Override
-    public String getDocumentName(XDOM newDoc)
+    public DocumentReference getDocumentReference(XDOM xdom)
     {
-        String documentName = null;
-        String prefix = spaceName + ".";
-        if (newDoc.getChildren().size() > 0) {
-            Block firstChild = newDoc.getChildren().get(0);
+        DocumentReference documentReference = maybeTruncate(computeDocumentReference(xdom));
+
+        // Resolve any name clashes.
+        DocumentReference newDocumentReference = documentReference;
+        int localIndex = 0;
+        while (this.documentReferences.contains(newDocumentReference) || exists(newDocumentReference)) {
+            // Append a trailing local index if the page already exists.
+            newDocumentReference =
+                newDocumentReference(getPageName(documentReference) + INDEX_SEPERATOR + (++localIndex));
+        }
+
+        // Add the newly generated document reference into the pool of generated document references.
+        this.documentReferences.add(newDocumentReference);
+
+        return newDocumentReference;
+    }
+
+    private Optional<String> getFirstHeadingName(XDOM xdom)
+    {
+        if (xdom.getChildren().size() > 0) {
+            Block firstChild = xdom.getChildren().get(0);
             if (firstChild instanceof HeaderBlock) {
-                // Clone the header block and remove any unwanted stuff
+                // Clone the header block and remove any unwanted stuff.
                 Block clonedHeaderBlock = firstChild.clone(new BlockFilter()
                 {
                     public List<Block> filter(Block block)
@@ -120,50 +150,76 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                         return blocks;
                     }
                 });
-                XDOM xdom = new XDOM(clonedHeaderBlock.getChildren());
+                XDOM heading = new XDOM(clonedHeaderBlock.getChildren());
 
                 WikiPrinter printer = new DefaultWikiPrinter();
-                this.plainSyntaxRenderer.render(xdom, printer);
+                this.plainTextRenderer.render(heading, printer);
 
-                documentName = cleanPageName(printer.toString());
+                String headingName = cleanPageName(printer.toString());
+                return StringUtils.isEmpty(headingName) ? Optional.empty() : Optional.of(headingName);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private DocumentReference computeDocumentReference(XDOM xdom)
+    {
+        Optional<String> documentName = getFirstHeadingName(xdom);
+
+        // Fall back if necessary.
+        if (documentName.isEmpty()) {
+            this.mainPageNameAndNumberingNamingCriterion.getParameters()
+                .setBaseDocumentReference(getParameters().getBaseDocumentReference());
+            this.mainPageNameAndNumberingNamingCriterion.getParameters()
+                .setUseTerminalPages(getParameters().isUseTerminalPages());
+            return this.mainPageNameAndNumberingNamingCriterion.getDocumentReference(xdom);
+        } else if (getParameters().getParameter(PARAM_PREPEND_BASE_PAGE_NAME, false)) {
+            return newDocumentReference(getBasePageName() + INDEX_SEPERATOR + documentName.get());
+        } else {
+            return newDocumentReference(documentName.get());
+        }
+    }
+
+    private DocumentReference maybeTruncate(DocumentReference documentReference)
+    {
+        // Reserve 3 characters for the suffix needed to avoid name clashes in case the document reference was used
+        // previously or it exists already.
+        // TODO: The max length should be taken from the store API instead of being hard-coded.
+        int maxLength = (this.documentReferences.contains(documentReference) || exists(documentReference)) ? 765 : 768;
+
+        // We can only truncate the document name, so we can't do much if the base space reference is already too large.
+        // The document name can contain special characters that are escaped when serialized, requiring more length, so
+        // we can't simply subtract the document name length from the reference length to get the space reference
+        // length. Instead we have to compute another document reference without special characters in the name.
+        // Note: We're using toString() instead of a proper serializer in order to preserve backwards compatibility with
+        // old code that might still instantiate this class using the constructor.
+        boolean isNotTerminal = "WebHome".equals(documentReference.getName());
+        int lengthWithoutPageName = (isNotTerminal
+            ? new DocumentReference(documentReference.getName(),
+                new SpaceReference("n", documentReference.getLastSpaceReference().getParent()))
+            : new DocumentReference("t", documentReference.getLastSpaceReference())).toString().length() - 1;
+        if (lengthWithoutPageName < maxLength) {
+            int maxPageNameLength = maxLength - lengthWithoutPageName;
+            String pageName = getPageName(documentReference);
+            if (pageName.length() > maxPageNameLength) {
+                pageName = pageName.substring(0, maxPageNameLength);
+                if (isNotTerminal) {
+                    return new DocumentReference(documentReference.getName(),
+                        new SpaceReference(pageName, documentReference.getLastSpaceReference().getParent()));
+                } else {
+                    return new DocumentReference(pageName, documentReference.getLastSpaceReference());
+                }
             }
         }
 
-        // Fall back if necessary.
-        if (null == documentName || documentName.equals("")) {
-            documentName = mainPageNameAndNumberingNamingCriterion.getDocumentName(newDoc);
-        } else if (prependBasePageName) {
-            documentName = prefix + basePageName + INDEX_SEPERATOR + documentName;
-        } else {
-            documentName = prefix + documentName;
-        }
-
-        // Truncate long document names.
-        // TODO: the value should be asked to the store API instead of being hardcoded
-        int maxWidth = (documentNames.contains(documentName) || docBridge.exists(documentName)) ? 765 : 768;
-        if (documentName.length() > maxWidth) {
-            documentName = documentName.substring(0, maxWidth);
-        }
-
-        // Resolve any name clashes.
-        String newDocumentName = documentName;
-        int localIndex = 0;
-        while (documentNames.contains(newDocumentName) || docBridge.exists(newDocumentName)) {
-            // Append a trailing local index if the page already exists
-            newDocumentName = documentName + INDEX_SEPERATOR + (++localIndex);
-        }
-
-        // Add the newly generated document name into the pool of generated document names.
-        documentNames.add(newDocumentName);
-
-        return newDocumentName;
+        return documentReference;
     }
 
     /**
      * Utility method for cleaning out invalid / dangerous characters from page names.
      * 
-     * @param originalName the page name to be cleaned.
-     * @return the cleaned page name.
+     * @param originalName the page name to be cleaned
+     * @return the cleaned page name
      */
     private String cleanPageName(String originalName)
     {

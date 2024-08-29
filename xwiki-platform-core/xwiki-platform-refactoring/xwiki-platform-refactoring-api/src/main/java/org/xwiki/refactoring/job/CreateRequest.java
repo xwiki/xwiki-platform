@@ -22,6 +22,7 @@ package org.xwiki.refactoring.job;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -37,6 +38,24 @@ public class CreateRequest extends EntityRequest
     private static final String PROPERTY_TEMPLATE = "template";
 
     private static final String PROPERTY_SKIPPED_ENTITIES = "skippedEntities";
+
+    /**
+     * Default constructor.
+     */
+    public CreateRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public CreateRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @param templateReference the reference of the entity to use as template

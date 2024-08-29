@@ -19,7 +19,10 @@
  */
 package org.xwiki.refactoring;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents an in-memory wiki page used by the {@link org.xwiki.refactoring.splitter.DocumentSplitter} interface.
@@ -30,44 +33,74 @@ import org.xwiki.rendering.block.XDOM;
 public class WikiDocument
 {
     /**
-     * Full name of the target wiki page.
+     * The reference of the target wiki page.
      */
-    private String fullName;
+    private final DocumentReference documentReference;
 
     /**
      * The {@link XDOM} of the target wiki page.
      */
-    private XDOM xdom;
+    private final XDOM xdom;
 
     /**
      * The parent {@link WikiDocument} of this document.
      */
-    private WikiDocument parent;
+    private final WikiDocument parent;
 
     /**
      * Constructs a new {@link WikiDocument}.
      * 
-     * @param fullName full name of the target wiki page.
-     * @param xdom {@link XDOM} for the target wiki page.
-     * @param parent the parent {@link WikiDocument} of this document.
+     * @param fullName full name of the target wiki page
+     * @param xdom {@link XDOM} for the target wiki page
+     * @param parent the parent {@link WikiDocument} of this document
+     * @deprecated since 14.10.2, 15.0RC1 use {@link #WikiDocument(DocumentReference, XDOM, WikiDocument)} instead
      */
+    @Deprecated
     public WikiDocument(String fullName, XDOM xdom, WikiDocument parent)
     {
-        this.fullName = fullName;
+        this(RefactoringUtils.resolveDocumentReference(fullName, parent.getDocumentReference()), xdom, parent);
+    }
+
+    /**
+     * Constructs a new {@link WikiDocument}.
+     * 
+     * @param documentReference the reference of the target wiki page
+     * @param xdom {@link XDOM} for the target wiki page
+     * @param parent the parent {@link WikiDocument} of this document
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public WikiDocument(DocumentReference documentReference, XDOM xdom, WikiDocument parent)
+    {
+        this.documentReference = documentReference;
         this.xdom = xdom;
         this.parent = parent;
     }
 
     /**
-     * @return full name of the target wiki page.
+     * @return full name of the target wiki page
+     * @deprecated since 14.10.2, 15.0RC1 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getFullName()
     {
-        return fullName;
+        return this.documentReference.toString();
     }
 
     /**
-     * @return the {@link XDOM} of the target wiki page.
+     * @return the reference of the target wiki page
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
+    }
+
+    /**
+     * @return the {@link XDOM} of the target wiki page
      */
     public XDOM getXdom()
     {
@@ -75,7 +108,7 @@ public class WikiDocument
     }
 
     /**
-     * @return the parent {@link WikiDocument} of this document.
+     * @return the parent {@link WikiDocument} of this document
      */
     public WikiDocument getParent()
     {
@@ -87,7 +120,7 @@ public class WikiDocument
     {
         boolean equals = false;
         if (obj instanceof WikiDocument) {
-           equals = ((WikiDocument) obj).getFullName().equals(getFullName());
+            equals = ((WikiDocument) obj).getDocumentReference().equals(getDocumentReference());
         }
         return equals;
     }
@@ -95,6 +128,6 @@ public class WikiDocument
     @Override
     public int hashCode()
     {
-        return getFullName().hashCode();
-    }    
+        return getDocumentReference().hashCode();
+    }
 }

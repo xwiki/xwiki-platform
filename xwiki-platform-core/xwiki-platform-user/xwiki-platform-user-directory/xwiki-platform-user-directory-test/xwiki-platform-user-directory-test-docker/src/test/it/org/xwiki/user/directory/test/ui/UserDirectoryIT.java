@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.directory.test.ui;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -29,7 +28,6 @@ import org.xwiki.user.directory.test.po.UserDirectoryPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.xwiki.test.ui.AbstractTest.validateConsole;
 
 /**
  * Tests the User Directory feature.
@@ -48,20 +46,19 @@ import static org.xwiki.test.ui.AbstractTest.validateConsole;
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
     },
     extraJARs = {
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus,
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
-        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
-        "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate",
-        // The Solr store is not ready yet to be installed as an extension. We need it since the Tag UI requires
-        // Notifications, as otherwise even streams won't have a store.
+        // The Solr store is not ready yet to be installed as an extension, so we need to add it to WEB-INF/lib
+        // manually. See https://jira.xwiki.org/browse/XWIKI-21594
+        // We need it since the Tag UI requires Notifications, as otherwise even streams won't have a store.
         "org.xwiki.platform:xwiki-platform-eventstream-store-solr"
-    })
-public class UserDirectoryIT
+    }
+)
+class UserDirectoryIT
 {
     @Test
-    public void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
+    void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.loginAsSuperAdmin();
 

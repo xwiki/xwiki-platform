@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxGeneralRemarks</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxGeneralRemarks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 일반 =
+
+== 일반 사항 ==
+
+=== 2.0 일반 사항 ===
+
+XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}는 아래 표의 예와 같이 사용자가 입력한 일부 오류나 모호한 구문을 수정합니다.
+
+|=설명|=잘못되거나 모호한 구문의 예|=수정된 XWiki 구문 {{velocity}}$crtSyntaxVer{{/velocity}}
+|닫히지 않은 텍스트 스타일|{{{**bold}}}|{{{**bold**}}}
+|2개의 새 줄로 구분되지 않은 두 개의 독립형 요소|{{{| 테이블 셀}}}{{{* 목록 항목}}}|{{{| 테이블 셀}}}\\{{{* 목록 항목}}}
+|2개의 새 줄로 구분되지 않은 두 개의 독립형 요소|{{{paragraph}}}{{{--}}}{{{paragraph}}}|{{{paragraph}}}\\{{{--- -}}}\\{{{절}}}
+|문서 시작 부분의 새 줄 무시|&lt;문서 시작 부분의 새 줄&gt;paragraph|paragraph
+|닫히지 않은 제목 구문|{{{=== 제목}}}|{{{=== 제목 ===}}}</content>
+</xwikidoc>

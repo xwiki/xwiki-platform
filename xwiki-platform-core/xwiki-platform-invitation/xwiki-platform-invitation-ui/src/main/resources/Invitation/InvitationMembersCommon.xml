@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Invitation.InvitationMembersCommon" locale="">
+<xwikidoc version="1.5" reference="Invitation.InvitationMembersCommon" locale="">
   <web>Invitation</web>
   <name>InvitationMembersCommon</name>
   <language/>
@@ -34,7 +34,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 #*
@@ -53,7 +53,9 @@
  * Macros also depend on other macros but only other macros which are contained in this script.
  *###
 #if($doc.documentReference.name == 'InvitationMembersCommon')
-  {{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}
+  #set ($linkTarget = "${doc.getSpace()}.WebHome")
+  #set ($linkTarget = $services.rendering.escape($linkTarget, 'xwiki/2.1'))
+  {{info}}$services.localization.render('xe.invitation.internalDocument', [$linkTarget]){{/info}}
 #end
 ##
 #*
@@ -79,6 +81,7 @@
   #else
 
     (%class="message-table"%)(((
+     #set($checkboxCount = 0)
      #foreach($field in $fieldsToDisplay)
        #if($field == '_history')
          |=(%class="history"%)$services.localization.render('xe.invitation.displayMessageTable.history')##
@@ -98,12 +101,15 @@
          #if($field == 'sendingUser')
            |[[$escapetool.xml($message.getProperty("$field").getValue())]]##
          #elseif($field == 'subjectLine')
-           |[[$escapetool.xml($message.getProperty('subjectLine').getValue())&gt;&gt;$doc.getFullName()?inspect=group##
-           ## If the user is an admin they will be linked to a different page.
-           #if($asAdmin)
-             AsAdmin##
+           #set ($inspectValue = 'group')
+           #if ($asAdmin)
+             #set ($inspectValue = "${inspectValue}AsAdmin")
            #end
-           &amp;messageID=$message.getProperty('messageID').getValue()]]##
+           #set ($queryString = $escapetool.url({
+             'inspect': $inspectValue,
+             'messageID': $message.getProperty('messageID').getValue()
+           }))
+           |[[$escapetool.xml($message.getProperty('subjectLine').getValue())&gt;&gt;$doc.getFullName()||queryString="$queryString"]]##
          #elseif($field == 'status'
                  &amp;&amp; $numberOfRecipientsByMessage
                  &amp;&amp; $numberOfRecipientsByMessage.get($message.get('recipient'))
@@ -118,20 +124,28 @@
            |$services.localization.render('xe.invitation.displayMessageTable.multipleRecipients',
                      [$numberOfRecipientsByMessage.get($message.get('recipient'))])
          #elseif($field == '_checkbox')
-           |&lt;input type="checkbox" name="messageID" value="$message.getProperty('messageID').getValue()" ##
-           ## If there is only one message in the group, add the convienence of checking the box by default.
+           |&lt;label for="messageCheckboxID$checkboxCount" class='sr-only'&gt;
+             $escapetool.xml($services.localization.render('xe.invitation.displayMessageTable.checkbox.input.label'))
+           &lt;/label&gt;
+           &lt;input type="checkbox" id="messageCheckboxID$checkboxCount" name="messageID"
+            value="$message.getProperty('messageID').getValue()" ##
+           #set($checkboxCount = $checkboxCount + 1)
+           ## If there is only one message in the group, add the convenience of checking the box by default.
            #if($messages.size() == 1)
              checked="checked" ##
            #end
            /&gt;##
          #elseif($field == '_history')
+           #set ($inspectValue = 'history')
+           #if ($asAdmin)
+             #set ($inspectValue = "${inspectValue}AsAdmin")
+           #end
+           #set ($queryString = $escapetool.url({
+             'inspect': $inspectValue,
+             'messageID': $message.getProperty('messageID').getValue()
+           }))
            |[[$services.localization.render('xe.invitation.displayMessageTable.history')&gt;&gt;##
-              $doc.getFullName()?inspect=history##
-              ## If we are looking as an admin then go to historyAsAdmin
-              #if($asAdmin)
-                AsAdmin##
-              #end
-              &amp;messageID=$message.getProperty('messageID').getValue()]]##
+              $doc.getFullName()||queryString="$queryString"]]##
          #else
            |$services.rendering.escape($message.display($field, 'view') , $doc.syntax)##
          #end
@@ -171,7 +185,7 @@
    #end
    ## My invitations
    #if($inspect != 'all')
-     * [[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;$config.get('membersActionsPage')?inspect=all]] ##
+     * [[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;$config.get('membersActionsPage')||queryString='inspect=all']] ##
      #if($inspect == 'group')
 
        ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
@@ -186,8 +200,11 @@
        ## If viewing message history then show history brelow group.
        #if($inspect == 'history')
 
-         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
-               inspect=group&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
+        #set ($queryString = $escapetool.url({
+          'inspect': 'group',
+          'messageID': $parameterMap.get('messageID').get(0)
+        }))
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')||queryString="$queryString"]]
          *** **$services.localization.render('xe.invitation.tools.invitationHistory')**##
        #end
 
@@ -212,8 +229,7 @@
        &lt;/a&gt;{{/html}}
      ## View all invitations
      #if($inspect != 'allAsAdmin')
-       * [[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;##
-         $config.get('membersActionsPage')?inspect=allAsAdmin]] ##
+       * [[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;$config.get('membersActionsPage')||queryString='inspect=allAsAdmin']] ##
        #set($spamReports = [])
        #getMessagesByStatus($mail.values(), 'reported', $spamReports)
        #if($spamReports.size() &gt; 0)
@@ -223,8 +239,11 @@
        #if($inspect == 'groupAsAdmin')
          ** **$services.localization.render('xe.invitation.tools.invitationsInGroup')**
        #elseif($inspect == 'historyAsAdmin')
-         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')?##
-               inspect=groupAsAdmin&amp;messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]
+         #set ($queryString = $escapetool.url({
+             'inspect': 'groupAsAdmin',
+             'messageID': $parameterMap.get('messageID').get(0)
+           }))
+         ** [[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;$config.get('membersActionsPage')||queryString="$queryString"]]
          *** **$services.localization.render('xe.invitation.tools.invitationHistory')**
        #end
      #else
@@ -299,17 +318,21 @@
           ## [[Invitation]]  --&gt;  All invitations
           #set($discard = $trail.add($services.localization.render('xe.invitation.adminTools.allInvitationsLink')))
         #else
-          #set($allAsAdminLink = "[[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')&gt;&gt;"
-                                 + "$config.get('membersActionsPage')?inspect=allAsAdmin]]")
+          #set ($queryString = $escapetool.url({ 'inspect': 'allAsAdmin' }))
+          #set($allAsAdminLink = "[[$services.localization.render('xe.invitation.adminTools.allInvitationsLink')"
+            + "&gt;&gt;$config.get('membersActionsPage')||queryString='$queryString']]")
           #set($discard = $trail.add($allAsAdminLink))
           #if($inspect == 'groupAsAdmin')
             ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  Invitations in group
             #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
           #elseif($inspect == 'historyAsAdmin')
             ## [[Invitation]]  --&gt;  [[All invitations]]  --&gt;  [[Invitations in group]]  --&gt;  History of this invitation
+            #set ($queryString = $escapetool.url({
+             'inspect': 'groupAsAdmin',
+             'messageID': $parameterMap.get('messageID').get(0)
+            }))
             #set($allInGroupAsAdminLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
-                                          + "$config.get('membersActionsPage')?inspect=groupAsAdmin&amp;"
-                                          + "messageID=$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+                                          + "$config.get('membersActionsPage')||queryString='$queryString']]")
             #set($discard = $trail.add($allInGroupAsAdminLink))
             #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))
           #end
@@ -322,14 +345,17 @@
           #set($discard = $trail.add($services.localization.render('xe.invitation.tools.myInvitationsLink')))
         #else
           #set($myInvitationsLink = "[[$services.localization.render('xe.invitation.tools.myInvitationsLink')&gt;&gt;"
-                                    + "$config.get('membersActionsPage')?inspect=all]]")
+                                    + "$config.get('membersActionsPage')||queryString='inspect=all']]")
           #set($discard = $trail.add($myInvitationsLink))
           #if($inspect == 'group')
             #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationsInGroup')))
           #else
+            #set ($queryString = $escapetool.url({
+             'inspect': 'group',
+             'messageID': $parameterMap.get('messageID').get(0)
+            }))
             #set($myInvitationsinGroupLink = "[[$services.localization.render('xe.invitation.tools.invitationsInGroup')&gt;&gt;"
-                                             + "$config.get('membersActionsPage')?inspect=group&amp;amp;messageID="
-                                             + "$escapetool.xml($parameterMap.get('messageID').get(0))]]")
+                                             + "$config.get('membersActionsPage')||queryString='$queryString']]")
             #set($discard = $trail.add($myInvitationsinGroupLink))
             #if($inspect == 'history')
               #set($discard = $trail.add($services.localization.render('xe.invitation.tools.invitationHistory')))

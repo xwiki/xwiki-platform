@@ -20,9 +20,9 @@
 package org.xwiki.refactoring;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow to replace references during rename/move refactoring operations.
@@ -30,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.4RC1
  */
-@Unstable
 @Role
 public interface ReferenceRenamer
 {
@@ -39,12 +38,29 @@ public interface ReferenceRenamer
      *
      * @param block the {@link Block} to modify
      * @param currentDocumentReference the current document reference
-     * @param oldTarget the previous reference of the renamed document
-     * @param newTarget the new reference of the renamed document
+     * @param oldTarget the previous reference of the renamed entity (attachment or document)
+     * @param newTarget the new reference of the renamed entity (attachment or document)
      * @param relative {@code true} if the link should be serialized relatively to the current document
-     *      (see {@link org.xwiki.refactoring.internal.LinkRefactoring#updateRelativeLinks})
      * @return {@code true} if the given {@link Block} was modified
      */
     boolean renameReferences(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
         DocumentReference newTarget, boolean relative);
+
+    /**
+     * Change references of the given block so that the references pointing to the old target points to the new target.
+     *
+     * @param block the {@link Block} to modify
+     * @param currentDocumentReference the current document reference
+     * @param oldTarget the previous reference of the renamed entity (attachment or document)
+     * @param newTarget the new reference of the renamed entity (attachment or document)
+     * @param relative {@code true} if the link should be serialized relatively to the current document
+     * @return {@code true} if the given {@link Block} was modified
+     * @since 14.2RC1
+     */
+    default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+    {
+        return false;
+    }
+
 }

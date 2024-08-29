@@ -51,6 +51,13 @@
   width: 15% !important;
 }
 
+#usersandgroupstable button.rights-edit.yes {
+  color: $theme.notificationSuccessColor;
+}
+#usersandgroupstable button.rights-edit.no {
+  color: $theme.notificationErrorColor;
+}
+
 .spaceName {
   margin-left: 13px;
   margin-top: 5px;

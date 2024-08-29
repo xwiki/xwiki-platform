@@ -1,0 +1,307 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="ja">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>###############################################################################
+# WikiManager Manager translation page
+#
+# The translations contained in this page are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this page is GLOBAL.
+#
+# This contains the translations of the module in the default language
+# (generally English).
+# 
+# Translation key syntax:
+#   &lt;short top level project name&gt;.&lt;short module name&gt;.&lt;propertyName&gt;
+#   where:
+#   * &lt;short top level project name&gt; = top level project name without the "xwiki-" prefix,
+#                                     for example: commons, rendering, platform, enterprise, manager, etc
+#   * &lt;short module name&gt; = the name of the Maven module without the &lt;short top level project name&gt; prefix,
+#                           for example: oldcore, scheduler, activitystream, etc
+#   * &lt;propertyName&gt; = the name of the property using camel case,
+#                      for example updateJobClassCommitComment
+#
+# Comments: it's possible to add some detail about a key to make easier to
+#   translate it by adding a comment before it. To make sure a comment is not
+#   assigned to the following key use at least three sharps (###) for the comment
+#   or after it.
+# 
+# Deprecated keys:
+#   * when deleting a key it should be moved to deprecated section at the end
+#     of the file (between #@deprecatedstart and #@deprecatedend) and associated to the
+#     first version in which it started to be deprecated
+#   * when renaming a key, it should be moved to the same deprecated section
+#     and a comment should be added with the following syntax:
+#     #@deprecated new.key.name
+#     old.key.name=Some translation
+###############################################################################
+
+## Menus
+platform.wiki.menu.wikiindex=ウィキのインデックス
+platform.wiki.menu.deletewiki=ウィキを削除
+platform.wiki.menu.userwikis=ウィキ
+
+## Dependencies
+platform.wiki.dependencies.wiki.missing="Wiki" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki API"と"Wiki Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
+platform.wiki.dependencies.template.missing="Wiki Template" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki Template API"と"Wiki Template Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-template-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-template-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
+platform.wiki.dependencies.user.missing="Wiki User" Javaコンポーネントがインストールされていないため、このページは適切に機能しません。拡張機能マネージャーで"Wiki User API"と"Wiki User Script"の拡張機能がインストールされていることを確認するか、'xwiki-platform-wiki-user-api-&lt;バージョン&gt;.jar'と'xwiki-platform-wiki-user-script-&lt;バージョン&gt;.jar'が'WEB-INF/lib/'のウェブアプリケーションフォルダー内にあることを確認してください（手動インストールの場合）。
+
+## Create
+platform.wiki.create.button=ウィキを作成
+platform.wiki.create.title=新しいウィキを作成
+platform.wiki.create.members=メンバー
+platform.wiki.create.prettyname.empty=名称を指定してください
+platform.wiki.create.error=ウィキ"{0}"を作成できませんでした: {1}。
+platform.wiki.create.error.wikiname.databasealreadyexists=このIDをもつデータベースが既に存在しています
+platform.wiki.create.error.wikiname.wikialreadyexists=このIDは既に使用されています
+platform.wiki.create.error.wikiname.empty=IDを指定してください
+
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=ウィキ [{0}] は存在しません
+platform.wiki.error.oneParameterNotSpecified=パラメーター''{0}''が指定されていません。
+platform.wiki.error.parameterAcceptsMultipleValues=複数の値が許可されています。
+platform.wiki.error.exceptionWithMessage=例外：{0}
+platform.wiki.form.requiredField=必須
+platform.wiki.csrf.error=不正なセキュリティートークンです。再試行してください。
+
+## Users
+platform.wiki.users.userAlreadyMemberOfWiki=ユーザー {0}{1}{2} は既にウィキ {3}{4}{5} のメンバーです。
+platform.wiki.users.userNotMemberOfWiki=ユーザー {0}{1}{2} はウィキ {3}{4}{5} のメンバーではありません。
+platform.wiki.users.logInToContinue=続行するには最初に{0}ログイン{1}してください。
+platform.wiki.users.invitation.userAcceptedNotification=ユーザー''{0}''（{1}）はウィキ''{2}''（{3}）への招待を承諾しました。
+platform.wiki.users.invitation.userAcceptedSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への招待を受け入れ、ウィキに参加しました。
+platform.wiki.users.invitation.userRejectedSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への招待を拒否しました。
+platform.wiki.users.join.error.needInvitation=このウィキは招待専用です。管理者から招待を受け取る必要があります。
+platform.wiki.users.join.request.pendingRequestExists=ユーザー {0}{1}{2} にはウィキ {3}{4}{5} への保留中の参加リクエストがあります。ウィキの管理者が確認するまでお待ちください。
+platform.wiki.users.join.request.cancelConfirmation=ウィキ {0}{1}{2} の参加リクエストをキャンセルしてよろしいですか？
+platform.wiki.users.join.request.cancelYes=はい
+platform.wiki.users.join.request.cancelNo=いいえ
+platform.wiki.users.join.request.cancelSuccess=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の参加リクエストをキャンセルしました。
+platform.wiki.users.join.request.saveNotification=ユーザー''{0}''（{1}）はウィキ''{2}''（{3}）への参加を要求しました。
+platform.wiki.users.join.request.success=ユーザー {0}{1}{2} はウィキ {3}{4}{5} への参加リクエストを送信しました。
+platform.wiki.users.join.confirmation=このウィキに参加してよろしいですか{0}{1}{2}？
+platform.wiki.users.join.yes=はい
+platform.wiki.users.join.no=いいえ
+platform.wiki.users.join.success=ユーザー{0}{1}{2}がウィキに参加しました{3}{4}{5}。
+platform.wiki.users.leave.error.userIsOwner=ユーザー {0}{1}{2} はウィキ {3}{4}{5} の所有者です。ウィキを削除するか所有者を変更しない限り、所有者はこのウィキから退出できません。
+platform.wiki.users.leave.confirmation=ウィキ {0}{1}{2} を退出してよろしいですか？
+platform.wiki.users.leave.confirmation.yes=はい
+platform.wiki.users.leave.confirmation.no=いいえ
+platform.wiki.users.leave.success=ユーザー {0}{1}{2} はウィキ {3}{4}{5} を退出しました。
+platform.wiki.users.join.title=ウィキに参加
+platform.wiki.users.leave.title=ウィキ"{0}"から退出
+platform.wiki.users.leave.empty=ウィキから退出
+platform.wiki.users.delete.title=ウィキ"{0}"を削除
+platform.wiki.users.delete.empty=ウィキを削除
+platform.wiki.users.invitation.reply.hint=返信用メッセージ。ウィキの管理者が閲覧できます。招待に関する決定の理由を記入してください。
+platform.wiki.users.join.request.hint=ウィキ {0}{1}{2} に参加するには、参加リクエストを送信する必要があります。送信後、ウィキの管理者が参加を許可するかを確認します。
+platform.wiki.users.join.request.message.hint=参加をリクエストする際にウィキの管理者に送信するメッセージ。
+platform.wiki.users.invitation.title=ウィキ {0}{1}{2} に招待されました。
+platform.wiki.users.invitation.message.label=招待メッセージ
+platform.wiki.users.invitation.reply.title=返信
+platform.wiki.users.invitation.accept.label=受け入れる
+platform.wiki.users.invitation.reject.label=拒否する
+platform.wiki.users.invitation.postpone.label=後で
+platform.wiki.users.join.request.message.label=メッセージ
+platform.wiki.users.join.request.send.label=リクエストを送信
+platform.wiki.users.join.request.cancel.label=戻る
+
+## User profile
+platform.wiki.users.profile.joinedwikis.label=参加済のウィキ
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=あなたはまだどのウィキのメンバーでもありません。
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=ユーザーはどのウィキのメンバーでもありません。
+platform.wiki.users.profile.activity.title=ウィキ {0} のアクティビティー
+platform.wiki.users.profile.activity.hint=指定したウィキのアクティビティーストリームを生成。
+platform.wiki.users.profile.activity.multipletitle=ウィキ {0} のアクティビティー
+platform.wiki.users.profile.activity.show=アクティビティーを表示
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=ウィキ {0}{1}{2} を削除してよろしいですか？これは取り消せません！
+platform.wiki.delete.confirmation.retypeWikiId=ウィキの識別子を繰り返してください：
+platform.wiki.delete.error.wikiIdDoesNotMatch=削除するウィキの識別子を入力してください。
+platform.wiki.delete.success=ユーザー {0}{1}{2} はウィキ''{3}''を削除しました。
+
+## Wiki macro
+platform.wiki.macro.noWikis=作成済のウィキがありません（メインのウィキを除いて）。
+rendering.macro.wikis.name=ウィキ
+rendering.macro.wikis.description=全てのウィキの一覧を表示
+
+## LegacyWorkspaces macro
+rendering.macro.workspaces.name=ワークスペース（レガシー）
+rendering.macro.workspaces.description=互換性の理由で使用すべきでない非推奨のマクロです。代わりに"wikis"マクロを使用してください。
+
+## Browse
+platform.wiki.browse=ウィキを閲覧
+platform.wiki.browse.emptyvalue=該当なし
+platform.wiki.browse.wikiprettyname=名称
+platform.wiki.browse.description=詳細
+platform.wiki.browse.owner=オーナー
+platform.wiki.browse.membershipType=メンバーシップの種類
+platform.wiki.browse.doc.creationDate=作成日
+platform.wiki.browse._actions=アクション
+platform.wiki.browse._actions.join=参加
+platform.wiki.browse._actions.requestJoin=参加をリクエスト
+platform.wiki.browse._actions.viewInvitation=招待を閲覧
+platform.wiki.browse._actions.cancelJoinRequest=リクエストをキャンセル
+platform.wiki.browse._actions.leave=退出
+platform.wiki.browse._actions.delete=削除
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=誰でも参加可能
+WikiManager.WikiUserClass_membershipType_request=どの共通のユーザーも参加を要求できますが、管理者が受け入れる必要があります
+WikiManager.WikiUserClass_membershipType_invite=管理者のみウィキへの招待を送信することが可能
+WikiManager.WikiUserClass_userScope_local_only=ローカルユーザーのみ可能
+WikiManager.WikiUserClass_userScope_global_only=共通ユーザーのみ可能
+WikiManager.WikiUserClass_userScope_local_and_global=共通ユーザーとローカルユーザーの両方が可能
+platform.wiki.prop.wikiname=ウィキの識別子
+platform.wiki.prop.wikiprettyname=名称
+platform.wiki.prop.wikialias=エイリアス
+platform.wiki.prop.description=詳細
+platform.wiki.prop.owner=所有者
+platform.wiki.prop.membershipType.label=メンバーシップの種類
+platform.wiki.prop.membershipType.hint=ユーザーがこのウィキに参加する方法。
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=新しいウィキの固有の識別子。
+platform.wiki.create.wizard.desc.wikiprettyname=このウィキの表示名。
+platform.wiki.create.wizard.desc.wikialias=ウィキで使用するドメイン名。
+platform.wiki.create.wizard.desc.newTemplateHint=この新しいウィキに使用するテンプレート（全てのページがコピーされます）。
+platform.wiki.create.wizard.desc.description=ウィキとその目的についての簡単な説明。
+platform.wiki.create.wizard.desc.owner=管理機能による設定から独立して、ウィキに関する全ての権限を常に所有するユーザー。
+platform.wiki.create.wizard.desc.members=ウィキに参加できるユーザー。
+platform.wiki.create.wizard.step.nameAndType=ステップ1 — 名称を設定しましょう
+platform.wiki.create.wizard.step.nameAndType.shortname=名称
+platform.wiki.create.wizard.step.users=ステップ2 — メンバーを選択しましょう
+platform.wiki.create.wizard.step.users.shortname=ユーザー
+platform.wiki.create.wizard.step.cleaningUp=クリーンアップ
+platform.wiki.create.wizard.step.provisioning.cleanUp=このウィキを消去・削除
+platform.wiki.create.wizard.step.cleaningup.success=ウィキ {0} を正常に削除しました。
+platform.wiki.create.wizard.step.cleaningup.error=エラー。ウィキ {0} は削除されていません。
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=ウィキ {0} を削除します。承認してください。
+platform.wiki.create.wizard.step.cleaningUp.confirm=承認
+platform.wiki.create.wizard.setAsTemplate.label=このウィキをテンプレートにする
+platform.wiki.create.wizard.template.noTemplate=テンプレートがありません（既定）
+platform.wiki.create.wizard.userScope.label=ユーザースコープ
+platform.wiki.create.wizard.userScope.hint=どの種類のユーザーがウィキにアクセスできるか選択してください
+platform.wiki.create.wizard.template.label=テンプレート
+platform.wiki.create.wizard.flavortemplate.label=フレーバー / テンプレート
+platform.wiki.create.wizard.flavortemplate.hint=新しいウィキの最初のコンテンツとして使用するフレーバーあるいはテンプレート
+platform.wiki.create.wizard.flavortemplate.flavorTab=フレーバー
+platform.wiki.create.wizard.flavortemplate.templateTab=テンプレート
+platform.wiki.create.wizard.step.dw="作成"ボタンをクリックすると、ウィキを作成して、ウィキの初期化を援助するディストリビューションウィザードを開始しょます。ウィザードをスキップすると、ウィキは空となります。
+platform.wiki.create.wizard.step.previous=前のステップ
+platform.wiki.create.wizard.step.next=次のステップ
+platform.wiki.create.wizard.step.create=作成
+platform.wiki.create.wizard.step.creation=ウィキの作成
+platform.wiki.create.wizard.step.creation.wait=ウィキを作成するまでお待ちください。
+platform.wiki.create.wizard.step.creation.complete=ウィキ {0} が作成されました。アクセスできます。
+platform.wiki.create.wizard.step.creation.errorlog=ただし、作成する際にエラーが発生しました。エラーは確認が必要かもしれません。
+platform.wiki.create.wizard.step.creation.error=ウィキ {0} を作成できませんでした。削除を推奨します。
+platform.wiki.create.wizard.step.creation.go=ウィキに行く
+
+## Admin
+admin.wikis.description=ウィキの管理。
+admin.wikis.templates=ウィキのテンプレート
+admin.wikis.templates.description=ウィキのテンプレートを管理
+admin.wikis.templates.hint=テンプレートは、新しいウィキを作成する際に使用されるウィキです。ユーザーがテンプレートを選択して新しいウィキを作成する際、テンプレートの全てのコンテンツがコピーされます。
+admin.wikis.rights=作成権限
+
+## XWikiServer Sheet
+platform.wiki.sheet.title=ウィキ "{0}" の記述子
+platform.wiki.sheet.erroraliasalreadynotexists=ウィキのエイリアス"{0}"は既に存在します。
+platform.wiki.sheet.erroraliasdoesnotexists=ウィキのエイリアス"{0}"は存在しません。
+platform.wiki.sheet.title.settings=ウィキのプロパティー
+platform.wiki.sheet.title.createnewalias=新しいエイリアスを作成
+platform.wiki.sheet.title.viewaliases=エイリアスを閲覧
+platform.wiki.sheet.desc.wikiprettyname=ウィキの表示名。
+platform.wiki.sheet.desc.owner=このウィキの全ての権限をもつユーザー。
+platform.wiki.sheet.desc.secure=有効にすると、このウィキが生成する全ての外部URLが"https"から始まるようになります。
+platform.wiki.sheet.desc.port=このウィキが生成する全ての外部URLに使用するポート。設定がない場合は、メインのウィキの設定を使用します。ドメインに基づくURLにのみ適用されます。
+platform.wiki.sheet.desc.iswikitemplate=新しいウィキを作成する際にこのウィキをテンプレートとして使用できるかどうかを指定。
+platform.wiki.sheet.desc.server=ウィキにアクセスする際に使用するエイリアス。
+platform.wiki.sheet.desc.description=ウィキの簡潔な説明。
+platform.wiki.sheet.desc.homepage=ウィキのトップページ。
+platform.wiki.sheet.prop.wikiprettyname=名称
+platform.wiki.sheet.prop.owner=オーナー
+platform.wiki.sheet.prop.secure=安全（SSL）
+platform.wiki.sheet.prop.port=ポート
+platform.wiki.sheet.prop.description=詳細
+platform.wiki.sheet.prop.server=エイリアス
+platform.wiki.sheet.prop.homepage=トップページ
+platform.wiki.sheet.prop.iswikitemplate=ウィキのテンプレート
+platform.wiki.sheet.descriptor=このページではウィキ"{0}"へのアクセス方法と、関連するプロパティーを規定します。他の設定に関しては、 を確認してください
+platform.wiki.sheet.descriptor.admin=ウィキの管理ページ。
+platform.wiki.sheet.aliases=エイリアスは、ウィキの別名です。エイリアスを追加すると、異なるウィキのURLを作成できます。
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing={0}アプリケーション管理プラグイン{1}がインストールされていません。インストール後、もう一度お試しください。
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=ウィキ
+admin.wikis.template=ウィキのテンプレート
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=システムがウィキを準備しています。
+platform.wiki.create.wizard.step.provisioning.wait=システムがウィキを準備しています。お待ちください。
+platform.wiki.create.wizard.step.provisioning.complete=準備が完了しました。"完了"をクリックし、最後の操作を実行してください。
+platform.wiki.create.wizard.step.provisioning.error=ウィキ {0} を作成しましたが、テンプレートにあるいくつかのページがコピーされませんでした。ウィキを削除すべきかもしれません。
+platform.wiki.create.wizard.step.provisioning.finalize=完了
+
+#######################################
+## until 9.5-rc-1
+#######################################
+platform.wiki.delete.confirmation.yes=はい、このウィキを削除してください！
+platform.wiki.delete.confirmation.no=いいえ、戻ります！
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

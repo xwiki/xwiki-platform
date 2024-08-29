@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro(displayPanelProperty $obj $propName)
-  ; &lt;label#if ($xcontext.action == 'edit' || $xcontext.action == 'inline') for="${class.getName()}_${obj.number}_${propName}"#end&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;
+  ; &lt;label#if ($xcontext.action == 'edit') for="${class.getName()}_${obj.number}_${propName}"#end&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;
   : $doc.display($propName, $obj)
 #end
 

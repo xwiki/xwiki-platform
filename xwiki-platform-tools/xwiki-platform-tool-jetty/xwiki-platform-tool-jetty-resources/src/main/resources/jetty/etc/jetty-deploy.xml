@@ -20,64 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
 
 <!-- =============================================================== -->
 <!-- Create the deployment manager                                   -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-<!-- The deployment manager handles the lifecycle of deploying web   -->
+<!-- The deplyment manager handles the lifecycle of deploying web    -->
 <!-- applications. Apps are provided by instances of the             -->
 <!-- AppProvider interface.                                          -->
 <!-- =============================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
-
   <Call name="addBean">
     <Arg>
       <New id="DeploymentManager" class="org.eclipse.jetty.deploy.DeploymentManager">
         <Set name="contexts">
           <Ref refid="Contexts" />
         </Set>
-        <!-- Note: We don't need to define a "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern" attribute
-             since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
-             tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
 
-        <!-- Prevent any JAR scanning for tlds, etc, in order to improve startup speed. Seems it makes us win about
-             10% on startup time. -->
-        <Call name="setContextAttribute">
-          <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-          <Arg>somethingnotmatching.jar</Arg>
+        <!-- Add a customize step to the deployment lifecycle -->
+        <!-- uncomment and replace DebugBinding with your extended AppLifeCycle.Binding class
+        <Call name="insertLifeCycleNode">
+          <Arg>deployed</Arg>
+          <Arg>starting</Arg>
+          <Arg>customise</Arg>
         </Call>
+         -->
 
-        <Call id="webappprovider" name="addAppProvider">
-          <Arg>
-            <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
-              <Set name="monitoredDirName">
-                <Property>
-                  <Name>jetty.deploy.monitoredPath</Name>
-                  <Default>
-                    <!-- We deploy XWiki and the Root webapp with defined context xml files rather than based on
-                         webapps/ monitoring -->
-                    <Property name="jetty.home" default="." />/<Property name="jetty.deploy.monitoredDir" deprecated="jetty.deploy.monitoredDirName" default="contexts"/>
-                  </Default>
-                </Property>
-              </Set>
-              <Set name="defaultsDescriptor">
-                <Property>
-                  <Name>jetty.deploy.defaultsDescriptorPath</Name>
-                  <Default>
-                    <Property name="jetty.home" default="." />/etc/webdefault.xml
-                  </Default>
-                </Property>
-              </Set>
-              <Set name="scanInterval"><Property name="jetty.deploy.scanInterval" default="1"/></Set>
-              <Set name="extractWars"><Property name="jetty.deploy.extractWars" default="true"/></Set>
-              <Set name="configurationManager">
-                <New class="org.eclipse.jetty.deploy.PropertiesConfigurationManager">
-                </New>
-              </Set>
-            </New>
-          </Arg>
-        </Call>
       </New>
     </Arg>
   </Call>

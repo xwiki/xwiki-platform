@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -39,6 +40,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
@@ -48,6 +50,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.util.IdGenerator;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -113,7 +116,7 @@ public class DocumentContentAsyncExecutor
         this.parameters = parameters;
 
         this.transformationId = transformationId;
-        this.xdom = getContent(document, parameters);
+        this.xdom = getPreparedContent(document, parameters);
         this.documentReference = document.getDocumentReference();
         this.syntax = document.getSyntax();
         this.document = document;
@@ -126,9 +129,10 @@ public class DocumentContentAsyncExecutor
      * @param parameters the display parameters
      * @return the content as an XDOM tree
      */
-    private XDOM getContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
+    private XDOM getPreparedContent(DocumentModelBridge document, final DocumentDisplayerParameters parameters)
     {
-        XDOM content = parameters.isContentTranslated() ? getTranslatedContent(document) : document.getXDOM();
+        XDOM content =
+            parameters.isContentTranslated() ? getPreparedTranslatedContent(document) : document.getPreparedXDOM();
 
         if (parameters.getSectionId() != null) {
             HeaderBlock headerBlock =
@@ -144,7 +148,51 @@ public class DocumentContentAsyncExecutor
             }
         }
 
+        IdGenerator idGenerator = parameters.getIdGenerator();
+        if (idGenerator != null) {
+            content.setIdGenerator(idGenerator);
+            makeIdsUnique(content, idGenerator);
+        }
+
         return content;
+    }
+
+    /**
+     * Replace ids of heading and images by unique ids.
+     *
+     * @param content the XDOM to modify in-place
+     * @param idGenerator the id generator for unique ids
+     * @since 14.2RC1
+     */
+    private void makeIdsUnique(XDOM content, IdGenerator idGenerator)
+    {
+        // Traverse the XDOM and adapt all image and heading blocks.
+        content.getBlocks(block -> {
+            if (block instanceof ImageBlock) {
+                ImageBlock imageBlock = (ImageBlock) block;
+                imageBlock.setId(adaptId(idGenerator, imageBlock.getId()));
+            } else if (block instanceof HeaderBlock) {
+                HeaderBlock headerBlock = (HeaderBlock) block;
+                headerBlock.setId(adaptId(idGenerator, headerBlock.getId()));
+            }
+            return false;
+        }, Block.Axes.DESCENDANT);
+    }
+
+    /**
+     * @param idGenerator the id generator to use
+     * @param id the id to adapt to make it unique
+     * @return the unique id, can be the input if was already unique
+     * @since 14.2RC1
+     */
+    private String adaptId(IdGenerator idGenerator, String id)
+    {
+        if (StringUtils.isNotBlank(id)) {
+            String prefix = id.substring(0, 1);
+            String suffix = id.substring(1);
+            return idGenerator.generateUniqueId(prefix, suffix);
+        }
+        return id;
     }
 
     /**
@@ -156,7 +204,7 @@ public class DocumentContentAsyncExecutor
      * @param document the source document
      * @return the translated content of the given document, as XDOM tree
      */
-    private XDOM getTranslatedContent(DocumentModelBridge document)
+    private XDOM getPreparedTranslatedContent(DocumentModelBridge document)
     {
         try {
             DocumentModelBridge translatedDocument = this.documentAccessBridge.getTranslatedDocumentInstance(document);
@@ -168,7 +216,7 @@ public class DocumentContentAsyncExecutor
                 // The language of the given document doesn't match the context language. Use the translated content.
                 if (document.getSyntax().equals(translatedDocument.getSyntax())) {
                     // Use getXDOM() because it caches the XDOM.
-                    return translatedDocument.getXDOM();
+                    return translatedDocument.getPreparedXDOM();
                 } else {
                     // If the translated document has a different syntax then we have to parse its content using the
                     // syntax of the given document.
@@ -180,7 +228,7 @@ public class DocumentContentAsyncExecutor
             // Use the content of the given document.
         }
 
-        return document.getXDOM();
+        return document.getPreparedXDOM();
     }
 
     /**

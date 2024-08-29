@@ -23,15 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.job.diff.EntityUnifiedDiff;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.ObjectReference;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -61,6 +63,9 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
 
     @Inject
     private AttachmentUnifiedDiffBuilder attachmentDiffBuilder;
+
+    @Inject
+    private Provider<GeneralMailConfiguration> emailProvider;
 
     /**
      * Computes the differences, in unified format, between two versions of a document. A null document represents a
@@ -257,9 +262,12 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
             if (xclass != null) {
                 PropertyClass propertyClass = (PropertyClass) xclass.get(property.getName());
                 String propertyType = propertyClass == null ? null : propertyClass.getClassType();
-                return "Password".equals(propertyType) || "Email".equals(propertyClass);
+
+                return "Password".equals(propertyType)
+                    || ("Email".equals(propertyType) && this.emailProvider.get().shouldObfuscate());
             }
         }
+
         return false;
     }
 

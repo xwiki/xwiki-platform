@@ -39,6 +39,77 @@
   margin: 0 0 0 5px;
 }
 
+/*Supported By*/
+
+.supported-by {
+  color: $theme.textColor;
+}
+
+.supported-by h3,
+.supported-by h4{
+  font-size: 1.1rem;
+  opacity: .5;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.supporter-listing {
+  position: relative;
+  left: -6px;
+}
+
+.support-multi-plan {
+  position: relative;
+  padding: 4px 0px;
+}
+
+.supporter-name {
+  font-weight: 600;
+  padding: 0px 6px;
+}
+
+.support-multi-name {
+  cursor: pointer;
+}
+
+.support-multi-name:hover {
+  background-color: rgba(0,0,0,0.1);
+  border-radius: 56px;
+}
+
+.plan-name.infomessage {
+  border-radius: 96px;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  padding: 4px 6px;
+}
+
+.plan-name.infomessage a {
+  text-decoration: none;
+}
+
+.support-dialog {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  padding: 12px 16px;
+  position: absolute;
+  display: none;
+  top: 24px;
+  left: 0;
+  z-index: 1;
+}
+
+.support-dialog.open {
+  display: block;
+}
+
+.support-flex {
+  display: flex;
+  gap: 8px;
+}
+
+/*--end supported by*/
+
 .extension-actions {
   clear: right;
   float: right;
@@ -315,7 +386,7 @@ ul.innerMenu {
   margin-left: -1px;
 }
 .innerMenu li a {
-  border-radius: 5px 5px 0 0 / 3px 3px 0 0;
+  border-radius: 7px 7px 0 0 / 5px 5px 0 0;
   border-top: 3px solid $theme.borderColor;
   display: inline-block;
   margin: 2px 2em 0 0;
@@ -324,7 +395,7 @@ ul.innerMenu {
   top: 0px;
 }
 .innerMenu li a:hover {
-  border-radius: 5px 5px 0 0;
+  border-radius: 8px 8px 0 0;
   border-top: 5px solid $theme.borderColor;
   margin-top: 0px;
 }
@@ -333,7 +404,7 @@ ul.innerMenu {
   border: 0 none;
   border-top: 5px solid $theme.panelCollapsedBackgroundColor;
   margin-top: 0;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 8px 8px;
   box-shadow: 3px;
 }
 .innerMenu li a.current:after {

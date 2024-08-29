@@ -1,0 +1,179 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Solr検索管理
+solr.admin.submit=適用
+solr.admin.error.action={0}ができませんでした：
+solr.admin.error.notallowed=このアクションの実行は許可されていません。
+solr.admin.error.norights=このセクションへのアクセスには管理権限が必要です。
+solr.admin.success.action={0}を正常に開始しました。
+solr.admin.status.title=状態
+solr.admin.status.queueSize.label=実行待機中
+solr.admin.status.queueSize.hint=インデックス化、再インデックス化、インデックスからの削除を待機している構成要素の数（実行中のアクションに依存）。
+solr.admin.indexing.title=インデックス化
+solr.admin.indexing.action.label=アクション
+solr.admin.indexing.action.hint=インデックスに対して実行するアクション。
+solr.admin.indexing.action.select_index=インデックスに追加
+solr.admin.indexing.action.select_delete=インデックスから削除
+solr.admin.indexing.action.select_reindex=再インデックス
+solr.admin.indexing.wiki.label=ウィキ
+solr.admin.indexing.wiki.hint=全てのドキュメントに選択したアクションを実行するウィキ。
+solr.admin.indexing.wiki.select_farm=全てのウィキ
+solr.admin.indexing.query.label=カスタムクエリー
+solr.admin.indexing.query.hint=選択したアクションを実行するインデックスのドキュメントを制限するクエリー（オプション）。
+solr.admin.info.affectedDocuments=影響を受けるインデックス内のドキュメント：
+solr.sortBy=並び替え：
+solr.sortBy.score=関連性
+solr.sortBy.title_sort=タイトル
+solr.sortBy.date=最終更新日
+solr.sortBy.author_display_sort=最終更新者
+solr.sortBy.filename_sort=ファイル名
+solr.sortBy.attsize_sort=ファイルのサイズ
+solr.sortBy.attdate_sort=アップロード日
+solr.sortBy.attauthor_display_sort=アップロードした人
+solr.sortOrder.asc=昇順
+solr.sortOrder.desc=降順
+solr.options=表示：
+solr.options.highlight=ハイライト
+solr.options.highlight.title=各結果で該当するものを抽出して表示
+solr.options.facet=ファセット
+solr.options.facet.title=結果を追加でフィルタリングすることを許可
+solr.result.language=言語
+solr.result.locatedIn=保存場所
+solr.result.author={0}が{1}に変更
+solr.result.mediaType=種類 {0} のファイル
+solr.result.uploadedBy={0}が{1}にアップロードしました（{2}）
+solr.result.highlightAll=全ての一致をハイライト
+solr.facets.title=検索を絞り込む
+solr.facets.hint=カテゴリーを選択して結果を絞り込む
+solr.facets.resetAll=全てリセット
+solr.facets.expandAll=全て展開
+solr.facets.collapseAll=全て折りたたむ
+solr.facets.emptyValue=空の値
+solr.facets.moreValues=あと{0}件
+solr.filterBy.type.document=ドキュメント
+solr.filterBy.type.attachment=添付ファイル
+solr.filterBy.type.object=オブジェクト
+solr.filterBy.type.object_property=オブジェクトのプロパティー
+solr.filterBy.fileType.image=画像
+solr.filterBy.fileType.audio=音声
+solr.filterBy.fileType.video=動画
+solr.filterBy.fileType.text=テキスト
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=プレゼンテーション
+solr.filterBy.fileType.spreadsheet=スプレッドシート
+solr.filterBy.fileType.archive=アーカイブ
+solr.filterBy.fileType.font=フォント
+solr.filterBy.fileType.other=その他
+solr.facet.fileType.text.plain=プレーンテキスト
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Javaのソースコード
+solr.facet.fileType.text.sh=シェルスクリプト
+solr.facet.fileType.image.icon=アイコン
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=バイナリーデータ
+solr.facet.date.today=今日
+solr.facet.date.last7Days=過去7日間
+solr.facet.date.last30Days=過去30日間
+solr.facet.date.olderThan30Days=30日以前
+solr.facet.date.customInterval=カスタムの日付・時間間隔
+solr.facet.date.start=開始日時
+solr.facet.date.end=終了日時
+solr.facet.date.applyCustomInterval=適用
+solr.facet.date.between={0}から{1}まで
+solr.facet.date.after={0}以降
+solr.facet.date.before={0}以前
+solr.facet.date.any=任意の日付
+solr.facet.size.tiny=最小
+solr.facet.size.small=小
+solr.facet.size.medium=中
+solr.facet.size.large=大
+solr.facet.size.between={0}と{1}の間
+solr.facet.size.lessThan={0}より少ない
+solr.facet.size.moreThan={0}より多い
+solr.facet.size.any=任意のサイズ
+solr.field.type=結果の種類
+solr.field.locale=言語
+solr.field.locale.emptyValue=言語設定はありません
+solr.field.locale.emptyValue.hint=いくつかのドキュメントは自然言語で書かれていないスクリプトを含んでおり、言語設定がありません。あるいは（このページのように）現在の言語で表示されているユーザーインターフェースを構成しています。
+solr.field.wiki=ウィキ
+solr.field.spaces=保存場所
+solr.field.space_exact=場所
+solr.field.space_facet=保存場所
+solr.field.name=ページ
+solr.field.name_exact=ページ
+solr.field.title=タイトル
+solr.field.author=最終更新者
+solr.field.author_display=最終更新者
+solr.field.creator=作成者
+solr.field.creator_display=作成者
+solr.field.date=最終更新日
+solr.field.creationdate=作成日
+solr.field.doccontent=表示されるドキュメントの内容
+solr.field.doccontentraw=ドキュメントの内容のソース
+solr.field.class=オブジェクトの種類
+solr.field.class.definedBy={0} » {1} により規定
+solr.field.propertyname=プロパティーの名称
+solr.field.propertyvalue=プロパティーの値
+solr.field.filename=添付ファイルの名称
+solr.field.attcontent=添付ファイルの内容
+solr.field.comment=コメント
+solr.field.objcontent=オブジェクト
+solr.field.mimetype=ファイルの種類
+solr.field.attauthor=アップロードした人
+solr.field.attauthor_display=アップロードした人
+solr.field.attdate=アップロード日
+solr.field.attsize=ファイルのサイズ
+solr.uix.docdoesnotexist.title=以下のページをお探しでしたか？
+solr.uix.attachmentdoesnotexist.title=以下の添付ファイルをお探しでしたか？
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+solr.result.location={0} » {1} » {2} に位置
+
+## until 7.2RC1
+solr.field.space=場所
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

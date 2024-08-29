@@ -98,9 +98,12 @@
 
   @panel-bg:                            $theme.panelBackgroundColor;
   @panel-default-text:                  $theme.panelTextColor;
+  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
+  ## Kept for backward compatibility
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  
+
   ##
   ## XWiki variables: LESS variables specific to XWiki
   ##
@@ -108,8 +111,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
 #end
 
 ##############################################
@@ -194,6 +197,7 @@
       "legend-border-color": "color",
       "panel-bg" : "color",
       "panel-default-text" : "color",
+      "panel-header-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
       "breadcrumb-separator": "escapedText",
@@ -225,13 +229,48 @@
   ## currently, it comes from the old color theme object (see colorThemeInit.vm)
   // Default
   @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @panel-header-bg:                     $theme.panelHeaderBackgroundColor;
+  @panel-header-text:                   $theme.panelHeaderTextColor;
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  @xwiki-page-header-bg-image:          $stringtool.defaultString($theme.headerBackgroundImage, '""');
+  @xwiki-page-header-bg-position:       $stringtool.defaultString($theme.headerBackgroundPosition, '""');
+  ## Kept for backward compatibility
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+
+  ## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+  ## Make sure the links are dark enough in the tmDrawer
+  @navbar-default-link-color:           #727272;
+  @navbar-default-color:                #727272;
+  ## Make sure the placeholder are not too light (the default from bootstrap is #999, which does not have enough contrast with a white bg)
+  @input-color-placeholder:             #727272;
+  ## Make sure the breadcrumb links are dark enough
+  @breadcrumb-active-color:             #707070;
+  @breadcrumb-color:                    #707070;
+  ## Make sure that all text-muted based components have sufficient contrast on white
+  @text-muted:                          @gray;
+  ## Make the links a bit darker than the default from bootstrap. Default #337ab7 has sufficient contrast on white
+  ## but this updated value allows light grey background to keep enough contrast.
+  @brand-primary:                       #2f70a7;
+  ## Make regular text darker so that the contrast with links is high enough to differentiate them easily.
+  @text-color:                          #222222;
+  ## Make sure button white text has enough contrast on the whole gradient
+  @btn-primary-bg:                      #386da7;
+  ## Make sure all kinds of buttons have proper contrast
+  @btn-danger-bg:                       #ca302c;
+  @brand-success:                       #077537;
+  ## For the warning buttons, since the saturation is very high, we'd need to make the background way darker, going
+  ## from an orangish yellow to complete brown. Instead, we change the text color to black.
+  @btn-warning-color:                   #000;
+  ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
+  ## @alert-warning-bg default value from bootstrap does not pose contrast issues, so we don't override it.
+  @alert-danger-bg:                     #f8ecec;
+  @alert-success-bg:                    #e5f3df;
+  @alert-info-bg:                       #e1f1f9;
+  ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
+  @brand-danger:                        #cc3333;
 #end
 
 ##############################################

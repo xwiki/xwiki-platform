@@ -37,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.3RC1
  */
-@Unstable
 @Role
 public interface SolrUtils
 {
@@ -117,6 +116,18 @@ public interface SolrUtils
     void setMap(String fieldName, Map<String, ?> fieldValue, SolrInputDocument document);
 
     /**
+     * @param key the key in the map
+     * @param mapFieldName the name of the virtual map field
+     * @param type the type of the value
+     * @return the name of the Solr field
+     * @since 13.9RC1
+     */
+    default String getMapFieldName(String key, String mapFieldName, Type type)
+    {
+        return mapFieldName;
+    }
+
+    /**
      * Extract the identifier of the document.
      * 
      * @param document the Solr document
@@ -172,7 +183,6 @@ public interface SolrUtils
      * @param document the Solr document
      * @since 12.10
      */
-    @Unstable
     default void setAtomic(String modifier, String fieldName, Object fieldValue, Type valueType,
         SolrInputDocument document)
     {
@@ -250,6 +260,40 @@ public interface SolrUtils
     }
 
     /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @return the Solr query version of the passed value
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5
+     */
+    default String toCompleteFilterQueryString(Object fieldValue)
+    {
+        return toFilterQueryString(fieldValue);
+    }
+
+    /**
+     * Serialize the value into a string that is a complete query string, i.e., cannot be combined with other strings.
+     * <p>
+     * For example, this serializes the empty string as "".
+     *
+     * @param fieldValue the value of a field
+     * @param valueType the type to use as reference to serialize the value
+     * @return the Solr query version of the passed value
+     * @since 13.10.7
+     * @since 14.4.2
+     * @since 14.5
+     */
+    default String toCompleteFilterQueryString(Object fieldValue, Type valueType)
+    {
+        return toFilterQueryString(fieldValue, valueType);
+    }
+
+
+    /**
      * Extract from the document the value associated with the passed field name.
      * 
      * @param <T> the of the value to return
@@ -285,6 +329,22 @@ public interface SolrUtils
     default <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
     {
         return getCollection(fieldName, document);
+    }
+
+    /**
+     * Extract from the document the values associated with the passed field name.
+     * 
+     * @param <T> the of the value to return
+     * @param fieldName the name of the field in the document
+     * @param document the Solr document
+     * @param targetType the type of the value to return
+     * @return the value associated with the passed field name in the document
+     * @since 16.8.0RC1
+     */
+    @Unstable
+    default <T> List<T> getList(String fieldName, SolrDocument document, Type targetType)
+    {
+        return getList(fieldName, document);
     }
 
     /**

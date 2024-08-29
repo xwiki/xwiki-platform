@@ -154,6 +154,8 @@ public class DocumentsDeletingListener extends AbstractEventListener
 
     private void checkIfDeleteIsAllowed(EntitySelection entitySelection, ExtensionBreakingQuestion question)
     {
+        // TODO: To be fixed since this means it's not possible to change the implementation (will get a
+        // ClassCastException).
         XarInstalledExtensionRepository repository = (XarInstalledExtensionRepository) installedExtensionRepository;
         DocumentReference documentReference = (DocumentReference) entitySelection.getEntityReference();
 

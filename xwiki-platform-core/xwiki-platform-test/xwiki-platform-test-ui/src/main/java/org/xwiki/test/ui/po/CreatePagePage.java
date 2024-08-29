@@ -53,6 +53,9 @@ public class CreatePagePage extends ViewPage
     @FindBy(id = "terminal")
     private WebElement isTerminalCheckbox;
 
+    @FindBy(css = "form#create input[type='submit']")
+    private WebElement createButton;
+
     public static CreatePagePage gotoPage()
     {
         getUtil().gotoPage("Main", "WebHome", "create");
@@ -91,13 +94,33 @@ public class CreatePagePage extends ViewPage
 
     public void setType(String type)
     {
-        this.pageTypePicker.selectTypeByValue(type);
+        this.pageTypePicker.selectByValue(type);
     }
 
     public void clickCreate()
     {
-        // Submit the create form. Don`t use the DocumentPicker element since it might not always be there.
-        getDriver().findElementWithoutWaiting(By.id("create")).submit();
+        clickCreate(true);
+    }
+
+    /**
+     * Click on the create page button.
+     * 
+     * @param waitForSubmit whether to wait for the form to be submitted or not
+     * @since 14.8RC1
+     */
+    public void clickCreate(boolean waitForSubmit)
+    {
+        // The form is submitted by JavaScript code if the submit button is clicked while the form has pending
+        // asynchronous validations, and in such case Selenium doesn't wait for the form to be submitted.
+        if (waitForSubmit) {
+            getDriver().addPageNotYetReloadedMarker();
+        }
+
+        this.createButton.click();
+
+        if (waitForSubmit) {
+            getDriver().waitUntilPageIsReloaded();
+        }
     }
 
     public EditPage createPage(String spaceValue, String pageValue)
@@ -115,9 +138,7 @@ public class CreatePagePage extends ViewPage
      */
     public EditPage createPage(String title, String spaceValue, String pageValue, boolean isTerminalPage)
     {
-        fillForm(title, spaceValue, pageValue, isTerminalPage);
-        clickCreate();
-        return new EditPage();
+        return createPageFromTemplate(title, spaceValue, pageValue, null, isTerminalPage);
     }
 
     public EditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue)
@@ -146,7 +167,9 @@ public class CreatePagePage extends ViewPage
         boolean isTerminalPage)
     {
         fillForm(title, spaceValue, pageValue, isTerminalPage);
-        setTemplate(templateValue);
+        if (templateValue != null) {
+            setTemplate(templateValue);
+        }
         clickCreate();
         return new EditPage();
     }
@@ -156,7 +179,7 @@ public class CreatePagePage extends ViewPage
      * @param spaceReference document's space reference (parent nested document), ignored if {@code null}
      * @param pageName document's name (space name or page name, depending if terminal or not), ignored if {@code null}
      * @param isTerminalPage true if the new document is terminal, false for non-terminal
-     * @since public since 7.4M2
+     * @since 7.4M2
      */
     public void fillForm(String title, String spaceReference, String pageName, boolean isTerminalPage)
     {

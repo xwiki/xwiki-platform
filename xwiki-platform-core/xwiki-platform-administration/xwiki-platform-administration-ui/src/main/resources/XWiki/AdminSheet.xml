@@ -270,7 +270,8 @@
 
 #macro (verticalNavigation $menu $options)
   {{html clean="false"}}
-  &lt;div id="$!options.id" class="panel-group $!options.cssClass" role="tablist" aria-multiselectable="true"&gt;
+  &lt;nav id="$!options.id" class="panel-group $!options.cssClass"
+    aria-label="$escapetool.xml($services.localization.render('administration.menu.label'))"&gt;
     &lt;div class="panel xform"&gt;
       &lt;label for="adminsearchmenu" class="hidden"&gt;$services.localization.render('search')&lt;/label&gt;
       &lt;input type="text" class="form-control panel-group-filter" autocomplete="off" id="adminsearchmenu"
@@ -286,7 +287,7 @@
         $escapetool.xml($services.localization.render('administration.menu.search.noResults'))
       &lt;/div&gt;
     &lt;/div&gt;
-  &lt;/div&gt;
+  &lt;/nav&gt;
   {{/html}}
 #end
 
@@ -302,18 +303,21 @@
     #set ($children = [])
     #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     &lt;div class="panel panel-default"&gt;
-      &lt;a class="panel-heading#if (!$isActive) collapsed#end" role="tab" id="panel-heading-$escapedId"
-        href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
-        data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
-        title="$!escapetool.xml($item.description)"&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/a&gt;
-      &lt;div class="panel-collapse collapse#if ($isActive) in#end" role="tabpanel" id="panel-body-$escapedId"
+      &lt;a class="panel-heading#if (!$isActive) collapsed#end" id="panel-heading-$escapedId"
+      href="$!item.url" data-toggle="collapse"#if ("$!options.id" != '') data-parent="#$options.id" #end
+      data-target="#panel-body-$escapedId" aria-expanded="$isActive" aria-controls="panel-body-$escapedId"
+      title="$!escapetool.xml($item.description)"&gt;
+        &lt;span&gt;$!services.icon.renderHTML($item.icon)$escapetool.xml($name)&lt;/span&gt;
+        &lt;div&gt;$services.icon.renderHTML('caret-down')&lt;/div&gt;
+      &lt;/a&gt;
+      &lt;section class="panel-collapse collapse#if ($isActive) in#end" id="panel-body-$escapedId"
           aria-labelledby="panel-heading-$escapedId"&gt;
         &lt;div class="list-group"&gt;
           #foreach ($child in $children)
             #verticalNavigationItem($child $options)
           #end
         &lt;/div&gt;
-      &lt;/div&gt;
+      &lt;/section&gt;
     &lt;/div&gt;
   #else
     &lt;a class="list-group-item#if ($isActive) active#end" data-id="$escapedId"
@@ -371,7 +375,7 @@
   #end
 #end
 (% id="document-title" %)(((
-  = $services.localization.render("administration.sectionTitle$level", [$sectionName]) =
+  = $services.localization.render("administration.sectionTitle$level", 'xwiki/2.1', [$sectionName]) =
   ## Display the category/section description below the title.
   #set ($categoryOrSectionId = $crtCategory.id)
   #if ("$!crtSection.id" != '')
@@ -714,7 +718,7 @@ require(['jquery'], function($) {
     // Filter the categories.
     panelGroup.find('a.panel-heading').each(function() {
       var panel = $(this).closest('.panel');
-      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').size() &gt; 0;
+      var hasVisibleSections = panel.find('.list-group-item').not('.hidden').length &gt; 0;
       var matchesFilterQuery = !filterItem.call($(this), text);
       panel.toggle(hasVisibleSections || matchesFilterQuery);
       if (!hasVisibleSections &amp;&amp; matchesFilterQuery) {
@@ -738,7 +742,7 @@ require(['jquery'], function($) {
         .next('.panel-collapse').addClass('in').css('height', '');
     }
     // Show/Hide the "No results." message.
-    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').size() &gt; 0;
+    var hasVisibleCategories = panelGroup.find('a.panel-heading').filter(':visible').length &gt; 0;
     panelGroup.find('.noitems').toggleClass('hidden', hasVisibleCategories);
   };
 
@@ -749,7 +753,7 @@ require(['jquery'], function($) {
     var panelGroup = $(this).closest('.panel-group');
     var text = $(this).val().toLowerCase();
     // Schedule a new filter operation.
-    timeoutId = setTimeout($.proxy(filterPanelGroup, panelGroup, text), 500);
+    timeoutId = setTimeout(filterPanelGroup.bind(panelGroup, text), 500);
 
   // Finally, enable the search input.
   }).prop('disabled', false);
@@ -887,7 +891,11 @@ require(['jquery'], function($) {
 
 #admin-page-content label &gt; input[type="checkbox"],
 #admin-page-content label &gt; input[type="radio"] {
-  vertical-align: bottom;
+  vertical-align: middle;
+}
+
+#admin-page-content .usersorgroupsnames label &gt; input[type="radio"] {
+  vertical-align: unset;
 }
 
 /**
@@ -929,8 +937,21 @@ require(['jquery'], function($) {
 /* Override general table styles. */
 /* TODO: Move to livetable.css */
 
-#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+#usersandgroupstable td, #alldocstable td {
   border-color: transparent;
+}
+
+#admin-page-content .usersorgroupsnames {
+  white-space: nowrap;
+  /* Triple of the value for the .right column. This is useful to make sure the columns are somewhat balanced when
+    there is only one right (e.g., extension rights with a default flavor).
+    Keeping them balanced is useful to make sure the filters are displayed properly, which is especially important
+    on a subwiki where we have to find a place to display the scope selector. */
+  width: 27%;
+}
+
+#usersandgroupstable-filters-scope {
+  white-space: nowrap;
 }
 
 #usersandgroupstable-filters #name {
@@ -951,6 +972,10 @@ require(['jquery'], function($) {
   vertical-align: top;
 }
 
+.xform #usersandgroupstable select {
+  width: unset;
+}
+
 /**
  * Bootstrap's Accordion Menu
  */
@@ -961,31 +986,46 @@ require(['jquery'], function($) {
 }
 
 .admin-menu .panel-heading.collapsed {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .admin-menu a.panel-heading {
-  display: block;
+  display: flex;
   font-size: 100%;
 }
+
+.admin-menu a.panel-heading span {
+  flex-grow: 1;
+}
+
 .admin-menu a.panel-heading:not(.collapsed) {
   background-color: $theme.menuBackgroundColor;
   color: $theme.menuLinkColor;
 }
+
+/* Rotate the carret on collapse. */
+.admin-menu a.panel-heading.collapsed &gt; *:last-child {
+  transform: rotate(90deg);
+}
+
+.admin-menu a.panel-heading &gt; *:last-child {
+  transition: transform 200ms ease-in-out;
+}
+
 .admin-menu a.panel-heading:active,
 .admin-menu a.panel-heading:focus,
 .admin-menu a.panel-heading:hover {
   text-decoration: none;
 }
 
-.admin-menu .panel-heading &gt; *:first-child {
+.admin-menu .panel-heading &gt; span &gt; *:first-child {
   margin-right: .8em;
 }
 
 .admin-menu .panel-collapse &gt; .list-group:last-child .list-group-item.last {
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
 
 .admin-menu .panel.noitems &gt; .panel-heading {

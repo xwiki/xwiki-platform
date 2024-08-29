@@ -80,7 +80,7 @@ if [ -z "$JETTY_STOP_PORT" ]; then
 fi
 
 # The location where to store the process id
-XWIKI_LOCK_DIR="/var/tmp"
+XWIKI_LOCK_DIR="${PRGDIR}/tmp"
 
 # The number of seconds to wait for the XWiki lock file to be removed before exiting.
 XWIKI_WAIT_TIME=30
@@ -126,7 +126,7 @@ XWIKI_DATA_DIR=${xwikiDataDir}
 
 # Specify Jetty's home and base directories
 JETTY_HOME=jetty
-JETTY_BASE=$XWIKI_DATA_DIR/jetty
+JETTY_BASE=.
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 # Specify port and key to stop a running Jetty instance

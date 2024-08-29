@@ -38,16 +38,29 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Підказки
 help.tipsPanel.noTipMessage=Немає підказок!
-help.tipsPanel.gettingStartedTip=Якщо ви новий користувач XWiki, ознайомтеся з [[Керівництвом по початку роботи&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Перехід на будь-яку сторінку в вікі за допомогою Ctrl + G або Meta + G.\nДивіться [[ще про гарячі клавіші &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=Чи знаєте ви, що ви можете поліпшити XWiki? Витратьте 5 хвилин, щоб [[заповнити цей опитування &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] і допомогти цим проектом з відкритим вихідним кодом!
-help.tipsPanel.breadcrumbsTip=Ви можете використовувати стрілки на панелі навігації, щоб швидко перейти до споріднених і дочірнім сторінкам.
-help.tipsPanel.advancedHiddenShortcutTip=Натисніть клавіші x + x + x + a для перемикання в [[Розширений режим &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] і x + x + x + h для перемикання відображення [[прихованих сторінок &gt;&gt; https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
+help.tipsPanel.gettingStartedTip=Якщо ви новий користувач XWiki, ознайомтеся з [[Посібником&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Перехід на будь-яку сторінку в вікі за допомогою Ctrl + G або Meta + G.\nДивіться [[інші гарячі клавіші &gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Чи знаєте ви, що ви можете поліпшити XWiki? Витратьте 5 хвилин, щоб [[пройти це опитування &gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] і допомогти цим проектом з відкритим вихідним кодом!
+help.tipsPanel.breadcrumbsTip=Ви можете використовувати стрілки на панелі навігації, щоб швидко перейти до родинних і дочірніх сторінок.
+help.tipsPanel.advancedHiddenShortcutTip=Натисніть клавіші x + x + x + a для перемикання в [[Розширений режим &gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] і x + x + x + h для перемикання відображення [[прихованих сторінок &gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]].
 help.tipsPanel.linkAutocompleteWYSIWYGTip=При редагуванні в WYSIWYG редакторі введіть ## [##, а потім почніть вводити літери, щоб отримати рекомендації по створенню посилання.
 help.macroList.title=Доступні макроси
 help.macroList.id=ID
 help.macroList.name=Назва
-help.macroList.category=Категорія
+help.macroList.categories=Категорії
 help.macroList.description=Опис
-help.macroList.visibility=Видимість</content>
+help.macroList.visibility=Видимість
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Категорія
+
+#@deprecatedend
+</content>
 </xwikidoc>

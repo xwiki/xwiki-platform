@@ -1,0 +1,115 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ko">
+  <web>XWiki</web>
+  <name>XWikiSyntaxDefinitionLists</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxDefinitionLists</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Definition Lists ==
+
+=== 1.0 Definition Lists ===
+
+|=요소|=XWiki Syntax 1.0|=결과
+|표준 정의|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; term
+: definition
+)))
+|중첩된 정의|((({{{
+&lt;dl&gt;
+  &lt;dt&gt;term 1&lt;/dt&gt;
+  &lt;dd&gt;definition 1
+    &lt;dl&gt;
+      &lt;dt&gt;term 2&lt;/dt&gt;
+      &lt;dd&gt;definition 2&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+)))
+|매개 변수 정의|((({{{
+&lt;dl style="color:blue"&gt;
+  &lt;dt&gt;term&lt;/dt&gt;
+  &lt;dd&gt;definition&lt;/dd&gt;
+&lt;/dl&gt;
+}}})))|(((
+(% style="color:blue" %)
+; term
+: definition
+)))
+
+=== 2.0 Definition Lists ===
+
+|=요소|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=결과
+|표준 정의|((({{{
+; term
+: definition
+}}})))|(((
+; term
+: definition
+)))
+|중첩된 정의|((({{{
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+}}})))|(((
+; term 1
+: definition 1
+:; term 2
+:: definition 2
+)))
+|매개 변수 정의|((({{{
+(% style="color:blue" %)
+; term
+: definition
+}}})))|(((
+(% style="color:blue" %)
+; term
+: definition
+)))</content>
+</xwikidoc>

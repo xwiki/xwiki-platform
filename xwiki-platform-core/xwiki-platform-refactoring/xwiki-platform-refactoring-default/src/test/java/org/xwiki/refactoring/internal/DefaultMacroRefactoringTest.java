@@ -33,11 +33,12 @@ import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.internal.parser.LinkParser;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroContentParser;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroRefactoringException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -88,6 +89,9 @@ class DefaultMacroRefactoringTest
     @MockComponent
     private RenderingContext renderingContext;
 
+    @MockComponent
+    private Provider<LinkParser> linkParserProvider;
+
     private ReferenceRenamer referenceRenamer;
     private MacroBlock macroBlock;
     private Syntax syntax;
@@ -97,6 +101,7 @@ class DefaultMacroRefactoringTest
     private DocumentReference sourceReference;
     private DocumentReference targetReference;
     private BlockRenderer blockRenderer;
+    private LinkParser linkParser;
 
     @BeforeComponent
     void beforeComponent(MockitoComponentManager componentManager) throws Exception
@@ -109,6 +114,9 @@ class DefaultMacroRefactoringTest
     {
         this.referenceRenamer = mock(ReferenceRenamer.class);
         when(this.referenceRenamerProvider.get()).thenReturn(this.referenceRenamer);
+
+        this.linkParser = mock(LinkParser.class);
+        when(this.linkParserProvider.get()).thenReturn(this.linkParser);
 
         this.macroBlock = mock(MacroBlock.class);
         this.macroId = "macroId";
@@ -148,7 +156,7 @@ class DefaultMacroRefactoringTest
         assertEquals(Optional.empty(),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference,
                 this.sourceReference, this.targetReference, false));
-        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(), any(), anyBoolean());
+        verify(this.referenceRenamer, never()).renameReferences(any(), any(), any(DocumentReference.class), any(), anyBoolean());
     }
 
     @Test
@@ -193,7 +201,8 @@ class DefaultMacroRefactoringTest
         String macroContent = "some macro content";
         when(this.macroBlock.getContent()).thenReturn(macroContent);
         XDOM xdom = mock(XDOM.class);
-        when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false))).thenAnswer(invocationOnMock -> {
+        when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false)))
+            .thenAnswer(invocationOnMock -> {
             MacroTransformationContext transformationContext = invocationOnMock.getArgument(1);
             assertEquals(transformationContext.getId(), "refactoring_" + macroId);
             assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
@@ -224,5 +233,37 @@ class DefaultMacroRefactoringTest
         assertEquals(Optional.of(expectedBlock),
             this.macroRefactoring.replaceReference(this.macroBlock, this.currentDocumentReference, this.sourceReference,
                 this.targetReference, true));
+    }
+
+    @Test
+    void extractReferences() throws MacroExecutionException, MacroRefactoringException
+    {
+        when(this.contentDescriptor.getType()).thenReturn(Block.LIST_BLOCK_TYPE);
+        when(this.macroBlock.isInline()).thenReturn(false);
+        String macroContent = "some macro content";
+        when(this.macroBlock.getContent()).thenReturn(macroContent);
+        XDOM xdom = mock(XDOM.class);
+        when(this.macroContentParser.getCurrentSyntax(any())).thenAnswer(invocationOnMock -> {
+            MacroTransformationContext transformationContext = invocationOnMock.getArgument(0);
+            assertEquals(transformationContext.getId(), "refactoring_" + macroId);
+            assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
+            assertEquals(this.syntax, transformationContext.getSyntax());
+            assertFalse(transformationContext.isInline());
+            return this.syntax;
+        });
+        when(this.macroContentParser.parse(eq(macroContent), any(), eq(true), eq(false)))
+            .thenAnswer(invocationOnMock -> {
+            MacroTransformationContext transformationContext = invocationOnMock.getArgument(1);
+            assertEquals(transformationContext.getId(), "refactoring_" + macroId);
+            assertEquals(macroBlock, transformationContext.getCurrentMacroBlock());
+            assertEquals(this.syntax, transformationContext.getSyntax());
+            assertFalse(transformationContext.isInline());
+            return xdom;
+        });
+
+        ResourceReference resourceReference = mock(ResourceReference.class);
+        when(this.linkParser.extractReferences(xdom)).thenReturn(Collections.singleton(resourceReference));
+        assertEquals(Collections.singleton(resourceReference),
+            this.macroRefactoring.extractReferences(this.macroBlock));
     }
 }

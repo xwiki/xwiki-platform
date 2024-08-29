@@ -53,15 +53,12 @@ class LoginIT
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
-        // By default the minimal distribution used for the tests doesn't have any rights setup. For this test class
+        // By default, the minimal distribution used for the tests doesn't have any rights set up. For this test class
         // we'll need:
         // - Make sure that only authenticated users can edit/save content (for test dataIsPreservedAfterLogin below).
-        // - Create an Admin user part of the Admin Group and make sure that this Admin Group has admin rights in the
-        //   wiki. We could also have given that Admin user the admin right directly but the solution we chose is closer
-        //   to the XS distribution.
+        // - Create an Admin user.
         setup.loginAsSuperAdmin();
         setup.setGlobalRights("XWiki.XWikiAllGroup", "", "edit", true);
-        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
         setup.createAdminUser();
     }
 
@@ -123,7 +120,7 @@ class LoginIT
         try {
             // Test setup: disallow view right for unauthenticated users. Note that we use the UI to perform this
             // since this allows us to verify that the UI works.
-            setup.loginAsAdmin();
+            setup.loginAsSuperAdmin();
             GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
             grasp.forceAuthenticatedView();
 
@@ -144,7 +141,7 @@ class LoginIT
         } finally {
             // Make sure we're logged-in since the test could fail when we're not logged in and we need to be admin
             // to go to the Rights UI.
-            setup.loginAsAdmin();
+            setup.loginAsSuperAdmin();
             GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
             grasp.unforceAuthenticatedView();
             // Make sure to log out to leave a deterministic state for the following tests.

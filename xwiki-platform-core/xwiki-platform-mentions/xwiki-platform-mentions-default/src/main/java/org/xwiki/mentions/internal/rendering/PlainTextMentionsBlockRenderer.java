@@ -39,7 +39,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 public class PlainTextMentionsBlockRenderer extends PlainTextBlockRenderer
 {
     /**
-     * Used to create new plain/1.0 {@link org.xwiki.rendering.renderer.PrintRenderer}s.
+     * Used to create new {@code plain/1.0} {@link org.xwiki.rendering.renderer.PrintRenderer}s.
      */
     @Inject
     @Named("plainmentions/1.0")

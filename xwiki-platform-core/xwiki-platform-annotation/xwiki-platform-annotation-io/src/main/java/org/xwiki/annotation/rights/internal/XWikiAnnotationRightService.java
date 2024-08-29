@@ -93,7 +93,7 @@ public class XWikiAnnotationRightService implements AnnotationRightService
             }
 
             // check if it's the author of the annotation
-            Annotation ann = annotationsStorageService.getAnnotation(target, annotationId);
+            Annotation ann = this.annotationsStorageService.getAnnotation(target, annotationId);
             return ann != null && ann.getAuthor().equals(userName);
         } catch (Exception e) {
             logException(e, target, userName);
@@ -112,6 +112,12 @@ public class XWikiAnnotationRightService implements AnnotationRightService
     {
         // if user can view the target, it should be able to view annotations on it
         return this.authorization.hasAccess(Right.VIEW, getUserReference(userName), getDocumentReference(target));
+    }
+
+    @Override
+    public boolean canUploadAttachment(String target, String userName)
+    {
+        return this.authorization.hasAccess(Right.EDIT, getUserReference(userName), getDocumentReference(target));
     }
 
     /**

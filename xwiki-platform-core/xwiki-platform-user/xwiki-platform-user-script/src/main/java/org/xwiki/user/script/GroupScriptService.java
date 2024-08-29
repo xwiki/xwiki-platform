@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
@@ -161,7 +160,6 @@ public class GroupScriptService implements ScriptService
      * @return {@code true} if the candidate can be added to the members of the target, {@code false} otherwise
      * @since 12.8RC1
      */
-    @Unstable
     public boolean canAddGroupAsMember(DocumentReference candidate, DocumentReference target)
     {
         boolean ret;

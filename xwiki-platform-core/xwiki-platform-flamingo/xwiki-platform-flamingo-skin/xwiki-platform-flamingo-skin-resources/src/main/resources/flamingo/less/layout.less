@@ -80,7 +80,7 @@
         }
       }
     }
-    // // Left panels are large
+    // Left panels are large
     &.panel-left-width-Large {
       .main {
         .make-md-column-push(3);
@@ -233,7 +233,6 @@
 
 #xwikieditor .main {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @input-border;
 }
 
 #xwikieditcontent .main {
@@ -254,10 +253,6 @@
   padding-bottom: (@grid-gutter-width / 2);
 }
 
-#mainContentArea > .xcontent {
-  margin-top: @line-height-computed / 2;
-}
-
 #xwikicontent {
   overflow: auto;
 }
@@ -267,6 +262,10 @@
   margin-bottom: @line-height-computed;
   #document-title h1 {
     word-wrap: break-word;
+  }
+  #document-title-input {
+    // Override the fixed height as the content is a large heading that would otherwise overflow.
+    height: auto;
   }
   .document-menu, .document-info {
     margin-top: @line-height-computed;
@@ -295,20 +294,39 @@
   }
 }
 
+#hierarchy_breadcrumb,
 #mainContentArea,
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @xwiki-border-color;
   margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
 }
 
+#hierarchy_breadcrumb {
+  padding-bottom: 0;
+
+  .breadcrumb {
+    margin-bottom: 0;
+  }
+}
+
+/* Protect against nesting of the breadcrumb inside #mainContentArea, e.g., in AdminSheet and other containers that
+already take care of padding and shadow. */
+#mainContentArea #hierarchy_breadcrumb, #xwikieditor #hierarchy_breadcrumb {
+  padding-bottom: @line-height-computed;
+  /* Padding and shadow is already in the #mainContentArea element */
+  padding-top: 0;
+  box-shadow: none;
+}
+
 #docextrapanes {
-  border-top: 1px solid @xwiki-border-color;
+  border: 1px solid @xwiki-border-color;
   border-top-left-radius: @border-radius-base;
   border-top-right-radius: @border-radius-base;
   margin-top: -1px;
+  /* Makes the bottom border hidden below the footer on pages with a long content (longer than the viewport height). */
+  margin-bottom: -1px;
 }
 
 #xdocFooter {
@@ -327,6 +345,12 @@
   .nav;
   .nav-tabs;
   margin: 0;
+
+  > li.active > a:focus {
+    border-top-color: @xwiki-border-color;
+    border-left-color: @xwiki-border-color;
+    border-right-color: @xwiki-border-color;
+  }
 }
 
 #docExtrasTabsUl {

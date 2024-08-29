@@ -87,7 +87,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
         }
     }
 
-    private boolean isWorkspace(String wikiId) throws DataMigrationException, XWikiException
+    private boolean isWorkspace(String wikiId) throws XWikiException
     {
         // The main wiki is not a workspace
         if (wikiId.equals(wikiDescriptorManager.getMainWikiId())) {
@@ -111,7 +111,7 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
         return (oldObject != null) || isWorkspaceTemplate(wikiId);
     }
 
-    private boolean isWorkspaceTemplate(String wikiId)
+    private boolean isWorkspaceTemplate(String wikiId) throws XWikiException
     {
         // Context, XWiki
         XWikiContext context = getXWikiContext();
@@ -173,8 +173,12 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
         Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
         while (itDocumentsToRestore.hasNext()) {
             DocumentReference docRef = itDocumentsToRestore.next();
-            if (xwiki.exists(docRef, xcontext)) {
-                itDocumentsToRestore.remove();
+            try {
+                if (xwiki.exists(docRef, xcontext)) {
+                    itDocumentsToRestore.remove();
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to test the existence of document with reference [{}]", docRef, e);
             }
         }
 
@@ -236,14 +240,14 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
             // Get the corresponding doc in the main wiki
             DocumentReference mainDocRef = docRef.setWikiReference(mainWikiReference);
 
-            // If the document exists in the main wiki, copy it
-            if (xwiki.exists(mainDocRef, xcontext)) {
-                try {
+            try {
+                // If the document exists in the main wiki, copy it
+                if (xwiki.exists(mainDocRef, xcontext)) {
                     xwiki.copyDocument(mainDocRef, docRef, xcontext);
                     itDocumentsToRestore.remove();
-                } catch (XWikiException e) {
-                    logger.error("Failed to copy [{}] to [{}].", mainDocRef, docRef, e);
                 }
+            } catch (XWikiException e) {
+                logger.error("Failed to copy [{}] to [{}].", mainDocRef, docRef, e);
             }
         }
     }

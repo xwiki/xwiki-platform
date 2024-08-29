@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Panels.DocumentInformation" locale="">
+<xwikidoc version="1.4" reference="Panels.DocumentInformation" locale="">
   <web>Panels</web>
   <name>DocumentInformation</name>
   <language/>
@@ -73,11 +73,11 @@
         <number>8</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -172,35 +172,17 @@
       <category>Tools</category>
     </property>
     <property>
-      <content>{{template name="display_macros.vm" /}}
-
-{{velocity}}
-#set ($pages = $tdoc.includedPages)
+      <content>{{velocity}}
 #largepanelheader($services.localization.render('panels.documentInformation.title'))
-#if ("$tdoc.locale" == '' &amp;&amp; $xwiki.isMultiLingual())
-; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
-: {{html clean="false"}}#displayDocumentProperty_defaultLocale('edit'){{/html}}
-#end
-##----------------------------------
-## Display the wiki syntax combo box
-##----------------------------------
-; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$services.localization.render('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
-: {{html clean="false"}}#displayDocumentProperty_syntax('edit'){{/html}}
-##--------------------------------------------------------------------------
-; {{html}}
-&lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
-&lt;input name="xhidden" type="hidden" value="0" /&gt;
-{{/html}}
-: #* Keep empty for HTML validation. *#
 
-##--------------------------------------------------------------------------
-#if($pages.size() != 0)
-  ; $services.localization.render('panels.documentInformation.includesCount', [$pages.size()])
-  #foreach ($page in $pages)
-  : [[$page&gt;&gt;$page]] [[[[image:icon:page_white_edit||alt="$services.localization.render('panels.documentInformation.editIncluded', [$page])"]]&gt;&gt;path:$xwiki.getURL($page, 'edit')]]
-  #end
+{{html}}
+&lt;dl&gt;
+#foreach ($extension in $services.uix.getExtensions('org.xwiki.platform.panels.documentInformation', {'sortByParameter': 'order'}))
+  $services.rendering.render($extension.execute(), 'html/5.0')
 #end
-##--------------------------------------------------------------------------
+&lt;/dl&gt;
+{{/html}}
+
 #panelfooter()
 {{/velocity}}</content>
     </property>

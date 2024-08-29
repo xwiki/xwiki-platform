@@ -31,16 +31,20 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.model.document.DocumentAuthors;
+import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -49,8 +53,13 @@ import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -70,7 +79,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
@@ -127,11 +135,6 @@ public class Document extends Api
      */
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
-    /**
-     * Used to convert user references to string.
-     */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
     private DocumentRevisionProvider documentRevisionProvider;
 
     private ConfigurationSource configuration;
@@ -162,16 +165,6 @@ public class Document extends Api
         }
 
         return this.localEntityReferenceSerializer;
-    }
-
-    private EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
-    {
-        if (this.compactWikiEntityReferenceSerializer == null) {
-            this.compactWikiEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        }
-
-        return this.compactWikiEntityReferenceSerializer;
     }
 
     private DocumentRevisionProvider getDocumentRevisionProvider()
@@ -447,7 +440,8 @@ public class Document extends Api
     /**
      * Get fullName of the profile document of the author of the current version of the document. Example: XWiki.Admin.
      *
-     * @return The fullName of the profile document of the author of the current version of the document.
+     * @return The fullName of the profile document of the effective metadata author of the current version of the
+     *         document.
      */
     public String getAuthor()
     {
@@ -713,7 +707,6 @@ public class Document extends Api
      * @throws XWikiException if retrieving the document translations from the database fails
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getTranslationLocales() throws XWikiException
     {
         return this.doc.getTranslationLocales(getXWikiContext());
@@ -1376,6 +1369,22 @@ public class Document extends Api
         }
     }
 
+    /**
+     * @param objectReference the object reference
+     * @param create if true, the object will be created when missing
+     * @return the XWiki object from this document that matches the specified object reference
+     * @since 14.0RC1
+     */
+    public Object getObject(ObjectReference objectReference, boolean create)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(objectReference, create, getXWikiContext());
+            return obj == null ? null : newObjectApi(obj, getXWikiContext());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private Object newObjectApi(BaseObject obj, XWikiContext context)
     {
         return obj.newObjectApi(obj, context);
@@ -1412,6 +1421,20 @@ public class Document extends Api
         return this.doc.getRevisions(getXWikiContext());
     }
 
+    /**
+     * Counts the number of document versions matching criteria like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @return the number of matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    public long getRevisionsCount(RevisionCriteria criteria) throws XWikiException
+    {
+        return this.doc.getRevisionsCount(criteria, getXWikiContext());
+    }
+
     public String[] getRecentRevisions() throws XWikiException
     {
         return this.doc.getRecentRevisions(5, getXWikiContext());
@@ -1423,7 +1446,7 @@ public class Document extends Api
     }
 
     /**
-     * Get document versions matching criterias like author, minimum creation date, etc.
+     * Gets document versions matching criteria like author, minimum creation date, etc.
      *
      * @param criteria criteria used to match versions
      * @return a list of matching versions
@@ -1609,37 +1632,6 @@ public class Document extends Api
             return "";
         }
         return this.doc.displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(), getXWikiContext());
-    }
-
-    /**
-     * Displays the tooltip of the given field. This function uses the active object or will find the first object that
-     * has the given field.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname)
-    {
-        if (this.currentObj == null) {
-            return this.doc.displayTooltip(fieldname, getXWikiContext());
-        } else {
-            return this.doc.displayTooltip(fieldname, this.currentObj.getBaseObject(), getXWikiContext());
-        }
-    }
-
-    /**
-     * Displays the tooltip of the given field of the given object.
-     *
-     * @param fieldname fieldname to display the tooltip of
-     * @param obj Object to find the class to display the tooltip of
-     * @return the tooltip display of the field.
-     */
-    public String displayTooltip(String fieldname, Object obj)
-    {
-        if (obj == null) {
-            return "";
-        }
-        return this.doc.displayTooltip(fieldname, obj.getBaseObject(), getXWikiContext());
     }
 
     /**
@@ -1945,7 +1937,12 @@ public class Document extends Api
 
             return this.doc.getMetaDataDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            java.lang.Object[] args;
+            if (origdoc != null) {
+                args = new java.lang.Object[] { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
+            } else {
+                args = new java.lang.Object[] { doc.getFullName(), null, newdoc.getVersion() };
+            }
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
@@ -2141,15 +2138,31 @@ public class Document extends Api
     /**
      * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on this
      * document.
+     * Note that this method does not override {@link Api#hasAccess(Right, DocumentReference)}: they share same
+     * signature but on the {@code Api} one the {@link DocumentReference} parameter is about the entity where to check
+     * the right, while here it's about the user to check right for.
      * 
      * @param right the right to check
      * @param userReference the user to check the right for
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
      * @since 10.6RC1
      */
+    @Override
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());
+    }
+
+    /**
+     * Verifies if the context user has the access identified by {@code right} on the current context document.
+     * @param right the right to check
+     * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
+     * @since 14.10
+     * @since 14.4.7
+     */
+    public boolean hasAccess(Right right)
+    {
+        return hasAccess(right, getXWikiContext().getUserReference());
     }
 
     public boolean getLocked()
@@ -2194,6 +2207,16 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Renders the passed xproperty as HTML. Note that if you need the raw value, you should call 
+     * {@link #getValue(String)} instead. 
+     *
+     * @param classOrFieldName the xproperty (aka field) name to render or an xclass reference
+     * @return the rendered xproperty as HTML if an xobject exists with that xproperty. Otherwise considers that the
+     *         passed parameter is an xclass reference and return the xobject for it or null if none exist
+     * @see #getValue(String) 
+     * @see #getValue(String, Object) 
+     */
     public java.lang.Object get(String classOrFieldName)
     {
         if (this.currentObj != null) {
@@ -2206,6 +2229,12 @@ public class Document extends Api
         return this.getDoc().getObject(classOrFieldName);
     }
 
+    /**
+     * @param fieldName the xproperty (aka field) name for which to get the value
+     * @return the raw value of the passed xproperty found in the current xobject or in the first xobject containing
+     *         such a field
+     * @see #getValue(String, Object) 
+     */
     public java.lang.Object getValue(String fieldName)
     {
         Object object;
@@ -2217,6 +2246,12 @@ public class Document extends Api
         return getValue(fieldName, object);
     }
 
+    /**
+     * @param fieldName the xproperty (aka field) name for which to get the value
+     * @param object the specific xobject from which to get the xproperty value
+     * @return the raw value of the passed xproperty
+     * @see #getValue(String)
+     */
     public java.lang.Object getValue(String fieldName, Object object)
     {
         if (object != null) {
@@ -2305,7 +2340,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to perform the query.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getBackLinkedReferences() throws XWikiException
     {
         return this.doc.getBackLinkedReferences(getXWikiContext());
@@ -2346,7 +2380,6 @@ public class Document extends Api
      * @throws XWikiException in case of problem to query the children.
      * @since 12.5RC1
      */
-    @Unstable
     public List<DocumentReference> getChildrenReferences() throws XWikiException
     {
         return this.doc.getChildrenReferences(getXWikiContext());
@@ -2545,9 +2578,18 @@ public class Document extends Api
         save(comment, false);
     }
 
+    private UserReferenceResolver<CurrentUserReference> getCurrentUserReferenceResolver()
+    {
+        return Utils.getComponent(new DefaultParameterizedType(null, UserReferenceResolver.class,
+                CurrentUserReference.class));
+    }
+
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
+
+            DocumentAuthors authors = getDoc().getAuthors();
+            authors.setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
             // If the current author does not have PR don't let it set current user as author of the saved document
             // since it can lead to right escalation
             if (hasProgrammingRights() || !getConfiguration().getProperty("security.script.save.checkAuthor", true)) {
@@ -2643,6 +2685,8 @@ public class Document extends Api
     {
         XWikiContext xcontext = getXWikiContext();
 
+        getDoc().getAuthors()
+            .setOriginalMetadataAuthor(getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE));
         DocumentReference author = getEffectiveAuthorReference();
         if (hasAccess(Right.EDIT, author)) {
             DocumentReference currentUser = xcontext.getUserReference();
@@ -2669,12 +2713,11 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = getXWikiContext().getUserReference();
-
-        doc.setAuthorReference(currentUserReference);
+        UserReference currentUserReference = getCurrentUserReferenceResolver().resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
         if (doc.isNew()) {
-            doc.setCreatorReference(currentUserReference);
+            doc.getAuthors().setCreator(currentUserReference);
         }
 
         if (checkSaving) {
@@ -3012,9 +3055,13 @@ public class Document extends Api
      */
     public void rename(DocumentReference newReference) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
-            this.getDoc().rename(newReference, getXWikiContext());
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
+            List<DocumentReference> backLinkedReferences = getDocument().getBackLinkedReferences(this.context);
+            List<DocumentReference> childrenReferences = getDocument().getChildrenReferences(this.context);
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backLinkedReferences, childrenReferences,
+                    this.context);
         }
     }
 
@@ -3085,8 +3132,9 @@ public class Document extends Api
     public void rename(DocumentReference newReference, List<DocumentReference> backlinkDocumentNames,
         List<DocumentReference> childDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newReference, this.context), this.context)) {
+        XWiki xWiki = this.context.getWiki();
+        if (hasAccessLevel("delete") && xWiki.checkAccess("edit",
+            xWiki.getDocument(newReference, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
@@ -3097,14 +3145,14 @@ public class Document extends Api
             while (counter > 0) {
                 counter--;
                 if (!actuallyChildren.contains(childDocumentNames.get(counter))
-                    && !this.context.getWiki().checkAccess("edit",
-                        this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context),
+                    && !xWiki.checkAccess("edit",
+                        xWiki.getDocument(childDocumentNames.get(counter), this.context),
                         this.context)) {
                     return;
                 }
             }
-
-            this.getDoc().rename(newReference, backlinkDocumentNames, childDocumentNames, getXWikiContext());
+            xWiki.renameDocument(getDocumentReference(), newReference, true, backlinkDocumentNames, childDocumentNames,
+                    this.context);
         }
     }
 
@@ -3112,20 +3160,26 @@ public class Document extends Api
      * Allow to easily access any revision of a document
      *
      * @param revision the version to access
-     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist.
+     * @return the document corresponding to the requested revision or {@code null} if the revision does not exist or
+     * access is denied.
      */
     public Document getDocumentRevision(String revision)
     {
         try {
-            XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(this.doc, revision);
+            DocumentRevisionProvider revisionProvider = getDocumentRevisionProvider();
+            revisionProvider.checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, getDocumentReference(), revision);
+            XWikiDocument documentRevision = revisionProvider.getRevision(this.doc, revision);
 
             return documentRevision != null ? new Document(documentRevision, this.context) : null;
+        } catch (AuthorizationException e) {
+            LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision,
+                getDocumentReferenceWithLocale(), ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             LOGGER.error("Failed to load revision [{}] of document [{}]", revision, getDocumentReferenceWithLocale(),
                 e);
-
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -3145,6 +3199,17 @@ public class Document extends Api
     public boolean isMostRecent()
     {
         return this.doc.isMostRecent();
+    }
+
+    /**
+     * @return if rendering transformations shall be executed in restricted mode and the title not be executed
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public boolean isRestricted()
+    {
+        return this.doc.isRestricted();
     }
 
     @Override
@@ -3251,5 +3316,45 @@ public class Document extends Api
     public int getLocalReferenceMaxLength()
     {
         return this.doc.getLocalReferenceMaxLength();
+    }
+
+    /**
+     * @return the authors of the document.
+     * @since 14.0RC1
+     */
+    public DocumentAuthors getAuthors()
+    {
+        if (this.hasAccess(Right.PROGRAM)) {
+            // We're using getDoc here to ensure to have a cloned doc
+            return getDoc().getAuthors();
+        } else {
+            // in this case we don't care if the doc is cloned or not since it's readonly
+            return new SafeDocumentAuthors(this.doc.getAuthors());
+        }
+    }
+
+    /**
+     * You need to have programming right to use this API.
+     * <p>
+     * Update the author of the document. It's the recommended way to update it if you don't fully understand the
+     * various types of authors exposed by {@link #getAuthor()}.
+     * <p>
+     * What will happen in practice is the following:
+     * <ul>
+     * <li>the effective and original metadata authors are set to the passed reference</li>
+     * <li>when saving the document, if the content is modified (the content dirty flag is true) then the content author
+     * will also be updated to the passed reference</li>
+     * </ul>
+     * 
+     * @param userReference the reference of the new author of the document
+     * @throws AccessDeniedException when the current author is not allowed to use this API
+     * @since 16.1.0RC1
+     */
+    @Unstable
+    public void setAuthor(UserReference userReference) throws AccessDeniedException
+    {
+        getContextualAuthorizationManager().checkAccess(Right.PROGRAM);
+
+        getDoc().setAuthor(userReference);
     }
 }

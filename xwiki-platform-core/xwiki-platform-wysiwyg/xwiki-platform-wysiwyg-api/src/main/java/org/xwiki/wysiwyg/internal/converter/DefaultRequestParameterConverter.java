@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
+import org.xwiki.wysiwyg.converter.RequestParameterConversionResult;
 import org.xwiki.wysiwyg.converter.RequestParameterConverter;
 import org.xwiki.wysiwyg.filter.MutableServletRequest;
 import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
@@ -86,32 +87,36 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     @Override
     public Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
     {
-        Optional<ServletRequest> result = Optional.of(request);
-        // Take the list of request parameters that require HTML conversion.
-        String[] parametersRequiringHTMLConversion = request.getParameterValues(REQUIRES_HTML_CONVERSION);
-        if (parametersRequiringHTMLConversion != null) {
-            // Wrap the current request in order to be able to change request parameters.
-            MutableServletRequest mreq = this.mutableServletRequestFactory.newInstance(request);
-            // Remove the list of request parameters that require HTML conversion to avoid recurrency.
-            mreq.removeParameter(REQUIRES_HTML_CONVERSION);
-            // Try to convert each parameter from the list and save caught exceptions.
-            Map<String, Throwable> errors = new HashMap<>();
-            // Save also the output to prevent loosing data in case of conversion exceptions.
-            Map<String, String> output = new HashMap<>();
-            convertHTML(parametersRequiringHTMLConversion, mreq, output, errors);
-            if (!errors.isEmpty()) {
-                handleConversionErrors(errors, output, mreq, response);
-                result = Optional.empty();
-            } else {
-                result = Optional.of(mreq);
-            }
+        RequestParameterConversionResult conversionResult = this.convert(request);
+        Optional<ServletRequest> result;
+        if (conversionResult.getErrors().isEmpty()) {
+            result = Optional.of(conversionResult.getRequest());
+        } else {
+            result = Optional.empty();
+            this.handleConversionErrors(conversionResult, response);
         }
         return result;
     }
 
-    private void convertHTML(String[] parametersRequiringHTMLConversion, MutableServletRequest request,
-        Map<String, String> output, Map<String, Throwable> errors)
+    @Override
+    public RequestParameterConversionResult convert(ServletRequest request)
     {
+        MutableServletRequest mutableServletRequest = this.mutableServletRequestFactory.newInstance(request);
+        RequestParameterConversionResult result = new RequestParameterConversionResult(mutableServletRequest);
+        // Take the list of request parameters that require HTML conversion.
+        String[] parametersRequiringHTMLConversion = request.getParameterValues(REQUIRES_HTML_CONVERSION);
+        if (parametersRequiringHTMLConversion != null) {
+            // Remove the list of request parameters that require HTML conversion to avoid recurrency.
+            result.getRequest().removeParameter(REQUIRES_HTML_CONVERSION);
+            convertHTML(parametersRequiringHTMLConversion, result);
+        }
+        return result;
+    }
+
+    private void convertHTML(String[] parametersRequiringHTMLConversion,
+        RequestParameterConversionResult conversionResult)
+    {
+        MutableServletRequest request = conversionResult.getRequest();
         for (String parameterName : parametersRequiringHTMLConversion) {
             String html = request.getParameter(parameterName);
             // Remove the syntax parameter from the request to avoid interference with further request processing.
@@ -123,23 +128,24 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
                 request.setParameter(parameterName, this.htmlConverter.fromHTML(html, syntax));
             } catch (Exception e) {
                 this.logger.error(e.getLocalizedMessage(), e);
-                errors.put(parameterName, e);
+                conversionResult.getErrors().put(parameterName, e);
             }
             // If the conversion fails the output contains the value before the conversion.
-            output.put(parameterName, request.getParameter(parameterName));
+            conversionResult.getOutput().put(parameterName, request.getParameter(parameterName));
         }
     }
 
-    private void handleConversionErrors(Map<String, Throwable> errors, Map<String, String> output,
-        MutableServletRequest mreq, ServletResponse res) throws IOException
+    private void handleConversionErrors(RequestParameterConversionResult conversionResult, ServletResponse res)
+        throws IOException
     {
-        ServletRequest req = mreq.getRequest();
-        if (req instanceof HttpServletRequest
-            && "XMLHttpRequest".equals(((HttpServletRequest) req).getHeader("X-Requested-With"))) {
+        MutableServletRequest mutableRequest = conversionResult.getRequest();
+        ServletRequest originalRequest = mutableRequest.getRequest();
+        if (originalRequest instanceof HttpServletRequest
+            && "XMLHttpRequest".equals(((HttpServletRequest) originalRequest).getHeader("X-Requested-With"))) {
             // If this is an AJAX request then we should simply send back the error.
             StringBuilder errorMessage = new StringBuilder();
             // Aggregate all error messages (for all fields that have conversion errors).
-            for (Map.Entry<String, Throwable> entry : errors.entrySet()) {
+            for (Map.Entry<String, Throwable> entry : conversionResult.getErrors().entrySet()) {
                 errorMessage.append(entry.getKey()).append(": ");
                 errorMessage.append(entry.getValue().getLocalizedMessage()).append('\n');
             }
@@ -149,10 +155,10 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         // Otherwise, if this is a normal request, we have to redirect the request back and provide a key to
         // access the exception and the value before the conversion from the session.
         // Redirect to the error page specified on the request.
-        String redirectURL = mreq.getParameter("xerror");
+        String redirectURL = mutableRequest.getParameter("xerror");
         if (redirectURL == null) {
             // Redirect to the referrer page.
-            redirectURL = mreq.getReferer();
+            redirectURL = mutableRequest.getReferer();
         }
         // Extract the query string.
         String queryString = StringUtils.substringAfterLast(redirectURL, String.valueOf('?'));
@@ -165,43 +171,42 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
             queryString += '&';
         }
         // Save the output and the caught exceptions on the session.
-        queryString += "key=" + save(mreq, output, errors);
-        mreq.sendRedirect(res, redirectURL + '?' + queryString);
+        queryString += "key=" + save(conversionResult);
+        mutableRequest.sendRedirect(res, redirectURL + '?' + queryString);
     }
 
     /**
      * Saves on the session the conversion output and the caught conversion exceptions, after a conversion failure.
      *
-     * @param mreq the request used to access the session
-     * @param output the conversion output for the given request
-     * @param errors the conversion exceptions for the given request
+     * @param conversionResult the result of the conversion
      * @return a key that can be used along with the name of the request parameters that required HTML conversion to
      *         extract the conversion output and the conversion exceptions from the {@link #CONVERSION_OUTPUT} and
      *         {@value #CONVERSION_ERRORS} session attributes
      */
     @SuppressWarnings("unchecked")
-    private String save(MutableServletRequest mreq, Map<String, String> output, Map<String, Throwable> errors)
+    private String save(RequestParameterConversionResult conversionResult)
     {
         // Generate a random key to identify the request.
         String key = RandomStringUtils.randomAlphanumeric(4);
+        MutableServletRequest request = conversionResult.getRequest();
 
         // Save the output on the session.
         Map<String, Map<String, String>> conversionOutput =
-            (Map<String, Map<String, String>>) mreq.getSessionAttribute(CONVERSION_OUTPUT);
+            (Map<String, Map<String, String>>) request.getSessionAttribute(CONVERSION_OUTPUT);
         if (conversionOutput == null) {
-            conversionOutput = new HashMap<String, Map<String, String>>();
-            mreq.setSessionAttribute(CONVERSION_OUTPUT, conversionOutput);
+            conversionOutput = new HashMap<>();
+            request.setSessionAttribute(CONVERSION_OUTPUT, conversionOutput);
         }
-        conversionOutput.put(key, output);
+        conversionOutput.put(key, conversionResult.getOutput());
 
         // Save the errors on the session.
         Map<String, Map<String, Throwable>> conversionErrors =
-            (Map<String, Map<String, Throwable>>) mreq.getSessionAttribute(CONVERSION_ERRORS);
+            (Map<String, Map<String, Throwable>>) request.getSessionAttribute(CONVERSION_ERRORS);
         if (conversionErrors == null) {
-            conversionErrors = new HashMap<String, Map<String, Throwable>>();
-            mreq.setSessionAttribute(CONVERSION_ERRORS, conversionErrors);
+            conversionErrors = new HashMap<>();
+            request.setSessionAttribute(CONVERSION_ERRORS, conversionErrors);
         }
-        conversionErrors.put(key, errors);
+        conversionErrors.put(key, conversionResult.getErrors());
 
         return key;
     }

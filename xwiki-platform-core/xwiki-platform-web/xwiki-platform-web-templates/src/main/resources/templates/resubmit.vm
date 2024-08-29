@@ -27,10 +27,11 @@ $response.setStatus(401)##
 $response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #xwikimessageboxstart($services.localization.render('warning') $services.localization.render('csrf.confirmation'))
-#set($resubmit = "$!{escapetool.xml($request.getParameter('resubmit'))}")
-#set($xback = "$!{escapetool.xml($request.getParameter('xback'))}")
+#getSanitizedURLAttributeValue('form','action', $request.getParameter('resubmit'), '', $resubmit)
+#getSanitizedURLAttributeValue('a','href', $request.getParameter('xback'), $doc.getURL(), $xback)
 <form action="$resubmit" method="post">
   <div class="hidden">
     ## Valid CSRF token
@@ -41,7 +42,7 @@ $response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 </form>
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")
 

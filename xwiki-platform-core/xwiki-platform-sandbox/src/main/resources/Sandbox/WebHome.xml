@@ -86,7 +86,7 @@ Here are a number of test pages you can play with:
 
 Below is a demonstration of the [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] you can use in wiki pages (headings, images, tables).
 
-= Headings =
+== Headings ==
 
 XWiki offers 6 levels of headings. You can use them to structure your pages.
 
@@ -100,7 +100,11 @@ XWiki offers 6 levels of headings. You can use them to structure your pages.
 
 ====== Level 6 Heading 6 ======
 
-= Styles =
+{{info title="Accessibility recommendation"}}
+In order to provide the best experience for assistive technology users on your wiki, you should avoid using the first level of heading in page content.
+{{/info}}
+
+== Styles ==
 
 Basic styles are supported in XWiki:
 
@@ -111,11 +115,11 @@ Basic styles are supported in XWiki:
 * Text in ,,subscript,,
 * Text in ^^superscript^^
 
-= Lists =
+== Lists ==
 
 You can create various types of lists in your wiki pages:
 
-== Unordered list ==
+=== Unordered list ===
 
 * Level 1
 ** Level 2
@@ -123,14 +127,14 @@ You can create various types of lists in your wiki pages:
 ** Level 2
 * Level 1
 
-== Numbered list ==
+=== Numbered list ===
 
 1. Item
 11. Subitem
 111. Item
 1. Subitem
 
-== Mixed list ==
+=== Mixed list ===
 
 1. Item 1
 11. Item 2
@@ -138,23 +142,23 @@ You can create various types of lists in your wiki pages:
 11*. Item 4
 1. Item 5
 
-= Tables =
+== Tables ==
 
 You can create tables right into wiki pages:
 
-== Table with headers in the top row ==
+=== Table with headers in the top row ===
 
 |= table header |= table header |= table header
 | cell | cell | cell
 | cell | cell | cell
 
-== Table with headers in the top row and left column ==
+=== Table with headers in the top row and left column ===
 
 |= table header |= table header |= table header
 |= table header | cell | cell
 |= table header | cell | cell
 
-= Links =
+== Links ==
 
 XWiki allows you to create links to other pages in your wiki or on the web:
 
@@ -168,17 +172,17 @@ You can also create links to attachments:
 
 attach:XWikiLogo.png
 
-= Images =
+== Images ==
 
 You can insert images in your wiki pages:
 
 image:XWikiLogo.png
 
-= Macros =
+== Macros ==
 
 Macros allow you to make wiki content look better and to add additional features to your wiki. Here are 2 examples of how macros can be used in wiki pages:
 
-== Warning Macro ==
+=== Warning Macro ===
 
 This macro allows you to draw users' attention to a specific piece of information:
 
@@ -186,7 +190,7 @@ This macro allows you to draw users' attention to a specific piece of informatio
 Hello World
 {{/warning}}
 
-== Table of Contents ==
+=== Table of Contents ===
 
 This macro automatically generates a table of contents of your wiki page based on headings:
 

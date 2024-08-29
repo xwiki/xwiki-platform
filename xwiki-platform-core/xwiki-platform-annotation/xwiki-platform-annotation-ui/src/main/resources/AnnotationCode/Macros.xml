@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Macros" locale="">
+<xwikidoc version="1.5" reference="AnnotationCode.Macros" locale="">
   <web>AnnotationCode</web>
   <name>Macros</name>
   <language/>
@@ -37,6 +37,16 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none" output="false"}}
+## Determine the document that is being annotated.
+#if ("$!request.reference" != '')
+  #set ($annotationReference = $services.model.resolveDocument($request.reference))
+#elseif ("$!request.wiki" != '' &amp;&amp; "$!request.space" != '' &amp;&amp; "$!request.page" != '')
+  #set ($annotationReference = $services.model.createDocumentReference($request.wiki, $request.space, $request.page))
+#elseif ("$!request.sheet" != '')
+  ## When the annotation create / edit / display form is loaded as a sheet for the annotated document.
+  #set ($annotationReference = $doc.documentReference)
+#end
+##
 ## Not used here but kept for retro-compatibility
 #set($restURL = "${request.contextPath}/rest")
 ## Retrieve the annotation class from the configuration
@@ -194,7 +204,7 @@
       #displayAnnotationToolboxFromReference($ann $mode $docRef)
     &lt;/div&gt;
     &lt;div class="annotationContent"&gt;
-      #displayAnnotationBody($ann $mode)
+      #displayAnnotationBody($ann $mode $docRef)
       #if ($mode == 'view' &amp;&amp; $annotationClassDocName == 'XWiki.XWikiComments')
         #set($annoDoc = $xwiki.getDocument($docRef))
         #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
@@ -299,8 +309,9 @@
  *
  * @param $ann the annotation object
  * @param $mode view (default), list, create or edit
+ * @param $annotatedDocumentReference the reference of the annotated document
  *#
-#macro(displayAnnotationBody $ann $mode)
+#macro(displayAnnotationBody $ann $mode $annotatedDocumentReference)
   #if ($mode == 'list')
       #if ($ann.state == 'ALTERED')
         &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.altered.text')&lt;/div&gt;
@@ -312,8 +323,9 @@
     &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.updated.text')&lt;/div&gt;
     &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$!escapetool.xml($ann.originalSelection)&lt;/blockquote&gt;
   #end
+  #set ($annotatedDocument = $xwiki.getDocument($annotatedDocumentReference))
   ## Fake object that allows to use the API to generate the display
-  #set($fakeObj = $doc.newObject($annotationClassDocName))
+  #set($fakeObj = $annotatedDocument.newObject($annotationClassDocName))
   #set($properties = $annotationClass.properties)
   #if ($properties.size() == $hiddenProperties.size() + 1)
     ## Do not show property labels if there's only one property to display
@@ -327,11 +339,7 @@
     #end
     #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
     &lt;div class="annotationText"&gt;
-      #if($mode == 'edit' || $mode == 'create')
-        $doc.displayEdit($onlyProperty, '', $fakeObj)
-      #else
-        $doc.displayView($onlyProperty, '', $fakeObj)
-      #end
+      #displayAnnotationProperty($annotatedDocument $fakeObj $onlyProperty $mode)
     &lt;/div&gt;
   #else
   &lt;dl&gt;
@@ -339,14 +347,24 @@
     #if (!$hiddenProperties.contains($prop.name))
       #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
       &lt;dt class="annotationLabel"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
-      #if($mode == 'edit' || $mode == 'create')
-        &lt;dd&gt;$doc.displayEdit($prop, '', $fakeObj)&lt;/dd&gt;
-      #else
-        &lt;dd&gt;$doc.displayView($prop, '', $fakeObj)&lt;/dd&gt;
-      #end
+      &lt;dd&gt;#displayAnnotationProperty($annotatedDocument $fakeObj $prop $mode)&lt;/dd&gt;
     #end
   #end
   &lt;/dl&gt;
+  #end
+#end
+
+#macro(displayAnnotationProperty $annotatedDocument $annotationObject $annotationProperty $mode)
+  #if ($mode == 'edit' || $mode == 'create')
+    ## We use displayEdit and not display('edit') because we want the input field name to be just the property name
+    ## (without the "DocumentReference_objectNumber_" prefix).
+    $annotatedDocument.displayEdit($annotationProperty, '', $annotationObject)
+  #else
+    ## We use display('view') and not displayView because we want the property value to be evaluated in the context of
+    ## the annotated document (i.e. isolated), not the current document.
+    #set ($output = $annotatedDocument.display($annotationProperty.name, 'view', $annotationObject))
+    ## Remove the HTML macro wrapping because the output is later injected in another HTML macro with wiki=false.
+    #unwrapXPropertyDisplay($output)
   #end
 #end
 {{/velocity}}</content>

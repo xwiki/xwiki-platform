@@ -42,11 +42,13 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -95,6 +97,9 @@ public class SolrRatingsManager implements RatingsManager
     @Named("context")
     private ComponentManager contextComponentManager;
 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     private AverageRatingManager averageRatingManager;
 
     private RatingsConfiguration ratingsConfiguration;
@@ -102,9 +107,9 @@ public class SolrRatingsManager implements RatingsManager
     private String identifier;
 
     /**
-     * Retrieve the solr client for storing ratings based on the configuration.
-     * If the configuration specifies to use a dedicated core (see {@link RatingsConfiguration#hasDedicatedCore()}),
-     * then it will use a client based on the current manager identifier, else it will use the default solr core.
+     * Retrieve the solr client for storing ratings based on the configuration. If the configuration specifies to use a
+     * dedicated core (see {@link RatingsConfiguration#hasDedicatedCore()}), then it will use a client based on the
+     * current manager identifier, else it will use the default solr core.
      *
      * @return the right solr client for storing ratings.
      * @throws SolrException in case of problem to retrieve the solr client.
@@ -216,11 +221,11 @@ public class SolrRatingsManager implements RatingsManager
 
             Object value = queryParameter.getValue();
             if (value instanceof String || value instanceof Date) {
-                result.append(solrUtils.toFilterQueryString(value));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value));
             } else if (value instanceof UserReference) {
-                result.append(solrUtils.toFilterQueryString(value, UserReference.class));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value, UserReference.class));
             } else if (value instanceof EntityReference) {
-                result.append(solrUtils.toFilterQueryString(value, EntityReference.class));
+                result.append(this.solrUtils.toCompleteFilterQueryString(value, EntityReference.class));
             } else if (value != null) {
                 result.append(value);
             }
@@ -274,14 +279,11 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public Rating saveRating(EntityReference reference, UserReference user, int vote)
+    public synchronized Rating saveRating(EntityReference reference, UserReference user, int vote)
         throws RatingsException
     {
-        // If the vote is outside the scope of the scale, we throw an exception immediately.
-        if (vote < 0 || vote > this.getScale()) {
-            throw new RatingsException(String.format("The vote [%s] is out of scale [%s] for [%s] rating manager.",
-                vote, this.getScale(), this.getIdentifier()));
-        }
+        checkIfVoteValid(vote);
+        checkIfDocumentExists(reference);
 
         // Check if a vote for the same entity by the same user and on the same manager already exists.
         Optional<Rating> existingRating = this.retrieveExistingRating(reference, user);
@@ -309,20 +311,20 @@ public class SolrRatingsManager implements RatingsManager
                 event = new CreatedRatingEvent(result);
             }
 
-        // There was already a vote with the same information
+            // There was already a vote with the same information
         } else {
             oldRating = existingRating.get();
 
             // If the vote is not 0 or if we store zero, we just modify the existing vote
-            if (vote != 0) {
+            if (vote != 0 || this.getRatingConfiguration().isZeroStored()) {
                 result = new DefaultRating(oldRating)
                     .setUpdatedAt(new Date())
                     .setVote(vote);
 
                 // It's an update of a vote
                 event = new UpdatedRatingEvent(result, oldRating.getVote());
-            // Else we remove it.
-            } else if (this.ratingsConfiguration.isZeroStored()) {
+                // Else we remove it.
+            } else {
                 this.removeRating(oldRating.getId());
             }
         }
@@ -397,7 +399,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public boolean removeRating(String ratingIdentifier) throws RatingsException
+    public synchronized boolean removeRating(String ratingIdentifier) throws RatingsException
     {
         Map<RatingQueryField, Object> queryMap = Collections
             .singletonMap(RatingQueryField.IDENTIFIER, ratingIdentifier);
@@ -422,11 +424,13 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public long removeRatings(EntityReference entityReference) throws RatingsException
+    public synchronized long removeRatings(EntityReference entityReference) throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(entityReference, EntityReference.class);
+        String escapedEntityReference =
+            this.solrUtils.toCompleteFilterQueryString(entityReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
         SolrQuery solrQuery = new SolrQuery()
@@ -450,12 +454,13 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public long moveRatings(EntityReference oldReference, EntityReference newReference)
+    public synchronized long moveRatings(EntityReference oldReference, EntityReference newReference)
         throws RatingsException
     {
-        String escapedEntityReference = this.solrUtils.toFilterQueryString(oldReference, EntityReference.class);
+        String escapedEntityReference = this.solrUtils.toCompleteFilterQueryString(oldReference, EntityReference.class);
         String filterQuery = String.format(FILTER_REFERENCE_OR_PARENTS,
-            RatingQueryField.MANAGER_ID.getFieldName(), solrUtils.toFilterQueryString(this.getIdentifier()),
+            RatingQueryField.MANAGER_ID.getFieldName(),
+            this.solrUtils.toCompleteFilterQueryString(this.getIdentifier()),
             RatingQueryField.ENTITY_REFERENCE.getFieldName(), escapedEntityReference,
             RatingQueryField.PARENTS_REFERENCE.getFieldName(), escapedEntityReference);
         int offset = 0;
@@ -492,7 +497,7 @@ public class SolrRatingsManager implements RatingsManager
                     if (parentReferences.contains(oldReference)) {
                         this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
                             RatingQueryField.PARENTS_REFERENCE
-                            .getFieldName(), oldReference, EntityReference.class, solrInputDocument);
+                                .getFieldName(), oldReference, EntityReference.class, solrInputDocument);
                         this.solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD,
                             RatingQueryField.PARENTS_REFERENCE
                                 .getFieldName(), newReference, EntityReference.class, solrInputDocument);
@@ -524,7 +529,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public void saveRating(Rating rating) throws RatingsException
+    public synchronized void saveRating(Rating rating) throws RatingsException
     {
         SolrInputDocument solrInputDocument = this.getInputDocumentFromRating(rating);
         try {
@@ -536,7 +541,7 @@ public class SolrRatingsManager implements RatingsManager
     }
 
     @Override
-    public AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
+    public synchronized AverageRating recomputeAverageRating(EntityReference entityReference) throws RatingsException
     {
         if (this.getRatingConfiguration().isAverageStored()) {
             Map<RatingQueryField, Object> queryMap = new LinkedHashMap<>();
@@ -554,10 +559,36 @@ public class SolrRatingsManager implements RatingsManager
                 offsetIndex += BULK_OPERATIONS_BATCH_SIZE;
             } while (!ratings.isEmpty());
 
-            float newAverage = Float.valueOf(sumOfVotes) / numberOfVotes;
+            float newAverage = (numberOfVotes > 0) ? Float.valueOf(sumOfVotes) / numberOfVotes : 0;
             return this.getAverageRatingManager().resetAverageRating(entityReference, newAverage, numberOfVotes);
         } else {
             throw new RatingsException(AVERAGE_RATING_NOT_ENABLED_ERROR_MESSAGE);
+        }
+    }
+
+    private void checkIfVoteValid(int vote) throws RatingsException
+    {
+        // If the vote is outside the scope of the scale, we throw an exception immediately.
+        if (vote < 0 || vote > this.getScale()) {
+            throw new RatingsException(String.format("The vote [%s] is out of scale [%s] for [%s] rating manager.",
+                vote, this.getScale(), this.getIdentifier()));
+        }
+    }
+
+    private void checkIfDocumentExists(EntityReference reference) throws RatingsException
+    {
+        Optional<DocumentReference> optionalDoc = DocumentReference.extractDocument(reference);
+        try {
+            if (optionalDoc.isEmpty() || !this.documentAccessBridge.exists(optionalDoc.get())) {
+                throw new RatingsException(String.format("The reference [%s] is not an existing page.", reference));
+            }
+        } catch (Exception e) {
+            if (e instanceof RatingsException) {
+                throw (RatingsException) e;
+            } else {
+                throw new RatingsException(String.format("An error occurred while checking of [%s] exists", reference),
+                    e);
+            }
         }
     }
 }

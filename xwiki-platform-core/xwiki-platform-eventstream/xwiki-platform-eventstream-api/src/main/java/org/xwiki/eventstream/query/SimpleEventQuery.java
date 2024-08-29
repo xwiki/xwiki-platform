@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -33,7 +34,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
 import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -42,22 +42,21 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 public class SimpleEventQuery extends GroupQueryCondition implements PageableEventQuery, SortableEventQuery
 {
-    private List<QueryCondition> currentConditions = conditions;
-
     private long limit = -1;
 
     private long offset;
 
     private List<SortClause> sorts = new ArrayList<>();
 
-    private boolean nextReversed;
-
     private boolean nextOr;
 
-    private boolean nextOpen;
+    private boolean nextReversed;
+
+    private boolean nextCustom;
+
+    private Type nextCustomType;
 
     private Deque<GroupQueryCondition> groupStack = new LinkedList<>();
 
@@ -79,6 +78,11 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
 
         setOffset(offset);
         setLimit(limit);
+    }
+
+    private GroupQueryCondition getCurrentGroupQueryCondition()
+    {
+        return this.groupStack.isEmpty() ? this : this.groupStack.peek();
     }
 
     /**
@@ -136,6 +140,13 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         return this;
     }
 
+    private QueryCondition getCurrentCondition()
+    {
+        GroupQueryCondition group = getCurrentGroupQueryCondition();
+
+        return group.conditions.isEmpty() ? null : group.conditions.get(group.conditions.size() - 1);
+    }
+
     /**
      * Group together the previous and next condition in a OR group.
      * 
@@ -144,7 +155,7 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery or()
     {
-        nextOr(true);
+        this.nextOr = true;
 
         return this;
     }
@@ -157,16 +168,78 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery and()
     {
-        nextOr(false);
+        this.nextOr = false;
 
         return this;
     }
 
-    private void nextOr(boolean or)
+    private SimpleEventQuery beforeQueryCondition()
     {
-        if (!this.nextOpen && !this.currentConditions.isEmpty()) {
-            this.nextOr = or;
+        GroupQueryCondition currentGroup = getCurrentGroupQueryCondition();
+
+        // If current group is already a OR/AND group calling or/and() has no effect
+        if (this.nextOr != currentGroup.isOr()) {
+            if (currentGroup.conditions.size() <= 1) {
+                // Switch current group to an OR/AND group when calling OR/AND right after open() or after the first
+                // element
+                currentGroup.or = this.nextOr;
+            } else {
+                // Otherwise push a new group with the previous condition in it
+                QueryCondition currentCondition = getCurrentCondition();
+
+                // Remove current condition from current group
+                currentGroup.conditions.remove(currentGroup.conditions.size() - 1);
+
+                // Push a new OR/AND group with the current condition
+                open(this.nextOr, true, currentCondition);
+            }
         }
+
+        // Reset OR flag
+        this.nextOr = false;
+
+        return this;
+    }
+
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @return this {@link SimpleEventQuery}
+     * @since 13.9RC1
+     * @deprecated use {@link #custom()} instead
+     */
+    @Deprecated(since = "14.2RC1")
+    public SimpleEventQuery parameter()
+    {
+        return custom();
+    }
+
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @return this {@link SimpleEventQuery}
+     * @since 14.2RC1
+     */
+    public SimpleEventQuery custom()
+    {
+        this.nextCustom = true;
+
+        return this;
+    }
+
+    /**
+     * Next call will be about custom event parameters.
+     * 
+     * @param type the type in which that property was stored
+     * @return this {@link SimpleEventQuery}
+     * @since 14.2RC1
+     */
+    public SimpleEventQuery custom(Type type)
+    {
+        this.nextCustom = true;
+        this.nextCustomType = type;
+
+        return this;
     }
 
     /**
@@ -177,26 +250,20 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery open()
     {
-        if (this.nextOr) {
-            forceOpen(true);
+        beforeQueryCondition();
 
-            this.nextOr = false;
-        } else if (this.nextOpen || this.nextReversed) {
-            forceOpen(false);
-        } else {
-            this.nextOpen = true;
-        }
+        open(false, false);
 
         return this;
     }
 
-    private void forceOpen(boolean or, QueryCondition... newConditions)
+    private void open(boolean or, boolean virtual, QueryCondition... newConditions)
     {
-        GroupQueryCondition group = new GroupQueryCondition(or, this.nextReversed, newConditions);
+        GroupQueryCondition group = new GroupQueryCondition(or, this.nextReversed, virtual, newConditions);
 
-        this.currentConditions.add(group);
+        GroupQueryCondition currentGroup = getCurrentGroupQueryCondition();
+        currentGroup.conditions.add(group);
         this.groupStack.push(group);
-        this.currentConditions = group.conditions;
 
         this.nextReversed = false;
     }
@@ -209,58 +276,43 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery close()
     {
-        if (this.nextOpen) {
-            this.nextOpen = false;
-        } else {
-            GroupQueryCondition group = this.groupStack.pop();
+        GroupQueryCondition closedGroup;
+        do {
+            closedGroup = this.groupStack.pop();
 
-            this.currentConditions = this.groupStack.isEmpty() ? this.conditions : this.groupStack.peek().conditions;
+            GroupQueryCondition currentGroup = getCurrentGroupQueryCondition();
 
-            if (group.getConditions().isEmpty()) {
+            if (closedGroup.getConditions().isEmpty()) {
                 // Cleanup empty group
-                this.currentConditions.remove(this.currentConditions.size() - 1);
-            } else if (group.getConditions().size() == 1
-                && group.getConditions().get(0) instanceof GroupQueryCondition) {
+                currentGroup.conditions.remove(currentGroup.conditions.size() - 1);
+            } else if (closedGroup.getConditions().size() == 1
+                && closedGroup.getConditions().get(0) instanceof GroupQueryCondition) {
                 // Optimize group containing only a group
-                this.currentConditions.set(this.currentConditions.size() - 1, group.getConditions().get(0));
+                currentGroup.conditions.set(currentGroup.conditions.size() - 1, closedGroup.getConditions().get(0));
             }
-        }
+        } while (closedGroup.virtual);
 
         return this;
     }
 
     private void addCompareCondition(String property, Object value, CompareType type)
     {
-        addCondition(new CompareQueryCondition(property, value, type, this.nextReversed));
+        addCondition(
+            new CompareQueryCondition(property, this.nextCustom, this.nextCustomType, value, type, this.nextReversed));
     }
 
     private void addCondition(QueryCondition newCondition)
     {
-        if (this.nextOpen) {
-            forceOpen(false);
+        beforeQueryCondition();
 
-            this.nextOpen = false;
-        }
+        GroupQueryCondition currentGroup = getCurrentGroupQueryCondition();
 
-        if (this.nextOr) {
-            QueryCondition previousCondition = this.currentConditions.get(this.currentConditions.size() - 1);
-            if (previousCondition instanceof GroupQueryCondition && ((GroupQueryCondition) previousCondition).isOr()) {
-                ((GroupQueryCondition) previousCondition).conditions.add(newCondition);
-            } else {
-                // Remove previous condition from the list
-                this.currentConditions.remove(this.currentConditions.size() - 1);
-
-                // Add a OR condition with the previous and new conditions
-                this.currentConditions
-                    .add(new GroupQueryCondition(true, this.nextReversed, previousCondition, newCondition));
-            }
-        } else {
-            this.currentConditions.add(newCondition);
-        }
+        currentGroup.conditions.add(newCondition);
 
         // Reset flags
         this.nextReversed = false;
-        this.nextOr = false;
+        this.nextCustom = false;
+        this.nextCustomType = null;
     }
 
     /**
@@ -328,6 +380,45 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     }
 
     /**
+     * @param property the name of the property
+     * @param value the value the property should starts with
+     * @return this {@link SimpleEventQuery}
+     * @since 14.0RC1
+     */
+    public SimpleEventQuery startsWith(String property, Object value)
+    {
+        addCompareCondition(property, value, CompareType.STARTS_WITH);
+
+        return this;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param value the value the property should ends with
+     * @return this {@link SimpleEventQuery}
+     * @since 14.0RC1
+     */
+    public SimpleEventQuery endsWith(String property, Object value)
+    {
+        addCompareCondition(property, value, CompareType.ENDS_WITH);
+
+        return this;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param value the value the property should contain
+     * @return this {@link SimpleEventQuery}
+     * @since 14.4RC1
+     */
+    public SimpleEventQuery contains(String property, Object value)
+    {
+        addCompareCondition(property, value, CompareType.CONTAINS);
+
+        return this;
+    }
+
+    /**
      * @param date the date before which events should be selected
      * @return this {@link SimpleEventQuery}
      * @since 12.5RC1
@@ -359,7 +450,8 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery in(String property, List<?> values)
     {
-        addCondition(new InQueryCondition(this.nextReversed, property, (List) values));
+        addCondition(
+            new InQueryCondition(this.nextReversed, property, this.nextCustom, this.nextCustomType, (List) values));
 
         return this;
     }
@@ -448,7 +540,11 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
      */
     public SimpleEventQuery addSort(String property, Order order)
     {
-        this.sorts.add(new SortClause(property, order));
+        this.sorts.add(new SortClause(property, this.nextCustom, this.nextCustomType, order));
+
+        // Reset flag
+        this.nextCustom = false;
+        this.nextCustomType = null;
 
         return this;
     }
@@ -494,9 +590,9 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
 
+        builder.appendSuper(super.toString());
         builder.append("limit", getLimit());
         builder.append("offset", getOffset());
-        builder.append("conditions", getConditions());
         builder.append("sorts", getSorts());
 
         return builder.build();

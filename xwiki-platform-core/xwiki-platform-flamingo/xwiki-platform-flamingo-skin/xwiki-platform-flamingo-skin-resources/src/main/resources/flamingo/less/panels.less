@@ -7,11 +7,11 @@
   box-shadow: none;
 }
 
-h1.xwikipaneltitle {
+h1.xwikipaneltitle, h2.xwikipaneltitle {
   .panel-title;
   margin: @padding-small-vertical @padding-large-horizontal @padding-large-vertical;
   padding: 0 0 @padding-large-vertical;
-  color: @xwiki-panel-header-text;
+  color: @panel-header-text;
   border-bottom: @border-width solid @xwiki-page-content-bg;
   box-shadow: 0 @border-width 0 @xwiki-border-color;
   overflow: hidden;
@@ -39,9 +39,12 @@ h1.xwikipaneltitle {
 }
 
 // Panels inside the page =================================================
-.main {
+.main {
   .panel-body {
     background-color: @xwiki-page-content-bg;
+    // Without this radius, the panel background can be displayed over the parent border, when the parent has a rounded
+    // corner.
+    border-radius: inherit;
   }
 }
 

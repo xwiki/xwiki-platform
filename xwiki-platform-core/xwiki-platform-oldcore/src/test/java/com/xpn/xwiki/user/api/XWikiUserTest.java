@@ -19,12 +19,17 @@
  */
 package com.xpn.xwiki.user.api;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,21 +61,29 @@ public class XWikiUserTest
     @InjectMockitoOldcore
     private MockitoOldcore mockitoOldcore;
 
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     @Mock
     private XWikiDocument userDocument;
 
-    private DocumentReference userClassReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+    @Mock
+    private DocumentAuthors authors;
 
-    private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
+    private final DocumentReference userClassReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+
+    private final DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
 
     @BeforeEach
     public void setup(MockitoComponentManager componentManager) throws Exception
     {
-        when(mockitoOldcore.getSpyXWiki().getDocument(userReference, mockitoOldcore.getXWikiContext()))
-            .thenReturn(userDocument);
-        when(userDocument.getDocumentReference()).thenReturn(userReference);
-        when(userDocument.getDocumentReferenceWithLocale()).thenReturn(userReference);
-        when(userDocument.clone()).thenReturn(userDocument);
+        when(this.mockitoOldcore.getSpyXWiki().getDocument(this.userReference, this.mockitoOldcore.getXWikiContext()))
+            .thenReturn(this.userDocument);
+        when(this.userDocument.getDocumentReference()).thenReturn(this.userReference);
+        when(this.userDocument.getDocumentReferenceWithLocale()).thenReturn(this.userReference);
+        when(this.userDocument.getAuthors()).thenReturn(this.authors);
+        when(this.userDocument.clone()).thenReturn(this.userDocument);
         componentManager.registerMockComponent(ContextualLocalizationManager.class, "default");
     }
 
@@ -96,38 +108,42 @@ public class XWikiUserTest
     @Test
     public void isDisabled()
     {
-        XWikiUser user = new XWikiUser(userReference);
-        when(userDocument.getIntValue(userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(1);
-        assertFalse(user.isDisabled(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(1);
+        assertFalse(user.isDisabled(this.mockitoOldcore.getXWikiContext()));
 
-        when(userDocument.getIntValue(userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(0);
-        assertTrue(user.isDisabled(mockitoOldcore.getXWikiContext()));
+        when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1)).thenReturn(0);
+        assertTrue(user.isDisabled(this.mockitoOldcore.getXWikiContext()));
 
         user = new XWikiUser((DocumentReference) null);
-        assertFalse(user.isDisabled(mockitoOldcore.getXWikiContext()));
+        assertFalse(user.isDisabled(this.mockitoOldcore.getXWikiContext()));
 
         user = new XWikiUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-        assertFalse(user.isDisabled(mockitoOldcore.getXWikiContext()));
+        assertFalse(user.isDisabled(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
     public void setDisabledFalseNormalUser() throws XWikiException
     {
-        XWikiUser user = new XWikiUser(userReference);
-        user.setDisabled(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, times(1)).setIntValue(userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
-        verify(mockitoOldcore.getSpyXWiki(), times(1))
-            .saveDocument(same(userDocument), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+            .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
+        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
     @Test
     public void setDisabledTrueNormalUser() throws XWikiException
     {
-        XWikiUser user = new XWikiUser(userReference);
-        user.setDisabled(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, times(1)).setIntValue(userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
-        verify(mockitoOldcore.getSpyXWiki(), times(1))
-            .saveDocument(same(userDocument), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.ACTIVE_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+            .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
+        verify(this.authors, times(1)).setOriginalMetadataAuthor(any());
+        verify(this.authors, never()).setEffectiveMetadataAuthor(any());
     }
 
     @Test
@@ -135,68 +151,68 @@ public class XWikiUserTest
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);
-        user.setDisabled(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
-        user.setDisabled(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
         // With superadmin user we never save anything
         user = new XWikiUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-        user.setDisabled(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setDisabled(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
-        user.setDisabled(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setDisabled(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
     public void isEmailChecked()
     {
-        XWikiUser user = new XWikiUser(userReference);
-        when(userDocument.getIntValue(userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(1);
-        assertTrue(user.isEmailChecked(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(1);
+        assertTrue(user.isEmailChecked(this.mockitoOldcore.getXWikiContext()));
 
-        when(userDocument.getIntValue(userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(0);
-        assertFalse(user.isEmailChecked(mockitoOldcore.getXWikiContext()));
+        when(this.userDocument.getIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1)).thenReturn(0);
+        assertFalse(user.isEmailChecked(this.mockitoOldcore.getXWikiContext()));
 
         user = new XWikiUser((DocumentReference) null);
-        assertTrue(user.isEmailChecked(mockitoOldcore.getXWikiContext()));
+        assertTrue(user.isEmailChecked(this.mockitoOldcore.getXWikiContext()));
 
         user = new XWikiUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-        assertTrue(user.isEmailChecked(mockitoOldcore.getXWikiContext()));
+        assertTrue(user.isEmailChecked(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
     public void setEmailCheckedFalseNormalUser() throws XWikiException
     {
-        XWikiUser user = new XWikiUser(userReference);
-        user.setEmailChecked(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, times(1)).setIntValue(userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
-        verify(mockitoOldcore.getSpyXWiki(), times(1))
-            .saveDocument(same(userDocument), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 0);
+        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+            .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
     public void setEmailCheckedTrueNormalUser() throws XWikiException
     {
-        XWikiUser user = new XWikiUser(userReference);
-        user.setEmailChecked(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, times(1)).setIntValue(userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
-        verify(mockitoOldcore.getSpyXWiki(), times(1))
-            .saveDocument(same(userDocument), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        XWikiUser user = new XWikiUser(this.userReference);
+        user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, times(1)).setIntValue(this.userClassReference, XWikiUser.EMAIL_CHECKED_PROPERTY, 1);
+        verify(this.mockitoOldcore.getSpyXWiki(), times(1))
+            .saveDocument(same(this.userDocument), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 
     @Test
@@ -204,30 +220,30 @@ public class XWikiUserTest
     {
         // With guest user we never save anything
         XWikiUser user = new XWikiUser((DocumentReference) null);
-        user.setEmailChecked(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
-        user.setEmailChecked(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
         // With superadmin user we never save anything
         user = new XWikiUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
-        user.setEmailChecked(true, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setEmailChecked(true, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
 
-        user.setEmailChecked(false, mockitoOldcore.getXWikiContext());
-        verify(userDocument, never())
-            .setIntValue(same(userClassReference), any(String.class), any(Integer.class));
-        verify(mockitoOldcore.getSpyXWiki(), never())
-            .saveDocument(any(XWikiDocument.class), any(String.class), same(mockitoOldcore.getXWikiContext()));
+        user.setEmailChecked(false, this.mockitoOldcore.getXWikiContext());
+        verify(this.userDocument, never())
+            .setIntValue(same(this.userClassReference), any(String.class), any(Integer.class));
+        verify(this.mockitoOldcore.getSpyXWiki(), never())
+            .saveDocument(any(XWikiDocument.class), any(String.class), same(this.mockitoOldcore.getXWikiContext()));
     }
 }

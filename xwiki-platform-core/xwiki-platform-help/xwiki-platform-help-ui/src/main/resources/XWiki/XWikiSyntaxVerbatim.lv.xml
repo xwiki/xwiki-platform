@@ -46,7 +46,7 @@
 Precīza teksta kopijas iezīme ļauj attēlot tekstu tieši tādu, kāds tas ir ievadīts (citiem vārdiem sakot, šim tekstam netiek izpildīta viki sintakse).
 
 {{info}}
-XWiki 1.0 sintaksē [[//pre// makross&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/PreMacro]] novērš tikai viki un //Radeox// makrosu izpildi, tomēr HTML kods un Groovy vai Velocity skripti tiek izpildīti.
+XWiki 1.0 sintaksē [[//pre// makross&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] novērš tikai viki un //Radeox// makrosu izpildi, tomēr HTML kods un Groovy vai Velocity skripti tiek izpildīti.
 {{/info}}
 
 |=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
@@ -60,7 +60,7 @@ attēlots teksts
 {/pre}
 }}}
 
-{{info}}Precīczu teksta kpoju var attēlot, arī izmantojot [[//code// makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/CodeMacro]], bet tas uzreiz pēc noklusējuma tekstu attēlo rāmī.{{/info}}
+{{info}}Precīczu teksta kpoju var attēlot, arī izmantojot [[//code// makrosu&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]], bet tas uzreiz pēc noklusējuma tekstu attēlo rāmī.{{/info}}
 )))|(((
 {{{
 Daudzu rindu

@@ -79,9 +79,9 @@ class PersonalMessageStreamNotificationFilterTest
         when(event1.getType()).thenReturn("personalMessage");
         when(event2.getType()).thenReturn("personalMessage");
         when(event3.getType()).thenReturn("otherType");
-        when(this.preferencesGetter.isUsedFollowed("xwiki:XWiki.User1", null, ALERT))
+        when(this.preferencesGetter.isUserFollowed("xwiki:XWiki.User1", null, ALERT))
             .thenReturn(true);
-        when(this.preferencesGetter.isUsedFollowed("xwiki:XWiki.User2", null, ALERT))
+        when(this.preferencesGetter.isUserFollowed("xwiki:XWiki.User2", null, ALERT))
             .thenReturn(false);
 
         assertEquals(KEEP, this.personalMessageFilter.filterEvent(event1, null, null, ALERT));

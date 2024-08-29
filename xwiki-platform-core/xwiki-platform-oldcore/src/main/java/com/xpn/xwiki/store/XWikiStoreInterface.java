@@ -22,9 +22,9 @@ package com.xpn.xwiki.store;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,7 +48,6 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of problem during the rename.
      * @since 12.5RC1
      */
-    @Unstable
     default void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context)
         throws XWikiException
     {
@@ -82,9 +81,9 @@ public interface XWikiStoreInterface
     List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
 
     /**
@@ -94,9 +93,9 @@ public interface XWikiStoreInterface
         throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
@@ -106,9 +105,9 @@ public interface XWikiStoreInterface
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context)
         throws XWikiException;
 
@@ -142,9 +141,9 @@ public interface XWikiStoreInterface
         List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
@@ -158,9 +157,9 @@ public interface XWikiStoreInterface
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
+     * @deprecated use {@link #searchDocumentReferences(String, List, XWikiContext)}
      */
-    @Deprecated
+    @Deprecated(since = "2.2M2")
     List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -400,22 +399,57 @@ public interface XWikiStoreInterface
 
     void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
 
+    /**
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
+     */
+    @Deprecated(since = "14.8RC1")
     List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
+     * Returns the backlinks for the given document reference.
+     *
+     * @param documentReference the document reference to search backlinks for
+     * @param bTransaction {@code true} if a transaction must be create
+     * @param context the current context
      * @since 2.2M2
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
+    @Deprecated(since = "14.8RC1")
     List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     * Returns the backlinks for the given attachment reference.
+     *
+     * @param documentReference the attachment reference to search backlinks for
+     * @param bTransaction {@code true} if a transaction must be create
+     * @param context the current context
+     * @since 14.2RC1
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
      */
-    @Deprecated
+    @Deprecated(since = "14.8RC1")
+    default List<DocumentReference> loadBacklinks(AttachmentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return List.of();
+    }
+
+    /**
+     * @deprecated use {@link org.xwiki.link.LinkStore} APIs instead
+     */
+    @Deprecated(since = "2.2M2")
     List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
 
+    /**
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
+     */
+    @Deprecated(since = "14.8RC1")
     void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
 
+    /**
+     * @deprecated link storage and indexing moved to Solr (implemented in xwiki-platform-search-solr-api)
+     */
+    @Deprecated(since = "14.8RC1")
     void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
@@ -523,9 +557,9 @@ public interface XWikiStoreInterface
     boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated since 11.5RC1, use {@link #isCustomMappingValid(BaseClass, String)}
+     * @deprecated use {@link #isCustomMappingValid(BaseClass, String)}
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
 
     /**
@@ -533,13 +567,17 @@ public interface XWikiStoreInterface
      */
     default boolean isCustomMappingValid(BaseClass bclass, String custommapping1)
     {
-        return isCustomMappingValid(bclass, custommapping1);
+        try {
+            return isCustomMappingValid(bclass, custommapping1, null);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
-     * @deprecated since 11.5RC1, use {@link #injectCustomMapping(BaseClass)} instead
+     * @deprecated use {@link #injectCustomMapping(BaseClass)} instead
      */
-    @Deprecated
+    @Deprecated(since = "11.5RC1")
     boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;
 
     /**

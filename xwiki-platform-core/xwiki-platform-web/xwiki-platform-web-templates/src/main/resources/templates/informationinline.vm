@@ -34,156 +34,234 @@
 $xwiki.jsfx.use('js/xwiki/viewers/information.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})
 $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
 $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': true, 'language': $xcontext.locale})
+
+## Prepare a static list of extensions that provide the default content as XWIKI-12823 hasn't been implemented yet
+#set ($staticUIX = [])
+
+##
+## Locale
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt#if ($hasEdit && $tdoc.realLocale == $doc.realLocale && $xwiki.isMultiLingual()) class=""editableProperty""
+      data-property=""defaultLocale""#end>
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.locale'))</label>
+  </dt>
+  #set ($displayParams = {'value': $tdoc.realLocale})
+  <dd data-key=""locale"">#displayProperty_locale($displayParams)</dd>
+  ",
+  'order': 100
+}))
+
+##
+## Original Locale
+##
+#if ($tdoc.realLocale != $doc.realLocale)
+  #set ($discard = $staticUIX.add({'content': "
+    <dt>
+      <label>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</label>
+    </dt>
+    <dd data-key=""originalLocale"">#docTranslationLink($doc.realLocale 'view')</dd>
+    ",
+    'order': 200
+  }))
+#end
+
+##
+## Translations
+##
+#set ($existingTranslations = $doc.translationLocales)
+## Show the list of translations if multilingual is on and either the original page is translatable (has a
+## locale specified) or it has existing translations.
+#if ($xwiki.isMultiLingual() && ("$!doc.realLocale" != '' || !$existingTranslations.isEmpty()))
+  #set ($supportedLocales = $xwiki.availableLocales)
+  ## Remove the translations that we already display above.
+  #set ($discard = $supportedLocales.remove($tdoc.realLocale))
+  #set ($discard = $supportedLocales.remove($doc.realLocale))
+  #if (!$supportedLocales.isEmpty())
+    #set ($output = [])
+    #foreach ($supportedLocale in $supportedLocales)
+      #if ($existingTranslations.contains($supportedLocale))
+        #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale 'view')")))
+      #elseif ($hasEdit)
+        ## Show the link to create the missing translation if the current user can edit the page. Use the
+        ## preferred edit mode (in-place versus stand-alone) depending on the user preferences, in order to
+        ## replicate the behavior of the Translate button.
+        #set ($action = 'edit')
+        #set ($fragment = $NULL)
+        #getDefaultDocumentEditor($defaultEditMode)
+        #if ($services.edit.document.inPlaceEditingEnabled() && $defaultEditMode == 'wysiwyg')
+          ## Link to the in-place page editor which currently uses the view action.
+          #set ($action = 'view')
+          #set ($fragment = 'translate')
+        #end
+        #set ($discard = $output.add(
+          "<span class='wikicreatelink skipCreatePagePopup'>" +
+            $stringtool.trim("#docTranslationLink($supportedLocale $action $fragment)") +
+          "</span>"
+        ))
+      #end
+    #end
+    #set ($discard = $staticUIX.add({'content': "
+      <dt>
+        <label>$escapetool.xml($services.localization.render('core.viewers.information.translations'))</label>
+      </dt>
+      <dd data-key=""translations"">$stringtool.join($output, ', ')</dd>
+      ",
+      'order': 300
+    }))
+  #end
+#end
+
+##
+## Syntax
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt#if ($hasEdit) class=""editableProperty""#end data-property=""syntax"">
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.syntax'))</label>
+  </dt>
+  <dd>#displayDocumentProperty_syntax()</dd>
+  ",
+  'order': 400
+  }))
+
+##
+## Hidden
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt#if ($hasEdit) class=""editableProperty""#end data-property=""hidden"">
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.hidden'))</label>
+  </dt>
+  <dd>#displayDocumentProperty_hidden()</dd>
+  ",
+  'order': 500
+}))
+
+##
+## Included Pages
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt>
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.includedPages'))</label>
+  </dt>
+  <dd>
+    #set ($includedPages = $tdoc.includedPages)
+    #if ($includedPages.isEmpty())
+      <span class=""noitems"">
+        $escapetool.xml($services.localization.render('core.viewers.information.noIncludedPages'))
+      </span>
+    #else
+      #displayDocumentList($includedPages false $NULL)
+    #end
+  </dd>
+  ",
+  'order': 1100}))
+
+##
+## Backlinks
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt>
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.backlinks'))</label>
+  </dt>
+  <dd>
+    #set ($backlinks = $doc.backlinks)
+    #set ($discard = $collectiontool.sortModifiable($backlinks))
+    #if ($backlinks.isEmpty())
+      <span class=""noitems"">
+        $escapetool.xml($services.localization.render('core.viewers.information.noBacklinks'))
+      </span>
+    #else
+      #displayDocumentList($backlinks false $NULL)
+    #end
+  </dd>
+  ",
+  'order': 1200}))
+
+##
+## Reference
+##
+#set ($discard = $staticUIX.add({'content': "
+  <dt>
+    <label for=""reference-value"">
+      $escapetool.xml($services.localization.render('core.viewers.information.pageReference'))
+    </label>
+  </dt>
+  <dd id=""information-reference"">
+    <div class=""reference-group input-group flat-buttons"">
+      #set ($globalHint = $services.localization.render('core.viewers.information.pageReference.globalButton'))
+      <span class=""input-group-btn"">
+        <button id=""button-inout"" class=""btn btn-default"" type=""button"" title=""$escapetool.xml($globalHint)"">
+          $services.icon.renderHTML('world')
+        </button>
+      </span>
+      <input id=""reference-value"" type=""text"" readonly title=""$escapetool.xml($services.localization.render(
+        'core.viewers.information.pageReference.tips'))"" value=""$escapetool.xml($services.model.serialize(
+        $doc.getDocumentReference().getLocalDocumentReference(), 'local'))"" />
+      #set ($copyHint = $services.localization.render('core.viewers.information.pageReference.copyButton'))
+      <span class=""input-group-btn"">
+        <button id=""button-paste"" class=""btn btn-default"" type=""button"" title=""$escapetool.xml($copyHint)"">
+          $services.icon.renderHTML('paste')
+        </button>
+      </span>
+    </div>
+  </dd>
+  ",
+  'order': 1300}))
+
+## Add the static UIX to the list of UIX to display
+#set ($extensions = [])
+#set ($discard = $extensions.addAll($staticUIX))
+
+## Add the dynamic UIX to the list of UIX to display
+#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.template.information'))
+  #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
+  #if ("$!order" == '')
+    ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
+    #set ($order = 0)
+  #end
+  #set ($uixMap = { 'content'  : $services.rendering.render($uix.execute(), 'html/5.0'),
+                    'order'    : $order})
+  #set ($discard = $extensions.add($uixMap))
+#end
+
+## Sort the extensions by order
+#set ($sortedExtensions = $collectiontool.sort($extensions, 'order'))
+
+##
+## UIXs are split into two columns based on their order so they have some influence on the column they are displayed in
+## as a completely dynamic (e.g., first half left, second half right column) allocation could have strange effects. At
+## the same time, the number of columns can be changed by the skin and should not be dictated by the UIXs.
+## UIXs with a limit below $columnOrderLimit will be displayed in the left column.
+##
+#set ($columnOrderLimit = 1000)
+
 ###
 ### Display document information
 ###
 <div id="informationcontent" class="xwikiintracontent">
   <div id="_information" class="row xform">
-    ##------------
-    ## Left Column
-    ##------------
+    ##--------------------------------------------------
+    ## Left Column - UIXs with order < $columnOrderLimit
+    ##--------------------------------------------------
     <div id="informationleft" class="col-xs-12 col-sm-6">
       <dl>
-        ##
-        ## Locale
-        ##
-        <dt#if ($hasEdit && $tdoc.realLocale == $doc.realLocale && $xwiki.isMultiLingual()) class="editableProperty"
-            data-property="defaultLocale"#end>
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.locale'))</label>
-        </dt>
-        #set ($displayParams = {'value': $tdoc.realLocale})
-        <dd data-key="locale">#displayProperty_locale($displayParams)</dd>
-        ##
-        ## Original Locale
-        ##
-        #if ($tdoc.realLocale != $doc.realLocale)
-          <dt>
-            <label>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</label>
-          </dt>
-          <dd data-key="originalLocale">#docTranslationLink($doc.realLocale 'view')</dd>
-        #end
-        ##
-        ## Translations
-        ##
-        #set ($existingTranslations = $doc.translationLocales)
-        ## Show the list of translations if multilingual is on and either the original page is translatable (has a
-        ## locale specified) or it has existing translations.
-        #if ($xwiki.isMultiLingual() && ("$!doc.realLocale" != '' || !$existingTranslations.isEmpty()))
-          #set ($supportedLocales = $xwiki.availableLocales)
-          ## Remove the translations that we already display above.
-          #set ($discard = $supportedLocales.remove($tdoc.realLocale))
-          #set ($discard = $supportedLocales.remove($doc.realLocale))
-          #if (!$supportedLocales.isEmpty())
-            <dt>
-              <label>$escapetool.xml($services.localization.render('core.viewers.information.translations'))</label>
-            </dt>
-            #set ($output = [])
-            #foreach ($supportedLocale in $supportedLocales)
-              #if ($existingTranslations.contains($supportedLocale))
-                #set ($discard = $output.add($stringtool.trim("#docTranslationLink($supportedLocale 'view')")))
-              #elseif ($hasEdit)
-                ## Show the link to create the missing translation if the current user can edit the page. Use the
-                ## preferred edit mode (in-place versus stand-alone) depending on the user preferences, in order to
-                ## replicate the behavior of the Translate button.
-                #set ($action = 'edit')
-                #set ($fragment = $NULL)
-                #getDefaultDocumentEditor($defaultEditMode)
-                #if ($services.edit.document.inPlaceEditingEnabled() && $defaultEditMode == 'wysiwyg')
-                  ## Link to the in-place page editor which currently uses the view action.
-                  #set ($action = 'view')
-                  #set ($fragment = 'translate')
-                #end
-                #set ($discard = $output.add(
-                  "<span class='wikicreatelink skipCreatePagePopup'>" +
-                    $stringtool.trim("#docTranslationLink($supportedLocale $action $fragment)") +
-                  "</span>"
-                ))
-              #end
-            #end
-            <dd data-key="translations">$stringtool.join($output, ', ')</dd>
+        #foreach ($extension in $sortedExtensions)
+          #if ($extension.order < $columnOrderLimit)
+            $extension.content
           #end
         #end
-        ##
-        ## Syntax
-        ##
-        <dt#if ($hasEdit) class="editableProperty"#end data-property="syntax">
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.syntax'))</label>
-        </dt>
-        <dd>#displayDocumentProperty_syntax()</dd>
-        ##
-        ## Hidden
-        ##
-        <dt#if ($hasEdit) class="editableProperty"#end data-property="hidden">
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.hidden'))</label>
-        </dt>
-        <dd>#displayDocumentProperty_hidden()</dd>
       </dl>
     </div>
-    ##-------------
-    ## Right Column
-    ##-------------
+    ##----------------------------------------------------
+    ## Right Column - UIXs with order >= $columnOrderLimit
+    ##----------------------------------------------------
     <div id="informationright" class="col-xs-12 col-sm-6">
       <dl>
-        ##
-        ## Included Pages
-        ##
-        <dt>
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.includedPages'))</label>
-        </dt>
-        <dd>
-          #set ($includedPages = $tdoc.includedPages)
-          #if ($includedPages.isEmpty())
-            <span class="noitems">
-              $escapetool.xml($services.localization.render('core.viewers.information.noIncludedPages'))
-            </span>
-          #else
-            #displayDocumentList($includedPages false $blacklistedSpaces)
+        #foreach ($extension in $sortedExtensions)
+          #if ($extension.order >= $columnOrderLimit)
+            $extension.content
           #end
-        </dd>
-        ##
-        ## Backlinks
-        ##
-        <dt>
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.backlinks'))</label>
-        </dt>
-        <dd>
-          #set ($backlinks = $doc.backlinks)
-          #set ($discard = $collectiontool.sortModifiable($backlinks))
-          #if ($backlinks.isEmpty())
-            <span class="noitems">
-              $escapetool.xml($services.localization.render('core.viewers.information.noBacklinks'))
-            </span>
-          #else
-            #displayDocumentList($backlinks false $blacklistedSpaces)
-          #end
-        </dd>
-        ##
-        ## Reference
-        ##
-        <dt>
-          <label for="reference-value">
-            $escapetool.xml($services.localization.render('core.viewers.information.pageReference'))
-          </label>
-        </dt>
-        <dd id="information-reference">
-          <div class="reference-group input-group flat-buttons">
-            #set ($globalHint = $services.localization.render('core.viewers.information.pageReference.globalButton'))
-            <span class="input-group-btn">
-              <button id="button-inout" class="btn btn-default" type="button" title="$escapetool.xml($globalHint)">
-                $services.icon.renderHTML('world')
-              </button>
-            </span>
-            <input id="reference-value" type="text" readonly title="$escapetool.xml($services.localization.render(
-              'core.viewers.information.pageReference.tips'))" value="$escapetool.xml($services.model.serialize(
-              $doc.getDocumentReference().getLocalDocumentReference(), 'local'))" />
-            #set ($copyHint = $services.localization.render('core.viewers.information.pageReference.copyButton'))
-            <span class="input-group-btn">
-              <button id="button-paste" class="btn btn-default" type="button" title="$escapetool.xml($copyHint)">
-                $services.icon.renderHTML('paste')
-              </button>
-            </span>
-          </div>
-        </dd>
+        #end
       </dl>
     </div>
     <div class="clearfloats">&nbsp;</div>

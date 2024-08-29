@@ -32,7 +32,6 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
-import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;

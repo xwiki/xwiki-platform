@@ -377,19 +377,6 @@ REFERENCE_SETUP[EntityType.OBJECT][OBJECTSEP] = EntityType.DOCUMENT;
 REFERENCE_SETUP[EntityType.OBJECT_PROPERTY][PROPERTYSEP] = EntityType.OBJECT;
 REFERENCE_SETUP[EntityType.CLASS_PROPERTY][CLASSPROPSEP] = EntityType.DOCUMENT;
 
-/**
- * Map defining ordered entity types of a proper reference chain for a given entity type.
- */
-const ENTITY_TYPES = [
-  /* WIKI */            [EntityType.WIKI],
-  /* SPACE */           [EntityType.SPACE, EntityType.WIKI],
-  /* DOCUMENT */        [EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI],
-  /* ATTACHMENT */      [EntityType.ATTACHMENT, EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI],
-  /* OBJECT */          [EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI],
-  /* OBJECT_PROPERTY */ [EntityType.OBJECT_PROPERTY, EntityType.OBJECT, EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI],
-  /* CLASS_PROPERTY */  [EntityType.CLASS_PROPERTY, EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI]
-];
-
 const ESCAPE_MATCHING = [DBLESCAPE, ESCAPE];
 const ESCAPE_MATCHING_REPLACE = [ESCAPE, ''];
 

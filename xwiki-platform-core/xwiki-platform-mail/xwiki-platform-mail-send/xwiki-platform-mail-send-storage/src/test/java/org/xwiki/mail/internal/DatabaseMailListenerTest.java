@@ -67,7 +67,7 @@ class DatabaseMailListenerTest
     private DatabaseMailListener listener;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @MockComponent
     private Execution execution;

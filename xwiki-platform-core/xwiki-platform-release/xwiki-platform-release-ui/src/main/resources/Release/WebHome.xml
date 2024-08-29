@@ -41,7 +41,9 @@
   #set ($shortVersion = $stringtool.replaceChars($request.version, ".-", ""))
   #set ($shortVersion = $stringtool.upperCase($shortVersion))
   #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
-  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
+  #set ($additionQueryArguments = $escapetool.url({'editor': 'inline',
+    'title': "New Release for version $shortVersion", 'version': $request.version}))
+  $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "edit", "$!{request.queryString}&amp;${additionQueryArguments}"))
 #end
 = Create Release =
 

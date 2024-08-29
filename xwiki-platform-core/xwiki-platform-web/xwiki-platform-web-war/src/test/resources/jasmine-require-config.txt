@@ -2,13 +2,15 @@ paths: {
   'jquery': '/webjars/jquery.min',
   'jQueryNoConflict': '/spec/jQueryNoConflict',
 
+  'prototype': '/webjars/prototype',
+
   'bootstrap': '/webjars/bootstrap.min',
 
   // Tree
   'jsTree': '/webjars/jstree.min',
-  'JobRunner': '/webjars/jobRunner.min',
-  'tree-finder': '/webjars/finder.min',
-  'tree': '/webjars/tree.min',
+  'xwiki-job-runner': '/webjars/jobRunner.min',
+  'xwiki-tree-finder': '/webjars/finder.min',
+  'xwiki-tree': '/webjars/tree.min',
 
   'xwiki-entityReference': 'uicomponents/model/entityReference.min'
 },
@@ -24,6 +26,9 @@ map: {
   }
 },
 shim: {
+  'prototype': {
+    exports: '$'
+  },
   'bootstrap': ['jquery'],
   'xwiki-entityReference': {
     exports: 'XWiki'

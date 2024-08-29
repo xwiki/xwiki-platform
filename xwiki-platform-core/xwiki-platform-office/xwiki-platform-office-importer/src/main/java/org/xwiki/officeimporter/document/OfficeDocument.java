@@ -20,10 +20,9 @@
 package org.xwiki.officeimporter.document;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Set;
+import java.util.Map;
 
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
 import org.xwiki.stability.Unstable;
@@ -58,21 +57,23 @@ public interface OfficeDocument extends Closeable
      * Artifacts are generated during the import operation if the original office document contains embedded
      * non-textual elements. Also, some office formats (like presentations) result in multiple output files when
      * converted into html. In this case all these output files will be considered as artifacts.
+     * <p>
+     * The key of the map is the artifact name.
      *
-     * @return the set of artifacts related to this office document.
-     * @since 13.1RC1
+     * @return the map of artifact names to artifacts related to this office document
+     * @since 14.10.8
+     * @since 15.3RC1
      */
     @Unstable
-    default Set<File> getArtifactsFiles()
+    default Map<String, OfficeDocumentArtifact> getArtifactsMap()
     {
-        return Collections.emptySet();
+        return Collections.emptyMap();
     }
 
     /**
      * @return the converter result.
      * @since 13.1RC1
      */
-    @Unstable
     default OfficeConverterResult getConverterResult()
     {
         return null;

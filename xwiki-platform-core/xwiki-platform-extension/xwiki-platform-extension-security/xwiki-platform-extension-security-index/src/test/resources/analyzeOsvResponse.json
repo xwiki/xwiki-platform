@@ -1,0 +1,40 @@
+{
+  "vulns": [
+    {
+      "affected": [
+        {
+          "ranges": [
+            {
+              "events": [
+                {
+                  "introduced": null,
+                  "fixed": "15.7",
+                  "last_affected": null
+                }
+              ],
+              "start": null,
+              "end": "15.7"
+            }
+          ],
+          "package": null
+        }
+      ],
+      "id": "VULN_ID",
+      "aliases": ["A1", "CVE-1"],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://main.ref/"
+        }
+      ],
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:L/A:L"
+        }
+      ],
+      "mainURL": "https://main.ref/",
+      "severityCCSV3": "CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:L/A:L"
+    }
+  ]
+}

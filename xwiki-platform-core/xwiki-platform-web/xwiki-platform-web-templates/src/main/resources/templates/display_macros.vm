@@ -95,7 +95,7 @@
 
 #macro (displayProperty_syntax $parameters)
   #if ($parameters.mode == 'edit')
-    #set ($configuredSyntaxes = $services.rendering.configuredSyntaxes)
+    #set ($configuredSyntaxes = $collectiontool.sort($services.rendering.configuredSyntaxes))
     #set ($availableParserSyntaxes = $services.rendering.availableParserSyntaxes)
     #set ($availableRendererSyntaxes = $services.rendering.availableRendererSyntaxes)
     <select id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)" data-type="syntax">
@@ -165,4 +165,13 @@
   #set ($macro.importStrings = $stringtool.join($macro.importStrings, ''))
   #set ($return = $NULL)
   #setVariable("$return" $macro.importStrings)
+#end
+
+#macro (createObjectAndPropertyIfMissing $propertyReference)
+  #set ($propertyReferenceObject = $services.model.resolveObjectProperty($propertyReference))
+  #set ($object = $doc.getObject($propertyReferenceObject.parent, true))
+  ## Properties are only initialized when the document is saved, try initializing the property if it is missing
+  #if (!$object.getProperty($propertyReferenceObject.name))
+    #set ($discard = $object.set($propertyReferenceObject.name, $object.getValue($propertyReferenceObject.name)))
+  #end
 #end

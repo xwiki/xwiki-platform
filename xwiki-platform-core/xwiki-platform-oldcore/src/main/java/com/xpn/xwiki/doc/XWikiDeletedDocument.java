@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -393,5 +394,15 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     public String getBatchId()
     {
         return batchId;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("id", id)
+            .append("fullName", fullName)
+            .append("locale", locale)
+            .toString();
     }
 }

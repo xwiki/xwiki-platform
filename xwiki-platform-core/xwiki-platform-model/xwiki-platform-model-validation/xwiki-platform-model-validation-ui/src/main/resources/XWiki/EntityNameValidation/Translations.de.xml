@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="de">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=Aktuelle Namensstrategie
+entitynamevalidation.currentStrategy.hint=Die Namensstrategie wird beim Erstellen, Umbenennen oder Speichern von Dokumenten verwendet.
+entitynamevalidation.useTransformation.label=Namen automatisch umwandeln
+entitynamevalidation.useTransformation.hint=Wenn aktiviert, wird die Namensstrategie verwendet, um den Namen nach Möglichkeit automatisch anzupassen.
+entitynamevalidation.useValidation.label=Namen überprüfen vor dem Speichern
+entitynamevalidation.useValidation.hint=Wenn aktiviert, validiert die Namensstrategie den Namen vor dem Speichern: Verwenden Sie diese Funktion mit Vorsicht, da sie das Speichern einiger vorhandener Dokumente verhindern könnte.
+entitynamevalidation.replacementCharacter.configuration=Konfiguration der Zeichenersetzungsstrategie
+entitynamevalidation.testStrategy.label=Testen Sie die gewählte Strategie
+entitynamevalidation.testStrategy.hint=Ermöglicht es Ihnen, das Verhalten der von Ihnen gewählten Namensstrategie zu überprüfen
+entitynamevalidation.testStrategy.placeholder=Geben Sie hier den Namen einer Seite ein, um sie zu testen
+entitynamevalidation.testStrategy.validName=Ist dieser Name mit der gewählten Strategie gültig?
+entitynamevalidation.testStrategy.transformedName=Name nach Transformation durch die gewählte Strategie:
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=Verbotene Zeichen
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=Ersatzzeichen
+entitynamevalidation.replacementCharacter.livetable._actions=Aktionen
+entitynamevalidation.replacementCharacter.add=Neues Zeichen hinzufügen
+entitynamevalidation.replacementCharacter.addNewCharacter=Fügen Sie ein neues Zeichen hinzu, um es zu verbieten oder zu ersetzen
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=Neues verbotenes Zeichen
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=Dieses Zeichen ist in Seitennamen verboten
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=Geben Sie hier das neue verbotene Zeichen ein
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=Neues Ersatzzeichen
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=Dieses Zeichen ersetzt das verbotene Zeichen in Seitennamen. Wenn nicht angegeben, wird das verbotene Zeichen aus Seitennamen entfernt.
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Geben Sie hier das neue Ersatzzeichen ein oder lassen Sie es leer
+entitynamevalidation.replacementCharacter.create.inProgress=Neues verbotenes Zeichen wird hinzugefügt...
+entitynamevalidation.replacementCharacter.create.done=Ein neues verbotenes Zeichen wurde erfolgreich hinzugefügt.
+entitynamevalidation.replacementCharacter.create.failed=Fehler beim Hinzufügen des neuen verbotenen Zeichens.
+entitynamevalidation.replacementCharacter.removeCharacter=Löschung eines verbotenen Zeichens
+entitynamevalidation.replacementCharacter.removeCharacter.warning=Möchten Sie dieses verbotene Zeichen wirklich löschen?
+entitynamevalidation.replacementCharacter.removeCharacter.remove=Löschen
+entitynamevalidation.replacementCharacter.remove.inProgress=Das verbotene Zeichen wird gelöscht...
+entitynamevalidation.replacementCharacter.remove.done=Das verbotene Zeichen wurde gelöscht.
+entitynamevalidation.replacementCharacter.remove.failed=Fehler beim Löschen eines verbotenen Zeichens.
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Kein
+entitynamevalidation.admin.heading=Namensstrategien
+admin.namestrategies=Namensstrategien
+</content>
+</xwikidoc>

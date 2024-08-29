@@ -23,13 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.test.ui.po.SortableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.assertTrue;
@@ -55,6 +52,8 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
 
     @FindBy(id = "bt-save")
     private WebElement saveButton;
+
+    private final SortableElement sortableDisplayedPanels = new SortableElement(this.displayedPanels);
 
     public static ApplicationsPanelAdministrationPage gotoPage()
     {
@@ -116,40 +115,7 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
             return;
         }
 
-        WebElement app = displayedPanels.findElement(By.linkText(appName));
-        WebElement appBefore = displayedPanels.findElement(By.linkText(appBeforeName));
-        Point target = appBefore.getLocation();
-        Point source = app.getLocation();
-
-        // The drag & drop of the "sortable" plugin of "jquery-ui" is very sensitive so we need to script the
-        // moves of the mouse precisely if we don't want to have flickers.
-        Actions actions = new Actions(getDriver().getWrappedDriver());
-        // First we hold the app
-        actions.clickAndHold(app);
-        // Then we move into the position of the targeted app so jquery-ui can register we want to take its place.
-        actions.moveByOffset(target.getX() - source.getX(), target.getY() - source.getY());
-        // Now we do a little move on top left so jquery-ui understand we want to be *before* the other app and
-        // put a blank place instead of the other app.
-        actions.moveByOffset(-5, -5);
-        // Do it
-        actions.perform();
-
-        // Before releasing the click, check that jquery-ui has moved the other app to let the place free.
-        getDriver().waitUntilCondition(new ExpectedCondition<Object>()
-        {
-            @Override
-            public Object apply(WebDriver webDriver)
-            {
-                Point newTarget = appBefore.getLocation();
-                Point newSource = app.getLocation();
-                return newTarget.getX() > newSource.getX() + 5 || newTarget.getY() > newSource.getY() + 5;
-            }
-        });
-
-        // Now we can release the selection
-        actions = new Actions(getDriver().getWrappedDriver());
-        actions.release();
-        actions.perform();
+        this.sortableDisplayedPanels.moveBefore(By.linkText(appName), By.linkText(appBeforeName));
     }
 
     public void revert()

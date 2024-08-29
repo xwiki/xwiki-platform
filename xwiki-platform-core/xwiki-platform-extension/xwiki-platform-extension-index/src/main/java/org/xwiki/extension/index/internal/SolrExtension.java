@@ -26,18 +26,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.xwiki.extension.DefaultExtensionSupportPlans;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionComponent;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.RemoteExtension;
+import org.xwiki.extension.ExtensionSupportPlan;
+import org.xwiki.extension.ExtensionSupportPlans;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.index.IndexedExtension;
 import org.xwiki.extension.rating.ExtensionRating;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.version.Version;
-import org.xwiki.extension.wrap.AbstractWrappingExtension;
+import org.xwiki.extension.wrap.WrappingIndexedExtension;
 
 /**
  * An extension stored in the Solr based index of extensions.
@@ -45,7 +47,7 @@ import org.xwiki.extension.wrap.AbstractWrappingExtension;
  * @version $Id$
  * @since 12.10
  */
-public class SolrExtension extends AbstractWrappingExtension<Extension> implements IndexedExtension
+public class SolrExtension extends WrappingIndexedExtension<Extension> implements IndexedExtension
 {
     private final ExtensionRepository repository;
 
@@ -228,6 +230,15 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     }
 
     /**
+     * @param supportPlans the support plans of the extension
+     */
+    public void setSupportPlans(Collection<? extends ExtensionSupportPlan> supportPlans)
+    {
+        this.overwrites.put(FIELD_SUPPORT_PLANS,
+            supportPlans != null ? new DefaultExtensionSupportPlans(supportPlans) : ExtensionSupportPlans.EMPTY);
+    }
+
+    /**
      * @param components the components provided by the extension
      * @since 13.3RC1
      */
@@ -239,16 +250,6 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
 
     // RemoteExtension
 
-    @Override
-    public boolean isRecommended()
-    {
-        if (this.overwrites.containsKey(FIELD_RECOMMENDED)) {
-            return (boolean) this.overwrites.get(FIELD_RECOMMENDED);
-        }
-
-        return getWrapped() instanceof RemoteExtension && ((RemoteExtension) getWrapped()).isRecommended();
-    }
-
     /**
      * @param recommended true if the extension is recommended
      * @see #isRecommended()
@@ -256,6 +257,15 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     public void setRecommended(boolean recommended)
     {
         this.overwrites.put(FIELD_RECOMMENDED, recommended);
+    }
+
+    /**
+     * @param supportPlans the support plans
+     * @since 16.8.0RC1
+     */
+    public void setSupportPlans(List<ExtensionSupportPlan> supportPlans)
+    {
+        this.overwrites.put(FIELD_SUPPORT_PLANS, supportPlans);
     }
 
     // RatingExtension
@@ -314,5 +324,11 @@ public class SolrExtension extends AbstractWrappingExtension<Extension> implemen
     public void setLast(boolean last)
     {
         this.last = last;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getId().toString();
     }
 }

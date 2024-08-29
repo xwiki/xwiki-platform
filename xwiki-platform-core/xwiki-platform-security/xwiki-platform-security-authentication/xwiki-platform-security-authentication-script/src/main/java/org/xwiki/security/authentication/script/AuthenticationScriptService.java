@@ -38,17 +38,18 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.AuthenticationAction;
-import org.xwiki.security.authentication.ResetPasswordRequestResponse;
 import org.xwiki.security.authentication.AuthenticationConfiguration;
 import org.xwiki.security.authentication.AuthenticationFailureManager;
 import org.xwiki.security.authentication.AuthenticationFailureStrategy;
 import org.xwiki.security.authentication.AuthenticationResourceReference;
 import org.xwiki.security.authentication.ResetPasswordException;
 import org.xwiki.security.authentication.ResetPasswordManager;
+import org.xwiki.security.authentication.ResetPasswordRequestResponse;
+import org.xwiki.security.authentication.RetrieveUsernameException;
+import org.xwiki.security.authentication.RetrieveUsernameManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 import org.xwiki.user.UserReference;
@@ -91,6 +92,9 @@ public class AuthenticationScriptService implements ScriptService
 
     @Inject
     private ResetPasswordManager resetPasswordManager;
+
+    @Inject
+    private RetrieveUsernameManager retrieveUsernameManager;
 
     @Inject
     @Named("contextpath")
@@ -160,14 +164,14 @@ public class AuthenticationScriptService implements ScriptService
      * @return a relative URL for the current wiki or {@code null} if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public String getAuthenticationURL(String action, Map<String, Object> params)
     {
         try {
             AuthenticationAction authenticationAction = AuthenticationAction.getFromRequestParameter(action);
 
-            AuthenticationResourceReference resourceReference =
-                new AuthenticationResourceReference(authenticationAction);
+            AuthenticationResourceReference resourceReference = new AuthenticationResourceReference(
+                this.contextProvider.get().getWikiReference(),
+                authenticationAction);
             if (params != null) {
                 for (Map.Entry<String, Object> entry : params.entrySet()) {
                     resourceReference.addParameter(entry.getKey(), entry.getValue());
@@ -192,7 +196,6 @@ public class AuthenticationScriptService implements ScriptService
      * @throws ResetPasswordException if any error occurs for performing the reset password request.
      * @since 13.1RC1
      */
-    @Unstable
     public void requestResetPassword(UserReference user) throws ResetPasswordException
     {
         if (this.authorizationManager.hasAccess(Right.PROGRAM)) {
@@ -204,18 +207,16 @@ public class AuthenticationScriptService implements ScriptService
 
     /**
      * Check that the given verification code is correct.
-     * Since a new verification code is generated (to avoid reusing a code several times), we also return the new code.
      * Note that we don't need to protect this API for programming rights: if the verificationCode is not correct a
      * {@link ResetPasswordException} is thrown and the verificationCode is reset. So a script attacker with wrong
-     * credentials cannot access the new verification code, or bruteforce it.
+     * credentials cannot access the verification code, or bruteforce it.
      *
      * @param user the user for which to check the verification code.
      * @param verificationCode the code to check.
-     * @return a newly generated verification code if it is correct.
+     * @return the same verification code if it is correct.
      * @throws ResetPasswordException if the code is not correct or if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public String checkVerificationCode(UserReference user, String verificationCode)
         throws ResetPasswordException
     {
@@ -232,11 +233,27 @@ public class AuthenticationScriptService implements ScriptService
      * @throws ResetPasswordException if the verification code is wrong, or if an error occurs.
      * @since 13.1RC1
      */
-    @Unstable
     public void resetPassword(UserReference user, String verificationCode, String newPassword)
         throws ResetPasswordException
     {
         this.resetPasswordManager.checkVerificationCode(user, verificationCode);
         this.resetPasswordManager.resetPassword(user, newPassword);
+    }
+
+    /**
+     * Retrieve users information associated to the given email address and send them by email.
+     *
+     * @param userEmail the email address for which to find associated accounts
+     * @throws RetrieveUsernameException in case of problem for finding the information or for sending the email
+     * @since 14.9
+     * @since 13.10.10
+     * @since 14.4.6
+     */
+    public void retrieveUsernameAndSendEmail(String userEmail) throws RetrieveUsernameException
+    {
+        Set<UserReference> users = this.retrieveUsernameManager.findUsers(userEmail);
+        if (!users.isEmpty()) {
+            this.retrieveUsernameManager.sendRetrieveUsernameEmail(userEmail, users);
+        }
     }
 }

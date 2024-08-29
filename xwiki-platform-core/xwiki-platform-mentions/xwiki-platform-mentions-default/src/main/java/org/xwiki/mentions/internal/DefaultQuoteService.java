@@ -65,7 +65,7 @@ public class DefaultQuoteService implements QuoteService
         Optional<Block> firstBlock;
         // Best effort selection of the mentions. In case of ambiguity we do not generation a quote 
         // for the provided anchorId.
-        // Note that if xdoom contains a single empty anchor, it is not ambiguous and a quote will
+        // Note that if xdom contains a single empty anchor, it is not ambiguous and a quote will
         // be extracted.
         if (blockList.size() == 1) {
             firstBlock = Optional.of(blockList.get(0));
@@ -74,8 +74,8 @@ public class DefaultQuoteService implements QuoteService
         }
 
         return firstBlock
-                   .map(new RenderFunction())
-                   .map(it -> StringUtils.abbreviate(it, "...", 200));
+           .map(new RenderFunction())
+           .map(it -> StringUtils.abbreviate(it, "...", 200));
     }
 
     private static class ExactAnchorBlockMatcher implements BlockMatcher
@@ -92,9 +92,8 @@ public class DefaultQuoteService implements QuoteService
         {
             boolean ret;
             if (block instanceof MacroBlock) {
-                ret =
-                    ((MacroBlock) block).getId().equals("mention")
-                        && Objects.equals(Objects.toString(block.getParameter("anchor"), ""), this.anchorId);
+                ret = ((MacroBlock) block).getId().equals("mention")
+                    && Objects.equals(Objects.toString(block.getParameter("anchor"), ""), this.anchorId);
             } else {
                 ret = false;
             }
@@ -102,7 +101,7 @@ public class DefaultQuoteService implements QuoteService
         }
     }
 
-    private class RenderFunction implements Function<Block, String>
+    private final class RenderFunction implements Function<Block, String>
     {
         @Override
         public String apply(Block mentionBlock)

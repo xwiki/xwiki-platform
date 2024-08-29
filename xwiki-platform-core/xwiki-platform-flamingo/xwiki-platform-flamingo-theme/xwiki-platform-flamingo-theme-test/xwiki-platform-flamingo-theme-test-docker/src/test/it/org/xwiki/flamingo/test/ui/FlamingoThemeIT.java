@@ -159,7 +159,7 @@ class FlamingoThemeIT
         assertCustomThemeColors(new ViewPage());
 
         // Click on the 'customize' button to edit the theme to verify it works
-        presentationAdministrationSectionPage.clickOnCustomize();
+        presentationAdministrationSectionPage.clickOnCustomizeColorTheme();
         EditThemePage editThemePage = new EditThemePage();
         assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
@@ -214,7 +214,7 @@ class FlamingoThemeIT
         //assertEquals("rgb(255, 0, 0)", page.getPageBackgroundColor());
         // Test 'lessCode' is correctly handled
         //assertEquals("rgb(0, 0, 255)", page.getTextColor());
-        assertColor(255, 0, 0, page.getPageBackgroundColor());
+        assertColor(255, 218, 218, page.getPageBackgroundColor());
         assertColor(0, 0, 255, page.getTitleColor());
         assertEquals("monospace", page.getTitleFontFamily().toLowerCase());
     }
@@ -262,9 +262,12 @@ class FlamingoThemeIT
         // Verify that the preview is working with the current values
         PreviewBox previewBox = editThemePage.getPreviewBox();
         assertFalse(previewBox.hasError(true));
-        // Select a variable category and change value
+        // Select a variable category and change value.
+        // The default link color is too light to operate viewable changes without breaking contrast.
         editThemePage.selectVariableCategory("Base colors");
-        editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");
+        editThemePage.setVariableValue("link-color", "#2c699c");
+        // Change another value. We don't deactivate all WCAG checks, so we need to take care about contrast.
+        editThemePage.setVariableValue("xwiki-page-content-bg", "#ffdada");
         // Again...
         editThemePage.selectVariableCategory("Typography");
         editThemePage.setVariableValue("font-family-base", "Monospace");

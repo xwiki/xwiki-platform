@@ -45,7 +45,7 @@ platform.flamingo.themes.home.otherthemes=Другие темы
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Это приложение для управления темами фламинго. Тема Фламинго - это настраиваемая вариация любого скина на основе Фламинго. Если вы хотите управлять Цветовыми темами для оболочек на основе Colibri, перейдите в {0} Приложение Цветовые темы Colibri {1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=Текущей темой является Colibri Color Theme, которая не оптимизирована для работы со скинами на основе фламинго. Мы старались сделать его совместимым, но результаты могут быть не оптимальными.
 platform.flamingo.themes.home.useThisTheme=Использовать эту тему
-platform.flamingo.themes.home.newThemeName=Название темы...
+platform.flamingo.themes.home.newThemeName=Название темы…
 platform.flamingo.themes.home.create=Создать новую тему
 platform.flamingo.themes.home.create.invalid=Неверное название темы!
 platform.flamingo.themes.home.create.csrf=По соображениям безопасности, пожалуйста, подтвердите, что вы хотите создать тему под названием "{0}".
@@ -56,6 +56,7 @@ platform.flamingo.themes.title.preview=Предпросмотр
 platform.flamingo.themes.autorefresh=Автообновление
 platform.flamingo.themes.refresh=Обновить
 platform.flamingo.themes.refreshwarning=Обновление может занять несколько секунд.
+platform.flamingo.themes.preview.iframe.label=Предварительный просмотр цветовой темы.
 platform.flamingo.themes.loading=Загрузка...
 platform.flamingo.themes.category.logos=Логотипы
 platform.flamingo.themes.category.base-colors=Базовые цвета
@@ -79,7 +80,7 @@ platform.flamingo.themes.global=Глобальные
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-@deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1
@@ -91,5 +92,6 @@ platform.flamingo.themes.lessCode.warning=К сожалению, это поле
 #######################################
 platform.flamingo.themes.incompatiblebrowser=Извините, предварительный просмотр не работает с этой версией Internet Explorer. Вам нужно использовать более новый браузер.
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

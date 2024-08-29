@@ -22,7 +22,6 @@ package org.xwiki.ratings.events;
 import org.xwiki.observation.event.EndEvent;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent whenever an update of {@link AverageRating} failed. The event is sent with the following information:
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class UpdateAverageRatingFailedEvent extends AbstractAverageRatingEvent implements EndEvent
 {
     /**
@@ -43,7 +41,6 @@ public class UpdateAverageRatingFailedEvent extends AbstractAverageRatingEvent i
      * @since 13.1RC1
      * @since 12.10.4
      */
-    @Unstable
     public UpdateAverageRatingFailedEvent()
     {
     }

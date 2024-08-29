@@ -64,6 +64,7 @@ rendering.macro.tree.parameter.finder.name=Suchfeld
 rendering.macro.tree.parameter.finder.description=Zeigt eine Texteingabe an, die zum Suchen von Baumknoten verwendet werden kann. Die Eingabe wird über dem Baum angezeigt und bietet Vorschläge während der Eingabe, basierend auf dem Inhalt des Baums. Wenn ein Vorschlag ausgewählt wird, wird der Baum bis zum entsprechenden Knoten aufgeklappt.
 rendering.macro.tree.parameter.limit.name=Limit
 rendering.macro.tree.parameter.limit.description=Die maximale Anzahl der Unterknoten, die beim ersten Aufklappen eines übergeordneten Knotens angezeigt werden sollen. Der Rest der Unterknoten ist über einen "mehr..." Link erreichbar. Dieser Parameter wird im Wesentlichen verwendet, um die Unterknoten zu paginieren und hilft so dem Baum bei einer großen Anzahl von Unterknoten zu skalieren. Der Baum übergibt diesen Parameter an die Baumquelle, so dass er nur mit dynamischen Bäumen funktioniert, deren Quelle die Grenze der Kinderzählung implementiert.
-rendering.macro.tree.content.description=Zur Beschreibung der Baumstruktur können Sie verschachtelte, ungeordnete HTML-Listen verwenden. Weitere Informationen finden Sie unter: http://www.jstree.com/docs/html/
-tree.macro.editModeWarning=Dieser Baum kann im Bearbeitungsmodus nicht angezeigt werden.</content>
+rendering.macro.tree.content.description=Zur Beschreibung der Baumstruktur können Sie verschachtelte, ungeordnete HTML-Listen verwenden. Weitere Informationen finden Sie unter: http://www.jstree.com/docs/html/.
+tree.macro.editModeWarning=Dieser Baum kann im Bearbeitungsmodus nicht angezeigt werden.
+</content>
 </xwikidoc>

@@ -1,0 +1,273 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="uk">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=Сповіщення
+notifications.filters.cancel=Скасувати
+notifications.filters.submit=Зберегти
+notifications.filters.type.label=Тип фільтра:
+notifications.filters.type.hint=Як фільтр повинен діяти щодо події в заданому місці
+notifications.filters.location.label=Область фільтра:
+notifications.filters.location.hint=Яку частину вікі повинен стосуватись фільтр?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Розширені параметри фільтрації
+notifications.filters.advanced.toggles.hint=Ці фільтри активовано за умовчанням, ви можете вимкнути їх, натиснувши кнопку поруч із кожним фільтром.
+notifications.filters.advanced.toggles.table.name=Назва фільтра
+notifications.filters.advanced.toggles.table.description=Опис
+notifications.filters.advanced.toggles.table.toggle=Перемикач
+notifications.filters.advanced.modal.close=Закрити
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Системний фільтр
+notifications.filters.description.systemUserNotificationFilter=Приховати сповіщення від користувача Системи, якщо подія не стосується вас
+notifications.filters.name.ownEventsNotificationFilter=Власний фільтр подій
+notifications.filters.description.ownEventsNotificationFilter=Приховати сповіщення про власну діяльність, якщо подія не стосується вас
+notifications.filters.name.eventReadAlertFilter=Фільтр подій читання (оповіщення)
+notifications.filters.description.eventReadAlertFilter=Приховати сповіщення, які ви позначили як прочитані
+notifications.filters.name.eventReadEmailFilter=Фільтр подій читання (електронна пошта)
+notifications.filters.description.eventReadEmailFilter=Приховати сповіщення, які ви позначили як прочитані
+notifications.filters.name.minorEventAlertNotificationFilter=Незначна подія (оповіщення)
+notifications.filters.description.minorEventAlertNotificationFilter=Приховувати сповіщення про незначні зміни на сторінках
+notifications.filters.name.minorEventEmailNotificationFilter=Незначна подія (електронна пошта)
+notifications.filters.description.minorEventEmailNotificationFilter=Приховувати сповіщення про незначні зміни на сторінках
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Фільтр області сповіщень
+notifications.filters.preferences.scopeNotificationFilter.page=Тільки сторінка
+notifications.filters.preferences.scopeNotificationFilter.space=Сторінка і нащадки
+notifications.filters.preferences.scopeNotificationFilter.wiki=Вікі
+notifications.filters.preferences.scopeNotificationFilter.user=Користувач
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Вам потрібно ввімкнути сповіщення в налаштуваннях, якщо ви хочете переглядати ці місця
+
+## Notifications formats
+notifications.format.alert=Оповіщення
+notifications.format.email=Електронна пошта
+
+## Filter preferences settings
+notifications.filters.preferences.delete.inProgress=Видалення...
+notifications.filters.preferences.delete.done=Налаштування фільтра видалено!
+notifications.filters.preferences.delete.error=Не вдалося видалити налаштування фільтра
+notifications.filters.preferences.setEnabled.inProgress=Збереження...
+notifications.filters.preferences.setEnabled.done=Налаштування фільтра збережено!
+notifications.filters.preferences.setEnabled.error=Не вдалося зберегти налаштування фільтра
+notifications.filters.preferences.allEvents=Усі події (навіть вимкнені)
+
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Системні фільтри
+notifications.settings.filters.preferences.system.hint=Системні фільтри, які ви можете перемикати, щоб мати більш детальний контроль над сповіщеннями, які ви хочете отримувати.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.system.table.name=Назва
+notifications.settings.filters.preferences.system.table.filterDescription=Опис
+notifications.settings.filters.preferences.system.table.filterType=Опис
+notifications.settings.filters.preferences.system.table.notificationFormats=Формати
+notifications.settings.filters.preferences.system.table.isEnabled=Увімкнуто?
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Користувальницькі фільтри
+notifications.settings.filters.preferences.custom.hint=Створюйте фільтри, щоб контролювати сповіщення, які ви хочете отримувати.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Ідентифікатор
+notifications.settings.filters.preferences.custom.table.scope=Область видимості
+notifications.settings.filters.preferences.custom.table.location=Розташування
+notifications.settings.filters.preferences.custom.table.filterType=Фільтр дії
+notifications.settings.filters.preferences.custom.table.eventTypes=Події
+notifications.settings.filters.preferences.custom.table.notificationFormats=Формати
+notifications.settings.filters.preferences.custom.table.isEnabled=Увімкнуто?
+notifications.settings.filters.preferences.custom.table._actions=Дії
+notifications.filters.type.custom.inclusive=Сповістити про подію
+notifications.filters.type.custom.exclusive=Проігнорувати подію
+
+
+## Add filter modal
+notifications.settings.addFilter=Додати фільтр
+notifications.settings.addFilter.hint=Створіть фільтр для подій, що відбуваються в конкретних місцях. Фільтр може ініціювати надсилання сповіщення або забороняти його надсилання, залежно від події та каналу сповіщення.
+notifications.filters.preferences.custom.addFilter.location.label=Розташування
+notifications.filters.preferences.custom.addFilter.location.hint=Цей фільтр застосовується до подій у вибраних тут місцях. Виберіть одне чи декілька місць.
+notifications.filters.preferences.custom.addFilter.type.label=Дія
+notifications.filters.preferences.custom.addFilter.type.hint=Цей фільтр може сповіщати про події, що відбуваються у вибраних місцях, або ігнорувати їх. Виберіть дію, яку ви хочете виконати для подій.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Сповістити про подію
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Проігнорувати подію
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Канал
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Цей фільтр застосовується лише до сповіщень, надісланих за вибраними нижче каналами зв'язку. Виберіть один або декілька каналів зв'язку.
+notifications.filters.preferences.custom.addFilter.eventType.label=Події
+notifications.filters.preferences.custom.addFilter.eventType.hint=Цей фільтр застосовується до подій, вибраних тут, у місцях, вибраних вище. Виберіть одну чи декілька подій.
+notifications.menu.header=Сповіщення
+notifications.menu.header.settings=Налаштування
+notifications.menu.clear=Очистити Все
+notifications.menu.clearing=Очищення сповіщень
+notifications.menu.cleared=Сповіщення очищено
+notifications.settings.title=Налаштування сповіщень
+notifications.settings.error.notAdmin=Вам потрібно бути адміністратором, щоб це побачити.
+notifications.settings.menu=Меню сповіщень
+notifications.settings.menu.hint=Меню сповіщень розташоване у верхньому правому куті сторінки, його можна побачити, натиснувши на дзвіночок ({0})
+notifications.settings.email=Електронна пошта
+notifications.settings.email.forGuest=Увійдіть або зареєструйтесь, щоб керувати своїми налаштуваннями сповіщень.
+notifications.settings.email.disabled=Сповіщення електронною поштою вимкнено. Будь ласка, зверніться до свого адміністратора.
+notifications.settings.email.hint=Вам регулярно надсилається електронний лист із коротким описом того, що сталося на вікі
+notifications.settings.email.title=Налаштування електронної пошти
+notifications.settings.email.frequency=Частота надсилання електронних листів
+notifications.settings.email.frequency.hint=Виберіть, як часто ви хочете отримувати електронні листи із коротким описом того, що сталося на вікі.
+notifications.settings.email.diffType.hint=Виберіть рівень деталізації, який ви хочете отримувати про всі зміни в електронному листі.
+notifications.settings.saving=Ваші налаштування зберігаються...
+notifications.settings.saved=Збережено!
+notifications.settings.savingfailed=Не вдалося зберегти налаштування
+notifications.settings.filters=Фільтри ({0})
+notifications.settings.errorFilterWiki=Помилка: необхідно вибрати вікі, а не сторінку
+notifications.settings.preferences=Налаштування
+notifications.settings.preferences.hint=Записуйте події, що відбуваються, і надсилайте їх у потоці або електронною поштою.
+notifications.settings.applications.title=Додатки
+notifications.settings.applications.hint=Це список додатків, які можуть надсилати сповіщення. Ви можете ввімкнути або вимкнути будь-який із них.
+notifications.settings.applications.forGuest=Увійдіть або зареєструйтесь, щоб керувати своїми налаштуваннями сповіщень.
+notifications.settings.applications.appName=Назва
+notifications.settings.applications.table.dropdown.toggle.label=Перемкнути деталі для сповіщень від додатків {0}.
+notifications.settings.events=Події
+notifications.settings.watch.title=Відстежувані сторінки
+notifications.settings.watch.autowatchmode=Автоматичне спостереження за сторінкою
+notifications.settings.watch.autowatchmode.hint=Вирішіть, чи бажаєте ви спостерігати за сторінкою після того, як ви над нею попрацювали
+notifications.settings.watch.forGuest=Увійдіть або зареєструйтесь, щоб керувати своїми налаштуваннями сповіщень.
+notifications.settings.watch.disabled=Об'єкти, які спостерігаються, вимкнено. Будь ласка, зверніться до свого адміністратора.
+notifications.events.by=відредаговано {0}.
+notifications.events.lastChange=Остання зміна: {0}.
+notifications.events.lastComment=Останній коментар: {0}.
+notifications.preferences.scope.table.scope=Область видимості
+notifications.preferences.scope.table.location=Розташування
+### Missing: notifications.preferences.scope.table.scopeFilterType=Filter Type
+notifications.preferences.scope.table._actions=Дії
+notifications.email.title=Подія(ї) на вікі:
+notifications.email.subject={0} подія(й) на вікі
+notifications.email.seeChanges=Зміни: {0}
+notifications.email.linkDetails=Дивитись деталі
+notifications.rss.feedLink=Стрічка RSS
+notifications.rss.feedLinkDescription=Стрічка подій для сповіщень
+notifications.rss.feedTitle=Сповіщення стрічки RSS
+notifications.rss.feedDescription=Цю стрічку RSS можна налаштувати на сторінці вашого профілю.
+notifications.rss.seeChanges=Зміни: {0}
+notifications.rss.defaultTitleWithPage=Нова подія у {0}
+notifications.rss.defaultTitle=Нова подія
+notifications.globalsettings.email=Сповіщення електронною поштою
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Щоденно
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Погодинно
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Щотижня
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Деталі змін
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Нічого
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Звичайні
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Включно
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Виключно
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Ніколи
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Кожен раз, коли я вношу зміни
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Кожен раз, коли я роблю серйозні зміни
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Тільки тоді, коли я створюю нову сторінку
+
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=Зазначене посилання користувача не підтримується, наразі підтримуються лише DocumentUserReference.
+notifications.settings.error.userReferenceAdminForbidden=Ви не маєте прав адміністрування для вказаного користувача: {0}.
+notifications.settings.error.badCSRF=Поганий CSRF токен.
+notifications.settings.badParameters=Погані параметри запиту.
+
+## User profile
+notifications.userprofile.following=Підписка
+notifications.userprofile.notfollowing=Не відстежувати
+notifications.userprofile.follow=Підписатися
+notifications.userprofile.unfollow=Відписатися
+notifications.userprofile.done=Виконано
+notifications.userprofile.saving=Збереження...
+notifications.userprofile.error=Помилка збереження налаштувань сповіщень
+
+## Macros description
+### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+rendering.macro.notificationsApplicationsPreferences.description=Показати налаштування поточного користувача щодо додатків сповіщень.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Ціль
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Ціль макросу (може бути "user" для поточного користувача або "wiki" для поточної вікі)
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Ціль
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Ціль макросу (може бути "user" для поточного користувача або "wiki" для поточної вікі)
+
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=Перемкнути лише сповіщення сторінки
+notifications.filters.preferences.label.space=Перемкнути сповіщення для сторінки та її нащадків
+notifications.filters.preferences.label.wiki=Перемкнути сповіщення вікі
+
+## Notifications switches
+notifications.switches.tooltip.page=Спостерігати за цією сторінку
+notifications.switches.tooltip.pageAndChildren=Спостерігати за цією сторінку та її нащадками
+notifications.switches.tooltip.space=Спостерігати за батьківською сторінку та її нащадками
+notifications.switches.tooltip.wiki=Спостерігати за цією вікі
+notifications.switches.changeStatusError=Не вдалося змінити статус сповіщень.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+notifications.settings.filters.preferences.title=Фільтри
+notifications.settings.filters.preferences.hint=Створіть фільтри, щоб точніше контролювати, коли активні події мають ініціювати сповіщення.
+notifications.settings.filters.preferences.forGuest=Увійдіть або зареєструйтеся, щоб керувати своїми фільтрами сповіщень.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Назва
+### Missing: notifications.settings.filters.preferences.table.filterType=Filter Type
+notifications.settings.filters.preferences.table.eventTypes=Події
+notifications.settings.filters.preferences.table.notificationFormats=Формати
+notifications.settings.filters.preferences.table.isEnabled=Увімкнуто?
+notifications.settings.filters.preferences.table._actions=Дії
+notifications.filters.preferences.addPreference.filterType.inclusive=Включно
+notifications.filters.preferences.addPreference.filterType.exclusive=Виключно
+notifications.filters.preferences.addPreference.notificationFormat.label=Формат сповіщень
+notifications.filters.preferences.addPreference.notificationFormat.hint=До якого формату сповіщень має застосовуватися фільтр?
+notifications.filters.preferences.addPreference.eventType.label=Тип події
+notifications.filters.preferences.addPreference.eventType.hint=На який тип події має націлюватися фільтр?
+### Missing: notifications.filters.preferences.addPreference.location.label=Filter Scope
+notifications.filters.preferences.addPreference.location.hint=На яку сторінку має націлюватися фільтр?
+
+
+## Filter Types
+notifications.filters.type.inclusive=Включно
+notifications.filters.type.exclusive=Виключно
+
+## until 16.2.0RC1
+notifications.settings.filters.preferences.custom.table.description=У цій таблиці перераховано всі спеціальні фільтри, зареєстровані для поточного користувача чи поточної вікі.
+notifications.settings.filters.preferences.system.table.description=У цій таблиці перераховано всі системні фільтри, зареєстровані у вікі.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Розташування
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

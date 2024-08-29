@@ -105,7 +105,7 @@ public class SortByParameterFilter implements UIExtensionFilter
     @Override
     public List<UIExtension> filter(List<UIExtension> extensions, String... parameterKey)
     {
-        List<UIExtension> results = new ArrayList<UIExtension>();
+        List<UIExtension> results = new ArrayList<>();
         results.addAll(extensions);
 
         if (parameterKey.length > 0 && !StringUtils.isBlank(parameterKey[0])) {

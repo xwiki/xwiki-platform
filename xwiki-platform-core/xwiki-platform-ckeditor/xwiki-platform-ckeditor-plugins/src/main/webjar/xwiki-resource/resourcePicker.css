@@ -1,0 +1,73 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+#template('colorThemeInit.vm')
+
+.resourcePicker .dropdown-menu > .active > a,
+.resourcePicker .dropdown-menu > .active > a:hover,
+.resourcePicker .dropdown-menu > .active > a:focus {
+  color: $theme.textColor;
+  background-color: $theme.highlightColor;
+}
+
+.resourcePicker .dropdown-menu .resource-label {
+  display: block;
+}
+.resourcePicker a.resource-label {
+  color: $theme.textColor;
+}
+.resourcePicker .resource-hint {
+  color: $theme.textSecondaryColor;
+  font-size: smaller;
+}
+.resourcePicker .resource-hint.breadcrumb {
+  background-color: transparent;
+  margin-bottom: 0;
+  padding: 0;
+}
+.resourcePicker .resource-hint.breadcrumb a {
+  color: $theme.textSecondaryColor;
+}
+
+.resourcePicker .resourceDisplay {
+  background-color: $theme.backgroundSecondaryColor;
+  border-radius: 7px;
+  border: 1px solid $theme.borderColor;
+  margin: 6px 0;
+  padding: 6px 22px 6px 6px;
+  position: relative;
+}
+.resourcePicker .resourceDisplay.loading {
+  background-position: 6px center;
+  min-height: 28px;
+}
+
+.resourcePicker .resourceDisplay .remove {
+  color: $theme.textSecondaryColor;
+  cursor: pointer;
+  font-size: 75%;
+  opacity: .3;
+  position: absolute;
+  right: 6px;
+  top: 6px;
+}
+.resourcePicker .resourceDisplay .remove:hover {
+  color: $theme.textColor;
+  opacity: 1;
+}

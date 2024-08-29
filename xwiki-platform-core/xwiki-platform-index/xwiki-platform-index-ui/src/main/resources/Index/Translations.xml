@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="Index.Translations" locale="">
   <web>Index</web>
   <name>Translations</name>
   <language/>
@@ -36,15 +36,23 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Spaces
+  <content>index.deletedDocuments.deleteAll=Delete all
+index.administration.remainingTasks.heading=Remaining Document Analysis tasks
+index.administration.remainingTasks.emptyQueue=No remaining tasks.
+admin.documentanalysis=Document Analysis
+
+#######################################
+## until 16.3.0RC1
+#######################################
+
+index.spacesMacro.title=Spaces
 index.spacesMacro.spaceIndex.title=See Space Index
 index.spacesMacro.spaceIndex.alt=Space Index
 index.spacesMacro.spaceAdministration.title=See Space Administration
 index.spacesMacro.spaceAdministration.alt=Administer Space
 index.spacesMacro.createSpace.link=Create a new space
 index.spacesMacro.createSpace.defaultSpaceName=Space name
-index.spacesMacro.createSpace.submit=Create
-index.deletedDocuments.deleteAll=Delete all</content>
+index.spacesMacro.createSpace.submit=Create</content>
   <object>
     <name>Index.Translations</name>
     <number>0</number>
@@ -63,6 +71,8 @@ index.deletedDocuments.deleteAll=Delete all</content>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

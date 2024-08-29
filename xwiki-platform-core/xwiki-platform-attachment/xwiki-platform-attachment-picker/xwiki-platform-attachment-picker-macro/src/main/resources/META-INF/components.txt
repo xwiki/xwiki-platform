@@ -1,0 +1,1 @@
+org.xwiki.attachment.picker.internal.AttachmentGalleryPickerMacro

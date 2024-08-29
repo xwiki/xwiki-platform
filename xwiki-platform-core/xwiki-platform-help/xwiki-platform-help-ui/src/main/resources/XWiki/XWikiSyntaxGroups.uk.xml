@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редагування =
+
+== Групи ==
+
+=== 2.0 Groups ===
+
+Групи можна використовувати, щоб вставити інший документ у рядок безпосередньо в поточний. Це дозволяє, наприклад, вставляти складні елементи або стилі всередину елемента списку, клітинки таблиці чи абзацу. Групи розділені такими синтаксичними елементами: ##{{{(((...)))}}}##. Одна група може містити іншу групу, і немає жодних обмежень на вкладеність.
+
+|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|((({{{
+|=Заголовок 1|=Заголовок 2|=Заголовок 3
+|Комірка 1|(((
+= Вбудований документ =
+
+Деякі вбудовані параграфи.
+
+* пункт списку перший
+* пункт списку другий
+   ** підпункт 1
+   ** підпункт 2
+))) | Комірка 3
+
+Наступний параграф у документі верхнього рівня
+}}})))|(((
+|=Заголовок 1|=Заголовок 2|=Заголовок 3
+|Комірка 1|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Вбудований документ&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Деякі вбудовані параграфи&lt;h1 id="HEmbeddeddocument"&gt;.
+
+* пункт списку перший
+* пункт списку другий
+   ** підпункт 1
+   ** підпункт 2
+))) | Комірка 3
+
+Наступний параграф у документі верхнього рівня
+)))
+|((({{{(% class="myClass" style="color:blue" %)(((сині параграфи
+
+всередині myClass)))}}})))| (% class="myClass" style="color:blue" %)(((сині параграфи
+
+в моїй групі)))</content>
+</xwikidoc>

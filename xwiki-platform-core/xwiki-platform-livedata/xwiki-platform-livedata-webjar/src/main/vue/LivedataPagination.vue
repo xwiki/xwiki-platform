@@ -1,23 +1,22 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   The LivedataPagination component is used to change the current page
@@ -29,11 +28,15 @@
 -->
 <template>
   <!-- Pagination -->
-  <nav class="livedata-pagination">
+  <nav class="livedata-pagination"
+       :aria-label="this.data.id
+        ? $t('livedata.pagination.label', [this.data.id])
+        : $t('livedata.pagination.label.empty')
+      ">
 
     <!--
       Display the pagination current entry range
-      Can be shown / hiden by the `pagination.showEntryRange` property
+      Can be shown / hidden by the `pagination.showEntryRange` property
       in the Livedata meta config
     -->
     <span
@@ -58,6 +61,7 @@
     >
       {{ $t('livedata.pagination.pageSize') }}
       <select
+        :title="$t('livedata.pagination.selectPageSize')"
         @change="changePageSize"
       >
         <!-- Page sizes (get from the `pagination.pageSizes` config -->
@@ -72,12 +76,12 @@
 
     <!--
       The actual pagination widget
-      It dislays the the available pages numbers, and change to them on click.
-      Not all page numbers are show depending of the `pagination.maxShownPages`
+      It displays the the available pages numbers, and change to them on click.
+      Not all page numbers are shown depending of the `pagination.maxShownPages`
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <nav class="pagination-indexes">
+    <span class="pagination-indexes">
       {{ $t('livedata.pagination.page') }}
       <!--
         Go to First Page button
@@ -93,7 +97,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, 0)"
       >
-        <span class="fa fa-angle-double-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-backward'}"/>
       </a>
 
       <!--
@@ -110,7 +114,7 @@
         href="#"
         @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
       >
-        <span class="fa fa-angle-left"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-backward'}"/>
       </a>
 
 
@@ -149,7 +153,7 @@
 
       <!--
         Go to Next Page button
-        Can be shown / hiden by the `pagination.showNextPrevious` property
+        Can be shown / hidden by the `pagination.showNextPrevious` property
         in the Livedata meta config
       -->
       <a
@@ -161,7 +165,7 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage , logic.getPageIndex() + 1)"
       >
-        <span class="fa fa-angle-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'step-forward'}"/>
       </a>
 
       <!--
@@ -178,19 +182,22 @@
         href="#"
         @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
-        <span class="fa fa-angle-double-right"></span>
+        <XWikiIcon :icon-descriptor="{name: 'fast-forward'}"/>
       </a>
 
-    </nav>
+    </span>
 
   </nav>
 </template>
 
 
 <script>
+import XWikiIcon from "./utilities/XWikiIcon";
 export default {
 
   name: "LivedataPagination",
+
+  components: {XWikiIcon},
 
   inject: ["logic"],
 
@@ -285,7 +292,7 @@ export default {
         pageSizesSet.add(limit);
       }
       // Converts the set of page size values into an array and sorts them in ascending numerical order.
-      return Array.from(pageSizesSet).sort((a, b) => a - b);
+      return [...pageSizesSet].sort((a, b) => a - b);
     },
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange
@@ -310,8 +317,7 @@ export default {
 <style>
 
 .livedata-pagination {
-  color: #777777;
-  margin-left: 1rem;
+  color: @text-muted;
   font-size: 0.9em;
 }
 

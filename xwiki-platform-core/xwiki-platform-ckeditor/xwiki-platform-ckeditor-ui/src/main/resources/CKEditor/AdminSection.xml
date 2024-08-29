@@ -1,0 +1,653 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.AdminSection" locale="">
+  <web>CKEditor</web>
+  <name>AdminSection</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity output="false"}}
+#macro (copyObject $sourceDoc $targetDoc $className)
+  #set ($sourceObj = $sourceDoc.getObject($className))
+  #set ($targetObj = $targetDoc.getObject($className, true))
+  #foreach ($propName in $sourceObj.propertyNames)
+    #set ($discard = $targetObj.set($propName, $sourceObj.getValue($propName)))
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html clean="false"}}
+#set ($discard = $xwiki.ssx.use('CKEditor.AdminSection'))
+#set ($discard = $xwiki.jsx.use('CKEditor.AdminSection'))
+#set ($configDoc = $xwiki.getDocument('CKEditor.Config'))
+&lt;form id="ckeditorConfig" method="post" action="$configDoc.getURL('save')" class="xform"
+    data-editorId="ckeditor" data-label="CKEditor"&gt;
+  &lt;fieldset&gt;
+    #if ($configDoc.isNew())
+      ## Copy the configuration object from the template.
+      #set ($templateDoc = $xwiki.getDocument('CKEditor.ConfigTemplate'))
+      #copyObject($templateDoc $configDoc 'CKEditor.ConfigClass')
+      ## We still need to specify the template when we save because otherwise the configuration object is not added (the
+      ## save action only updates existing objects).
+      &lt;input type="hidden" name="template" value="$templateDoc.fullName" /&gt;
+      ## Make sure the configuration page is created as hidden.
+      &lt;input type="hidden" name="xhidden" value="1" /&gt;
+    #end
+    &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
+    &lt;input value="$escapetool.xml($services.localization.render('ckeditor.admin.saveComment'))"
+      type="hidden" name="comment" /&gt;
+  &lt;/fieldset&gt;
+  #displayCKEditorConfig($configDoc 'edit')
+  &lt;div class="bottombuttons"&gt;
+    &lt;p class="admin-buttons"&gt;
+      &lt;input class="btn btn-primary" type="submit" name="action_saveandcontinue"
+        value="$escapetool.xml($services.localization.render('admin.save'))" /&gt;
+      #set ($resetURL = $configDoc.getURL('delete', $escapetool.url({
+        'confirm': 1,
+        'form_token': $services.csrf.token,
+        'xredirect': "$request.requestURI?$!request.queryString"
+      })))
+      &lt;a class="btn btn-default" href="$resetURL"
+          title="$escapetool.xml($services.localization.render('ckeditor.admin.reset.hint'))"
+          data-confirmation="$escapetool.xml($services.localization.render('ckeditor.admin.reset.confirmation'))"&gt;
+        $escapetool.xml($services.localization.render('ckeditor.admin.reset'))
+      &lt;/a&gt;
+    &lt;/p&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}</content>
+  <attachment>
+    <filename>wysiwyg.png</filename>
+    <mimetype>image/png</mimetype>
+    <author>xwiki:XWiki.Admin</author>
+    <version>1.1</version>
+    <comment/>
+    <content>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</content>
+    <filesize>8798</filesize>
+  </attachment>
+  <object>
+    <name>CKEditor.AdminSection</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>6140243c-aaf3-4e15-8272-be4e89b90645</guid>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <contenttype>VelocityWiki</contenttype>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <hint/>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <idField/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>configurationClass</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </configurationClass>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
+      <displayInSection>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+      <scope>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText/>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>12</number>
+        <picker>1</picker>
+        <prettyName>scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>WIKI|SPACE|ALL_SPACES|WIKI+ALL_SPACES</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
+    </class>
+    <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute>{{include reference="CKEditor.AdminSection" /}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory/>
+    </property>
+    <property>
+      <displayInSection>WYSIWYG</displayInSection>
+    </property>
+    <property>
+      <heading/>
+    </property>
+    <property>
+      <iconAttachment>wysiwyg.png</iconAttachment>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+    <property>
+      <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.AdminSection</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0635d088-9d33-4370-b387-411f20e3e963</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'bootstrap'], function($) {
+  var adminPageContent = $('#admin-page-content');
+  var forms = adminPageContent.find('form');
+  // Check if we need to enhance the WYSIWYG administration section with tabs (one tab for each editor).
+  if (forms.length &lt; 2 || forms.is('#wysiwyg')) {
+    // Either there is only one editor available or the WYSIWYG administration section handles the tabs itself
+    // (XWiki 9.2RC1+). Leave the administration page as it is.
+    // This JavaScript code is executed after the page has been loaded so in order to avoid flickering UI we hide the
+    // page content from CSS and restore it back here.
+    adminPageContent.addClass('visible');
+    return;
+  }
+
+  var formIdToEditorName = {
+    'wysiwyg_XWiki.WysiwygEditorConfig': 'GWT',
+    'ckeditorConfig': 'CKEditor'
+  };
+
+  // Use tabs to configure each of the available editors.
+  var editorTabList = $('&lt;ul class="nav nav-tabs" role="tablist"&gt;&lt;/ul&gt;').prependTo(adminPageContent);
+  var editorTabContent = $('&lt;div class="tab-content"&gt;').insertAfter(editorTabList);
+  forms.each(function() {
+    // The Bootstrap Tab plugin uses the tab id in a CSS selector and since dot is a special character we need to avoid
+    // it (the Tab plugin expects a valid id string and so it doesn't perform any escaping).
+    var tabId = $(this).attr('id').replace('.', '_') + '_tab';
+    // Add the tab name.
+    var formId = $(this).attr('id');
+    var tabName = formIdToEditorName[formId] || formId;
+    $('&lt;li role="presentation"&gt;&lt;a role="tab" data-toggle="tab"&gt;&lt;/a&gt;&lt;/li&gt;').appendTo(editorTabList)
+      .find('a').attr({
+        'href': '#' + tabId,
+        'data-editorId': tabName.toLowerCase()
+      }).text(tabName)
+      .on('click', function(event) {
+        event.preventDefault();
+        $(this).tab('show');
+      });
+    // Add the tab content.
+    $('&lt;div role="tabpanel" class="tab-pane"&gt;&lt;/div&gt;').attr('id', tabId).appendTo(editorTabContent)
+      .append($(this).closest('#admin-page-content &gt; *'));
+  });
+
+  // Show the configuration for the active editor, or the first one if none is active.
+  var activeTab = editorTabList.find('a[data-editorId="$!services.edit.syntaxContent.defaultWysiwygEditor.descriptor.id"]');
+  if (!activeTab.length) {
+    activeTab = editorTabList.find('a').first();
+  }
+  activeTab.tab('show');
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.AdminSection</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>be5b01ee-2d39-4393-840b-4f1ede3738dd</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* Hide the page content until the JavaScript code is loaded and executed. Also hide unnecessary headings.
+  This is not needed anymore starting with XWiki 9.2RC1. */
+#admin-page-content &gt; form,
+#admin-page-content &gt; .codeToExecute,
+#admin-page-content &gt; h1.wikigeneratedheader,
+#admin-page-content &gt; h2.wikigeneratedheader {
+  display: none;
+}
+#admin-page-content.visible &gt; form,
+#admin-page-content.visible &gt; .codeToExecute {
+  display: block;
+}
+
+.tab-content .ckeditor-config {
+  margin-top: 1em;
+}
+
+/* Fix the styles that come from the GWT editor section (XWiki &lt;9.2RC1). */
+form.xform .ckeditor-config dd input[type="text"] {
+  width: 100% !important;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.query.QueryException;
 
 /**
  * Generate a query to retrieve notifications events according to the preferences of the user.
@@ -49,7 +48,6 @@ public class EventQueryGenerator
      *
      * @param parameters parameters to use
      * @return the query to execute
-     * @throws QueryException if error happens
      * @throws EventStreamException if error happens
      */
     public SimpleEventQuery generateQuery(NotificationParameters parameters) throws EventStreamException

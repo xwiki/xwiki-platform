@@ -1,0 +1,406 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.ConfigSheet" locale="">
+  <web>CKEditor</web>
+  <name>ConfigSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity}}
+#if ($xcontext.action == 'edit')
+  {{html clean="false"}}
+  &lt;div class="xform half"&gt;
+    #displayCKEditorConfig($doc 'edit')
+  &lt;/div&gt;
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($xcontext.action != 'edit')
+  #if ($xcontext.action == 'get')
+    #set ($discard = $response.setContentType('application/javascript'))
+  #end
+  #set ($isTemporaryAttachmentSupported = "$!services.temporaryAttachments" != '')
+  #set ($htmlSyntax = ${services.wysiwyg.HTMLSyntax.toIdString()|'annotatedxhtml/1.0'})
+  #set ($isHTML5 = !$htmlSyntax.equals('annotatedxhtml/1.0'))
+  ## Verify if the office import feature is supported.
+  ##
+  ## It's not enough to check if the Office server is connected because the 'importOfficeAttachment' API is available
+  ## only since XWiki 9.8 (see XWIKI-14739) while the CKEditor Integration extension can be installed on older versions
+  ## of XWiki where the users won't be able to import office documents from the CKEditor even if the Office server is
+  ## connected. On these older versions the users will have to use the Create Page dialog with the Page from Office
+  ## option.
+  ##
+  ## We check if the 'importOfficeAttachment' API is available by trying to import an attachment that doesn't exist
+  ## using the Office Viewer macro, which should output an error message saying that the attachment doesn't exist. This
+  ## way the Office server is not actually called so there's no risk of slowing down or blocking the CKEditor load (see
+  ## CKEDITOR-294).
+  #set ($missingAttachmentReference = $services.model.resolveAttachment('CKEditor.OfficeImporter@doesNotExist.txt'))
+  #set ($officeServerConnected = $services.officemanager.isConnected())
+  #if ("$!officeServerConnected" == '')
+    ## Before XWiki 12.3 and 11.10.5
+    #set ($officeServerConnected = $services.officemanager.serverState == 'Connected')
+  #end
+  #set ($officeImportSupported = $officeServerConnected &amp;&amp;
+    "$!services.wysiwyg.importOfficeAttachment($missingAttachmentReference, {'useOfficeViewer': true})" != '')
+  ## Global default configuration that doesn't depend on the edited content and that needs Velocity code for evaluation.
+  ## Static global configuration (that doesn't need Velocity) should be put in config.js . The default instance level
+  ## configuration is in EditSheet.
+  #set ($customConfig = {
+    'editorplaceholder': $services.localization.render('ckeditor.content.placeholder'),
+    'htmlSyntax': $htmlSyntax,
+    'stylesSet': "#if ($isHTML5)html5#{else}html4#end",
+    'xwiki-office': {
+      'enabled': $officeImportSupported
+    },
+    'xwiki-realtime': {
+      'stylesheets': [
+        $services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.css'),
+        $services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wysiwyg-webjar', 'webjar.bundle.min.css')
+      ]
+    },
+    'xwiki-upload': {
+      'isTemporaryAttachmentSupported': $isTemporaryAttachmentSupported
+    }
+  })
+  ## CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
+  #set ($customConfig.language = $xcontext.locale.toString().toLowerCase().replace('_', '-'))
+  #set ($configObj = $doc.getObject('CKEditor.ConfigClass'))
+  #foreach ($propName in $configObj.propertyNames)
+    #if ($propName != 'advanced')
+      #set ($discard = $customConfig.put($propName, $configObj.getValue($propName)))
+    #end
+  #end
+  CKEDITOR.editorConfig = function(config) {
+    CKEDITOR.tools.extend(config, $jsontool.serialize($customConfig), true);
+    $!doc.getValue('advanced')
+  };
+#end
+{{/velocity}}</content>
+  <object>
+    <name>CKEditor.ConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5f4381e2-b8c1-4cea-bb91-8610189ebc63</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require.config({
+  paths: {
+    'xwiki-ckeditor': new XWiki.Document('EditSheet', 'CKEditor').getURL('jsx', 'r=1'),
+    'bootstrap-select': $jsontool.serialize($services.webjars.url('bootstrap-select', 'js/bootstrap-select.min')),
+  },
+  shim: {
+    'bootstrap-select' : ['jquery', 'bootstrap']
+  }
+});
+
+require(['jquery', 'xwiki-ckeditor', 'bootstrap-select'], function($, ckeditorPromise) {
+  $('.btn-default[data-confirmation]').on('click', function(event) {
+    if (!window.confirm($(this).attr('data-confirmation'))) {
+      event.preventDefault();
+    }
+  });
+
+  var maybeShowDefaultValues = function(config) {
+    // Show the default values if the configuration is new.
+    $('.ckeditor-config.new #CKEditor\\.ConfigClass_0_removePlugins').val(config.removePlugins);
+    $('.ckeditor-config.new #CKEditor\\.ConfigClass_0_removeButtons').val(config.removeButtons);
+  };
+
+  var commaSeparator = /\s*,\s*/;
+  var enhanceConfig = function(editor) {
+    var availablePlugins = editor.config.plugins.split(commaSeparator);
+    enhanceList($('#CKEditor\\.ConfigClass_0_removePlugins'), availablePlugins, 'available-plugins-select');
+
+    var availableButtons = Object.keys(editor.ui.items);
+    enhanceList($('#CKEditor\\.ConfigClass_0_removeButtons'), availableButtons, 'available-buttons-select');
+    
+    enhanceTextArea($('#CKEditor\\.ConfigClass_0_advanced'), 'advanced-text-area');
+  };
+
+  var enhanceList = function(input, allowedValues, selectId) {
+    var values = input.hide().val().split(commaSeparator);
+    var select = $('&lt;select class="form-control" multiple&gt;&lt;/select&gt;').insertAfter(input);
+    input.parent().prev().find('label').attr('for', selectId);
+    select.attr('id', selectId);
+    allowedValues.sort().forEach(function(value) {
+      select.append($('&lt;option&gt;&lt;/option&gt;').text(value));
+    });
+    select.selectpicker({
+      container: 'body',
+      liveSearch: true,
+      size: 10
+    }).selectpicker('val', values);
+    // Synchronize the value of the hidden text input with the selected items.
+    select.on('changed.bs.select', function (event) {
+      // bootstrap-select returns null when nothing is selected.
+      var values = select.selectpicker('val') || [];
+      input.val(values.join(','));
+    });
+  };
+  
+  var enhanceTextArea = function(textarea, textareaId) {
+    textarea.parent().prev().find('label').attr('for', textareaId);
+    textarea.attr('id', textareaId);
+  };
+
+  ckeditorPromise.done(function(ckeditor) {
+    ckeditor.once('instanceLoaded', function(event) {
+      maybeShowDefaultValues(event.editor.config);
+      enhanceConfig(event.editor);
+    });
+    // We need to create an editor instance in order to load the configuration.
+    new ckeditor.editor(); 
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>CKEditor.ConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>1058178e-1428-424c-acc8-c6008c84eea1</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* Fix the check-box style. */
+.ckeditor-config input[type="checkbox"] {
+  margin-top: 0;
+  vertical-align: middle;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

@@ -49,6 +49,8 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -343,5 +345,29 @@ class XWikiWikiModelTest
             .thenReturn("?" + expectedQueryString);
 
         assertEquals("?" + expectedQueryString, this.wikiModel.getImageURL(imageReference, parameters));
+    }
+
+    @Test
+    void isDocumentAvailable() throws Exception
+    {
+        DocumentResourceReference documentResourcereference = new DocumentResourceReference("wiki:space.document");
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "document");
+        PageResourceReference pageResourcereference = new PageResourceReference("wiki:space.document");
+        PageReference pageReference = new PageReference("wiki", "space", "document");
+
+        when(this.referenceResolver.resolve(documentResourcereference, EntityType.DOCUMENT))
+            .thenReturn(documentReference);
+        when(this.referenceResolver.resolve(pageResourcereference, EntityType.PAGE))
+            .thenReturn(pageReference);
+        when(this.documentAccessBridge.getDocumentReference(documentReference)).thenReturn(documentReference);
+        when(this.documentAccessBridge.getDocumentReference(pageReference)).thenReturn(documentReference);
+
+        when(this.documentAccessBridge.exists(documentReference)).thenReturn(true);
+        assertTrue(this.wikiModel.isDocumentAvailable(documentResourcereference));
+        assertTrue(this.wikiModel.isDocumentAvailable(pageResourcereference));
+
+        when(this.documentAccessBridge.exists(documentReference)).thenReturn(false);
+        assertFalse(this.wikiModel.isDocumentAvailable(documentResourcereference));
+        assertFalse(this.wikiModel.isDocumentAvailable(pageResourcereference));
     }
 }

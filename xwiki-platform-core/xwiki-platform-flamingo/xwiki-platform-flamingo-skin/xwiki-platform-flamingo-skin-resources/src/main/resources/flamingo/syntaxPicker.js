@@ -49,9 +49,14 @@
     #set ($discard = $l10n.put($key, $services.localization.render($key)))
   #end
 #end
+#set ($iconNames = ['cross'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
 #[[*/
 // Start JavaScript-only code.
-(function(l10n) {
+(function(l10n, icons) {
   "use strict";
 
 /**
@@ -64,7 +69,7 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     var syntaxPicker = $(this);
     var previousSyntax = syntaxPicker.data('previousSyntax');
     var nextSyntax = getSelectedSyntax(syntaxPicker);
-    maybeAskForSyntaxConversionConfirmation(previousSyntax, nextSyntax).done(function(data) {
+    maybeAskForSyntaxConversionConfirmation(previousSyntax, nextSyntax).then(data => {
       // Give the focus back to the syntax picker.
       syntaxPicker.focus();
       // Trigger the syntax change event.
@@ -93,9 +98,10 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
       .data('documentReference');
     // Notify the others that the document syntax has changed. We disable the syntax picker while the UI is updated as
     // a result of the document syntax change.
-    var deferred = $.Deferred();
     data = $.extend(data, {
-      promise: deferred.promise(),
+      // Used by the syntax change listeners to schedule asynchronous tasks when the syntax changes:
+      //   data.promise = data.promise.then(() => {...});
+      promise: Promise.resolve(),
       savedSyntax: syntaxPicker.data('savedSyntax'),
       syntaxConverter: syntaxConverter,
       documentReference: XWiki.Model.resolve(documentReference, XWiki.EntityType.DOCUMENT,
@@ -103,11 +109,9 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     });
     syntaxPicker.prop('disabled', true).trigger('xwiki:document:syntaxChange', data);
     // Re-enable the syntax picker after the UI has been updated.
-    data.promise.always($.proxy(syntaxPicker, 'prop', 'disabled', false));
+    data.promise.finally(syntaxPicker.prop.bind(syntaxPicker, 'disabled', false));
     // Update the previous syntax.
     syntaxPicker.data('previousSyntax', data.syntax);
-    // Trigger the asynchronous syntax change process.
-    deferred.resolve();
   };
 
   var confirmationModal = $(`
@@ -115,9 +119,9 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">` +
+              icons.cross +
+            `</button>
             <h4 class="modal-title"></h4>
           </div>
           <div class="modal-body"></div>
@@ -143,7 +147,6 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
   confirmationModal.find('button.acknowledge').text(l10n['web.widgets.syntaxPicker.conversionUnsupported.acknowledge']);
 
   var maybeAskForSyntaxConversionConfirmation = function(previousSyntax, nextSyntax) {
-    var deferred = $.Deferred();
     var message;
     // In order to perform a syntax conversion we need to parse from the previous syntax and render to the next syntax.
     var canConvertSyntax = previousSyntax.parser && nextSyntax.renderer;
@@ -159,8 +162,11 @@ require(['jquery', 'xwiki-syntax-converter', 'bootstrap'], function($, syntaxCon
     confirmationModal.find('.nextSyntax').text(nextSyntax.label);
     confirmationModal.find('button.dontConvertSyntax, button.convertSyntax').toggle(canConvertSyntax);
     confirmationModal.find('button.acknowledge').toggle(!canConvertSyntax);
+    var deferred, promise = new Promise((resolve, reject) => {
+      deferred = {resolve, reject};
+    });
     confirmationModal.data('deferred', deferred).data('data', {convertSyntax: false}).modal('show');
-    return deferred.promise();
+    return promise;
   };
 
   $(document).on('xwiki:actions:cancel.xwikiDocumentSyntaxPicker', function(event) {
@@ -267,7 +273,7 @@ define('xwiki-syntax-converter', ['jquery', 'xwiki-meta'], function($, xcontext)
       }
       return $.post(XWiki.currentDocument.getURL('preview'), data).then(function(html) {
         // Extract the rendered title and content.
-        var container = $('<div/>').html(html);
+        var container = $('<div></div>').html(html);
         return {
           renderedTitle: container.find('#document-title h1').html(),
           renderedContent: container.find('#xwikicontent').html()
@@ -292,21 +298,20 @@ require(['jquery'], function($) {
     // Convert the syntax if the content is not empty and the form was not canceled.
     } else if (data.convertSyntax && contentField.val() && !data.reverting) {
       // Convert the content to the new syntax.
-      data.promise = data.promise.then(function() {
-        var notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.inProgress'],
+      var notification;
+      data.promise = data.promise.then(() => {
+        notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.inProgress'],
           'inprogress');
         // Pass the content since it may have unsaved changes.
-        return data.syntaxConverter.convert(data.syntax, data.previousSyntax, contentField.val())
-          .done(function(newContent) {
-            // Update the content and the syntax. We trigger the change event in case the content field is enhanced with
-            // syntax highlighting.
-            contentField.val(newContent).data('syntax', data.syntax.id).trigger('change');
-            notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.done'],
-              'done'));
-          }).fail(function() {
-            notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.failed'],
-              'error'));
-          });
+        return data.syntaxConverter.convert(data.syntax, data.previousSyntax, contentField.val());
+      }).then(newContent => {
+        // Update the content and the syntax. We trigger the change event in case the content field is enhanced with
+        // syntax highlighting.
+        contentField.val(newContent).data('syntax', data.syntax.id).trigger('change');
+        notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.done'], 'done'));
+      }).catch(() => {
+        notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.conversion.failed'],
+          'error'));
       });
     } else {
       // Just update the syntax. The user can change the syntax multiple times during an editing session without saving.
@@ -326,21 +331,22 @@ require(['jquery'], function($) {
     // Check if we are viewing the document content. Also make sure that the syntax change targets the current document.
     var contentWrapper = $('#xwikicontent').not('[contenteditable]');
     if (contentWrapper.length && XWiki.currentDocument.documentReference.equals(data.documentReference)) {
-      data.promise = data.promise.then(function() {
-        var notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.inProgress'],
+      var notification;
+      data.promise = data.promise.then(() => {
+        notification = new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.inProgress'],
           'inprogress');
-        return maybeConvertAndRender(data).done(function(output) {
-          // Update the displayed document title and content.
-          $('#document-title h1').html(output.renderedTitle);
-          contentWrapper.html(output.renderedContent);
-          // Let others know that the DOM has been updated, in order to enhance it.
-          $(document).trigger('xwiki:dom:updated', {'elements': contentWrapper.toArray()});
-          notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.done'],
-            'done'));
-        }).fail(function() {
-          notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.failed'],
-            'error'));
-        });
+        return maybeConvertAndRender(data);
+      }).then(output => {
+        // Update the displayed document title and content.
+        $('#document-title h1').html(output.renderedTitle);
+        contentWrapper.html(output.renderedContent);
+        // Let others know that the DOM has been updated, in order to enhance it.
+        $(document).trigger('xwiki:dom:updated', {'elements': contentWrapper.toArray()});
+        notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.done'],
+          'done'));
+      }).catch(() => {
+        notification.replace(new XWiki.widgets.Notification(l10n['web.widgets.syntaxPicker.contentUpdate.failed'],
+          'error'));
       });
     }
   });
@@ -350,7 +356,8 @@ require(['jquery'], function($) {
     // the user can change the syntax multiple times before saving. Note that this check works as long as the document
     // content doesn't have unsaved changes, which is true because we are only viewing the content in this case.
     if (data.convertSyntax && data.syntax.id !== data.savedSyntax.id) {
-      return data.syntaxConverter.convert(data.syntax).then($.proxy(data.syntaxConverter, 'render', data.syntax));
+      return data.syntaxConverter.convert(data.syntax)
+        .then(data.syntaxConverter.render.bind(data.syntaxConverter, data.syntax));
     } else {
       return data.syntaxConverter.render(data.syntax);
     }
@@ -358,4 +365,4 @@ require(['jquery'], function($) {
 });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n]));
+}).apply(']]#', $jsontool.serialize([$l10n, $icons]));

@@ -46,6 +46,21 @@ textarea {
   font-family: @font-family-monospace;
 }
 
+input:invalid,
+select:invalid,
+textarea:invalid {
+  @border-color: @state-danger-text;
+  border-color: @border-color;
+  // Redeclare so transitions work.
+  .box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075));
+
+  &:focus {
+    border-color: darken(@border-color, 10%);
+    @shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px lighten(@border-color, 20%);
+    .box-shadow(@shadow);
+  }
+}
+
 .placeholder(@color: @text-muted);
 
 /* For browsers that don't support the placeholder attribute. */
@@ -59,6 +74,7 @@ select[size="0"], select[size="1"] {
 }
 
 .xform {
+
   input[type="color"],
   input[type="date"],
   input[type="datetime-local"],
@@ -73,6 +89,7 @@ select[size="0"], select[size="1"] {
   textarea {
     width: 100%;
   }
+
   dl {
     dt {
       margin-top: floor(@font-size-base * 1.4);
@@ -88,7 +105,6 @@ select[size="0"], select[size="1"] {
         text-transform: uppercase;
         .buttonwrapper a {
           .btn-xs;
-          line-height: 1.3em;
           margin: 0;
           position: absolute;
           right: 0;
@@ -101,6 +117,7 @@ select[size="0"], select[size="1"] {
       }
     }
   }
+
   label {
     margin: 0;
     font-weight: normal;
@@ -153,4 +170,12 @@ select[size="0"], select[size="1"] {
 // Images inside input groups
 .input-group img {
   max-width: inherit;
+}
+
+// Use color theme defined variables instead of a hard coded color for the bootstrap select
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:hover,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:focus,
+#xwikimaincontainer .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
+  .text-muted;
 }

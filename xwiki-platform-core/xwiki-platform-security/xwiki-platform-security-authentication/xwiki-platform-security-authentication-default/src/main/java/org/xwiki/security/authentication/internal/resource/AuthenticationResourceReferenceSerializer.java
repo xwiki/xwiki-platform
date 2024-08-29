@@ -47,6 +47,8 @@ public class AuthenticationResourceReferenceSerializer implements
     {
         return new ExtendedURL(Arrays.asList(
             AuthenticationResourceReference.TYPE.getId(),
+            "wiki",
+            resource.getWikiReference().getName(),
             resource.getAction().getRequestParameter()),
             resource.getParameters());
     }

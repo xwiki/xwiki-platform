@@ -50,8 +50,8 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +62,7 @@ import static org.mockito.Mockito.when;
  * @since 11.10
  */
 @ComponentTest
-public class JCaptchaResourceReferenceHandlerTest
+class JCaptchaResourceReferenceHandlerTest
 {
     private static final String SESSION_ID = "customSessionId";
 
@@ -95,90 +95,93 @@ public class JCaptchaResourceReferenceHandlerTest
 
         ServletResponse servletResponse = mock(ServletResponse.class);
         when(container.getResponse()).thenReturn(servletResponse);
-        when(servletResponse.getHttpServletResponse()).thenReturn(response);
-        when(response.getOutputStream()).thenReturn(outputStream);
+        when(servletResponse.getHttpServletResponse()).thenReturn(this.response);
+        when(this.response.getOutputStream()).thenReturn(this.outputStream);
 
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
         when(request.getHttpServletRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getLocale()).thenReturn(LOCALE);
 
-        when(httpServletRequest.getSession()).thenReturn(httpSession);
-        when(httpSession.getId()).thenReturn(SESSION_ID);
+        when(httpServletRequest.getSession()).thenReturn(this.httpSession);
+        when(this.httpSession.getId()).thenReturn(SESSION_ID);
     }
 
     @Test
-    public void handleCaptchaImage() throws ResourceReferenceHandlerException, CaptchaException, IOException
+    void handleCaptchaImage() throws ResourceReferenceHandlerException, CaptchaException, IOException
     {
         ImageCaptchaService imageCaptchaService = mock(ImageCaptchaService.class);
-        when(captchaServiceManager.getCaptchaService("customImageEngine")).thenReturn(imageCaptchaService);
+        when(this.captchaServiceManager.getCaptchaService("customImageEngine")).thenReturn(imageCaptchaService);
 
         JCaptchaResourceReference jCaptchaResourceReference =
             new JCaptchaResourceReference("image", "customImageEngine");
-        jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+        this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
 
-        verify(captchaServiceManager, times(1)).getCaptchaService("customImageEngine");
-        verify(httpSession, times(1)).getId();
-        verify(imageCaptchaService, times(1)).getImageChallengeForID(SESSION_ID, LOCALE);
-        verify(response, times(1)).setContentType("image/jpeg");
-        verify(response, times(1)).getOutputStream();
-        verify(outputStream, times(1)).write(any());
-        verify(resourceReferenceHandlerChain, times(1)).handleNext(jCaptchaResourceReference);
+        verify(this.captchaServiceManager).getCaptchaService("customImageEngine");
+        verify(this.httpSession).getId();
+        verify(imageCaptchaService).getImageChallengeForID(SESSION_ID, LOCALE);
+        verify(this.response).setContentType("image/jpeg");
+        verify(this.response).getOutputStream();
+        verify(this.outputStream).write(any());
+        verify(this.resourceReferenceHandlerChain).handleNext(jCaptchaResourceReference);
     }
 
     @Test
-    public void handleCaptchaSound() throws ResourceReferenceHandlerException, CaptchaException, IOException
+    void handleCaptchaSound() throws ResourceReferenceHandlerException, CaptchaException, IOException
     {
         SoundCaptchaService soundCaptchaService = mock(SoundCaptchaService.class);
-        when(captchaServiceManager.getCaptchaService("customSoundEngine")).thenReturn(soundCaptchaService);
+        when(this.captchaServiceManager.getCaptchaService("customSoundEngine")).thenReturn(soundCaptchaService);
 
         AudioInputStream audioInputStream = mock(AudioInputStream.class);
         when(soundCaptchaService.getSoundChallengeForID(SESSION_ID, LOCALE)).thenReturn(audioInputStream);
-        when(audioInputStream.getFormat()).thenReturn(mock(AudioFormat.class));
+        AudioFormat audioFormat = mock(AudioFormat.class);
+        // Specifying a random encoding format as we don't care what encoding is used.
+        when(audioFormat.getEncoding()).thenReturn(AudioFormat.Encoding.PCM_SIGNED);
+        when(audioInputStream.getFormat()).thenReturn(audioFormat);
 
         JCaptchaResourceReference jCaptchaResourceReference =
             new JCaptchaResourceReference("sound", "customSoundEngine");
-        jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+        this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
 
-        verify(captchaServiceManager, times(1)).getCaptchaService("customSoundEngine");
-        verify(httpSession, times(1)).getId();
-        verify(soundCaptchaService, times(1)).getSoundChallengeForID(SESSION_ID, LOCALE);
-        verify(response, times(1)).setContentType("audio/x-wav");
-        verify(response, times(1)).getOutputStream();
-        verify(outputStream, times(1)).write(any());
-        verify(resourceReferenceHandlerChain, times(1)).handleNext(jCaptchaResourceReference);
+        verify(this.captchaServiceManager).getCaptchaService("customSoundEngine");
+        verify(this.httpSession).getId();
+        verify(soundCaptchaService).getSoundChallengeForID(SESSION_ID, LOCALE);
+        verify(this.response).setContentType("audio/x-wav");
+        verify(this.response).getOutputStream();
+        verify(this.outputStream).write(any());
+        verify(this.resourceReferenceHandlerChain).handleNext(jCaptchaResourceReference);
     }
 
     @Test
-    public void handleCaptchaText() throws ResourceReferenceHandlerException, CaptchaException, IOException
+    void handleCaptchaText() throws ResourceReferenceHandlerException, CaptchaException, IOException
     {
         CaptchaService textCaptchService = mock(CaptchaService.class);
-        when(captchaServiceManager.getCaptchaService("customTextEngine")).thenReturn(textCaptchService);
+        when(this.captchaServiceManager.getCaptchaService("customTextEngine")).thenReturn(textCaptchService);
 
         // just to have some data to write to check the mock.
         when(textCaptchService.getChallengeForID(SESSION_ID, LOCALE)).thenReturn("some data");
 
         JCaptchaResourceReference jCaptchaResourceReference =
             new JCaptchaResourceReference("text", "customTextEngine");
-        jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+        this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
 
-        verify(captchaServiceManager, times(1)).getCaptchaService("customTextEngine");
-        verify(httpSession, times(1)).getId();
-        verify(textCaptchService, times(1)).getChallengeForID(SESSION_ID, LOCALE);
-        verify(response, times(1)).setContentType("text/plain");
-        verify(response, times(1)).getOutputStream();
-        verify(outputStream, times(1)).write(any());
-        verify(outputStream, times(1)).close();
-        verify(resourceReferenceHandlerChain, times(1)).handleNext(jCaptchaResourceReference);
+        verify(this.captchaServiceManager).getCaptchaService("customTextEngine");
+        verify(this.httpSession).getId();
+        verify(textCaptchService).getChallengeForID(SESSION_ID, LOCALE);
+        verify(this.response).setContentType("text/plain");
+        verify(this.response).getOutputStream();
+        verify(this.outputStream).write(any(), anyInt(), anyInt());
+        verify(this.outputStream).close();
+        verify(this.resourceReferenceHandlerChain).handleNext(jCaptchaResourceReference);
     }
 
     @Test
-    public void handleWrongTypeCaptchaReference()
+    void handleWrongTypeCaptchaReference()
     {
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("customType", "foobar");
 
         ResourceReferenceHandlerException resourceReferenceHandlerException =
             assertThrows(ResourceReferenceHandlerException.class, () -> {
-                jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+                this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
             });
 
         assertEquals("Failed to handle resource [jcaptcha]", resourceReferenceHandlerException.getMessage());
@@ -188,13 +191,13 @@ public class JCaptchaResourceReferenceHandlerTest
     }
 
     @Test
-    public void handleNullTypeCaptchaReference()
+    void handleNullTypeCaptchaReference()
     {
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference(null, "foobar");
 
         ResourceReferenceHandlerException resourceReferenceHandlerException =
             assertThrows(ResourceReferenceHandlerException.class, () -> {
-                jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+                this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
             });
 
         assertEquals("Failed to handle resource [jcaptcha]", resourceReferenceHandlerException.getMessage());
@@ -203,15 +206,15 @@ public class JCaptchaResourceReferenceHandlerTest
     }
 
     @Test
-    public void handleErrorWhenGettingEngine() throws CaptchaException
+    void handleErrorWhenGettingEngine() throws CaptchaException
     {
         JCaptchaResourceReference jCaptchaResourceReference = new JCaptchaResourceReference("text", "foobar");
-        when(captchaServiceManager.getCaptchaService("foobar"))
+        when(this.captchaServiceManager.getCaptchaService("foobar"))
             .thenThrow(new CaptchaException("Cannot found foobar service", new RuntimeException()));
 
         ResourceReferenceHandlerException resourceReferenceHandlerException =
             assertThrows(ResourceReferenceHandlerException.class, () -> {
-                jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, resourceReferenceHandlerChain);
+                this.jCaptchaResourceReferenceHandler.handle(jCaptchaResourceReference, this.resourceReferenceHandlerChain);
             });
 
         assertEquals("Failed to handle resource [jcaptcha]", resourceReferenceHandlerException.getMessage());

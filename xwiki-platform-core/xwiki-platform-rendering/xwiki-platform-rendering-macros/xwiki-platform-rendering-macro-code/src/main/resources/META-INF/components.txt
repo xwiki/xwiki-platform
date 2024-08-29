@@ -1,4 +1,7 @@
 org.xwiki.rendering.internal.macro.code.CodeMacro
+org.xwiki.rendering.internal.macro.code.source.DefaultCodeMacroSourceFactory
+org.xwiki.rendering.internal.macro.code.source.ScriptCodeMacroSourceFactory
+org.xwiki.rendering.internal.macro.code.source.StringCodeMacroSourceFactory
 org.xwiki.rendering.internal.parser.pygments.PygmentsParser
 org.xwiki.rendering.internal.parser.pygments.DefaultPygmentsParserConfiguration
 org.xwiki.rendering.internal.code.layout.PlainLayoutHandler

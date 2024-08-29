@@ -32,6 +32,7 @@ import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
@@ -82,6 +83,8 @@ public class DefaultWikiManagerTest
 
     private WikiDeleter wikiDeleter;
 
+    private WikiConfiguration wikiConfiguration;
+
     @Before
     public void setUp() throws Exception
     {
@@ -92,6 +95,7 @@ public class DefaultWikiManagerTest
         wikiCopier = mocker.getInstance(WikiCopier.class);
         wikiDeleter = mocker.getInstance(WikiDeleter.class);
         wikiCreator = mocker.getInstance(WikiCreator.class);
+        this.wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
 
         // Frequent uses
         xcontext = mock(XWikiContext.class);
@@ -106,6 +110,8 @@ public class DefaultWikiManagerTest
     @Test
     public void idAvailable() throws Exception
     {
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
+
         // Forbidden list
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid3,toto");
         when(store.isWikiNameAvailable(any(String.class), any(XWikiContext.class))).thenReturn(true);
@@ -159,6 +165,8 @@ public class DefaultWikiManagerTest
     @Test
     public void createWhenWikiIdIsValid() throws Exception
     {
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
+
         // The wiki does not already exist
         when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
@@ -192,6 +200,8 @@ public class DefaultWikiManagerTest
     @Test
     public void createWhenWikiIdIsValidButFail() throws Exception
     {
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
+
         // The wiki does not already exist
         when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
@@ -246,6 +256,8 @@ public class DefaultWikiManagerTest
     @Test
     public void copyWhenWikiAvailable() throws Exception
     {
+        when(this.wikiConfiguration.shouldCreateDatabase()).thenReturn(true);
+
         // The wiki does not already exist
         when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 

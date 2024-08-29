@@ -26,39 +26,43 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     #error($services.localization.render('core.rename.nonexistingDocument'))
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
     <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>
       <dl>
-        #if($xwiki.isMultiLingual() && $doc.translationLocales.size() > 0)
+        #if ($xwiki.isMultiLingual())
           <dt>
-            <label for="language">$services.localization.render('language')</label>
-            <span class="xHint">$services.localization.render('core.export.pdf.options.language.hint')</span>
+            <label for="language">$escapetool.xml($services.localization.render('language'))</label>
+            <span class="xHint">
+              $escapetool.xml($services.localization.render('core.export.pdf.options.language.hint'))
+            </span>
           </dt>
           <dd>
             <select size="1" id="language" name="language">
-            #set ($locales = $doc.translationLocales)
-            #set ($discard =  $locales.add($doc.realLocale))
-            #foreach ($locale in $locales)
-              ## By default, we suggest that the export is done for current locale.
-              #if ($locale == $tdoc.realLocale)
-                <option value="$locale" selected="selected">
-                  $locale $services.localization.render('core.export.pdf.options.currentLanguage')
-                </option>
-              #else
-                <option value="$locale">$locale</option>
+            #foreach ($locale in $xwiki.availableLocales)
+              #set ($localeName = $locale.getDisplayName($xcontext.locale))
+              #if ("$!localeName" == '')
+                #set ($localeName = $services.localization.render('core.viewers.information.noLocale'))
               #end
+              #if ($locale == $xcontext.locale)
+                #set ($localeName = "$localeName $services.localization.render('core.export.pdf.options.currentLanguage')")
+              #end
+              ## By default, we suggest that the export is done for the current locale.
+              <option value="$escapetool.xml($locale)"
+                #if ($locale == $xcontext.locale) selected#end>$escapetool.xml($localeName)</option>
             #end
             </select>
           </dd>
@@ -138,7 +142,7 @@
       </div>
     </form>
     <div class="clearfloats"></div>
-  </div>## mainContentArea
+  </main>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #end

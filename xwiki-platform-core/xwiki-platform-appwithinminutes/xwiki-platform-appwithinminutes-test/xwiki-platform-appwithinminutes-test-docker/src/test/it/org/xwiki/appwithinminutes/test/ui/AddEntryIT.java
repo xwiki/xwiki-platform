@@ -43,7 +43,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 13.3RC1
  * @since 12.10.6
  */
-@UITest
+@UITest(properties = {
+    // Exclude the AppWithinMinutes.ClassEditSheet and AppWithinMinutes.DynamicMessageTool from the PR checker since 
+    // they use the groovy macro which requires PR rights.
+    // TODO: Should be removed once XWIKI-20529 is closed.
+    // Exclude AppWithinMinutes.LiveTableEditSheet because it calls com.xpn.xwiki.api.Document.saveWithProgrammingRights
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:AppWithinMinutes\\.(ClassEditSheet|DynamicMessageTool|LiveTableEditSheet)"
+})
 class AddEntryIT
 {
     private static final String DATE_COLUMN_TITLE = "panel.livetable.doc.date";
@@ -67,7 +73,7 @@ class AddEntryIT
         testUtils.gotoPage(testReference, "edit", editQueryStringParameters);
         // Wait for the page to load before clicking on the save button to make sure the page layout is stable.
         // The page being tested.
-        ApplicationHomePage homePage = new ApplicationHomeEditPage().waitUntilPageIsLoaded().clickSaveAndView();
+        ApplicationHomePage homePage = new ApplicationHomeEditPage().clickSaveAndView();
 
         // Test
         EntryNamePane entryNamePane = homePage.clickAddNewEntry();

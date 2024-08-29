@@ -33,7 +33,10 @@ import java.sql.Statement;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -51,20 +54,20 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.cfgxml.internal.ConfigLoader;
+import org.hibernate.boot.cfgxml.spi.LoadedConfig;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.relational.QualifiedSequenceName;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.jdbc.spi.JdbcServices;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.internal.util.StringHelper;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.KeyValue;
@@ -72,7 +75,6 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Table;
 import org.hibernate.query.NativeQuery;
-import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
 import org.hibernate.tool.schema.extract.spi.ExtractionContext;
@@ -89,6 +91,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
@@ -106,7 +109,7 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
 @Singleton
 // Make sure the Hibernate store is disposed at the end in case some components needs it for their own dispose
 @DisposePriority(10000)
-public class HibernateStore implements Disposable, Integrator, Initializable
+public class HibernateStore implements Disposable, Initializable
 {
     /**
      * @see #isConfiguredInSchemaMode()
@@ -154,14 +157,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private DataMigrationManager dataMigrationManager;
 
-    private final BootstrapServiceRegistry bootstrapServiceRegistry =
-        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+    private MetadataSources metadataSources;
 
-    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+    private HibernateStoreConfiguration configuration;
 
-    private final Configuration configuration = new Configuration(this.metadataSources);
+    private BootstrapServiceRegistry bootstrapServiceRegistry;
 
-    private StandardServiceRegistry standardServiceRegistry;
+    private StandardServiceRegistry standardRegistry;
 
     private Dialect dialect;
 
@@ -169,9 +171,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private SessionFactory sessionFactory;
 
-    private Metadata configurationMetadata;
+    private Metadata configuredMetadata;
 
     private String configurationCatalog;
+
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private URL configurationURL;
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -221,13 +227,59 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        URL url = getHibernateConfigurationURL();
-        if (url != null) {
-            this.configuration.configure(url);
+        // Search for the base configuration file
+        this.configurationURL = getHibernateConfigurationURL();
 
-            // Resolve some variables
-            replaceVariables(this.configuration);
+        // For retro compatibility reasons we have to create an old Configuration object since it's exposed in the API
+        this.configuration = new HibernateStoreConfiguration(this.configurationURL);
+        replaceVariables(this.configuration);
+    }
+
+    private void disposeSessionFactory()
+    {
+        Session session = getCurrentSession();
+        closeSession(session);
+
+        if (this.sessionFactory != null) {
+            this.sessionFactory.close();
         }
+        if (this.standardRegistry != null) {
+            this.standardRegistry.close();
+        }
+        if (this.bootstrapServiceRegistry != null) {
+            this.bootstrapServiceRegistry.close();
+        }
+    }
+
+    private void createSessionFactory()
+    {
+        this.bootstrapServiceRegistry = new BootstrapServiceRegistryBuilder().build();
+
+        // Load the base configuration file
+        ConfigLoader configLoader = new ConfigLoader(this.bootstrapServiceRegistry);
+        LoadedConfig baseConfiguration = configLoader.loadConfigXmlUrl(this.configurationURL);
+        // Resolve some variables
+        replaceVariables(baseConfiguration);
+
+        StandardServiceRegistryBuilder standardRegistryBuilder =
+            new StandardServiceRegistryBuilder(this.bootstrapServiceRegistry);
+        standardRegistryBuilder.configure(baseConfiguration);
+        this.standardRegistry = standardRegistryBuilder.build();
+
+        this.metadataSources = new MetadataSources(this.standardRegistry);
+
+        // Copy the extended configuration
+        this.configuration.copy(this.metadataSources);
+
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
+        this.configuredMetadata = metadataBuilder.build();
+
+        Identifier catalog = this.configuredMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog();
+        if (catalog != null) {
+            this.configurationCatalog = catalog.getCanonicalName();
+        }
+
+        this.sessionFactory = this.configuredMetadata.getSessionFactoryBuilder().build();
     }
 
     /**
@@ -238,25 +290,22 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         build();
     }
 
-    @Override
-    public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
-        SessionFactoryServiceRegistry serviceRegistry)
+    private String resolveURL(String url)
     {
-        this.configurationMetadata = metadata;
+        // Replace variables
+        if (StringUtils.isNotEmpty(url) && url.matches(".*\\$\\{.*\\}.*")) {
+            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                this.environment.getPermanentDirectory().getAbsolutePath());
 
-        Identifier catalog = this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog();
-        if (catalog != null) {
-            this.configurationCatalog =
-                this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog().getCanonicalName();
+            try {
+                return StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
+                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                this.logger.error("Failedd to encode the current timezone id", e);
+            }
         }
-    }
 
-    @Override
-    public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
-    {
-        this.configurationMetadata = null;
-        this.databaseProductCache = DatabaseProduct.UNKNOWN;
-        this.dialect = null;
+        return null;
     }
 
     /**
@@ -268,58 +317,59 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     private void replaceVariables(Configuration hibernateConfiguration)
     {
-        String url = hibernateConfiguration.getProperty(org.hibernate.cfg.Environment.URL);
-        if (StringUtils.isEmpty(url)) {
-            return;
-        }
-
-        // Replace variables
-        if (url.matches(".*\\$\\{.*\\}.*")) {
-            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
-                this.environment.getPermanentDirectory().getAbsolutePath());
-
-            try {
-                newURL = StringUtils.replace(newURL, PROPERTY_TIMEZONE_VARIABLE,
-                    URLEncoder.encode(TimeZone.getDefault().getID(), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                this.logger.error("Failedd to encode the current timezone id", e);
-            }
-
+        String newURL = resolveURL(hibernateConfiguration.getProperty(org.hibernate.cfg.AvailableSettings.URL));
+        if (newURL != null) {
             // Set the new URL
-            hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
-            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+            hibernateConfiguration.setProperty(org.hibernate.cfg.AvailableSettings.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
         }
     }
 
     /**
+     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
+     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
+     * from the XWiki configuration.
+     *
+     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     */
+    private void replaceVariables(LoadedConfig hibernateConfiguration)
+    {
+        Map values = hibernateConfiguration.getConfigurationValues();
+        String newURL = resolveURL((String) values.get(org.hibernate.cfg.AvailableSettings.URL));
+        if (newURL != null) {
+            // Set the new URL
+            values.put(org.hibernate.cfg.AvailableSettings.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", newURL, newURL);
+        }
+    }
+
+    /**
+     * Reload the Hibernate setup.
+     * <p>
+     * This method is synchronized to make sure that it's only executed once at a time.
+     * 
      * @since 11.5RC1
      */
     public void build()
     {
-        // Get rid of existing session factory
-        disposeInternal();
+        this.lock.writeLock().lock();
 
-        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
-        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+        try {
+            // Check if it's a reload
+            if (this.sessionFactory != null) {
+                disposeSessionFactory();
+            }
 
-        // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory(this.standardServiceRegistry);
-    }
-
-    private void disposeInternal()
-    {
-        Session session = getCurrentSession();
-        closeSession(session);
-
-        if (this.sessionFactory != null) {
-            this.sessionFactory.close();
+            createSessionFactory();
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        disposeInternal();
+        disposeSessionFactory();
     }
 
     /**
@@ -431,7 +481,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public DatabaseProduct getDatabaseProductName()
     {
         if (this.databaseProductCache == DatabaseProduct.UNKNOWN) {
-            if (this.sessionFactory != null) {
+            if (getSessionFactory() != null) {
                 DatabaseMetaData metaData = getDatabaseMetaData();
                 if (metaData != null) {
                     try {
@@ -493,7 +543,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public Metadata getConfigurationMetadata()
     {
-        return this.configurationMetadata;
+        return this.configuredMetadata;
     }
 
     /**
@@ -560,7 +610,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         return new StringBuilder(2000).append("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n")
             .append("<!DOCTYPE hibernate-mapping PUBLIC\n").append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("\t\"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
             .append("<class entity-name=\"").append(className).append("\" table=\"")
             .append(toDynamicMappingTableName(className)).append("\">\n")
             .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
@@ -617,7 +667,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            JdbcServices jdbcServices = this.standardServiceRegistry.getService(JdbcServices.class);
+            JdbcServices jdbcServices = this.standardRegistry.getService(JdbcServices.class);
             this.dialect = jdbcServices.getDialect();
         }
 
@@ -627,7 +677,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     /**
      * Set the current wiki in the passed session.
      * 
-     * @param session the hibernate session
+     * @param session the Hibernate session
      * @throws XWikiException when failing to switch wiki
      */
     public void setWiki(Session session) throws XWikiException
@@ -638,7 +688,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     /**
      * Set the passed wiki in the passed session
      *
-     * @param session the hibernate session
+     * @param session the Hibernate session
      * @param wikiId the id of the wiki to switch to
      * @throws XWikiException when failing to switch wiki
      */
@@ -669,17 +719,17 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                         }
                     });
                 }
-            }
 
-            getDataMigrationManager().checkDatabase();
+                session.setProperty("xwiki.database", databaseName);
+            }
         } catch (Exception e) {
             // close session with rollback to avoid further usage
             endTransaction(false);
 
             Object[] args = {wikiId};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to database {0}",
-                e, args);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while switching to wiki {0}", e,
+                args);
         }
     }
 
@@ -778,11 +828,47 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             return false;
         }
 
+        String contextWikiId = this.wikis.getCurrentWikiId();
+
         if (session != null) {
+            String sessionDatabase = (String) session.getProperties().get("xwiki.database");
+            String contextDatabase = getDatabaseFromWikiName(contextWikiId);
+
+            // The current context is trying to manipulate a database different from the one in the current session
+            if (!Objects.equals(sessionDatabase, contextDatabase)) {
+                Object[] args = {contextWikiId};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
+                    "Cannot switch to database {0} in an existing session", null, args);
+            }
+
             this.logger.debug("Taking session from context [{}]", session);
             this.logger.debug("Taking transaction from context [{}]", transaction);
 
             return false;
+        }
+
+        // We should not try to access the schema/database which is not a registered wiki
+        try {
+            if (!this.wikis.isMainWiki(contextWikiId) && this.wikis.getById(contextWikiId) == null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                    "No wiki with id [" + contextWikiId + "] could be found");
+            }
+        } catch (WikiManagerException e) {
+            throw new XWikiException("Failed to load the wiki descriptor", e);
+        }
+
+        // Makes sure the database is initialized/migrated
+        // Doing it before creating a new session because:
+        // * we don't need one for that
+        // * it seems MySQL does not like having changes in the tables structure during a session (even if those change
+        // are not done as part of this session, just at the same time)
+        try {
+            getDataMigrationManager().checkDatabase();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE, "Exception while initializing the database",
+                e);
         }
 
         // session is obviously null here
@@ -819,7 +905,13 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory;
+        this.lock.readLock().lock();
+
+        try {
+            return this.sessionFactory;
+        } finally {
+            this.lock.readLock().unlock();
+        }
     }
 
     /**
@@ -895,7 +987,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
     public void shutdownHibernate()
     {
         // Close all connections
-        disposeInternal();
+        disposeSessionFactory();
     }
 
     /**
@@ -938,8 +1030,9 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      */
     public void updateDatabase(String wikiId)
     {
-        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder();
 
+        // Associate the metadata with a specific wiki
         setWiki(metadataBuilder, wikiId);
 
         updateDatabase(metadataBuilder.build());
@@ -963,7 +1056,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
 
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
-                JdbcEnvironment jdbcEnvironment = this.standardServiceRegistry.getService(JdbcEnvironment.class);
+                JdbcEnvironment jdbcEnvironment = this.standardRegistry.getService(JdbcEnvironment.class);
 
                 ExtractionContext extractionContext = new ExtractionContext.EmptyExtractionContext()
                 {
@@ -1055,7 +1148,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             // Try to create the Hibernate sequence
             try (Session session = getSessionFactory().openSession()) {
                 Transaction transaction = session.beginTransaction();
-                session.createSQLQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
+                session.createNativeQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
                     .executeUpdate();
                 transaction.commit();
             } catch (Exception e) {

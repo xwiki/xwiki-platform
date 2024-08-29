@@ -99,7 +99,7 @@ public class LiveTableElement extends BaseElement
         getDriver().executeJavascript("return $('" + StringEscapeUtils.escapeEcmaScript(livetableId)
             + "-ajax-loader').removeClassName('hidden')");
 
-        WebElement element = getDriver().findElement(By.id(inputId));
+        WebElement element = getDriver().findElement(By.id(livetableId)).findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
             if (element.getAttribute("class").contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(element);
@@ -192,7 +192,8 @@ public class LiveTableElement extends BaseElement
     {
         String cellXPath = String.format(".//tr/td[position() = %s]", getColumnIndex(columnTitle) + 1);
         WebElement liveTableBody = getDriver().findElement(By.id(this.livetableId + "-display"));
-        return liveTableBody.findElements(By.xpath(cellXPath));
+        // Don't wait as rows should be available after the LiveTable is ready.
+        return getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath(cellXPath));
     }
 
     /**
@@ -212,6 +213,25 @@ public class LiveTableElement extends BaseElement
     {
         WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(this.livetableId + "-display"));
         return getDriver().findElementWithoutWaiting(liveTableBody, By.xpath("tr[" + rowNumber + "]"));
+    }
+
+    /**
+     * Get the row index of an element, relative to the number of currently displayed rows.
+     *
+     * @param by the selector of the searched element
+     * @return the row index where the element was found
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public int getRowNumberForElement(By by)
+    {
+        WebElement livetableRowElement =
+            getDriver().findElement(By.xpath("//tbody[@id='" + this.livetableId + "-display']/tr/td")).findElement(by);
+        if (livetableRowElement.isDisplayed()) {
+            // Count the preceding rows.
+            return livetableRowElement.findElements(By.xpath("./ancestor::tr[1]/preceding-sibling::tr")).size() + 1;
+        }
+        return 0;
     }
 
     /**
@@ -259,6 +279,7 @@ public class LiveTableElement extends BaseElement
             getDriver().waitUntilCondition(driver -> {
                 // Refresh the current page since we need the livetable to fetch the JSON again
                 driver.navigate().refresh();
+                this.waitUntilReady();
                 int count = driver.findElements(by).size();
                 LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/refresh(): count = [{}]", count);
                 return count >= minimalExpectedRowCount;
@@ -268,6 +289,7 @@ public class LiveTableElement extends BaseElement
             getDriver().waitUntilCondition(driver -> {
                 // Refresh the current page since we need the livetable to fetch the JSON again
                 driver.get(driver.getCurrentUrl());
+                this.waitUntilReady();
                 int count = driver.findElements(by).size();
                 LOGGER.info("LiveTableElement#waitUntilRowCountGreaterThan/get(): count = [{}]", count);
                 return count >= minimalExpectedRowCount;

@@ -46,11 +46,22 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
         new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
-     * This event will match any other document event of the same type.
+     * The reference of the targeted document.
+     * 
+     * @since 14.4.2
+     * @since 14.5
+     */
+    private final DocumentReference documentReference;
+
+    /**
+     * This event will match any other document event of the same type. Since listeners may expect to find the document
+     * reference in the event, it is recommended to use the constructor with the explicit parameter when generating the
+     * event.
      */
     public AbstractDocumentEvent()
     {
         super();
+        this.documentReference = null;
     }
 
     /**
@@ -61,6 +72,7 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
     public AbstractDocumentEvent(DocumentReference documentReference)
     {
         super(SERIALIZER.serialize(documentReference));
+        this.documentReference = documentReference;
     }
 
     /**
@@ -71,5 +83,16 @@ public abstract class AbstractDocumentEvent extends AbstractCancelableEvent
     public AbstractDocumentEvent(EventFilter eventFilter)
     {
         super(eventFilter);
+        this.documentReference = null;
+    }
+
+    /**
+     * @return the reference of the document targeted by this event, or {@code null} if it was not specified
+     * @since 14.4.2
+     * @since 14.5
+     */
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
     }
 }

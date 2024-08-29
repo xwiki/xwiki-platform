@@ -27,6 +27,8 @@ package org.xwiki.security.internal;
  */
 public abstract class AbstractSecurityConfiguration
 {
-    /** Prefix for configuration keys. */
+    /**
+     * Prefix for configuration keys.
+     */
     protected static final String SECURITY = "security";
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+
+<Configure id="logging">
+  <New id="ServerLog" class="java.io.PrintStream">
+    <Arg>
+      <!-- XWiki wants to log to both the console and also to file, and thus we're wrapping the RolloverFileOutputStream
+           class with a TeeOutputStream to split the logs. -->
+      <New class="org.apache.commons.io.output.TeeOutputStream">
+        <Arg>
+          <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
+            <Arg><Property name="jetty.console-capture.dir" default="./logs" />/yyyy_mm_dd.jetty.log
+            </Arg>
+            <Arg type="boolean">
+              <Property name="jetty.console-capture.append" default="false" />
+            </Arg>
+            <Arg type="int">
+              <Property name="jetty.console-capture.retainDays" default="90" />
+            </Arg>
+            <Arg>
+              <Call class="java.util.TimeZone" name="getTimeZone">
+                <Arg>
+                  <Property name="jetty.console-capture.timezone" default="GMT" />
+                </Arg>
+              </Call>
+            </Arg>
+            <Get id="ServerLogName" name="datedFilename" />
+          </New>
+        </Arg>
+        <!-- Since we can't send to both out and err, we choose to send to out since logs are not errors by default,
+             so it seems the most logical one to use -->
+        <Arg><Get class="java.lang.System" name="out"/></Arg>
+      </New>
+    </Arg>
+  </New>
+
+  <Call class="org.slf4j.LoggerFactory" name="getLogger">
+    <Arg>org.eclipse.jetty</Arg>
+    <Call name="info">
+      <Arg>Console stderr/stdout captured to
+        <Ref refid="ServerLogName" />
+      </Arg>
+    </Call>
+  </Call>
+  <Call class="java.lang.System" name="setErr">
+    <Arg>
+      <Ref refid="ServerLog" />
+    </Arg>
+  </Call>
+  <Call class="java.lang.System" name="setOut">
+    <Arg>
+      <Ref refid="ServerLog" />
+    </Arg>
+  </Call>
+</Configure>

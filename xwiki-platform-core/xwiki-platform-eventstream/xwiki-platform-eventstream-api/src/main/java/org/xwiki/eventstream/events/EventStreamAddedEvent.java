@@ -20,11 +20,12 @@
 package org.xwiki.eventstream.events;
 
 /**
- * Event triggered when a new event is registered inside of the {@link org.xwiki.eventstream.EventStream}. This event
- * contains a reference to the actual event that has been registered in the event stream.
- *
- * This event also send the following parameters:
- * source: the event inserted in the event stream that triggered this event
+ * Event triggered when a new event is registered inside of the store.
+ * <p>
+ * This event also send the following parameters
+ * <ul>
+ * <li>source: the event inserted in the event stream that triggered this event</li>
+ * </ul>
  *
  * @since 9.6RC1
  * @version $Id$

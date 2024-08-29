@@ -27,10 +27,6 @@ import javax.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.bridge.event.DocumentVersionRangeDeletedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -42,6 +38,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
@@ -50,6 +47,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -156,14 +154,13 @@ public class XWikiCacheStore extends AbstractXWikiStore
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
-            new WikiDeletedEvent(), new DocumentVersionRangeDeletedEvent());
+        return Arrays.<Event>asList(new WikiDeletedEvent());
     }
 
     private void initListener()
     {
         // register XWikiCacheStore as listener to remote document events
-        this.observationManager.addListener(this);
+        this.observationManager.addListener(this, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     private void initCache() throws CacheException
@@ -289,18 +286,26 @@ public class XWikiCacheStore extends AbstractXWikiStore
         if (this.remoteObservationManagerContext.isRemoteState()) {
             if (event instanceof WikiDeletedEvent) {
                 flushCache();
-            } else {
-                XWikiDocument doc = (XWikiDocument) source;
-
-                String key = doc.getKey();
-
-                if (getCache() != null) {
-                    getCache().remove(key);
-                }
-                if (getPageExistCache() != null) {
-                    getPageExistCache().remove(key);
-                }
             }
+        }
+    }
+
+    /**
+     * @param document the reference of the document to remove from the cache
+     * @since 15.3RC1
+     * @since 14.10.8
+     */
+    @Unstable
+    public void invalidate(XWikiDocument document)
+    {
+        String key = document.getKey();
+
+        if (getCache() != null) {
+            getCache().remove(key);
+        }
+
+        if (getPageExistCache() != null) {
+            getPageExistCache().remove(key);
         }
     }
 
@@ -647,12 +652,14 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadLinks(docId, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
@@ -660,18 +667,29 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
+    public List<DocumentReference> loadBacklinks(AttachmentReference attachmentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.loadBacklinks(attachmentReference, bTransaction, context);
+    }
+
+    @Override
+    @Deprecated(since = "2.2M2")
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.saveLinks(doc, context, bTransaction);
     }
 
     @Override
+    @Deprecated(since = "14.8RC1")
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         this.store.deleteLinks(docId, context, bTransaction);

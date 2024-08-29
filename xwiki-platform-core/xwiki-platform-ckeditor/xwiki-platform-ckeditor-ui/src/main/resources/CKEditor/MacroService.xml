@@ -1,0 +1,505 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.MacroService" locale="">
+  <web>CKEditor</web>
+  <name>MacroService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>CKEditor.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity output="false"}}
+## ================================================================
+## Returned JSON format:
+##
+## {
+##   'options': {
+##     'allMacrosExcludedCategories': [
+##       (translated category name), ...
+##     ]
+##   },
+##   'list': [
+##     {
+##       'id': (macro id),
+##       'name': (translated macro name),
+##       'description': (translated macro description),
+##       'defaultCategory': (translated macro category)
+##     },
+##     ...
+##   ],
+##   'notinstalled': [
+##     {
+##       'id': (macro id),
+##       'name': (translated macro name),
+##       'description': (translated macro description),
+##       'defaultCategory': '_notinstalled',
+##       'extensionId':	(extension id)
+##       'extensionVersion': (extension version)
+##       'extensionType': (extension type)
+##       'extensionRecommended': (is extension recommended)
+##       'extensionName': (extension name)
+##       'extensionSummary': (extension summary)
+##       ]
+##     },
+##     ...
+##   ]
+## }
+## ================================================================
+#macro (getMacroList $syntaxId)
+
+  ## Loads the css resources to display the macros list
+  ## TODO: Refactor once we add support for loading css files from javascript without velocity.
+  #if ($xcontext.action == 'get')
+    #template('display_macros.vm')
+    #initRequiredSkinExtensions()
+  #end
+
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+
+  #if ($xcontext.action == 'get')
+    #getRequiredSkinExtensions($requiredSkinExtensions)
+    #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+  #end
+
+  #set ($syntax = $services.rendering.resolveSyntax($syntaxId))
+  #set ($macroDescriptors = $services.rendering.getMacroDescriptors($syntax))
+  #if (!$macroDescriptors)
+    ## Before XWiki 9.7RC1 we had to use APIs that require programming rights.
+    #set ($macroDescriptors = [])
+    #try()
+      #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
+      #foreach ($macroId in $macroManager.getMacroIds($syntax))
+        #set ($macroDescriptor = $macroManager.getMacro($macroId).descriptor)
+        #set ($discard = $macroDescriptors.add($macroDescriptor))
+      #end
+    #end
+  #end
+  #set ($data = {})
+  #set ($allMacrosExcludedCategories = [])
+  #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Internal' 'Internal')"))
+  #set ($discard = $allMacrosExcludedCategories.add("#maybeTranslate('rendering.macroCategory.Deprecated' 'Deprecated')"))
+  #set ($discard = $data.put('options', { 'allMacrosExcludedCategories' : $allMacrosExcludedCategories }))
+  ## If the current user do not want to display hidden documents, we initialize the set of hidden default
+  ## categories.
+  ## TODO: Make the list of hidden by default categories configurable from the administration (XWIKI-19993).
+  #if(!$services.user.getProperties().displayHiddenDocuments())
+    #set ($hiddenCategories = $services.rendering.getHiddenMacroCategories())
+  #else
+    #set ($hiddenCategories = [])
+  #end
+  #set ($macroList = [])
+  #set ($installedMacros = [])
+  #foreach ($macroDescriptor in $macroDescriptors)
+    #set ($discard = $installedMacros.add($macroDescriptor.id.id))
+
+    #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
+    #set ($categories = [])
+    #set ($hidden = false)
+    #foreach ($category in $services.rendering.getMacroCategories($macroDescriptor.id))
+      #set ($macroCategoryTranslationKey = "rendering.macroCategory.$category")
+      #set ($hidden = $hidden || $hiddenCategories.contains($category))
+      #set ($discard = $categories.add({
+        'id': $category,
+        'label': "#maybeTranslate($macroCategoryTranslationKey $category)"
+      }))
+    #end
+
+    #if (!$hidden)
+      #set ($defaultCategoryTranslation = "rendering.macroCategory.${macroDescriptor.defaultCategory}")
+      #set ($discard = $macroList.add({
+        'id': $macroDescriptor.id,
+        'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
+        'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
+        'defaultCategory': "#maybeTranslate($defaultCategoryTranslation $macroDescriptor.defaultCategory)",
+        'categories': $categories
+      }))
+    #end
+  #end
+  #set ($macroList = $resolvedSortTool.sort($macroList, 'name'))
+  #set ($discard = $data.put('list', $macroList))
+  ## Get macros provided by compatible available extensions
+  #set ($macroExtensionsList = [])
+  #set($extensionQuery = $services.extension.index.newQuery("$!request.search"))
+  #set ($discard = $extensionQuery.addFilter('components__org.xwiki.rendering.macro.Macro', '', 'MATCH'))
+  #if ($xcontext.isMainWiki())
+    #set ($discard = $extensionQuery.setCompatible(true, '', "wiki:$xcontext.database"))
+  #else
+    #set ($discard = $extensionQuery.setCompatible(true, "wiki:$xcontext.database"))
+  #end
+  #set ($discard = $extensionQuery.setInstalled(false, '', "wiki:$xcontext.database"))
+  #set ($extensions = $services.extension.index.repository.search($extensionQuery))
+  #if ($extensions.size &gt; 0)
+    #set ($macroExtensionsMap = {})
+    #foreach ($extension in $extensions)
+      ## TODO: move to a proper generic API to check if an extension can be installed by a given user
+      #set ($extensionInstallAllowed = $services.security.authorization.hasAccess('programming', $xcontext.userReference, $NULL)
+        || (($extension.type == 'xar' || $extension.type == 'webjar')
+            &amp;&amp; $services.security.authorization.hasAccess('admin', $xcontext.userReference, "wiki:$xcontext.database") &amp;&amp; $services.extension.isAllowed($extension, "wiki:$xcontext.database")))
+      #foreach ($extensionComponent in $extension.getComponents())
+        #if ($extensionComponent.roleType == 'org.xwiki.rendering.macro.Macro')
+          ## Skip macros identifiers for which a macro is already installed
+          #if (!$installedMacros.contains($extensionComponent.roleHint))
+            #set ($discard = $macroExtensionsList.add({
+                'id' : {
+                    'id' : $extensionComponent.roleHint
+                  },
+                'name': $extensionComponent.roleHint,
+                'description': $extension.summary,
+                'defaultCategory': '_notinstalled',
+                'categories': [{
+                  'id' :'_notinstalled',
+                  'label': $services.localization.render('macroSelector.filter.category.notinstalled')
+                }],
+                'extensionId' : $extension.id.id,
+                'extensionVersion' : $extension.id.version.value,
+                'extensionType' : $extension.type,
+                'extensionRecommended': $extension.recommended,
+                'extensionName': $extension.name,
+                'extensionSummary': $extension.summary,
+                'extensionInstallAllowed': $extensionInstallAllowed
+              }))
+          #end
+        #end
+      #end
+    #end
+    #set ($discard = $data.put('notinstalled', $macroExtensionsList))
+  #end
+#end
+
+#macro (maybeGetMacroDescriptor $macroIdAsString)
+  #set ($xmacro = $NULL)
+  #set ($macroDescriptor = $NULL)
+  #set ($macroId = $services.rendering.resolveMacroId($macroIdAsString))
+  #if ($macroId)
+    #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
+    #if (!$macroDescriptor &amp;&amp; $macroId.syntax)
+      ## Try the macro id without the syntax.
+      #set ($macroId = $services.rendering.resolveMacroId($macroId.id))
+      #set ($macroDescriptor = $services.rendering.getMacroDescriptor($macroId))
+    #end
+  #else
+    ## Either the macro id could not be resolved (unlikely) or we are on an older XWiki instance (before 10.10RC1) where
+    ## we had to use APIs that require programming rights.
+    #getMacroWithPR($macroIdAsString)
+    #if ($xmacro)
+      #set ($macroDescriptor = $xmacro.descriptor)
+    #end
+  #end
+  #if ($macroDescriptor)
+    #getMacroDescriptor($macroDescriptor)
+    #if ($xmacro)
+      ## supportsInlineMode was not exposed on the macro descriptor before XWiki 10.10RC1.
+      #set ($data.supportsInlineMode = $xmacro.supportsInlineMode())
+    #end
+  #end
+#end
+
+#macro (getMacroWithPR $macroIdAsString)
+  #set ($xmacro = $NULL)
+  #try()
+    #set ($macroIdFactory = $services.component.getInstance('org.xwiki.rendering.macro.MacroIdFactory'))
+    #set ($macroId = $macroIdFactory.createMacroId($macroIdAsString))
+    #set ($macroManager = $services.component.getInstance('org.xwiki.rendering.macro.MacroManager'))
+    #if ($macroManager.exists($macroId))
+      #set ($xmacro = $macroManager.getMacro($macroId))
+    #elseif ($macroId.syntax)
+      ## Try the macro id without the syntax.
+      #set ($macroId = $macroIdFactory.createMacroId($macroId.id))
+      #if ($macroManager.exists($macroId))
+        #set ($xmacro = $macroManager.getMacro($macroId))
+      #end
+    #end
+  #end
+#end
+
+#macro (getMacroDescriptor $macroDescriptor)
+  ## Translate the macro name and description.
+  #set ($macroTranslationKey = "rendering.macro.$macroDescriptor.id")
+  #ckeditor_initRequiredSkinExtensions()
+  #set ($data = {
+    'id': $macroDescriptor.id,
+    'name': "#maybeTranslate(""${macroTranslationKey}.name"" $macroDescriptor.name)",
+    'description': "#maybeTranslate(""${macroTranslationKey}.description"" $macroDescriptor.description)",
+    'defaultCategory': $macroDescriptor.defaultCategory,
+    'supportsInlineMode': $macroDescriptor.supportsInlineMode(),
+    'parameterDescriptorMap': {}
+  })
+  #if ($macroDescriptor.contentDescriptor)
+    ## Translate the content label and description.
+    ## Treat the macro content as if it is the last macro parameter.
+    #set ($data.contentDescriptor = {
+      'name': "#maybeTranslate('rendering.macroContent' 'Content')",
+      'description': "#maybeTranslate(""${macroTranslationKey}.content.description""
+        $macroDescriptor.contentDescriptor.description)",
+      'mandatory': $macroDescriptor.contentDescriptor.mandatory,
+      'deprecated': $macroDescriptor.contentDescriptor.deprecated,
+      'advanced': $macroDescriptor.contentDescriptor.advanced,
+      'defaultValue': $macroDescriptor.contentDescriptor.defaultValue,
+      'type': $macroDescriptor.contentDescriptor.type,
+      'editTemplate': '&lt;textarea name="$content" rows="7"&gt;&lt;/textarea&gt;',
+      'index': $macroDescriptor.parameterDescriptorMap.size()
+    })
+    #fixDescriptorType($data.contentDescriptor)
+  #end
+  #set ($groupDescriptorTree = {})
+  #foreach ($entry in $macroDescriptor.parameterDescriptorMap.entrySet())
+    #set ($parameterDescriptor = $entry.value)
+    ## Translate the parameter name and description.
+    #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
+    ## Note: The displayHidden parameter is new in XWiki 12.4RC1 so make sure we set 'hidden' to false if it doesn't
+    ## exist
+    #if ("$!parameterDescriptor.displayHidden" != '')
+      #set ($parameterHidden = $parameterDescriptor.displayHidden)
+    #else
+      #set ($parameterHidden = false)
+    #end
+    #set ($translatedParameterDescriptor = {
+      'id': $parameterDescriptor.id,
+      'name': "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)",
+      'description': "#maybeTranslate(""${parameterTranslationKey}.description"" $parameterDescriptor.description)",
+      'mandatory': $parameterDescriptor.mandatory,
+      'deprecated': $parameterDescriptor.deprecated,
+      'advanced': $parameterDescriptor.advanced,
+      'defaultValue': $parameterDescriptor.defaultValue,
+      'type': $parameterDescriptor.displayType,
+      'hidden' : $parameterHidden,
+      'index': $foreach.index
+    })
+    #if ("$!translatedParameterDescriptor.type" == '')
+      ## displayType is not available before XWiki 11.0 so we need to fall back on parameterType.
+      #set ($translatedParameterDescriptor.type = $parameterDescriptor.parameterType)
+    #end
+    #set ($translatedParameterDescriptor.caseInsensitive = $translatedParameterDescriptor.type.isEnum())
+    #set ($groupDescriptor = $parameterDescriptor.groupDescriptor)
+    #if ($groupDescriptor)
+      #handleMacroParameterGroup($groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
+    #end
+    #if ($translatedParameterDescriptor.type.getName() == 'java.lang.String'
+        &amp;&amp; ($parameterDescriptor.defaultValue == 'false' || $parameterDescriptor.defaultValue == 'true')
+        &amp;&amp; $macroDescriptor.parametersBeanClass.getSimpleName() == 'WikiMacroParameters')
+      #set ($translatedParameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
+      #set ($translatedParameterDescriptor.type = $translatedParameterDescriptor.defaultValue.getClass())
+    #end
+    #set ($htmlDisplayerParameters = {'name': $parameterDescriptor.id})
+    #if ($translatedParameterDescriptor.group)
+      #set ($discard = $htmlDisplayerParameters.put('data-property-group',
+        $stringtool.join($translatedParameterDescriptor.group, '/')))
+    #end
+    #set ($translatedParameterDescriptor.editTemplate = $services.display.html.display(
+      $translatedParameterDescriptor.type, $translatedParameterDescriptor.defaultValue, $htmlDisplayerParameters, 'edit'
+    ))
+    #if ("$!translatedParameterDescriptor.editTemplate" == '')
+      #set ($translatedParameterDescriptor.editTemplate = "#getMacroParameterEditTemplate(
+        $translatedParameterDescriptor)")
+    #end
+    #set ($translatedParameterDescriptor.editTemplate = $translatedParameterDescriptor.editTemplate.trim())
+    #fixDescriptorType($translatedParameterDescriptor)
+    ## Make sure the key is lowercase (for XWiki &lt;9.0).
+    ## See XWIKI-13990: Inconsistency between Java-based and Wiki-based rendering macros regarding the parameter
+    ## descriptor map keys
+    #set ($discard = $data.parameterDescriptorMap.put($entry.key.toLowerCase(), $translatedParameterDescriptor))
+  #end
+  #if ($groupDescriptorTree.groups)
+    #set ($data.groupDescriptorTree = $groupDescriptorTree.groups)
+  #end
+  #set ($data.requiredSkinExtensions = "#ckeditor_getRequiredSkinExtensions()")
+#end
+
+#macro (fixDescriptorType $descriptor)
+  ## The goal of this code is to obtain a normalized string representation of the type specified in the descriptor.
+  ## See XCOMMONS-1583: Define a stable way to serialize types
+  ##
+  ## The type specified in the descriptor can be any implementation of java.lang.reflect.Type, not necessarily a
+  ## java.lang.Class. We can't use toString() because the return of Class#toString() is different than Class#getName().
+  ## We can't use Type#getTypeName() either because the access to this method is restricted from Velocity. The only
+  ## option for now is to try #getName() first and fall back on #toString() for types that are not instances of
+  ## java.lang.Class.
+  #set ($typeName = $descriptor.type.getName())
+  #if ("$!typeName" == '')
+    ## Probably not a java.lang.Class. Fall back on #toString().
+    #set ($typeName = "$!descriptor.type")
+  #end
+  ## Remove whitespace from the type name in order to have a single string representation.
+  #set ($descriptor.type = $typeName.replaceAll('\s+', ''))
+#end
+
+## Builds the group tree with the following structure:
+##
+## {
+##   'parentGroupId': {
+##     'id': 'parentGroupId',
+##     'name': 'Parent Group',
+##     'feature': 'someFeature',
+##     'groups': {
+##       'childGroupId': {...},
+##       ...
+##     }
+##   },
+##   ...
+## }
+#macro (handleMacroParameterGroup $groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)
+  #if ($groupDescriptor.group &amp;&amp; $groupDescriptor.group.size() &gt; 0)
+    #set ($translatedParameterDescriptor.group = $groupDescriptor.group)
+    #set ($parentGroup = $groupDescriptorTree)
+    #foreach ($groupId in $groupDescriptor.group)
+      #if (!$parentGroup.groups)
+        #set ($parentGroup.groups = {})
+      #end
+      #set ($childGroup = $parentGroup.groups.get($groupId))
+      #if (!$childGroup)
+        #if ($groupId == $translatedParameterDescriptor.id)
+          #set ($groupName = $translatedParameterDescriptor.name)
+        #else
+          #set ($groupTranslationKey = "${macroTranslationKey}.group.$groupId")
+          #set ($groupName = "#maybeTranslate(""${groupTranslationKey}.name"" $groupId)")
+        #end
+        #set ($childGroup = {
+          'id': $groupId,
+          'name': $groupName
+        })
+        #set ($discard = $parentGroup.groups.put($groupId, $childGroup))
+      #end
+      #set ($parentGroup = $childGroup)
+    #end
+    #if ("$!groupDescriptor.feature" != '')
+      #set ($parentGroup.feature = $groupDescriptor.feature)
+    #end
+  #elseif ($groupDescriptor.feature)
+    ## This group is made of a single parameter. The feature then refers to this parameter.
+    #set ($translatedParameterDescriptor.feature = $groupDescriptor.feature)
+  #end
+#end
+
+#macro (getMacroParameterEditTemplate $translatedParameterDescriptor)
+  #if ($translatedParameterDescriptor.type.getName() == 'boolean'
+      || $translatedParameterDescriptor.type.getName() == 'java.lang.Boolean')
+    &lt;input type="checkbox" name="$escapetool.xml($translatedParameterDescriptor.id)" value="true"/&gt;##
+    ## We need to submit something in case the checkbox is not checked.
+    &lt;input type="hidden" name="$escapetool.xml($translatedParameterDescriptor.id)" value="false"/&gt;
+  #elseif ($translatedParameterDescriptor.type.isEnum())
+    #if ($translatedParameterDescriptor.defaultValue)
+      #set ($enumValues = $translatedParameterDescriptor.defaultValue.values())
+    #else
+      ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
+      ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
+      ## a warning in the logs that will help us investigate the problem.
+      #set ($enumValues = $translatedParameterDescriptor.type.getEnumConstants())
+    #end
+    &lt;select name="$escapetool.xml($translatedParameterDescriptor.id)"&gt;##
+      #foreach ($enumValue in $enumValues)
+        #set ($value = $enumValue.name())
+        #set ($label = "#maybeTranslate(""${parameterTranslationKey}.value.$value"" $enumValue)")
+        &lt;option value="$escapetool.xml($value)"&gt;$escapetool.xml($label)&lt;/option&gt;##
+      #end
+    &lt;/select&gt;
+  #else
+    &lt;input type="text" name="$escapetool.xml($translatedParameterDescriptor.id)"/&gt;
+  #end
+#end
+
+#macro (maybeTranslate $key $defaultValue)
+  #if ($services.localization.get($key))
+    $services.localization.render($key)##
+  #else
+    $!defaultValue##
+  #end
+#end
+
+#macro (installMacroExtension $extensionId, $extensionVersion)
+  #set ($extension = $services.extension.index.repository.resolve("$extensionId/$extensionVersion"))
+  #if ($extension)
+    ## Find where to install it
+    ## 1) Check if a diffferent version is already installed
+    ## 2) Check if it's allowed to install it at current wiki level
+    #set ($rootNamespace = $NULL)
+    #set ($currentWikiNamespace = "wiki:$xcontext.database")
+    #if ($services.extension.installed.getInstalledExtension($extensionId, $rootNamespace))
+      #set ($extensionNamespace = $rootNamespace)
+    #elseif ($services.extension.installed.getInstalledExtension($extensionId, $currentWikiNamespace))
+      #set ($extensionNamespace = $currentWikiNamespace)
+    #else
+      #if ($services.extension.isAllowed($extension, "wiki:$xcontext.database"))
+        #set ($extensionNamespace = $currentWikiNamespace)
+      #else
+        #set ($extensionNamespace = $NULL)
+      #end
+    #end
+    ## Make the install non interractive
+    #set ($installRequest = $services.extension.createInstallRequest($extensionId, $extensionVersion, $extensionNamespace))
+    #set ($discard = $installRequest.setInteractive(false))
+    ## Start the install
+    #set ($job = $services.extension.install($installRequest))
+    ## Wait for the job to finish
+    #set ($discard = $job.join())
+    #if ($job.status.error)
+      ## The install failed
+      $response.sendError(500, $exceptiontool.getRootCauseMessage($job.status.error))
+    #else
+      ## The install succeeded
+      #set ($data = {
+        'extensionId': $extensionId,
+        'extensionVersion': $extensionVersion,
+        'extensionNamespace': $extensionNamespace
+      })
+    #end
+  #else
+    $response.sendError(404, $exceptiontool.getRootCauseMessage($job.status.error))
+  #end
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ("$!request.action" == 'install')
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #installMacroExtension($request.extensionId, $request.extensionVersion)
+  #else
+    $response.sendError(403)
+  #end
+#elseif ("$!request.data" != '')
+  #set ($data = $NULL)
+  #if ($request.data == 'list')
+    #getMacroList($request.syntaxId)
+  #elseif ($request.data == 'descriptor')
+    #maybeGetMacroDescriptor($request.macroId)
+  #end
+  #if ($data)
+    #set ($discard = $response.setContentType('application/json'))
+    $jsontool.serialize($data)
+  #else
+    $response.sendError(404)
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

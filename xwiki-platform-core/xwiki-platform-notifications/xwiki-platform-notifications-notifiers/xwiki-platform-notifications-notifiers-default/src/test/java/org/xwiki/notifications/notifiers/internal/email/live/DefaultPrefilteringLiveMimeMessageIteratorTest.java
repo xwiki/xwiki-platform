@@ -20,21 +20,26 @@
 package org.xwiki.notifications.notifiers.internal.email.live;
 
 import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.GroupingEventManager;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +53,13 @@ class DefaultPrefilteringLiveMimeMessageIteratorTest
 {
     @InjectMockComponents
     private DefaultPrefilteringLiveMimeMessageIterator liveMimeMessageIterator;
+
+    @MockComponent
+    private GroupingEventManager groupingEventManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     @MockComponent
     private LiveNotificationEmailEventFilter eventFilter;
@@ -66,11 +78,17 @@ class DefaultPrefilteringLiveMimeMessageIteratorTest
     @Test
     void retrieveCompositeEventList() throws NotificationException
     {
+        Event event = mock(Event.class);
         CompositeEvent compositeEvent = mock(CompositeEvent.class);
+        UserReference userReference = mock(UserReference.class);
+        when(this.userReferenceResolver.resolve(user)).thenReturn(userReference);
+
+        when(this.groupingEventManager.getCompositeEvents(List.of(event), userReference, "email"))
+            .thenReturn(List.of(compositeEvent));
 
         when(this.eventFilter.canAccessEvent(user, compositeEvent)).thenReturn(false);
         this.liveMimeMessageIterator
-            .initialize(Collections.singletonMap(user, compositeEvent), Collections.emptyMap(), null);
+            .initialize(Collections.singletonMap(user, List.of(event)), Collections.emptyMap(), null);
         assertEquals(Collections.emptyList(), this.liveMimeMessageIterator.retrieveCompositeEventList(user));
 
         when(this.eventFilter.canAccessEvent(user, compositeEvent)).thenReturn(true);

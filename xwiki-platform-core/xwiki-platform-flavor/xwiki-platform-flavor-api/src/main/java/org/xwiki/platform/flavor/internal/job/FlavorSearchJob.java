@@ -47,7 +47,6 @@ import org.xwiki.extension.version.IncompatibleVersionConstraintException;
 import org.xwiki.extension.version.Version;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.platform.flavor.FlavorQuery;
@@ -92,19 +91,6 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
     }
 
     @Override
-    protected FlavorSearchRequest castRequest(Request request)
-    {
-        FlavorSearchRequest installRequest;
-        if (request instanceof FlavorSearchRequest) {
-            installRequest = (FlavorSearchRequest) request;
-        } else {
-            installRequest = new FlavorSearchRequest(request);
-        }
-
-        return installRequest;
-    }
-
-    @Override
     protected DefaultFlavorSearchStatus createNewStatus(FlavorSearchRequest request)
     {
         Job currentJob = this.jobContext.getCurrentJob();
@@ -128,7 +114,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             installExtension(extensionId, namespace, currentTree);
 
             // Cleanup
-            this.extensionsNodeCache.clear();
+            this.extensionsCache.clear();
 
             return currentTree.get(0).getAction().getExtension();
         } catch (InstallException e) {

@@ -35,56 +35,42 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="V&amp;iacute;deo YouTube de XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Bienvenido a tu wiki =
+  <content>== Bienvenido a tu wiki ==
 
 XWiki es la mejor herramienta para organizar tu conocimiento ("knowledge"). Una //wiki// está organizada como una jerarquía de //páginas//. Puedes crear múltiples wikis, cada una de ellas con su propio conjunto de páginas.
 
 XWiki se puede utilizar como base de conocimiento (soporte, documentación, ventas, etc.), para espacios de trabajo colaborativo o incluso como una intranet completa.
 
-= Lo básico =
+== Lo básico ==
 
 Para sacar el máximo provecho de tu wiki, inicia sesión y:
 
-Utiliza el botón {{velocity}}$services.icon.render('pencil'){{/velocity}} de arriba para //editar// esta página y empezar a personalizar la wiki según tus necesidades.
+Utiliza el botón {{displayIcon name="pencil"/}} de arriba para //editar// esta página y empezar a personalizar la wiki según tus necesidades.
 
-Utiliza el botón {{velocity}}$services.icon.render('add'){{/velocity}} de arriba para //añadir// más páginas a tu wiki y crear así la //jerarquía// que en la que mejor se organice tu contenido.
+Utiliza el botón {{displayIcon name="add"/}} de arriba para //añadir// más páginas a tu wiki y crear así la //jerarquía// que en la que mejor se organice tu contenido.
 
-Utiliza las {{velocity}}$services.icon.render('home'){{/velocity}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro desde tus páginas. Sin ellas, es fácil perderse en una wiki grande.
+Utiliza las {{displayIcon name="home"/}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro desde tus páginas. Sin ellas, es fácil perderse en una wiki grande.
 
 Además, puedes acceder a la [[Zona de Pruebas&gt;&gt;Sandbox.WebHome]] para ver ejemplos de uso de la wiki y, en general, como un lugar donde experimentar con sus funcionalidades.
 
 {{box}}
-Aprende más sobre cómo utilizar XWiki con la {{velocity}}[[Guía de Introducción&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+Aprende más sobre cómo utilizar XWiki con la [[Guía de Introducción&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (% class="row" %)
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Ampliando tu wiki =
+== Ampliando tu wiki ==
 
-Para aumentar la potencia y las funciones de tu wiki con las funcionalidades que //tu// necesitas, accede al {{velocity}}[[Administrador de Extensiones&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} donde puedes buscar e instalar extensiones.
+Para aumentar la potencia y las funciones de tu wiki con las funcionalidades que //tu// necesitas, accede al [[Administrador de Extensiones&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] donde puedes buscar e instalar extensiones.
 
-Para navegar por las más de 900 extensiones proporcionadas por la comunidad disponibles para XWiki, accede al [[repositorio de extensiones&gt;&gt;http://extensions.xwiki.org]].
+Para navegar por las más de 900 extensiones proporcionadas por la comunidad disponibles para XWiki, accede al [[repositorio de extensiones&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (% class="col-xs-12 col-sm-6" %)
 (((
-= Crea tu applicación =
+== Crea tu applicación ==
 
 Supera los límites de las extensiones disponibles y define la //estructura// de tus datos basada en //tus// necesidades, creando //tus// propias aplicaciones con [[Aplicación en cuestión de minutos&gt;&gt;AppWithinMinutes]] (ACM).
 

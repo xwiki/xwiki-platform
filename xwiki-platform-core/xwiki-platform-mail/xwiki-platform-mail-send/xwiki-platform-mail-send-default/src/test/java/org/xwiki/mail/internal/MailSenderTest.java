@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -51,7 +53,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class MailSenderTest
+class MailSenderTest
 {
     @InjectMockComponents
     private DefaultMailSender mailSender;
@@ -66,7 +68,7 @@ public class MailSenderTest
     private Execution execution;
 
     @Test
-    public void sendAsynchronouslyWhenTimeout() throws Exception
+    void sendAsynchronouslyWhenAddIsInterrupted() throws Exception
     {
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("wiki");
@@ -74,17 +76,35 @@ public class MailSenderTest
         when(copiedContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
         when(this.executionContextCloner.copy(null)).thenReturn(copiedContext);
         Session session = Session.getInstance(new Properties());
-        doThrow(new InterruptedException("error")).when(this.prepareMailQueueManager).addMessage(
+        doThrow(new InterruptedException("error")).when(this.prepareMailQueueManager).addMessageToQueue(
             any(PrepareMailQueueItem.class), anyLong(), any(TimeUnit.class));
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
-            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class));
-        });
-        assertEquals("Mail prepare queue is still full after waiting [60] [SECONDS]", exception.getMessage());
+        Throwable exception = assertThrows(RuntimeException.class, () ->
+            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
+        assertLinesMatch(List.of("Mail items couldn't be added to the prepare queue as it was interrupted. "
+            + "The following messages will be lost: \\[.*\\]..."), List.of(exception.getMessage()));
     }
 
     @Test
-    public void sendAsynchronouslyWhenNoWikiIdInCopiedContext()
+    void sendAsynchronouslyWhenAddTimesOut() throws Exception
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getWikiId()).thenReturn("wiki");
+        ExecutionContext copiedContext = mock(ExecutionContext.class);
+        when(copiedContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
+        when(this.executionContextCloner.copy(null)).thenReturn(copiedContext);
+        Session session = Session.getInstance(new Properties());
+        when(this.prepareMailQueueManager.addMessageToQueue(any(PrepareMailQueueItem.class), anyLong(),
+            any(TimeUnit.class))).thenReturn(false);
+
+        Throwable exception = assertThrows(RuntimeException.class, () ->
+            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
+        assertLinesMatch(List.of("The mail prepare queue is still full after waiting \\[60\\] \\[SECONDS\\]. The "
+            + "following messages will be lost: \\[.*\\]..."), List.of(exception.getMessage()));
+    }
+
+    @Test
+    void sendAsynchronouslyWhenNoWikiIdInCopiedContext()
     {
         XWikiContext xcontext2 = mock(XWikiContext.class);
         when(xcontext2.getWikiId()).thenReturn("wiki");
@@ -99,9 +119,8 @@ public class MailSenderTest
 
         Session session = Session.getInstance(new Properties());
 
-        Throwable exception = assertThrows(RuntimeException.class, () -> {
-            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class));
-        });
+        Throwable exception = assertThrows(RuntimeException.class, () ->
+            this.mailSender.sendAsynchronously(mock(Iterable.class), session, mock(MailListener.class)));
         assertEquals("Aborting Mail Sending: the Wiki Id must not be null in the XWiki Context. Got [wiki] in the "
             + "original context.", exception.getMessage());
     }

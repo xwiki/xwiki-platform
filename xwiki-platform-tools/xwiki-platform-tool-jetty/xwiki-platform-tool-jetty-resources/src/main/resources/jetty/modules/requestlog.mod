@@ -18,13 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Enables a NCSA style request log.
+Logs requests using CustomRequestLog and AsyncRequestLogWriter.
 
 [tags]
 requestlog
+logging
 
 [depend]
 server
@@ -35,7 +36,14 @@ etc/jetty-requestlog.xml
 [files]
 logs/
 
+[ini]
+jetty.requestlog.dir?=logs
+
 [ini-template]
+# tag::documentation[]
+## Format string
+# jetty.requestlog.formatString=%{client}a - %u %{dd/MMM/yyyy:HH:mm:ss ZZZ|GMT}t "%r" %s %O "%{Referer}i" "%{User-Agent}i"
+
 ## Logging directory (relative to $jetty.base)
 # jetty.requestlog.dir=logs
 
@@ -51,14 +59,6 @@ logs/
 ## Whether to append to existing file
 # jetty.requestlog.append=false
 
-## Whether to use the extended log output
-# jetty.requestlog.extended=true
-
-## Whether to log http cookie information
-# jetty.requestlog.cookies=true
-
-## Timezone of the log entries
+## Timezone of the log file rollover
 # jetty.requestlog.timezone=GMT
-
-## Whether to log LogLatency
-# jetty.requestlog.loglatency=false
+# end::documentation[]

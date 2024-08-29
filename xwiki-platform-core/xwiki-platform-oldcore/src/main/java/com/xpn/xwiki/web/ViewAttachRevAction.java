@@ -47,7 +47,6 @@ public class ViewAttachRevAction extends XWikiAction
     public ViewAttachRevAction()
     {
         this.waitForXWikiInitialization = false;
-        this.handleRedirectObject = true;
     }
 
     @Override
@@ -74,10 +73,10 @@ public class ViewAttachRevAction extends XWikiAction
             attachment = doc.getAttachmentList().get(id);
         } else {
             attachment = doc.getAttachment(filename);
-            if (attachment == null) {
-                context.put("message", "attachmentdoesnotexist");
-                return "exception";
-            }
+        }
+        if (attachment == null) {
+            context.put("message", "attachmentdoesnotexist");
+            return "exception";
         }
 
         ScriptContext scriptContext = getCurrentScriptContext();
@@ -86,6 +85,12 @@ public class ViewAttachRevAction extends XWikiAction
             ScriptContext.ENGINE_SCOPE);
 
         return "viewattachrev";
+    }
+
+    @Override
+    protected boolean supportRedirections()
+    {
+        return true;
     }
 
     /**

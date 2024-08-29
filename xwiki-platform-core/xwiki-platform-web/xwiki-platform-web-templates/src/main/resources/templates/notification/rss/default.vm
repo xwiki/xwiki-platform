@@ -22,9 +22,10 @@
 ###
 ### Get the app
 ###
-#set ($app  = "$!event.events.get(0).application")
-#if ($app == 'xwiki')
-  #set ($app = $services.localization.render('core.events.appName'))
+#set ($eventDescriptor = $services.eventstream.getDescriptorForEventType($event.type, $xcontext.isMainWiki()))
+#set ($applicationName = $services.localization.render($eventDescriptor.applicationName))
+#if ("$!applicationName" == '')
+  #set ($applicationName = $eventDescriptor.applicationName)
 #end
 ###
 ### Get the doc
@@ -34,12 +35,13 @@
 ### Display
 ###
 <p>
-  <strong>$app: [$event.type]</strong>
+  <strong>$escapetool.xml($applicationName)</strong>
   #if ($document)
-    <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>
+    <a href="$escapetool.xml($document.getExternalURL())">$document.getRenderedTitle('html/5.0')</a>
   #end
   .<br/>
-  $services.localization.render('notifications.events.by', ["#displayNotificationEventUsers($event.users, false)"])
+  $services.localization.render('notifications.events.by', 'html/5.0',
+  ["#displayNotificationEventUsers($event.users, false)"])
 </p>
 ###
 ### Display dates
@@ -47,9 +49,9 @@
 <p>
 #set ($dates = $event.dates)
 #if ($dates.size() > 1)
-  $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])
+  $services.localization.render('notifications.events.lastChange', 'html/5.0', [$xwiki.formatDate($event.dates.get(0))])
 #else
-  $xwiki.formatDate($event.dates.get(0))
+  $escapetool.xml($xwiki.formatDate($event.dates.get(0)))
 #end
 <br/>
 ###
@@ -66,8 +68,8 @@
 #if ($newdoc.version)
   #set ($externalURL = $newdoc.getExternalURL('view',
     "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}"))
-  #set ($diffLink = "<a href='$externalURL'>${newdoc.version}</a>")
-  $services.localization.render('notifications.rss.seeChanges', 'xwiki/2.1', [$diffLink])
+  #set ($diffLink = "<a href='$escapetool.xml($externalURL)'>$escapetool.xml(${newdoc.version})</a>")
+  $services.localization.render('notifications.rss.seeChanges', [$diffLink])
 #end
 #end
 </p>

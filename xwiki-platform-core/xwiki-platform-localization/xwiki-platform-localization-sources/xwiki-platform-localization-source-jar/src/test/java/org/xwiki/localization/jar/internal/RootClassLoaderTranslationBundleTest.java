@@ -21,10 +21,10 @@ package org.xwiki.localization.jar.internal;
 
 import java.util.Locale;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.localization.LocalizationManager;
@@ -34,21 +34,34 @@ import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.rendering.internal.parser.plain.PlainTextBlockParser;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ComponentList({MessageToolTranslationMessageParser.class, PlainTextBlockParser.class,
-ContextComponentManagerProvider.class, DefaultLocalizationManager.class, DefaultTranslationBundleContext.class,
-DefaultExecution.class, DefaultModelContext.class, RootClassLoaderTranslationBundle.class})
+    ContextComponentManagerProvider.class, DefaultLocalizationManager.class, DefaultTranslationBundleContext.class,
+    DefaultExecution.class, DefaultModelContext.class, RootClassLoaderTranslationBundle.class})
+@ComponentTest
 public class RootClassLoaderTranslationBundleTest
 {
-    @Rule
-    public final MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private BlockRenderer plainRenderer;
 
     private LocalizationManager localizationManager;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         // Components
 
@@ -60,18 +73,17 @@ public class RootClassLoaderTranslationBundleTest
         Translation translation = this.localizationManager.getTranslation(key, locale);
 
         if (message != null) {
-            Assert.assertNotNull("Could not find translation for key [" + key + "] and locale [" + locale + "]",
-                translation);
-            Assert.assertEquals(message, translation.getRawSource());
+            assertNotNull(translation, "Could not find translation for key [" + key + "] and locale [" + locale + "]");
+            assertEquals(message, translation.getRawSource());
         } else {
-            Assert.assertNull("Found translation for key [" + key + "] and locale [" + locale + "]", translation);
+            assertNull(translation, "Found translation for key [" + key + "] and locale [" + locale + "]");
         }
     }
 
     // tests
 
     @Test
-    public void getTranslations()
+    void getTranslations()
     {
         assertTranslation("test.key", "default translation", Locale.ROOT);
         assertTranslation("test.key", "en translation", Locale.ENGLISH);

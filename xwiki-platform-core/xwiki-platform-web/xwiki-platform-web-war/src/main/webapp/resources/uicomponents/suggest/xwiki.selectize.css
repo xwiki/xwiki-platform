@@ -6,11 +6,6 @@
   padding: 6px 12px;
 }
 
-/* The selected value overflows the dropdown caret on single selection. */
-.selectize-control.single > .selectize-input {
-  padding-right: 32px;
-}
-
 /* The selectize widget adds padding around the text input so we need to reduce the height of the text input. */
 .selectize-input > input[type="text"] {
   height: 20px;
@@ -22,17 +17,38 @@
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
   background-repeat: no-repeat;
 }
+/*
+Add enough padding to have room to display the spinning loader. That way, the selectize field do not have a brief
+change of width during load.
+The second 'has-items' selector is required to override the one from default bootstrap's selectize css. */
+.selectize-control.multi .selectize-input,
+.selectize-control.multi .selectize-input.has-items {
+  padding-right: 32px;
+}
 .selectize-control.multi.loading .selectize-input {
   background-position: center right 12px;
-  padding-right: 31px;
+}
+/**
+Add enough padding to have room to display the spinning loader. That way, the selectize field do not have a brief
+change of width during load.
+ */
+.selectize-control.single .selectize-input,
+.selectize-control.single .selectize-input.input-active {
+  padding-right: 55px;
 }
 .selectize-control.single.loading .selectize-input,
 .selectize-control.single.loading .selectize-input.input-active {
   background-position: center right 36px;
-  padding-right: 55px;
 }
 
 /* Dropdown styles */
+/* Override width: 100% defined in selectize.bootstrap3.css, see XWIKI-19453. */
+/* Override z-index so that the suggestions can be displayed in modal, see XWIKI-19870 */
+.selectize-dropdown {
+  width: auto;
+  z-index: 10051;
+}
+
 .selectize-dropdown-left,
 .selectize-dropdown-right {
   margin-top: -3px;
@@ -63,7 +79,7 @@
   margin-right: .3em;
 }
 img.xwiki-selectize-option-icon {
-  border-radius: 3px;
+  border-radius: 5px;
   max-height: 18px;
   max-width: 18px;
   vertical-align: text-top;
@@ -81,7 +97,7 @@ a.xwiki-selectize-option-label {
 .selectize-control.async-create > .selectize-input > div.xwiki-selectize-option {
   background-image: none;
   border-left: 2px solid transparent;
-  border-radius: 3px;
+  border-radius: 5px;
   padding-left: 3px;
   padding-right: 3px;
 }

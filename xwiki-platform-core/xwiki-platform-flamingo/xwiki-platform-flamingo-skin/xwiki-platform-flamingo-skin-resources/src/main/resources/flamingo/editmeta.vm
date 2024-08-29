@@ -37,11 +37,17 @@
   <dt>
     <label for="xwikidoctitleinput">
       $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
+      #set ($titleIsMandatory = $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)
+      #if ($titleIsMandatory)
+        <span class="xRequired">$escapetool.xml($services.localization.render('core.validation.required'))</span>
+      #end
     </label>
   </dt>
   <dd>
-    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" 
-      class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
+    <input type="text" id="xwikidoctitleinput" name="title" value="$!escapetool.xml($docTitle)"
+      #if ($titleIsMandatory)required #end
+      data-validation-value-missing="$escapetool.xml($services.localization.render('core.validation.required.message'))"
+      />
   </dd>
 </dl>
 #end

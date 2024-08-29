@@ -18,28 +18,44 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Enables the Server thread pool.
+Enables and configures the Server ThreadPool.
+
+[depends]
+logging
+
+[provides]
+threadpool|default
 
 [xml]
 etc/jetty-threadpool.xml
 
 [ini-template]
+# tag::documentation[]
+## Thread name prefix.
+#jetty.threadPool.namePrefix=qtp<hashCode>
 
-### Server Thread Pool Configuration
-## Minimum Number of Threads
+## Minimum number of pooled threads.
 #jetty.threadPool.minThreads=10
 
-## Maximum Number of Threads
+## Maximum number of pooled threads.
 #jetty.threadPool.maxThreads=200
 
-## Number of reserved threads (-1 for heuristic)
-# jetty.threadPool.reservedThreads=-1
+## Number of reserved threads (-1 for heuristic).
+#jetty.threadPool.reservedThreads=-1
 
-## Thread Idle Timeout (in milliseconds)
+## Whether to use virtual threads, if the runtime supports them.
+## Deprecated, use Jetty module 'threadpool-virtual' instead.
+#jetty.threadPool.useVirtualThreads=false
+
+## Thread idle timeout (in milliseconds).
 #jetty.threadPool.idleTimeout=60000
 
-## Whether to Output a Detailed Dump
+## The max number of idle threads that are evicted in one idleTimeout period.
+#jetty.threadPool.maxEvictCount=1
+
+## Whether to output a detailed dump.
 #jetty.threadPool.detailedDump=false
+# end::documentation[]

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="AppWithinMinutes.Content" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.Content" locale="">
   <web>AppWithinMinutes</web>
   <name>Content</name>
   <language/>
@@ -69,16 +69,20 @@
       'name': "$name",
       'rows': 25,
       'cols': 80,
-      'full': true
+      'full': true,
+      'restricted': $editedDocument.isRestricted()
     })
   #else
     &lt;/div&gt;
   #end
   {{/html}}
 #elseif ("$!type" != '')
-  ## Include the content of the current document.
-  ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
-  {{html}}$tdoc.getRenderedContent($tdoc.content, $tdoc.syntax.toIdString()).replace('{{', '&amp;amp;#123;&amp;amp;#123;'){{/html}}
+  ## Display the content of the current document without using any sheet. We can't use the include macro here (with the
+  ## author parameter) because the content may have unsaved changes (e.g. on preview action). We make sure that the HTML
+  ## macro is not closed unintentionally, even though the XHTML printer protects us against this, just to be extra safe.
+  {{html}}$services.display.content($tdoc, {
+    'displayerHint': 'default'
+  }).replace('{{/html}}', '&amp;amp;#123;&amp;amp;#123;/html&amp;amp;#125;&amp;amp;#125;'){{/html}}
 #else
   The display mode is not specified!
 #end

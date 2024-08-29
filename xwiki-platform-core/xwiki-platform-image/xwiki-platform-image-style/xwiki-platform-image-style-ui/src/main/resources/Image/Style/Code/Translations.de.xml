@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Image.Style.Code.Translations" locale="de">
+  <web>Image.Style.Code</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.image.style=Bildstile
+image.style.admin.heading=Bildstile Administration
+image.style.administration.imageStyleList.heading=Bildstile
+image.style.administation.newImageStyle.button=Bildstil erstellen
+image.style.administation.defaultImageStyle.button=Standardbildstil aktualisieren
+image.style.imageStyleSheet.backToAdministration.link=Zurück zur Administration
+image.style.administration.liveData.doc.title=Kennung
+image.style.administration.liveData._actions=Aktionen
+image.style.administration.liveData.prettyName=Schöner Name
+image.style.administration.liveData.prettyName.hint=Benutzerorientierter Name des Bildstils
+image.style.administration.liveData.type=Typ
+image.style.administration.liveData.type.hint=Der Typ des Bildstils (wird als CSS-Klasse verwendet)
+### Missing: image.style.administration.liveData.emptyvalue=
+image.style.administation.newImageStyle.label=Neuer Bildstil
+image.style.administation.newImageStyle.hint=Kennung des neuen Bildstils.
+image.style.administation.newImageStyle.placeHolder=Kennung
+image.style.administation.newImageStyle.normalizedTitle=Der neue Bildstil, der den Namenskonventionen entspricht, lautet [{0}].
+Image.Style.Code.ImageStyleClass_adjustableAlignment=Einstellbare Ausrichtung
+Image.Style.Code.ImageStyleClass_adjustableAlignment_hint=Wenn diese Option aktiviert ist, kann der Benutzer die Ausrichtung des Bildes anpassen.
+Image.Style.Code.ImageStyleClass_adjustableBorder=Einstellbarer Rahmen
+Image.Style.Code.ImageStyleClass_adjustableBorder_hint=Wenn diese Option aktiviert ist, darf der Benutzer den Rahmen des Bildes anpassen.
+Image.Style.Code.ImageStyleClass_adjustableSize=Einstellbare Größe
+Image.Style.Code.ImageStyleClass_adjustableSize_hint=Wenn diese Option aktiviert ist, darf der Benutzer die Größe des Bildes anpassen.
+Image.Style.Code.ImageStyleClass_adjustableTextWrap=Einstellbarer Textumbruch
+Image.Style.Code.ImageStyleClass_adjustableTextWrap_hint=Wenn diese Option aktiviert ist, darf der Benutzer den Textumbruch des Bildes anpassen.
+Image.Style.Code.ImageStyleClass_defaultAlignment=Standardausrichtung
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Mitte
+### Missing: Image.Style.Code.ImageStyleClass_defaultAlignment_default=
+Image.Style.Code.ImageStyleClass_defaultAlignment_hint=Die Standardausrichtung des Bildes.
+Image.Style.Code.ImageStyleClass_defaultAlignment_none=Keiner
+Image.Style.Code.ImageStyleClass_defaultAlignment_start=Beginn
+Image.Style.Code.ImageStyleClass_defaultAlignment_center=Mitte
+Image.Style.Code.ImageStyleClass_defaultAlignment_end=Ende
+Image.Style.Code.ImageStyleClass_defaultBorder=Standardrahmen
+Image.Style.Code.ImageStyleClass_defaultBorder_hint=Wenn diese Option aktiviert ist, hat das Bild standardmäßig einen Rahmen.
+Image.Style.Code.ImageStyleClass_defaultHeight=Standardhöhe
+Image.Style.Code.ImageStyleClass_defaultHeight_hint=Die Standardhöhe des Bildes. Wenn die Standardbreite leer gelassen wird, wird sie gemäß dem Bildverhältnis berechnet. Andernfalls hat das Bild eine feste Größe.
+Image.Style.Code.ImageStyleClass_defaultTextWrap=Standardtextumbruch
+Image.Style.Code.ImageStyleClass_defaultTextWrap_hint=Wenn diese Option aktiviert ist, umfließt der Text standardmäßig das Bild.
+Image.Style.Code.ImageStyleClass_defaultWidth=Standardbreite
+Image.Style.Code.ImageStyleClass_defaultWidth_hint=Die Standardbreite des Bildes. Wenn die Standardhöhe leer gelassen wird, wird sie gemäß dem Bildverhältnis berechnet. Andernfalls hat das Bild eine feste Größe.
+Image.Style.Code.ImageStyleClass_prettyName=Schöner Name
+Image.Style.Code.ImageStyleClass_prettyName_hint=Benutzerorientierter Name des Bildstils.
+Image.Style.Code.ImageStyleClass_type=Typ
+Image.Style.Code.ImageStyleClass_type_hint=Der Typ des Bildstils (wird als CSS-Klasse verwendet).
+Image.Style.Code.ConfigurationClass_defaultStyle=Standardstil
+Image.Style.Code.ConfigurationClass_defaultStyle_hint=Der Standard-Bildstil für dieses Wiki.
+Image.Style.Code.ConfigurationClass_forceDefaultStyle=Standard-Stil erzwingen
+Image.Style.Code.ConfigurationClass_forceDefaultStyle_hint=Wenn dieses Kontrollkästchen aktiviert ist, werden die Einschränkungen des Standard-Stils in der Bildkonfiguration erzwungen, und die Benutzer sind gezwungen, einen Stil zu wählen.
+</content>
+</xwikidoc>

@@ -101,7 +101,10 @@
 {{velocity}}
 #set ($rssMode = $xcontext.action == 'get' || "$!request.xpage" == 'plain')
 #if (!$rssMode)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/search/search.css', true))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url(
+    'org.xwiki.platform:xwiki-platform-search-webjar',
+    'search.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
   ## Disable the document extra data: comments, attachments, history...
   #set ($displayDocExtra = false)
   #databaseSearchForm
@@ -120,8 +123,8 @@
     #set ($discard = $feed.setDescription($services.localization.render('search.rss', [$text])))
     #set ($discard = $feed.setLanguage("$xcontext.locale"))
     #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
-    #set ($discard = $response.setContentType('application/rss+xml'))
-    {{{$xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))}}}
+    #set ($feedOutput = $xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0')))
+    #rawResponse($feedOutput, 'application/rss+xml')
   #else
     {{include reference="XWiki.Results"/}}
 

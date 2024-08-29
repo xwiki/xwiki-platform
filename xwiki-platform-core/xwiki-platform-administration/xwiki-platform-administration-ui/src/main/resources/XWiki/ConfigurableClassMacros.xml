@@ -34,7 +34,7 @@
   <title>$services.localization.render('xe.admin.configurable.macros.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ## Constants:
@@ -81,18 +81,39 @@
  *                             a safety measure because macros can't return values.
  *###
 #macro(findNamesOfAppsToConfigure, $section, $globaladmin, $space, $outputList)
-  #set ($fromClause = [
+  ## We keep looking in the old configureGlobally property since we do not provide a migration for it:
+  ## this choice has been made to avoid any problem during the upgrade of old wikis.
+  ## And we are doing this look in a separate query for performance reason: adding a or statement is very bad
+  ## in terms of performance. This all should be improved in the future with proper caching.
+  ##
+  #set ($fromClauseWithoutGlobal = [
     'BaseObject as obj',
     'StringProperty as category',
-    'IntegerProperty as sectionOrder',
-    'StringProperty as global'
+    'IntegerProperty as sectionOrder'
   ])
-  #set ($whereClause = [
+  ##
+  #set ($fromClause = [])
+  #set ($discard = $fromClause.addAll($fromClauseWithoutGlobal))
+  #set ($discard = $fromClause.add('StringProperty as global'))
+  ##
+  #set ($fromClauseDeprecated = [])
+  #set ($discard = $fromClauseDeprecated.addAll($fromClauseWithoutGlobal))
+  #set ($discard = $fromClauseDeprecated.add('IntegerProperty as deprecatedGlobal'))
+  ##
+  #set ($whereClauseWithoutGlobal = [
     "obj.name = doc.fullName and obj.className = :className",
     "category.id = obj.id and category.name = 'displayInCategory'",
-    "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'",
-    "global.id = obj.id and global.name = 'scope' and global.value in (:global)"
+    "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'"
   ])
+  ##
+  #set ($whereClause = [])
+  #set ($discard = $whereClause.addAll($whereClauseWithoutGlobal))
+  #set ($discard = $whereClause.add("global.id = obj.id and global.name = 'scope' and global.value in (:global)"))
+  ##
+  #set ($whereClauseDeprecated = [])
+  #set ($discard = $whereClauseDeprecated.addAll($whereClauseWithoutGlobal))
+  #set ($discard = $whereClauseDeprecated.add("deprecatedGlobal.id = obj.id and deprecatedGlobal.name = 'configureGlobally' and deprecatedGlobal.value = :deprecatedGlobal"))
+  ##
   #set ($params = {'className' : $nameOfThisDocument})
   ## Order by category and section priority, leaving empty/null category at the end, because we want to read the
   ## category meta data from the first (most important) section in each category.
@@ -102,8 +123,10 @@
     'sectionOrder.value'
   ])
   #if ($globaladmin == true)
+    #set ($discard = $params.put('deprecatedGlobal', 1))
     #set ($discard = $params.put('global', ['WIKI','WIKI+ALL_SPACES']))
   #else
+    #set ($discard = $params.put('deprecatedGlobal', 0))
     #if ("$!space" != '')
       #set ($discard = $params.put('global', ['SPACE']))
       #set ($discard = $whereClause.add('doc.space = :space'))
@@ -114,16 +137,29 @@
   #end
   #if ("$!section" != '')
     #set ($discard = $fromClause.add('StringProperty as section'))
+    #set ($discard = $fromClauseDeprecated.add('StringProperty as section'))
     #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = :section"))
+    #set ($discard = $whereClauseDeprecated.add("section.id = obj.id and section.name = 'displayInSection' and section.value = :section"))
     #set ($discard = $params.put('section', $section))
   #end
   #set ($statement = ', ' + $stringtool.join($fromClause, ', ') +
     ' where ' + $stringtool.join($whereClause, ' and ') +
     ' order by ' + $stringtool.join($orderByClause, ', '))
+  #set ($statementDeprecated = ', ' + $stringtool.join($fromClauseDeprecated, ', ') +
+    ' where ' + $stringtool.join($whereClauseDeprecated, ' and ') +
+    ' order by ' + $stringtool.join($orderByClause, ', '))
+  ##
+  #set ($deprecatedParams = {})
+  #set ($discard = $deprecatedParams.putAll($params))
+  #set ($discard = $deprecatedParams.remove('global'))
+  #set ($discard = $deprecatedParams.remove('space'))
+  #set ($discard = $params.remove('deprecatedGlobal'))
+  ##
   ## We can't remove duplicates using the unique filter because the select clause will be extended with the information
   ## needed by the order by clause. Thus we remove the duplicates after we get the results.
   #set ($orderedSetOfAppNames = $collectiontool.orderedSet)
   #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statement).bindValues($params).execute()))
+  #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statementDeprecated).bindValues($deprecatedParams).execute()))
   #set ($discard = $outputList.addAll($orderedSetOfAppNames))
   #if ($globaladmin == false &amp;&amp; "$!space" != '')
     ## If we are looking for the apps of a specific space, we should also get the one configured for all spaces.
@@ -289,8 +325,10 @@
 #macro(showHeading, $appName, $headingAlreadyShowing)
   #if(!$headingAlreadyShowing)
     #set($headingAlreadyShowing = true)
+    #set($escapedAppName = $services.rendering.escape($appName, 'xwiki/2.1'))
+    #set($doubleEscapedAppName = $services.rendering.escape($escapedAppName, 'xwiki/2.1'))
 
-    = {{translation key="admin.customize"/}} [[$appName&gt;&gt;$appName]]: =
+    == {{translation key="admin.customize"/}} [[$doubleEscapedAppName&gt;&gt;$escapedAppName]]: ==
   #end
 #end
 
@@ -301,8 +339,6 @@
       #if($propertiesToShow.size() &gt; 0 &amp;&amp; !$propertiesToShow.contains($propName))
         ## Silently skip over this property.
       #else
-        #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
-        ##
         #set($hintKey = "${obj.xWikiClass.name}_${propName}.hint")
         #set($hint = $services.localization.render($hintKey))
         #if($hint == $hintKey)
@@ -326,11 +362,10 @@
           $out ##
           #set ($out = '')
         #end
-        $escapetool.xml($prettyName)
+        $escapetool.xml($app.displayPrettyName($propName, $obj))
         &lt;/label&gt;
         #if($linkPrefix != '')
-          #set($linkScript = "$linkPrefix$propName")
-          &lt;a href="$escapetool.xml("#evaluate($linkScript)")" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
+          &lt;a href="$escapetool.xml($linkPrefix + $propName)" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
         #end
         #if ($hint)
           &lt;span class="xHint"&gt;$hint&lt;/span&gt;

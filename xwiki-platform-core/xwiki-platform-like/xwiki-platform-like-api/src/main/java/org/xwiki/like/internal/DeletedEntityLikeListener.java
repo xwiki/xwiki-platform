@@ -22,6 +22,7 @@ package org.xwiki.like.internal;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -33,8 +34,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.like.LikeManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.refactoring.event.DocumentRenamedEvent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -50,7 +51,6 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  *     <li>deletion of users</li>
  * </ul>
  *
- * Note that this component also listen to rename of documents.
  * The deletion of a documents will perform a partial clean of cache, to remove the information related to that
  * document (see {@link LikeManager#clearCache(EntityReference)}), while the other kinds lead to full clean of the
  * cache (see {@link LikeManager#clearCache()}).
@@ -61,14 +61,14 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 @Component
 @Named(DeletedEntityLikeListener.NAME)
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class DeletedEntityLikeListener extends AbstractEventListener
 {
     static final String NAME = "DeletedEntityLikeListener";
     private static final List<Event> EVENT_LIST = Arrays.asList(
         new DocumentDeletedEvent(),
         new WikiDeletedEvent(),
-        new XObjectDeletedEvent(BaseObjectReference.any(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING)),
-        new DocumentRenamedEvent()
+        new XObjectDeletedEvent(BaseObjectReference.any(XWikiUsersDocumentInitializer.CLASS_REFERENCE_STRING))
     );
 
     @Inject
@@ -88,9 +88,6 @@ public class DeletedEntityLikeListener extends AbstractEventListener
         if (event instanceof DocumentDeletedEvent) {
             XWikiDocument sourceDoc = (XWikiDocument) source;
             this.likeManagerProvider.get().clearCache(sourceDoc.getDocumentReference());
-        } else if (event instanceof DocumentRenamedEvent) {
-            DocumentRenamedEvent documentRenamedEvent = (DocumentRenamedEvent) event;
-            this.likeManagerProvider.get().clearCache(documentRenamedEvent.getSourceReference());
         } else {
             this.likeManagerProvider.get().clearCache();
         }

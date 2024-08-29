@@ -48,10 +48,7 @@ a.tag-delete, a.tag-delete:visited {
   vertical-align: top !important;
   z-index: 1000;
 }
-* html .tag-add-form {
-  width: 190px;
-}
-.tag-add-form div {
+.tag-add-form > div {
   background: $theme.backgroundSecondaryColor;
   overflow: hidden;
   padding: 4px 8px;

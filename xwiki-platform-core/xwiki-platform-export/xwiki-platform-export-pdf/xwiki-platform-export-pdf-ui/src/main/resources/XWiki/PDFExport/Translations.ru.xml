@@ -1,0 +1,113 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="ru">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=Шаблон
+export.pdf.options.template.hint=Шаблон PDF управляет информацией, отображаемой на титульной странице, в оглавлении, а также в верхнем и нижнем колонтитулах каждой страницы.
+export.pdf.options.loadFailure=Не удалось загрузить параметры экспорта PDF.
+export.pdf.hint=Экспорт в формате Portable Document Format (PDF) с помощью веб-браузера
+export.pdf.modal.close=Закрыть
+export.pdf.inProgress=Экспортируем в PDF...
+export.pdf.failed=Не удалось экспортировать в PDF
+export.pdf.lastError=Журнал экспорта PDF содержит ошибки: {0}
+export.pdf.canceling=Отмена экспорта PDF...
+export.pdf.canceled=Экспорт PDF отменен
+export.pdf.cancelFailed=Не удалось отменить экспорт PDF
+export.pdf.loading=Загрузка...
+export.pdf.pageReadyTimeout=Время ожидания готовности веб-страницы к печати истекло.
+export.pdf.templates.default=Шаблон по умолчанию
+export.pdf.templates.default.versionInfo=Версия {0}, созданная {1} {2}
+export.pdf.template.name=PDF-шаблон
+export.pdf.template.hint=Шаблон, используемый экспортом PDF
+export.pdf.template.provider=Поставщик шаблонов PDF
+export.pdf.template.skinExtensionInfo=Расширения темы оформления CSS и JavaScript, представленные на этой странице, также являются частью шаблона PDF и поэтому загружаются автоматически при использовании шаблона PDF.
+admin.export.pdf=Экспорт PDF
+admin.export.pdf.description=Настройте способ экспорта вики-страниц в PDF.
+export.pdf.admin.status=Статус
+export.pdf.admin.configuration=Конфигурация
+export.pdf.admin.saveComment=Обновлена конфигурация экспорта PDF
+export.pdf.admin.reset=Сброс
+export.pdf.admin.reset.hint=Восстановить конфигурацию по умолчанию
+export.pdf.admin.reset.confirmation=Вы уверены, что хотите восстановить конфигурацию по умолчанию? Все ваши изменения будут потеряны.
+export.pdf.config.default=(по умолчанию)
+export.pdf.config.empty=(пустой)
+export.pdf.generator.label=Генератор
+export.pdf.generator.hint=Инструмент, используемый для создания PDF.
+export.pdf.generator.checking=Проверка доступности генератора PDF...
+export.pdf.generator.checkFailed=Не удалось проверить, доступен ли генератор PDF.
+export.pdf.generator.available=Доступный
+export.pdf.generator.unavailable=Генератор PDF в настоящее время недоступен.
+export.pdf.generator.userBrowser.label=Пользовательский браузер
+export.pdf.generator.userBrowser.hint=PDF-файл создается на стороне клиента с использованием функции печати, предоставляемой собственным веб-браузером пользователя.
+export.pdf.generator.chromeDockerContainer.label=Докер-контейнер Chrome
+export.pdf.generator.chromeDockerContainer.hint=PDF-файл создается на стороне сервера с помощью безголового веб-браузера Chrome, работающего внутри контейнера Docker на том же сервере, что и XWiki.
+export.pdf.generator.remoteChrome.label=Удаленный Chrome
+export.pdf.generator.remoteChrome.hint=PDF-файл создается на стороне сервера с помощью удаленного веб-браузера Chrome, который может работать на сервере, отличном от сервера XWiki.
+XWiki.PDFExport.TemplateClass_cover=Обложка
+XWiki.PDFExport.TemplateClass_cover.hint=Информация отображается на первой странице. Например. название и автор
+XWiki.PDFExport.TemplateClass_toc=Оглавление
+XWiki.PDFExport.TemplateClass_toc.hint=Обычно перечисляет заголовки контента вместе с их номерами страниц.
+XWiki.PDFExport.TemplateClass_header=Верхний колонтитул
+XWiki.PDFExport.TemplateClass_header.hint=Информация отображается в верхней части каждой страницы, кроме титульной. Например. название
+XWiki.PDFExport.TemplateClass_footer=Нижний колонтитул
+XWiki.PDFExport.TemplateClass_footer.hint=Информация отображается внизу каждой страницы, кроме титульной. Например. номер страницы
+XWiki.PDFExport.TemplateClass_metadata=Метаданные
+XWiki.PDFExport.TemplateClass_metadata.hint=Скрипт, который выполняется для каждой вики-страницы, включенной в PDF-экспорт, для создания метаданных, отображаемых в верхнем или нижнем колонтитуле PDF-файла. Метаданные задаются с помощью специальной привязки с именем metadata, значением которой является Map&lt;String, String&gt;. Метаданные попадают в HTML в виде атрибутов заголовка, используемого для отображения названия каждой вики-страницы.
+XWiki.PDFExport.ConfigurationClass_templates=Шаблоны
+XWiki.PDFExport.ConfigurationClass_templates.hint=Список шаблонов PDF, которые пользователь может выбрать при экспорте вики-страниц в PDF.
+XWiki.PDFExport.ConfigurationClass_serverSide=Серверное исполнение
+XWiki.PDFExport.ConfigurationClass_serverSide.hint=Должен ли экспорт PDF выполняться на стороне сервера, например. используя безголовый веб-браузер Chrome, работающий внутри контейнера Docker, или на стороне клиента, используя вместо этого веб-браузер пользователя.
+XWiki.PDFExport.ConfigurationClass_chromeHost=Хост Chrome
+XWiki.PDFExport.ConfigurationClass_chromeHost.hint=Хост, на котором работает безголовый веб-браузер Chrome, указанный либо по имени, либо по IP-адресу.
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=Порт удаленной отладки Chrome
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=Номер порта, используемый для связи с безголовым веб-браузером Chrome.
+XWiki.PDFExport.ConfigurationClass_xwikiURI=XWiki URI
+XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=Основной URI, который браузер Headless Chrome должен использовать для доступа к экземпляру XWiki (например, к странице предварительного просмотра печати). Примеры: localhost, localhost:9293, http://localhost, https://localhost:8080
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage=Докер-образ Chrome
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=Образ Docker, используемый для создания контейнера Docker, работающего безголового веб-браузера Chrome.
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Имя контейнера Chrome Docker
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=Имя контейнера Docker, в котором запущен автономный веб-браузер Chrome. Это особенно полезно при повторном использовании существующего контейнера.
+XWiki.PDFExport.ConfigurationClass_dockerNetwork=Docker Сеть
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=Имя или идентификатор сети Docker, в которую нужно добавить контейнер Chrome Docker. Это полезно, когда сам XWiki работает внутри контейнера Docker, и вы хотите, чтобы контейнер Chrome находился в той же сети, чтобы они могли взаимодействовать.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Тайм-аут готовности страницы
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=Количество секунд ожидания готовности веб-страницы к печати до истечения времени ожидания.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Максимальный размер содержимого
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=Максимальный размер содержимого в килобайтах (КБ), которое может быть включено в один экспорт PDF. Используйте 0, чтобы отключить ограничение.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=Заменить FOP
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Замените старый экспорт PDF на основе Apache Formatting Objects Processor (FOP).
+</content>
+</xwikidoc>

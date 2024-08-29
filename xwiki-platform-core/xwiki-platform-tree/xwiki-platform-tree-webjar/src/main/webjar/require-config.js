@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+// NOTICE: We don't need this file anymore because this RequireJS configuration is now published from javascript.vm
 /*!
 #set ($minified = '.min')
 #if (!$services.debug.minify)
@@ -24,8 +25,7 @@
 #end
 #set ($paths = {
   'jsTree': $services.webjars.url('jstree', "jstree${minified}"),
-  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner${minified}"),
-  'tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}"),
+  'xwiki-tree-finder': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "finder${minified}"),
   'tree': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', "tree${minified}")
 })
 #[[*/
@@ -34,10 +34,7 @@
   "use strict";
 
   require.config({
-    paths,
-    shim: {
-      jsTree: ['jquery']
-    }
+    paths
   });
 
 // End JavaScript-only code.

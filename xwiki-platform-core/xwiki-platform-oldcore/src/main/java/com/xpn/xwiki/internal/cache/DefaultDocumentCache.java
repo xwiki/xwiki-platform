@@ -140,7 +140,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
 
         this.mappingCache = this.cacheManager.createNewCache(mappingCacheConfiguration);
 
-        this.observationManager.addListener(this.listener);
+        this.observationManager.addListener(this.listener, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     // cache

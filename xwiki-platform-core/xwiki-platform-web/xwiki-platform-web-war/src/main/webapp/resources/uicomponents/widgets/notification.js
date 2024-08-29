@@ -163,6 +163,8 @@ widgets.Notification.container = null;
 widgets.Notification.getContainer = function() {
   if (!widgets.Notification.container) {
     widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
+    // Make notifications alert / accessible for screen readers
+    widgets.Notification.container.writeAttribute("role", "alert");
     // Insert the container in the document body.
     $('body').insert(widgets.Notification.container);
   }

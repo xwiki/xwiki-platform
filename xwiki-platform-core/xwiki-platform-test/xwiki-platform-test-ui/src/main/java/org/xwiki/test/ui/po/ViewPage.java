@@ -67,13 +67,6 @@ public class ViewPage extends BasePage
         return new HistoryPane();
     }
 
-    public AttachmentsPane openAttachmentsDocExtraPane()
-    {
-        getDriver().findElement(By.id("Attachmentslink")).click();
-        waitForDocExtraPaneActive("attachments");
-        return new AttachmentsPane();
-    }
-
     public InformationPane openInformationDocExtraPane()
     {
         getDriver().findElement(By.id("Informationlink")).click();
@@ -121,7 +114,7 @@ public class ViewPage extends BasePage
      */
     public WebElement getTranslateButton()
     {
-        return getDriver().findElement(By.cssSelector("#tmTranslate > a[role='button']"));
+        return getDriver().findElement(By.cssSelector("#tmTranslate > a.btn"));
     }
 
     /**
@@ -157,7 +150,8 @@ public class ViewPage extends BasePage
             // Ensure that the template choice popup is displayed. Since this is done using JS we need to wait till
             // it's displayed. For that we wait on the Create button since that would mean the template radio buttons
             // will all have been displayed.
-            getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='modal-popup']//input[@type='submit']"));
+            getDriver().waitUntilElementIsVisible(
+                By.xpath("//div[@class='modal-dialog']//form[@id='create']//button[@type='submit']"));
         }
     }
 
@@ -213,7 +207,7 @@ public class ViewPage extends BasePage
     /**
      * Waits until the page has the passed content by refreshing the page
      * 
-     * @param expectedValue the content value to wait for (in regex format)
+     * @param expectedValue the content value to wait for (in regex format), can be a subset of the full content
      * @since 4.0M1
      */
     public void waitUntilContent(final String expectedValue)
@@ -228,10 +222,10 @@ public class ViewPage extends BasePage
                 public Boolean apply(WebDriver driver)
                 {
                     // Note: don't refresh the page here since that would fail use cases (imagine some async process
-                    // executing, the refresh will just start over that async process!). In addition users don't need
+                    // executing, the refresh will just start over that async process!). In addition, users don't need
                     // to click refresh so the tests shouldn't do that either.
                     lastContent[0] = getContent();
-                    return Boolean.valueOf(pattern.matcher(lastContent[0]).matches());
+                    return Boolean.valueOf(pattern.matcher(lastContent[0]).find());
                 }
             });
         } catch (TimeoutException e) {
@@ -264,16 +258,10 @@ public class ViewPage extends BasePage
         getDriver().scrollTo(0, 0);
     }
 
-    private void useShortcutForDocExtraPane(String shortcut, String pane)
+    protected void useShortcutForDocExtraPane(String shortcut, String pane)
     {
         getDriver().createActions().sendKeys(shortcut).perform();
         waitForDocExtraPaneActive(pane);
-    }
-
-    public AttachmentsPane useShortcutKeyForAttachmentPane()
-    {
-        useShortcutForDocExtraPane("a", "attachments");
-        return new AttachmentsPane();
     }
 
     public HistoryPane useShortcutKeyForHistoryPane()
@@ -312,5 +300,14 @@ public class ViewPage extends BasePage
     private String getElementCSSValue(By locator, String attribute)
     {
         return getDriver().findElement(locator).getCssValue(attribute);
+    }
+
+    /**
+     * @return the last modified text displayed under the title in a wiki page
+     * @since 15.1RC1
+     */
+    public String getLastModifiedText()
+    {
+        return getDriver().findElement(By.className("xdocLastModification")).getText();
     }
 }

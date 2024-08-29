@@ -66,8 +66,8 @@
 #####################
 #macro(view)
   ## Call getDefaultEditMode() for backward compatibility with existing skins.
-  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
-  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;${services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))}||queryString="skin=${doc.fullName}"]]
+  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${services.rendering.escape($doc.getURL($doc.getDefaultEditMode()), 'xwiki/2.1')}]]
+  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;${services.rendering.escape($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')), 'xwiki/2.1')}||queryString="${services.rendering.escape($escapetool.url({"skin": $doc.fullName}), 'xwiki/2.1')}"]]
 #end
 #####################
 ##      EDIT
@@ -80,8 +80,10 @@
   #set ($class = $doc.getObject($className).xWikiClass)
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; $prop.prettyName
-    : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif,svg" displayImage="true"/}}#else $doc.display($prop.name)#end
+    ; {{html}}&lt;label for="${className}_$escapetool.xml($doc.getObject($className).getNumber())_$escapetool.xml($prop.name)"&gt;$escapetool.xml($prop.prettyName)&lt;/label&gt;{{/html}}
+    : #if($prop.name == 'logo')## Avoid line break
+      {{attachmentSelector classname="${className}" property="${services.rendering.escape($prop.name, 'xwiki/2.1')}" filter="png,jpg,gif,svg" displayImage="true"/}}## Avoid line break
+    #else$doc.display($prop.name)#end
     
     #else
       #set($discard = $deprecatedProperties.add($prop))
@@ -98,16 +100,16 @@
     {{html}}
     &lt;noscript&gt;
       &lt;div class="box errormessage"&gt;
-        $services.localization.render('skin.sheet.nojs', ["&lt;a href='$doc.getURL('edit', 'editor=object')'&gt;", '&lt;/a&gt;', 'XWiki.XWikiSkinFileOverrideClass'])
+        $escapetool.xml($services.localization.render('skin.sheet.nojs', ['LINK_START', 'LINK_END', 'XWiki.XWikiSkinFileOverrideClass'])).replace('LINK_START', "&lt;a href='$escapetool.xml($doc.getURL('edit', 'editor=object'))'&gt;").replace('LINK_END', '&lt;/a&gt;')
       &lt;/div&gt;
     &lt;/noscript&gt;
     {{/html}}
     
     {{html}}
     &lt;div id="addOverride"&gt;
-      &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $services.localization.render("skin.sheet.addTemplate")&lt;/label&gt;
+      &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $escapetool.xml($services.localization.render("skin.sheet.addTemplate"))&lt;/label&gt;
       &lt;input placeholder="file.vm" id="newPath" name="newPath" value="file.vm" size="20" class="withTip" type="text" /&gt;
-      &lt;button class="btn btn-primary" id="newPathAdd"&gt;$services.localization.render("skin.sheet.add")&lt;/button&gt;
+      &lt;button class="btn btn-primary" id="newPathAdd"&gt;$escapetool.xml($services.localization.render("skin.sheet.add"))&lt;/button&gt;
     &lt;/div&gt;
     {{/html}}
     ## Display the XWiki.XWikiSkinFileOverrideClass objects
@@ -127,7 +129,7 @@
       
       #foreach ($prop in $deprecatedProperties)
         #if ($prop.classType == 'TextArea')
-        ; $services.icon.render('file-white') $prop.prettyName
+        ; $services.icon.render('file-white') $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
         : $doc.display($prop.name)
         
         #end
@@ -152,7 +154,7 @@
       #set ($className = 'XWiki.XWikiSkinFileOverrideClass')
       #set ($class = $doc.getObject($className).xWikiClass)
       #foreach ($prop in $class.properties)
-        ; $prop.prettyName
+        ; $services.rendering.escape($prop.prettyName, 'xwiki/2.1')
         : $obj.display($prop.name, 'edit')
     
       #end
@@ -308,35 +310,38 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         'type'     : 'POST',
         'dataType' : 'json',
         'data' : {
-          'action'      : 'deleteObj'            ,
+          'action'      : 'deleteObj',
           'objNumber'   : objNumber ,
-          'form_token'  : xm.form_token       ,
+          'form_token'  : xm.form_token,
           'outputSyntax': 'plain'
         }
-      }).done(function(data){
-        if (data.status == 'success') {
+      }).then(data =&gt; {
+        if (data.status === 'success') {
           obj.fadeOut();
           xm.refreshVersion();
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
-        } else if (data.status == 'fail') {
-          if (data.cause == 'form_token') {
-            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
-          } else if (data.cause == 'rights') {
-            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
+        } else if (data.status === 'fail') {
+          if (data.cause === 'form_token') {
+            notif.replace(new XWiki.widgets.Notification(
+              '$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+          } else if (data.cause === 'rights') {
+            notif.replace(new XWiki.widgets.Notification(
+              '$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
           }
         }
       });
     }
-    
+
     var confirmationBoxParams = {
       confirmationText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationText'))',
       yesButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationYes'))',
       noButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationNo'))'
     };
-    
+
     // Display a confirmation box
     new XWiki.widgets.ConfirmationBox({onYes: deleteObjOnConfirm}, confirmationBoxParams);
-    
+
     // Do not perform the default action bound to the &lt;button&gt; element
     return false;
   }
@@ -360,7 +365,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       properties.slideToggle();
     }
   }
-  
+
   /**
    * Function that performs an ajax request to get the code that displays an object and inject it in the page.
    */
@@ -372,15 +377,16 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         'action'    : 'displayObj',
         'objNumber' : objNumber
       }
-    }).done(function(data) {
-      notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.addingDone'))', 'done'));
+    }).then(data =&gt; {
+      notif.replace(new XWiki.widgets.Notification(
+        '$escapetool.javascript($services.localization.render('skin.sheet.js.addingDone'))', 'done'));
       // Add the html code into the document
       $('#overrideSection').append(data);
       // Get the new object
       var newObj = $('.overrideObject').last();
       // Bind the events of the new objects
-      newObj.find('.overrideTitle').click(objTitleClicked);
-      newObj.find('button').click(onDeleteObj);
+      newObj.find('.overrideTitle').on('click', objTitleClicked);
+      newObj.find('button').on('click', onDeleteObj);
       // Show the new object
       // First we remove our own 'hidden' class
       newObj.find('.overrideProperties').removeClass('hidden');
@@ -396,49 +402,52 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
   /**
    * Function called when the user add a new override object
    */
-  $('#newPathAdd').click(function() {
+  $('#newPathAdd').on('click', function() {
     $.ajax({
       'url'      : XWiki.currentDocument.getURL('get'),
       'type'     : 'POST',
       'dataType' : 'json',
       'data' : {
-        'action'      : 'newObj'            ,
-        'path'        : $('#newPath').val() ,
-        'form_token'  : xm.form_token       ,
+        'action'      : 'newObj',
+        'path'        : $('#newPath').val(),
+        'form_token'  : xm.form_token,
         'outputSyntax': 'plain'
       }
-    }).done(function(data) {
-      notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
-      if (data.status == 'success') {
+    }).then(data =&gt; {
+      notif = new XWiki.widgets.Notification(
+        '$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
+      if (data.status === 'success') {
         xm.refreshVersion();
         displayObj(data.objNumber);
-      } else if (data.status == 'fail') {
-        if (data.cause == 'form_token') {
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
-        } else if (data.cause == 'rights') {
-          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+      } else if (data.status === 'fail') {
+        if (data.cause === 'form_token') {
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+        } else if (data.cause === 'rights') {
+          notif.replace(new XWiki.widgets.Notification(
+            '$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
         }
       }
     });
-    
+
     // Do not perform the default action bound to the &lt;button&gt; element
     return false;
   });
-  
+
   var onDeprecatedPropertyClicked = function() {
     $('.deprecatedProperties &gt; dl').slideToggle();
   }
-  
+
   /**
    * Function that initialize the javascript events
    */
   var init = function() {
     // Bind objTitleClicked to the existing objects
-    $('.overrideTitle').click(objTitleClicked);
+    $('.overrideTitle').on('click', objTitleClicked);
     // Bind onDeleteObj to the existing objects
-    $('.overrideObject button').click(onDeleteObj);
+    $('.overrideObject button').on('click', onDeleteObj);
     $('.deprecatedProperties &gt; dl').hide();
-    $('.deprecatedProperties &gt; h2').click(onDeprecatedPropertyClicked);
+    $('.deprecatedProperties &gt; h2').on('click', onDeprecatedPropertyClicked);
   }
   
   init();

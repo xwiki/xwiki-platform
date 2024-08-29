@@ -51,6 +51,7 @@ $xwiki.ssx.use('Main.Tags')##
 ##
 #set ($do = "$!{request.get('do')}")
 #set ($tag = "$!{request.get('tag')}")
+#set ($wikiEscapedTag = $services.rendering.escape($tag, 'xwiki/2.1'))
 #set ($urlEscapedTag = $escapetool.url($tag))
 #set ($htmlEscapedTag = $escapetool.xml($tag))
 ##
@@ -58,7 +59,7 @@ $xwiki.ssx.use('Main.Tags')##
 ##
 #macro (displayTagAppTitle $urlEscapedTag $htmlEscapedTag $displayButtons)
   (% class="xapp" %)
-  = (% class="highlight tag" %)${tag}##
+  = (% class="highlight tag" %)${wikiEscapedTag}##
       #if ($xwiki.hasAdminRights() &amp;&amp; $displayButtons) ##
         [[$services.localization.render('xe.tag.rename.link')&gt;&gt;||queryString="do=prepareRename&amp;tag=${urlEscapedTag}" class="button rename" rel="nofollow"]] [[$services.localization.render('xe.tag.delete.link')&gt;&gt;||queryString="do=prepareDelete&amp;tag=${urlEscapedTag}" class="button delete" rel="nofollow"]]##
       #end
@@ -74,25 +75,25 @@ $xwiki.ssx.use('Main.Tags')##
   ##
   #displayTagAppTitle($urlEscapedTag $htmlEscapedTag true)
   #if ("$!{request.get('renamedTag')}" != '')
-    {{info}}$services.localization.render('xe.tag.rename.success', ["//${request.get('renamedTag')}//"]){{/info}}
+    {{info}}$services.localization.render('xe.tag.rename.success', ["//${services.rendering.escape(${request.get('renamedTag')}, 'xwiki/2.1')}//"]){{/info}}
 
   #end
   #set ($list = $xwiki.tag.getDocumentsWithTag($tag))
   {{container layoutStyle="columns"}}
     (((
       (% class="xapp" %)
-      === $services.localization.render('xe.tag.alldocs', ["//${tag}//"]) ===
+      === $services.localization.render('xe.tag.alldocs', ["//${wikiEscapedTag}//"]) ===
 
       #if ($list.size()&gt; 0)
-        {{html}}#displayDocumentList($list false $blacklistedSpaces){{/html}}
+        {{html}}#displayDocumentList($list false $NULL){{/html}}
       #else
         (% class='noitems' %)$services.localization.render('xe.tag.notags')
       #end
     )))
     (((
       (% class="xapp" %)
-      === $services.localization.render('xe.tag.activity', ["//${tag}//"]) ===
-      {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$tag" displayRSSLink="true" /}}
+      === $services.localization.render('xe.tag.activity', ["//${wikiEscapedTag}//"]) ===
+      {{notifications useUserPreferences="false" displayOwnEvents="true" tags="$wikiEscapedTag" displayRSSLink="true" /}}
     )))
   {{/container}}
 #elseif ($do == 'prepareRename')
@@ -111,19 +112,23 @@ $xwiki.ssx.use('Main.Tags')##
   &lt;/form&gt;
 {{/html}}
 #elseif ($do == 'renameTag')
-  ##
-  ## Rename tag
-  ##
-  #set ($renameTo = "$!{request.get('renameTo')}")
-  #set ($success = false)
-  #if ($renameTo != '')
-    #set ($success = $xwiki.tag.renameTag($tag, $renameTo))
-  #end
-  #if ($success == true || $success == 'OK')
-   #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
-   $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
+  #if (!$services.csrf.isTokenValid($request.get('form_token')))
+    #set ($discard = $response.sendError(401, "Wrong CSRF token"))
   #else
-    {{error}}$services.localization.render('xe.tag.rename.failure', ["//${tag}//", "//${renameTo}//"]){{/error}}
+    ##
+    ## Rename tag
+    ##
+    #set ($renameTo = "$!{request.get('renameTo')}")
+    #set ($success = false)
+    #if ($renameTo != '')
+      #set ($success = $xwiki.tag.renameTag($tag, $renameTo))
+    #end
+    #if ($success == true || $success == 'OK')
+     #set ($urlEscapedRenameTo = $escapetool.url($renameTo))
+     $response.sendRedirect($doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedRenameTo}&amp;renamedTag=${urlEscapedTag}"))
+    #else
+      {{error}}$services.localization.render('xe.tag.rename.failure', ["//${wikiEscapedTag}//", "//${services.rendering.escape($renameTo, 'xwiki/2.1')}//"]){{/error}}
+    #end
   #end
 #elseif ($do == 'prepareDelete')
   ##
@@ -141,14 +146,18 @@ $xwiki.ssx.use('Main.Tags')##
   &lt;/form&gt;
 {{/html}}
 #elseif ($do == 'deleteTag')
-  ##
-  ## Delete tag
-  ##
-  #set ($success = $xwiki.tag.deleteTag($tag))
-  #if ($success == true || $success == 'OK')
-    $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
+  #if (!$services.csrf.isTokenValid($request.get('form_token')))
+    #set ($discard = $response.sendError(401, "Wrong CSRF token"))
   #else
-    {{error}}$services.localization.render('xe.tag.delete.failure', ["//${tag}//"]){{/error}}
+    ##
+    ## Delete tag
+    ##
+    #set ($success = $xwiki.tag.deleteTag($tag))
+    #if ($success == true || $success == 'OK')
+      $response.sendRedirect($doc.getURL('view', "deletedTag=${urlEscapedTag}"))
+    #else
+      {{error}}$services.localization.render('xe.tag.delete.failure', ["//${wikiEscapedTag}//"]){{/error}}
+    #end
   #end
 #else
   ##
@@ -156,7 +165,7 @@ $xwiki.ssx.use('Main.Tags')##
   ##
   #set ($title = 'All Tags')
   #if ("$!{request.get('deletedTag')}" != '')
-    {{info}}$services.localization.render('xe.tag.delete.success', ["//${request.get('deletedTag')}//"]){{/info}}
+    {{info}}$services.localization.render('xe.tag.delete.success', ["//${services.rendering.escape($request.get('deletedTag'), 'xwiki/2.1')}//"]){{/info}}
 
   #end
   {{tagcloud/}}

@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
@@ -69,73 +70,145 @@ public class DefaultTemplateManager implements TemplateManager
     @Override
     public String renderNoException(String templateName)
     {
-        return this.templateManager.renderNoException(templateName);
+        return renderNoException(templateName, false);
+    }
+
+    @Override
+    public String renderNoException(String templateName, boolean inline)
+    {
+        return this.templateManager.renderNoException(templateName, inline);
     }
 
     @Override
     public String render(String templateName) throws Exception
     {
-        return this.templateManager.render(templateName);
+        return render(templateName, false);
+    }
+
+    @Override
+    public String render(String templateName, boolean inline) throws Exception
+    {
+        return this.templateManager.render(templateName, inline);
     }
 
     @Override
     public String renderFromSkin(String templateName, Skin skin) throws Exception
     {
-        return this.templateManager.renderFromSkin(templateName, skin);
+        return renderFromSkin(templateName, skin, false);
+    }
+
+    @Override
+    public String renderFromSkin(String templateName, Skin skin, boolean inline) throws Exception
+    {
+        return this.templateManager.renderFromSkin(templateName, skin, inline);
     }
 
     @Override
     public void renderNoException(Template template, Writer writer)
     {
-        this.templateManager.renderNoException(template, writer);
+        renderNoException(template, false, writer);
+    }
+
+    @Override
+    public void renderNoException(Template template, boolean inline, Writer writer)
+    {
+        this.templateManager.renderNoException(template, inline, writer);
     }
 
     @Override
     public void renderNoException(String templateName, Writer writer)
     {
-        this.templateManager.renderNoException(templateName, writer);
+        this.templateManager.renderNoException(templateName, false, writer);
+    }
+
+    @Override
+    public void renderNoException(String templateName, boolean inline, Writer writer)
+    {
+        this.templateManager.renderNoException(templateName, inline, writer);
     }
 
     @Override
     public void render(Template template, Writer writer) throws Exception
     {
-        this.templateManager.render(template, writer);
+        render(template, false, writer);
     }
 
     @Override
-    public void render(String template, Writer writer) throws Exception
+    public void render(Template template, boolean inline, Writer writer) throws Exception
     {
-        this.templateManager.render(template, writer);
+        this.templateManager.render(template, inline, writer);
+    }
+
+    @Override
+    public void render(String templateName, Writer writer) throws Exception
+    {
+        render(templateName, false, writer);
+    }
+
+    @Override
+    public void render(String templateName, boolean inline, Writer writer) throws Exception
+    {
+        this.templateManager.render(templateName, inline, writer);
     }
 
     @Override
     public void renderFromSkin(String templateName, Skin skin, Writer writer) throws Exception
     {
-        this.templateManager.renderFromSkin(templateName, skin, writer);
+        renderFromSkin(templateName, skin, false, writer);
+    }
+
+    @Override
+    public void renderFromSkin(String templateName, Skin skin, boolean inline, Writer writer) throws Exception
+    {
+        this.templateManager.renderFromSkin(templateName, skin, inline, writer);
     }
 
     @Override
     public XDOM executeNoException(Template template)
     {
-        return this.templateManager.executeNoException(template);
+        return (XDOM) executeNoException(template, false);
+    }
+
+    @Override
+    public Block executeNoException(Template template, boolean inline)
+    {
+        return this.templateManager.executeNoException(template, inline);
     }
 
     @Override
     public XDOM executeNoException(String templateName)
     {
-        return this.templateManager.executeNoException(templateName);
+        return (XDOM) executeNoException(templateName, false);
+    }
+
+    @Override
+    public Block executeNoException(String templateName, boolean inline)
+    {
+        return this.templateManager.executeNoException(templateName, inline);
     }
 
     @Override
     public XDOM execute(Template template) throws Exception
     {
-        return this.templateManager.execute(template);
+        return (XDOM) execute(template, false);
+    }
+
+    @Override
+    public Block execute(Template template, boolean inline) throws Exception
+    {
+        return this.templateManager.execute(template, inline);
     }
 
     @Override
     public XDOM execute(String templateName) throws Exception
     {
-        return this.templateManager.execute(templateName);
+        return (XDOM) execute(templateName, false);
+    }
+
+    @Override
+    public Block execute(String templateName, boolean inline) throws Exception
+    {
+        return this.templateManager.execute(templateName, inline);
     }
 
     @Override
@@ -157,8 +230,24 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
+    @Deprecated
     public Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
-        return this.templateManager.createStringTemplate(content, author);
+        return createStringTemplate(content, author, null);
+    }
+
+    @Override
+    @Deprecated(since = "15.9RC1")
+    public Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+        throws Exception
+    {
+        return createStringTemplate("Unknown template", content, author, sourceReference);
+    }
+
+    @Override
+    public Template createStringTemplate(String id, String content, DocumentReference author,
+        DocumentReference sourceReference) throws Exception
+    {
+        return this.templateManager.createStringTemplate(id, content, author, sourceReference);
     }
 }

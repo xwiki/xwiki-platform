@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -48,7 +49,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.restlet.data.MediaType;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.embed.EmbeddableComponentManager;
@@ -205,7 +205,7 @@ public abstract class AbstractHttpIT
         HttpClient httpClient = new HttpClient();
 
         GetMethod getMethod = new GetMethod(uri);
-        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
         httpClient.executeMethod(getMethod);
 
         return getMethod;
@@ -218,7 +218,7 @@ public abstract class AbstractHttpIT
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         GetMethod getMethod = new GetMethod(uri);
-        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
         httpClient.executeMethod(getMethod);
 
         return getMethod;
@@ -229,13 +229,13 @@ public abstract class AbstractHttpIT
         HttpClient httpClient = new HttpClient();
 
         PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         postMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(postMethod);
@@ -250,13 +250,13 @@ public abstract class AbstractHttpIT
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         postMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(postMethod);
@@ -271,7 +271,7 @@ public abstract class AbstractHttpIT
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         RequestEntity entity = new InputStreamRequestEntity(is);
         postMethod.setRequestEntity(entity);
@@ -281,15 +281,31 @@ public abstract class AbstractHttpIT
         return postMethod;
     }
 
+    protected String getFormToken(String userName, String password) throws Exception
+    {
+        GetMethod getMethod = executeGet(getFullUri(WikisResource.class), userName, password);
+        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        return getMethod.getResponseHeader("XWiki-Form-Token").getValue();
+    }
+
     protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password)
         throws Exception
+    {
+        return executePost(uri, string, mediaType, userName, password, getFormToken(userName, password));
+    }
+
+    protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password,
+        String formToken) throws Exception
     {
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
+        if (formToken != null) {
+            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+        }
 
         RequestEntity entity = new StringRequestEntity(string, mediaType, "UTF-8");
         postMethod.setRequestEntity(entity);
@@ -302,13 +318,22 @@ public abstract class AbstractHttpIT
     protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password)
         throws Exception
     {
+        return executePostForm(uri, nameValuePairs, userName, password, getFormToken(userName, password));
+    }
+
+    protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password,
+        String formToken) throws Exception
+    {
         HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
-        postMethod.addRequestHeader("Content-type", MediaType.APPLICATION_WWW_FORM.toString());
+        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
+        postMethod.addRequestHeader("Content-type", MediaType.APPLICATION_FORM_URLENCODED);
+        if (formToken != null) {
+            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+        }
 
         postMethod.setRequestBody(nameValuePairs);
 
@@ -322,13 +347,13 @@ public abstract class AbstractHttpIT
         HttpClient httpClient = new HttpClient();
 
         PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         putMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(putMethod);
@@ -343,13 +368,13 @@ public abstract class AbstractHttpIT
         httpClient.getParams().setAuthenticationPreemptive(true);
 
         PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML.toString());
+        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
 
         StringWriter writer = new StringWriter();
         marshaller.marshal(object, writer);
 
         RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML.toString(), "UTF-8");
+            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
         putMethod.setRequestEntity(entity);
 
         httpClient.executeMethod(putMethod);
@@ -502,9 +527,22 @@ public abstract class AbstractHttpIT
         return sb.toString();
     }
 
+    protected List<String> toRestSpaces(List<String> spaces)
+    {
+        List<String> restSpaces = new ArrayList<>(spaces.size());
+        spaces.forEach(s -> {
+            if (!restSpaces.isEmpty()) {
+                restSpaces.add("spaces");
+            }
+            restSpaces.add(s);
+        });
+
+        return restSpaces;
+    }
+    
     protected void createPage(List<String> spaces, String pageName, String content) throws Exception
     {
-        String uri = buildURI(PageResource.class, getWiki(), spaces, pageName);
+        String uri = buildURI(PageResource.class, getWiki(), toRestSpaces(spaces), pageName);
 
         Page page = this.objectFactory.createPage();
         page.setContent(content);
@@ -516,7 +554,7 @@ public abstract class AbstractHttpIT
 
     protected boolean createPageIfDoesntExist(List<String> spaces, String pageName, String content) throws Exception
     {
-        String uri = buildURI(PageResource.class, getWiki(), spaces, pageName);
+        String uri = buildURI(PageResource.class, getWiki(), toRestSpaces(spaces), pageName);
 
         GetMethod getMethod = executeGet(uri);
 

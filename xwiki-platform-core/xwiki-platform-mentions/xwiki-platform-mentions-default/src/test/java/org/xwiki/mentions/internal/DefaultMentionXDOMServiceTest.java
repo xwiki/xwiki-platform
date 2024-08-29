@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -73,7 +74,7 @@ class DefaultMentionXDOMServiceTest
     private DefaultMentionXDOMService xdomService;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(WARN);
 
     @MockComponent
     @Named("context")
@@ -182,7 +183,7 @@ class DefaultMentionXDOMServiceTest
     }
 
     @Test
-    void parseError() throws Exception
+    void parseParseException() throws Exception
     {
         Parser parser = mock(Parser.class);
         when(this.componentManager.getInstance(Parser.class, XWIKI_2_1.toIdString())).thenReturn(
@@ -194,6 +195,22 @@ class DefaultMentionXDOMServiceTest
         assertEquals(1, this.logCapture.size());
         assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
         assertEquals("Failed to parse the payload [ABC]. Cause [ParseException: ].", this.logCapture.getMessage(0));
+
+        assertEquals(Optional.empty(), actual);
+    }
+
+    @Test
+    void parseComponentLookupException() throws Exception
+    {
+        when(this.componentManager.getInstance(Parser.class, XWIKI_2_1.toIdString()))
+            .thenThrow(new ComponentLookupException(""));
+
+        Optional<XDOM> actual = this.xdomService.parse("ABC", XWIKI_2_1);
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
+        assertEquals("Failed to get the parser instance [XWiki 2.1]. Cause [ComponentLookupException: ].",
+            this.logCapture.getMessage(0));
 
         assertEquals(Optional.empty(), actual);
     }

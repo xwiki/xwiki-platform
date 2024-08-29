@@ -56,7 +56,6 @@ public interface NotificationFilterPreferenceManager
      * @throws NotificationException if an error occurs
      * @since 13.3RC1
      */
-    @Unstable
     default Collection<NotificationFilterPreference> getFilterPreferences(WikiReference wikiReference)
         throws NotificationException
     {
@@ -96,8 +95,7 @@ public interface NotificationFilterPreferenceManager
             NotificationFilterType filterType, NotificationFormat format);
 
     /**
-     * Save the given set of {@link NotificationFilterPreference} against their respective
-     * {@link NotificationFilterPreferenceProvider}.
+     * Save the given set of {@link NotificationFilterPreference}.
      *
      * @param user the user to use
      * @param notificationFilterPreferences a set of {@link NotificationFilterPreference} to save
@@ -106,7 +104,8 @@ public interface NotificationFilterPreferenceManager
      * @since 10.8.3
      * @since 9.11.9
      */
-    void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> notificationFilterPreferences);
+    void saveFilterPreferences(DocumentReference user, Set<NotificationFilterPreference> notificationFilterPreferences)
+        throws NotificationException;
 
     /**
      * Delete a filter preference.
@@ -121,6 +120,22 @@ public interface NotificationFilterPreferenceManager
     void deleteFilterPreference(DocumentReference user, String filterPreferenceId) throws NotificationException;
 
     /**
+     * Delete a set of filter preferences.
+     * @param user the user to use
+     * @param filterPreferenceIds ids of the filter preferences
+     * @throws NotificationException if an error happens
+     *
+     * @since 15.10.2
+     * @since 16.0.0RC1
+     */
+    @Unstable
+    default void deleteFilterPreferences(DocumentReference user, Set<String> filterPreferenceIds)
+        throws NotificationException
+    {
+        // Do nothing
+    }
+
+    /**
      * Delete a filter preference.
      * @param wikiReference the wiki reference to use
      * @param filterPreferenceId id of the filter preference
@@ -128,7 +143,6 @@ public interface NotificationFilterPreferenceManager
      *
      * @since 13.3RC1
      */
-    @Unstable
     default void deleteFilterPreference(WikiReference wikiReference, String filterPreferenceId)
         throws NotificationException
     {
@@ -158,7 +172,6 @@ public interface NotificationFilterPreferenceManager
      *
      * @since 13.3RC1
      */
-    @Unstable
     default void setFilterPreferenceEnabled(WikiReference wikiReference, String filterPreferenceId, boolean enabled)
         throws NotificationException
     {

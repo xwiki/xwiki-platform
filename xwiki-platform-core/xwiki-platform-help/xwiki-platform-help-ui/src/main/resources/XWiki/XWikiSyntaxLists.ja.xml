@@ -1,0 +1,403 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxLists</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxLists</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 編集 =
+
+== リスト ==
+
+=== リスト 1.0 ===
+
+{{info}}いくつかのスタイルは全てのブラウザーでは機能しません。 包括的なリストは[[このリンク&gt;&gt;http://www.quirksmode.org/css/lists.html]]から確認できます。{{/info}}
+
+|=機能|=XWikiシンタックス 1.0|=結果
+|箇条書きリスト|((({{{
+* 項目1
+** 項目2
+*** 項目3
+* 項目4
+}}})))|(((
+* 項目1
+** 項目2
+*** 項目3
+* 項目4
+)))
+|番号付きリスト|((({{{
+1. 項目1
+11. 項目2
+111. 項目3
+1. 項目4
+}}})))|(((
+1. 項目1
+11. 項目2
+111. 項目3
+1. 項目4
+)))
+|混合リスト|((({{{
+1. 項目1
+1*. 項目2
+1*. 項目3
+1. 項目4
+}}})))|(((
+1. 項目1
+1*. 項目2
+1*. 項目3
+1. 項目4
+)))
+|四角リスト|((({{{
+- 項目1
+- 項目2
+}}})))|(((
+(% style="list-style-type: square" %)
+* 項目1
+* 項目2
+)))
+|丸リスト|(((
+&lt;ul style="list-style-type: disc"&gt;
+  &lt;li&gt;項目1&lt;/li&gt;
+  &lt;li&gt;項目2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: disc" %)
+* 項目1
+* 項目2
+)))
+|小文字アルファベットリスト|((({{{
+a. 項目1
+a. 項目2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* 項目1
+* 項目2
+)))
+|大文字アルファベットリスト|((({{{
+A. 項目1
+A. 項目2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* 項目1
+* 項目2
+)))
+|小文字ローマ字リスト|((({{{
+i. 項目1
+i. 項目2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* 項目1
+* 項目2
+)))
+|大文字ローマ字リスト|((({{{
+I. 項目1
+I. 項目2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* 項目1
+* 項目2
+)))
+|小文字ギリシア文字リスト|((({{{
+g. 項目1
+g. 項目2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* 項目1
+* 項目2
+)))
+|大文字ギリシア文字リスト|((({{{
+G. 項目1
+G. 項目2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* 項目1
+* 項目2
+)))
+|平仮名リスト|((({{{
+h. 項目1
+h. 項目2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* 項目1
+* 項目2
+)))
+|平仮名（いろは）リスト|((({{{
+H. 項目1
+H. 項目2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* 項目1
+* 項目2
+)))
+|片仮名リスト|((({{{
+k. 項目1
+k. 項目2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* 項目1
+* 項目2
+)))
+|片仮名（イロハ）リスト|((({{{
+K. 項目1
+K. 項目2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* 項目1
+* 項目2
+)))
+|アルメニア語リスト|((({{{
+&lt;ul style="list-style-type: armenian"&gt;
+  &lt;li&gt;項目1&lt;/li&gt;
+  &lt;li&gt;項目2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* 項目1
+* 項目2
+)))
+|ヘブライ語リスト|((({{{
+j. 項目1
+j. 項目2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* 項目1
+* 項目2
+)))
+|ジョージア語リスト|((({{{
+&lt;ul style="list-style-type: georgian"&gt;
+  &lt;li&gt;項目1&lt;/li&gt;
+  &lt;li&gt;項目2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* 項目1
+* 項目2
+)))
+|CJK（中国語・日本語・韓国語）表意文字リスト|((({{{
+&lt;ul style="list-style-type: cjk-ideographic"&gt;
+  &lt;li&gt;項目1&lt;/li&gt;
+  &lt;li&gt;項目2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* 項目1
+* 項目2
+)))
+
+=== リスト 2.0 ===
+
+{{info}}いくつかのスタイルは全てのブラウザーでは機能しません。 包括的なリストは[[このリンク&gt;&gt;http://www.quirksmode.org/css/lists.html]]から確認できます。{{/info}}
+
+|=機能|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
+|箇条書きリスト|((({{{
+* 項目1
+** 項目2
+*** 項目3
+* 項目4
+}}})))|(((
+* 項目1
+** 項目2
+*** 項目3
+* 項目4
+)))
+|番号付きリスト|((({{{
+1. 項目1
+11. 項目2
+111. 項目3
+1. 項目4
+}}})))|(((
+1. 項目1
+11. 項目2
+111. 項目3
+1. 項目4
+)))
+|混合リスト|((({{{
+1. 項目1
+1*. 項目2
+1*. 項目3
+1. 項目4
+}}})))|(((
+1. 項目1
+1*. 項目2
+1*. 項目3
+1. 項目4
+)))
+|四角リスト|((({{{
+(% style="list-style-type: square" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: square" %)
+* 項目1
+* 項目2
+)))
+|丸リスト|((({{{
+(% style="list-style-type: disc" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* 項目1
+* 項目2
+)))
+|小文字アルファベットリスト|((({{{
+(% style="list-style-type: lower-alpha" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* 項目1
+* 項目2
+)))
+|大文字アルファベットリスト|((({{{
+(% style="list-style-type: upper-alpha" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* 項目1
+* 項目2
+)))
+|小文字ローマ字リスト|((({{{
+(% style="list-style-type: lower-roman" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* 項目1
+* 項目2
+)))
+|大文字ローマ字リスト|((({{{
+(% style="list-style-type: upper-roman" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* 項目1
+* 項目2
+)))
+|小文字ギリシア文字リスト|((({{{
+(% style="list-style-type: lower-greek" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* 項目1
+* 項目2
+)))
+|大文字ギリシア文字リスト|((({{{
+(% style="list-style-type: upper-greek" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* 項目1
+* 項目2
+)))
+|平仮名リスト|((({{{
+(% style="list-style-type: hiragana" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* 項目1
+* 項目2
+)))
+|平仮名（いろは）リスト|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* 項目1
+* 項目2
+)))
+|片仮名リスト|((({{{
+(% style="list-style-type: katakana" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* 項目1
+* 項目2
+)))
+|片仮名（イロハ）リスト|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* 項目1
+* 項目2
+)))
+|アルメニア語リスト|((({{{
+(% style="list-style-type: armenian" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* 項目1
+* 項目2
+)))
+|ヘブライ語リスト|((({{{
+(% style="list-style-type: hebrew" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* 項目1
+* 項目2
+)))
+|ジョージア語リスト|((({{{
+(% style="list-style-type: georgian" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* 項目1
+* 項目2
+)))
+|CJK（中国語・日本語・韓国語）表意文字リスト|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* 項目1
+* 項目2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* 項目1
+* 項目2
+)))</content>
+</xwikidoc>

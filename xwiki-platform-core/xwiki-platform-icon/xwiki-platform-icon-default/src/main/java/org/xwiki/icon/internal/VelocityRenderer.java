@@ -20,18 +20,25 @@
 package org.xwiki.icon.internal;
 
 import java.io.StringWriter;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.IconException;
 import org.xwiki.logging.LoggerConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Internal helper to render safely any velocity code.
@@ -43,19 +50,35 @@ import org.xwiki.velocity.XWikiVelocityException;
 @Singleton
 public class VelocityRenderer
 {
+    private static final String NAMESPACE = "DefaultIconRenderer";
+
     @Inject
     private VelocityManager velocityManager;
 
     @Inject
     private LoggerConfiguration loggerConfiguration;
 
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
+
+    @Inject
+    private DocumentContextExecutor documentContextExecutor;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
+
     /**
      * Render a velocity code without messing with the document context and namespace.
      * @param code code to render
+     * @param contextDocumentReference the reference of the context document
      * @return the rendered code
      * @throws IconException if problem occurs
      */
-    public String render(String code) throws IconException
+    public String render(String code, DocumentReference contextDocumentReference) throws IconException
     {
         // The macro namespace to use by the velocity engine, see afterwards.
         String namespace = "IconVelocityRenderer_" + Thread.currentThread().getId();
@@ -64,35 +87,64 @@ public class VelocityRenderer
         StringWriter output = new StringWriter();
 
         VelocityEngine engine = null;
+
+        boolean result;
+
         try {
             // Get the velocity engine
-            engine = velocityManager.getVelocityEngine();
+            engine = this.velocityManager.getVelocityEngine();
 
             // Use a new macro namespace to prevent the code redefining existing macro.
             // We use the thread name to have a unique id.
             engine.startedUsingMacroNamespace(namespace);
 
+            DocumentReference authorReference;
+            DocumentModelBridge sourceDocument;
+
+            // Execute the Velocity code in an isolated execution context with the rights of its author when the icon
+            // theme is from a document.
+            if (contextDocumentReference != null) {
+                sourceDocument =
+                    this.documentAccessBridge.getDocumentInstance(contextDocumentReference);
+                authorReference = this.documentUserSerializer.serialize(sourceDocument.getAuthors().getContentAuthor());
+            } else {
+                authorReference = null;
+                sourceDocument = null;
+            }
+
             // Create a new VelocityContext to prevent the code creating variables in the current context.
             // See https://jira.xwiki.org/browse/XWIKI-11400.
             // We set the current context as inner context of the new one to be able to read existing variables.
             // See https://jira.xwiki.org/browse/XWIKI-11426.
-            VelocityContext context = new XWikiVelocityContext(velocityManager.getVelocityContext(),
+            VelocityContext context = new XWikiVelocityContext(this.velocityManager.getVelocityContext(),
                 this.loggerConfiguration.isDeprecatedLogEnabled());
 
             // Render the code
-            if (engine.evaluate(context, output, "DefaultIconRenderer", code)) {
-                return output.toString();
-            } else {
-                // I don't know how to check the velocity runtime log
-                throw new IconException("Failed to render the icon. See the Velocity runtime log.", null);
+            VelocityEngine finalEngine = engine;
+            Callable<Boolean> callable = () -> finalEngine.evaluate(context, output, NAMESPACE, code);
+            if (contextDocumentReference != null) {
+                // Wrap the callable in a document context and author executor to ensure that the document is in
+                // context and the Velocity code is executed with the author's rights.
+                Callable<Boolean> innerCallable = callable;
+                callable = () -> this.documentContextExecutor.call(
+                    () -> this.authorExecutor.call(innerCallable, authorReference, contextDocumentReference),
+                    sourceDocument);
             }
-        } catch (XWikiVelocityException e) {
+            result = callable.call();
+        } catch (Exception e) {
             throw new IconException("Failed to render the icon.", e);
         } finally {
             // Do not forget to close the macro namespace we have created previously
             if (engine != null) {
                 engine.stoppedUsingMacroNamespace(namespace);
             }
+        }
+
+        if (result) {
+            return output.toString();
+        } else {
+            // I don't know how to check the velocity runtime log
+            throw new IconException("Failed to render the icon. See the Velocity runtime log.");
         }
     }
 }

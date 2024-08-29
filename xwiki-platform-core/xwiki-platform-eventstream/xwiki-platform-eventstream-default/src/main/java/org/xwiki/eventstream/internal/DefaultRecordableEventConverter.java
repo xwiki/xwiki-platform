@@ -19,24 +19,27 @@
  */
 package org.xwiki.eventstream.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.RecordableEvent;
-import org.xwiki.eventstream.RecordableEventConverter;
-import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.eventstream.TargetableEvent;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventFactory;
+import org.xwiki.eventstream.RecordableEvent;
+import org.xwiki.eventstream.RecordableEventConverter;
+import org.xwiki.eventstream.RecordableEventDescriptor;
+import org.xwiki.eventstream.TargetableEvent;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Default converter for any type of RecordableEvent.
@@ -55,12 +58,15 @@ public class DefaultRecordableEventConverter implements RecordableEventConverter
     @Named("context")
     private ComponentManager contextComponentManager;
 
+    @Inject
+    private EventFactory eventFactory;
+
     @Override
     public Event convert(RecordableEvent recordableEvent, String source, Object data) throws Exception
     {
         XWikiContext context = contextProvider.get();
 
-        Event convertedEvent = new DefaultEvent();
+        Event convertedEvent = this.eventFactory.createRawEvent();
         convertedEvent.setType(recordableEvent.getClass().getCanonicalName());
         convertedEvent.setApplication(source);
         convertedEvent.setDate(new Date());

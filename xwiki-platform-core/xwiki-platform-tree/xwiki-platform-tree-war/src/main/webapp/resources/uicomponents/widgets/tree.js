@@ -18,31 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // TODO: Move this file in the WebJar once we add support for loading JavaScript files from WebJars as Skin Extensions.
-/*!
-#set ($paths = {
-  'treeRequireConfig': $services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
-    {'evaluate': true, 'minify': $services.debug.minify})
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths) {
-  "use strict";
+require(['xwiki-tree'], function($) {
+  var init = function(event, data) {
+    var container = $((data && data.elements) || document);
+    container.find('.xtree').xtree().one('ready.jstree', function(event, data) {
+      var tree = data.instance;
+      var openToNodeId = tree.element.attr('data-openTo');
+      // Open the tree to the specified node and select it.
+      openToNodeId && data.instance.openTo(openToNodeId);
+    });
+  };
 
-require([paths.treeRequireConfig], function() {
-  require(['tree'], function($) {
-    var init = function(event, data) {
-      var container = $((data && data.elements) || document);
-      container.find('.xtree').xtree().one('ready.jstree', function(event, data) {
-        var tree = data.instance;
-        var openToNodeId = tree.element.attr('data-openTo');
-        // Open the tree to the specified node and select it.
-        openToNodeId && data.instance.openTo(openToNodeId);
-      });
-    };
-
-    $(document).ready(init).on('xwiki:dom:updated', init);
-  });
+  $(init).on('xwiki:dom:updated', init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));

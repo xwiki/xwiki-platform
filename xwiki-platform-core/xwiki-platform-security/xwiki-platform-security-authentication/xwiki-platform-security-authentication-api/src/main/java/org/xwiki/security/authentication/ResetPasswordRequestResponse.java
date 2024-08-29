@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authentication;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -28,7 +27,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public interface ResetPasswordRequestResponse
 {
     /**

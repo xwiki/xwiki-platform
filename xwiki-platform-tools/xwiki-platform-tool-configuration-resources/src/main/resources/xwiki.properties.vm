@@ -76,8 +76,8 @@
 #-# The directory used to store persistent data (data that should persist across server restarts). This is an
 #-# important directory containing important data and thus it should never be deleted (it should be backed-up along
 #-# with the database).
-#-# For example this is where the Extension Manager stores downloaded extensions if the extension.localRepository
-#-# property isn't configured.
+#-# For example this is where the Extension Manager stores downloaded extensions (unless extension.localRepository
+#-# property is configured to a different location).
 #-#
 #-# You can set:
 #-# * an absolute path (recommended)
@@ -119,13 +119,25 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 # rendering.linkLabelFormat = %np
 
 #-# [Since 2.0M3]
-#-# Overrides default macro categories (Each macro has a default category already defined, for example
-#-# "presentation" for the Table of Contents Macro).
+#-# Overrides default macro categories (Each macro has default categories already defined, for example
+#-# "Navigation" for the Table of Contents Macro).
+#-# Note: the categories are case sensitive.
 #-#
-#-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
-#-# redefine the category for the Script Macro to be "My Other Category", you'd use:
-# rendering.macroCategories = toc:My Category
-# rendering.macroCategories = script:My Other Category
+#-# Ex: To redefine the macro categories for the TOC macro so that it'd be in the "My Category" and "Deprecated" 
+#-# categories + redefine the category for the Script Macro to be "My Other Category", you'd use:
+# rendering.transformation.macro.categories = toc = My Category\,Deprecated
+# rendering.transformation.macro.categories = script = My Other Category
+
+#-# [Since 14.8RC1]
+#-# Override the default hidden macro categories.
+#-# Note: the categories are case sensitive.
+#-#
+#-# The default value is:
+# rendering.transformation.macro.hiddenCategories = Internal,Deprecated
+#-#
+#-# For instance, to make the "Development" category hidden by default, in addition to the "Internal" and
+#-# "Deprecated" categories, you'd use:
+# rendering.transformation.macro.hiddenCategories = Development,Internal,Deprecated
 
 #-# [Since 2.5M2]
 #-# Specify whether the image dimensions should be extracted from the image parameters and included in the image URL
@@ -163,6 +175,13 @@ environment.permanentDirectory = $xwikiPropertiesEnvironmentPermanentDirectory
 #-# Change the Pygments style used in the code macro (see http://pygments.org/docs/styles/)
 #-# If not set "default" style is used.
 # rendering.macro.code.pygments.style = vs
+
+#-# [Since 15.0RC1]
+#-# [Since 14.10.2]
+#-# The maximum size (in bytes) of attachment to allow as code macro source.
+#-# 
+#-# The default is:
+# rendering.macro.code.source.attachmentMaximumSize = 1000000
 
 #-------------------------------------------------------------------------------------
 # Rendering Transformations
@@ -237,6 +256,75 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# - html: Removes all leading and trailing white spaces and new lines. If you need a space you'll need to use
 #-#         \$sp and if you need a new line you'll need to use \$nl
 #-# rendering.macro.velocity.filter = indent
+
+#-------------------------------------------------------------------------------------
+# HTML Sanitization
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.6RC1]
+#-# The HTML sanitization strategy to use for user-generated content to avoid JavaScript injection. The following
+#-# strategies are available by default:
+#-# - secure (default): Only allows known elements and attributes that are considered safe. The following options
+#-#                     allow customizing its behavior.
+#-# - insecure:         Allows everything including JavaScript. Use this only if you absolutely trust everybody who can
+#-#                     write wiki syntax (in particular, all users, but also anonymous users commenting when enabled).
+# xml.htmlElementSanitizer = secure
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional tags that should be allowed by the HTML sanitizer. These tags will be allowed
+#-# in addition to the already extensive built-in list of tags that are considered safe. Use with care to avoid
+#-# introducing security issues. By default, the following tags are allowed:
+#-# HTML tags: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L63-L74
+#-# SVG tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L91-L102
+#-# MathML tags: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L62-L64
+# xml.htmlElementSanitizer.extraAllowedTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional attributes that should be allowed by the HTML sanitizer. These attributes will
+#-# be allowed in addition to the already extensive built-in list of attributes that are considered safe. This option
+#-# is useful if your content uses attributes that are invalid in HTML. Use with care to avoid introducing security
+#-# issues. By default, the following attributes are allowed:
+#-# HTML attributes: https://github.com/xwiki/xwiki-commons/blob/99484d48e899a68a1b6e33d457825b776c6fe8c3/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/HTMLDefinitions.java#L76-L91
+#-# SVG attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SVGDefinitions.java#L66-L89
+#-# MathML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/MathMLDefinitions.java#L73-L79
+#-# XML attributes: https://github.com/xwiki/xwiki-commons/blob/b11eae9d82cb53f32962056b5faa73f3720c6182/xwiki-commons-core/xwiki-commons-xml/src/main/java/org/xwiki/xml/internal/html/SecureHTMLElementSanitizer.java#L135
+# xml.htmlElementSanitizer.extraAllowedAttributes =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of tags that should be forbidden. This takes precedence over any tags allowed by default or
+#-# configured above. This can be used, for example, to forbid video or audio elements.
+# xml.htmlElementSanitizer.forbidTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of attributes that should be forbidden. This takes precedence over any attributes allowed by
+#-# default or configured above. This can be used, for example, to forbid inline styles by forbidding the "style"
+#-# attribute.
+# xml.htmlElementSanitizer.forbidAttributes =
+
+#-# [Since 14.6RC1]
+#-# If unknown protocols shall be allowed. This means all protocols like "xwiki:" will be allowed in links, however,
+#-# script and data-URIs will still be forbidden (for data-URIs see also below).  By default, unknown protocols are
+#-# allowed.
+# xml.htmlElementSanitizer.allowUnknownProtocols = true
+
+#-# [Since 14.6RC1]
+#-# If unknown protocols are disallowed (see above), the (Java) regular expression URIs are matched against.
+#-# The default values is ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
+# xml.htmlElementSanitizer.allowedUriRegexp = ^(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional tags on which data-URIs should be allowed in "src", "xlink:href" or "href".
+#-# Adding "a" here, for example, would allow linking to data-URIs which is disabled by default due to the potential of
+#-# security issues. Modern browsers should mitigate them, though, see for example
+#-# https://blog.mozilla.org/security/2017/11/27/blocking-top-level-navigations-data-urls-firefox-59/ so you could
+#-# use this to allow defining images, PDF files or files to be downloaded inline as data-URIs in links.
+# xml.htmlElementSanitizer.extraDataUriTags =
+
+#-# [Since 14.6RC1]
+#-# Comma-separated list of additional attributes that are considered safe for arbitrary content including
+#-# script-URIs, on these attributes the above-mentioned URI-checks aren't used. Use with care to avoid introducing
+#-# security issues.
+# xml.htmlElementSanitizer.extraURISafeAttributes =
 
 #-------------------------------------------------------------------------------------
 # Cache
@@ -336,7 +424,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = context.scope_control.template = true
 #-#   velocity.properties = context.scope_control.macro = true
 #-#   velocity.properties = event_handler.include.class = org.xwiki.velocity.internal.util.RestrictParseLocationEventHandler
-#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector\,org.xwiki.velocity.introspection.MethodOverrideUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -466,7 +554,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories = maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
-# extension.repositories = maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots
+# extension.repositories = maven-xwiki-snapshot:maven:https://nexus-snapshots.xwiki.org/repository/snapshots/
 #-#
 #-# When not set the following is taken (in this order):
 # extension.repositories = maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public
@@ -485,9 +573,8 @@ extension.repositories = $extensionRepository
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
 #-#
-#-# The default is extension/repository in whatever is the general persistent directory.
-#-# See container.persistentDirectory.
-# extension.localRepository=extension/repository
+#-# The default is {environment.permanentDirectory}/extension/repository.
+# extension.localRepository=/var/lib/xwiki/data/extension/repository
 
 #-# [Since 3.4]
 #-# The user agent to use when communication with external services (generally repositories).
@@ -566,6 +653,37 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # extension.ignoredDependencies=stax:stax-api
 # extension.ignoredDependencies=xalan:xalan
 # extension.ignoredDependencies=xalan:serializer
+# extension.ignoredDependencies=xml-apis:xml-apis
+# extension.ignoredDependencies=xerces:xmlParserAPIs
+
+#-------------------------------------------------------------------------------------
+# Extension Manager - Security
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.5RC1]
+#-# When true, the security scan is enabled. This is the default; set to false to disable the scan.
+#-#
+# extension.security.scan.enabled = true
+
+#-# [Since 15.5RC1]
+#-# Specifies the delay before starting a new security scan after the last one has finished.
+#-# The default value is 24 hours.
+#-#
+# extension.security.scan.delay = 24
+
+#-# [Since 15.5RC1]
+#-# Specifies the url to use as the endpoint for the security scan rest queries.
+#-# The url must conform to the API documented here: https://google.github.io/osv.dev/post-v1-query/
+#-# The default value is https://api.osv.dev/v1/query.
+#-#
+# extension.security.scan.url = https://api.osv.dev/v1/query
+
+#-# [Since 15.6RC1]
+#-# Specifies the url to use as the endpoint for the security scan false-positive fetching rest queries.
+#-# The url must conform to the API documented here: http://e.x.o.doc...
+#-# The default value is https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
+#-#
+# extension.security.reviews.url = https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews
 
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
@@ -574,8 +692,15 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# [Since 7.1RC1] Enable or disable the automatic start of Distribution Wizard on empty/outdated wiki.
 #-#
 #-# The default is:
+
 # distribution.automaticStartOnMainWiki=true
 # distribution.automaticStartOnWiki=true
+#if ($xwikiPropertiesAutomaticStartOnMainWiki)
+distribution.automaticStartOnMainWiki=$xwikiPropertiesAutomaticStartOnMainWiki
+#end
+#if ($xwikiPropertiesAutomaticStartOnWiki)
+distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
+#end
 
 #-# [Since 10.2RC1] Control if the Distribution Wizard should be automatic or interactive (the default)
 #-# 
@@ -662,14 +787,76 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The identifier provided here is matched with the component role hint.
 #-#
 #-# The default is:
-# security.authorization.settler=default
+# security.authorization.settler = default
 
 #-# [Since 13.0]
 #-# Control if document save API should also check the right of the script author when saving a document.
 #-# When false only the current user right is checked.
 #-#
 #-# The default is:
-# security.script.save.checkAuthor=true
+# security.script.save.checkAuthor = true
+
+#-# [Since 13.10]
+#-# Prevent against DOS attacks by limiting the number of entries returned by DB queries, for guest users.
+#-#
+#-# The default is:
+# security.queryItemsLimit = 100
+
+#-# [Since 13.10.1]
+#-# [Since 14.0RC1]
+#-# Define the lifetime of the token used for resetting passwords in minutes.
+#-# Default value is 60 meaning that users have 1 hour to access the link sent by email for performing password reset.
+#-# Once the password is reset using the link, the token is revoked.
+#-# Using 0 here means that the token has no expiration date, however it will be revoked at first wrong access.
+#-#
+#-# The value is in minutes. The default is:
+# security.authentication.resetPasswordTokenLifetime = 60
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if as part of the migration R140600000XWIKI19869 the passwords of impacted user should be
+#-# reset or not. It's advised to keep this value as true, now for some usecases advertised administrators might want
+#-# their users to keep their passwords nevertheless, then enable the configuration and set it to false before the
+#-# migration is executed.
+# security.migration.R140600000XWIKI19869.resetPassword = true
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if reset password emails should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendResetPasswordEmail = true
+
+#-# [Since 14.6RC1]
+#-# [Since 14.4.3]
+#-# [Since 13.10.8]
+#-# This option is only used when performing a migration from a wiki before the versions mentioned above.
+#-#
+#-# This parameter defines if a security email information should be sent as part of the migration R140600000XWIKI19869.
+#-# By default this value is set to true, so emails will be automatically produced. Now it's possible for admin to set
+#-# this option to false: note that in such case a file containing the list of users for whom a reset password email
+#-# should be sent will still be created in the permanent directory (named 140600000XWIKI19869DataMigration-users.txt).
+#-# If this file exists and this property is set back to true after the migration, the file will still be consumed to
+#-# send the emails, so it's possible to perform the migration and send the emails only later if needed.
+# security.migration.R140600000XWIKI19869.sendSecurityEmail = true
+
+#-# [Since 15.9RC1]
+#-# Indicates how documents are protected by required rights.
+#-#
+#-# The possible choices are:
+#-# * none: no required rights check
+#-# * warning (the default): a warning is presented to the user when trying to edit a document with required rights
+#-# issues
+# security.requiredRights.protection=warning
 
 #-------------------------------------------------------------------------------------
 # URL
@@ -763,6 +950,17 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# By default this property is set to true:
 # url.trustedDomainsEnabled=true
 
+#-# [Since 15.0]
+#-# [Since 14.10.4]
+#-# Define the list of schemes that are allowed for trusted URIs. Those schemes are checked whenever an absolute URI
+#-# needs to be checked (e.g. before performing a redirect). Any URI whose scheme doesn't belong to that list will not
+#-# be considered trustful, even if the domain of the URI is trusted.
+#-# Also note that even if a protocol is added here to be trusted, it might need a custom protocol handler. By default,
+#-# only http,https,ftp and file protocols are handled.
+#-#
+#-# The default is:
+# url.trustedSchemes=http,https,ftp
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------
@@ -792,19 +990,48 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# with programming rights, while this configuration affect any attachment.
 # attachment.download.forceDownload=
 
+#-# [Since 14.10]
+#-# Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a 
+#-# comma-separated list of allowed mimetypes. Note that a single star character (*) can be used in the defined allowed
+#-# mimetype and in this case the allowed mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment with an unlisted mimetype will be rejected.
+#-# For instance, if you want to only accept plain text and any kind of images, you can set the list to:
+#-# text/plain,image/*
+# attachment.upload.allowList=
+
+#-# [Since 14.10]
+#-# Define the list of blocked attachment mimetypes. By default, this list is empty, but you can specify a 
+#-# comma-separated list of blocked mimetypes. Note that a single star character (*) can be used in the defined blocked
+#-# mimetype and in this case the blocked mimetype value will need to start with the text before the star and end with
+#-# the text after it.
+#-# Once this list is not empty, any attachment matching one of the listed mimetype will be rejected.
+#-# For instance, if you want to reject plain text and any kind of images, you can set the list to:
+#-# text/plain,image/*
+#-#
+# attachment.upload.blockList=
+
+#-# [Since 16.3.0RC1]
+#-# Indicate whether or not comments for attachment uploads should be settable from UI, and displayed whenever the
+#-# attachment revisions are listed. The default is false.
+# attachment.upload.enableComments=false
+
 #-------------------------------------------------------------------------------------
-# Active Installs
+# Active Installs 2
 #-------------------------------------------------------------------------------------
 
-#-# [Since 5.2M2]
-#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
-#-# regularly sends the following information to xwiki.org about the current instance:
-#-# - its unique id
-#-# - the id and versions of all installed extensions)
+#-# [Since 14.5]
+#-# The URL of where the Active Installs 2 module should connect to, in order to send a ping of activity. This feature
+#-# regularly sends anonymous information to xwiki.org about the current instance.
 #-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
 #-#
 #-# The default is:
-# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
+# activeinstalls2.pingURL = https://extensions.xwiki.org/activeinstalls2
+
+#-# [Since 14.5]
+#-# Default user agent used when sending pings.
+#-# The default is:
+# activeinstalls2.userAgent = XWikiActiveInstalls2
 
 #-------------------------------------------------------------------------------------
 # Wikis
@@ -820,6 +1047,14 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-#
 #-# The default is:
 # wiki.alias.suffix=
+
+#-# [Since 14.9RC1]
+#-# Allows delegating the database/schema/user creation (depends on the database) for a new wiki to an infra admin.
+#-# Said differently, if the following property is false then XWiki will not create any database/schema/user when
+#-# creating a wiki. It's assumed that it will exist prior to using the Wiki creation wizard.
+#-#
+#-# The default is:
+# wiki.createDatabase = true
 
 #-------------------------------------------------------------------------------------
 # Store
@@ -922,12 +1157,6 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# Max queue size for the send mail thread. When the max size is reached, the prepare queue will block till the first
 # mail item in the send queue has been sent.
 # mail.sender.sendQueueCapacity = 1000
-
-#-# [Since 12.9RC1]
-#-# Decides if XWiki should resend automatically mails that were prepared but not sent, at restart.
-#-# Note that emails that were in the prepare_error state are not resent since they failed to be saved and thus cannot
-#-# be resent.
-# mail.sender.database.resendAutomaticallyAtStartup = true
 
 #-------------------------------------------------------------------------------------
 # Debug
@@ -1065,13 +1294,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.rest.cache = true
 
-#-# [Since 12.6]
-#-# When this option is enabled the relation between users and events is evaluated and stored when the events are
-#-# generated instead of each time they are displayed.
-#-#
-#-# The default is :
-# notifications.eventPrefilteringEnabled = true
-
 #-# [Since 12.5RC1]
 #-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
 #-# instance.
@@ -1079,6 +1301,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default is :
 # notifications.async.poolSize = 2
+
+#-# [Since 15.5RC1]
+#-# The hint of the strategy component to use for email grouping notifications. Default strategy is to group all
+#-# notifications in a single email, but other strategies can be provided, e.g. to send as many emails as there was
+#-# type of notifications. Check online documentation related to notification to see the list of available strategies.
+#-#
+#-# The default is :
+# notifications.emailGroupingStrategyHint = "default"
 
 #-------------------------------------------------------------------------------------
 # Mentions
@@ -1097,22 +1327,6 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 11.1RC1]
-#-# The Event Stream, on which the notifications are based, stores data in a dedicated table in the database.
-#-# Each wiki has its own database. The feature can be configured to store its data into the database corresponding to
-#-# the wiki, into the main database (default: xwiki) or both. These options should not be both set to false (in this
-#-# case the local store will be forced).
-#-# Important note: disabling storage in the main store will prevent the notifications from retrieving events from
-#-# subwikis. Moreover, disabling the main store makes impossible for global users to watch pages from subwikis. It is
-#-# not recommended.
-#-#
-#-# This feature was originally implemented by the Activity Stream plugin so these settings might sound familiar to you.
-#-#
-#-# The default is :
-# eventstream.uselocalstore = true
-#-#
-#-# The default is :
-# eventstream.usemainstore = true
-#-#
 #-# Number of days the events should be kept (0 or any negative value: infinite duration)
 #-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
 #-# delete events older than the configured value.
@@ -1153,6 +1367,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The format is:
 #-# user.preferences.superadmin.<preference name> = <value>
 #-#
+#-# Values set by default for the SuperAdmin user:
+#-# user.preferences.superadmin.displayHiddenDocuments = 1
+#-# user.preferences.superadmin.active = 1
+#-# user.preferences.superadmin.first_name = SuperAdmin
+#-# user.preferences.superadmin.email_checked = 1
+#-# user.preferences.superadmin.usertype = Advanced
+#-#
 #-# Examples:
 #-# user.preferences.superadmin.displayHiddenDocuments = 0
 #-# user.preferences.superadmin.editor = Text
@@ -1163,22 +1384,28 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The format is:
 #-# user.preferences.guest.<preference name> = <value>
 #-#
+#-# Values set by default for the Guest user:
+#-# user.preferences.guest.displayHiddenDocuments = 0
+#-# user.preferences.guest.active = 0
+#-# user.preferences.guest.first_name = Guest
+#-# user.preferences.guest.email_checked = 0
+#-#
 #-# Examples:
 #-# user.preferences.guest.displayHiddenDocuments = 1
 #-# user.preferences.guest.editor = Text
 
+#-# [Since 14.10.12]
+#-# [Since 15.5RC1]
+#-# When displaying an user in a compact mode we usually rely only on the user avatar and their full name. If this is
+#-# not enough to properly identify the user then this configuration can be used to display additional information.
+#-#
+#-# The name of the user property to be used as qualifier (hint) when displaying the user in a compact mode. This
+#-# configuration is not set by default, which means no additional information is displayed:
+# user.display.qualifierProperty =
+
 #-------------------------------------------------------------------------------------
 # Refactoring
 #-------------------------------------------------------------------------------------
-
-#-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
-#-# on database (which is a lot more performant).
-#-# This property aims at being removed in the future once the atomic rename has been validated to work 100% fine.
-#-# Only use it if you are facing an issue with the move/rename features.
-#-#
-#-# The default value is:
-# refactoring.rename.useAtomicRename = true
 
 #-# [Since 12.9RC1]
 #-# Indicates whether skipping the recycle bin when deleting pages is allowed for Advanced users.
@@ -1210,5 +1437,149 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# The default value is:
 # skinx.jsStrictModeEnabled = false
+
+#-------------------------------------------------------------------------------------
+# Localization
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.2, 15.0RC1]
+#-# Indicate whether translations with user scope that are only applied for the user who created them shall be
+#-# restricted to users with script right. The default value is true. Disable this option only when you absolutely
+#-# trust all users on the wiki.
+# localization.wiki.restrictUserTranslations = true
+
+#-------------------------------------------------------------------------------------
+# PDF Export
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.4.3]
+#-# [Since 14.6RC1]
+#-# Whether the PDF export should be performed server-side, e.g. using a headless Chrome web browser running inside a
+#-# Docker container, or client-side, using the user's web browser instead. Defaults to client-side PDF generation
+#-# starting with 14.8
+# export.pdf.serverSide = false
+
+#-# The host running the headless Chrome web browser, specified either by its name or by its IP address. This allows you
+#-# to use a remote Chrome instance, running on a separate machine, rather than a Chrome instance running in a Docker
+#-# container on the same machine. Defaults to empty value, meaning that by default the PDF export is done using the
+#-# Chrome instance running in the specified Docker container.
+# export.pdf.chromeHost =
+
+#-# The port number used for communicating with the headless Chrome web browser.
+# export.pdf.chromeRemoteDebuggingPort = 9222
+
+#-# [Since 14.10.15]
+#-# [Since 15.5.2]
+#-# [Since 15.7RC1]
+#-# The base URI that the headless Chrome browser should use to access the XWiki instance (i.e. the print preview page).
+#-# The host (domain or IP address) is mandatory but the scheme and port number are optional (they default on the scheme
+#-# and port number used when triggering the PDF export). Defaults to "host.xwiki.internal" which means the host running
+#-# the Docker daemon; if XWiki runs itself inside a Docker container then you should use the assigned network alias,
+#-# provided both containers (XWiki and Chrome) are in the same Docker network.
+#-#
+#-# Note that this configuration replaces the old "export.pdf.xwikiHost" configuration which is currently still taken
+#-# into account as a fall back in case this configuration is not set.
+# export.pdf.xwikiURI = host.xwiki.internal
+
+#-# The Docker image used to create the Docker container running the headless Chrome web browser.
+# export.pdf.chromeDockerImage = zenika/alpine-chrome:latest
+
+#-# The name of the Docker container running the headless Chrome web browser. This is especially useful when reusing an
+#-# existing container.
+# export.pdf.chromeDockerContainerName = headless-chrome-pdf-printer
+
+#-# The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs
+#-# inside a Docker container and you want to have the Chrome container in the same network in order for them to
+#-# communicate. The default value "bridge" represents the default Docker network.
+# export.pdf.dockerNetwork = bridge
+
+#-# [Since 14.9]
+#-# The number of seconds to wait for the web page to be ready (for print) before timing out.
+# export.pdf.pageReadyTimeout = 60
+
+#-# [Since 14.10]
+#-# The maximum content size, in kilobytes (KB), an user is allowed to export to PDF. In order to compute the content
+#-# size we sum the size of the HTML rendering for each of the XWiki documents included in the export. The size of
+#-# external resources, such as images, style sheets, JavaScript code is not taken into account. 0 means no limit.
+# export.pdf.maxContentSize = 5000
+
+#-# [Since 14.10]
+#-# The maximum number of PDF exports that can be executed in parallel (each PDF export needs a separate thread).
+# export.pdf.threadPoolSize = 3
+
+#-# [Since 14.10]
+#-# Whether to replace or not the old PDF export based on Apache Formatting Objects Processor (FOP).
+# export.pdf.replaceFOP = true
+
+#-------------------------------------------------------------------------------------
+# Tags
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.4.8, 14.10.4, 15.0RC1]
+#-# Configure the tag selection algorithm to use.
+#-# The default algorithm is "exhaustive", which check all elements (documents and tags) for view right before returning
+#-# them. This exhaustive check can lead to tag clouds and tag lists being slow to compute on instances with very large 
+#-# amounts of tags or tagged documents (more than 5000 of elements).   
+#-# Note that it is advised to keep using the default implementation as much as possible, and to switch to the "unsafe"
+#-# option only when all performance improvements options have been exhausted 
+#-# (see https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/Performances/)
+#-# The "unsafe" algorithm does not perform any right checks. It is approximately 10 times faster than "exhaustive"
+#-# but does not provide any guarantee that the current user won't be able to view a tag he/she is not allowed to. 
+#-# Therefore, we cannot recommend to use it unless tags performance is critical AND tags and document references are 
+#-# not considered as critical information.
+# tag.rightCheckStrategy.hint=exhaustive
+# tag.rightCheckStrategy.hint=unsafe
+
+#-------------------------------------------------------------------------------------
+# What's New
+#-------------------------------------------------------------------------------------
+
+#-# [Since 15.2RC1]
+#-# Defines the list of News sources from which to get news items displayed by the What's New UI
+#-# Source format:
+#-#   whatsnew.sources = <a unique id> = <a valid source hint>
+#-# Where:
+#-#   - <a unique id>: a user-chosen id that represents the source. It's used to define the parameters for the source,
+#-#     see below
+#-#   - <a valid source hint>: for example use "xwikiblog" for using the XWiki Blog Application as a news source.
+#-# Source parameters format:
+#-#   whatsnew.source.<source id>.<key> = <value>
+#-# Where:
+#-#   - <source id>: this is the unique id mentioned above
+#-#   - <key>: a source-dependent parameter name (e.g for the "xwikiblog" source, the "rssURL" key is used to point to
+#-#     the URL that generates the RSS feed)
+#-#   - <value>: a source-dependent parameter value for the specified key
+#-#
+#-# To disable the feature, use an empty source list, as in:
+# whatsnew.sources =
+#-#
+#-# When not defined, the default list of sources and their configuration is:
+# whatsnew.sources = xwikiorg = xwikiblog
+# whatsnew.source.xwikiorg.rssURL = https://extensions.xwiki.org/news
+# whatsnew.sources = xwikisas = xwikiblog
+# whatsnew.sources.xwikisas.rssURL = https://xwiki.com/news
+
+#-------------------------------------------------------------------------------------
+# XML Diff
+#-------------------------------------------------------------------------------------
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# If the compared documents contain images, they can be embedded as data URI to compare the images themselves
+#-# instead of their URLs. For this, images are downloaded via HTTP and embedded as data URI. Images are only
+#-# downloaded from trusted domains when enabled above. Still, this can be a security and stability risk as
+#-# downloading images can easily increase the server load. If this option is set to "false", no images are
+#-# downloaded by the diff and images are compared by URL instead.
+#-# Default is "true".
+# diff.xml.dataURI.enabled = true
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the maximum size in bytes of an image to be embedded into the XML diff output as data URI.
+#-# Default is 1MB.
+# diff.xml.dataURI.maximumContentSize = 1048576
+
+#-# [Since 14.10.15, 15.5.1, 15.6]
+#-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
+#-# Default is 10 seconds.
+# diff.xml.dataURI.httpTimeout = 10
 
 $!xwikiPropertiesAdditionalProperties

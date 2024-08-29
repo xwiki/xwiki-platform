@@ -21,27 +21,28 @@ package org.xwiki.messagestream;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.verification.api.VerificationData;
+import org.mockito.verification.VerificationMode;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
+import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.messagestream.internal.DefaultMessageStream;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -50,9 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,12 +75,6 @@ class MessageStreamTest
     private DocumentAccessBridge mockBridge;
 
     @MockComponent
-    private QueryManager mockQueryManager;
-
-    @MockComponent
-    private EventStream mockEventStream;
-
-    @MockComponent
     private EntityReferenceSerializer<String> mockSerializer;
 
     @MockComponent
@@ -95,17 +89,17 @@ class MessageStreamTest
     @InjectMockComponents
     private DefaultMessageStream stream;
 
-    private Query mockQuery = mock(Query.class);
-
     @BeforeEach
     void beforeEach()
     {
         when(this.mockSerializer.serialize(CURRENT_USER)).thenReturn("wiki:XWiki.JohnDoe");
         when(this.mockSerializer.serialize(TARGET_USER)).thenReturn("wiki:XWiki.JaneBuck");
         when(this.mockSerializer.serialize(TARGET_GROUP)).thenReturn("wiki:XWiki.MyFriends");
+
+        when(this.mockEventStore.saveEvent(any())).thenReturn(CompletableFuture.completedFuture(null));
     }
 
-    private Event setupForNewMessage() throws ComponentLookupException, Exception
+    private Event setupForNewMessage() throws Exception
     {
         Event event = new DefaultEvent();
         event.setId(UUID.randomUUID().toString());
@@ -116,7 +110,7 @@ class MessageStreamTest
         return event;
     }
 
-    private void verifyForNewMessage(Event event) throws EventStreamException
+    private void verifyForNewMessage(Event event)
     {
         verify(this.mockEventFactory).createEvent();
         verify(this.mockEventStore).saveEvent(event);
@@ -158,23 +152,25 @@ class MessageStreamTest
         return e;
     }
 
-    private void setupForLimitQueries(int expectedLimit, int expectedOffset) throws ComponentLookupException, Exception
+    private void setupForLimitQueries(int expectedLimit, int expectedOffset) throws Exception
     {
-        when(this.mockQuery.setLimit(expectedLimit)).thenReturn(mockQuery);
-        when(this.mockQuery.setOffset(expectedOffset)).thenReturn(mockQuery);
-
-        when(this.mockQueryManager.createQuery(anyString(), anyString())).thenReturn(mockQuery);
-
         when(this.mockBridge.getCurrentUserReference()).thenReturn(CURRENT_USER);
 
-        when(this.mockEventStream.searchEvents(mockQuery)).thenReturn(null);
+        when(this.mockEventStore.search(any())).thenReturn(EventSearchResult.EMPTY);
     }
 
-    private void verifyLimitQueries(int expectedLimit, int expectedOffset) throws QueryException
+    private void verifyLimitQueries(int expectedLimit, int expectedOffset) throws EventStreamException
     {
-        verify(this.mockQuery).setLimit(expectedLimit);
-        verify(this.mockQuery).setOffset(expectedOffset);
-        verify(this.mockEventStream).searchEvents(this.mockQuery);
+        verify(this.mockEventStore, new VerificationMode()
+        {
+            @Override
+            public void verify(VerificationData data)
+            {
+                SimpleEventQuery query = data.getAllInvocations().get(0).getArgument(0);
+                assertEquals(expectedLimit, query.getLimit());
+                assertEquals(expectedOffset, query.getOffset());
+            }
+        }).search(any());
     }
 
     // Tests
@@ -477,7 +473,7 @@ class MessageStreamTest
     {
         setupForLimitQueries(30, 0);
 
-        doThrow(new QueryException("", null, null)).when(this.mockEventStream).searchEvents(this.mockQuery);
+        doThrow(new EventStreamException()).when(this.mockEventStore).search(any());
 
         List<Event> result = this.stream.getRecentPersonalMessages();
         assertNotNull(result);

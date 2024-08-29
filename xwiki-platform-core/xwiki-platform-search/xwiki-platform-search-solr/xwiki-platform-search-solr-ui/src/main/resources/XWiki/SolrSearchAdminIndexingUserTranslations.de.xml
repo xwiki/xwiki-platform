@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.SolrSearchAdminIndexingUserTranslations" locale="de">
+  <web>XWiki</web>
+  <name>SolrSearchAdminIndexingUserTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.SolrSearchAdminIndexingUser</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Admin Indexing User Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## keys for the admin section navigation
+admin.indexinguser=Indizierungs-Benutzer
+admin.indexinguser.description=Einen Benutzer auswählen, der den Inhalt des Wikis indizieren soll.
+
+## keys use on the admin "indexing user" page itself
+admin.indexinguser.explanation.part1=Der Indexer läuft im Hintergrund, normalerweise ohne dass ein Benutzer mit ihm verbunden ist. Für Seiten, deren Titel von einem "Vorlagen"-Dokument berechnet werden, wird der berechnete Titel nicht angezeigt, wenn die Vorlage für anonyme Benutzer nicht sichtbar ist. Dies ist insbesondere dann der Fall, wenn das Wiki geschlossen ist. In diesem Fall werden z.B. Suchergebnisse für Benutzerprofile nicht mit dem berechneten Titel "Profil von Vorname Nachname" angezeigt, sondern nur der Seitenname ("Login").
+admin.indexinguser.explanation.part2=Um den korrekten Titel in den Suchergebnissen anzeigen zu können, ist es notwendig, dem Indexer einen Benutzer zuzuweisen, der Zugriff auf die Vorlagenseiten hat. Es wird empfohlen, ein eigenes, gesperrtes Benutzerkonto ohne besondere Rechte einzurichten.
+admin.indexinguser.explanation.security.head=Sicherheitshinweis:
+admin.indexinguser.explanation.security.content=Die Verwendung eines Kontos mit mehr Ansichtsrechten als andere Benutzer kann zum Durchsickern von Seitentiteln von Seiten führen, die diese Benutzer normalerweise nicht sehen.
+admin.indexinguser.explanation.part3=Änderungen an dieser Einstellung werden nur auf Seiten angewendet, die nach der Änderung indiziert werden; für eine konsistente Anwendung der Änderung wird eine vollständige Neuindizierung empfohlen.
+admin.indexinguser.explanation.mainwikionly=Diese Einstellung kann nur im Hauptwiki vorgenommen werden, da der Solr-Indexer vom Hauptwiki aus läuft.
+
+## keys used by the configuration class
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Indizierungs-Benutzer
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=Das XWiki-Benutzerkonto, das zum Indizieren von Seiten im Hintergrund verwendet wird.
+</content>
+  </xwikidoc>

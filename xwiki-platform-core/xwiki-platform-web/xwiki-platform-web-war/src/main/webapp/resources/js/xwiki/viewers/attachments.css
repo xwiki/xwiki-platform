@@ -1,58 +1,4 @@
 #template('colorThemeInit.vm')
-/* Attachment list style */
-.attachment {
-  font-size: 85%;
-  padding: 10px;
-  margin: 0 -10px;
-}
-.attachment:hover {
-  background: $theme.highlightColor;
-}
-
-.attachment .information {
-  color: $theme.textPrimaryColor;
-  overflow: hidden;
-}
-
-.attachment .mime, .attachment .name, .attachment .version {
-  float: left;
-  padding: 0 8px 0 0;
-}
-
-.attachment .mime, .attachment .name {
-  font-size: 1.35em;
-}
-
-.attachment .mime {
-  color: $theme.textSecondaryColor;
-  font-size: 32px;
-  height: 48px;
-  line-height: 48px;
-  text-align: center;
-  width: 48px;
-}
-
-.attachment .mime > span > * {
-  max-height: 85%;
-  vertical-align: text-top;
-}
-
-.attachment .meta {
-  clear: left;
-}
-
-.attachment .size {
-  color: $theme.textSecondaryColor;
-}
-
-.attachment .xwikibuttonlinks {
-  float: right;
-}
-
-.skin-colibri .attachment .xwikibuttonlinks {
-  width: 60px;
-}
-
 /* Attachment form style */
 .attachmentActionButton {
   background-color: transparent;
@@ -78,28 +24,23 @@
   margin: 5px 10px 5px 0 !important; /* !important is needed for Toucan. */
 }
 /* Attachment "toolbox" style */
-.skin-colibri .attachment .xwikibuttonlinks a {
-  width: 16px;
-  height: 16px;
-  text-indent: -1000em;
-  overflow: hidden;
-  background: transparent left top no-repeat;
-  display: block;
-  float: right;
-  margin: 0 0 0 4px;
-}
-.skin-colibri .attachment .xwikibuttonlinks a.deletelink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-.skin-colibri .attachment .xwikibuttonlinks a.editlink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
-}
-.skin-colibri .attachment .xwikibuttonlinks a.viewlink {
-  background-image: url("$xwiki.getSkinFile('icons/silk/eye.png')");
-}
 .skin-colibri #AddAttachment {
   border-top: 1px solid $theme.borderColor;
 }
 #AddAttachment legend {
-  font-size: 1em;
+  font-size: 1.3em;
+}
+#attachform {
+  margin-top: 2%;
+}
+.attachmentMimeType {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+}
+.attachmentMimeType img {
+  max-height: 32px;
+  max-width: 48px;
 }

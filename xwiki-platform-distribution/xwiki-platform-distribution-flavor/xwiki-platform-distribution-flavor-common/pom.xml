@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -186,6 +186,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-like-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
@@ -199,29 +205,58 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib.templates</groupId>
-      <artifactId>application-templates-ui</artifactId>
-      <version>1.0.7</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-lightbox-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.contrib</groupId>
-      <artifactId>application-ckeditor-ui</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-image-style-ui</artifactId>
+      <version>${project.version}</version>
       <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-picker-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.contrib.templates</groupId>
+      <artifactId>application-templates-ui</artifactId>
+      <version>1.0.11</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-export-pdf-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-whatsnew-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
       <artifactId>editor-tool-highlighting-ui</artifactId>
-      <version>4.6</version>
+      <version>4.8</version>
       <type>xar</type>
       <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-platform-webjars</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Needed for editor-tool-highlighting-ui because it's depending on some old version of xwiki-platform-webjars
          which has now been moved into xwiki-platform-webjar-api -->
@@ -229,6 +264,21 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Temporary dependency until we migrate recommended extensions to jQuery 3.x -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>jquery-migrate</artifactId>
+      <version>3.4.1</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- Inject the legacy event migrator in the administration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-events-hibernate-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <optional>true</optional>
     </dependency>
   </dependencies>
   <profiles>

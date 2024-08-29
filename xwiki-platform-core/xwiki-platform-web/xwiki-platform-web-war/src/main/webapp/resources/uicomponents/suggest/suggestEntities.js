@@ -20,7 +20,7 @@
 /*!
 #set ($paths = {
   'xwiki-suggestPages': $xwiki.getSkinFile('uicomponents/suggest/suggestPages.js', true),
-  'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js', true)
+  'xwiki-suggestAttachments': $xwiki.getSkinFile('uicomponents/suggest/suggestAttachments.js')
 })
 #[[*/
 // Start JavaScript-only code.
@@ -32,7 +32,7 @@ require.config({paths});
 define('xwiki-entityTypeSwitch', ['jquery', 'xwiki-suggestPages', 'xwiki-suggestAttachments'], function($) {
   var maybeEnableEntityTypeSwitch = function(entityTypeField) {
     var referenceField = getReferenceField(entityTypeField);
-    entityTypeField.change(function(event) {
+    entityTypeField.on('change', function(event) {
       updateReferencePicker(referenceField, entityTypeField.val());
     });
     // Activate the picker that corresponds to the default entity type.

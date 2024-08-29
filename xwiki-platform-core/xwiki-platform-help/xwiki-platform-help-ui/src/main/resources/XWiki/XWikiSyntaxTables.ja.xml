@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="ja">
+  <web>XWiki</web>
+  <name>XWikiSyntaxTables</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxTables</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= 編集 =
+
+== 表 ==
+
+=== 表1.0 ===
+
+コンテンツを簡単に表形式で作成できます。
+
+|=機能|=XWikiシンタックス 1.0|=結果
+|標準の表|((({{{
+{table}
+タイトル1 | タイトル2
+語1 | 語2
+{table}
+}}})))|(((
+|=タイトル1|=タイトル2
+|語1|語2
+)))
+|パラメーター表記の表|(((
+&lt;table style="background-color:red;text-align:center"&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;タイトル1&lt;/td&gt;
+      &lt;td style="background-color:yellow"&gt;タイトル2&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;語1&lt;/td&gt;
+      &lt;td&gt;語2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+)))|(((
+(% style="background-color:red;text-align:center" %)
+|=タイトル1|=(% style="background-color:yellow" %)タイトル2
+|語1|語2
+)))
+|フィルター可能なソートテーブル|((({{{
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
+  &lt;tr class="sortHeader"&gt;
+    &lt;th&gt;タイトル1&lt;/th&gt;
+    &lt;th&gt;タイトル2&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;セル11&lt;/td&gt;
+   &lt;td&gt;セル12&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td&gt;セル21&lt;/td&gt;
+   &lt;td&gt;セル22&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+}}}
+
+{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]]を参照してください。{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="table1id" %)
+(% class="sortHeader" %)|=タイトル1|=タイトル2
+|セル11|セル12
+|セル21|セル22
+)))
+
+=== 表2.0 ===
+
+コンテンツを簡単に表形式で作成できます。XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}では、表、列、行のパラメーターもサポートしています。
+
+|=機能|=XWikiシンタックス {{velocity}}$crtSyntaxVer{{/velocity}}|=結果
+|標準の表|((({{{
+|=タイトル1|=タイトル2
+|語1|語2
+}}}))) or ((({{{
+!=タイトル1!=タイトル2
+!!語1!!語2
+}}})))|(((
+|=タイトル1|=タイトル2
+|語1|語2
+)))
+|パラメーター表記の表|((({{{
+(% style="background-color:red;text-align:center" %)
+|=タイトル1|=(% style="background-color:yellow" %)タイトル2
+|語1|語2
+}}})))|(((
+(% style="background-color:red;text-align:center" %)
+|=タイトル1|=(% style="background-color:yellow" %)タイトル2
+|語1|語2
+)))
+|フィルター可能なソートテーブル|((({{{
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=タイトル1|=タイトル2
+|セル11|セル12
+|セル21|セル22
+}}}
+
+{{info}}改良した機能については[[ライブテーブルマクロ&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]]を参照してください。{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=タイトル1|=タイトル2
+|セル11|セル12
+|セル21|セル22
+)))</content>
+</xwikidoc>

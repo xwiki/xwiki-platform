@@ -72,7 +72,7 @@ public class DefaultUserPropertiesResolverTest
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
-    private class TestUserReference implements UserReference
+    private final class TestUserReference implements UserReference
     {
         @Override
         public boolean isGlobal()

@@ -21,8 +21,9 @@ package org.xwiki.xclass.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.test.ui.po.DocumentPicker;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -37,7 +38,7 @@ public class DataTypesPage extends ViewPage
     /**
      * The widget used to specify the class to create.
      */
-    private DocumentPicker documentPicker = new DocumentPicker();
+    private final DocumentPicker documentPicker = new DocumentPicker();
 
     /**
      * The button used to create a new class.
@@ -46,9 +47,9 @@ public class DataTypesPage extends ViewPage
     private WebElement createClassButton;
 
     /**
-     * The live table that lists the existing classes.
+     * The Live Data table that lists the existing classes.
      */
-    private LiveTableElement classesLiveTable = new LiveTableElement("classes");
+    private final TableLayoutElement classesLiveDataTable = (new LiveDataElement("classes")).getTableLayout();
 
     /**
      * Opens the page that list the available data types.
@@ -72,7 +73,13 @@ public class DataTypesPage extends ViewPage
     {
         this.documentPicker.setParent(spaceName);
         this.documentPicker.setName(className);
+
+        // The create class form is submitted by JavaScript code in case the create button is clicked before the
+        // asynchronous validation ends, and in this case Selenium doesn't wait for the new page to load.
+        getDriver().addPageNotYetReloadedMarker();
         this.createClassButton.click();
+        getDriver().waitUntilPageIsReloaded();
+
         new WikiEditPage().clickSaveAndView();
         return new ClassSheetPage();
     }
@@ -93,14 +100,7 @@ public class DataTypesPage extends ViewPage
     public boolean isClassListed(String spaceName, String className)
     {
         String classReference = spaceName + "." + className;
-        this.classesLiveTable.filterColumn("xwiki-livetable-classes-filter-2", classReference);
-        return this.classesLiveTable.getRowCount() > 0;
-    }
-
-    @Override
-    public DataTypesPage waitUntilPageIsLoaded()
-    {
-        this.classesLiveTable.waitUntilReady();
-        return this;
+        this.classesLiveDataTable.filterColumn("Location", classReference);
+        return this.classesLiveDataTable.countRows() > 0;
     }
 }

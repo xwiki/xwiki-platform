@@ -21,6 +21,8 @@ package org.xwiki.rendering.macro.script;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Decides whether a Script Macro can execute or not. Script Macros should implement this Role with a Hint being the
@@ -40,4 +42,17 @@ public interface MacroPermissionPolicy
      * @return true if the script can execute or false otherwise
      */
     boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context);
+
+    /**
+     * Retrieves the required permission level for executing the script macro.
+     *
+     * @param parameters the executing macro parameters
+     * @return the required permission level
+     * @since 15.9RC1
+     */
+    @Unstable
+    default Right getRequiredRight(ScriptMacroParameters parameters)
+    {
+        return Right.PROGRAM;
+    }
 }

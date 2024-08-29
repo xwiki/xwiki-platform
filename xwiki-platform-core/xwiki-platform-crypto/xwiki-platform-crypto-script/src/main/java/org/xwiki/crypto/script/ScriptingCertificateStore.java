@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.crypto.pkix.CertificateProvider;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
-import org.xwiki.crypto.script.internal.AbstractScriptingStore;
 import org.xwiki.crypto.store.CertificateStore;
 import org.xwiki.crypto.store.CertificateStoreException;
 import org.xwiki.crypto.store.StoreReference;

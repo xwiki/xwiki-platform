@@ -43,6 +43,7 @@
   #if($list && $list.size() > 0)
     #set ($canDelete = $list[0].canDelete())
     #set ($canRestore = $list[0].canUndelete())
+    #set ($canView = $list[0].canView())
     <hr />
     <div class="centered $!className">
       <p class="recyclebin-message">$escapetool.xml($services.localization.render($message))</p>
@@ -61,9 +62,17 @@
        #foreach($dd in $list)
         <tr>
          <td>$xwiki.getUserName($dd.getDeleter())</td>
-         <td><a href="$doc.getURL('view', $escapetool.url({'rev' : "deleted:${dd.getId()}"}))">$xwiki.formatDate($dd.getDate())</a></td>
+         <td>
+         #if ($canView)
+           <a class="link-view" href="$doc.getURL('view', $escapetool.url({'rev' : "deleted:${dd.getId()}"}))">
+             $xwiki.formatDate($dd.getDate())
+           </a>
+         #else
+           $xwiki.formatDate($dd.getDate())
+         #end
+         </td>
          #if ($canRestore)
-           <td><a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a></td>
+           <td>#if("$!{dd.batchId}" != "")<a href="$xwiki.getURL($dd.fullName, 'undelete', "id=${dd.id}&amp;showBatch=true")">$!{dd.batchId}</a>#end</td>
          #end
          <td>
            #if($canRestore)

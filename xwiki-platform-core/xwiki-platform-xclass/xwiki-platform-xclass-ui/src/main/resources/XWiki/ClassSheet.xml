@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.ClassSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.ClassSheet" locale="">
   <web>XWiki</web>
   <name>ClassSheet</name>
   <language/>
@@ -68,6 +68,7 @@
     ## inline action.
     #set ($editAction = $xwiki.getDocument($request.template).getDefaultEditMode())
     $response.sendRedirect($xwiki.getURL($targetDocRef, $editAction, $escapetool.url({
+      'form_token': $request.form_token,
       'template': $request.template,
       'parent': $request.parent,
       'title': $request.docName
@@ -83,7 +84,7 @@
 ## sheet output. Class authors can put the description of the class in the class document content.
 #set($classSheetReference = $services.model.createDocumentReference($doc.wiki, 'XWiki', 'ClassSheet'))
 #if($services.sheet.getDocumentSheets($doc).contains($classSheetReference))
-  {{include reference="" /}}
+  {{include reference="" author="target"/}}
 #end
 {{/velocity}}
 
@@ -129,31 +130,45 @@
 
   #set ($classEditorURL = $doc.getURL('edit', 'editor=class'))
   #if($doc.getxWikiClass().properties.size() == 0)
-    {{warning}}$services.localization.render('platform.xclass.defaultClassSheet.properties.empty', [
-      "{{html}}&lt;a href='$classEditorURL'&gt;",
-      '&lt;/a&gt;{{/html}}'
-    ]){{/warning}}
+    #set ($openLink = "&lt;a href='$escapetool.xml($classEditorURL)'&gt;")
+    #set ($closeLink = '&lt;/a&gt;')
+    {{warning}}
+      {{html}}
+      ## First escape the content of the translation, then replace the placeholders with content that would otherwise be
+      ## escaped during the first escaping.
+      #set ($warningMessage = $services.localization.render('platform.xclass.defaultClassSheet.properties.empty', 
+        ['__OPEN_LINK__', '__CLOSE_LINK__']))
+      $escapetool.xml($warningMessage).replace('__OPEN_LINK__', $openLink).replace('__CLOSE_LINK__', $closeLink)
+      {{/html}}
+    {{/warning}}
   #else
     (% id="HClassProperties" %)
     = {{translation key="platform.xclass.defaultClassSheet.properties.heading"/}} =
     #foreach($property in $doc.getxWikiClass().properties)
       * $services.rendering.escape("$property.prettyName ($property.name: $xwiki.metaclass.get($property.classType).prettyName)", $xwiki.currentContentSyntaxId)
     #end
-    * //$services.localization.render('platform.xclass.defaultClassSheet.properties.edit', [
-      "{{html}}&lt;a href='$classEditorURL'&gt;",
-      '&lt;/a&gt;{{/html}}'
-    ])//
+    #set ($openLink = "&lt;a href='$escapetool.xml($classEditorURL)'&gt;")
+    #set ($closeLink = '&lt;/a&gt;')
+    #set ($warningMessage = $escapetool.xml($services.localization.render('platform.xclass.defaultClassSheet.properties.edit', ['__OPEN_LINK__', '__CLOSE_LINK__'])))
+    ## First escape the content of the translation, then replace the placeholders with content that would otherwise be
+    ## escaped during the first escaping.
+    * //{{html}}$warningMessage.replace('__OPEN_LINK__', $openLink).replace('__CLOSE_LINK__', $closeLink){{/html}}//
 
   #end
   #if ($hasClassSheets &amp;&amp; $hasClassTemplate)
     (% id="HCreatePage" %)
     = {{translation key="platform.xclass.defaultClassSheet.createPage.heading"/}} =
     #if("$!targetDocRef" != '' &amp;&amp; $xwiki.exists($targetDocRef))
-
-      {{warning}}$services.localization.render('platform.xclass.defaultClassSheet.createPage.pageAlreadyExists', [
-        '[[',
-        "&gt;&gt;$services.model.serialize($targetDocRef)]]"
-      ]){{/warning}}
+      {{warning}}
+        {{html}}
+          #set ($targetDocLink = $xwiki.getURL($targetDocRef))
+          #set ($openLink = "&lt;a href='$escapetool.xml($targetDocLink)'&gt;")
+          #set ($message = $escapetool.xml($services.localization.render('platform.xclass.defaultClassSheet.createPage.pageAlreadyExists', ['__OPEN_LINK__', '__CLOSE_LINK__'])))
+          ## First escape the content of the translation, then replace the placeholders with content that would
+          ## otherwise be escaped during the first escaping.
+          $message.replace('__OPEN_LINK__', $openLink).replace('__CLOSE_LINK__', '&lt;/a&gt;')
+        {{/html}}
+      {{/warning}}
     #elseif("$!targetDocRef" != '')
 
       {{warning}}{{translation key="platform.xclass.defaultClassSheet.createPage.denied"/}}{{/warning}}
@@ -161,10 +176,11 @@
 
     {{html}}
     &lt;form action="$doc.getURL()" id="newdoc" method="post" class="xform half"&gt;
+      &lt;fieldset&gt;
       &lt;div class="hidden"&gt;
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-        &lt;input type="hidden" name="parent" value="${defaultParent}"/&gt;
-        &lt;input type="hidden" name="template" value="${classTemplateDoc}"/&gt;
+        &lt;input type="hidden" name="parent" value="$escapetool.xml(${defaultParent})"/&gt;
+        &lt;input type="hidden" name="template" value="$escapetool.xml(${classTemplateDoc})"/&gt;
         &lt;input type="hidden" name="sheet" value="1"/&gt;
       &lt;/div&gt;
       #locationPicker({
@@ -199,6 +215,7 @@
             'platform.xclass.defaultClassSheet.createPage.label'))"/&gt;
         &lt;/span&gt;
       &lt;/p&gt;
+      &lt;/fieldset&gt;
     &lt;/form&gt;
     {{/html}}
 
@@ -208,24 +225,35 @@
 
   {{translation key="platform.xclass.defaultClassSheet.pages.description"/}}
 
-  {{html}}
-  #set ($columns = ['doc.title', 'doc.location', 'doc.date', 'doc.author', 'doc.objectCount', '_actions'])
-  #set ($columnsProperties = {
-    'doc.title': {'link': 'view'},
-    'doc.location': {'html': true},
-    'doc.author': {'link': 'author'},
-    'doc.objectCount': {'type': 'numeric', 'filterable': false, 'sortable': false},
-    '_actions': {'sortable': false, 'filterable': false, 'html': true, 'actions': ['edit', 'delete']}
-  })
   #set ($options = {
     'className': $doc.fullName,
     'translationPrefix' : 'platform.index.',
-    'rowCount': 10,
-    'outputOnlyHtml': true,
     'queryFilters': ['unique']
   })
-  #livetable("classEntries" $columns $columnsProperties $options)
-  {{/html}}
+  {{liveData
+    id="classEntries"
+    properties="doc.title,doc.location,doc.date,doc.author,doc.objectCount,_actions"
+    source="liveTable"
+    className="$services.rendering.escape(${doc.fullName}, 'xwiki/2.1')"
+    sourceParameters="$services.rendering.escape($escapetool.url($options), 'xwiki/2.1')"
+  }}
+  {
+    "meta": {
+      "propertyDescriptors": [
+        {
+          "id": "doc.title",
+          "editable": false
+        },
+        {
+          "id": "doc.objectCount",
+          "editable": false,
+          "filterable": false,
+          "sortable": false
+        }
+      ]
+    }
+  }
+  {{/liveData}}
 
   (% id="HClassSheets" %)
   = {{translation key="platform.xclass.defaultClassSheet.sheets.heading"/}} =
@@ -234,15 +262,21 @@
     {{translation key="platform.xclass.defaultClassSheet.sheets.missing"/}}
   #end
 
-  {{info}}$services.localization.render('platform.xclass.defaultClassSheet.sheets.description', ['//', '//']){{/info}}
+  {{info}}
+    #set ($message = $services.localization.render('platform.xclass.defaultClassSheet.sheets.description', ['__START_EM__', '__END_EM__']))
+    #set ($message = $escapetool.xml($message))
+    ## First escape the content of the translation, then replace the placeholders with content that would
+    ## otherwise be escaped during the first escaping.
+    {{html}}$message.replace('__START_EM__', '&lt;em&gt;').replace('__END_EM__', '&lt;/em&gt;'){{/html}}
+  {{/info}}
 
   #if(!$hasClassSheets)
     {{html}}
       &lt;form action="$xwiki.getURL($defaultClassSheetReference, 'save', 'editor=wiki')" method="post"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-          &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-          &lt;input type="hidden" name="xredirect" value="${doc.URL}"/&gt;
+          &lt;input type="hidden" name="parent" value="$escapetool.xml(${doc.fullName})"/&gt;
+          &lt;input type="hidden" name="xredirect" value="$escapetool.xml(${doc.URL})"/&gt;
           #set ($sheetContent = $xwiki.getDocument('XWiki.ObjectSheet').getContent().replace('XWiki.MyClass',
             $doc.fullName))
           ## We have to encode the new line characters in order to preserve them, otherwise they are replace with a
@@ -267,7 +301,9 @@
         {{translation key="platform.xclass.defaultClassSheet.sheets.notBound"/}} ##
         #if ($hasEdit)
           {{html}}
-          &lt;a href="$bindURL"&gt;$services.localization.render('platform.xclass.defaultClassSheet.sheets.bind') »&lt;/a&gt;.
+          &lt;a href="$escapetool.xml($bindURL)"&gt;##
+            $escapetool.xml($services.localization.render('platform.xclass.defaultClassSheet.sheets.bind')) »##
+          &lt;/a&gt;.
           {{/html}}
         #end
       {{/warning}}
@@ -279,7 +315,12 @@
         #set($classSheetDoc = $xwiki.getDocument($classSheetReferences.get(0)))
       #end
       #set ($sheetPath = "#hierarchy($classSheetDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
-      [[$services.localization.render('platform.xclass.defaultClassSheet.sheets.view', [$sheetPath.trim()]) »&gt;&gt;${classSheetDoc.fullName}]]
+      #set ($classSheetLink = "$services.localization.render('platform.xclass.defaultClassSheet.sheets.view', [$sheetPath.trim()]) »")
+      #set ($classSheetLink = $services.rendering.escape($classSheetLink, 'xwiki/2.1'))
+      #set ($classSheetLink = $services.rendering.escape($classSheetLink, 'xwiki/2.1'))
+      #set ($classSheetText = ${classSheetDoc.fullName})
+      #set ($classSheetText = $services.rendering.escape($classSheetText, 'xwiki/2.1'))
+      [[$classSheetLink&gt;&gt;$classSheetText]]
     #else
       {{translation key="platform.xclass.defaultClassSheet.sheets.list"/}}
 
@@ -292,17 +333,22 @@
   (% id="HClassTemplate" %)
   = {{translation key="platform.xclass.defaultClassSheet.template.heading"/}} =
 
-    {{info}}$services.localization.render('platform.xclass.defaultClassSheet.template.description',
-      ['//', '//']){{/info}}
+    {{info}}
+      #set ($message = $services.localization.render('platform.xclass.defaultClassSheet.template.description', ['__START_EM__', '__END_EM__']))
+      #set ($message = $escapetool.xml($message))
+      ## First escape the content of the translation, then replace the placeholders with content that would
+      ## otherwise be escaped during the first escaping.
+      {{html}}$message.replace('__START_EM__', '&lt;em&gt;').replace('__END_EM__', '&lt;/em&gt;'){{/html}}
+    {{/info}}
 
   #if (!$hasClassTemplate)
     {{html}}
-      &lt;form action="$classTemplateDoc.getURL('save', 'editor=wiki')" method="post"&gt;
+      &lt;form action="$escapetool.xml($classTemplateDoc.getURL('save', 'editor=wiki'))" method="post"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-          &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-          &lt;input type="hidden" name="xredirect" value="${doc.URL}"/&gt;
-          &lt;input type="hidden" name="title" value="$className Template"/&gt;
+          &lt;input type="hidden" name="parent" value="$escapetool.xml(${doc.fullName})"/&gt;
+          &lt;input type="hidden" name="xredirect" value="$escapetool.xml(${doc.URL})"/&gt;
+          &lt;input type="hidden" name="title" value="$escapetool.xml($className) Template"/&gt;
           &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$escapetool.xml(
             $services.localization.render('platform.xclass.defaultClassSheet.template.create'))"/&gt;&lt;/span&gt;
         &lt;/div&gt;
@@ -311,25 +357,44 @@
   #else
     #if(!$classTemplateDoc.getObject(${doc.fullName}))
       #set($xredirect = $xwiki.relativeRequestURL)
-      #set($createUrl = $classTemplateDoc.getURL('objectadd', "classname=${escapetool.url($doc.fullName)}&amp;amp;xredirect=${escapetool.url($xredirect)}&amp;amp;form_token=$!{services.csrf.getToken()}"))
+      #set($createUrl = $classTemplateDoc.getURL('objectadd', "classname=${escapetool.url($doc.fullName)}&amp;xredirect=${escapetool.url($xredirect)}&amp;form_token=$!{services.csrf.getToken()}"))
       {{warning}}
-        $services.localization.render('platform.xclass.defaultClassSheet.template.missingObject', ["//$className//"]) ##
-        {{html}}&lt;a href="$createUrl"&gt;$escapetool.xml($services.localization.render(
-          'platform.xclass.defaultClassSheet.template.addObject', [$className])) »&lt;/a&gt;.{{/html}}
+        #set ($message = $services.localization.render('platform.xclass.defaultClassSheet.template.missingObject', ['__CLASS_NAME__']))
+        #set ($message = $escapetool.xml($message))
+        {{html}}
+          ## First escape the content of the translation, then replace the placeholders with content that would
+          ## otherwise be escaped during the first escaping.
+          $message.replace('__CLASS_NAME__', "&lt;em&gt;$escapetool.xml($className)&lt;/em&gt;")
+          &lt;a href="$escapetool.xml($createUrl)"&gt;##
+            $escapetool.xml($services.localization.render('platform.xclass.defaultClassSheet.template.addObject', [$className])) »##
+          &lt;/a&gt;.
+        {{/html}}
       {{/warning}}
 
     #end
     #set ($templatePath = "#hierarchy($classTemplateDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
-    [[$services.localization.render('platform.xclass.defaultClassSheet.template.view',
-      [$templatePath.trim()]) »&gt;&gt;${classTemplateDoc.fullName}]]
+    #set ($templateDocLink = "$services.localization.render('platform.xclass.defaultClassSheet.template.view', [$templatePath.trim()]) »")
+    #set ($templateDocLink = $services.rendering.escape($templateDocLink, 'xwiki/2.1'))
+    #set ($templateDocLink = $services.rendering.escape($templateDocLink, 'xwiki/2.1'))
+    #set ($templateDocText = "${classTemplateDoc.fullName}")
+    ## First escape the xwiki/2.1 syntax of the translation, then replace the placeholders with content that would
+    ## otherwise be escaped during the first escaping.
+    #set ($templateDocText = $services.rendering.escape($templateDocText, 'xwiki/2.1'))
+    [[$templateDocLink&gt;&gt;$templateDocText]]
   #end
   ## Create a template provider only if a template for the current class exists.
   #if ($classTemplateDoc.getObject(${doc.fullName}))
     (% id="HClassTemplateProvider" %)
     = {{translation key="platform.xclass.defaultClassSheet.templateProvider.heading"/}} =
 
-      {{info}}$services.localization.render('platform.xclass.defaultClassSheet.templateProvider.description',
-        ['//']){{/info}}
+      {{info}}
+        #set ($message = $services.localization.render('platform.xclass.defaultClassSheet.templateProvider.description', ['__EM__']))
+        #set ($message = $services.rendering.escape($message, 'xwiki/2.1'))
+        ## First escape the xwiki/2.1 syntax of the translation, then replace the placeholders with content that would
+        ## otherwise be escaped during the first escaping.
+        ## The replacement key is itself escaped, and it's escaped form needs to be used for the replacement.
+        $message.replace('~_~_~E~M~_~_', '//')
+      {{/info}}
 
     #if (!$hasClassTemplateProvider)
       #set ($templateProviderClassName = 'XWiki.TemplateProviderClass')
@@ -349,12 +414,12 @@
         "${templateProviderClassName}_visibilityRestrictions": $restrictionSpace}))
       #set ($createUrl = $classTemplateProviderDoc.getURL('objectadd', $createUrlQueryString))
       {{html}}
-        &lt;form action="$classTemplateProviderDoc.getURL('save', 'editor=wiki')" method="post"&gt;
+        &lt;form action="$escapetool.xml($classTemplateProviderDoc.getURL('save', 'editor=wiki'))" method="post"&gt;
           &lt;div&gt;
             &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-            &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-            &lt;input type="hidden" name="xredirect" value="$createUrl"/&gt;
-            &lt;input type="hidden" name="title" value="$className Template Provider"/&gt;
+            &lt;input type="hidden" name="parent" value="$escapetool.xml(${doc.fullName})"/&gt;
+            &lt;input type="hidden" name="xredirect" value="$escapetool.xml($createUrl)"/&gt;
+            &lt;input type="hidden" name="title" value="$escapetool.xml($className) Template Provider"/&gt;
             &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$escapetool.xml(
               $services.localization.render('platform.xclass.defaultClassSheet.templateProvider.create'))"/&gt;&lt;/span&gt;
           &lt;/div&gt;
@@ -362,8 +427,11 @@
       {{/html}}
     #else
       #set ($templateProviderPath = "#hierarchy($classTemplateProviderDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
-      [[$services.localization.render('platform.xclass.defaultClassSheet.templateProvider.view',
-        [$templateProviderPath.trim()]) »&gt;&gt;${classTemplateProviderDoc.fullName}]]
+      #set ($linkTarget = "$services.localization.render('platform.xclass.defaultClassSheet.templateProvider.view', [$templateProviderPath.trim()]) »")
+      #set ($linkTarget = $services.rendering.escape($linkTarget, 'xwiki/2.1'))
+      #set ($linkTarget = $services.rendering.escape($linkTarget, 'xwiki/2.1'))
+      #set ($linkLabel = $services.rendering.escape(${classTemplateProviderDoc.fullName}, 'xwiki/2.1'))
+      [[$linkTarget&gt;&gt;$linkLabel]]
     #end
   #end
 

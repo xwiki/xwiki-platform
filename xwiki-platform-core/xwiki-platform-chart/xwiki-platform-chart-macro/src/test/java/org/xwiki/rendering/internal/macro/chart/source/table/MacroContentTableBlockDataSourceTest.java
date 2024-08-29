@@ -19,9 +19,12 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link MacroContentTableBlockDataSource}.
@@ -29,43 +32,38 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @version $Id$
  * @since 2.4M2
  */
-public class MacroContentTableBlockDataSourceTest extends AbstractMacroContentTableBlockDataSourceTest
+@ComponentTest
+class MacroContentTableBlockDataSourceTest extends AbstractMacroContentTableBlockDataSourceTest
 {
     @Test
-    public void testGetTableBlockWhenNullMacroContent() throws Exception
+    void getTableBlockWhenNullMacroContent()
     {
-        try {
-            getDataSource().getTableBlock(null, null);
-            Assert.fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class, () -> {
+            this.source.getTableBlock(null, null);
+        });
+        assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
+            exception.getMessage());
     }
 
     @Test
-    public void testGetTableBlockWhenEmptyMacroContent() throws Exception
+    void getTableBlockWhenEmptyMacroContent()
     {
-        try {
-            getDataSource().getTableBlock("", null);
-            Assert.fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class, () -> {
+            this.source.getTableBlock("", null);
+        });
+        assertEquals("A Chart Macro using an inline source must have a data table defined in its content.",
+            exception.getMessage());
     }
 
     @Test
-    public void testGetTableBlockWhenMacroContentDoesntContainTable() throws Exception
+    void getTableBlockWhenMacroContentDoesntContainTable() throws Exception
     {
         // Simulate a macro content of "not a table", i.e. not containing a table.
         setUpContentExpectation("not a table");
 
-        try {
-            getDataSource().getTableBlock("not a table", null);
-            Assert.fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("Unable to locate a suitable data table.", expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class, () -> {
+            this.source.getTableBlock("not a table", null);
+        });
+        assertEquals("Unable to locate a suitable data table.", exception.getMessage());
     }
 }

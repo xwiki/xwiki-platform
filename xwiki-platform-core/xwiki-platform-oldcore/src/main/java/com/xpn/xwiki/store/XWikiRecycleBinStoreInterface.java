@@ -22,6 +22,9 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -231,5 +234,38 @@ public interface XWikiRecycleBinStoreInterface
         // pass an empty document than null. However, if the document's reference is actually used, the result might be
         // unpredictable.
         deleteFromRecycleBin(new XWikiDocument(), index, context, bTransaction);
+    }
+
+    /**
+     * Check if the given deleted document can be accessed for the given right by the given user.
+     * This method only throw the {@link AuthorizationException} if the right is not granted.
+     *
+     * @param right the right to check access for
+     * @param userReference the user for whom to check access
+     * @param deletedDocument the document to be accessed
+     * @throws AuthorizationException if the user doesn't have appropriate right
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    default void checkAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument) throws
+        AuthorizationException
+    {
+    }
+
+    /**
+     * Check if the given deleted document can be accessed for the given right by the given user.
+     *
+     * @param right the right to check access for
+     * @param userReference the user for whom to check access
+     * @param deletedDocument the document to be accessed
+     * @return {@code true} if the user have appropriate right
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    default boolean hasAccess(Right right, UserReference userReference, XWikiDeletedDocument deletedDocument)
+    {
+        return false;
     }
 }

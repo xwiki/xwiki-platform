@@ -114,8 +114,7 @@ public class GroupMimeMessageIteratorTest
 
         when(document.getXObjects(any(EntityReference.class))).thenReturn(Arrays.asList(object, object, object));
 
-        DocumentReferenceResolver<String> resolver =
-            (DocumentReferenceResolver<String>) mock(DocumentReferenceResolver.class);
+        DocumentReferenceResolver<String> resolver = mock(DocumentReferenceResolver.class);
         when(resolver.resolve("XWiki.JohnDoe")).thenReturn(userReference1);
         when(resolver.resolve("XWiki.JaneDoe")).thenReturn(userReference2);
         when(resolver.resolve("XWiki.JonnieDoe")).thenReturn(userReference3);

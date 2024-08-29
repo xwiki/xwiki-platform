@@ -37,11 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Das Wiki enthält Dokumente, die standardmäßig nicht angezeigt werden. Diese verborgenen Dokumente repräsentieren technische Inhalte wie Anwendungsklassen, Konfigurationsseiten, Makros, Stile, Skripts usw.
-XWiki.XWikiUsers_accessibility.hint=Zusätzliche Barrierefreiheit aktiviert diverse visuelle Verbesserungen wie: Größere Schriften, unterstrichene Links, etc.
+XWiki.XWikiUsers_underline.hint=Lege fest, ob Links unterstrichen werden sollen.
 XWiki.XWikiUsers_timezone.hint=Verwenden Sie eine bestimmte Zeitzone, damit die Daten Ihrem aktuellen Standort entsprechen.
 XWiki.XWikiUsers_editor.hint=Wählen Sie einen Standard-Editor, der den global definierten Standard-Editor überschreibt. Wenn nicht definiert, wird entsprechend dem Inhalt ein Editor gewählt.
-### Missing: XWiki.XWikiUsers_usertype.hint=Choose what type of user will be the default one. Advanced users will have access to multiple editing features, terminal page creation, etc.
-### Missing: XWiki.XWikiUsers_extensionConflictSetup.hint=Indicate if you want Extension Manager to ask you to confirm conflict resolution default rules (for example tell Extension Manager to ask you what to do if the document to upgrade has been removed from the wiki).
+XWiki.XWikiUsers_usertype.hint=Wählen Sie den Standardbenutzertyp aus. Fortgeschrittene Benutzer haben Zugriff auf weitere Bearbeitungsfunktionen, die Erstellung von Terminalseiten usw.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Geben Sie an, ob Sie von Extension Manager aufgefordert werden sollen, die Standardregeln für die Konfliktlösung zu bestätigen (z. B. Extension Manager anweisen, Sie zu fragen, was zu tun ist, wenn das zu aktualisierende Dokument aus dem Wiki entfernt wurde).
 userprofile.default=Standard
 user.profile.groups.title=Gruppen
 user.profile.groups.description=Hier sind alle Gruppen aufgelistet, denen Ihr Benutzer angehört.
@@ -58,7 +58,16 @@ user.profile.network.unfollow=Nicht mehr folgen
 user.profile.network.done=Erledigt
 user.profile.network.saving=Speichert…
 user.profile.network.error=Fehler beim Speichern der Benachrichtigungseinstellungen
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+user.profile.status.done=Erledigt
+user.profile.status.saving=Speichern...
+user.profile.status.error=Fehler beim Speichern des Benutzerstatus
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=Zusätzliche Barrierefreiheit aktiviert diverse visuelle Verbesserungen wie: Größere Schriften, unterstrichene Links, etc.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

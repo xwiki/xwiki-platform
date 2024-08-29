@@ -24,7 +24,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Generic interface to manage {@link AverageRating}.
@@ -184,6 +183,5 @@ public interface AverageRatingManager
      * @throws RatingsException in case of problem during the update.
      * @since 12.10
      */
-    @Unstable
     long moveAverageRatings(EntityReference oldReference, EntityReference newReference) throws RatingsException;
 }

@@ -128,7 +128,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
                 this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
                 this.documentReference.getWikiReference().getName()));
 
-        this.observation.addListener(this);
+        this.observation.addListener(this, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
     }
 
     protected void setReference(DocumentReference reference)
@@ -138,19 +138,25 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         setId(this.idPrefix + this.serializer.serialize(reference));
     }
 
-    protected LocalizedTranslationBundle loadDocumentLocaleBundle(Locale locale) throws Exception
+    /**
+     * Gets the document that defines the translation bundle for a given locale.
+     *
+     * @param locale the requested locale
+     * @return the document defining the translation bundle, or null if it could not be fetched yet and requires a retry
+     */
+    protected XWikiDocument getDocumentLocaleBundle(Locale locale) throws Exception
     {
         XWikiContext context = this.contextProvider.get();
 
         if (context == null) {
-            // No context for some reason, lets try later
+            // No context for some reason, let's try later.
             return null;
         }
 
         XWiki xwiki = context.getWiki();
 
         if (xwiki == null) {
-            // No XWiki instance ready, lets try later
+            // No XWiki instance ready, let's try later.
             return null;
         }
 
@@ -158,11 +164,23 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
             document = xwiki.getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
+        }
 
-            if (document.isNew()) {
-                // No document found for this locale
-                return LocalizedTranslationBundle.EMPTY;
-            }
+        return document;
+    }
+
+    protected LocalizedTranslationBundle loadDocumentLocaleBundle(Locale locale) throws Exception
+    {
+        XWikiDocument document = getDocumentLocaleBundle(locale);
+
+        if (document == null) {
+            // Either no context or XWiki instance not ready, let's try later.
+            return null;
+        }
+
+        if (document.isNew()) {
+            // No document found for this locale.
+            return LocalizedTranslationBundle.EMPTY;
         }
 
         String content = document.getContent();
@@ -170,7 +188,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         Properties properties = new Properties();
         properties.load(new StringReader(content));
 
-        // Convert to LocalBundle
+        // Convert to LocalBundle.
         DefaultLocalizedTranslationBundle localeBundle = new DefaultLocalizedTranslationBundle(this, locale);
 
         TranslationMessageParser parser = getTranslationMessageParser();

@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="ko">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=여기에서 응용 프로그램 표시줄(기본적으로 왼쪽)에 표시되는 응용 프로그램을 선택할 수 있습니다. 새로운 응용 프로그램이 여기에 표시됩니다. 그 중 일부를 제거하려면 첫 번째 상자에서 다른 상자로 아이콘을 끌어다 놓으면 됩니다. 원하는 대로 애플리케이션을 다시 주문할 수도 있습니다. 변경 사항을 저장하는 것을 잊지 마세요!
+platform.panels.applications.displayedapps=바의 애플리케이션
+platform.panels.applications.blacklistedapps=바에 없는 애플리케이션
+platform.panels.applications.save=저장
+platform.panels.applications.revert=초기화
+platform.panels.applications.ajax.success=구성이 저장되었습니다.
+platform.panels.applications.ajax.csrf=CSRF 검증에 실패했습니다. 페이지를 새로고침해 보세요.
+platform.panels.applications.ajax.noright=PanelsCode.ApplicationsPanelConfiguration을 편집할 권한이 없습니다.
+platform.panels.applications.ajax.error=변경사항을 저장하지 못했습니다.
+admin.panels.applications=애플리케이션 패널
+admin.panels.applications.description=응용 프로그램 패널에 표시되는 응용 프로그램을 관리합니다.
+admin.panels.navigation=탐색 패널
+admin.panels.navigation.description=탐색 패널에 표시되는 페이지를 관리합니다.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=최상위 확장 페이지 제외
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=이 동적 필터는 설치된 확장 프로그램에 속한 최상위 페이지가 수정되지 않는 경우 탐색 트리에서 제거합니다.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=최상위 애플리케이션 페이지 제외
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=이 동적 필터는 App Within Minutes로 생성된 애플리케이션에 속하는 최상위 페이지를 탐색 트리에서 제거합니다.
+PanelsCode.NavigationConfigurationClass_exclusions=제외
+PanelsCode.NavigationConfigurationClass_exclusions.hint=탐색 트리에서 제외할 페이지 목록입니다.
+PanelsCode.NavigationConfigurationClass_inclusions=포함사항
+PanelsCode.NavigationConfigurationClass_inclusions.hint=이전 필터에 의해 제외된 경우에도 탐색 트리에 포함할 페이지 목록입니다.
+platform.panels.navigation.configuration.excludedPages=제외된 페이지
+platform.panels.navigation.configuration.excludedPages.hint=페이지를 탐색 트리 밖으로 이동하거나 다시 넣으려면 끌어서 놓기를 사용하세요.
+platform.panels.navigation.configuration.excludedPages.empty=없음
+platform.panels.navigation.configuration.topLevelExtensionPages=최상위 확장 페이지
+platform.panels.navigation.configuration.topLevelApplicationPages=최상위 신청 페이지
+platform.panels.navigation.configuration.otherPages=다른 페이지
+platform.panels.navigation.configuration.saveComment=관리에서 탐색 패널 구성을 업데이트했습니다
+</content>
+  </xwikidoc>

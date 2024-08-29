@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="zh">
+<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="zh">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>zh</language>
@@ -37,11 +37,11 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=名称
 extension.repository.summary=概要
 extension.repository.type=类型
-extension.repository.category=类别
+extension.repository.category=分类
 extension.repository.authors=作者
 extension.repository.doc.creationDate=创建于
 extension.repository.doc.date=最后修改
@@ -49,5 +49,6 @@ extension.repository.rating=评分
 extension.repository.installedCount=安装次数
 
 ## Administration UI
-admin.repository=扩展库</content>
+admin.repository=扩展库
+</content>
 </xwikidoc>

@@ -19,13 +19,23 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.text.StringUtils;
+
+import com.xpn.xwiki.XWiki;
 
 /**
  * Factory to create a cache key.
@@ -41,6 +51,9 @@ public class CacheKeyFactory
 
     @Inject
     private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
+
+    @Inject
+    private Container container;
 
     /**
      * Get the cache key corresponding to the given LESS resource and context.
@@ -62,10 +75,25 @@ public class CacheKeyFactory
         String result = lessResource.length()  + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
                      +  skin.length()          + CACHE_KEY_SEPARATOR + skin         + CACHE_KEY_SEPARATOR
                      +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
-        
+
         if (withContext) {
+            /** Also take into account the request parameters, if any, except parameters which are already
+             * taken into account or that are irrelevant. */
+            Request request = container.getRequest();
+            List<String> excludes = Arrays.asList("skin", "colorTheme", "colorThemeVersion", "language", "docVersion",
+                XWiki.CACHE_VERSION);
+            if (request instanceof ServletRequest) {
+                Map<String, String[]> parameters = ((ServletRequest) request).getHttpServletRequest().getParameterMap();
+                for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
+                    if (!excludes.contains(entry.getKey())) {
+                        String[] values = entry.getValue();
+                        result += CACHE_KEY_SEPARATOR + entry.getKey() + ":" + StringUtils.join(values, "|");
+                    }
+                }
+            }
+
             String xcontext = xcontextCacheKeyFactory.getCacheKey();
-            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext; 
+            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext;
         }
 
         return result;

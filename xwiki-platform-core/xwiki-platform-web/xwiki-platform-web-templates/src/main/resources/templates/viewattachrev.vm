@@ -19,8 +19,9 @@
 ## ---------------------------------------------------------------------------
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
-<h3>$services.localization.render("core.viewers.attachments.revisions", [$attachment.filename])</h3>
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
+<h3>$services.localization.render("core.viewers.attachments.revisions", [$escapetool.html($attachment.filename)])</h3>
 #if ("$tdoc.realLocale" != '')
 #set($lang = "&language=${tdoc.realLocale}")
 #else
@@ -30,6 +31,9 @@
     <tr>
         <th></th><th>$services.localization.render('version')</th><th>$services.localization.render('size')</th>
         <th>$services.localization.render('author')</th><th>$services.localization.render('date')</th>
+        #if ($services.attachment.configuration.commentsEnabled)
+          <th>$services.localization.render('core.viewers.attachments.livetable.comment')</th>
+        #end
     </tr>
 #foreach ($version in $attachment.getVersions())
     <tr#if($foreach.count % 2 == 1) class="table-odd"#else class="table-even"#end>
@@ -40,7 +44,7 @@
   #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
 #end
 #if ($attachment.isImage())
-        <td><img src="${url}" alt="${attachment.filename}" width="80" />
+        <td><img src="${url}" alt="${escapetool.xml($attachment.filename)}" width="80" />
 #else
         <td class="mime">#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase())
 #end
@@ -49,9 +53,12 @@
         <td>$attachrev.longSize</td>
         <td>$xwiki.getUserName($attachrev.getAuthor())</td>
         <td>$xwiki.formatDate($attachrev.getDate())</td>
+        #if ($services.attachment.configuration.commentsEnabled)
+          <td>$escapetool.xml($attachrev.comment)</td>
+        #end
     </tr>
 #end
 </table>
-</div>## mainContentArea
+</main>## mainContentArea
 </div>## main
 #template("endpage.vm")

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.OfficeImporter" locale="">
+<xwikidoc version="1.5" reference="XWiki.OfficeImporter" locale="">
   <web>XWiki</web>
   <name>OfficeImporter</name>
   <language/>
@@ -36,148 +36,298 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($displayDocExtra = false)
-#if ($isguest)
-  {{error}}$services.localization.render('xe.officeimporter.notallowed'){{/error}}
-#elseif (!$services.officemanager.isConnected())
-  #if ($hasAdmin)
-    {{error}}$services.localization.render('xe.officeimporter.error.adminuser', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application]]']){{/error}}
-  #else
-    {{error}}$services.localization.render('xe.officeimporter.error.normaluser'){{/error}}
-  #end
-#elseif("$!request.page" == '')
-  ## This page does not propose to select the target page anymore. We redirect to the create action instead
-  ## Note: we make the URL from the main page and not from the current one. Because the user have probably not the
-  ## create right on the "XWiki" space, and this space should be reserved for technical usage.
-  {{error}}$services.localization.render('office.form.error.noDocument', ['[[', "&gt;&gt;path:$xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference, 'create', 'type=office')]]"]){{/error}}
-#else
+  <content>{{velocity output="false"}}
+#macro (officeImporterForm)
   #set ($targetReference = $services.model.resolveDocument($request.page))
-  #set ($targetDoc = $xwiki.getDocument($targetReference))
+  #set ($targetPageIsNested = $targetReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name)
+  #set ($discard = $xwiki.ssx.use('XWiki.OfficeImporter'))
   #set ($discard = $xwiki.jsx.use('XWiki.OfficeImporter'))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
-
-{{html}}
-&lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post" class="xform" id="officeImportForm"&gt;
-  &lt;dl class="row"&gt;
-    ##
-    ## Left part
-    ##
-    &lt;div class="col-xs-12 col-md-6"&gt;
-      ##
-      ## Document
-      ##
-      &lt;dt&gt;
-        &lt;label for="filepath"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.document'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd class="buttonwrapper"&gt;
-        &lt;input id="filepath" type="file" name="filePath" value="" size="40" class="button secondary" /&gt;
-      &lt;/dd&gt;
-      ##
-      ## Target
-      ##
-      &lt;dt&gt;
-        &lt;label&gt;Target&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        #template('hierarchy_macros.vm')
-        #hierarchy($targetReference)
-      &lt;/dd&gt;
-      ##
-      ## Append result
-      ##
-      #if (!$targetDoc.isNew())
-        &lt;dt class="warningmessage"&gt;
-          &lt;label for="appendContentInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.appendresult'))&lt;/label&gt;
-          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('office.form.append.hint'))&lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd class="warningmessage"&gt;
-          &lt;input id="appendContentInputId" name="appendContent" type="checkbox" value="true" /&gt;
-        &lt;/dd&gt;
-      #end
-    &lt;/div&gt;
-    ##
-    ## Right part
-    ##
-    &lt;div class="col-xs-12 col-md-6"&gt;
-      ##
-      ## Styles
-      ##
-      &lt;dt&gt;
-        &lt;label for="filterStylesInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.filterstyles'))&lt;/label&gt;
-        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.help.styles'))&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict" checked="checked"/&gt;
-      &lt;/dd&gt;
-      ##
-      ## Splitting
-      ##
-      &lt;dt&gt;
-        &lt;label for="splitDocumentInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.splitdocument'))&lt;/label&gt;
-        &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.help.splitting'))&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="splitDocumentInputId" name="splitDocument" type="checkbox" value="true"/&gt;
-      &lt;/dd&gt;
-      ##
-      ## Heading level splits
-      ##
-      &lt;dt&gt;
-        &lt;label for="headingLevelsToSplitInputId" class="multipleselect"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.headinglevels'))&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit"&gt;
-          #foreach($h in [1..6])
-            &lt;option value="${h}"#if ($foreach.count == 1) selected="selected"#end&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.heading'))-${h}&lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-      ##
-      ## Child pages naming method:
-      ##
-      #if ($targetDoc.documentReference.name == 'WebHome')
-        ## When the target page is not terminal, the only logical strategy to use is "headingNames". It creates pages
-        ## as children of the target, which seems to be the correct way in the nested pages paradigm.
-        ## The other choices have no sense:
-        ## - "mainPageNameAndHeading" will create pages called "WebHome-Title1" instead of "targetDoc/Title1".
-        ## - "mainPageNameAndNumbering" will create pages called "WebHome-1" instead of "targetDoc/1".
-        ## In both cases, the "WebHome" part of the names are meaningless.
+  {{html clean="false"}}
+  &lt;form id="officeImportForm" class="xform" method="post" enctype="multipart/form-data"
+      action="$escapetool.xml($xwiki.getURL('XWiki.OfficeImporterResults'))"
+      data-progress-message="$escapetool.xml($services.localization.render('office.import.inProgress'))"
+      data-done-message="$escapetool.xml($services.localization.render('office.import.done'))"
+      data-failed-message="$escapetool.xml($services.localization.render('office.import.failed'))"&gt;
+    &lt;fieldset&gt;
+      &lt;dl class="row"&gt;
         ##
-        ## NOTE: The created children are terminal until https://jira.xwiki.org/browse/XWIKI-12569 is fixed.
-        &lt;input type="hidden" name="childPagesNamingMethod" value="headingNames" /&gt;
-      #else
-        &lt;dt&gt;
-          &lt;label for="childPagesNamingMethodInputId"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming'))&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;
-            &lt;option value="headingNames"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.headingnames'))&lt;/option&gt;
-            &lt;option value="mainPageNameAndHeading"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandheading'))&lt;/option&gt;
-            &lt;option value="mainPageNameAndNumbering"&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.mainpagenameandnumbering'))&lt;/option&gt;
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      #end
+        ## Left part
+        ##
+        &lt;div class="col-xs-12 col-md-6"&gt;
+          #officeImporterForm_officeDocument()
+          #officeImporterForm_targetPage()
+          #if ($xwiki.exists($targetReference))
+            #officeImporterForm_overwriteContent()
+          #end
+        &lt;/div&gt;
+        ##
+        ## Right part
+        ##
+        &lt;div class="col-xs-12 col-md-6"&gt;
+          #officeImporterForm_filterStyles()
+          #officeImporterForm_splitDocument()
+          #officeImporterForm_headingLevelsToSplit()
+          #officeImporterForm_childPagesNamingMethod()
+          #officeImporterForm_terminalChildPages()
+        &lt;/div&gt;
+      &lt;/dl&gt;
+      ##
+      ## Hidden inputs
+      ##
+      &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" /&gt;
+      ## Normalize the parent reference of the new document so that even in a subwiki it points to the current wiki.
+      #set ($normalizedParentReference = $services.model.resolveDocument("$!request.parent", 'current'))
+      &lt;input type="hidden" name="parent" value="$escapetool.xml($normalizedParentReference)" /&gt;
+      &lt;input type="hidden" name="target" value="$escapetool.xml($services.model.serialize($targetReference,
+        'default'))" /&gt;
+      ##
+      ## Form action buttons
+      ##
+      &lt;div class="buttons"&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button id="submit"&gt;
+            $escapetool.xml($services.localization.render('xe.officeimporter.import.import'))
+          &lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;a class="secondary button" href="$escapetool.xml($xwiki.getURL($targetReference))"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/a&gt;
+        &lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro (officeImporterForm_officeDocument)
+  ## FIXME: The following list of file name extensions and media types are duplicated from the office resource reference
+  ## picker (templates/html_displayer/officeresourcereference/edit.vm).
+  #set ($officeFileNameExtensions = $stringtool.join([
+    '.doc', '.docx',
+    '.xls', '.xlsx',
+    '.ppt', '.pptx',
+    '.odt', '.ott', '.fodt',
+    '.ods', '.ots', '.fods',
+    '.odp', '.otp', '.fodp',
+    '.sxw', '.sxc', '.sxi'
+  ], ','))
+  #set ($officeMediaTypes = $stringtool.join([
+    'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint',
+    'application/vnd.oasis.opendocument.',
+    'application/vnd.openxmlformats-officedocument.',
+    'application/vnd.sun.xml.'
+  ], ','))
+  &lt;dt&gt;
+    &lt;label for="filePath"&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.document'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.document.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd class="buttonwrapper"&gt;
+    &lt;input type="file" id="filePath" name="filePath" value="" size="40" class="button secondary" required
+      accept="$escapetool.xml("$officeFileNameExtensions,$officeMediaTypes")" /&gt;
+  &lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_targetPage)
+  &lt;dt&gt;
+    &lt;label&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.target'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.target.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    #template('hierarchy_macros.vm')
+    #hierarchy($targetReference)
+  &lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_overwriteContent)
+  &lt;dt class="box warningmessage"&gt;
+    &lt;label&gt;
+      &lt;input name="overwriteContent" type="checkbox" value="true" checked /&gt;
+      $escapetool.xml($services.localization.render('office.import.overwriteContent'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.overwriteContent.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    #officeImporterForm_confirmationModal({
+      'cssClass': 'confirmation-overwriteContent',
+      'title': 'office.import.overwriteContent',
+      'message': 'office.import.overwriteContent.confirmationMessage',
+      'action': 'office.import.overwriteContent.confirmationAction'
+    })
+  &lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_confirmationModal $config)
+  &lt;div class="confirmation modal fade $!escapetool.xml($config.cssClass)" tabindex="-1" role="dialog"&gt;
+    &lt;div class="modal-dialog"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal"&gt;&amp;times;&lt;/button&gt;
+          &lt;div class="modal-title"&gt;
+            $escapetool.xml($services.localization.render($config.title))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          $escapetool.xml($services.localization.render($config.message))
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;input type="button" class="btn btn-danger"  data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render($config.action))"&gt;
+          &lt;input type="button" class="btn btn-default" data-dismiss="modal"
+            value="$escapetool.xml($services.localization.render('cancel'))"&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
-  &lt;/dl&gt;
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
-  ##
-  ## Hidden inputs
-  ##
-  &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-  ## Normalize the parent reference of the new document so that even in a subwiki it points to the current wiki
-  #set ($normalizedParentReference = $services.model.resolveDocument("$!request.parent", 'current'))
-  &lt;input type="hidden" name="parent" value="$normalizedParentReference" /&gt;
-  &lt;input type="hidden" name="target" value="$escapetool.xml($services.model.serialize($targetReference, 'default'))" id="target"/&gt;
-  ##
-  ## Confirm button
-  ##
-  &lt;span class="buttonwrapper"&gt;
-    &lt;input type="submit" value="$services.localization.render('xe.officeimporter.import.import')" class="button" id="submit"/&gt;
-  &lt;/span&gt;
-&lt;/form&gt;
-{{/html}}
+  &lt;/div&gt;
+#end
+
+#macro (officeImporterForm_filterStyles)
+  &lt;dt&gt;
+    &lt;label&gt;
+      &lt;input name="filterStyles" type="checkbox" value="strict" checked /&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.filterstyles'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.help.styles'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;&lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_splitDocument)
+  &lt;dt&gt;
+    &lt;label&gt;
+      &lt;input name="splitDocument" type="checkbox" value="true" /&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.splitdocument'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.help.splitting'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;&lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_headingLevelsToSplit)
+  &lt;dt&gt;
+    &lt;label for="headingLevelsToSplitInputId"&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.headinglevels'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.headingLevelsToSplit.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    &lt;select id="headingLevelsToSplitInputId" name="headingLevelsToSplit" multiple required size="6"
+        class="splitDocument-setting"&gt;
+      #foreach ($level in [1..6])
+        &lt;option value="$level"#if ($level == 1) selected#end&gt;
+          $escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.heading')) $level
+        &lt;/option&gt;
+      #end
+    &lt;/select&gt;
+  &lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_childPagesNamingMethod)
+  ## Hide the field when the target page is nested (not terminal) because the only logical strategy in this case is to
+  ## use "headingNames". It creates pages as children of the target, which seems to be the correct way in the nested
+  ## pages paradigm. The other choices have no sense:
+  ## - "mainPageNameAndHeading" will create pages called "WebHome-Title1" instead of "targetPage/Title1".
+  ## - "mainPageNameAndNumbering" will create pages called "WebHome-1" instead of "targetPage/1".
+  ## In both cases, the "WebHome" part of the names is meaningless.
+  &lt;dt#if ($targetPageIsNested) hidden#end&gt;
+    &lt;label for="childPagesNamingMethodInputId"&gt;
+      $escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.childPagesNaming.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;
+    &lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod" class="splitDocument-setting"
+        #if ($targetPageIsNested) hidden#end&gt;
+      &lt;option value="headingNames"#if ($targetPageIsNested) selected#end&gt;
+        $escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.naming.headingnames'))
+      &lt;/option&gt;
+      &lt;option value="mainPageNameAndHeading"#if (!$targetPageIsNested) selected#end&gt;
+        $escapetool.xml($services.localization.render(
+          'xe.officeimporter.import.splitting.naming.mainpagenameandheading'))
+      &lt;/option&gt;
+      &lt;option value="mainPageNameAndNumbering"&gt;
+        $escapetool.xml($services.localization.render(
+          'xe.officeimporter.import.splitting.naming.mainpagenameandnumbering'))
+      &lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/dd&gt;
+#end
+
+#macro (officeImporterForm_terminalChildPages)
+  #set ($hidden = !($targetPageIsNested &amp;&amp; ($isAdvancedUser || $isSuperAdmin)))
+  &lt;dt#if ($hidden) hidden#end&gt;
+    &lt;label&gt;
+      &lt;input type="checkbox" name="terminalChildPages" value="true"#if ($hidden) checked#end
+        class="splitDocument-setting" /&gt;
+      $escapetool.xml($services.localization.render('office.import.terminalChildPages'))
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $escapetool.xml($services.localization.render('office.import.terminalChildPages.hint'))
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;&lt;/dd&gt;
+#end
+
+#macro (officeImporter_translationWithLink $key $linkTarget)
+  #set ($targetSyntax = 'xwiki/2.1')
+  #set ($translation = $services.localization.render($key, $targetSyntax, ['LINKSTART', 'LINKEND']))
+  #set ($linkLabel = $stringtool.substringBetween($translation, 'LINKSTART', 'LINKEND'))
+  #if ($linkLabel)
+    #set ($escapedLinkLabel = $services.rendering.escape($linkLabel, $targetSyntax))
+    #set ($escapedLinkTarget = $services.rendering.escape($linkTarget, $targetSyntax))
+    $translation.replace("LINKSTART${linkLabel}LINKEND", "[[$escapedLinkLabel&gt;&gt;$escapedLinkTarget]]")
+  #else
+    $services.localization.render($key, $targetSyntax, ['', ''])
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.page" == '')
+  {{error}}
+  ## This page does not propose to select the target page anymore. The create action should be used instead.
+  ## Note: The link points to the main page because the user might not have create right on the current "XWiki" space,
+  ## which is reserved anyway for technical pages.
+  #set ($createURL = $xwiki.getURL($services.wiki.currentWikiDescriptor.mainPageReference, 'create', 'type=office'))
+  #officeImporter_translationWithLink('office.form.error.noDocument' "path:$createURL")
+  {{/error}}
+#else
+  ## Hide UI elements that are not needed for office import.
+  #set ($displayContentMenu = false)
+  #set ($displayContentFooter = false)
+  #set ($displayDocExtra = false)
+  #if ($isguest)
+    {{error}}$services.localization.render('xe.officeimporter.notallowed', 'xwiki/2.1'){{/error}}
+  #elseif (!$services.officemanager.isConnected())
+    #if ($hasAdmin)
+      {{error}}
+      #set ($documentationURL = 'http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application')
+      #officeImporter_translationWithLink('xe.officeimporter.error.adminuser' $documentationURL)
+      {{/error}}
+    #else
+      {{error}}$services.localization.render('xe.officeimporter.error.normaluser', 'xwiki/2.1'){{/error}}
+    #end
+  #else
+    #officeImporterForm()
+  #end
 #end
 {{/velocity}}</content>
   <object>
@@ -196,8 +346,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -211,10 +364,13 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
+        <restricted>0</restricted>
         <rows>20</rows>
         <size>50</size>
         <unmodifiable>0</unmodifiable>
@@ -243,6 +399,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -260,71 +418,216 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
-  $(document).ready(function() {
-  
-    // Add a validator on the document input
-    var documentValidator = new LiveValidation($('#filepath')[0], {
-      validMessage: "$services.localization.render('core.validation.valid.message')"
-    });
-    documentValidator.displayMessageWhenEmpty = true;
-    documentValidator.add(Validate.Custom, {
-      failureMessage: "$services.localization.render('core.validation.required.message')",
-      against: function(value) {
-        return typeof value === 'string' &amp;&amp; value.strip().length &gt; 0;
-      }
-    });
-  
-    /**
-     * Enable/disable the split option depending of the value of the split document checkbox
-     */
-    var maybeDisableSplitOptions = function () {
-      var splitOptionsDisabled = !$('#splitDocumentInputId').prop('checked');
-      $('#headingLevelsToSplitInputId').prop('disabled', splitOptionsDisabled);
-      $('#childPagesNamingMethodInputId').prop('disabled', splitOptionsDisabled);
+      <code>require(['jquery', 'bootstrap'], function($) {
+  /**
+   * Enable/disable the split document settings based on the value of the split document checkbox.
+   */
+  const maybeDisableSplitDocumentSettings = function() {
+    const splitDocumentDisabled = !$('input[name=splitDocument]').prop('checked');
+    $('.splitDocument-setting').prop('disabled', splitDocumentDisabled);
+  };
+
+  // Initalize the default state.
+  maybeDisableSplitDocumentSettings();
+
+  // Enable/disable the split document settings when the checkbox's value changes.
+  $('input[name=splitDocument]').on('change', maybeDisableSplitDocumentSettings);
+
+  /**
+   * Handle form submit.
+   */
+  $('#officeImportForm').on('submit', function(event) {
+    event.preventDefault();
+
+    const overwriteContentCheckbox = $('input[name=overwriteContent]');
+    if (!overwriteContentCheckbox.prop('checked') || overwriteContentCheckbox.data('confirmed')) {
+      importOfficeDocument($(event.target));
+    } else {
+      // Ask for confirmation to overwrite the content of the target page.
+      $('.modal.confirmation-overwriteContent').modal();
     }
-    
-    // Initalize the default state
-    maybeDisableSplitOptions();
-  
-    // Enable/disable the split options when the checkbox's value changes
-    $('#splitDocumentInputId').change(maybeDisableSplitOptions);
-    
-    /**
-     * Event sent when the form is submitted
-     */
-    $('#officeImportForm').submit(function(event) {
-      // Verify that the target document does not already exist
-      var appendContentCheckbox = $('#appendContentInputId');
-      if (appendContentCheckbox.length == 0 || appendContentCheckbox.prop('checked')) {
-        // Except if the "append content" checkbox is enabled or if it is not present!
-        return true;
-      }
-      
-      // The document exist
-      new XWiki.widgets.ConfirmationBox({
-        onYes: function() {
-          // Enable the append result checkbox
-          $('#appendContentInputId').prop('checked', true);
-          // Re-send the formular
-          $('#submit').click();
-        }
-      }, {
-        confirmationText: "$escapetool.javascript($services.localization.render('platform.office.importDocumentOverwriteConfirmation'))"
-      });
-      
-      return false;
-    });
-  
   });
-});
-</code>
+
+  $('.modal.confirmation-overwriteContent .btn-danger').on('click', function(event) {
+    // Remember the confirmation.
+    $('input[name=overwriteContent]').data('confirmed', true);
+    // Re-submit the form.
+    $('#officeImportForm #submit').click();
+  });
+
+  const importOfficeDocument = function(form) {
+    // Collect the form data before disabling the form.
+    const formData = new FormData(form[0]);
+    // Disable the form while the office document is being imported (to prevent the form from being re-submitted).
+    form.children('fieldset').prop('disabled', true);
+    // Let the user know that the import is in progress.
+    $('body').css('cursor', 'wait');
+    const notification = new XWiki.widgets.Notification(form.data('progressMessage'), 'inprogress');
+    // Send the office import request.
+    fetch(new XWiki.Document('OfficeImporterResults', 'XWiki').getURL('get'), {
+      method: 'POST',
+      body: formData
+    }).then(
+      response =&gt; response.text()
+    ).then(html =&gt; {
+      if (html.indexOf('infomessage') &gt; 0) {
+        // Office import successful.
+        notification.replace(new XWiki.widgets.Notification(form.data('doneMessage'), 'done'));
+        // Redirect to the target page.
+        const targetPageReference = XWiki.Model.resolve(formData.get('target'), XWiki.EntityType.DOCUMENT,
+          XWiki.currentDocument.documentReference);
+        window.location.href = new XWiki.Document(targetPageReference).getURL();
+      } else {
+        // Extract the error message from the returned HTML.
+        const errorMessage = $('&lt;div&gt;&lt;/div&gt;').html(html).text();
+        return Promise.reject(errorMessage);
+      }
+    }).catch(error =&gt; {
+      let failedMessage = form.data('failedMessage');
+      if (error) {
+        failedMessage += `: ${error}`;
+      }
+      notification.replace(new XWiki.widgets.Notification(failedMessage, 'error'));
+    }).finally(() =&gt; {
+      // Re-enable the office import.
+      form.children('fieldset').prop('disabled', false);
+      $('body').css('cursor', '');
+    });
+  };
+
+  // Everything is ready.
+  $('#officeImportForm #submit').attr('data-ready', true);
+});</code>
     </property>
     <property>
       <name>Code</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.OfficeImporter</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2c9ca015-5097-4158-a8fd-218bcb28f5c0</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.xdocLastModification,
+#hierarchy.breadcrumb {
+  display: none;
+}</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

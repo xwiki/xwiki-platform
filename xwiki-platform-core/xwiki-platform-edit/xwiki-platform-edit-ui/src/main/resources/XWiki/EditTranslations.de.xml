@@ -37,14 +37,24 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>edit.inplace.close=Schließen
-
 edit.inplace.page.lockFailed=Die Seite konnte nicht gesperrt werden.
 edit.inplace.page.loadFailed=Die Seite konnte nicht geladen werden.
 edit.inplace.page.renderFailed=Die Seite konnte nicht gerendert werden.
+edit.inplace.page.translate.messageBefore=Sie bearbeiten die {0} Übersetzung dieser Seite (die Originalversion), da diese Seite noch nicht in {1} (die ausgewählte Sprache) übersetzt wurde.
+edit.inplace.page.translate.messageAfter=Sie bearbeiten jetzt die {0} Übersetzung. Beginnen Sie mit der Übersetzung des Seitentitels.
+
+
+edit.inplace.actionButtons.loadFailed=Die Aktionsschaltflächen konnten nicht geladen werden.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
 
 edit.inplace.page.original=Sie bearbeiten die Originalseite ({0})
 edit.inplace.page.translation=Sie bearbeiten die folgende Übersetzung: {0}.
 
-
-edit.inplace.actionButtons.loadFailed=Die Aktionsschaltflächen konnten nicht geladen werden.</content>
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

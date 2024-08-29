@@ -19,9 +19,7 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,9 +39,15 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link AbstractEntityJobWithChecks}.
+ *
+ * @version $Id$
+ */
 @ComponentTest
-public class EntityJobWithChecksTest
+class EntityJobWithChecksTest
 {
+    // This class needs to remain public so that the test framework can find it.
     public static class MockAbstractEntityJobWithChecks
         extends AbstractEntityJobWithChecks<EntityRequest, EntityJobStatus<EntityRequest>>
     {
@@ -66,51 +70,60 @@ public class EntityJobWithChecksTest
     @Mock
     private EntityRequest request;
 
+    private DocumentReference documentReference;
+
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws ComponentLookupException
+    void setup(MockitoComponentManager componentManager) throws ComponentLookupException
     {
         EntityReferenceProvider entityReferenceProvider = componentManager.getInstance(EntityReferenceProvider.class);
 
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
         abstractEntityJobWithChecks.initialize(this.request);
+        this.documentReference = new DocumentReference("wiki", "space", "doc");
     }
 
     @Test
-    public void getDocumentEntities()
+    void getDocumentEntities_deepfalse()
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "doc");
-
         // request deep is false so we don't visit the space
         when(request.isDeep()).thenReturn(false);
         abstractEntityJobWithChecks.getEntities(documentReference);
 
-        Map<EntityReference, EntitySelection> expectedConcernedEntities = new HashMap<>();
-        expectedConcernedEntities.put(documentReference, new EntitySelection(documentReference));
-        assertEquals(expectedConcernedEntities, abstractEntityJobWithChecks.concernedEntities);
+        assertEquals(new EntitySelection(documentReference),
+            abstractEntityJobWithChecks.getConcernedEntitiesEntitySelection(documentReference));
+    }
 
-        // need to be cleared for next assertion
-        abstractEntityJobWithChecks.concernedEntities.clear();
+
+    @Test
+    void getDocumentEntities_deepTrueTerminal()
+    {
         // request deep is true, but isSpaceHomeReference will return false, so we still don't visit the space
         when(request.isDeep()).thenReturn(true);
         abstractEntityJobWithChecks.getEntities(documentReference);
-        assertEquals(expectedConcernedEntities, abstractEntityJobWithChecks.concernedEntities);
+        assertEquals(new EntitySelection(documentReference),
+            abstractEntityJobWithChecks.getConcernedEntitiesEntitySelection(documentReference));
+    }
 
-        // need to be cleared for next assertion
-        abstractEntityJobWithChecks.concernedEntities.clear();
+    @Test
+    void getDocumentEntities_deepTrueTerminalRootLocale()
+    {
+        when(request.isDeep()).thenReturn(true);
         // Ensure that the root locale is removed
         DocumentReference documentReferenceWithLocale = new DocumentReference(documentReference, Locale.ROOT);
         abstractEntityJobWithChecks.getEntities(documentReferenceWithLocale);
-        assertEquals(expectedConcernedEntities, abstractEntityJobWithChecks.concernedEntities);
+        assertEquals(new EntitySelection(documentReference),
+            abstractEntityJobWithChecks.getConcernedEntitiesEntitySelection(documentReferenceWithLocale));
+    }
 
-        // need to be cleared for next assertion
-        abstractEntityJobWithChecks.concernedEntities.clear();
+    @Test
+    void getDocumentEntities_deepTrueTerminalRootNotLocale()
+    {
         // Ensure that any other locale remains
-        documentReferenceWithLocale = new DocumentReference(documentReference, Locale.FRANCE);
+        DocumentReference documentReferenceWithLocale = new DocumentReference(documentReference, Locale.FRANCE);
         abstractEntityJobWithChecks.getEntities(documentReferenceWithLocale);
 
-        expectedConcernedEntities = new HashMap<>();
-        expectedConcernedEntities.put(documentReferenceWithLocale, new EntitySelection(documentReferenceWithLocale));
-        assertEquals(expectedConcernedEntities, abstractEntityJobWithChecks.concernedEntities);
+        assertEquals(new EntitySelection(documentReferenceWithLocale),
+            abstractEntityJobWithChecks.getConcernedEntitiesEntitySelection(documentReferenceWithLocale));
     }
 }

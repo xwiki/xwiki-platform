@@ -37,7 +37,8 @@ describe('DisplayerDocTitle.vue', () => {
           return {
             propertyHref: 'colorHref'
           };
-        }
+        },
+        isContentTrusted: () => true
       }
     });
     expect(wrapper.find('a').html()).toBe('<a href="entryLink" class="">Test <sup>1</sup></a>');

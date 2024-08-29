@@ -24,25 +24,23 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rest.internal.ModelFactory;
-import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.extension.RestExtensionInstaller;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
+
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getComponentManager;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getTestConfiguration;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getXWikiURL;
 
 /**
  * Finds all the extensions in the current pom (i.e. in the {@code ./pom.xml} in the current directory) that are not
@@ -54,15 +52,13 @@ import org.xwiki.test.integration.maven.MavenResolver;
  */
 public class ExtensionInstaller
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionInstaller.class);
-
     private static final String XAR = "xar";
 
     private static final String JAR = "jar";
 
     private static final String DEPENDENCIES_SYSTEM_PROPERTY = System.getProperty("xwiki.test.ui.dependencies");
 
-    private EmbeddableComponentManager ecm;
+    private final ExtensionContext context;
 
     private ArtifactResolver artifactResolver;
 
@@ -72,26 +68,23 @@ public class ExtensionInstaller
 
     private MavenTimestampVersionConverter mavenVersionConverter;
 
+    private RestExtensionInstaller restExtensionInstaller;
+
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
      *
-     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param context the context of the test
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      */
-    public ExtensionInstaller(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
-        MavenResolver mavenResolver)
+    public ExtensionInstaller(ExtensionContext context, ArtifactResolver artifactResolver, MavenResolver mavenResolver)
     {
+        this.context = context;
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
-        this.testConfiguration = testConfiguration;
-
-        // Initialize XWiki Component system
-        EmbeddableComponentManager cm = new EmbeddableComponentManager();
-        cm.initialize(Thread.currentThread().getContextClassLoader());
-        this.ecm = cm;
-
+        this.testConfiguration = getTestConfiguration(context);
         this.mavenVersionConverter = new MavenTimestampVersionConverter();
+        this.restExtensionInstaller = new RestExtensionInstaller(getComponentManager(context), this.mavenResolver);
     }
 
     /**
@@ -100,18 +93,15 @@ public class ExtensionInstaller
      * extensions found in the distribution and install them (since they have not been installed in {@code
      * WEB-INF/lib}).
      *
-     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
      * @param username the xwiki user to use to connect for the REST endpoint (e.g. {@code superadmin})
      * @param password the xwiki password to connect for the REST endpoint
      * @param installUserReference the reference to the user who will the user under which pages are installed (e.g.
      * {@code superadmin})
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(String xwikiRESTURL, String username, String password, String installUserReference)
-        throws Exception
+    public void installExtensions(String username, String password, String installUserReference) throws Exception
     {
-        installExtensions(xwikiRESTURL, new UsernamePasswordCredentials(username, password), installUserReference,
-            null);
+        installExtensions(new UsernamePasswordCredentials(username, password), installUserReference, null);
     }
 
     /**
@@ -120,7 +110,6 @@ public class ExtensionInstaller
      * extensions found in the distribution and install them (since they have not been installed in {@code
      * WEB-INF/lib}).
      *
-     * @param xwikiRESTURL the XWiki REST URL (e.g. {@code http://localhost:8080/xwiki/rest})
      * @param credentials the xwiki user and password to use to connect for the REST endpoint
      * @param installUserReference the reference to the user who will the user under which pages are installed (e.g.
      * {@code superadmin})
@@ -128,11 +117,12 @@ public class ExtensionInstaller
      * null they'll be installed in the main wiki
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
-    public void installExtensions(String xwikiRESTURL, UsernamePasswordCredentials credentials,
-        String installUserReference, List<String> namespaces) throws Exception
+    public void installExtensions(UsernamePasswordCredentials credentials, String installUserReference,
+        List<String> namespaces) throws Exception
     {
         Set<ExtensionId> extensions = new LinkedHashSet<>();
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        String platformVersion = this.mavenResolver.getPlatformVersion();
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
@@ -140,7 +130,7 @@ public class ExtensionInstaller
             this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
         Collection<ArtifactResult> distributionArtifactResults =
-            this.artifactResolver.getDistributionDependencies(xwikiVersion, extraArtifacts);
+            this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();
@@ -159,7 +149,7 @@ public class ExtensionInstaller
         // it wasn't developed for).
         extensions.addAll(getProjectExtensionIds(distributionExtensionIds));
 
-        installExtensions(extensions, xwikiRESTURL, credentials, installUserReference, namespaces);
+        installExtensions(extensions, credentials, installUserReference, namespaces, true);
     }
 
     private Collection<ExtensionId> getProjectExtensionIds(List<ExtensionId> distributionExtensionIds) throws Exception
@@ -206,53 +196,21 @@ public class ExtensionInstaller
         return XAR.equals(type) || JAR.equals(type);
     }
 
-    private void installExtensions(Collection<ExtensionId> extensions, String xwikiRESTURL,
-        UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces) throws Exception
+    /**
+     * @param extensions the extensions to install
+     * @param credentials the xwiki user and password to use to connect for the REST endpoint
+     * @param installUserReference the reference to the user who will the user under which pages are installed (e.g.
+     *            {@code superadmin})
+     * @param namespaces the wikis in which to install the extensions (e.g. {@code wiki:xwiki} for the main wiki). If
+     *            null they'll be installed in the main wiki
+     * @param failOnExist true if the install should fail if one of the extension is already install on one of the
+     *            namespaces
+     * @throws Exception if there's a failure to install the extensions in the running XWiki instance
+     */
+    public void installExtensions(Collection<ExtensionId> extensions, UsernamePasswordCredentials credentials,
+        String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
-        try {
-            installExtensions(extensions, xwikiRESTURL, installUserReference, namespaces, credentials);
-        } catch (Exception e) {
-            throw new Exception(String.format("Failed to install Extension(s) into XWiki at [%s]", xwikiRESTURL), e);
-        }
-    }
-
-    private void installExtensions(Collection<ExtensionId> extensions, String xwikiRESTURL, String installUserReference,
-        List<String> namespaces, UsernamePasswordCredentials credentials) throws Exception
-    {
-        InstallRequest installRequest = new InstallRequest();
-
-        // Set a job id to save the job result
-        installRequest.setId("extension", "provision", UUID.randomUUID().toString());
-
-        installRequest.setInteractive(false);
-
-        // Set the extension list to install
-        for (ExtensionId extensionId : extensions) {
-            LOGGER.info("...Adding extension [{}] to the list of extensions to provision...", extensionId);
-            installRequest.addExtension(extensionId);
-        }
-
-        // Set the namespaces into which to install the extensions
-        if (namespaces == null || namespaces.isEmpty()) {
-            installRequest.addNamespace("wiki:xwiki");
-        } else {
-            for (String namespace : namespaces) {
-                installRequest.addNamespace(namespace);
-            }
-        }
-
-        // Set any user for installing pages (if defined)
-        if (installUserReference != null) {
-            installRequest.setProperty("user.reference", new DocumentReference("xwiki", "XWiki", "superadmin"));
-        }
-
-        JobExecutor jobExecutor = new JobExecutor();
-        JobRequest request = getModelFactory().toRestJobRequest(installRequest);
-        jobExecutor.execute(request, xwikiRESTURL, credentials);
-    }
-
-    private ModelFactory getModelFactory() throws Exception
-    {
-        return this.ecm.getInstance(ModelFactory.class);
+        this.restExtensionInstaller.installExtensions(getXWikiURL(this.context), extensions, credentials,
+            installUserReference, namespaces, failOnExist);
     }
 }

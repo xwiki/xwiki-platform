@@ -35,13 +35,16 @@ import org.xwiki.test.ui.po.BootstrapSelect;
  */
 public class LocalizationAdministrationSectionPage extends AdministrationSectionPage
 {
-    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[1]")
+    @FindBy(xpath = "//div[contains(@class, 'bootstrap-select')"
+        + " and ./select[@id='XWiki.XWikiPreferences_0_multilingual']]")
     private WebElement multiLingualSelect;
 
-    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[3]")
+    @FindBy(xpath = "//div[contains(@class, 'bootstrap-select')"
+        + " and ./select[@id='XWiki.XWikiPreferences_0_default_language']]")
     private WebElement defaultLanguageSelect;
 
-    @FindBy(xpath = "(//div[contains(@class, 'bootstrap-select')])[2]")
+    @FindBy(xpath = "//div[contains(@class, 'bootstrap-select')"
+        + " and ../input[@id='XWiki.XWikiPreferences_0_languages']]")
     private WebElement supportedLanguagesSelect;
 
     public LocalizationAdministrationSectionPage()
@@ -49,7 +52,9 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
         super("Localization");
         waitUntilActionButtonIsLoaded();
         // Wait for asynchronous widgets to be loaded
-        getDriver().waitUntilElementIsVisible(By.cssSelector(".bootstrap-select"));
+        getDriver().waitUntilCondition(driver -> multiLingualSelect.isDisplayed() && defaultLanguageSelect.isDisplayed()
+            && (multiLingualSelect.findElement(By.xpath(".//option[@value='0']")).isSelected()
+            || supportedLanguagesSelect.isDisplayed()));
     }
 
     public void setMultiLingual(boolean isMultiLingual)

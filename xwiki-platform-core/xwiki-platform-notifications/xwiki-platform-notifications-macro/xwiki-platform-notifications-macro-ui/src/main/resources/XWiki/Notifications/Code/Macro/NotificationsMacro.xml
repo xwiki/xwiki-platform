@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Macro.NotificationsMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.Macro.NotificationsMacro" locale="">
   <web>XWiki.Notifications.Code.Macro</web>
   <name>NotificationsMacro</name>
   <language/>
@@ -243,7 +243,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
    *
    * Deprecated: This macro relies only on REST API calls which don't allow all usecases to display notifications.
    * In particular, the macro won't benefits from the Skin Extension capabilities when displayed with it.
-   * It is strongly recommended to now use the XWikiAsyncNotificationMacro defined in the other JSX.
+   * It is strongly recommended to now use the XWikiAsyncNotificationsMacro defined in the other JSX.
    *
    * Except the first one, all the parameters are optional in the constructor. If they are not provided, the macro will
    * load them from the DOM element, where they should be present with the "data-" attributes.
@@ -289,7 +289,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
     self.pages = pages != undefined ? pages : self.macro.attr('data-pages');
     self.users = users != undefined ? users : self.macro.attr('data-users');
     self.tags = tags != undefined ? tags : self.macro.attr('data-tags');
-    console.warn("XWikiNotificationMacro is now deprecated. Please consider using XWikiAsyncNotificationMacro instead.");
+    console.warn("XWikiNotificationMacro is now deprecated. Please consider using XWikiAsyncNotificationsMacro instead.");
 
     /**
      * Function that load notifications.
@@ -328,7 +328,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
 
     self.doLoad = function(params, untilDate, promise) {
       var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications?media=json';
-      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function (data, textStatus, jqXHR) {
+      $.ajax(restURL, {cache: false, data: params, method: 'POST'}).done(function(data, textStatus, jqXHR) {
         switch (jqXHR.status) {
             case 200:
               // 200 means that the search is done, we displayer the received notifications
@@ -340,7 +340,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
               setTimeout(self.doLoad, 1000, params, untilDate, promise);
               break;
         }
-      }).fail(function () {
+      }).catch(() =&gt; {
         self.displayNoNotification();
       });
     };
@@ -368,7 +368,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
         self.insertElementInMacroContainer(loadMore);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           self.load(lastEventDate);
@@ -400,12 +400,13 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       notif.attr('data-eventtype', entry.type);
       // Put the content
       notif.append(entry.html);
-      // Create the "read" button
-      var readButton = $('&lt;button&gt;');
+      // Enable the "read" button
+      var readButton = notif.find('.notification-event-read-button');
       if (!entry.read &amp;&amp; self.displayReadStatus) {
+        // Make sure the style of the notification is in line with its status.
         notif.addClass('notification-event-unread');
-        // Add the "mark as read" button
-        notif.find('.notification-content').prepend(readButton);
+        readButton.prop('disabled', false);
+        readButton.removeClass('hidden');
       }
       if (entry.exception) {
         var exceptionBox = $('&lt;div&gt;').addClass('box errormessage');
@@ -420,12 +421,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       self.insertElementInMacroContainer(notif);
       // Add the "mark as read" button if the notif is not already read
       if (!entry.read) {
-        // Style the read button
-        readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-        // Insert the cross icon
-        readButton.html('$services.icon.renderHTML("check")');
         // On click
-        readButton.click(function() {
+        readButton.on('click', function() {
           var notif = $(this).parents('div.notification-event');
           notif.removeClass('notification-event-unread');
           var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -443,7 +440,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       var details = notif.find('.notification-event-details');
       details.hide();
       var arrow = notif.find('.notification-event-arrow');
-      notif.find('.toggle-notification-event-details').click(function() {
+      notif.find('.toggle-notification-event-details').on('click', function() {
         details.toggle();
         arrow.text(arrow.text() == '▸' ? '▾' : '▸');
       });
@@ -579,7 +576,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         btn.text("$escapetool.javascript($services.localization.render('notifications.menu.more'))");
         btn.addClass('btn').addClass('btn-default').addClass('btn-block');
         loadMore.append(btn);
-        btn.click(function(event) {
+        btn.on('click', function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
           var lastEventDate = self.macro.find('.notification-event').last().attr('data-eventdate');
@@ -592,17 +589,13 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       if (!entry.data('augmented')) {
         // Ensure to not call twice this method.
         entry.data('augmented', true);
-        // Create the "read" button
-        var readButton = $('&lt;button&gt;');
         if (entry.hasClass("notification-event-unread") &amp;&amp; self.displayReadStatus) {
-          // Add the "mark as read" button
-          entry.find('.notification-content').prepend(readButton);
-          // Style the read button
-          readButton.addClass('notification-event-read-button').addClass('btn btn-xs');
-          // Insert the cross icon
-          readButton.html('$services.icon.renderHTML("check")');
+          // Enable the "read" button
+          var readButton = entry.find('.notification-event-read-button');
+          readButton.prop('disabled', false);
+          readButton.removeClass('hidden');
           // On click
-          readButton.click(function() {
+          readButton.on('click', function() {
             var notif = $(this).parents('div.notification-event');
             notif.removeClass('notification-event-unread');
             var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
@@ -620,7 +613,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         var details = entry.find('.notification-event-details');
         details.hide();
         var arrow = entry.find('.notification-event-arrow');
-        entry.find('.toggle-notification-event-details').click(function() {
+        entry.find('.toggle-notification-event-details').on('click', function() {
           details.toggle();
           arrow.text(arrow.text() == '▸' ? '▾' : '▸');
         });
@@ -832,6 +825,10 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
   width: 2em;
 }
 
+.notification-icon .img-thumbnail span {
+  vertical-align: middle;
+}
+
 /***********************************************
  * Notification Content
  ***********************************************/
@@ -943,7 +940,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -956,14 +953,14 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -972,7 +969,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -1038,15 +1035,24 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -1077,6 +1083,16 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1196,7 +1212,9 @@ $notifs
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description/>
@@ -1206,6 +1224,9 @@ $notifs
     </property>
     <property>
       <name>Notifications</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>

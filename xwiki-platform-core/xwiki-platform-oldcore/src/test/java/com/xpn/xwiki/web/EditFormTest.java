@@ -97,6 +97,7 @@ class EditFormTest
         String[] paramValue1 = { "value1", "value2" };
         String[] paramValue2 = { "value1" };
         String[] paramValue3 = { "value2" };
+        String[] emptyValue = {""};
 
         parameterMap.put("someParam", paramValue2);
         parameterMap.put("XWiki.XWikiRights_42_baz", paramValue1);
@@ -108,6 +109,7 @@ class EditFormTest
         parameterMap.put("foobar_18_buz", paramValue1);
         parameterMap.put("foo_48bar_buz", paramValue1);
         parameterMap.put("A class.With Some spaces_42_myProp", paramValue1);
+        parameterMap.put("XWiki.XWikiRights_2_foo",  emptyValue);
 
         // Note that this one might be ambiguous, page name could be WebHome or WebHome_0_Something
         // This should be fixed as part of https://jira.xwiki.org/browse/XWIKI-17302
@@ -122,6 +124,7 @@ class EditFormTest
         Map<String, SortedMap<Integer, Map<String, String[]>>> expectedMap = new HashMap<>();
         TreeMap<Integer, Map<String, String[]>> treeMap = new TreeMap<>();
         treeMap.put(0, Collections.singletonMap("foo", paramValue1));
+        treeMap.put(2, Collections.singletonMap("foo", emptyValue));
         treeMap.put(42, Collections.singletonMap("baz", paramValue1));
         Map<String, String[]> parametersValues = new HashMap<>();
         parametersValues.put("foo", paramValue2);

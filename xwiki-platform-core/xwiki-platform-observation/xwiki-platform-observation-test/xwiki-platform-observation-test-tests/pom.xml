@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-test-tests</artifactId>
   <name>XWiki Platform - Observation - Tests - Functional Tests</name>
@@ -93,6 +93,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-test-utils</artifactId>
       <version>${project.version}</version>
@@ -157,7 +163,6 @@
                     <xwikiDbConnectionUrl>jdbc:hsqldb:hsql://localhost/xwiki_db</xwikiDbConnectionUrl>
                     <xwikiDbConnectionUsername>sa</xwikiDbConnectionUsername>
                     <xwikiDbConnectionDriverClass>org.hsqldb.jdbcDriver</xwikiDbConnectionDriverClass>
-                    <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
                     <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                     <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
                     <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>

@@ -35,12 +35,15 @@
 
     <!-- Provide the Html Viewer widget to the `viewer` slot -->
     <template #viewer>
-      <div :class="['html-wrapper', isLoading ? 'disabled' : '']" v-html="value" ref="xObjectPropertyView"></div>
+      <div :class="['html-wrapper', isLoading ? 'disabled' : '']"
+           v-html="sanitizeHtml(value)"
+           ref="xObjectPropertyView"/>
     </template>
 
     <!-- Provide the Html Editor widget to the `editor` slot -->
     <template #editor>
-      <div v-html="editField" ref="xObjectPropertyEdit"></div>
+      <div v-html="sanitizeHtml(editField)"
+           ref="xObjectPropertyEdit"/>
     </template>
   </BaseDisplayer>
 </template>

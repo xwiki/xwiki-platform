@@ -75,7 +75,7 @@ public class BaseReplaceUserJobTest
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     private DocumentReference alice = new DocumentReference("test", "Users", "Alice");
 

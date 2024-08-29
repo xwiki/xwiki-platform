@@ -54,9 +54,9 @@ notifications.filters.advanced.modal.close=Fermer
 
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Filtre Système
-notifications.filters.description.systemUserNotificationFilter=Masquer les notifications provenant de l'utilisateur Système
+notifications.filters.description.systemUserNotificationFilter=Masquer les notifications provenant de l'utilisateur Système sauf si l'événement vous concerne directement
 notifications.filters.name.ownEventsNotificationFilter=Filtre de vos propres événements
-notifications.filters.description.ownEventsNotificationFilter=Masquer les notifications de votre activité
+notifications.filters.description.ownEventsNotificationFilter=Masquer les notifications de votre activité sauf si l'événement vous concerne directement
 notifications.filters.name.eventReadAlertFilter=Filtre d'événement lu (Alerte)
 notifications.filters.description.eventReadAlertFilter=Masquer les notifications que vous avez marquées comme lu
 notifications.filters.name.eventReadEmailFilter=Filtre d'événement lu (Email)
@@ -73,7 +73,7 @@ notifications.filters.preferences.scopeNotificationFilter.space=Page et fils
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
 ## Notifications toggles
-notifications.toggle.disabled.hint=Vous devez activer les notifications dans vos préférences si vous désirez surveiller ces emplacements.
+notifications.toggle.disabled.hint=Vous devez activer les notifications dans vos préférences si vous désirez surveiller ces emplacements
 
 ## Notifications formats
 notifications.format.alert=Alerte
@@ -88,7 +88,7 @@ notifications.filters.preferences.allEvents=Tous les événements (y compris les
 
 ## System Filter preferences settings
 notifications.settings.filters.preferences.system.title=Filtres système
-### Missing: notifications.settings.filters.preferences.system.hint=System filters that you can switches to have a more fine-grained control of the notifications you want to receive.
+notifications.settings.filters.preferences.system.hint=Les filtres du système que vous pouvez activer pour avoir un contrôle plus précis des notifications que vous souhaitez recevoir.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Nom
 notifications.settings.filters.preferences.system.table.filterType=Description
@@ -108,7 +108,7 @@ notifications.settings.filters.preferences.custom.table._actions=Actions
 ### Missing: notifications.filters.type.custom.inclusive=Notify of the event
 notifications.filters.type.custom.exclusive=Ignorer l'événement
 notifications.settings.addFilter=Ajouter un filtre
-### Missing: notifications.settings.addFilter.hint=Create a custom location filter: this filter applies on events related to specific locations and allow to notify or ignore them based on the event type and the notification format.
+notifications.settings.addFilter.hint=Créez un filtre d'emplacement personnalisé : ce filtre s'applique aux événements liés à des emplacements spécifiques et permet de les notifier ou de les ignorer en fonction du type d'événement et du format de notification.
 notifications.filters.preferences.custom.addFilter.location.label=Emplacement
 ### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies when an event is sent from the selected location. Multiple locations can be selected.
 notifications.filters.preferences.custom.addFilter.type.label=Action
@@ -127,11 +127,11 @@ notifications.menu.cleared=Les notifications ont été effacées
 notifications.settings.title=Préférences de notifications
 notifications.settings.error.notAdmin=Vous devez être administrateur pour visualiser cet élément.
 notifications.settings.menu=Menu des notifications
-notifications.settings.menu.hint=Le menu des notifications est situé en haut à droite de la page, vous pouvez l''ouvrir en cliquant sur la cloche ({0}).
+notifications.settings.menu.hint=Le menu des notifications est situé en haut à droite de la page, vous pouvez l''ouvrir en cliquant sur la cloche ({0})
 notifications.settings.email=Courriel
 notifications.settings.email.forGuest=Connectez-vous ou inscrivez-vous pour gérer vos paramètres de notification.
 notifications.settings.email.disabled=Les notifications par courriel sont désactivées. Veuillez contacter votre administrateur.
-notifications.settings.email.hint=Un courriel vous est envoyé régulièrement avec une synthèse de l'activité du wiki.
+notifications.settings.email.hint=Un e-mail vous est envoyé régulièrement avec une synthèse de l'activité du wiki
 notifications.settings.email.title=Préférences des courriels
 notifications.settings.email.frequency=Fréquence des courriels
 notifications.settings.email.frequency.hint=Choisissez à quelle fréquence vous souhaitez recevoir un courriel avec le résumé de ce qui s'est passé dans le wiki.
@@ -187,7 +187,7 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=A chaq
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Seulement à la création d'une page
 
 ## Common notification settings errors
-### Missing: notifications.settings.error.userReferenceNotSupported=The given user reference is not supported, only DocumentUserReference are supported for now.
+notifications.settings.error.userReferenceNotSupported=La référence utilisateur donnée n'est pas supportée, seul DocumentUserReference est supporté pour le moment.
 notifications.settings.error.userReferenceAdminForbidden=Vous ne disposez pas du droit d''administration de l''utilisateur : {0}.
 notifications.settings.error.badCSRF=Jeton CSRF incorrect.
 notifications.settings.badParameters=Erreur dans les paramètres de la requête.

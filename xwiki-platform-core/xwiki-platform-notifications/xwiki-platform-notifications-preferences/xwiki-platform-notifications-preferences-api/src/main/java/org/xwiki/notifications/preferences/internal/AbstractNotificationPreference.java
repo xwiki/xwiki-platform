@@ -75,7 +75,7 @@ public abstract class AbstractNotificationPreference implements NotificationPref
 
     protected AbstractNotificationPreference()
     {
-
+        this.isNotificationEnabled = true;
     }
 
     @Override

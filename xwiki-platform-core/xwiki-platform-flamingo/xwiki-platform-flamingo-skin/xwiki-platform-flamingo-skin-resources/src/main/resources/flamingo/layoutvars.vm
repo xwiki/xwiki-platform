@@ -22,15 +22,15 @@
 ##
 ## In admin mode, Panels.PanelWizard must display the layout for the requested space
 ##
-#set($spaceprefs = "")
+#set($spacePrefsRef = "")
 #set($globalprefs = false)
 
 #if($doc.documentReference.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
-  #set($spaceprefs = $request.space)
-  #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $request.space))
-  #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $request.space))
-  #set($leftPanelsWidth =  $xwiki.getSpacePreferenceFor("leftPanelsWidth", $request.space))
-  #set($rightPanelsWidth =  $xwiki.getSpacePreferenceFor("rightPanelsWidth", $request.space))
+  #set($spacePrefsRef = $services.model.resolveSpace($request.space))
+  #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $spacePrefsRef))
+  #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $spacePrefsRef))
+  #set($leftPanelsWidth =  $xwiki.getSpacePreferenceFor("leftPanelsWidth", $spacePrefsRef))
+  #set($rightPanelsWidth =  $xwiki.getSpacePreferenceFor("rightPanelsWidth", $spacePrefsRef))
 #elseif($doc.fullName == "XWiki.XWikiPreferences" || "$!request.editor" == "globaladmin")
   #set($globalprefs = true)
   #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
@@ -76,8 +76,8 @@
 #if($showLeftPanels)
   #if($globalprefs == true)
      #set($leftPanels = $xwiki.getXWikiPreference("leftPanels"))
-  #elseif($spaceprefs != "")
-     #set($leftPanels = $xwiki.getSpacePreferenceFor("leftPanels", $spaceprefs))
+  #elseif($spacePrefsRef != "")
+     #set($leftPanels = $xwiki.getSpacePreferenceFor("leftPanels", $spacePrefsRef))
   #else
     #set($leftPanels = $xwiki.getUserPreference("leftPanels"))
     #if($leftPanels == "")
@@ -92,8 +92,8 @@
 #if($showRightPanels)
   #if($globalprefs == true)
     #set($rightPanels = $xwiki.getXWikiPreference("rightPanels"))
-  #elseif($spaceprefs != "")
-    #set($rightPanels = $xwiki.getSpacePreferenceFor("rightPanels", $spaceprefs))
+  #elseif($spacePrefsRef != "")
+    #set($rightPanels = $xwiki.getSpacePreferenceFor("rightPanels", $spacePrefsRef))
   #else
     #set($rightPanels = $xwiki.getUserPreference("rightPanels"))
     #if($rightPanels == "")
@@ -119,6 +119,9 @@
  #end
 #end
 
+## Check that the doc velocity variable is defined: it might not be the case when using some resource handlers.
+#set ($docIsDefined = ($doc != $NULL))
+
 #set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
 #set($displayCreateMenu = true) ## create menu
 #set($displayEditMenu = true) ## edit menu
@@ -131,7 +134,9 @@
 #set($displayShortcuts = true)
 #set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)
-#set ($displayLanguageChoice = true)
+
+## The language choice only makes sense when a doc is declared.
+#set ($displayLanguageChoice = $docIsDefined)
 
 #if ($xcontext.action=='preview')
   #set($displayContentMenu = false)

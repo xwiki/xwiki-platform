@@ -49,17 +49,17 @@
 |Lien vers une page avec l'espace spécifié|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
 |Lien vers un sous-wiki|{{{[sous-wiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
 |Lien qui s'ouvre dans une nouvelle page|{{{[étiquette&gt;WebHome&gt;_blank]}}}|[[étiquette&gt;&gt;WebHome||rel="__blank"]]
-|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
-|Lien vers un URL|{{{[http://xwiki.org]}}}|[[http://xwiki.org]]
-|Lien vers un URL avec étiquette|{{{[XWiki&gt;http://xwiki.org]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: https://xwiki.org}}}|Ceci est un URL: https://xwiki.org
+|Lien vers un URL|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|Lien vers un URL avec étiquette|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Lien vers une adresse email|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|{{{&lt;a href="$xwiki.getURL("Espace1.Page1")"&gt;{image:img.png|document=Espace2.Page2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
 |Lien vers une pièce jointe à la page courante|(((
-{{info}}Voir [[Attacher une Macro&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/AttachMacro]] pour savoir plus.{{/info}}
+{{info}}Voir [[Attacher une Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] pour savoir plus.{{/info}}
 {{{{attach:text|file=img.png}}}}
 )))|[[texte&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Lien vers une pièce jointe à une autre page|(((
-{{info}}Voir [[Attacher une Macro&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/AttachMacro]] pour savoir plus.{{/info}}
+{{info}}Voir [[Attacher une Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]] pour savoir plus.{{/info}}
 {{{{attach:texte|document=Space.Page|file=img.png}}}}
 )))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Lien vers une ancre dans une page|{{{[label&gt;Space.Page#ancre]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||ancre=ancre]]
@@ -78,10 +78,10 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 * Notez qu'il faut préciser soit le ##link## , soit l'##alias##.
 ** ##virtualWikiAlias##: Un String optionnel contenant le nom d'un wiki virtuel. Le lien est vers une page de ce wiki virtuel. Exemple: "mywiki".
 ** ##space##: Le nom d'un espace Wiki optionnel. Si aucun espace n'est spécifié, alors l'espace courant sera utilisé. Exemple: "Main".
-** ##reference##: La référence du lien. Elle peut contenir soit un URI##{{{ protocol:path }}}##(example: {{{"http://xwiki.org"}}}, {{{"mailto:john@smith.com"}}}) ou le nom d'une page wiki (exemple: "WebHome").
+** ##reference##: La référence du lien. Elle peut contenir soit un URI##{{{ protocol:path }}}##(example: {{{"https://xwiki.org"}}}, {{{"mailto:john@smith.com"}}}) ou le nom d'une page wiki (exemple: "WebHome").
 ** ##queryString##: Un String optionnel de requêtes pour spécifier les paramètres qui seront utilisés dans l'URL rendu. Exemple: {{{"mydata1=5&amp;mydata2=Bonjour"}}}.
 ** ##anchor##: Le nom d'un ancre optionnel vers un ancre défini dans le lien référencé. Notez qu'en XWiki les ancres sont créés automatiquement pour les titres. Exemple: "AncreDeLaTableDesMatières".
-* ##interWikiAlias##: Un alias optionnel [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] défini comme dans "InterWiki Map" (pour plus d'informations, allez au [[guide de l'administrateur&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Exemple: "wikipedia".
+* ##interWikiAlias##: Un alias optionnel [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] défini comme dans "InterWiki Map" (pour plus d'informations, allez au [[guide de l'administrateur&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Exemple: "wikipedia".
 * ##target##: Un String optionnel qui correspond à l'attribut HTML ##target## d'un élément HTML de liaison ##A##. Cet élément est utilisé lors du rendu du lien. Par défaut, le lien est ouvert dans la page courante. Exemples: "_self", "_blank"
 
 === 2.0 Links ===
@@ -92,9 +92,9 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 |Lien vers une page avec l'espace spécifié|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Lien vers un sous-wiki|{{{[[sous-wiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
 |Lien qui s'ouvre dans une nouvelle page|{{{[[étiquette&gt;&gt;WebHome||rel="__blank"]]}}}|[[étiquette&gt;&gt;WebHome||rel="__blank"]]
-|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
-|Lien vers un URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: https://xwiki.org}}}|Ceci est un URL: https://xwiki.org
+|Lien vers un URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Lien vers une adresse email|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|(((
 {{{[[image:Espace2.Page2@img.png&gt;&gt;Espace1.Page1]]}}}
@@ -125,9 +125,9 @@ La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 |Lien vers une page avec l'espace spécifié|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
 |Lien vers un sous-wiki|{{{[[sous-wiki:Main.WebHome]]}}}|[[xwiki:Main.WebHome]]
 |Lien qui s'ouvre dans une nouvelle page|{{{[[étiquette&gt;&gt;WebHome||rel="__blank"]]}}}|[[étiquette&gt;&gt;WebHome||rel="__blank"]]
-|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: http://xwiki.org}}}|Ceci est un URL: http://xwiki.org
-|Lien vers un URL|{{{[[http://xwiki.org]]}}}|[[http://xwiki.org]]
-|Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;http://xwiki.org]]}}}|[[XWiki&gt;&gt;http://xwiki.org]]
+|Lien vers un URL placé directement dans le texte|{{{Ceci est un URL: https://xwiki.org}}}|Ceci est un URL: https://xwiki.org
+|Lien vers un URL|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Lien vers un URL avec étiquette|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
 |Lien vers une adresse email|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
 |Lien image|(((
 {{{[[image:Espace2.Page2@img.png&gt;&gt;Espace1.Page1]]}}}

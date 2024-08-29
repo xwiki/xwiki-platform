@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="IconThemes.FontAwesome" locale="">
+<xwikidoc version="1.5" reference="IconThemes.FontAwesome" locale="">
   <web>IconThemes</web>
   <name>FontAwesome</name>
   <language/>
@@ -38,10 +38,9 @@
   <hidden>true</hidden>
   <content>## General settings
 xwiki.iconset.type = font
-xwiki.iconset.ssx = IconThemes.FontAwesome
-xwiki.iconset.jsx = IconThemes.FontAwesome
-xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon"&gt;&lt;/span&gt;{{/html}}
-xwiki.iconset.render.html = &lt;span class="fa fa-$icon"&gt;&lt;/span&gt;
+xwiki.iconset.css = $services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css')
+xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;{{/html}}
+xwiki.iconset.render.html = &lt;span class="fa fa-$icon" aria-hidden="true"&gt;&lt;/span&gt;
 xwiki.iconset.icon.cssClass = fa fa-$icon
 
 ## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
@@ -197,6 +196,11 @@ th=th
 translate=language
 minus-square = minus-square
 plus-square = plus-square
+filter = filter
+table_sort = sort
+fast-backward = fast-backward
+arrow_in = window-minimize
+reposition = arrows
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
@@ -388,6 +392,7 @@ user = user
 user_add=user-plus
 user_delete=user-times
 vcard = vcard-o
+wand = magic
 weather_clouds = cloud
 weather_sun = sun-o
 weather_snow=snowflake-o
@@ -428,222 +433,6 @@ zoom_out = search-minus
     </class>
     <property>
       <name>Font Awesome</name>
-    </property>
-  </object>
-  <object>
-    <name>IconThemes.FontAwesome</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>f8945ea9-36bd-46a9-ab6e-414ffa902988</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>// Sometimes IE8 loads the font *after* the rendering of the page so it does not display the icon correctly.
-// To fix this, we reload the stylesheet when we receive the 'document ready' event so that the browser recomputes
-// the display. Although, it does not solve everything (see https://jira.xwiki.org/browse/XWIKI-10813).
-require(['jquery'], function($) {
-  // This hack concerns IE8 only
-  if (navigator.userAgent.indexOf('MSIE 8.0') &gt; -1) {
-    $(function() {
-      var link = $("link[href*='IconThemes/FontAwesome']");
-      link[0].href = link[0].href;
-    });
-  }
-});
-</code>
-    </property>
-    <property>
-      <name>IE8 fix</name>
-    </property>
-    <property>
-      <parse>0</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>IconThemes.FontAwesome</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8b5cb416-e129-4063-9c8f-67c6a31d2e1d</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>@import "$services.webjars.url('org.webjars:font-awesome', 'css/font-awesome.min.css')"</code>
-    </property>
-    <property>
-      <name>Font-Awesome CSS</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

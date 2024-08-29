@@ -1,0 +1,164 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Sandbox.WebHome" locale="ko">
+  <web>Sandbox</web>
+  <name>WebHome</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>샌드박스</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>sandbox는 자유롭게 수정할 수 있는 Wiki의 일부입니다. 편집을 연습할 수 있게 되어 있습니다. 페이지 편집이 어떻게 작동하는지 확인하고 새 페이지를 작성합니다. **Edit**을 클릭하여 시작하십시오.
+
+{{info}}
+페이지를 편집할 때 덮어쓰거나 손실될 염려가 없습니다, 페이지 하단의 "기록" 탭에서 페이지의 첫 번째 버전으로 롤백할 수 있습니다.
+{{/info}}
+
+기본 [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] 참조하려면, 페이지를 편집할 때 "Wiki code" in the "Show" 메뉴에서 "Wiki code"를 클릭하거나 " Source"탭을 클릭 할 수 있습니다.
+
+다음은 당신이 테스트해볼 수 있는 페이지 입니다:
+
+* [[Sandbox Test Page 1&gt;&gt;Sandbox.TestPage1]]
+* [[Sandbox Test Page 2&gt;&gt;Sandbox.TestPage2]]
+* [[Sandbox Test Page 3&gt;&gt;Sandbox.TestPage3]]
+
+이 예시는 [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] Wiki 페이지(headings, images, tables)에서 사용할 수 있습니다.
+
+== Headings ==
+
+XWiki는 6가지 수준의 제목을 제공합니다. 페이지를 구성하는 데 사용할 수 있습니다.
+
+== Level 2 Heading ==
+
+=== Level 3 Heading ===
+
+==== Level 4 Heading 4 ====
+
+===== Level 5 Heading 5 =====
+
+====== Level 6 Heading 6 ======
+
+{{info title="접근성 권장사항"}}
+위키에서 보조 기술 사용자에게 최상의 경험을 제공하려면 페이지 콘텐츠에서 제목의 첫 번째 수준을 사용하지 않아야 합니다.
+{{/info}}
+
+== Styles ==
+
+XWiki에서 지원하는 기본 스타일:
+
+* **Text in Bold**
+* //Text in Italics//
+* __Text in Underline__
+* --Text in Strikethrough--
+* Text in ,,subscript,,
+* Text in ^^superscript^^
+
+== Lists ==
+
+Wiki 페이지에서 다양한 유형의 목록을 만들 수 있습니다:
+
+=== Unordered list ===
+
+* Level 1
+** Level 2
+*** Level 3
+** Level 2
+* Level 1
+
+=== Numbered list ===
+
+1. Item
+11. Subitem
+111. Item
+1. Subitem
+
+=== Mixed list ===
+
+1. Item 1
+11. Item 2
+11*. Item 3
+11*. Item 4
+1. Item 5
+
+== Tables ==
+
+Wiki 페이지에 직접 테이블을 만들 수 있습니다:
+
+=== 맨 위 행에 헤더가 있는 테이블 ===
+
+|= table header |= table header |= table header
+| cell | cell | cell
+| cell | cell | cell
+
+=== 맨 위 행과 왼쪽 열에 헤더가 있는 테이블 ===
+
+|= table header |= table header |= table header
+|= table header | cell | cell
+|= table header | cell | cell
+
+== 링크 ==
+
+XWiki를 사용하면 Wiki 또는 웹상의 다른 페이지에 대한 링크를 만들 수 있습니다:
+
+* [[WebHome]] -&gt; 현재 공간의 홈페이지 링크
+* [[Sandbox Home&gt;&gt;WebHome]] -&gt; 링크에는 라벨을 붙일 수 있습니다
+* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; 링크는 SpaceName.PageName 형식을 사용하여 다른 공간에 있는 페이지에 링크할 수 있습니다
+* [[http://www.xwiki.org]] -&gt; Wiki 페이지 또는 외부 웹 사이트에 링크할 수 있습니다
+* [[XWiki.org Website&gt;&gt;http://www.xwiki.org]] -&gt; 링크 라벨은 외부 링크에도 기능합니다
+
+첨부 파일에 대한 링크를 만들 수도 있습니다:
+
+attach:XWikiLogo.png
+
+== 이미지 ==
+
+Wiki 페이지에 이미지를 삽입할 수 있습니다:
+
+image:XWikiLogo.png
+
+== 매크로 ==
+
+매크로를 사용하면, Wiki 컨텐츠의 외관을 좋게 하고 Wiki 에 기능을 추가할 수 있습니다. 다음은 Wiki 페이지에서 매크로를 사용하는 방법의 2가지 예입니다:
+
+=== 경고 매크로 ===
+
+이 매크로를 사용하면 특정 정보에 대한 사용자의 주의를 끌 수 있습니다:
+
+{{warning}}
+Hello World
+{{/warning}}
+
+=== 목차 ===
+
+이 매크로는 Heading에 따라 자동으로 Wiki 페이지의 목차를 생성합니다:
+
+{{toc/}}</content>
+</xwikidoc>

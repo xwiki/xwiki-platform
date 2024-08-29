@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -30,6 +32,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.PageAttachmentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -167,25 +171,31 @@ public interface DocumentAccessBridge
 
     /**
      * Check if a document exists or not in the wiki.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
+     * @throws Exception when failing to check document existence
      * @since 2.2.1
      */
-    boolean exists(DocumentReference documentReference);
+    boolean exists(DocumentReference documentReference) throws Exception;
 
     /**
      * Check if a document exists or not in the wiki.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      * 
      * @param documentReference The reference of the document to check.
      * @return <code>true</code> if the document already exists, <code>false</code> otherwise.
      * @deprecated replaced by {@link #exists(DocumentReference)} since 2.2.1
+     * @throws Exception when failing to check document existence
      */
     @Deprecated
-    boolean exists(String documentReference);
+    boolean exists(String documentReference) throws Exception;
 
     /**
-     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * Updates the target document with the new content provided. If the target document does not exist, a new one will
      * be created.
      * 
      * @param documentReference the reference to the target document
@@ -199,7 +209,7 @@ public interface DocumentAccessBridge
         boolean isMinorEdit) throws Exception;
 
     /**
-     * Updates the target document with the new content provided. If the target document does not exists, a new one will
+     * Updates the target document with the new content provided. If the target document does not exist, a new one will
      * be created.
      * 
      * @param documentReference the reference to the target document
@@ -226,7 +236,7 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentReference) throws Exception;
 
     /**
-     * Get the syntax Id of the target document. If the target document does not exists, the default syntax of a new
+     * Get the syntax Id of the target document. If the target document does not exist, the default syntax of a new
      * document is returned.
      * 
      * @param documentReference the reference of the target document
@@ -239,7 +249,7 @@ public interface DocumentAccessBridge
     String getDocumentSyntaxId(String documentReference) throws Exception;
 
     /**
-     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exist, a new
      * one will be created.
      * 
      * @param documentReference the reference of the target document
@@ -250,7 +260,7 @@ public interface DocumentAccessBridge
     void setDocumentSyntaxId(DocumentReference documentReference, String syntaxId) throws Exception;
 
     /**
-     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exists, a new
+     * Changes the syntax Id of the target document to the given syntaxId. If the target document does not exist, a new
      * one will be created.
      * 
      * @param documentReference the reference of the target document
@@ -496,11 +506,27 @@ public interface DocumentAccessBridge
      * Returns the content of a document attachment.
      * 
      * @param attachmentReference the name of the attachment to access
-     * @return The content of the attachment as an input stream
+     * @return The content of the attachment as an input stream or null if the attachment doesn't exist
      * @throws Exception If the document cannot be accessed.
      * @since 2.2M1
+     * @deprecated use {@link #getAttachmentContent(EntityReference)} instead
      */
+    @Deprecated(since = "14.7RC1")
     InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception;
+
+    /**
+     * Returns the content of a document attachment.
+     *
+     * @param reference the reference to the attachment to access (can be an {@link AttachmentReference} or
+     *        {@link PageAttachmentReference}, or any reference containing a Document reference and an attachment name)
+     * @return The content of the attachment as an input stream or null if the attachment doesn't exist
+     * @throws Exception If the document cannot be accessed.
+     * @since 14.7RC1
+     */
+    default InputStream getAttachmentContent(EntityReference reference) throws Exception
+    {
+        throw new NotImplementedException("Method not implemented");
+    }
 
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
@@ -512,6 +538,23 @@ public interface DocumentAccessBridge
      * @since 2.2.1
      */
     void setAttachmentContent(AttachmentReference attachmentReference, byte[] attachmentData) throws Exception;
+
+    /**
+     * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
+     * newly.
+     *
+     * @param attachmentReference the name of the attachment to access
+     * @param attachmentData Attachment content.
+     * @throws Exception If the storage cannot be accessed.
+     * @since 14.10.8
+     * @since 15.3RC1
+     */
+    @Unstable
+    default void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
+        throws Exception
+    {
+        setAttachmentContent(attachmentReference, IOUtils.toByteArray(attachmentData));
+    }
 
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created

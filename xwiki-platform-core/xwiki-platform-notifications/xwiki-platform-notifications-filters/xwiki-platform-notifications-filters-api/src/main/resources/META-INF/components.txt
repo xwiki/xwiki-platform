@@ -9,11 +9,14 @@ org.xwiki.notifications.filters.internal.status.EventReadEmailFilter
 org.xwiki.notifications.filters.internal.user.EventUserFilter
 org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter
 org.xwiki.notifications.filters.internal.user.OwnEventFilter
-org.xwiki.notifications.filters.internal.CachedModelBridge
+org.xwiki.notifications.filters.internal.CachedFilterPreferencesModelBridge
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterManager
 org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreferenceManager
+org.xwiki.notifications.filters.internal.DeletedDocumentCleanUpFilterListener
+org.xwiki.notifications.filters.internal.DeletedDocumentCleanUpFilterProcessingQueue
 org.xwiki.notifications.filters.internal.LocationOperatorNodeGenerator
 org.xwiki.notifications.filters.internal.SystemUserNotificationFilter
-org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider
+org.xwiki.notifications.filters.internal.listener.DeletedWikiEventListener
+org.xwiki.notifications.filters.internal.listener.DeleteUserEventListener
 org.xwiki.notifications.filters.script.NotificationFiltersScriptService

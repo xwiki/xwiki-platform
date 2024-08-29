@@ -45,7 +45,7 @@
 
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
 |Bild von Anhang auf aktueller Seite|(((
-{{info}}Siehe [[Bildmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] für Details{{/info}}
+{{info}}Siehe [[Bildmakro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] für Details{{/info}}
 {{{{image:XWiki.XWikiSyntaxImages@img.png}}}}
 )))|image:XWiki.XWikiSyntaxImages@img.png
 |Bild von Anhang auf anderer Seite|{{{{image:img.png|document=Bereich.Seite}}}}|image:XWiki.XWikiSyntaxImages@img.png
@@ -58,6 +58,7 @@
 |Bild von Anhang auf aktueller Seite|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Bild von Anhang auf anderer Seite|{{{image:Bereich.Seite@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Bild mit Parametern|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Bild mit Bildunterschrift|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] unterstützt Bildunterschriften.&gt;&gt;image:img.png]]}}}|(( ([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] unterstützt Bildunterschriften.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
 |Bild befindlich an URL|{{{image:http://eine/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 
 {{velocity}}$subHeading XWiki Syntax 2.0 Bild-Spezifikation $subHeading{{/velocity}}
@@ -66,9 +67,10 @@
 Der Teil in ##( )## ist erforderlich, während die Teile in ##{ }## optional sind.
 {{/info}}
 
-Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[image~: (Verweis) {||Parameter}]]##**
+Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[{caption&gt;&gt;}image~: (Verweis) {||Parameter}]]##**
 
-* **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet. 
+* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.0-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist. Das Bild mit der Beschriftung kann auch in einen Link eingebettet sein. In diesem Fall enthält der Link das Bild, aber nicht die Beschriftung.
+* **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet.
 * **##Verweis##**: Der Verweis auf das anzuzeigende Bild. Der Verweis kann in folgenden Formaten angegeben werden:
 ** **URL**: Eine URL zu einem externen Bild in dem Format **##http:~/~/pfad/BildName##**. Beispiel: ##http:~/~/example.org/pfad/bild.png##
 ** **Anhang**: Ein Verweis auf einen Anhang im Wiki im Format **##~{~{~{wikiName:} Bereich.} Seite@} (BildName)##**
@@ -78,14 +80,14 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 *** **##BildName##**: Ein erforderlicher Text, welcher den Dateinamen des anzuzeigenden Bildes enthält, wie er im Wiki gespeichert ist.
 * **##Parameter##**: Eine optionale Liste von durch Leerzeichen getrennten Parametern, die an das Bild durchgereicht werden. Beispiel: ##width="800" height="600" alt="Ein beispielhaftes Bild" title="Dies ist ein schönes Bild"## 
 ** **HTML Attribute**: Alle Attribute, welche im HTML Standard vorgesehen sind, werden zu dem erzeugten ##&lt;img&gt;## Element hinzugefügt.
-*** **##style##**: CSS-Stil Anweisungen, welche auf das Bild angewendet werden. Beispiele:  ##style="float:right;height:50px"## (d.h. das Bild wird rechtsbündig eingebettet mit einer Höhe von 50 Pixeln),
+*** **##style##**: CSS-Stil Anweisungen, welche auf das Bild angewendet werden. Beispiele: ##style="float:right;height:50px"## (d.h. das Bild wird rechtsbündig eingebettet mit einer Höhe von 50 Pixeln),
  ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (Bild wird zentriert dargestellt in einer Breite von 80% des zur verfügung stehenden Platzes).
  ##style="vertical-align:bottom"## (Der folgende Text startet direkt an unteren Ende des Bildes).
 *** **##height##**: Die vertikale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##height="80"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##height="40%"##)
 *** **##width##**: Die horizontale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##width="120"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##width="80%"##)
 *** **##title##**: Der Text, der beim Überfahren den Bildes mit dem Mauszeiger angezeigt wird. Beispiel: ##title="Dies ist ein schönes Bild"##
 *** **##alt##**: Der Text, welcher //alt//ernativ angezeigt wird, wenn der Browser das Bild nicht darstellen kann. Da dies im HTML eine Pflichtangabe ist, verwendet XWiki den Dateinamen, wenn kein Wert für ##alt## angegeben wurde. Beispiel: alt="Ein beispielhaftes Bild"
-*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[w3.org Seite &gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]] (in Englisch) eingesehen werden.
+*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt; https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
 
 === 2.1 Images ===
 
@@ -93,6 +95,7 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 |Bild von Anhang auf aktueller Seite|{{{image:img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Bild von Anhang auf anderer Seite|{{{image:Bereich.Seite@img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Bild mit Parametern|{{{[[image:img.png||width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||width="25" height="25"]]
+|Bild mit Bildunterschrift|{{{[[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] unterstützt Bildunterschriften.&gt;&gt;image:img.png]]}}}|(( ([[~[~[XWiki~&gt;~&gt;https://www.xwiki.org~]~] unterstützt Bildunterschriften.&gt;&gt;image:XWiki.XWikiSyntaxImages@img.png]])))
 |Bild befindlich an URL|{{{image:http://eine/url/img.png}}}|image:XWiki.XWikiSyntaxImages@img.png
 |Vordefiniertes Piktogramm|{{{image:icon:accept}}}|image:icon:accept
 
@@ -102,23 +105,29 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 Der Teil in ##( )## ist erforderlich, während die Teile in ##{ }## optional sind.
 {{/info}}
 
-Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[image~: (Verweis) {||Parameter}]]##**
+Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** oder **##~[~[{caption&gt;&gt;}image~: (Verweis) {||Parameter}]]##**
 
-* **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet. 
+* **##caption##**: Eine optionale Beschriftung. Kann beliebige XWiki 2.1-Syntax enthalten, aber verschachtelte Link-Syntax muss mit ##~~## maskiert werden. Die Beschriftung wird nur unterstützt, wenn die Bildsyntax der einzige Inhalt eines Absatzes ist. Das Bild mit der Beschriftung kann auch in einen Link eingebettet sein. In diesem Fall enthält der Link das Bild, aber nicht die Beschriftung.
+* **##image~:##** Ein erforderlicher Text, welches die folgenden Angaben als Bild kennzeichnet.
 * **##Verweis##**: Der Verweis auf das anzuzeigende Bild. Der Verweis kann in folgenden Formaten angegeben werden:
 ** **URL**: Eine URL zu einem externen Bild in dem Format **##http:~/~/pfad/BildName##**. Beispiel: ##http:~/~/example.org/pfad/bild.png##
-** **Anhang**: Ein Verweis auf einen Anhang im Wiki im Format **##~{~{~{wikiName:} Bereich.} Seite@} (BildName)##**
+** **Anhang**: Ein Verweis auf einen Anhang eines XWiki-Dokuments im Format **##~{~{~{wikiName:} Bereich.} Seite@} (BildName)##**
 *** **##wikiName##**: Ein optionaler Text, welcher den Namen eines Subwikis enthält. Das Bild wird dann in dem entsprechenden Subwiki nachgeschlagen. Beispiel: ##mywiki##
 *** **##Bereich##**: Der Name eines Bereiches, in dem das Bild nachgeschlagen wird (optional). Wenn kein Bereich angegeben, wird der aktuelle Bereich verwendet. Beispiel: ##Main##
 *** **##Seite##**: Der Namen einer Seite, an der das Bild angehangen ist (optional). Wird keine Seite angegeben, wird die aktuelle Seite verwendet. Beispiel: ##WebHome##
 *** **##BildName##**: Ein erforderlicher Text, welcher den Dateinamen des anzuzeigenden Bildes enthält, wie er im Wiki gespeichert ist.
+** **Seiten-Anhang**: Ein Verweis in der Form **##pageAttach~:~{~{~{(wikiName):}(seitenNamenListe)/}(anhangName)##**
+*** **##pageAttach~:##** Eine erforderliche Zeichenfolge, die die Referenz als Anhang einer XWiki-Seite identifiziert.
+*** **##wikiName##**: Ein optionaler Text, welcher den Namen eines Subwikis enthält. Das Bild wird dann in dem entsprechenden Subwiki nachgeschlagen. Beispiel: ##mywiki##
+*** **##seitenNamenListe##**: Eine optionale, durch Punkte getrennte Liste von Wiki-Seitennamen. Wenn keine Seite angegeben ist, wird die aktuelle Seite verwendet. Beispiele: ##Main##, ##A/B##, ##A/B/C##
+*** **##anhangName##**: Eine erforderliche Zeichenfolge, die den Namen des an eine Seite angehängten Bildes enthält, wie es im Wiki gespeichert ist. Beispiel: ##myImage.png##
 ** **Piktogramme** Ein Verweis mittels des Textes **##{{{(icon:)}}} (iconName)##**. Beispiel: **##icon:accept##**
-*** **##icon:##**  Ein erforderlicher Text, welcher die folgende Angabe als Piktogramm kennzeichnet. Piktogramme können nur aus der vorinstallierten Liste der [[XWiki Icons&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]] ausgewählt werden.
+*** **##icon:##** Ein erforderlicher Text, welcher die folgende Angabe als Piktogramm kennzeichnet. Piktogramme können nur aus der vorinstallierten Liste der [[XWiki Icons&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]] ausgewählt werden.
 *** **##iconName##**: Ein erforderlicher Text mit dem (englischen) Namen des anzuzeigenden Piktogramms. Beispiel: ##accept##
-** **Data URI**s in der Form **##{{{(data:)}}} (bilddaten)##**. Beispiel:  **##data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4~/~/8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==##**
+** **Data URI**s in der Form **##{{{(data:)}}} (bilddaten)##**. Beispiel: **##data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4~/~/8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==##**
 *** **##data:##** Ein erforderlicher Text, welcher die folgende Angabe als Binärdaten zu interpretieren erlaubt, enstprechend dem [['data' URI Schema&gt;&gt;http://de.wikipedia.org/wiki/Data-URL]].
 *** **##bilddaten##**: Angabe zu Dateiformat und Codierung, etwa für PNG-Bilder in Base64-codierung ##{{{image/png;base64,}}}## gefolgt von den Binärdaten des Bildes in der angegebenen textuellen Codierung
-* **##Parameter##**: Eine optionale Liste von durch Leerzeichen getrennten Parametern, die an das Bild durchgereicht werden. Beispiel: ##width="800" height="600" alt="Ein beispielhaftes Bild" title="Dies ist ein schönes Bild"## 
+* **##Parameter##**: Eine optionale Liste von durch Leerzeichen getrennten Parametern, die an das Bild durchgereicht werden. Beispiel: ##width="800" height="600" alt="Ein beispielhaftes Bild" title="Dies ist ein schönes Bild"##
 ** **HTML Attribute**: Alle Attribute, welche im HTML Standard vorgesehen sind, werden zu dem erzeugten ##&lt;img&gt;## Element hinzugefügt.
 *** **##style##**: CSS-Stil Anweisungen, welche auf das Bild angewendet werden. Beispiele: ##style="float:right;height:50px"## (d.h. das Bild wird rechtsbündig eingebettet mit einer Höhe von 50 Pixeln),
  ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (Bild wird zentriert dargestellt in einer Breite von 80% des zur Verfügung stehenden Platzes),
@@ -127,6 +136,6 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 *** **##width##**: Die horizontale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##width="120"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##width="80%"##)
 *** **##title##**: Der Text, der beim Überfahren den Bildes mit dem Mauszeiger angezeigt wird. Beispiel: ##title="Dies ist ein schönes Bild"##
 *** **##alt##**: Der Text, welcher //alt//ernativ angezeigt wird, wenn der Browser das Bild nicht darstellen kann. Da dies im HTML eine Pflichtangabe ist, verwendet XWiki den Dateinamen, wenn kein Wert für ##alt## angegeben wurde. Beispiel: alt="Ein beispielhaftes Bild"
-*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[w3.org Seite &gt;&gt;http://www.w3.org/TR/html4/struct/objects.html#h-13.2]] (in Englisch) eingesehen werden.
+*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt; https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
 ** **##queryString##**: Ein optionaler Text, welcher als Abfrageparameter an die URL angehangen wird, unter der das Bild vom Server abgeholt wird. Beispiel: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true##** soll den Server veranlassen, die Seitenverhältnisse des Bildes beizubehalten, wird aber ignoriert, wenn sowohl ##width## als auch ##height## angegeben werden)</content>
 </xwikidoc>

@@ -57,7 +57,15 @@
   ##
   #set($tablelist = [])
   #foreach($colname in $collist)
-    #livetable_addColumnToQuery($colname)
+    ## If a classname is defined and the class field corresponding to the column name,
+    ## we check the type of the field and skip it if it's Password.
+    #if ($className != '' &amp;&amp; $class.get($colname))
+      #if ($class.get($colname).classType != 'Password')
+        #livetable_addColumnToQuery($colname)
+      #end
+    #else
+      #livetable_addColumnToQuery($colname)
+    #end
   #end
   ##
   ## Tag filtering
@@ -407,7 +415,7 @@
       #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")
-    #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
+    #set($fieldDisplayValue = "#unwrapXPropertyDisplay($itemDoc.display($colname, 'view'))")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
@@ -419,7 +427,7 @@
         #set($fieldUrl = '')
       #end
     #end
-    #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
+    #set($discard = $row.put($colname, $fieldDisplayValue))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #if($colname == 'wikiprettyname')

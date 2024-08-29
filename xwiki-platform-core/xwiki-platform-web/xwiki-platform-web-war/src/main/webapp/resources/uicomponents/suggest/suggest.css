@@ -14,24 +14,31 @@ body {
 }
 
 div.suggestItems {
-  position:absolute;
+  position: absolute;
   border: 1px solid $theme.borderColor;
   border-top: none;
   background: $theme.pageContentBackgroundColor;
   z-index: 100013;
   text-align:left;
 }
+
+div.suggestItems a,
+div.suggestItems button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+}
+
 div.suggestItems .hide-button-wrapper {
   line-height: 1em;
-  text-align: right;
 }
 div.suggestItems .hide-button {
-  cursor: pointer;
-  font-size: 0.8em;
   font-style: italic;
-  margin: 0 4px;
-  opacity: .4;
-  padding: 0 0.5em;
+  padding: 0 0.8em;
+  text-align: right;
 }
 
 div.suggestItems ul {
@@ -47,8 +54,7 @@ div.suggestItems ul.xlist.suggestList > li.xitem {
   /* Reset the float because we want the suggest items to take only the necessary width. This way, if the width of the
   suggest list is not specified, the list adapts its width to fit the suggest items. */
   float: none;
-  /* IE9 fix for XWIKI-9155. Added !important in order to override Colibri's "ul.xlist li" */
-  width: auto !important;
+  width: auto;
 }
 
 div.suggestItems * {
@@ -92,7 +98,7 @@ div.suggestItemName {
   text-indent: 0;
 }
 
-div.suggestItem, li.noSuggestion div {
+a.suggestItem, li.noSuggestion div {
   color: $theme.textColor;
   font-size: 0.875em;
 }
@@ -127,7 +133,7 @@ div.resultContainer div.sourceName {
   background-position:right 3px center;
 }
 
-.horizontalLayout div.resultContainer div.xitemcontainer {
+.horizontalLayout div.resultContainer a.xitemcontainer {
   margin-left:10px;
 }
 

@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="uk">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=Згадування користувача
+rendering.macro.mention.description=Вставити згадку про користувача.
+rendering.macro.mention.parameter.reference.name=Посилання
+rendering.macro.mention.parameter.reference.description=Згаданий користувач або посилання на групу.
+rendering.macro.mention.parameter.style.name=Стиль відображення
+rendering.macro.mention.parameter.style.description=Вибір стилю згадування (підтримується лише для згаданих користувачів).
+rendering.macro.mention.parameter.anchor.name=Якір
+rendering.macro.mention.parameter.anchor.description=Якір, яка буде використана для посилання на цю згадку (який має бути якомога більше унікальною для документа).
+rendering.macro.mention.parameter.type.name=Тип
+rendering.macro.mention.parameter.type.description=Тип згаданого діяча.
+org.xwiki.mentions.DisplayStyle.FULL_NAME=Повне ім'я користувача
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=Лише ім'я користувача
+org.xwiki.mentions.DisplayStyle.LOGIN=Ім'я користувача
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Колір згадок
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=Колір згадок для поточного користувача (примітка: використовується як значення атрибута CSS кольору фону).
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Колір само згадування
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=Активувати цитування
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=Визначає, чи включено цитату тексту навколо згадки до сповіщень про згадку користувача.
+mentions.tip=Під час редагування у WYSIWYG введіть @, а потім почніть вводити літери, щоб отримати пропозиції щодо згадування користувача.
+mentions.configuration.heading=Налаштування згадок
+</content>
+</xwikidoc>

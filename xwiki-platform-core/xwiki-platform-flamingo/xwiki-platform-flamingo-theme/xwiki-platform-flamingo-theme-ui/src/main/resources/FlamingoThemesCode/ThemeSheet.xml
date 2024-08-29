@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="FlamingoThemesCode.ThemeSheet" locale="">
+<xwikidoc version="1.5" reference="FlamingoThemesCode.ThemeSheet" locale="">
   <web>FlamingoThemesCode</web>
   <name>ThemeSheet</name>
   <language/>
@@ -125,7 +125,7 @@
    },
   "panels": {
     "panel-bg" : "color",
-    "panel-default-text" : "color"
+    "panel-header-text" : "color"
   },
   "breadcrumb": {
     "breadcrumb-bg": "color",
@@ -409,40 +409,54 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'bootstrap'], function($) {
+      <code>define('xwiki-flamingo-theme-messages', {
+  prefix: 'platform.flamingo.themes.',
+  keys: [
+    'preview.iframe.label'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!xwiki-flamingo-theme-messages', 'bootstrap'], function($, l10n) {
   'use strict';
 
   var createPreview = function() {
-    var deferred = $.Deferred();
+    return new Promise((resolve, reject) =&gt; createPreviewPromise({resolve, reject}));
+  };
+
+  var createPreviewPromise = function(deferred) {
     var iframe = $('&lt;iframe/&gt;').attr({
       src: new XWiki.Document('WebHome', 'Main').getURL('view', 'colortheme=no'),
       id: 'iframe',
-      'class': 'col-xs-12'
+      class: 'col-xs-12',
+      title: l10n.get('preview.iframe.label'),
+      'aria-label': l10n.get('preview.iframe.label')
     // We need to register the load listener before the iframe is attached to the DOM otherwise we can't catch reliably
     // the load event (because the iframe might load before we register our listener).
-    }).load(function() {
-      initPreview(iframe).done(function() {
-        // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
-        // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
-        refreshPreview().done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
-      });
+    }).on('load', function() {
+      // We need to refresh just after LESS is loaded because the fist rendering does not handle the variables of the
+      // flamingo theme. Unfortunately, it means that the preview is rendered twice at the loading of the page.
+      initPreview(iframe).then(refreshPreview).then(deferred.resolve.bind(deferred))
+        .catch(deferred.reject.bind(deferred));
     }).insertBefore('#preview-curtain');
 
     // Update the preview curtain size and position.
     showPreviewCurtain();
-
-    return deferred.promise();
   };
 
   var initPreview = function(iframe) {
-    window.colorThemePreviewInitDeferred = $.Deferred();
+    return new Promise((resolve, reject) =&gt; initPreviewPromise(iframe, {resolve, reject}));
+  };
+
+  var initPreviewPromise = function(iframe, deferred) {
+    window.colorThemePreviewInitDeferred = deferred;
     var iframeHead = iframe.contents().find('head')[0];
 
     // Add a link to the LESS source code of the skin.
     var link = document.createElement('link');
     link.rel = 'stylesheet/less';
     link.type = 'text/css';
-    link.href = $jsontool.serialize($xwiki.getSkinFile('less/style.less.vm', true)) + '?colorTheme=no';
+    link.href = $jsontool.serialize($xwiki.getSkinFile('less/style.less.vm', true));
+    link.href += (link.href.indexOf('?') &lt; 0 ? '?' : '&amp;') + 'colorTheme=no';
     iframeHead.appendChild(link);
 
     // Add the LESS plugin we have developed which appends dynamically the content of the @lessCode variable to the
@@ -455,7 +469,7 @@
     script.innerHTML = `
       require.config({
         paths: {
-          lessJs: $jsontool.serialize($services.webjars.url('less', 'less.min.js')),
+          lessJs: $jsontool.serialize($services.webjars.url('org.webjars.npm:less', 'dist/less.min.js')),
           lessCodePlugin: '$escapetool.d{pluginURL}'
         }
       });
@@ -466,7 +480,9 @@
       require(['lessCodePlugin'], function(lessCodePlugin) {
         // We defined it as a global variable so we can re-use it afterwards.
         window.lessCodePlugin = lessCodePlugin;
-        window.less = {plugins: [lessCodePlugin]};
+        window.less = {
+          plugins: [lessCodePlugin]
+        };
         // Now we can load the LESS preprocessor.
         require(['lessJs'], function(lessJs) {
           // We defined it as a global variable so we can re-use it afterwards.
@@ -477,31 +493,26 @@
       });
     `;
     iframeHead.appendChild(script);
-
-    return colorThemePreviewInitDeferred.promise();
   };
 
   // Refresh the color theme preview.
   var refreshPreview = function() {
-    var deferred = $.Deferred();
-    showPreviewCurtain();
+    return new Promise((resolve, reject) =&gt; {
+      showPreviewCurtain();
 
-    // Update the logo.
-    updatePreviewLogo();
+      // Update the logo.
+      updatePreviewLogo();
 
-    // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file. It
-    // is handled by our LessCodePlugin.
-    var previewWindow = $('#iframe').prop('contentWindow');
-    previewWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
+      // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS file.
+      // It is handled by our LessCodePlugin.
+      var previewWindow = $('#iframe').prop('contentWindow');
+      previewWindow.lessCodePlugin.contentToAdd = $('#var-lessCode').val();
 
-    // We run LESS in a thread in order to not block the main thread.
-    setTimeout(function() {
-      previewWindow.lessJs.modifyVars(getLessVariables())
-        .then($.proxy(deferred, 'resolve'), $.proxy(deferred, 'reject'))
-        .finally(hidePreviewCurtain);
-    }, 0);
-
-    return deferred.promise();
+      // We run LESS in a thread in order to not block the main thread.
+      setTimeout(function() {
+        previewWindow.lessJs.modifyVars(getLessVariables()).then(resolve, reject).finally(hidePreviewCurtain);
+      }, 0);
+    });
   };
 
   // Show the curtain on top of the preview while the LESS code is recompiled.
@@ -585,15 +596,15 @@
     }
   };
 
-  $(document).ready(function() {
-    $('#refresh').click(refreshPreview);
+  $(function() {
+    $('#refresh').on('click', refreshPreview);
 
     // Update the preview when the user modifies the LESS variables.
     $('#bt-variables').on('change', 'input, select', onLESSVariableChange);
 
     // Event handler for the logo field.
     var logoFieldInput = $('#var-logo input');
-    logoFieldInput.change(updatePreviewLogo);
+    logoFieldInput.on('change', updatePreviewLogo);
     // Since the logo input is hidden (by the attachment selector macro), we need to do some black magic (i.e. register
     // a mutation observer) to make it trigger the "change" event.
     trackValueChange(logoFieldInput[0]);

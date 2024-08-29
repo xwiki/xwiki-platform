@@ -20,7 +20,6 @@
 package org.xwiki.skinx;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for skin extensions.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.8RC1
  */
 @Role
-@Unstable
 public interface SkinExtensionConfiguration
 {
     /**

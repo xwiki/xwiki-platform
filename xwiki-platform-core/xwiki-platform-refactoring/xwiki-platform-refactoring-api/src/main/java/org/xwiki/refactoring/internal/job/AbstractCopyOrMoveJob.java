@@ -98,7 +98,11 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         switch (source.getType()) {
             case DOCUMENT:
-                process(new DocumentReference(source), destination);
+                try {
+                    process(new DocumentReference(source), destination);
+                } catch (Exception e) {
+                    this.logger.error("Failed to copy or move document with reference [{}]", source, e);
+                }
                 break;
             case SPACE:
                 process(new SpaceReference(source), destination);
@@ -117,7 +121,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         return parent != null;
     }
 
-    protected void process(DocumentReference source, EntityReference destination)
+    protected void process(DocumentReference source, EntityReference destination) throws Exception
     {
         if (processOnlySameSourceDestinationTypes()) {
             // We know the destination is a document (see above).
@@ -139,7 +143,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         }
     }
 
-    protected void process(DocumentReference source, DocumentReference destination)
+    protected void process(DocumentReference source, DocumentReference destination) throws Exception
     {
         if (this.request.isDeep() && isSpaceHomeReference(source)) {
             if (isSpaceHomeReference(destination)) {
@@ -179,12 +183,17 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             public void visit(DocumentReference oldChildReference)
             {
                 DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
-                maybePerformRefactoring(oldChildReference, newChildReference);
+                try {
+                    maybePerformRefactoring(oldChildReference, newChildReference);
+                } catch (Exception e) {
+                    logger.error("Failed to perform the refactoring from document with reference [{}] to [{}]",
+                        oldChildReference, newChildReference, e);
+                }
             }
         });
     }
 
-    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference)
+    protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
         if (!hasAccess(Right.VIEW, oldReference)) {
             this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
@@ -199,12 +208,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     }
 
     protected void maybePerformRefactoring(DocumentReference oldReference, DocumentReference newReference)
+        throws Exception
     {
         // Perform checks that are specific to the document source/destination type.
 
-        EntitySelection entitySelection = this.concernedEntities.get(oldReference);
-        if (entitySelection != null && !entitySelection.isSelected()) {
-            // TODO: handle entitySelection == null which means something is wrong
+        EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(oldReference);
+        if (entitySelection == null) {
+            this.logger.info("Skipping [{}] because it does not match any entity selection.", oldReference);
+        } else if (!entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", oldReference);
         } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
@@ -216,7 +227,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     protected abstract void performRefactoring(DocumentReference oldReference, DocumentReference newReference);
 
     protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference,
-        AbstractEntityCopyOrRenameEvent<?> beforeEvent, AbstractEntityCopyOrRenameEvent<?> afterEvent)
+        AbstractEntityCopyOrRenameEvent<?> beforeEvent, AbstractEntityCopyOrRenameEvent<?> afterEvent) throws Exception
     {
         this.progressManager.pushLevelProgress(5, this);
 
@@ -290,13 +301,9 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     @Override
     protected EntityReference getCommonParent()
     {
-        if (this.request.isUpdateLinksOnFarm()) {
-            return null;
-        } else {
-            List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
-            entityReferences.add(this.request.getDestination());
-            return getCommonParent(entityReferences);
-        }
+        List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
+        entityReferences.add(this.request.getDestination());
+        return getCommonParent(entityReferences);
     }
 
     /**

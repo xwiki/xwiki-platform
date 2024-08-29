@@ -59,7 +59,6 @@ public interface URLConfiguration
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     default List<String> getTrustedDomains()
     {
         return Collections.emptyList();
@@ -72,9 +71,23 @@ public interface URLConfiguration
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
     default boolean isTrustedDomainsEnabled()
     {
         return true;
+    }
+
+    /**
+     * Define which URI schemes should be trusted when checking if an URI can be trusted or not.
+     * Note that the list of defined schemes might not be enough if the scheme protocol is not supported (by default,
+     * only http, https, ftp and files are supported).
+     *
+     * @return a list of supported schemes for checking trusted URI
+     * @since 14.10.4
+     * @since 15.0
+     */
+    @Unstable
+    default List<String> getTrustedSchemes()
+    {
+        return List.of("http", "https", "ftp");
     }
 }

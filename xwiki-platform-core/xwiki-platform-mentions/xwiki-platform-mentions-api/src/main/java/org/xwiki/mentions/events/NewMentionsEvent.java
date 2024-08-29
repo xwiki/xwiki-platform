@@ -20,7 +20,6 @@
 package org.xwiki.mentions.events;
 
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event sent at the end of the analysis of a document change (i.e., a created or updated document).
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class NewMentionsEvent implements Event
 {
     @Override

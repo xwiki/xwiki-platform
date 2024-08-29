@@ -142,7 +142,7 @@ public enum ServletEngine
      */
     public String getInternalIP()
     {
-        return isOutsideDocker ? HOST_INTERNAL : "xwikiweb";
+        return isOutsideDocker() ? HOST_INTERNAL : "xwikiweb";
     }
 
     /**
@@ -179,6 +179,6 @@ public enum ServletEngine
      */
     public String getDockerImageName()
     {
-        return dockerImageName;
+        return this.dockerImageName;
     }
 }

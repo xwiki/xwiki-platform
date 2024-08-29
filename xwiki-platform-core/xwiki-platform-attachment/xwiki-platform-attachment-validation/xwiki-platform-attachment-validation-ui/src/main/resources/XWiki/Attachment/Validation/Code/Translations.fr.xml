@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Attachment.Validation.Code.Translations" locale="fr">
+  <web>XWiki.Attachment.Validation.Code</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: admin.attachmentsrestriction=Attachments Restriction
+### Missing: attachment.validation.filesize.errorMessage=File {0} is too large ({1}). Max file size: {2}.
+### Missing: attachment.validation.mimetype.errorMessage=File {0} has an invalid mimetype {1}.
+attachment.validation.mimetype.allowedMimetypes=Mimetypes autorisés : {0}
+### Missing: attachment.validation.mimetype.blockerMimetypes=Blocker mimetypes: {0}
+### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=Allowed Mimetypes
+### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=Define the list of allowed attachment mimetypes. By default, this list is empty, but you can specify a comma-separated list of allowed mimetypes. Note that a joker (*) can be used to accept any media type. Once this list is not empty, any attachment with an unlisted mimetype will be rejected. For instance, if you want to only accept plain text and any kind of images, you can set the list to: text/plain,image/*
+### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=Blocked Mimetypes 
+### Missing: XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=Define the list of rejected attachment mimetypes. By default, this list is empty, but you can specify a comma-separated list of blocked mimetypes. Note that a joker (*) can be used to accept any media type. Once this list is not empty, any attachment matching one of the listed mimetype will be rejected. For instance, if you want to reject plain text and any kind of images, you can set the list to: text/plain,image/*
+</content>
+</xwikidoc>

@@ -23,6 +23,7 @@
 
 #macro (displayCopyForm)
   <form action="$xwiki.relativeRequestURL" id="copy" class="xform">
+    <fieldset>
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -117,6 +118,7 @@
         <a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a>
       </span>
     </div>
+    </fieldset>
   </form>
 #end
 
@@ -256,7 +258,7 @@
 #end
 
 #macro (displayCopyJobStatus $copyJobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   #set ($copyJobState = $copyJobStatus.state)
   #set ($finished = $copyJobState == 'FINISHED')
   #set ($copyJobRequest = $copyJobStatus.request)
@@ -307,17 +309,19 @@
   #template('startpage.vm')
   #template('refactoring_macros.vm')
   <div class="main layoutsubsection">
-  <div id="mainContentArea">
-    #if ("$!request.copyId" != '')
-      ## Display the copy status
-      #handleCopyStatusRequest
-    #elseif ($doc.isNew())
-      $response.setStatus(404)
-      #error($services.localization.render('core.rename.nonexistingDocument'))
-    #else
-      #handleCopyRequest
-    #end
-  </div>## mainContentArea
+    #template("hierarchy.vm")
+    ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+    <main id="mainContentArea">
+      #if ("$!request.copyId" != '')
+        ## Display the copy status
+        #handleCopyStatusRequest
+      #elseif ($doc.isNew())
+        $response.setStatus(404)
+        #error($services.localization.render('core.rename.nonexistingDocument'))
+      #else
+        #handleCopyRequest
+      #end
+    </main>## mainContentArea
   </div>## main
   #template('endpage.vm')
 #end

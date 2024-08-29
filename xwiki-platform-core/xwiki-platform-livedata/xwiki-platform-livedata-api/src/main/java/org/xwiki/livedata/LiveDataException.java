@@ -19,15 +19,12 @@
  */
 package org.xwiki.livedata;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception related to live data processing.
  *
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class LiveDataException extends Exception
 {
     /**
@@ -51,7 +48,6 @@ public class LiveDataException extends Exception
      * @param message the detail message
      * @since 13.4RC1
      */
-    @Unstable
     public LiveDataException(String message)
     {
         super(message);

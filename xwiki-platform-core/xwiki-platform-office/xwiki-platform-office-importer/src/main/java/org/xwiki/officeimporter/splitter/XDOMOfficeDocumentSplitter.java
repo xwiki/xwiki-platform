@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component responsible for splitting office imports.
@@ -42,24 +43,51 @@ public interface XDOMOfficeDocumentSplitter
      * 
      * @param xdomOfficeDocument {@link XDOMOfficeDocument} to be split
      * @param headingLevelsToSplit heading levels (1..6) to be used as boundaries. The split process is recursive, if
-     *        there are multiple heading levels specified, the original document will be split from the highest heading
-     *        level ({@code lowest value >= 1}) first and then the resulting office documents will be re-split from the
-     *        next highest heading level
+     *            there are multiple heading levels specified, the original document will be split from the highest
+     *            heading level ({@code lowest value >= 1}) first and then the resulting office documents will be
+     *            re-split from the next highest heading level
      * @param namingCriterionHint naming criterion to be used when producing target page names for the newly split
-     *        documents. Currently three schemes are supported:
-     *        <ul>
-     *          <li>headingNames - Uses the first heading name as target document name</li>
-     *          <li>mainPageNameAndHeading - Base document name followed by heading name</li>
-     *          <li>mainPageNameAndNumbering - Base document name followed by index</li>
-     *        </ul>
+     *            documents. Currently three schemes are supported:
+     *            <ul>
+     *            <li>headingNames - Uses the first heading name as target document name</li>
+     *            <li>mainPageNameAndHeading - Base document name followed by heading name</li>
+     *            <li>mainPageNameAndNumbering - Base document name followed by index</li>
+     *            </ul>
      * @param baseDocumentReference base (root) page name to be used when generating target page names for child (newly
-     *        split) documents
-     * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
+     *            split) documents
+     * @return a map of page descriptors vs. xdom office documents; each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document
      * @throws OfficeImporterException if an error occurs while splitting
      * @since 2.2M1
+     * @deprecated since 14.10.2 / 15.0RC1 use {@link #split(XDOMOfficeDocument, OfficeDocumentSplitterParameters)}
+     *             instead
      */
-    Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+    @Deprecated
+    default Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
-        throws OfficeImporterException;
+        throws OfficeImporterException
+    {
+        OfficeDocumentSplitterParameters parameters = new OfficeDocumentSplitterParameters();
+        parameters.setHeadingLevelsToSplit(headingLevelsToSplit);
+        parameters.setNamingCriterionHint(namingCriterionHint);
+        parameters.setBaseDocumentReference(baseDocumentReference);
+        parameters.setUseTerminalPages(!"WebHome".equals(baseDocumentReference.getName()));
+        return split(xdomOfficeDocument, parameters);
+    }
+
+    /**
+     * Splits an {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances based on the provided
+     * parameters.
+     *
+     * @param xdomOfficeDocument {@link XDOMOfficeDocument} to be split
+     * @param parameters the split parameters
+     * @return a map of page descriptors vs. xdom office documents; each page descriptor describes the target wiki page
+     *         name for the corresponding xdom office document
+     * @throws OfficeImporterException if an error occurs while splitting
+     * @since 14.10.2
+     * @since 15.0RC1
+     */
+    @Unstable
+    Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+        OfficeDocumentSplitterParameters parameters) throws OfficeImporterException;
 }

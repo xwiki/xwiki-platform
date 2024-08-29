@@ -39,7 +39,7 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-core.menu.type.wiki=Wiki
+core.menu.type.wiki=维基
 core.menu.watchlist.add.wiki=关注Wiki
 core.menu.watchlist.remove.wiki=取消关注Wiki
 core.menu.admin.wiki=管理Wiki
@@ -131,7 +131,8 @@ admin.xwiki.workspaceusers.description=管理Wiki成员：增加、删除、邀�
 admin.xwiki.usersconfiguration.title=配置
 admin.xwiki.members.title=当前成员
 admin.xwiki.users.title=所有用户
-    
+
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=主页</content>
+platform.wiki.drawer.homeWiki=主页
+</content>
 </xwikidoc>

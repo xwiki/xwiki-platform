@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     public AsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
         Object fromCache =
-            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount());
+            this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount(), true);
 
         NotificationParameters notificationParameters = this.configuration.getNotificationParameters();
         List<CompositeEvent> events = null;
@@ -114,7 +115,9 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
             try {
                 events = this.notificationManager.getEvents(notificationParameters);
                 count = events.size();
-                this.notificationCacheManager.setInCache(this.cacheKey, events, this.configuration.isCount());
+                this.notificationCacheManager.setInCache(this.cacheKey, new ArrayList<>(events),
+                    this.configuration.isCount(),
+                    true);
             } catch (NotificationException e) {
                 throw new RenderingException("Error while retrieving the notification", e);
             }
@@ -133,10 +136,14 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
                 boolean loadMore = events.size() == notificationParameters.expectedCount;
                 List<CompositeEventStatus> compositeEventStatuses = null;
                 // We cannot compute the read status if the user is not available.
+                String userId = null;
                 if (notificationParameters.user != null) {
+                    userId = documentReferenceSerializer.serialize(notificationParameters.user);
+                }
+
+                if (userId != null) {
                     compositeEventStatuses =
-                        this.compositeEventStatusManager.getCompositeEventStatuses(events,
-                            documentReferenceSerializer.serialize(notificationParameters.user));
+                        this.compositeEventStatusManager.getCompositeEventStatuses(events, userId);
                 }
                 stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
             } catch (Exception e) {

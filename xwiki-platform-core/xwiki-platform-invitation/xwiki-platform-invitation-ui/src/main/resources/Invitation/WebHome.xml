@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Invitation.WebHome" locale="">
+<xwikidoc version="1.5" reference="Invitation.WebHome" locale="">
   <web>Invitation</web>
   <name>WebHome</name>
   <language/>
@@ -34,11 +34,11 @@
   <title>$services.localization.render('invitation.applicationsPanelEntryLabel')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="Invitation.InvitationCommon" /}}
+  <content>{{include reference="Invitation.InvitationCommon"/}}
 
-{{include reference="Invitation.InvitationMembersCommon" /}}
+{{include reference="Invitation.InvitationMembersCommon"/}}
 
 {{velocity}}
 #*
@@ -538,10 +538,10 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       <number>5</number>
       <picker>1</picker>
       <prettyName>Email message XClass</prettyName>
-      <size>30</size>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators/>
+      <size>30</size>
       <sort>none</sort>
       <sql/>
       <unmodifiable>0</unmodifiable>
@@ -563,10 +563,10 @@ $xwiki.get('ssx').use($config.get('commonPage'))
       <number>9</number>
       <picker>1</picker>
       <prettyName>Document containing email XObjects</prettyName>
-      <size>30</size>
       <relationalStorage>0</relationalStorage>
       <separator> </separator>
       <separators/>
+      <size>30</size>
       <sort>none</sort>
       <sql/>
       <unmodifiable>0</unmodifiable>

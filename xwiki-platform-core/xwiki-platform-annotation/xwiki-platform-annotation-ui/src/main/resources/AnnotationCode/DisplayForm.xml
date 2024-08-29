@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.DisplayForm" locale="">
+<xwikidoc version="1.5" reference="AnnotationCode.DisplayForm" locale="">
   <web>AnnotationCode</web>
   <name>DisplayForm</name>
   <language/>
@@ -37,14 +37,6 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="AnnotationCode.Macros" /}}
-
-{{velocity output="false"}}
-#if ("$!{request.reference}" != '')
-  #set($annotationReference = $services.model.resolveDocument($request.reference))
-#elseif("$!{request.wiki}" != '' &amp;&amp; "$!{request.space}" != '' &amp;&amp; "$!{request.page}" != '')
-  #set($annotationReference = $services.model.createDocumentReference("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
-#end
-{{/velocity}}
 
 {{velocity filter="none"}}
 {{html clean="false"}}

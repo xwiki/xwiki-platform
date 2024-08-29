@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -35,7 +36,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.restlet.ext.jaxrs.internal.core.MultivaluedMapImpl;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -65,8 +65,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -148,15 +148,17 @@ class DefaultLiveDataEntriesResourceTest
     void getEntriesWithNamespaceNull() throws Exception
     {
         List<String> properties = Arrays.asList("prop1", null, "prop2");
-        List<String> matchAll = Arrays.asList(null, "equals:1");
+        List<String> matchAll = Arrays.asList(null, "prop", "other");
         List<String> sort = Arrays.asList("pro2", null);
         List<Boolean> descending = Arrays.asList(true, false, null);
 
         LiveDataQuery.Source source = new LiveDataQuery.Source("liveTable");
         LiveDataConfiguration config = defaultConfig(source);
 
-        MultivaluedMapImpl<String, String> multivaluedMap = new MultivaluedMapImpl<>();
+        MultivaluedMap<String, String> multivaluedMap = new MultivaluedHashMap<>();
         multivaluedMap.putSingle("filters.age", "18");
+        multivaluedMap.putSingle("filters.other", "contains:xwiki:XWiki.Admin");
+        multivaluedMap.putSingle("filters.author", ":xwiki:XWiki.Author");
         multivaluedMap.putSingle("notfilter.unused", "abcd");
         when(this.uriInfo.getQueryParameters()).thenReturn(multivaluedMap);
         when(this.defaultLiveDataConfigResolver.resolve(any())).thenReturn(config);
@@ -168,7 +170,7 @@ class DefaultLiveDataEntriesResourceTest
 
         assertEquals("{\"links\":["
                 + "{\"href\":\"https://mywiki\",\"rel\":\"self\",\"type\":null,\"hrefLang\":null},"
-                + "{\"href\":\"https://mywiki//liveData/sources/liveTable\","
+                + "{\"href\":\"https://mywiki/liveData/sources/liveTable\","
                 + "\"rel\":\"http://www.xwiki.org/rel/parent\","
                 + "\"type\":null,\"hrefLang\":null}],\"entries\":[],\"count\":0,\"offset\":0,\"limit\":10}",
             this.objectMapper.writeValueAsString(entries));
@@ -179,7 +181,11 @@ class DefaultLiveDataEntriesResourceTest
         assertEquals("{\"query\":{"
             + "\"properties\":[\"prop1\",\"prop2\"],"
             + "\"source\":{\"id\":\"sourceId\"},"
-            + "\"filters\":[{\"property\":\"age\",\"constraints\":[{\"value\":\"18\"}]}],"
+            + "\"filters\":["
+            + "{\"property\":\"other\",\"matchAll\":true,\"constraints\":"
+            + "[{\"operator\":\"contains\",\"value\":\"xwiki:XWiki.Admin\"}]"
+            + "},"
+            + "{\"property\":\"author\",\"constraints\":[{\"value\":\"xwiki:XWiki.Author\"}]}],"
             + "\"sort\":[{\"property\":\"pro2\",\"descending\":true}],"
             + "\"offset\":0,"
             + "\"limit\":10}}", this.objectMapper.writeValueAsString(configCaptor.getValue()));
@@ -203,7 +209,7 @@ class DefaultLiveDataEntriesResourceTest
 
         assertEquals("{\"links\":["
                 + "{\"href\":\"https://mywiki\",\"rel\":\"self\",\"type\":null,\"hrefLang\":null},"
-                + "{\"href\":\"https://mywiki//liveData/sources/liveTable?namespace=wiki%3As2\","
+                + "{\"href\":\"https://mywiki/liveData/sources/liveTable?namespace=wiki%3As2\","
                 + "\"rel\":\"http://www.xwiki.org/rel/parent\","
                 + "\"type\":null,\"hrefLang\":null}],\"entries\":[],\"count\":0,\"offset\":1,\"limit\":20}",
             this.objectMapper.writeValueAsString(entries));
@@ -262,9 +268,9 @@ class DefaultLiveDataEntriesResourceTest
 
         Response response = this.resource.addEntry("sourceId", null, entry);
         assertEquals("{\"links\":[{"
-                + "\"href\":\"https://mywiki//liveData/sources/sourceId/entries/entryId\","
+                + "\"href\":\"https://mywiki/liveData/sources/sourceId/entries/entryId\","
                 + "\"rel\":\"self\",\"type\":null,\"hrefLang\":null},{"
-                + "\"href\":\"https://mywiki//liveData/sources/sourceId/entries\","
+                + "\"href\":\"https://mywiki/liveData/sources/sourceId/entries\","
                 + "\"rel\":\"http://www.xwiki.org/rel/parent\","
                 + "\"type\":null,\"hrefLang\":null}],\"values\":{\"age\":\"42\"}}",
             this.objectMapper.writeValueAsString(response.getEntity()));

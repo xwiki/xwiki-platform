@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Applications.Contributors.Code.ContributorsTranslations" locale="uk">
+  <web>Help.Applications.Contributors.Code</web>
+  <name>ContributorsTranslations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>ContributorsClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Help.Applications.Contributors.Code.ContributorsClass_longText1=Зображення
+Help.Applications.Contributors.Code.ContributorsClass_title1=Назва
+Help.Applications.Contributors.Code.ContributorsClass_date1=Дата народження
+Help.Applications.Contributors.Code.ContributorsClass_staticList1=Тип
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_actor=Діяч
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_composer=Композитор
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_director=Керівник
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_editor=Редактор
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_hairdresser=Перукар
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_make_up_artist=Візажист
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_producer=Продюсер
+Help.Applications.Contributors.Code.ContributorsClass_staticList1_writer=Сценарист
+Help.Applications.Contributors.Code.ContributorsClass_content1=Біографія
+
+# Live table generic keys
+contributors.livetable.doc.title=Заголовок сторінки
+contributors.livetable.doc.name=Назва сторінки
+contributors.livetable.doc.space=Простір
+contributors.livetable.doc.fullname=Повна назва сторінки
+contributors.livetable.doc.location=Розташування
+contributors.livetable.doc.author=Останній автор
+contributors.livetable.doc.creator=Автор
+contributors.livetable.doc.date=Дата
+contributors.livetable.doc.creationDate=Дата створення
+contributors.livetable._avatar=Аватарка
+contributors.livetable._images=Зображення
+contributors.livetable._attachments=Вкладення
+contributors.livetable._actions=Дії
+contributors.livetable._actions.edit=Редагувати
+contributors.livetable._actions.delete=Видалити
+contributors.livetable.emptyvalue=-
+
+# Live table specific keys
+contributors.livetable.longText1=Зображення
+contributors.livetable.title1=Назва
+contributors.livetable.date1=Дата народження
+contributors.livetable.staticList1=Тип
+contributors.livetable.content1=Біографія
+
+# Other keys
+contributors.entry.name=Дописувачі
+
+# Deprecated keys
+contributors.dataSpace.title=Дата
+</content>
+</xwikidoc>

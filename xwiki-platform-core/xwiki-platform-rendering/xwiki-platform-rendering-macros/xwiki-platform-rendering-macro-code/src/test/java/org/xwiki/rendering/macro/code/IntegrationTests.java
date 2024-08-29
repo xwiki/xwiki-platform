@@ -19,8 +19,16 @@
  */
 package org.xwiki.rendering.macro.code;
 
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.macro.source.MacroContentSourceReference;
+import org.xwiki.rendering.macro.source.MacroContentWikiSource;
+import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -29,7 +37,17 @@ import org.xwiki.rendering.test.integration.RenderingTestSuite;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+// @RenderingTests.Scope(pattern = "macrocode1.test")
+public class IntegrationTests implements RenderingTests
 {
+    @Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
+    {
+        MacroContentWikiSourceFactory factory =
+            componentManager.registerMockComponent(MacroContentWikiSourceFactory.class, "script");
+        MacroContentSourceReference reference = new MacroContentSourceReference("script", "myvar");
+        when(factory.getContent(eq(reference), any()))
+            .thenReturn(new MacroContentWikiSource(reference, "<i>script</i>", null));
+    }
 }

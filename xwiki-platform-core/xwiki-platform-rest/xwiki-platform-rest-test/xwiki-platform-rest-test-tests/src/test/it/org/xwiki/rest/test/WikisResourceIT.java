@@ -21,17 +21,19 @@ package org.xwiki.rest.test;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.restlet.engine.io.ReaderInputStream;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.Relations;
@@ -59,6 +61,7 @@ import org.xwiki.test.ui.TestUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class WikisResourceIT extends AbstractHttpIT
 {
@@ -84,6 +87,26 @@ public class WikisResourceIT extends AbstractHttpIT
         this.fullName = getTestClassName() + '.' + getTestMethodName();
 
         this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
+    }
+
+    private SearchResults search(int expectedSize, String query)
+    {
+        try {
+            GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
+            assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+
+            SearchResults searchResults =
+                (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+            int resultSize = searchResults.getSearchResults().size();
+            if (resultSize == expectedSize) {
+                return searchResults;
+            }
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+
+        return null;
     }
 
     @Override
@@ -114,6 +137,48 @@ public class WikisResourceIT extends AbstractHttpIT
 
             checkLinks(wiki);
         }
+    }
+
+    @Test
+    public void testSearchWikisName() throws Exception
+    {
+        this.testUtils.rest().delete(reference);
+        this.testUtils.rest().savePage(reference, "Name Content", "Name Title " + this.pageName);
+
+        GetMethod getMethod = executeGet(
+            String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        // Ensure that the terminal page is found by its name.
+        int resultSize = searchResults.getSearchResults().size();
+        assertEquals(1, resultSize);
+        assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
+
+        // Create a non-terminal page with the same "name" but this time as last space.
+        List<String> nonTerminalSpaces = List.of(this.spaces.get(0), this.pageName);
+        DocumentReference nonTerminalReference = new DocumentReference(this.wikiName, nonTerminalSpaces, "WebHome");
+        String nonTerminalFullName = String.join(".", nonTerminalSpaces) + "." + "WebHome";
+        this.testUtils.rest().savePage(nonTerminalReference, "content2" + this.pageName, "title2" + this.pageName);
+
+        getMethod = executeGet(
+            String.format("%s?scope=name&q=" + this.pageName, buildURI(WikiSearchResource.class, getWiki())));
+        searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+        // Ensure that searching by name finds both terminal and non-terminal page.
+        resultSize = searchResults.getSearchResults().size();
+        assertEquals(2, resultSize);
+        List<String> foundPages = searchResults.getSearchResults().stream()
+            .map(SearchResult::getPageFullName)
+            .collect(Collectors.toList());
+        assertTrue(foundPages.contains(this.fullName));
+        assertTrue(foundPages.contains(nonTerminalFullName));
+
+        // Ensure that searching by space finds neither the terminal nor the non-terminal page.
+        getMethod =
+            executeGet(String.format("%s?scope=name&q=" + this.spaces.get(0),
+                buildURI(WikiSearchResource.class, getWiki())));
+        searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        assertEquals(0, searchResults.getSearchResults().size());
     }
 
     @Test
@@ -260,7 +325,7 @@ public class WikisResourceIT extends AbstractHttpIT
     {
         this.testUtils.rest().delete(reference);
         this.testUtils.rest().attachFile(new AttachmentReference(getTestClassName() + ".txt", reference),
-            new ReaderInputStream(new StringReader("attachment content")), true);
+            new ReaderInputStream(new StringReader("attachment content"), StandardCharsets.UTF_8), true);
 
         // Verify there are attachments in the whole wiki
         GetMethod getMethod = executeGet(buildURI(WikiAttachmentsResource.class, getWiki()).toString());
@@ -371,7 +436,7 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
-        this.solrUtils.waitEmpyQueue();
+        this.solrUtils.waitEmptyQueue();
 
         GetMethod getMethod = executeGet(URIUtil.encodeQuery(String.format("%s?q=\"" + this.pageName + "\"&type=solr",
             buildURI(WikiSearchQueryResource.class, getWiki()))));
@@ -390,16 +455,14 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
-        this.solrUtils.waitEmpyQueue();
+        // Wait for the Solr queue to be empty
+        this.solrUtils.waitEmptyQueue();
 
         String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
-        GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        // Even if the Solr queue appear to be empty we also make sure to wait for the number of results we expect, in
+        // case there is some race condition on server side
+        SearchResults searchResults = this.testUtils.getDriver().waitUntilCondition(d -> search(1, query));
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-
-        int resultSize = searchResults.getSearchResults().size();
-        assertEquals(String.format("Query [%s] returned more or less than 1 result", query), 1, resultSize);
         assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
     }
 

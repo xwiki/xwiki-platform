@@ -32,7 +32,7 @@ import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
 
 /**
- * Sort a list of {@link UIExtension} by following a custom order strategy. If some extension IDs are not passed through
+ * Sort a list of {@link UIExtension} by following a custom order strategy. If some extension IDs are not passed
  * through {@link #filter(java.util.List, String...)} they will be put at the end of the list.
  *
  * @version $Id$
@@ -53,7 +53,7 @@ public class SortByCustomOrderFilter implements UIExtensionFilter
     {
         List<String> extensionIds = Arrays.asList(ids);
         Collections.reverse(extensionIds);
-        List<UIExtension> results = new ArrayList<UIExtension>();
+        List<UIExtension> results = new ArrayList<>();
         results.addAll(extensions);
 
         for (String id : extensionIds) {

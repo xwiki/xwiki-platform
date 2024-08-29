@@ -19,27 +19,31 @@
  */
 package org.xwiki.user.internal.group;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.security.authorization.cache.SecurityCache;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectAddedEvent;
-import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectEvent;
-import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * @version $Id$
@@ -48,16 +52,14 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 @Component
 @Named(GroupCacheInvalidationListener.NAME)
 @Singleton
+// We want to invalidate the group cache before the security cache
+@Priority(SecurityCache.CACHE_INVALIDATION_PRIORITY - 1)
 public class GroupCacheInvalidationListener extends AbstractEventListener
 {
     /**
      * The name of the listener.
      */
     public static final String NAME = "org.xwiki.user.internal.group.GroupInvalidationListener";
-
-    private static final String GROUPS_CLASSNAME = "XWiki.XWikiGroups";
-
-    private static final String USERS_CLASSNAME = "XWiki.XWikiUsers";
 
     @Inject
     private DocumentReferenceResolver<String> resolver;
@@ -73,10 +75,8 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
      */
     public GroupCacheInvalidationListener()
     {
-        super(NAME, new WikiDeletedEvent(), new XObjectDeletedEvent(BaseObjectReference.any(GROUPS_CLASSNAME)),
-            new XObjectAddedEvent(BaseObjectReference.any(GROUPS_CLASSNAME)),
-            new XObjectUpdatedEvent(BaseObjectReference.any(GROUPS_CLASSNAME)),
-            new XObjectDeletedEvent(BaseObjectReference.any(USERS_CLASSNAME)));
+        super(NAME, new WikiDeletedEvent(), new DocumentCreatedEvent(), new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent());
     }
 
     @Override
@@ -87,38 +87,54 @@ public class GroupCacheInvalidationListener extends AbstractEventListener
             this.groupsCache.cleanCache(wikiReference.getName());
             this.membersCache.cleanCache(wikiReference.getName());
         } else {
-            XWikiDocument document = (XWikiDocument) source;
+            XWikiDocument newDocument = (XWikiDocument) source;
+            XWikiDocument previousDocument = newDocument.getOriginalDocument();
 
-            DocumentReference documentReference = document.getDocumentReference();
+            DocumentReference documentReference = newDocument.getDocumentReference();
 
             // Remove the entity from the cache
             this.groupsCache.cleanCache(documentReference);
             this.membersCache.cleanCache(documentReference);
 
             // Remove the previous and new group members from the cache
-            XObjectEvent xobjectEvent = (XObjectEvent) event;
-            ObjectReference reference = (ObjectReference) xobjectEvent.getReference();
+            Set<DocumentReference> previousMembers = getMembers(previousDocument);
+            Set<DocumentReference> newMembers = getMembers(newDocument);
 
-            BaseObject newXObject = document.getXObject(reference);
-            BaseObject previousXObject = document.getOriginalDocument().getXObject(reference);
-
-            clean(newXObject, documentReference);
-            clean(previousXObject, documentReference);
+            invalidate(previousMembers, newMembers);
+            invalidate(newMembers, previousMembers);
         }
     }
 
-    private void clean(BaseObject xobject, DocumentReference groupReference)
+    private void invalidate(Set<DocumentReference> members1, Set<DocumentReference> members2)
     {
-        if (xobject == null) {
-            return;
+        for (DocumentReference member : members1) {
+            if (!members2.contains(member)) {
+                this.groupsCache.cleanCache(member);
+                this.membersCache.cleanCache(member);
+            }
+        }
+    }
+
+    private Set<DocumentReference> getMembers(XWikiDocument document)
+    {
+        List<BaseObject> memberObjects =
+            document.getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
+
+        if (memberObjects.isEmpty()) {
+            // It's not a group
+            return Set.of();
         }
 
-        String memberString = xobject.getStringValue("member");
-        if (StringUtils.isNotEmpty(memberString)) {
-            DocumentReference memberReference = this.resolver.resolve(memberString, groupReference);
-
-            this.groupsCache.cleanCache(memberReference);
-            this.membersCache.cleanCache(memberReference);
+        Set<DocumentReference> members = new HashSet<>(memberObjects.size());
+        for (BaseObject memberObject : memberObjects) {
+            if (memberObject != null) {
+                String memberString = memberObject.getStringValue("member");
+                if (StringUtils.isNotEmpty(memberString)) {
+                    members.add(this.resolver.resolve(memberString, document.getDocumentReference()));
+                }
+            }
         }
+
+        return members;
     }
 }

@@ -1,0 +1,95 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.SolrSearchAdminIndexingUserTranslations" locale="">
+  <web>XWiki</web>
+  <name>SolrSearchAdminIndexingUserTranslations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.SolrSearchAdminIndexingUser</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Admin Indexing User Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## keys for the admin section navigation
+admin.indexinguser=Indexing User
+admin.indexinguser.description=Choose a user with whom to index the content of the wiki.
+
+## keys use on the admin "indexing user" page itself
+admin.indexinguser.explanation.part1=The indexer runs as a background job, usually with no user associated with it. For pages whose title are computed by a "sheet" document the computed title will not show up if the sheet is not visible for anonymous users. This is especially the case if the wiki is closed. In that case e.g. search results for user profiles are not shown with their computed title «Profile of "firstname" "lastname"», but just their page name (usually «login»).
+admin.indexinguser.explanation.part2=To be able to show the same title in the search results it is necessary to provide the indexer with a user who has access to the sheet pages. It is recommended to create a dedicated, locked user account without special rights.
+admin.indexinguser.explanation.security.head=Security note:
+admin.indexinguser.explanation.security.content=Using an account with more view rights than other users can cause leakage of page titles from pages that these users normally do not see.
+
+admin.indexinguser.explanation.part3=Changes to this setting are applied only to pages indexed after the change; a full reindex is recommended for consistent application of the change.
+
+admin.indexinguser.explanation.mainwikionly=This setting can only be done in the main wiki as the Solr indexer runs from the main wiki.
+
+## keys used by the configuration class
+XWiki.SolrSearchAdminIndexingUser_indexer.description=Indexing User
+XWiki.SolrSearchAdminIndexingUser_indexer.hint=The XWiki User Account used to index pages in the background.
+
+</content>
+  <object>
+    <name>XWiki.SolrSearchAdminIndexingUserTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>ce332185-633a-4aac-b43d-67a75f89b59a</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

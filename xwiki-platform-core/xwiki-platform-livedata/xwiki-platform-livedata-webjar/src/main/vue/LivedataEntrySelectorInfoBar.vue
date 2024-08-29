@@ -16,8 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 <!--
   The LivedataEntrySelectorInfoBar indicate to the user
   what is being selected in the Livedata.
@@ -76,8 +75,8 @@ export default {
 .livedata-entry-selector-info-bar {
   margin-bottom: 1rem;
   padding: 12px;
-  border-radius: 5px;
-  background-color: #ddd4;
+  border-radius: @border-radius-base;
+  background-color: @panel-default-heading-bg;
 }
 
 </style>

@@ -64,10 +64,4 @@ public class DefaultMailStorageConfiguration implements MailStorageConfiguration
 
         return (discardSuccessStatuses == 1);
     }
-
-    @Override
-    public boolean resendAutomaticallyAtStartup()
-    {
-        return this.xwikiPropertiesSource.getProperty(PREFIX + "resendAutomaticallyAtStartup", true);
-    }
 }

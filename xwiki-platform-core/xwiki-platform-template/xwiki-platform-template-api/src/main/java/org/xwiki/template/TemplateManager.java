@@ -20,9 +20,11 @@
 package org.xwiki.template;
 
 import java.io.Writer;
+import java.util.concurrent.Callable;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.skin.Skin;
 
@@ -87,6 +89,21 @@ public interface TemplateManager
     XDOM executeNoException(Template template);
 
     /**
+     * Execute and return the template as {@link Block}.
+     * <p>
+     * Any failure is "printed" in the returned {@link Block}.
+     * 
+     * @param template the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the {@link Block} result of the template execution
+     * @since 14.0RC1
+     */
+    default Block executeNoException(Template template, boolean inline)
+    {
+        return executeNoException(template);
+    }
+
+    /**
      * Execute and return the template as {@link XDOM}.
      * <p>
      * Any failure is "printed" in the returned {@link XDOM}.
@@ -95,6 +112,21 @@ public interface TemplateManager
      * @return the {@link XDOM} result of the template execution
      */
     XDOM executeNoException(String templateName);
+
+    /**
+     * Execute and return the template as {@link Block}.
+     * <p>
+     * Any failure is "printed" in the returned {@link Block}.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the {@link Block} result of the template execution
+     * @since 14.0RC1
+     */
+    default Block executeNoException(String templateName, boolean inline)
+    {
+        return executeNoException(templateName);
+    }
 
     /**
      * Execute and return the template as {@link XDOM}.
@@ -107,6 +139,20 @@ public interface TemplateManager
     XDOM execute(Template template) throws Exception;
 
     /**
+     * Execute and return the template as {@link Block}.
+     * 
+     * @param template the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the {@link XDOM} result of the template execution
+     * @throws Exception when failing to parse the template
+     * @since 14.0RC1
+     */
+    default Block execute(Template template, boolean inline) throws Exception
+    {
+        return execute(template);
+    }
+
+    /**
      * Execute and return the template as {@link XDOM}.
      * 
      * @param templateName the name of the template
@@ -114,6 +160,20 @@ public interface TemplateManager
      * @throws Exception when failing to parse the template
      */
     XDOM execute(String templateName) throws Exception;
+
+    /**
+     * Execute and return the template as {@link Block}.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the {@link Block} result of the template execution
+     * @throws Exception when failing to parse the template
+     * @since 14.0RC1
+     */
+    default Block execute(String templateName, boolean inline) throws Exception
+    {
+        return execute(templateName);
+    }
 
     /**
      * Execute and render the template in current target syntax.
@@ -127,12 +187,41 @@ public interface TemplateManager
 
     /**
      * Execute and render the template in current target syntax.
+     * <p>
+     * Any failure is "printed" in the returned result.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the result of the execution of the template in the current target syntax
+     * @since 14.0RC1
+     */
+    default String renderNoException(String templateName, boolean inline)
+    {
+        return renderNoException(templateName);
+    }
+
+    /**
+     * Execute and render the template in current target syntax.
      * 
      * @param templateName the name of the template
      * @return the result of the execution of the template in the current target syntax
      * @throws Exception when failing to render the template
      */
     String render(String templateName) throws Exception;
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the result of the execution of the template in the current target syntax
+     * @throws Exception when failing to render the template
+     * @since 14.0RC1
+     */
+    default String render(String templateName, boolean inline) throws Exception
+    {
+        return render(templateName);
+    }
 
     /**
      * Execute and render the template in current target syntax.
@@ -146,10 +235,36 @@ public interface TemplateManager
     /**
      * Execute and render the template in current target syntax.
      * 
+     * @param template the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @param writer the writer containing the result of the execution and rendering
+     * @since 14.0RC1
+     */
+    default void renderNoException(Template template, boolean inline, Writer writer)
+    {
+        renderNoException(template, writer);
+    }
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
      * @param templateName the name of the template
      * @param writer the writer containing the result of the execution and rendering
      */
     void renderNoException(String templateName, Writer writer);
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @param writer the writer containing the result of the execution and rendering
+     * @since 14.0RC1
+     */
+    default void renderNoException(String templateName, boolean inline, Writer writer)
+    {
+        renderNoException(templateName, writer);
+    }
 
     /**
      * Execute and render the template in current target syntax.
@@ -163,11 +278,39 @@ public interface TemplateManager
     /**
      * Execute and render the template in current target syntax.
      * 
+     * @param template the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @param writer the writer containing the result of the execution and rendering
+     * @throws Exception when failing to render the template
+     * @since 14.0RC1
+     */
+    default void render(Template template, boolean inline, Writer writer) throws Exception
+    {
+        render(template, writer);
+    }
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
      * @param templateName the name of the template
      * @param writer the writer containing the result of the execution and rendering
      * @throws Exception when failing to render the template
      */
     void render(String templateName, Writer writer) throws Exception;
+
+    /**
+     * Execute and render the template in current target syntax.
+     * 
+     * @param templateName the name of the template
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @param writer the writer containing the result of the execution and rendering
+     * @throws Exception when failing to render the template
+     * @since 14.0RC1
+     */
+    default void render(String templateName, boolean inline, Writer writer) throws Exception
+    {
+        render(templateName, writer);
+    }
 
     /**
      * Execute and render the template in current target syntax from the passed skin. When the template is not found in
@@ -186,10 +329,42 @@ public interface TemplateManager
      * 
      * @param templateName the name of the template
      * @param skin the skin
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @return the result of the execution of the template in the current target syntax
+     * @throws Exception when failing to render the template
+     * @since 14.0RC1
+     */
+    default String renderFromSkin(String templateName, Skin skin, boolean inline) throws Exception
+    {
+        return renderFromSkin(templateName, skin);
+    }
+
+    /**
+     * Execute and render the template in current target syntax from the passed skin. When the template is not found in
+     * the passed skin it fallback on skin parent etc.
+     * 
+     * @param templateName the name of the template
+     * @param skin the skin
      * @param writer the writer containing the result of the execution and rendering
      * @throws Exception when failing to render the template
      */
     void renderFromSkin(String templateName, Skin skin, Writer writer) throws Exception;
+
+    /**
+     * Execute and render the template in current target syntax from the passed skin. When the template is not found in
+     * the passed skin it fallback on skin parent etc.
+     * 
+     * @param templateName the name of the template
+     * @param skin the skin
+     * @param inline indicate if the content of the template should be parse and executed as inline content
+     * @param writer the writer containing the result of the execution and rendering
+     * @throws Exception when failing to render the template
+     * @since 14.0RC1
+     */
+    default void renderFromSkin(String templateName, Skin skin, boolean inline, Writer writer) throws Exception
+    {
+        renderFromSkin(templateName, skin, writer);
+    }
 
     /**
      * Search the template with passed name in the passed skin.
@@ -227,13 +402,53 @@ public interface TemplateManager
      * @param content the template content
      * @param author the template author
      * @return the template
-     * @throws Exception if an error occurred during template instanciation
+     * @throws Exception if an error occurred during template instantiation
      * @since 9.6RC1
+     * @deprecated since 14.0CR1, use {@link #createStringTemplate(String, DocumentReference, DocumentReference)}
+     *             instead
      */
+    @Deprecated
     default Template createStringTemplate(String content, DocumentReference author) throws Exception
     {
         throw new UnsupportedOperationException(
-                "org.xwiki.template.TemplateManager#createStringTemplate() "
-                        + "has been called without being reimplemented.");
+            "org.xwiki.template.TemplateManager#createStringTemplate(String, DocumentReference) "
+                + "has been called without being reimplemented.");
+    }
+
+    /**
+     * Create a new template using a given content and a specific author and source document.
+     *
+     * @param content the template content
+     * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 14.0RC1
+     * @deprecated use {@link #createStringTemplate(String, String, DocumentReference, DocumentReference)} instead
+     */
+    @Deprecated(since = "15.9RC1")
+    default Template createStringTemplate(String content, DocumentReference author, DocumentReference sourceReference)
+        throws Exception
+    {
+        return createStringTemplate(content, author);
+    }
+
+    /**
+     * Create a new template using a given content and a specific author and source document.
+     *
+     * @param id the identifier of the template
+     * @param content the template content
+     * @param author the template author
+     * @param sourceReference the reference of the document associated with the {@link Callable} (which will be used to
+     *            test the author right)
+     * @return the template
+     * @throws Exception if an error occurred during template instantiation
+     * @since 15.9
+     */
+    default Template createStringTemplate(String id, String content, DocumentReference author,
+        DocumentReference sourceReference) throws Exception
+    {
+        return createStringTemplate(content, author, sourceReference);
     }
 }

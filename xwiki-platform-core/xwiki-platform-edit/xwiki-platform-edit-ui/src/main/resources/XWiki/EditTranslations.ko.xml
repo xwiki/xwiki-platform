@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EditTranslations" locale="ko">
+  <web>XWiki</web>
+  <name>EditTranslations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>edit.inplace.close=닫기
+edit.inplace.page.lockFailed=페이지를 잠그지 못했습니다.
+edit.inplace.page.loadFailed=페이지를 로드하지 못했습니다.
+edit.inplace.page.renderFailed=페이지를 렌더링하지 못했습니다.
+edit.inplace.page.translate.messageBefore=이 페이지가 아직 {1}(현재 로케일)로 번역되지 않았기 때문에 이 페이지(원본 버전)의 {0} 번역을 편집 중입니다.
+edit.inplace.page.translate.messageAfter={0}번역을 편집 중입니다. 페이지 제목을 번역하는 것부터 시작합니다.
+edit.inplace.actionButtons.loadFailed=작업 버튼을 읽지 못했습니다.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 12.10.5, 13.1
+#######################################
+edit.inplace.page.original=원본 페이지({0})를 편집하고 있습니다
+edit.inplace.page.translation=다음 번역을 편집하고 있습니다: {0}.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

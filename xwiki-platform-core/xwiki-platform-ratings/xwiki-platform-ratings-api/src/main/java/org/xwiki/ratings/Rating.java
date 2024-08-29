@@ -22,7 +22,6 @@ package org.xwiki.ratings;
 import java.util.Date;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
@@ -31,7 +30,6 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public interface Rating
 {
     /**

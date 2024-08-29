@@ -22,8 +22,6 @@ package org.xwiki.livedata;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -33,7 +31,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Unstable
 public class LiveDataLayoutDescriptor extends BaseDescriptor
 {
     private String name;

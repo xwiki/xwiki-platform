@@ -20,7 +20,6 @@
 package org.xwiki.edit;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for editing XWiki documents.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.5
  */
 @Role
-@Unstable
 public interface DocumentEditConfiguration
 {
     /**

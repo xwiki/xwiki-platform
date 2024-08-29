@@ -19,8 +19,6 @@
  */
 package org.xwiki.livedata;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Describes the live data selection configuration.
  * 
@@ -28,7 +26,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10.1
  * @since 13.0
  */
-@Unstable
 public class LiveDataSelectionConfiguration
 {
     /**

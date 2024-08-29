@@ -45,12 +45,10 @@
 
 {{info}}Es müssen vier oder mehr Striche sein.{{/info}}
 
-{{info}}Es ist zu beachten, dass dies anders als bei Creole ist, wo es genau vier Striche gefordert sind.{{/info}}
-
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
 |Einfache horizontale Linie|{{{----}}}|(((----)))
-|Parametrisierte horizontale Linie|&lt;hr style="color:blue"/&gt;|(((
-(% style="color:blue" %)
+|Parametrisierte horizontale Linie|&lt;hr style="border-color:blue"/&gt;|(((
+(% style="border-color:blue" %)
 ----
 )))
 
@@ -58,15 +56,13 @@
 
 {{info}}Es müssen vier oder mehr Striche sein.{{/info}}
 
-{{info}}Es ist zu beachten, dass dies anders als bei Creole ist, wo genau vier Striche gefordert sind.{{/info}}
-
-|=Funktion|=XWiki Syntax 2.0|=Ergebnis
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ergebnis
 |Einfache horizontale Linie|{{{----}}}|(((----)))
 |Parametrisierte horizontale Linie|((({{{
-(% style="color:blue" %)
+(% style="border-color:blue" %)
 ----
 }}})))|(((
-(% style="color:blue" %)
+(% style="border-color:blue" %)
 ----
 )))</content>
 </xwikidoc>

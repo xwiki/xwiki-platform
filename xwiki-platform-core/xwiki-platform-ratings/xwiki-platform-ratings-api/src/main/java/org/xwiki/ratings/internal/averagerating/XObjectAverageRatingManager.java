@@ -29,8 +29,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.solr.common.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
@@ -151,8 +151,10 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
             // sub-elements of the page.
             for (BaseObject ratingsObject : actualDoc
                 .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE)) {
-                moveAverageRatingsObject(oldReference, newReference, ratingsObject)
-                    .ifPresent(changedAverageRatings::add);
+                if (ratingsObject != null) {
+                    moveAverageRatingsObject(oldReference, newReference, ratingsObject)
+                        .ifPresent(changedAverageRatings::add);
+                }
             }
 
             // Save the document if something has changed
@@ -237,14 +239,16 @@ public class XObjectAverageRatingManager extends AbstractAverageRatingManager
         String serializedReference = this.entityReferenceConverter.convert(String.class, entityReference);
         for (BaseObject xObject : actualDoc
             .getXObjects(AverageRatingClassDocumentInitializer.AVERAGE_RATINGS_CLASSREFERENCE)) {
-            String xobjectReference =
-                xObject.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName());
-            String xobjectManagerId = xObject.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName());
+            if (xObject != null) {
+                String xobjectReference =
+                    xObject.getStringValue(AverageRatingQueryField.ENTITY_REFERENCE.getFieldName());
+                String xobjectManagerId = xObject.getStringValue(AverageRatingQueryField.MANAGER_ID.getFieldName());
 
-            if (StringUtils.isEmpty(xobjectReference) && StringUtils.isEmpty(xobjectManagerId)) {
-                return xObject;
-            } else if (getIdentifier().equals(xobjectManagerId) && serializedReference.equals(xobjectReference)) {
-                return xObject;
+                if (StringUtils.isEmpty(xobjectReference) && StringUtils.isEmpty(xobjectManagerId)) {
+                    return xObject;
+                } else if (getIdentifier().equals(xobjectManagerId) && serializedReference.equals(xobjectReference)) {
+                    return xObject;
+                }
             }
         }
         return null;

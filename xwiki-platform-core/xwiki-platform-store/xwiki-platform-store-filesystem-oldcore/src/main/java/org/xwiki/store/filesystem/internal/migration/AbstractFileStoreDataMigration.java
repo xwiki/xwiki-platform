@@ -126,7 +126,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
             return new DocumentReference(name, (SpaceReference) getPre11EntityReference(directory.getParentFile()));
         } catch (Exception e) {
             throw new DataMigrationException("Failed to get document reference for filesystem path [" + directory
-                + "] (root=" + getStoreRootDirectory() + ")");
+                + "] (root=" + getStoreRootDirectory() + ")", e);
         }
     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
                 FileUtils.moveToDirectory(child, toFolder, true);
             } catch (IOException e) {
                 throw new DataMigrationException(
-                    "Failed to move content of folder [" + sourceFolder + "] the new location [" + toFolder + "]");
+                    "Failed to move content of folder [" + sourceFolder + "] the new location [" + toFolder + "]", e);
             }
         }
     }

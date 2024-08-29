@@ -25,13 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-default</artifactId>
   <name>XWiki Platform - Refactoring - Default Implementation</name>
   <description>XWiki Platform - Refactoring - Default Implementation</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -52,6 +53,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-link</artifactId>
       <version>${project.version}</version>
     </dependency>
 

@@ -22,9 +22,8 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
+import org.xwiki.rendering.internal.macro.velocity.AbstractNoContextVelocityMacroFilter;
 
 /**
  * Do nothing.
@@ -35,18 +34,6 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 @Component
 @Named("none")
 @Singleton
-public class NoneVelocityMacroFilter implements VelocityMacroFilter
+public class NoneVelocityMacroFilter extends AbstractNoContextVelocityMacroFilter
 {
-    @Override
-    public String after(String content, VelocityContext velocityContect)
-    {
-        return content;
-    }
-
-    @Override
-    public String before(String content, VelocityContext velocityContect)
-    {
-        return content;
-    }
-
 }

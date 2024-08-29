@@ -37,28 +37,37 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=Вікі містить документи, які не відображаються за замовчуванням. Ці приховані документи являють собою технічний контент, такий як класи додатків, сторінки налаштування, макроси, стилі, скрипти і т.д.
-XWiki.XWikiUsers_accessibility.hint=Додаткова доступність забезпечить різні візуальні поліпшення, такі як: великі шрифти, підкреслені посилання і т.д.
+XWiki.XWikiUsers_underline.hint=Виберіть, чи потрібно посилання підкреслювати.
 XWiki.XWikiUsers_timezone.hint=Використовуйте певний часовий пояс, щоб дати відображали ваше поточне місце розташування.
 XWiki.XWikiUsers_editor.hint=Виберіть редактор за замовчуванням, перевизначивши встановлений глобально редактор за замовчуванням. Якщо не задано, то редактор за замовчуванням вибирається залежно від того, що редагується.
-XWiki.XWikiUsers_usertype.hint=Виберіть тип користувача за замовчуванням. Досвідчені користувачі отримають доступ до деяких функцій редагування, створення термінальних сторінок і т.д.
-XWiki.XWikiUsers_extensionConflictSetup.hint=Вкажіть, чи хочете Ви, щоб Менеджер розширень запитував підтвердження правил за замовчуванням для вирішення конфліктів (наприклад, скажіть Менеджеру Розширень питати Вас, що робити, якщо оновлюваний документ був вилучений з вікі).
-userprofile.default=За замовчуванням
+XWiki.XWikiUsers_usertype.hint=Виберіть тип користувача за замовчуванням. Розширені користувачі отримають доступ до деяких функцій редагування, створення термінальних сторінок і т.д.
+XWiki.XWikiUsers_extensionConflictSetup.hint=Вкажіть, чи хочете Ви, щоб Менеджер розширень запитував вас підтвердити правила вирішення конфліктів за замовчуванням (наприклад, скажіть Менеджеру Розширень питати Вас, що робити, якщо оновлюваний документ був видалений з вікі).
+userprofile.default=За умовчанням
 user.profile.groups.title=Групи
 user.profile.groups.description=Тут перераховані всі групи, в яких ви перебуваєте.
 user.profile.groups.table.group=Група
 platform.core.profile.category.groups=Групи
-user.profile.notifications=Повідомлення
+user.profile.notifications=Сповіщення
 user.profile.network.unfollow.question=Ви впевнені, що хочете відписатися від цього користувача?
 user.profile.network.unfollow.question.yes=Так, відписатися
 user.profile.network.unfollow.question.no=Ні, скасувати
-user.profile.network.following=Відстежувати
-user.profile.network.notfollowing=Ні відстежувати
+user.profile.network.following=Підписка
+user.profile.network.notfollowing=Не відстежувати
 user.profile.network.follow=Підписатися
 user.profile.network.unfollow=Відписатися
-user.profile.network.done=Готово
+user.profile.network.done=Виконано
 user.profile.network.saving=Збереження...
-user.profile.network.error=Помилка збереження налаштувань повідомлення
-### Missing: user.profile.status.done=Done
-### Missing: user.profile.status.saving=Saving...
-### Missing: user.profile.status.error=Error saving the user status</content>
+user.profile.network.error=Помилка збереження налаштувань сповіщень
+user.profile.status.done=Виконано
+user.profile.status.saving=Збереження...
+user.profile.status.error=Помилка під час збереження статусу користувача
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+XWiki.XWikiUsers_accessibility.hint=Додаткова спеціальні можливості забезпечать різні візуальні покращення, такі як: великі шрифти, підкреслені посилання і т.д.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

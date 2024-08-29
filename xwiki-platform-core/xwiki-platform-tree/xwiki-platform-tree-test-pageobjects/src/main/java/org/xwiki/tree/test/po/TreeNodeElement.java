@@ -20,13 +20,12 @@
 package org.xwiki.tree.test.po;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -101,8 +100,7 @@ public class TreeNodeElement extends BaseElement
      */
     public WebElement getLabelElement()
     {
-        String labelId = getElement().getAttribute("aria-labelledby");
-        return getElement().findElement(By.id(labelId));
+        return getElement().findElement(By.xpath("./*[@role = 'treeitem']"));
     }
 
     /**
@@ -111,7 +109,7 @@ public class TreeNodeElement extends BaseElement
     public List<TreeNodeElement> getChildren()
     {
         List<TreeNodeElement> children = new ArrayList<>();
-        for (WebElement childElement : getElement().findElements(By.xpath("./ul/li"))) {
+        for (WebElement childElement : getElement().findElements(By.xpath("./ul[@role = 'group']/li"))) {
             children.add(new TreeNodeElement(this.treeElement, By.id(childElement.getAttribute(ID))));
         }
         return children;
@@ -130,7 +128,7 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isOpen()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-expanded"));
+        return Boolean.valueOf(getLabelElement().getAttribute("aria-expanded"));
     }
 
     /**
@@ -138,7 +136,9 @@ public class TreeNodeElement extends BaseElement
      */
     public boolean isSelected()
     {
-        return Boolean.valueOf(getElement().getAttribute("aria-selected"));
+        // We can't rely on the 'aria-selected' attribute because of https://github.com/vakata/jstree/issues/2596
+        // (aria-selected is not updated when using parent checkbox to check/uncheck child elements)
+        return Arrays.asList(getLabelElement().getAttribute(CLASS).split("\\s+")).contains("jstree-clicked");
     }
 
     /**
@@ -205,18 +205,16 @@ public class TreeNodeElement extends BaseElement
      */
     public TreeNodeElement waitForIt()
     {
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                WebElement element = getElement();
-                try {
-                    return !Boolean.valueOf(element.getAttribute("aria-busy"));
-                } catch (StaleElementReferenceException e) {
-                    // The element has just been replaced. Try again.
-                    return false;
-                }
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                // The aria-busy attribute is not directly on the li element, but it's on the element located as a
+                // child of the li in the DOM.
+                WebElement anchor = getDriver().findElementWithoutWaiting(getElement(), By.id(String.format("%s_anchor",
+                    getId())));
+                return !Boolean.parseBoolean(anchor.getAttribute("aria-busy"));
+            } catch (StaleElementReferenceException e) {
+                // The element has just been replaced. Try again.
+                return false;
             }
         });
         return this;

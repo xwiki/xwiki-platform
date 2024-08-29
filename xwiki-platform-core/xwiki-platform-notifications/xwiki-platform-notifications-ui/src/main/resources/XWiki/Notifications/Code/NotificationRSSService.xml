@@ -37,14 +37,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set ($feedContent = $services.notification.notifiers.getFeed(20))
 #if ($xcontext.action == 'get' &amp;&amp; "$request.outputSyntax" == 'plain')
-  #set($discard = $response.setContentType('application/xml'))
+  #rawResponse($feedContent, 'application/xml')
 #else
-  {{code language="xml"}}
-#end
-$services.notification.notifiers.getFeed(20)
-#if ($xcontext.action != 'get' || "$request.outputSyntax" != 'plain')
-  {{/code}}
+  {{code language="xml" source="script:feedContent" /}}
 #end
 {{/velocity}}
 </content>

@@ -117,7 +117,7 @@ $services.template.execute('logging_macros.vm')
   #elseif ($status.canceled)
     #set($messageKeys = [$canceledKey, "${translationPrefix}.finish.canceled", "job.status.${status.jobType}.canceled", 'job.status.canceled'])
     #set($messageClass = 'warningmessage')
-  #elseif ($jobStatus.logTail.hasLogLevel('error'))
+  #elseif ($status.logTail.hasLogLevel('error'))
     #set($messageKeys = [$warningKey, "${translationPrefix}.finish.warning", "job.status.${status.jobType}.warning", 'job.status.warning'])
     #set($messageClass = 'warningmessage')
   #else
@@ -151,7 +151,7 @@ $services.template.execute('logging_macros.vm')
 #end
 
 #macro (displayJobStatus $jobStatus $translationPrefix $jobStatusURL $showLogs)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
   #set ($jobState = $jobStatus.state)
   #set ($finished = $jobState == 'FINISHED')
   #set ($jobRequest = $jobStatus.request)

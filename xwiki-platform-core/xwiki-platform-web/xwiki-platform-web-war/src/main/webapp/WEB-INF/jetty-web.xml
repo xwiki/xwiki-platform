@@ -31,22 +31,9 @@
   -->
   <Set name="maxFormContentSize">1000000</Set>
   <!-- Increasing the maxFormKeys in order to be able to import correctly a full wiki (more than 1000 pages in 11.10).
-  The import should be fixed at a point to allow importing everything without creating a form with a field by page.
-  Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow up. -->
+       The import should be fixed at a point to allow importing everything without creating a form with a field by 
+       page. Once done this configuration can be removed. See https://jira.xwiki.org/browse/XWIKI-11597 for a follow 
+       up. 
+  -->
   <Set name="maxFormKeys">2000</Set>
-
-  <!-- Tell jetty that javax.mail should be something that is invisible to the user, but if it's provided inside the
-       webapp use that instead (this is the case for XWiki). This is needed for work around issue
-       https://github.com/appropriate/docker-jetty/issues/108. Note that we don't have this problem in the XWiki
-       Standalone packaging since we create a custom distribution of Jetty and we don't include the Jetty "mail"
-       module. However we have the problem in our functional Docker-based tests where we use the official Jetty
-       image. -->
-  <!-- Note: If you're deploying on Jetty 10+ you must remove the 2 calls to prependSystemClass and
-       prependServerClass, as otherwise XWiki will fail to deploy. -->
-  <Call name="prependSystemClass">
-    <Arg>-javax.mail.</Arg>
-  </Call>
-  <Call name="prependServerClass">
-    <Arg>javax.mail.</Arg>
-  </Call>
 </Configure>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -40,6 +40,7 @@
 
     <!-- The Solr framework is designed to be shared for the whole farm -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -52,21 +53,18 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
     </dependency>
-    <!-- Solr core depende on a different verison of Jetty which we exclude and thus we need to
-      pull the right version here. -->
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-alpn-java-client</artifactId>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-analysis-extras</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-http-client-transport</artifactId>
-    </dependency>    
-    <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
-      pull the right version here. -->
+      <groupId>ua.net.nlp</groupId>
+      <artifactId>morfologik-ukrainian-lt</artifactId>
+      <version>6.4.5</version>
+    </dependency>
     <dependency>
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet</artifactId>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
     </dependency>
     <!-- Apache Commons -->
     <dependency>
@@ -111,11 +109,17 @@
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-link</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
       <version>${project.version}</version>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -125,6 +129,7 @@
       <type>zip</type>
       <scope>provided</scope>
     </dependency>
+    
 
     <!-- Testing dependencies -->
     <!-- Since we're mocking a class (XWiki) we need those -->
@@ -179,7 +184,8 @@
                 **/DefaultSolrIndexer.java,
                 **/SolrIndexEventListener.java,
                 **/AbstractSolrMetadataExtractor.java,
-                **/EmbeddedSolr.java
+                **/EmbeddedSolr.java,
+                **/SolrSchemaUtils.java
               </excludes>
             </configuration>
           </execution>
@@ -200,10 +206,10 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
                   <version>${project.version}</version>
-                  <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-core.zip</destFileName>
+                  <type>zip</type>
+                  <destFileName>xwiki-platform-search-solr-server-core-search.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>

@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.test.po;
 
+import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -106,5 +107,15 @@ public class ExtensionAdministrationPage extends ViewPage
         simpleSearchPane.clickButton();
 
         return new ExtensionAdministrationPage();
+    }
+
+    /**
+     * Starts the extensions indexation, by clicking on the "Index" button.
+     *
+     * @since 15.5
+     */
+    public void startIndex()
+    {
+        getDriver().findElement(By.cssSelector("input[name=\"index_start\"]")).click();
     }
 }

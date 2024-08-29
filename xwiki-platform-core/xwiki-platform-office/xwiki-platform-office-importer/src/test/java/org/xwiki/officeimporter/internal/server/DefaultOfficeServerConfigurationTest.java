@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -46,7 +44,7 @@ import static org.mockito.Mockito.when;
  * @since 1.8RC3
  */
 @ComponentTest
-public class DefaultOfficeServerConfigurationTest
+class DefaultOfficeServerConfigurationTest
 {
     @InjectMockComponents
     private DefaultOfficeServerConfiguration defaultOfficeServerConfiguration;
@@ -58,7 +56,7 @@ public class DefaultOfficeServerConfigurationTest
      * Test if default configuration values are present.
      */
     @Test
-    public void defaultConfiguration()
+    void defaultConfiguration()
     {
         when(configuration.getProperty(any(String.class), any(Object.class))).thenAnswer(
             invocationOnMock -> invocationOnMock.getArgument(1));
@@ -70,7 +68,7 @@ public class DefaultOfficeServerConfigurationTest
     }
 
     @Test
-    public void serverPorts()
+    void serverPorts()
     {
         when(configuration.getProperty("openoffice.serverPorts", List.class))
             .thenReturn(Arrays.asList("10", "12", "8569"));

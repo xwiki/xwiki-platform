@@ -17,7 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## Helper macros for ActivityPub notifications.
+## Renders the Mentions notifications.
+## Parameters:
+## $compositeEvent:       a CompositeEvent containing the events of the notification group
+## $compositeEventParams: a map of Events and MentionView. The keys are the events of the notification group, and the
+##                        values are the additional parameters required to display the notification 
 
 #template('notification/macros.vm')
 
@@ -57,9 +61,14 @@
   <div class="activity-type">$services.localization.render('mentions.event.mention.type')</div>
   <div class="activity-summary">
     #if ($compositeEvent.events.size() == 1)
-            $services.localization.render('mentions.event.mention.summary.singular')
-        #else
-      $services.localization.render('mentions.event.mention.summary.plural', $compositeEvent.events.size())
+        $services.localization.render('mentions.event.mention.summary.singular')
+    #else
+      $services.localization.render('mentions.event.mention.summary.plural', [$compositeEvent.events.size()])
+    #end
+    #if ($xcontext.getContext().getOriginalWikiId() != $compositeEvent.document.wikiReference.name)
+      <span class="text-muted">
+        ($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)
+      </span>
     #end
   </div>
   <div><small class="text-muted">$compositeEventDate</small></div>
@@ -72,22 +81,15 @@
       #set ($eventParams = $compositeEventParams.get($event))
       #set ($location = $eventParams.location)
       ## TODO: define variation for group mention
-      #if ($location == "DOCUMENT")
-        #set ($descriptionKey = 'mentions.event.mention.description.document')
-      #elseif($location == "COMMENT")
-        #set ($descriptionKey = 'mentions.event.mention.description.comment')
-      #elseif($location == "ANNOTATION")
-        #set ($descriptionKey = 'mentions.event.mention.description.annotation')
-      #elseif($location == "AWM_FIELD")
-        #set ($descriptionKey = 'mentions.event.mention.description.awmField')
+      #set ($translationKey = "mentions.event.mention.description.$location")
+      #if ($services.localization.get($translationKey))
+        #set ($descriptionKey = $translationKey)
       #else
-        #set ($descriptionKey = 'mentions.event.mention.description')
+        #set ($descriptionKey = 'mentions.event.mention.description.UNDEFINED')
       #end
       #set ($tdoc = $xwiki.getDocument($eventParams.getDocument().getDocumentReference()).getTranslatedDocument())
-      #set ($description =
-        "$services.localization.render($descriptionKey) <a href='$eventParams.getDocumentURL()'>" +
-        "$tdoc.getRenderedTitle( 'xhtml/1.0')" +
-        "</a>")
+      #set ($description = $services.localization.render($descriptionKey,
+        ["<a href='$eventParams.getDocumentURL()'>$tdoc.getRenderedTitle('xhtml/1.0')</a>"]))
       #displayEventDetail($event $description)
     #end
   #end

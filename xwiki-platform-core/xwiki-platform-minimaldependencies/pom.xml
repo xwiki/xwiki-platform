@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-minimaldependencies</artifactId>
   <name>XWiki Platform - Minimal WAR Dependencies</name>
@@ -52,15 +52,21 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed for IE11 backward compatibility: this API is currently used in platform-web -->
     <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>url-search-params-polyfill</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-script</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-localization-script</artifactId>
+      <artifactId>xwiki-platform-localization-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-logging-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -70,10 +76,28 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- JavaScript code from platform-web-war that needs translation messages should use the xwiki-l10n JavaScript
+      module provided by localization-webjar (see https://extensions.xwiki.org/xwiki/bin/view/Extension/Localization/#HFromJavaScript).
+      Translation messages are fetched using REST so we also need an implementation of the localizaion-rest-api. Note
+      that currently it's not easy to move JavaScript code outside platform-web-war (e.g. in a WebJar module that
+      properly declares its dependencies) because we're missing XWIKI-12788: "Introduce skin extension plugins for webjar
+      resources". This is the case with job.js that depends on 'xwiki-l10n' module. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Security -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-bridge</artifactId>
+      <artifactId>xwiki-platform-security-authorization-bridge</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -151,6 +175,12 @@
       <artifactId>xwiki-platform-refactoring-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Refactoring operation but also anything that manipulate document backlink need Solr -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- ********************************************************************** -->
     <!-- Core extension (what we absolutely require in a minimum XWiki runtime) -->
@@ -196,14 +226,20 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-jersey</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- FIXME: $services.security is a replacement for $xwiki.hasAccessLevel() and we have started using it in the
      Velocity templates. Most of these templates are located in platform-web and currently we don't declare the
      dependencies of platform-web (they are declared in the distribution) thus we need to bundle this script service
      here. In the future we may want to create a separate module to hold the Velocity templates from platform-web
-     and this module should have a dependency on platform-security-script. -->
+     and this module should have a dependency on platform-security-authorization-script. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-script</artifactId>
+      <artifactId>xwiki-platform-security-authorization-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -316,6 +352,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-model-validation-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The default document task analysis implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

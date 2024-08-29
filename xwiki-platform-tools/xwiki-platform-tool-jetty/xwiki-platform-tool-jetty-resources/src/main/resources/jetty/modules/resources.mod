@@ -18,12 +18,12 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Adds the $JETTY_HOME/resources and/or $JETTY_BASE/resources
-directory to the server classpath. Useful for configuration
-property files (eg jetty-logging.properties)
+# tag::description[]
+This module adds the `$JETTY_BASE/resources` directory to the server's classpath.
+# end::description[]
 
 [tags]
 classpath
@@ -33,3 +33,4 @@ resources/
 
 [files]
 resources/
+

@@ -21,9 +21,8 @@ package org.xwiki.query.solr;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
-
-import javax.inject.Provider;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -74,19 +73,19 @@ public class SolrQueryExecutorTest
 {
     private static final String ITERABLE_PARAM_NAME = "multiParam";
 
-    private static final String[] ITERABLE_PARAM_EXPECTED = {"value1", "value2"};
+    private static final String[] ITERABLE_PARAM_EXPECTED = { "value1", "value2" };
 
     private static final Iterable<String> ITERABLE_PARAM_VALUE = Arrays.asList(ITERABLE_PARAM_EXPECTED);
 
     private static final String INT_ARR_PARAM_NAME = "intArrayParam";
 
-    private static final String[] INT_ARR_PARAM_EXPECTED = {"-42", "4711"};
+    private static final String[] INT_ARR_PARAM_EXPECTED = { "-42", "4711" };
 
-    private static final int[] INT_ARR_PARAM_VALUE = {-42, 4711};
+    private static final int[] INT_ARR_PARAM_VALUE = { -42, 4711 };
 
     private static final String STR_ARR_PARAM_NAME = "stringArrayParam";
 
-    private static final String[] STR_ARR_PARAM_EXPECTED = {"valueA", "valueB"};
+    private static final String[] STR_ARR_PARAM_EXPECTED = { "valueA", "valueB" };
 
     private static final String[] STR_ARR_PARAM_VALUE = STR_ARR_PARAM_EXPECTED;
 
@@ -229,5 +228,63 @@ public class SolrQueryExecutorTest
 
         results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
         assertEquals(Arrays.asList(alice, bob), results);
+    }
+
+    @Test
+    public void filterResponseWithException() throws Exception
+    {
+        ParameterizedType resolverType =
+            new DefaultParameterizedType(null, DocumentReferenceResolver.class, SolrDocument.class);
+        DocumentReferenceResolver<SolrDocument> resolver = this.componentManager.getInstance(resolverType);
+
+        AuthorizationManager authorizationManager = this.componentManager.getInstance(AuthorizationManager.class);
+
+        DocumentReference currentUserReference = new DocumentReference("xwiki", "XWiki", "currentuser");
+        this.oldCore.getXWikiContext().setUserReference(currentUserReference);
+
+        DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
+        SolrDocument alice = new SolrDocument();
+        when(resolver.resolve(alice)).thenReturn(aliceReference);
+
+        DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
+        when(authorizationManager.hasAccess(Right.VIEW, currentUserReference, bobReference)).thenReturn(true);
+        SolrDocument bob = new SolrDocument();
+        when(resolver.resolve(bob)).thenReturn(bobReference);
+
+        SolrDocumentList sourceResults = new SolrDocumentList();
+        sourceResults.addAll(Arrays.asList(alice, bob));
+        sourceResults.setNumFound(2);
+
+        QueryResponse response = mock(QueryResponse.class);
+        when(this.solr.query(any(SolrParams.class))).thenReturn(response);
+
+        DefaultQuery query = new DefaultQuery("", null);
+
+        // No right check, verify that the setup works.
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+        SolrDocumentList results =
+            ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Arrays.asList(alice, bob), results);
+        assertEquals(2, results.getNumFound());
+
+        // Check current user right
+        query.checkCurrentUser(true);
+
+        // Throw an exception when resolving Alice
+        when(resolver.resolve(alice)).thenThrow(new RuntimeException("Alice"));
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Collections.singletonList(bob), results);
+        assertEquals(1, results.getNumFound());
+
+        // Throw also an exception when resolving Bob
+        when(resolver.resolve(bob)).thenThrow(new RuntimeException("Bob"));
+        when(response.getResults()).thenReturn((SolrDocumentList) sourceResults.clone());
+
+        // Assert that the results are empty when both throw an exception
+        results = ((QueryResponse) this.componentManager.getComponentUnderTest().execute(query).get(0)).getResults();
+        assertEquals(Collections.emptyList(), results);
+        assertEquals(0, results.getNumFound());
     }
 }

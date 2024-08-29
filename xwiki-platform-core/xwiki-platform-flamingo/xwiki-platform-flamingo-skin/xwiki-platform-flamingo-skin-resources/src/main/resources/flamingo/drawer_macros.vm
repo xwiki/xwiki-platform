@@ -27,12 +27,12 @@
  * @param $extraAttribute (optional) additional A element attributes to add (such as ref="nofollow" for example)
  *#
 #macro(drawerItem $url $icon $text $id $extraAttribute)
-  <li class="drawer-menu-item">
-    <a href="$url"#if($id) id="$id"#{end}#if ("$!extraAttribute" != '') $extraAttribute#end>
-      <div class="drawer-menu-item-icon">
+  <li>
+    <a class="drawer-menu-item" href="$url"#if($id) id="$id"#{end}#if ("$!extraAttribute" != '') $extraAttribute#end>
+      <span class="drawer-menu-item-icon">
         $services.icon.renderHTML($icon)
-      </div>
-      <div class="drawer-menu-item-text">$text</div>
+      </span>
+      <span class="drawer-menu-item-text">$text</span>
     </a>
   </li>
 #end
@@ -44,14 +44,15 @@
  * @param $id (optional) the HTML id of the element
  *#
 #macro(drawerTopItemStart $icon $text $id)
-  <li class="drawer-menu-item">
-    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu">
-      <div class="drawer-menu-item-icon">
+  <li class="drawer-dropdown">
+    <a class="drawer-menu-item" id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false"
+        aria-controls="${id}_menu">
+      <span class="drawer-menu-item-icon">
         $services.icon.renderHTML($icon)
-      </div>
-      <div class="drawer-menu-item-text">$text</div>
+      </span>
+      <span class="drawer-menu-item-text">$text</span>
     </a>
-    <ul class="drawer-menu-sub-item collapse" id="${id}_menu">
+    <ul class="drawer-dropdown-menu collapse" id="${id}_menu">
 #end
 #**
  * Close an foldable drawer item
@@ -70,5 +71,5 @@
  * Display a category header in the drawer
  *#
 #macro(drawerCategoryHeader $title)
-  <li class="drawer-menu-item drawer-category-header"><hr class="hidden"/>$title</li>
+  <li class="drawer-category-header"><hr class="hidden"/>$escapetool.xml($title)</li>
 #end

@@ -23,7 +23,8 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="mainContentArea">
+## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+<main id="mainContentArea">
 #set ($type= "$!{escapetool.xml($request.get('type'))}")
 #if ($type == '')
   #set($type = 'html')
@@ -52,6 +53,6 @@ $services.localization.render('currentdifftype'): $type (
 #set ($origdoc = $xwiki.getDocument($tdoc, '1.0'))
 #template("changesdoc.vm")
 <div class="clearfloats"></div>
-</div> ## mainContentArea
+</main> ## mainContentArea
 </div> ## main
 #template("endpage.vm")

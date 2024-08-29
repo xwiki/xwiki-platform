@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.DocumentEventType;
 
 import com.xpn.xwiki.internal.event.CommentAddedEvent;
 
@@ -40,7 +41,7 @@ public class DocumentCommentedEventDescriptor extends AbstractXWikiRecordableEve
     /**
      * Name of the supported type (as it is stored in Activity Stream).
      */
-    public static final String EVENT_TYPE = "addComment";
+    public static final String EVENT_TYPE = DocumentEventType.ADD_COMMENT;
 
     /**
      * Construct a DocumentCommentedEventDescriptor.

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration of {@link RatingsManager}.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 @Role
 public interface RatingsConfiguration
 {

@@ -54,7 +54,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -161,28 +160,34 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             if (query.getWiki() != null) {
                 getContext().setWikiId(query.getWiki());
             }
-            return getStore().executeRead(getContext(), session -> {
-                org.hibernate.query.Query<T> hquery = createHibernateQuery(session, query);
 
-                List<T> results = hquery.list();
-                if (query.getFilters() != null && !query.getFilters().isEmpty()) {
-                    for (QueryFilter filter : query.getFilters()) {
-                        results = filter.filterResults(results);
-                    }
-                }
-                return results;
+            // Filter the query
+            Query filteredQuery = filterQuery(query);
+
+            // Execute the query
+            List<T> results = getStore().executeRead(getContext(), session -> {
+                org.hibernate.query.Query<T> hquery = createQuery(session, filteredQuery);
+
+                return hquery.list();
             });
-        } catch (XWikiException e) {
+
+            // Filter the query result
+            if (query.getFilters() != null && !query.getFilters().isEmpty()) {
+                for (QueryFilter filter : query.getFilters()) {
+                    results = filter.filterResults(results);
+                }
+            }
+
+            return results;
+        } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         } finally {
             getContext().setWikiId(oldDatabase);
         }
     }
 
-    protected <T> org.hibernate.query.Query<T> createHibernateQuery(Session session, Query query)
+    protected Query filterQuery(Query query)
     {
-        org.hibernate.query.Query<T> hquery;
-
         Query filteredQuery = query;
         if (!filteredQuery.isNamed()) {
             // For non-named queries, convert the short form into long form before we apply the filters.
@@ -196,13 +201,40 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 }
             };
             filteredQuery = filterQuery(filteredQuery, Query.HQL);
-            hquery = session.createQuery(filteredQuery.getStatement());
-            populateParameters(hquery, filteredQuery);
+        }
+
+        return filteredQuery;
+    }
+
+    /**
+     * Create an Hibernate query from an XWiki {@link Query}.
+     * 
+     * @param <T> the type to return
+     * @param session the Hibernate session
+     * @param query the query to convert
+     * @return the Hibernate query
+     */
+    protected <T> org.hibernate.query.Query<T> createQuery(Session session, Query query)
+    {
+        org.hibernate.query.Query<T> hquery;
+
+        if (!query.isNamed()) {
+            hquery = session.createQuery(query.getStatement());
+            populateParameters(hquery, query);
         } else {
-            hquery = createNamedHibernateQuery(session, filteredQuery);
+            hquery = createNamedHibernateQuery(session, query);
         }
 
         return hquery;
+    }
+
+    /**
+     * @deprecated since 13.10.6, 14.4, use {@link #createQuery(Session, Query)} instead
+     */
+    @Deprecated(since = "13.10.6")
+    protected <T> org.hibernate.query.Query<T> createHibernateQuery(Session session, Query query)
+    {
+        return createQuery(session, filterQuery(query));
     }
 
     private Query filterQuery(Query query, String language)

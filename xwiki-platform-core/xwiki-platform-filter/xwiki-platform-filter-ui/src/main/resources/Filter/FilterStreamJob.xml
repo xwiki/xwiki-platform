@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Filter.FilterStreamJob" locale="">
+<xwikidoc version="1.5" reference="Filter.FilterStreamJob" locale="">
   <web>Filter</web>
   <name>FilterStreamJob</name>
   <language/>
@@ -39,7 +39,7 @@
   <content>{{template name="job_macros.vm"/}}
 
 {{velocity output="false"}}
-#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
 {{/velocity}}
 
 {{velocity}}
@@ -47,27 +47,7 @@
   &lt;div id="filter_job_status"&gt;
     #set($job = $services.filter.currentJob)
     #if ($job)
-      #set ($jobStatusURL = $xwiki.getURL('FilterStreamJobJSON', 'get', $escapetool.url({
-        'outputSyntax': 'plain'
-      })))
-      &lt;div class="xcontent job-status" data-url="$jobStatusURL"&gt;
-        #set($jobStatus = $job.status)
-        #set($finished = $jobStatus.state.name() == 'FINISHED')
-        #if (!$finished)
-          #displayJobProgressBar($jobStatus)
-        #else
-          #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
-            &lt;div class="box successmessage"&gt;
-              Done.
-            &lt;/div&gt;
-          #else
-            &lt;div class="box errormessage"&gt;
-              Error has been found during the conversion !
-            &lt;/div&gt;
-          #end
-        #end
-        #displayJobStatusLog($jobStatus true)
-      &lt;/div&gt;
+      #displayJobStatus($job.status)
     #end
   &lt;/div&gt;
 {{/html}}

@@ -67,6 +67,14 @@ define(['xwiki'], function() {
       });
 
     });
+
+    describe("XWiki.Document.getRestURL", function() {
+      it("always escapes spaces and the page name", function () {
+        const xwikiDocument = new XWiki.Document(new XWiki.DocumentReference('xwiki', ['F?o', 'Ne?ted'], 'Ba?'));
+        const url = xwikiDocument.getRestURL();
+        expect("${request.contextPath}/rest/wikis/xwiki/spaces/F%3Fo/spaces/Ne%3Fted/pages/Ba%3F").toEqual(url);
+      });
+    });
   });
 
 });

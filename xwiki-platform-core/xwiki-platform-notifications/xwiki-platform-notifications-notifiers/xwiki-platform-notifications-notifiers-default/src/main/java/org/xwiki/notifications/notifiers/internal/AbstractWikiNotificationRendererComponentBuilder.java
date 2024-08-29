@@ -56,7 +56,7 @@ public abstract class AbstractWikiNotificationRendererComponentBuilder implement
             this.checkRights(parentDocument.getDocumentReference(), parentDocument.getAuthorReference());
 
             // Instantiate the component
-            return Arrays.asList(instantiateComponent(parentDocument.getAuthorReference(), baseObject));
+            return Arrays.asList(instantiateComponent(baseObject));
         } catch (Exception e) {
             throw new WikiComponentException(String.format(
                     "Unable to build the WikiNotificationDisplayer wiki component "
@@ -66,13 +66,13 @@ public abstract class AbstractWikiNotificationRendererComponentBuilder implement
 
     /**
      * Instantiate the wiki component.
-     * @param authorReference reference of the author of the component
+     * 
      * @param baseObject object holding the component
      * @return the corresponding wiki component
      * @throws NotificationException if an error occurs
+     * @since 15.10RC1
      */
-    protected abstract WikiComponent instantiateComponent(DocumentReference authorReference, BaseObject baseObject)
-            throws NotificationException;
+    protected abstract WikiComponent instantiateComponent(BaseObject baseObject) throws NotificationException;
 
     /**
      * Ensure that the given author has the administrative rights in the current context.

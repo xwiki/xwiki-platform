@@ -27,10 +27,10 @@ import org.xwiki.component.annotation.Role;
  * 
  * @version $Id$
  * @since 1.9M2
- * @deprecated starting with 3.5M1, use the notion of Environment instead
+ * @deprecated use the notion of Environment instead
  */
 @Role
-@Deprecated
+@Deprecated(since = "3.5M1")
 public interface ApplicationContextListener
 {
     /**

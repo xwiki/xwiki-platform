@@ -1,23 +1,22 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <!--
   The LivedataDisplayer component is used to display any data of the Livedata.
@@ -53,31 +52,44 @@
   -->
   <component
     class="livedata-displayer"
-    v-if="displayerComponent"
-    :is="displayerComponent"
+    :data-livedata-property-id="propertyId"
+    :is="`Displayer${this.capitalize(this.displayerId)}`"
     :property-id="propertyId"
     :entry="entry"
-    :timestamp="new Date().getTime()"
   ></component>
-
-  <!--
-    This loader component is displayed while the displayer is being loaded
-  -->
-  <XWikiLoader
-    v-else
-  ></XWikiLoader>
 </template>
 
 
 <script>
-import XWikiLoader from "../utilities/XWikiLoader.vue";
+// Importing explicitly the dynamic components ensure that the components are loaded and ready without asynchronous 
+// imports when rendering the displayers. In addition, webpack build a single chunch for the less styles of the imported
+// modules, that way a single less file is imported, speeding up the rendering of the Live Data component when the 
+// compiled less cache is not populated (the more less import, the more separate compilations are need, the slower the
+// first load is).
+import DisplayerActions from "./DisplayerActions.vue"
+import DisplayerBoolean from "./DisplayerBoolean.vue"
+import DisplayerDate from "./DisplayerDate.vue"
+import DisplayerDocTitle from "./DisplayerDocTitle.vue"
+import DisplayerHtml from "./DisplayerHtml.vue"
+import DisplayerLink from "./DisplayerLink.vue"
+import DisplayerNumber from "./DisplayerNumber.vue"
+import DisplayerText from "./DisplayerText.vue"
+import DisplayerXObjectProperty from "./DisplayerXObjectProperty.vue"
 
 export default {
 
   name: "LivedataDisplayer",
 
   components: {
-    XWikiLoader,
+    DisplayerActions,
+    DisplayerBoolean,
+    DisplayerDate,
+    DisplayerDocTitle,
+    DisplayerHtml,
+    DisplayerLink,
+    DisplayerNumber,
+    DisplayerText,
+    DisplayerXObjectProperty,
   },
 
   inject: ["logic"],
@@ -87,15 +99,6 @@ export default {
     propertyId: String,
     entry: Object,
   },
-
-  data () {
-    return {
-      // The displayer component used to display the value
-      // It is set to `undefined before it is resolved
-      displayerComponent: undefined,
-    };
-  },
-
   computed: {
     data () { return this.logic.data; },
     // The displayer id of the Displayer component to load,
@@ -111,50 +114,7 @@ export default {
       string ??= "";
       return string[0].toUpperCase() + string.slice(1);
     },
-
-    // Load the displayer component corresponding to the given displayerId
-    // On success, set `this.displayerComponent` to the retrieved component,
-    // which automatically insert the component in the html
-    loadDisplayer (displayerId) {
-      return new Promise ((resolve, reject) => {
-
-        displayerId ??= this.displayerId;
-
-        // Load success callback
-        const loadDisplayerSuccess = displayerComponent => {
-          this.displayerComponent = displayerComponent;
-          resolve(displayerComponent);
-        };
-
-        // Load error callback
-        const loadDisplayerFailure = err => {
-          reject(err);
-        };
-
-        // Load displayer based on it's id
-        import("./Displayer" + this.capitalize(displayerId) + ".vue")
-          // We *have to* destructure the return value as `{ default: component }`,
-          // because it's how Webpack is handling dynamic imports
-          .then(({ default: component }) => loadDisplayerSuccess(component))
-          .catch(err => void loadDisplayerFailure(err));
-      });
-
-    },
   },
-
-  // On mounted, try to load the Displayer corresponding to the passed props,
-  // or the default one as fallback
-  mounted () {
-    // Try to load Displayer
-    this.loadDisplayer(this.displayerId).catch(err => {
-      // Try to load default Displayer
-      console.warn(err);
-      this.loadDisplayer(this.data.meta.defaultDisplayer).catch(err => {
-        console.error(err);
-      });
-    });
-  },
-
 };
 </script>
 

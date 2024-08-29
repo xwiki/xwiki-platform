@@ -1,0 +1,136 @@
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="space">
+      <wikiDocument name="document">
+        <p>
+          <parameters>
+            <entry>
+              <string>locale</string>
+              <locale></locale>
+            </entry>
+          </parameters>
+        </p>
+        <wikiDocumentLocale>
+          <p>
+            <parameters>
+              <entry>
+                <string>creation_author</string>
+                <string>XWiki.XWikiGuest</string>
+              </entry>
+              <entry>
+                <string>creation_date</string>
+                <date>1970-01-01 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.1</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocumentRevision revision="1.1">
+            <p>
+              <parameters>
+                <entry>
+                  <string>title</string>
+                  <string></string>
+                </entry>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>XWiki</name>
+                      <id>xwiki</id>
+                      <variants class="empty-list"/>
+                    </type>
+                    <version>2.1</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+                <entry>
+                  <string>hidden</string>
+                  <boolean>false</boolean>
+                </entry>
+                <entry>
+                  <string>revision_author</string>
+                  <string>XWiki.XWikiGuest</string>
+                </entry>
+                <entry>
+                  <string>revision_original_author</string>
+                  <string>XWiki.XWikiGuest</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string></string>
+                </entry>
+                <entry>
+                  <string>revision_date</string>
+                  <date>1970-01-01 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>revision_minor</string>
+                  <boolean>false</boolean>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>XWiki.XWikiGuest</string>
+                </entry>
+                <entry>
+                  <string>content_date</string>
+                  <date>1970-01-01 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string></string>
+                </entry>
+              </parameters>
+            </p>
+            <wikiAttachment name="attachment1" size="8">
+              <p>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>XWiki.XWikiGuest</string>
+                  </entry>
+                  <entry>
+                    <string>revision_comment</string>
+                    <string></string>
+                  </entry>
+                  <entry>
+                    <string>revision_date</string>
+                    <date>1970-01-01 00:00:00.0 UTC</date>
+                  </entry>
+                  <entry>
+                    <string>revision</string>
+                    <string>1.1</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachment>
+            <wikiAttachment name="attachment2" size="8">
+              <p>
+                <content>Y29udGVudDI=</content>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>XWiki.XWikiGuest</string>
+                  </entry>
+                  <entry>
+                    <string>revision_comment</string>
+                    <string></string>
+                  </entry>
+                  <entry>
+                    <string>revision_date</string>
+                    <date>1970-01-01 00:00:00.0 UTC</date>
+                  </entry>
+                  <entry>
+                    <string>revision</string>
+                    <string>1.1</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachment>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

@@ -47,13 +47,13 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.security.XarSecurityTool;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -239,8 +239,8 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
             // Update the existing job status if any
             if (jobId != null) {
                 JobStatus jobStatus = getJobStatus(jobId);
-                if (jobStatus != null && jobStatus instanceof DiffXarJobStatus) {
-                    ((DiffXarJobStatus) jobStatus).reset(reference);
+                if (jobStatus != null && jobStatus instanceof DiffXarJobStatus diffXarJobStatus) {
+                    diffXarJobStatus.reset(reference);
                 }
             }
 

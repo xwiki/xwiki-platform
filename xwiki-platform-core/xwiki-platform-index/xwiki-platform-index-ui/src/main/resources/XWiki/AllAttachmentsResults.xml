@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="XWiki.AllAttachmentsResults" locale="">
   <web>XWiki</web>
   <name>AllAttachmentsResults</name>
   <language/>
@@ -37,100 +37,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{template name="hierarchy_macros.vm" /}}
-
-{{velocity output="false"}}
-#macro (maybeApplyStringFilter $fieldName $defaultMatchType $constraints $queryParameters)
-  #if ("$!request.getParameter($fieldName)" != '')
-    #set ($fieldNameWithAlias = $fieldName)
-    #if ($fieldName.indexOf('.') &lt; 0)
-      #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
-    #end
-    #set ($matchType = $request.getParameter("${fieldName}_match"))
-    #if ("$!matchType" == '')
-      #set ($matchType = $defaultMatchType)
-    #end
-    #set ($parameterName = $fieldNameWithAlias.replace('.', '_'))
-    #if ($matchType == 'exact')
-      #set ($discard = $constraints.add("$fieldNameWithAlias = :$parameterName"))
-      #set ($parameterValue = $request.getParameter($fieldName))
-    #else
-      #set ($discard = $constraints.add("lower($fieldNameWithAlias) like lower(:$parameterName)"))
-      #set ($parameterValue = $request.getParameter($fieldName).trim())
-    #end
-    #set ($discard = $queryParameters.add({
-      'name': $parameterName,
-      'match': $matchType,
-      'value': $parameterValue
-    }))
-  #end
-#end
-
-#macro (maybeApplyIntegerRangeFilter $fieldName $constraints $queryParameters)
-  #set ($fieldValue = $request.getParameter($fieldName))
-  #if ("$!fieldValue" != '')
-    #set ($range = $fieldValue.split('-'))
-    #set ($range = [$numbertool.toNumber($range.get(0)).intValue(), $numbertool.toNumber($range.get(1)).intValue()])
-    #applyRangeFilter($fieldName $range $constraints $queryParameters)
-  #end
-#end
-
-#macro (maybeApplyDateRangeFilter $fieldName $constraints $queryParameters)
-  #set ($fieldValue = $request.getParameter($fieldName))
-  #if ("$!fieldValue" != '')
-    #set ($range = $fieldValue.split('-'))
-    #set ($range = [
-      $datetool.toDate($numbertool.toNumber($range.get(0))),
-      $datetool.toDate($numbertool.toNumber($range.get(1)))
-    ])
-    #applyRangeFilter($fieldName $range $constraints $queryParameters)
-  #end
-#end
-
-#macro (applyRangeFilter $fieldName $range $constraints $queryParameters)
-  #set ($fieldNameWithAlias = $fieldName)
-  #if ($fieldName.indexOf('.') &lt; 0)
-    #set ($fieldNameWithAlias = 'attachment.' + $fieldName)
-  #end
-  #set ($parameterNamePrefix = $fieldNameWithAlias.replace('.', '_'))
-  #set ($start = $range.get(0))
-  #if ($start)
-    #set ($startParameterName = $parameterNamePrefix + '_start')
-    #set ($discard = $constraints.add("$fieldNameWithAlias &gt;= :$startParameterName"))
-    #set ($discard = $queryParameters.add({
-      'name': $startParameterName,
-      'match': 'exact',
-      'value': $start
-    }))
-  #end
-  #set ($end = $range.get(1))
-  #if ($end)
-    #set ($endParameterName = $parameterNamePrefix + '_end')
-    #set ($discard = $constraints.add("$fieldNameWithAlias &lt; :$endParameterName"))
-    #set ($discard = $queryParameters.add({
-      'name': $endParameterName,
-      'match': 'exact',
-      'value': $end
-    }))
-  #end
-#end
-
-#macro (displayAttachmentMimeType $attachment)
-  &lt;div class="mime" data-type="$!escapetool.xml($attachment.mimeType)"&gt;
-    #if ($attachment.isImage())
-      &lt;span title="$escapetool.xml($services.localization.render('core.viewers.attachments.mime.image'))"&gt;
-        &lt;img src="$xwiki.getURL($attachmentReference, 'download', 'width=48')"
-          alt="$escapetool.xml($attachment.filename)" /&gt;
-      &lt;/span&gt;
-    #else
-      #mimetypeimg($attachment.mimeType.toLowerCase() $attachment.filename.toLowerCase())
-    #end
-  &lt;/div&gt;
-#end
-
-#macro (displayAttachmentSize $attachment)
-  &lt;span class="size" data-size="$!escapetool.xml($attachment.longSize)"&gt;#dynamicsize($attachment.longSize)&lt;/span&gt;
-#end
-{{/velocity}}
+{{template name="attachment_macros.vm" /}}
 
 {{velocity wiki="false"}}
 ## ========================================================================================
@@ -216,9 +123,12 @@
       'local': true,
       'displayTitle': false
     })")
+    ## The field "fullName" was used by Livetable and is needed for backwards-compatibility.
+    ## The field "doc.fullName" is needed by LiveData as doc.fullName is the actual field name.
     #set ($row = {
       'acclev': $hasAccess,
       'fullName': $location,
+      'doc.fullName': $location,
       'filename': $attachmentReference.name,
       'fileurl': $xwiki.getURL($attachmentReference)
     })
@@ -228,9 +138,9 @@
       #set ($authorReference = $services.model.resolveDocument($attachment.author))
       #set ($discard = $row.putAll({
         'mimeType': "#displayAttachmentMimeType($attachment)",
-        'filesize': "#displayAttachmentSize($attachment)",
+        'filesize': "#displayAttachmentSize($attachment.longSize)",
         'date': $xwiki.formatDate($attachment.date),
-        'author': $xwiki.getUserName($attachment.author)
+        'author': "#displayUserNameWithAvatar($attachment.author)"
       }))
     #end
     #set ($discard = $results.rows.add($row))

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AdminFieldsDisplaySheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.AdminFieldsDisplaySheet" locale="">
   <web>XWiki</web>
   <name>AdminFieldsDisplaySheet</name>
   <language/>
@@ -57,10 +57,14 @@
     $out ##
     #set ($out = '')
   #end
-  $title
+  $escapetool.xml($title)
   #if ($prop.name == 'skin')
     #set ($skin = $xwiki.skin)
-    &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin, 'edit')"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;
+      &lt;a href="$xwiki.getURL($skin, 'edit')"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;
+        $escapetool.xml($services.localization.render('admin.customize'))
+      &lt;/a&gt;
+    &lt;/span&gt;
   #end
   #if ($prop.name == 'colorTheme')
     #if ($editor == 'globaladmin')
@@ -69,18 +73,22 @@
       #set ($colorThemeName = $xwiki.getSpacePreference('colorTheme'))
       #set ($wikiColorTheme = $xwiki.getDocument($xwiki.getXWikiPreference('colorTheme')))
       #if (!$wikiColorTheme.isNew())
-        #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
+        #set ($colorThemeHint = $escapetool.xml($services.localization.render('admin.colortheme.wikiSetting', ['__LINK__'])).replaceAll('__LINK__', "&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"))
       #end
     #end
     #if ($xwiki.exists($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome')))
-      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$escapetool.xml($services.localization.render('admin.colortheme.manage'))&lt;/a&gt;&lt;/strong&gt;")
     #elseif ($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
-      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+      #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$escapetool.xml($services.localization.render('admin.colortheme.manage'))&lt;/a&gt;&lt;/strong&gt;")
     #end
-    &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;
+      &lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;
+        $escapetool.xml($services.localization.render('admin.customize'))
+      &lt;/a&gt;
+    &lt;/span&gt;
   #end
   &lt;/label&gt;
-  #if ($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end
+  #if ($hint)&lt;span class="xHint"&gt;$escapetool.xml($hint)&lt;/span&gt;#end
   &lt;/dt&gt;
   #if ($out != '')
     &lt;dd&gt;$out&lt;/dd&gt;
@@ -100,6 +108,7 @@
 ### - $params (mandatory): list of properties to display and their associated sections
 ### - $paramDoc (optional): document object which contains the $paramClass
 ### - $paramClass (optional): name of the xclass type for the xobject from which to read/save from
+### - $objectPolicy (since 14.10) (optional): the update policy to use when saving the form
 #if ("$!section" != '')
   ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
   {{html clean="false"}}
@@ -115,14 +124,17 @@
     #set($configClassName = 'XWiki.XWikiPreferences')
     #set($formId = $section.toLowerCase())
   #end
-  &lt;form id="$formId" method="post" action="$xwiki.getURL($configDoc, 'saveandcontinue')" onsubmit="cancelCancelEdit()" class="xform"&gt;
+  &lt;form id="$escapetool.xml($formId)" method="post"
+      action="$escapetool.xml($xwiki.getURL($configDoc, 'saveandcontinue'))"
+      onsubmit="cancelCancelEdit()"
+      class="xform"&gt;
     #set($obj = $configDoc.getObject($configClassName))
     #foreach ($entry in $params.entrySet())
       #set ($fields = $entry.value)
-      &lt;fieldset class="$entry.key"&gt;
+      &lt;fieldset class="$escapetool.xml($entry.key)"&gt;
       ## If there is only one section, don't display the legend
       #if ($params.size() &gt; 1)
-        &lt;legend&gt;$services.localization.render("admin.$entry.key")&lt;/legend&gt;
+        &lt;legend&gt;$escapetool.xml($services.localization.render("admin.$entry.key"))&lt;/legend&gt;
       #end
       #if ($fields.size() &gt; 0)
         &lt;dl&gt;
@@ -144,11 +156,15 @@
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       &lt;input type="hidden" name="xcontinue" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
       &lt;input type="hidden" name="xredirect" value="$xwiki.getURL($currentDoc, 'admin', "editor=${escapetool.url(${editor})}&amp;amp;section=${escapetool.url(${section})}&amp;amp;space=${escapetool.url(${currentSpace})}")" /&gt;
-      &lt;input type="hidden" name="classname" value="$configClassName" /&gt;
+      &lt;input type="hidden" name="classname" value="$escapetool.xml($configClassName)" /&gt;
+      #if ("$!objectPolicy" != '')
+      &lt;input type="hidden" name="objectPolicy" value="$escapetool.xml($objectPolicy)" /&gt;
+      #end
     &lt;/div&gt;
     &lt;div class="bottombuttons"&gt;
       &lt;p class="admin-buttons"&gt;
-        &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" value="$services.localization.render('admin.save')" /&gt;&lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" name="formactionsac" 
+          value="$escapetool.xml($services.localization.render('admin.save'))" /&gt;&lt;/span&gt;
       &lt;/p&gt;
     &lt;/div&gt; ## bottombuttons
   &lt;/form&gt;

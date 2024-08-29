@@ -25,57 +25,69 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BootstrapSwitch;
+
+import static org.xwiki.test.ui.po.BootstrapSwitch.State.OFF;
+import static org.xwiki.test.ui.po.BootstrapSwitch.State.ON;
 
 /**
  * Abstract representation of the notification filter preferences which covers common needs for
  * {@link SystemNotificationFilterPreference} and {@link CustomNotificationFilterPreference}.
+ *
  * @version $Id$
  * @since 13.2RC1
  */
-@Unstable
 public abstract class AbstractNotificationFilterPreference
 {
+    private final XWikiWebDriver webDriver;
+
     private AbstractNotificationsSettingsPage parentPage;
 
-    private WebElement livetableRow;
+    private WebElement row;
 
-    private String filterName;
     private List<String> formats = new ArrayList<>();
 
     private BootstrapSwitch enabledSwitch;
 
     /**
      * Default constructor.
+     *
      * @param parentPage the page where the settings are displayed.
-     * @param row the row of the livetable for this filter.
+     * @param row the row of the Live Data for this filter
      * @param webDriver the webdriver to initialize the switches.
      */
     public AbstractNotificationFilterPreference(AbstractNotificationsSettingsPage parentPage, WebElement row,
         XWikiWebDriver webDriver)
     {
         this.parentPage = parentPage;
-        this.livetableRow = row;
-        this.filterName = row.findElement(By.className("name")).getText();
-        List<WebElement> formatElements = row.findElement(By.className("notificationFormats"))
+        this.row = row;
+        List<WebElement> formatElements = getFormatsElement(row)
             .findElements(By.tagName("li"));
         for (WebElement format : formatElements) {
             this.formats.add(format.getText());
         }
-        this.enabledSwitch = new BootstrapSwitch(
-            row.findElement(By.className("isEnabled")).findElement(By.className("bootstrap-switch")),
-            webDriver
-        );
+        this.webDriver = webDriver;
+        this.enabledSwitch = new BootstrapSwitch(getBootstrapSwitchElement(row), webDriver);
     }
 
     /**
-     * @return the filter name.
+     * @param row the row to get the formats from
+     * @return the {@link WebElement} containing the formats of the row
      */
-    public String getFilterName()
+    private WebElement getFormatsElement(WebElement row)
     {
-        return filterName;
+        return row.findElement(By.cssSelector("td[data-title='Formats'] .view"));
+    }
+
+    /**
+     * @param row the row to get the switch from
+     * @return the {@link WebElement} containing the switch element of the row
+     */
+    private WebElement getBootstrapSwitchElement(WebElement row)
+    {
+        this.webDriver.waitUntilElementIsVisible(row, By.cssSelector(".displayer-toggle .bootstrap-switch"));
+        return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
     }
 
     /**
@@ -87,11 +99,11 @@ public abstract class AbstractNotificationFilterPreference
     }
 
     /**
-     * @return the livetable row.
+     * @return the row
      */
-    public WebElement getLivetableRow()
+    public WebElement getRow()
     {
-        return livetableRow;
+        return row;
     }
 
     /**
@@ -107,11 +119,12 @@ public abstract class AbstractNotificationFilterPreference
      */
     public boolean isEnabled()
     {
-        return enabledSwitch.getState() == BootstrapSwitch.State.ON;
+        return enabledSwitch.getState() == ON;
     }
 
     /**
      * Enable or disable the current filter.
+     *
      * @param enabled either or not the filter must be enabled
      * @throws Exception if the expected state cannot be set
      */
@@ -121,7 +134,7 @@ public abstract class AbstractNotificationFilterPreference
             return;
         }
 
-        this.enabledSwitch.setState(enabled ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
+        this.enabledSwitch.setState(enabled ? ON : OFF);
         this.parentPage.waitForNotificationSuccessMessage("Filter preference saved!");
     }
 }

@@ -42,8 +42,6 @@ entitynamevalidation.useTransformation.label=Преобразование име
 entitynamevalidation.useTransformation.hint=Если эта опция включена, стратегия именования будет использоваться для автоматической адаптации имени, если это возможно.
 entitynamevalidation.useValidation.label=Проверьте имена перед сохранением
 entitynamevalidation.useValidation.hint=Если этот параметр включен, стратегия именования будет проверять имя перед сохранением: используйте эту функцию с осторожностью, поскольку это может помешать сохранению некоторых существующих документов.
-entitynamevalidation.ReplaceCharacterEntityNameValidation.name=Замена символов
-entitynamevalidation.SlugEntityNameValidation.name=Предварительно отформатированные имена (без акцентов, без пробелов, без специальных символов)
 entitynamevalidation.replacementCharacter.configuration=Конфигурация стратегии замены символов
 entitynamevalidation.testStrategy.label=Проверьте выбранную вами стратегию
 entitynamevalidation.testStrategy.hint=Позволяет проверить поведение выбранной вами стратегии
@@ -71,5 +69,7 @@ entitynamevalidation.replacementCharacter.remove.inProgress=Запрещенны
 entitynamevalidation.replacementCharacter.remove.done=Запрещенный символ был удален.
 entitynamevalidation.replacementCharacter.remove.failed=Ошибка при удалении запрещенного символа.
 entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Пусто
-### Missing: entitynamevalidation.admin.heading=Name Strategies</content>
+entitynamevalidation.admin.heading=Стратегии именования
+admin.namestrategies=Стратегии именования
+</content>
 </xwikidoc>

@@ -23,6 +23,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -167,5 +168,44 @@ public class ChangePasswordPage extends BasePage
     public void cancel()
     {
         this.cancelPasswordChange.click();
+    }
+
+    /**
+     * Wait until the validation error message has the expected text. {@link TimeoutException} is thrown if the expected
+     * text is not displayed withing a given time limit.
+     *
+     * @param expectedText the expected text of the validation error message
+     * @since 14.4RC1
+     * @since 13.10.6
+     */
+    public void assertValidationErrorMessage(String expectedText)
+    {
+        getDriver().waitUntilElementHasTextContent(By.cssSelector(VALIDATION_ERROR_MESSAGE_SELECTOR), expectedText);
+    }
+
+    /**
+     * Wait until the success message has the expected text. {@link TimeoutException} is thrown if the expected text is
+     * not displayed withing a given time limit.
+     *
+     * @param expectedText the expected text of the success message
+     * @since 14.4RC1
+     * @since 13.10.6
+     */
+    public void assertSuccessMessage(String expectedText)
+    {
+        getDriver().waitUntilElementHasTextContent(By.cssSelector(SUCCESS_MESSAGE_SELECTOR), expectedText);
+    }
+
+    /**
+     * Wait until the error message has the expected text. {@link TimeoutException} is thrown if the expected text is
+     * not displayed withing a given time limit.
+     *
+     * @param expectedText the expected text of the error message
+     * @since 14.4RC1
+     * @since 13.10.6
+     */
+    public void assertErrorMessage(String expectedText)
+    {
+        getDriver().waitUntilElementHasTextContent(By.cssSelector(ERROR_MESSAGE_SELECTOR), expectedText);
     }
 }

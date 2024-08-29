@@ -21,6 +21,7 @@ package org.xwiki.mail.script;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -45,12 +47,16 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,6 +77,12 @@ class MailStorageScriptServiceTest
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
+    @MockComponent
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    @Mock
+    private XWikiContext xcontext;
+
     @BeforeEach
     void setUp() throws Exception
     {
@@ -81,6 +93,9 @@ class MailStorageScriptServiceTest
         Execution execution = this.componentManager.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
         when(execution.getContext()).thenReturn(executionContext);
+
+        when(this.xcontext.isMainWiki()).thenReturn(true);
+        when(this.xwikiContextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
@@ -107,6 +122,25 @@ class MailStorageScriptServiceTest
         assertEquals("batchId", result.getBatchId());
         assertNotNull(result.getStatusResult());
     }
+
+    @Test
+    void resendWhenInSubWiki() throws Exception
+    {
+        when(this.xcontext.isMainWiki()).thenReturn(false);
+        when(this.xcontext.getWikiId()).thenReturn("wiki");
+
+        Map filterMap = Collections.singletonMap("state", "prepare_%");
+
+        MailResender resender = this.componentManager.getInstance(MailResender.class, "database");
+
+        this.mailStorageScriptService.resend(filterMap, 5, 10);
+
+        // The test is here by checking that the filter map has been augmented of the wiki
+        Map expectedFilterMap = new HashMap(filterMap);
+        expectedFilterMap.put("wiki", "wiki");
+        verify(resender).resend(expectedFilterMap, 5, 10);
+    }
+
 
     @Test
     void resendAsynchronouslySeveralMessages() throws Exception
@@ -146,7 +180,7 @@ class MailStorageScriptServiceTest
     @Test
     void resendSynchronouslySeveralMessages() throws Exception
     {
-        Map filterMap = Collections.singletonMap("state", "prepare_%");
+        Map<String, Object> filterMap = Collections.singletonMap("state", "prepare_%");
 
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");

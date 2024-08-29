@@ -22,7 +22,6 @@ package org.xwiki.notifications.notifiers.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +32,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.NotificationException;
@@ -51,6 +52,7 @@ import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.notifications.preferences.internal.cache.UnboundedEntityCacheManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -62,8 +64,10 @@ import org.xwiki.security.authorization.Right;
  */
 @Component(roles = UserEventManager.class)
 @Singleton
-public class UserEventManager
+public class UserEventManager implements Initializable
 {
+    private static final String USERDATECACHE_NAME = "UserCreationDate";
+
     @Inject
     private AuthorizationManager authorizationManager;
 
@@ -86,15 +90,18 @@ public class UserEventManager
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    @Inject
     private EntityReferenceFactory entityReferenceFactory;
 
-    // We use a map here and not a cache since it's expected to contain all users
-    // (we iterate over all users in the UserEventDispatcher)
-    // Note that the memory footprint will be acceptable thanks to the dedup of references here.
-    private Map<DocumentReference, Date> userCreationDateCache = new HashMap<>();
+    @Inject
+    private UnboundedEntityCacheManager cacheManager;
+
+    private Map<EntityReference, Date> userCreationDateCache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.userCreationDateCache = this.cacheManager.createCache(USERDATECACHE_NAME, false);
+    }
 
     /**
      * @param event the event
@@ -107,12 +114,11 @@ public class UserEventManager
         try {
             if (hasAccess(user, event) && isEventAfterUserCreationDate(event, user)
                 && (hasCorrespondingNotificationPreference(user, event, format)
-                || isTriggeredByAFollowedUser(user, event, format))) {
+                    || isTriggeredByAFollowedUser(user, event, format))) {
                 // Apply the filters that the user has defined in its notification preferences
                 // If one of the events present in the composite event does not match a user filter, remove the event
-                List<NotificationFilter> filters =
-                    new ArrayList<>(this.notificationFilterManager.getAllFilters(user, true,
-                        NotificationFilter.FilteringPhase.PRE_FILTERING));
+                List<NotificationFilter> filters = new ArrayList<>(this.notificationFilterManager.getAllFilters(user,
+                    true, NotificationFilter.FilteringPhase.PRE_FILTERING));
                 filters.sort(null);
 
                 return !isEventFiltered(filters, event, user, format);
@@ -151,15 +157,15 @@ public class UserEventManager
      * @param event the event to check
      * @param user the targeted user
      * @return {@code true} if event's date or user's creation date is null, or if the event date is after the user's
-     *          creation date.
+     *         creation date.
      * @throws NotificationException in case of problem to retrieve user's creation date.
      */
     private boolean isEventAfterUserCreationDate(Event event, DocumentReference user) throws NotificationException
     {
         Date userCreationDate = getUserCreationDate(user);
         return event.getDate() == null || userCreationDate == null
-            // after and before API are "strictly after" and "strictly before",
-            // here we use the negative way to ensure we also accept "equals" date.
+        // after and before API are "strictly after" and "strictly before",
+        // here we use the negative way to ensure we also accept "equals" date.
             || !event.getDate().before(userCreationDate);
     }
 
@@ -183,6 +189,7 @@ public class UserEventManager
         } else {
             result = this.userCreationDateCache.get(user);
         }
+
         return result;
     }
 
@@ -190,8 +197,8 @@ public class UserEventManager
         NotificationFormat format)
     {
         try {
-            for (NotificationPreference notificationPreference : this.notificationPreferenceManager
-                .getAllPreferences(user)) {
+            List<NotificationPreference> allPreferences = this.notificationPreferenceManager.getAllPreferences(user);
+            for (NotificationPreference notificationPreference : allPreferences) {
                 if (notificationPreference.getFormat() == format
                     && notificationPreference.getProperties().containsKey(NotificationPreferenceProperty.EVENT_TYPE)
                     && notificationPreference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)
@@ -204,9 +211,10 @@ public class UserEventManager
                         && (notificationPreference.getStartDate() == null || event.getDate() == null
                         // after and before API are "strictly after" and "strictly before",
                         // here we use the negative way to ensure we also accept "equals" date.
-                        || !event.getDate().before(notificationPreference.getStartDate()));
+                            || !event.getDate().before(notificationPreference.getStartDate()));
                 }
             }
+            return allPreferences.isEmpty();
         } catch (NotificationException e) {
             this.logger.warn("Unable to retrieve the notifications preferences of [{}]: {}", user,
                 ExceptionUtils.getRootCauseMessage(e));
@@ -232,13 +240,13 @@ public class UserEventManager
      * @param event the event to check
      * @param filterPreference the preference to check
      * @return {@code true} if the event date or the preference start date is null for backward compatibility, or if the
-     *          preference start date is before the event date.
+     *         preference start date is before the event date.
      */
     private boolean isFilterCreatedBeforeEvent(Event event, NotificationFilterPreference filterPreference)
     {
         return event.getDate() == null || filterPreference.getStartingDate() == null
-            // after and before API are "strictly after" and "strictly before",
-            // here we use the negative way to ensure we also accept "equals" date.
+        // after and before API are "strictly after" and "strictly before",
+        // here we use the negative way to ensure we also accept "equals" date.
             || !event.getDate().before(filterPreference.getStartingDate());
     }
 
@@ -292,7 +300,6 @@ public class UserEventManager
                     // Do nothing
             }
         }
-
         return false;
     }
 }

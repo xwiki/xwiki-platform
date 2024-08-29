@@ -39,14 +39,34 @@
   <content>office.createForm.type.name=Office-Inhalt
 office.createForm.type.description=Office Dokumente als Wiki Seiten importieren
 office.form.error.noDocument=Sie müssen {0}"Erstellen"{1} verwenden, um ein Office Dokument zu importieren.
-office.form.append.hint=Diese Seite existiert bereits! Das Ergebnis wird an die vorhandene Seite angehängt
-
-### Missing: office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).
-office.config.serverPort.hint=Die Port-nummer, unter der der Office-Server läuft
+office.import.document.hint=Das Office-Dokument zum Importieren auswählen.
+office.import.target.hint=Die Seite in die der Inhalt des Office-Dokuments importiert wird.
+office.import.overwriteContent=Vorhandenen Inhalt überschreiben
+office.import.overwriteContent.hint=Die Zielseite existiert bereits. Der Inhalt kann überschrieben oder hinten angehängt werden.
+office.import.overwriteContent.confirmationMessage=Soll der Inhalt der Zielseite wirklich überschrieben werden?
+office.import.overwriteContent.confirmationAction=Überschreiben
+office.import.headingLevelsToSplit.hint=Importieren Sie die ausgewählten Überschriftenebenen und ihre entsprechenden Abschnitte in separate untergeordnete Seiten, die von der übergeordneten Seite verlinkt sind.
+office.import.childPagesNaming.hint=Auswählen, wie die untergeordneten Seiten benannt werden sollen, die beim Teilen des importierten Inhalts erstellt werden.
+office.import.terminalChildPages=Untergeordnete terminierte Seiten
+office.import.terminalChildPages.hint=Erweitert: Untergeordneten terminierte Seiten erstellen. Terminierte Seiten können keine untergeordneten Seiten haben und werden im Allgemeinen in Anwendungen, in der Entwicklung oder in älteren Versionen von XWiki verwendet.
+office.import.inProgress=Office-Dokument importieren...
+office.import.done=Office-Dokument importiert
+office.import.failed=Office-Import gescheitert
+office.config.serverType.hint=Die Art des Office Servers. Diese kann entweder "internally managed" (eingebetteter Dienst) oder "externally managed" (separater Dienst) sein.
+office.config.serverPort.hint=Die Port-Nummer, unter der der Office-Server läuft
 office.config.autoStart.hint=Gibt an, ob der Office-Server beim Start von XWiki automatisch mit gestartet bzw. verbunden wird
 office.config.serverPath.hint=Der Dateipfad zu der Office Installation
 office.config.serverState.connected=Verbunden
 office.config.serverState.notConnected=Nicht verbunden
 office.config.serverState.confError=Konfiguration ungültig
-office.config.serverState.error=Fehler</content>
+office.config.serverState.error=Fehler
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+office.form.append.hint=Diese Seite existiert bereits! Das Ergebnis wird an die vorhandene Seite angehängt
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

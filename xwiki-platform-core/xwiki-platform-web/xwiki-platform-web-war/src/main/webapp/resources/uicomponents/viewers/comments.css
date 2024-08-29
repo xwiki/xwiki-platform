@@ -20,13 +20,6 @@ ul.commentreplies, .reply {
 .commentthread .reply {
   padding-left: 35px;
 }
-* html .reply {
-  /* Strange things happen in IE if this is missing: the width of a comment is larger and the layout is broken. */
-  border-top: 1px solid $theme.pageContentBackgroundColor;
-}
-*+html .xwikicomment {
-  border-top: 1px solid $theme.pageContentBackgroundColor;
-}
 /* Comment */
 .xwikicomment {
   border: 0 none;   /* Overriding toucan */
@@ -47,7 +40,7 @@ ul.commentreplies, .reply {
   width: 30px;
 }
 .commentavatar img {
-  border-radius: 4px;
+  border-radius: 7px;
   max-width: 50px;
   max-height: 50px;
 }
@@ -143,10 +136,6 @@ ul.commentreplies, .reply {
   resize: vertical;
   width: 100%;
 }
-*+html #AddComment .commentcontainer textarea {
-  /* fix for IE7 */
-  width: 98%;
-}
 /* The message that appears in the place of a comment deleted with ajax */
 div.notification {
   background-color: $theme.highlightColor;
@@ -172,10 +161,6 @@ form.edit-xcomment .commentPreview {
 }
 form.edit-xcomment .commentcontent textarea {
   width: 100%;
-}
-*+html form.edit-xcomment .commentcontent textarea {
-  /* fix for IE7 */
-  width: 98%;
 }
 @media (max-width: 480px) {
   .commentdate {

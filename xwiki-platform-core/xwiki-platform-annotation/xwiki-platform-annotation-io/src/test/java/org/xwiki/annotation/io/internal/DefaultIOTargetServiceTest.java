@@ -19,22 +19,25 @@
  */
 package org.xwiki.annotation.io.internal;
 
-import org.jmock.Expectations;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.annotation.io.IOTargetService;
+import org.xwiki.annotation.reference.internal.DefaultTypedStringEntityReferenceResolver;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
 
 /**
  * Tests the default implementation of {@link IOTargetService}, and integration with target resolvers, up to the
@@ -43,302 +46,192 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 2.3M1
  */
-public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
+@ComponentTest
+@ComponentList({ DefaultTypedStringEntityReferenceResolver.class })
+@ReferenceComponentList
+class DefaultIOTargetServiceTest
 {
-    /**
-     * Tested io target service.
-     */
-    private IOTargetService ioTargetService;
+    @InjectMockComponents
+    private DefaultIOTargetService ioTargetService;
 
-    /**
-     * Mock for the document access bridge.
-     */
-    private DocumentAccessBridge dabMock;
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * Mock for DocumentReferenceResolver<String> used by BaseObjectReference
-     */
-    private DocumentReferenceResolver<String> classResolver;
+    @MockComponent
+    private DocumentModelBridge documentModelBridge;
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        // register the dab
-        this.dabMock = registerMockComponent(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(dabMock).getCurrentUserReference();
-            }
-        });
-        this.classResolver = registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
-
-        // We don't care about multi CM
-        DefaultComponentDescriptor<ComponentManager> componentDescriptor = new DefaultComponentDescriptor<>();
-        componentDescriptor.setRoleType(ComponentManager.class);
-        componentDescriptor.setRoleHint("context");
-        getComponentManager().registerComponent(componentDescriptor, getComponentManager());
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        // get the default io target service
-        ioTargetService = getComponentManager().getInstance(IOTargetService.class);
-        Utils.setComponentManager(getComponentManager());
-    }
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void testGettersWhenTargetIsTypedDocument() throws Exception
+    void gettersWhenTargetIsTypedDocument() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
-
         String reference = "DOCUMENT://wiki:Space.Page";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGettersWhenTargetIsNonTypedDocument() throws Exception
+    void gettersWhenTargetIsNonTypedDocument() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
-
         String reference = "wiki:Space.Page";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGettersWhenTargetIsNonTypedRelativeDocument() throws Exception
+    void gettersWhenTargetIsNonTypedRelativeDocument() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // default resolver should be used
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
-
         String reference = "Space.Page";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGettersWhenTargetIsTypedRelativeDocument() throws Exception
+    void gettersWhenTargetIsTypedRelativeDocument() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // default resolver should be used
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
-
         String reference = "DOCUMENT://Space.Page";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGettersWhenTargetIsTypedSpace() throws Exception
+    void gettersWhenTargetIsTypedSpace() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // default resolver should be used
-                oneOf(dabMock).getDocumentContent("SPACE://wiki:Space");
-                will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("SPACE://wiki:Space");
-                will(returnValue("xwiki/2.0"));
-            }
-        });
-
         // expect source ref to be used as is, as it doesn't parse to something acceptable
         String reference = "SPACE://wiki:Space";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        when(this.documentAccessBridge.getDocumentContent(reference)).thenReturn("defcontent");
+        when(this.documentAccessBridge.getDocumentSyntaxId(reference)).thenReturn("xwiki/2.0");
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGettersWhenTargetIsEmptyString() throws Exception
+    void gettersWhenTargetIsEmptyString() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // default resolver should be used. Note that this will fail if default values change, not very well
-                // isolated
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "WebHome"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
-
         // expect source ref to be used as is, as it doesn't parse to something acceptable
         String reference = "";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+
+        DocumentReference documentReference = new DocumentReference("xwiki", "Main", "WebHome");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(documentReference))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGetterWhenTargetIsTypedIndexedObjectProperty() throws Exception
+    void getterWhenTargetIsTypedIndexedObjectProperty() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
-                oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
-                                           new DocumentReference("wiki", "XWiki", "Class"), 1, "property");
-                will(returnValue("defcontent"));
-                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
+        Utils.setComponentManager(this.componentManager);
+        when(this.documentAccessBridge.getProperty(
+            new DocumentReference("wiki", "Space", "Page"),
+            new DocumentReference("wiki", "XWiki", "Class"), 1, "property"))
+            .thenReturn("defcontent");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page")))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
 
         String reference = "OBJECT_PROPERTY://wiki:Space.Page^XWiki.Class[1].property";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGetterWhenTargetIsTypedDefaultObjectProperty() throws Exception
+    void getterWhenTargetIsTypedDefaultObjectProperty() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
-                oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
-                                           new DocumentReference("wiki", "XWiki", "Class"), "property");
-                will(returnValue("defcontent"));
-                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
+        Utils.setComponentManager(this.componentManager);
+        when(this.documentAccessBridge.getProperty(
+            new DocumentReference("wiki", "Space", "Page"),
+            new DocumentReference("wiki", "XWiki", "Class"), "property"))
+            .thenReturn("defcontent");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference("wiki", "Space", "Page")))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
 
         String reference = "OBJECT_PROPERTY://wiki:Space.Page^XWiki.Class.property";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGetterWhenTargetIsTypedObjectPropertyInRelativeDocument() throws Exception
+    void getterWhenTargetIsTypedObjectPropertyInRelativeDocument() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(classResolver).resolve("XWiki.Class", new DocumentReference("xwiki", "Main", "Page"));
-                will(returnValue(new DocumentReference("xwiki", "XWiki", "Class")));
-                oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "Page"),
-                    new DocumentReference("xwiki", "XWiki", "Class"), "property");
-                will(returnValue("defcontent"));
-                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "Page"));
-                will(returnValue(dmb));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
+        Utils.setComponentManager(this.componentManager);
+        when(this.documentAccessBridge.getProperty(
+            new DocumentReference("xwiki", "Main", "Page"),
+            new DocumentReference("xwiki", "XWiki", "Class"), "property"))
+            .thenReturn("defcontent");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "Page")))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
 
         String reference = "OBJECT_PROPERTY://Page^XWiki.Class.property";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGetterWhenTargetIsNonTypedObjectProperty() throws Exception
+    void getterWhenTargetIsNonTypedObjectProperty() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // target will be parsed as document, because document is the default
-                allowing(dabMock).getTranslatedDocumentInstance(new DocumentReference("wiki", "Space.Page^XWiki.Class", "property"));
-                will(returnValue(dmb));
-                oneOf(dmb).getContent();
-                will(returnValue("defcontent"));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
+        Utils.setComponentManager(this.componentManager);
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(
+            new DocumentReference("wiki", "Space.Page^XWiki.Class", "property")))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getContent()).thenReturn("defcontent");
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
 
         String reference = "wiki:Space\\.Page^XWiki\\.Class.property";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 
     @Test
-    public void testGetterWhenTargetIsTypedIndexedRelativeObjectProperty() throws Exception
+    void getterWhenTargetIsTypedIndexedRelativeObjectProperty() throws Exception
     {
-        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // this will fail if defaults fail, not very well isolated
-                allowing(classResolver).resolve("Classes.Class", new DocumentReference("xwiki", "Main", "WebHome"));
-                will(returnValue(new DocumentReference("xwiki", "Classes", "Class")));
-                oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "WebHome"),
-                    new DocumentReference("xwiki", "Classes", "Class"), 3, "property");
-                will(returnValue("defcontent"));
-                oneOf(dabMock).getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "WebHome"));
-                will(returnValue(dmb));
-                oneOf(dmb).getSyntax();
-                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
-            }
-        });
+        Utils.setComponentManager(this.componentManager);
+        when(this.documentAccessBridge.getProperty(new DocumentReference("xwiki", "Main", "WebHome"),
+            new DocumentReference("xwiki", "Classes", "Class"), 3, "property"))
+            .thenReturn("defcontent");
+        when(this.documentAccessBridge.getTranslatedDocumentInstance(new DocumentReference("xwiki", "Main", "WebHome")))
+            .thenReturn(this.documentModelBridge);
+        when(this.documentModelBridge.getSyntax()).thenReturn(XWIKI_2_0);
 
         String reference = "OBJECT_PROPERTY://Classes.Class[3].property";
-        assertEquals("defcontent", ioTargetService.getSource(reference));
-        assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
+        assertEquals("defcontent", this.ioTargetService.getSource(reference));
+        assertEquals("xwiki/2.0", this.ioTargetService.getSourceSyntax(reference));
     }
 }

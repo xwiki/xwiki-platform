@@ -73,7 +73,7 @@
         <property name="content" type="materialized_clob" column="XWD_CONTENT" length="200000" not-null="false" />
         <property name="version" type="string" column="XWD_VERSION" length="255" not-null="true" />
         <property name="customClass" type="string" column="XWD_CUSTOM_CLASS" length="768" />
-        <property name="parent" type="string" column="XWD_PARENT" length="511" />
+        <property name="parent" type="string" column="XWD_PARENT" length="768" />
         <property name="xWikiClassXML" type="materialized_clob" column="XWD_CLASS_XML" length="60000" not-null="false" />
         <property name="elements" type="integer" not-null="true" column="XWD_ELEMENTS" />
         <property name="defaultTemplate" type="string" column="XWD_DEFAULT_TEMPLATE" length="768" />
@@ -82,6 +82,7 @@
         <property name="minorEdit1" type="boolean" column="XWD_MINOREDIT" index="DOC_MINOREDIT" not-null="true" />
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
+        <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA" length="768" index="DOC_ORIGINAL_METADATA" />
     </class>
 
     <!-- com.xpn.xwiki.doc.XWikiSpace root -->
@@ -165,13 +166,15 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
-        <composite-id unsaved-value="undefined">
-            <key-property name="docId" column="XWL_DOC_ID" type="long" />
-            <key-property name="link" type="string">
-                <column name="XWL_LINK" index="XWLNK_LINK" length="766" />
-            </key-property>
-        </composite-id>
-        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" />
+        <id name="id" column="XWL_ID">
+            <generator class="native"/>
+        </id>
+        <property name="docId" column="XWL_DOC_ID" type="long" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="link" type="string" column="XWL_LINK" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="type" type="string" column="XWL_TYPE" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="fullName" type="string" column="XWL_FULLNAME" length="768" unique-key="XWL_UNIQUE_CONSTRAINT"/>
+        <property name="attachmentName" type="string" column="XWL_ATTACHMENT_NAME" length="768"
+          unique-key="XWL_UNIQUE_CONSTRAINT"/>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
@@ -464,5 +467,20 @@
             <column name="XWV_VERSION" not-null="true" />
             <generator class="assigned" />
         </id>
+    </class>
+
+    <!-- XWikiDocumentIndexingTask custom mapping-->
+    <class name="org.xwiki.doc.tasks.XWikiDocumentIndexingTask" table="xwikidocumentindexingqueue">
+        <id name="id" column="XWT_ID">
+            <generator class="native"/>
+        </id>
+        <!-- Stores the queued tasks as well as the running tasks. -->
+        <property name="docId" column="XWT_DOC_ID" type="long"/>
+        <property name="version" column="XWT_VERSION" type="string" length="39" not-null="false"/>
+        <property name="type" column="XWT_TYPE" type="string" length="100"/>
+        <property name="instanceId" column="XWT_INSTANCE_ID" type="string" length="100"/>
+
+        <!-- The timestamp of creation of the task. Used to prioritize tasks. -->
+        <property name="timestamp" type="timestamp" column="XWT_TIMESTAMP" index="TASK_TIMESTAMP" not-null="true"/>
     </class>
 </hibernate-mapping>

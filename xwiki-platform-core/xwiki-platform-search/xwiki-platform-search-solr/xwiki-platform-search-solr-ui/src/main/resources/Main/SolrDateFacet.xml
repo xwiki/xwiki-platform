@@ -388,7 +388,8 @@
     var form = $(this).find('form').hide();
 
     // Toggle the form when the user selects the corresponding option. We pass null to prevent animation.
-    $(this).find('.itemName').prev('input[type="checkbox"]').removeClass('hidden').click($.proxy(form, 'toggle', null));
+    $(this).find('.itemName').prev('input[type="checkbox"]').removeClass('hidden')
+      .on('click', form.toggle.bind(form, null));
 
     // Use the client TimeZone when searching and displaying dates on the server.
     // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
@@ -523,7 +524,7 @@
     </property>
     <property>
       <code>.search-facet-body .customDateInterval label {
-  display: block;
+  display: flex;
 }
 .search-facet-body .customDateInterval .itemName {
   cursor: pointer;

@@ -79,7 +79,8 @@ widgets.ModalPopup = Class.create({
     }
     // Add the close button
     if (this.options.displayCloseButton) {
-      var closeButton = new Element('div', {'class': 'xdialog-close', 'title': 'Close'}).update("&#215;");
+      var closeButton = new Element('button', {'class': 'close xdialog-close', 'title': 'Close'})
+        .update("$!escapetool.javascript($services.icon.renderHTML('cross'))");
       closeButton.observe("click", this.closeDialog.bindAsEventListener(this));
       if (this.options.title) {
         title.insert({bottom: closeButton});
@@ -98,10 +99,10 @@ widgets.ModalPopup = Class.create({
     });
     switch(this.options.verticalPosition) {
       case "top":
-        this.dialogBox.setStyle({"top": "0"});
+        this.dialogBox.setStyle({"top": "30px"});
         break;
       case "bottom":
-        this.dialogBox.setStyle({"bottom": "0"});
+        this.dialogBox.setStyle({"bottom": "30px"});
         break;
       default:
         // TODO: smart alignment according to the actual height
@@ -212,7 +213,7 @@ widgets.ModalPopup = Class.create({
     var shortcuts = this.shortcuts[action].keys;
     var method = this.shortcuts[action].method.bindAsEventListener(this, action);
     var options = this.shortcuts[action].options;
-    for (var i = 0; i < shortcuts.size(); ++i) {
+    for (var i = 0; i < shortcuts.length; ++i) {
       shortcut.add(shortcuts[i], method, options);
     }
   },
@@ -222,7 +223,7 @@ widgets.ModalPopup = Class.create({
    * @param {String} action The action to unregister {@see #shortcuts}
    */
   unregisterShortcuts : function(action) {
-    for (var i = 0; i < this.shortcuts[action].keys.size(); ++i) {
+    for (var i = 0; i < this.shortcuts[action].keys.length; ++i) {
       shortcut.remove(this.shortcuts[action].keys[i]);
     }
   },

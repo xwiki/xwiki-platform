@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Main.WebHome" locale="">
+<xwikidoc version="1.4" reference="Main.WebHome" locale="">
   <web>Main</web>
   <name>WebHome</name>
   <language/>
@@ -35,178 +35,44 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" title="YouTube video of XWiki" role="presentation" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
-
-= Welcome to your wiki =
+  <content>== Welcome to your wiki ==
 
 XWiki is the best tool to organize your knowledge. A //wiki// is organized in a hierarchy of //pages//. You can create multiple wikis, each with its own set of pages.
 
 XWiki can be used as a knowledge base (support, documentation, sales, etc.), for collaborative workspaces or even as a complete intranet.
 
-= The basics =
+== The basics ==
 
 To make the most out of your wiki, log-in and:
 
-Use the {{velocity}}$services.icon.render('pencil'){{/velocity}} button above to //edit// this page and start customizing your wiki to your needs.
+Use the {{displayIcon name="pencil"/}} button above to //edit// this page and start customizing your wiki to your needs.
 
-Use the {{velocity}}$services.icon.render('add'){{/velocity}} button above to //add// more pages to your wiki and create the //hierarchy// that best organizes your content.
+Use the {{displayIcon name="add"/}} button above to //add// more pages to your wiki and create the //hierarchy// that best organizes your content.
 
-Use the {{velocity}}$services.icon.render('home'){{/velocity}} breadcrumbs located above the title to //navigate// inside your pages. It's easy to get lost in a big wiki without them.
+Use the {{displayIcon name="home"/}} breadcrumbs located above the title to //navigate// inside your pages. It's easy to get lost in a big wiki without them.
 
 You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
 
- {{box}}
-Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
-{{/box}}
+ {{box}}Learn more on how to use XWiki with the [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
-(%class="row"%)
+(% class="row" %)
 (((
-(%class="col-xs-12 col-sm-6"%)
+(% class="col-xs-12 col-sm-6" %)
 (((
-= Extend your wiki =
+== Extend your wiki ==
 
-To extend the power and functionalities of your wiki with the features that //you// need, head over to the {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} where you can search for and install extensions.
+To extend the power and functionalities of your wiki with the features that //you// need, head over to the [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] where you can search for and install extensions.
 
-To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
+To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]].
 )))
 
-(%class="col-xs-12 col-sm-6"%)
+(% class="col-xs-12 col-sm-6" %)
 (((
-= Create your application =
+== Create your application ==
 
 Go beyond the available extensions and define the //structure// of your data based on //your// needs, creating //your// own applications with [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
 
 AWM will take care of making it easy for you and your users to create and manage the data.
 )))
 )))</content>
-  <object>
-    <name>Main.WebHome</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>15760afa-b3b1-4e26-aee1-3168d8e4a621</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <defaultValue>long</defaultValue>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.floatinginfobox iframe {
-  border: 0;
-  height: 169px;
-  width: 100%;
-}</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse/>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
 </xwikidoc>

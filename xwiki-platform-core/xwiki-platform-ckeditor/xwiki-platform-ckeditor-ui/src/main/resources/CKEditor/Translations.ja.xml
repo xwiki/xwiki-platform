@@ -1,0 +1,215 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="ja">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=無効化されたプラグイン
+CKEditor.ConfigClass_removePlugins.hint=無効化されたプラグインのリスト。
+CKEditor.ConfigClass_removeButtons=無効化されたツールバーの機能
+CKEditor.ConfigClass_removeButtons.hint=無効化されたツールバーの機能の一覧。
+CKEditor.ConfigClass_linkShowAdvancedTab=リンク：高度なタブを表示
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=ID、name、クラス、スタイルなどのリンク属性を設定できます。
+CKEditor.ConfigClass_linkShowTargetTab=リンク：ターゲットのタブを表示
+CKEditor.ConfigClass_linkShowTargetTab.hint=リンクのターゲット属性（例：新しいタブでリンクを開く）の設定を許可。
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=JavaScriptのスキンの拡張機能を読み込む
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=いくつかのレンダリングマクロはJavaScriptのコードを使って表示されます。JavaScriptのコードを読み込むとWYSIWYGが改善されますが、JavaScriptのコードがCKEditorのコードに干渉したり、マクロの出力の境界の外でコンテンツを変更したりする場合、問題が生じる可能性があります。
+CKEditor.ConfigClass_advanced=高度な設定
+CKEditor.ConfigClass_advanced.hint=JavaScriptのスニペットで、設定オブジェクトを直接変更することができます。{0}CKEditorのドキュメンテーション{1}で、利用可能な設定プロパティーの一覧を確認できます。
+ckeditor.content.placeholder=ここに入力してください…
+ckeditor.admin.saveComment=管理機能からCKEditorの設定を更新しました
+ckeditor.admin.reset=リセット
+ckeditor.admin.reset.hint=既定の設定を復元
+ckeditor.admin.reset.confirmation=既定の設定を復元してよろしいですか？全ての変更が失われます。
+ckeditor.plugin.link.options=設定
+ckeditor.plugin.link.anchor=アンカー
+ckeditor.plugin.link.queryString=クエリー文字列
+ckeditor.plugin.link.defaultLabel=リンクのラベルを入力
+ckeditor.plugin.link.openInNewTab=リンクを新しいタブで開く
+ckeditor.plugin.list.listType.none=なし
+ckeditor.plugin.macro.placeholder=マクロ：{0}
+ckeditor.plugin.macro.buttonHint=XWikiマクロ
+ckeditor.plugin.macro.editButtonHint=マクロを編集
+ckeditor.plugin.macro.refreshFailed=編集したコンテンツを再読み込みできませんでした。
+ckeditor.plugin.macro.dedicatedInsertButtonHint={0}マクロを挿入
+ckeditor.plugin.office.importer.title=Officeファイルをインポート
+ckeditor.plugin.office.importer.filePath=ファイルのパス
+ckeditor.plugin.office.importer.filePath.hint=インポートするOfficeファイルを選択してください。ファイルをアップロードしてページに添付し、ファイルの内容をページのコンテンツに挿入します。
+ckeditor.plugin.office.importer.filterStyles=スタイルをフィルタリング
+ckeditor.plugin.office.importer.filterStyles.hint=フォント、色、並べ方、マージンなどに関するテキストのスタイルをフィルタリング。ヘッダーのレベル、段落、リスト、表など内容の構造は保存されます。
+ckeditor.plugin.office.importer.useOfficeViewer=Officeビューワーを使用
+ckeditor.plugin.office.importer.useOfficeViewer.hint=インポートした後にOfficeファイルの内容を変更する予定、または、Officeファイルの内容を現在編集中のコンテンツと合わせる予定がない場合は、このオプションをチェックしてください。
+ckeditor.plugin.office.importer.required=必須
+ckeditor.plugin.office.importer.import=インポート
+ckeditor.plugin.office.importer.inProgress=Officeファイルをインポートしています…
+ckeditor.plugin.office.importer.done=Officeファイルをインポートしました。
+ckeditor.plugin.office.importer.fail=Officeファイルをインポートできませんでした。
+ckeditor.plugin.office.importer.noUploadURL=ファイルのアップロードURLが設定されていません。
+ckeditor.plugin.office.importer.failedToLoadForm=フォームを読み込めませんでした。
+ckeditor.plugin.resource.notSpecified={0}は指定されていません。
+ckeditor.plugin.save.leaveConfirmationMessage=保存していない変更があります。変更を破棄してよろしいですか？
+ckeditor.plugin.save.failed=CKEditorの内部エラーのためコンテンツを保存できません。重要な変更をコピーして、エディターを再読み込みしてください。
+ckeditor.plugin.source.conversionFailed=変換できませんでした。
+ckeditor.plugin.toolbar.basicStyles=基本的なスタイル
+ckeditor.plugin.toolbar.lists=リスト
+ckeditor.plugin.toolbar.bulletedlist=箇条書きリスト
+ckeditor.plugin.toolbar.numberedlist=番号付きリスト
+ckeditor.plugin.toolbar.insert=挿入
+ckeditor.plugin.toolbar.horizontalrule=水平線
+ckeditor.plugin.toolbar.specialchar=特殊文字
+ckeditor.plugin.toolbar.infoBox=情報メッセージ
+ckeditor.plugin.toolbar.successBox=成功メッセージ
+ckeditor.plugin.toolbar.warningBox=警告メッセージ
+ckeditor.plugin.toolbar.errorBox=エラーメッセージ
+ckeditor.plugin.toolbar.toc=目次
+ckeditor.plugin.toolbar.include=含める
+ckeditor.plugin.toolbar.code=コードスニペット
+ckeditor.plugin.toolbar.otherMacros=他のマクロ
+ckeditor.plugin.syntax.update.inProgress=WYSIWYGエディターを更新しています
+ckeditor.plugin.syntax.update.done=WYSIWYGエディターを更新しました
+ckeditor.plugin.syntax.update.failed=WYSIWYGエディターを更新できませんでした
+ckeditor.plugin.syntax.wysiwygModeUnsupported={0}のシンタックスはWYSIWYGの編集モードをサポートしていません。
+ckeditor.plugin.image.imageEditor.standardTab.title=標準
+ckeditor.plugin.image.imageEditor.advancedTab.title=高度
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=画像のスタイル
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=画像に適用するスタイルを選択してください。
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=代替テキスト
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=画像が表示できない場合のために、画像の代替テキストを規定してください。
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=キャプション
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=画像のキャプションを有効化して規定。
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=画像のキャプションを有効化して規定。
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=サイズ
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=幅
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=高さ
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=画像のサイズを規定してください。
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=枠
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=チェックすると、画像に枠線を付けて表示します
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=配置
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=画像の配置を規定してください。
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=なし
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=先端
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=中央
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=末端
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=テキストの回り込み
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=チェックすると、画像の周囲をテキストが回り込みます。
+ckeditor.plugin.image.imageSelector.treeTab.title=ツリー
+ckeditor.plugin.image.imageSelector.uploadTab.title=アップロード
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=ファイル
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=ページに追加するローカルファイルを選択してください。
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=アップロード
+ckeditor.plugin.image.imageSelector.iconTab.title=アイコン
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=アイコン
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=画像として表示するアイコンの識別子。
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=許可
+ckeditor.plugin.image.imageSelector.urlTab.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.title=URL
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=表示する画像のURL。
+ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.inline.failedToInit=CKEditorを初期化できませんでした。
+ckeditor.upload.error.csrf=CSRFトークンがありません。
+ckeditor.upload.error.emptyReturn=ファイルのアップロードの際のエラー：設定されている最大のアップロードのサイズを超えているかもしれません。
+modal.ok=OK
+modal.cancel=キャンセル
+modal.close=閉じる
+resource.attach.label=添付ファイル
+resource.attach.placeholder=ページ.への.パス@attachment.png
+### Missing: resource.data.label=Data URI
+resource.doc.label=ページ
+resource.doc.placeholder=ページ.への.パス
+resource.icon.label=アイコン
+resource.mailto.label=メールアドレス
+resource.mailto.placeholder=user@example.org
+resource.path.label=パス
+resource.path.placeholder=/ファイル/への/パス
+resource.unc.label=UNCパス
+resource.unc.placeholder=//server/share/ファイルへのパス
+resource.unknown.label=不明
+resource.url.label=URL
+### Missing: resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=ユーザー
+resource.user.placeholder=エイリアス
+resourcePicker.attach.hint=添付ファイルを選択
+resourcePicker.doc.hint=ページを選択してください
+entityResourceSuggester.doc.placeholder=ページを探す…
+entityResourceSuggester.attach.placeholder=添付ファイルを探す…
+entityResourcePicker.select=選択
+entityResourcePicker.doc.title=ページを選択
+entityResourcePicker.attach.title=添付ファイルを選択
+macroSelector.title=マクロを選択
+macroSelector.filter.text.placeholder=入力してフィルタリング
+macroSelector.filter.category.all=全てのマクロ
+macroSelector.filter.category.other=その他
+macroSelector.filter.category.notinstalled=インストールされていません
+macroSelector.failedToRetrieveMacros=利用できるマクロのリストを取得できませんでした。
+macroSelector.select=選択
+macroSelector.recommended=推奨
+macroSelector.install=インストール
+macroSelector.install.confirm=拡張機能{0} {1}をインストールします。続行してよろしいですか？
+macroSelector.install.notAllowed=この拡張機能のインストールは許可されていません
+macroSelector.filter.category.placeholder=カテゴリーを選択…
+macroEditor.title=マクロを編集
+macroEditor.more=その他
+macroEditor.changeMacro=マクロを変更
+macroEditor.submit=送信
+macroEditor.content=内容
+macroEditor.noParameters=このマクロにはパラメーターがありません。
+macroEditor.descriptorRequestFailed={0}のマクロの記述子を取得できませんでした。
+macroEditor.installRequestFailed={0}のマクロをインストールできませんでした。
+
+
+imageEditor.modal.changeImage.button=画像を変更
+imageEditor.modal.loadFail.message=画像エディターフォームを取得できませんでした。
+imageEditor.modal.title=画像を編集
+imageEditor.modal.insertButton=挿入
+imageEditor.modal.initialization.fail=画像の選択フォームを取得できませんでした。
+imageSelector.modal.title=画像を選択
+imageSelector.modal.selectButton=選択
+imageSelector.modal.loadFail.message=画像の選択フォームを取得できませんでした。
+imageSelector.modal.fileUpload.success=ファイルをアップロードしました。
+imageSelector.modal.fileUpload.fail=ファイルをアップロードできませんでした。
+imageSelector.modal.fileUpload.abort=ファイルのアップロードを中止しました。
+imageSelector.modal.initialization.fail=画像の選択フォームを取得できませんでした。
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+imageEditor.modal.backToEditor.button=戻る
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=ドキュメントツリー
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

@@ -32,6 +32,8 @@ import org.xwiki.search.solr.internal.DefaultSolr;
 import org.xwiki.search.solr.internal.DefaultSolrConfiguration;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.EmbeddedSolr;
+import org.xwiki.search.solr.internal.SolrSchemaUtils;
+import org.xwiki.test.XWikiPropertiesMemoryConfigurationSource;
 import org.xwiki.test.annotation.ComponentList;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -56,7 +58,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     ConvertUtilsConverter.class,
     DefaultSolrConfiguration.class,
     EnumConverter.class,
-    ContextComponentManagerProvider.class
+    ContextComponentManagerProvider.class,
+    XWikiPropertiesMemoryConfigurationSource.class,
+    SolrSchemaUtils.class
 })
 @Inherited
 public @interface SolrComponentList

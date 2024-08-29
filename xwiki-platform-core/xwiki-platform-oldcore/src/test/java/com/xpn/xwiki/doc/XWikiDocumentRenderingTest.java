@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.io.Reader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,12 +30,14 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.mockito.MockitoComponentManager;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.DefaultVelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.api.Document;
@@ -47,6 +48,8 @@ import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -90,18 +93,14 @@ public class XWikiDocumentRenderingTest
     private XWiki xwiki;
 
     @BeforeEach
-    public void setupComponents() throws Exception
+    public void setup() throws Exception
     {
+        this.xwiki = this.oldcore.getSpyXWiki();
+
         // Setup display configuration.
         this.displayConfiguration = this.componentManager.registerMockComponent(DisplayConfiguration.class);
         when(this.displayConfiguration.getDocumentDisplayerHint()).thenReturn("default");
         when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
-    }
-
-    @BeforeEach
-    public void setup() throws Exception
-    {
-        this.xwiki = this.oldcore.getSpyXWiki();
 
         DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
         this.document = new XWikiDocument(documentReference);
@@ -134,7 +133,14 @@ public class XWikiDocumentRenderingTest
         this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
 
         when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
-        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenAnswer(invocationOnMock -> {
+            if (List.of(Right.SCRIPT, Right.PROGRAM).contains(invocationOnMock.getArgument(0))) {
+                RenderingContext renderingContext = this.oldcore.getMocker().getInstance(RenderingContext.class);
+                return !renderingContext.isRestricted();
+            } else {
+                return true;
+            }
+        });
         when(this.xwiki.getRightService().hasProgrammingRights(any())).thenReturn(true);
 
         this.componentManager
@@ -175,6 +181,16 @@ public class XWikiDocumentRenderingTest
     }
 
     @Test
+    void getRenderedTitleRestricted()
+    {
+        this.document.setRestricted(true);
+        // Title with velocity that shouldn't be evaluated
+        String title = "#set($key = \"title\")$key";
+        this.document.setTitle(title);
+        assertEquals(title, this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
     public void getRenderedTitleInHTMLWhenExtractedFromContent()
     {
         // Configure XWiki to extract title from content
@@ -206,6 +222,19 @@ public class XWikiDocumentRenderingTest
 
         this.document.setContent("content not in section\n=== header 3===");
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void getRenderedTitleWhenRestricted()
+    {
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+        this.document.setRestricted(true);
+
+        this.document.setContent("content not in section\n"
+            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        assertThat(this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()),
+            startsWith("<span class=\"xwikirenderingerror\">Failed to execute the [groovy] macro."));
     }
 
     @Test
@@ -291,16 +320,10 @@ public class XWikiDocumentRenderingTest
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
         vcontext.put("doc", new Document(this.document, this.oldcore.getXWikiContext()));
 
-        // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
-        VelocityManager velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
-        when(velocityManager.getCurrentVelocityContext()).thenReturn(vcontext);
-
-        VelocityFactory velocityFactory = this.componentManager.getInstance(VelocityFactory.class);
-        VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
-        when(velocityManager.getVelocityEngine()).thenReturn(vengine);
-        when(velocityManager.evaluate(any(), any(), any()))
-            .thenAnswer(invocation -> vengine.evaluate(vcontext, invocation.getArgument(0),
-                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
+        // Use the commons version of the VelocityManager to bypass skin APIs that we would need to mock otherwise.
+        this.componentManager.registerComponent(DefaultVelocityManager.class);
+        this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
+            vcontext);
 
         // Verify that the macro located inside the TextArea has been taken into account when executing the doc's
         // content.
@@ -345,6 +368,46 @@ public class XWikiDocumentRenderingTest
         // Verifies that a security document is always set,  independently of what was set before the execution of
         // getRenderedContent().
         assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    void getRenderedContentSetsRestrictedRendering() throws Exception
+    {
+        XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
+        otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));
+        XWikiDocument sdoc = new XWikiDocument(new DocumentReference("callerwiki", "callerspace", "callerpage"));
+        Document apiDocument = this.document.newDocument(this.oldcore.getXWikiContext());
+
+        String content = "{{velocity}}test{{/velocity}}";
+
+        this.document.setRestricted(true);
+        this.document.setContent(content);
+        this.oldcore.getXWikiContext().setDoc(null);
+
+        // Verify that the Velocity macro is not executed.
+        assertThat(this.document.getRenderedContent(this.oldcore.getXWikiContext()),
+            startsWith("<div class=\"xwikirenderingerror\">Failed to execute the [velocity] macro."));
+
+        this.document.setRestricted(false);
+
+        assertEquals("<p>test</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
+
+        this.oldcore.getXWikiContext().setDoc(otherDocument);
+
+        assertEquals("<p>test</p>", apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
+
+        otherDocument.setRestricted(true);
+
+        assertThat(apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()),
+            startsWith("<div class=\"xwikirenderingerror\">Failed to execute the [velocity] macro."));
+
+        this.oldcore.getXWikiContext().put("sdoc", sdoc);
+        assertEquals("<p>test</p>", apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
+
+        sdoc.setRestricted(true);
+
+        assertThat(apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()),
+            startsWith("<div class=\"xwikirenderingerror\">Failed to execute the [velocity] macro."));
     }
 
     @Test

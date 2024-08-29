@@ -66,12 +66,6 @@ public abstract class AbstractDistributionStep implements DistributionStep
                 setState(previousStep.getState());
             }
         }
-
-        // Custom preparation
-
-        if (getState() == null) {
-            prepare();
-        }
     }
 
     @Override

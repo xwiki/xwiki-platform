@@ -24,6 +24,7 @@ import org.xwiki.eventstream.query.CompareQueryCondition;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -49,6 +50,14 @@ public class EqualEventQueryTest
         assertEquals("value1", ((CompareQueryCondition) query.getConditions().get(0)).getValue());
         assertEquals("key2", ((CompareQueryCondition) query.getConditions().get(1)).getProperty());
         assertEquals("value2", ((CompareQueryCondition) query.getConditions().get(1)).getValue());
+
+        SimpleEventQuery queryStatus = new SimpleEventQuery(0, 0)
+            .eq(Event.FIELD_ID, "id1")
+            .withStatus("bar");
+        SimpleEventQuery queryMail = new SimpleEventQuery(0, 0)
+            .eq(Event.FIELD_ID, "id1")
+            .withMail("bar");
+        assertNotEquals(queryMail, queryStatus);
     }
 
     @Test

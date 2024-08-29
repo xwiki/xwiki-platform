@@ -73,7 +73,7 @@ public class EventUserFilter implements NotificationFilter
         if (preferencesGetter.isUserExcluded(eventUserId, filterPreferences, format)) {
             return FilterPolicy.FILTER;
         }
-        if (preferencesGetter.isUsedFollowed(eventUserId, filterPreferences, format)) {
+        if (preferencesGetter.isUserFollowed(eventUserId, filterPreferences, format)) {
             return FilterPolicy.KEEP;
         }
         return FilterPolicy.NO_EFFECT;

@@ -30,56 +30,49 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Página Inicial</title>
+  <title>Home</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{box cssClass="floatinginfobox"}}
-{{velocity}}
-{{html clean="false"}}
-## Chrome's XSS Auditor blocks the preview action if:
-## * the submitted content has an iframe with an external URL
-## * the preview action displays the submitted iframe
-## The workaround is to make sure the submitted content (the macro markers) don't match the preview HTML.
-## See XWIKI-14818: Preview triggers ERR_BLOCKED_BY_XSS_AUDITOR in Chrome
-#set ($iframe = 'iframe')
-&lt;$iframe src="https://www.youtube.com/embed/9QTWrZ7OfzI" allowfullscreen&gt;&lt;/$iframe&gt;
-{{/html}}
-{{/velocity}}
-{{/box}}
+  <content>== Bem-vindo ao seu wiki ==
 
-= Bem vindo ao seu wiki =
+XWiki é a melhor ferramenta para organizar seu conhecimento. Um //wiki// é organizado em uma hierarquia de //páginas//. Você pode criar vários wikis, cada um com seu próprio conjunto de páginas.
 
-XWiki é a melhor ferramenta para organizar seus conhecimentos. Um //wiki// está organizado em uma hierarquia de //páginas//. Você pode criar multiplos wikis, cada um com suas devidas páginas.
+O XWiki pode ser utilizado como base de conhecimento (suporte, documentação, vendas, etc.), para espaços de trabalho colaborativos ou até mesmo como uma intranet completa.
 
-XWiki pode ser usado como uma base de conhecimento (suporte, documentação, vendas, etc.), para espaços colaborativos ou até mesmo para uma completa intranet.
+== O básico ==
 
-= O básico =
+Para aproveitar ao máximo seu wiki, faça login e:
 
-Para fazer a maioria de seus wikis, faça o login e:
+Use o botão {{displayIcon name="pencil"/}} acima para //editar// esta página e começar a personalizar seu wiki de acordo com suas necessidades.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;{{/html}} para //editar// esta página e começar a customizar da maneira que você precisar.
+Use o botão {{displayIcon name="add"/}} acima para //adicionar// mais páginas ao seu wiki e criar a //hierarquia// que melhor organiza seu conteúdo.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;{{/html}} para //adicionar// mais páginas para seu wiki e criar a //hierarquia// que melhor organiza seus conteúdos.
+Use a localização atual {{displayIcon name="home"/}} localizada acima do título para //navegar// dentro de suas páginas. É fácil se perder em uma grande wiki sem eles.
 
-Use o botão {{html clean="false"}}&lt;span class="glyphicon glyphicon-home fa fa-home"&gt;&lt;/span&gt;&lt;span class="fa fa-caret-down"&gt;&lt;/span&gt;{{/html}} localizado acima do título para //navegar// dentro de suas páginas. É fácil de perder em um gigante wiki sem essa navegação.
+Você também pode usar o [[Sandbox&gt;&gt;Sandbox.WebHome]] para obter mais conteúdo de demonstração e geralmente um lugar para experimentar os recursos do seu wiki. 
 
-Você pode também utilizar a  [[Sandbox&gt;&gt;Sandbox.WebHome]] para mais demostração de conteúdos e geralmente será um lugar para experimentar as funcionalidades de seu wiki. 
+ {{box}}Saiba mais sobre como usar o XWiki com o [[Guia de primeiros passos&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
-{{box}}Aprenda mais a utilizar o XWiki com o {{velocity}}[[Guia para iniciantes&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+(% class="row" %)
+(((
+(% class="col-xs-12 col-sm-6" %)
+(((
+== Amplie seu wiki ==
 
-|(((
-= Amplie seu wiki =
+Para ampliar o poder e as funcionalidades do seu wiki com os recursos que //você// precisa, vá até o [[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] onde você pode procurar e instalar extensões.
 
-Para estender o poder e funcionalidades de seu XWiki com as características que //você// precisa, verifique o  {{velocity}}[[Gerenciador de extensões&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} onde você pode procurar e instalar complementos.
+Para navegar pelas mais de 900 extensões contribuídas pela comunidade disponíveis para o XWiki, acesse o [[Repositório de Extensões&gt;&gt;https://extensions.xwiki.org]].
+)))
 
-Para navegar através dos + de 900 complementos contribuidos pela comunidade, verifique o [[Repositório de Complementos&gt;&gt;http://extensions.xwiki.org]].
-)))|(((
-= Crie sua aplicação =
+(% class="col-xs-12 col-sm-6" %)
+(((
+== Crie seu aplicativo ==
 
-Vá além dos complementos disponívels e defina a //estrutura// de seus dados baseado nas //suas// necessidades, criando //suas// próprias aplicações com o [[App em Minutos&gt;&gt;AppWithinMinutes]] (AWM). 
+Vá além das extensões disponíveis e defina a //estrutura// de seus dados com base em //suas// necessidades, criando //suas// próprias aplicações com [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 
 
-AWM vai cuidar de tornar mais fácil para //você// e seus usuários criar e gerenciar os dados.
+AWM se encarregará de facilitar para você e seus usuários a criação e o gerenciamento dos dados.
+)))
 )))</content>
 </xwikidoc>

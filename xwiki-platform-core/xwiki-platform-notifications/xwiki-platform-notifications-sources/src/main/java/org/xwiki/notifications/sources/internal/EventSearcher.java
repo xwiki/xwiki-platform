@@ -31,12 +31,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.EventStreamConfiguration;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 
 /**
@@ -50,22 +48,16 @@ import org.xwiki.query.QueryException;
 public class EventSearcher
 {
     @Inject
-    private EventStream eventStream;
+    protected EventStore eventStore;
 
     @Inject
-    private EventStore eventStore;
+    protected EventQueryGenerator eventQueryGenerator;
 
     @Inject
-    private QueryGenerator queryGenerator;
+    protected EventStreamConfiguration configuration;
 
     @Inject
-    private EventQueryGenerator eventQueryGenerator;
-
-    @Inject
-    private EventStreamConfiguration configuration;
-
-    @Inject
-    private Logger logger;
+    protected Logger logger;
 
     /**
      * @param offset the index where to start returning events
@@ -80,15 +72,10 @@ public class EventSearcher
     {
         // Try event store if enabled
         if (this.configuration.isEventStoreEnabled()) {
-            try {
-                return searchStoreEvents(offset, limit, parameters);
-            } catch (EventStreamException e) {
-                this.logger.debug("Failed to get events from the EventStore. Trying on the legacy store", e);
-            }
+            return searchStoreEvents(offset, limit, parameters);
         }
 
-        // Fallback on legacy event stream
-        return searchStreamEvents(offset, limit, parameters);
+        return Collections.emptyList();
     }
 
     /**
@@ -96,7 +83,6 @@ public class EventSearcher
      * @param limit the maximum number of events to return
      * @param parameters parameters to use
      * @return the found events
-     * @throws QueryException when to search the events
      * @throws EventStreamException when to search the events
      */
     public List<Event> searchStoreEvents(int offset, int limit, NotificationParameters parameters)
@@ -108,30 +94,10 @@ public class EventSearcher
         query.setLimit(limit).setOffset(offset);
 
         // Get a batch of events
-        EventSearchResult result = this.eventStore.search(query);
-
-        return result.stream().collect(Collectors.toList());
-    }
-
-    /**
-     * @param offset the index where to start returning events
-     * @param limit the maximum number of events to return
-     * @param parameters parameters to use
-     * @return the found events
-     * @throws QueryException when to search the events
-     * @throws EventStreamException when to search the events
-     */
-    public List<Event> searchStreamEvents(int offset, int limit, NotificationParameters parameters)
-        throws QueryException, EventStreamException
-    {
-        // Create the query
-        Query query = this.queryGenerator.generateQuery(parameters);
-        if (query == null) {
-            return Collections.emptyList();
+        try (EventSearchResult result = this.eventStore.search(query)) {
+            return result.stream().collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to close the event search result", e);
         }
-        query.setLimit(limit).setOffset(offset);
-
-        // Get a batch of events
-        return this.eventStream.searchEvents(query);
     }
 }

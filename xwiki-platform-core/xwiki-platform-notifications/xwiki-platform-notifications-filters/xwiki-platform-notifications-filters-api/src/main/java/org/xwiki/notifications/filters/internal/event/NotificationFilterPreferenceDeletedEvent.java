@@ -20,8 +20,14 @@
 package org.xwiki.notifications.filters.internal.event;
 
 /**
- * Event generated when a notification filter preference is deleted.
- * 
+ * Event generated when notification filter preferences are deleted.
+ * The event is sent with the following information:
+ * <ul>
+ *     <li>source: either a DocumentReference representing the user who used to own the filter, or a WikiReference
+ *     if it was a filter set for a wiki</li>
+ *     <li>data: the actual identifiers of the filter as a {@code Set<String>}</li>
+ * </ul>
+ *
  * @version $Id$
  * @since 10.11.4
  * @since 11.2

@@ -36,17 +36,26 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>panels.available=Доступные Панели
+  <content>panels.available=Доступные панели
 panels.name=Название
 panels.description=Описание
 panels.type=Тип
 panels.category=Категория
 panels._actions=Действия
-panels.emptyvalue=
-panels.children.title=Дочерние Страницы
-panels.siblings.title=Родственные Страницы
+### Missing: panels.emptyvalue=
+panels.children.title=Дочерние страницы
+panels.siblings.title=Родственные страницы
+panels.customize=Вы можете настроить боковую колонку (колонки) с помощью {0}
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=Настройка синтаксиса
 panels.documentInformation.confirmChangeSyntaxWysiwyg=Хотите также преобразовать в выбранный синтаксис содержимое документа и его объекты? 'Отмена' сбросит синтаксис на предыдущий и ничего не произойдёт. Учтите, что при нажатии 'ОК' изменения будут потеряны и документ будет автоматически сохранен, вы сможете отменить преобразование перейдя в историю документа и восстановив последнюю версию.
 panels.documentInformation.confirmChangeSyntax=Хотите также преобразовать в выбранный синтаксис содержимое документа и его объекты? 'Отмена' только изменит идентификатор синтаксиса без преобразования содержимого документа. Учтите, что при нажатии 'ОК' документ будет автоматически сохранен, вы сможете отменить это изменение, перейдя в историю документа и восстановив последнюю версию.
-panels.documentInformation.failedSyntaxConversion=Не удалось преобразовать в выбранный синтаксис. Если хотите всё равно использовать этот синтаксис, то вы должны снова его выбрать, но не выполнять преобразование.</content>
+panels.documentInformation.failedSyntaxConversion=Не удалось преобразовать в выбранный синтаксис. Если хотите всё равно использовать этот синтаксис, то вы должны снова его выбрать, но не выполнять преобразование.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

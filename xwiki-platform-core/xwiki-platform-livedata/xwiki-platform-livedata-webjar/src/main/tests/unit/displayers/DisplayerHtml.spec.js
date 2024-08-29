@@ -28,6 +28,24 @@ describe('DisplayerHtml.vue', () => {
         entry: {
           color: '<strong>some content</strong>'
         }
+      },
+      logic: {
+        isContentTrusted: () => true
+      }
+    })
+    expect(wrapper.find('.html-wrapper').html())
+      .toBe('<div class="html-wrapper"><strong>some content</strong></div>')
+  })
+
+  it('Renders an entry in view mode with untrusted content', () => {
+    const wrapper = initWrapper(DisplayerHtml, {
+      props: {
+        entry: {
+          color: '<strong>some content<script>console.log("hello world")</script></strong>'
+        }
+      },
+      logic: {
+        isContentTrusted: () => false
       }
     })
     expect(wrapper.find('.html-wrapper').html())

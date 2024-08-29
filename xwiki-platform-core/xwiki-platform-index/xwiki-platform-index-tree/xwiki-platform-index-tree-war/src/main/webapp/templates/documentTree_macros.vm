@@ -24,7 +24,7 @@
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'exclusions': $collectiontool.set,
-  'filters': [],
+  'filters': ['pinnedChildPages'],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
@@ -106,8 +106,6 @@
   ## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
   ## SSX instead.
   #set ($discard = $xwiki.ssx.use('IconThemes.FontAwesome'))
-  ## Include also the fix for the FontAwesome loading issue on IE8.
-  #set ($discard = $xwiki.jsx.use('IconThemes.FontAwesome'))
   #set ($_options = $macro.options)
   #tree($_options)
 #end

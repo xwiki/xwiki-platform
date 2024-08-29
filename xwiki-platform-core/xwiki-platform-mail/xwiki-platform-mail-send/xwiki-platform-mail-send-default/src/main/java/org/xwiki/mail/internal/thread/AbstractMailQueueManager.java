@@ -60,6 +60,12 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     }
 
     @Override
+    public boolean addMessageToQueue(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
+    {
+        return getMailQueue().offer(mailQueueItem, timeout, unit);
+    }
+
+    @Override
     public boolean hasMessage()
     {
         return !getMailQueue().isEmpty();

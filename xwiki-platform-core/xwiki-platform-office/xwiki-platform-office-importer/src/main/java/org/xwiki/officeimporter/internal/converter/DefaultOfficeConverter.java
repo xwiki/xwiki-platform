@@ -25,9 +25,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DocumentFamily;
 import org.jodconverter.core.document.DocumentFormat;
-import org.jodconverter.local.LocalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.officeimporter.converter.OfficeConverter;
@@ -52,7 +52,7 @@ public class DefaultOfficeConverter implements OfficeConverter
     /**
      * Converter provided by JODConverter library.
      */
-    private LocalConverter converter;
+    private DocumentConverter converter;
 
     /**
      * Working directory to be used when working with files.
@@ -65,7 +65,7 @@ public class DefaultOfficeConverter implements OfficeConverter
      * @param converter provided by JODConverter library.
      * @param workDir space for holding temporary file.
      */
-    public DefaultOfficeConverter(LocalConverter converter, File workDir)
+    public DefaultOfficeConverter(DocumentConverter converter, File workDir)
     {
         this.converter = converter;
         this.workDir = workDir;
@@ -91,6 +91,9 @@ public class DefaultOfficeConverter implements OfficeConverter
             // Prepare temporary storage.
             OfficeConverterFileStorage storage = new OfficeConverterFileStorage(this.workDir, inputFileName,
                 outputFileName);
+
+            // Check that the potentially cleaned filename is actually in the input streams.
+            this.checkInputStream(inputStreams, storage.getInputFile().getName());
 
             // Write out all the input streams.
             for (Map.Entry<String, InputStream> entry : inputStreams.entrySet()) {
@@ -140,6 +143,6 @@ public class DefaultOfficeConverter implements OfficeConverter
     {
         String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
         DocumentFormat format = this.converter.getFormatRegistry().getFormatByExtension(extension);
-        return new DefaultOfficeDocumentFormat(format);
+        return format != null ? new DefaultOfficeDocumentFormat(format) : null;
     }
 }

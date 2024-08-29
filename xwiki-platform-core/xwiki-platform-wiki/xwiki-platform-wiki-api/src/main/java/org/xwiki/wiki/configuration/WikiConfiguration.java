@@ -35,4 +35,14 @@ public interface WikiConfiguration
      * when path mode is used.
      */
     String getAliasSuffix();
+
+    /**
+     * @return if XWiki should create the database (and/or schema/user depending on the DB) for the new wiki or not.
+     *         Default is true.
+     * @since 14.9RC1
+     */
+    default boolean shouldCreateDatabase()
+    {
+        return true;
+    }
 }

@@ -20,11 +20,12 @@
 #template('colorThemeInit.vm')
 
 #macro(concatenateQueryParameter $originalUrl $queryString)
-  #if ($originalUrl.contains("?"))
-    $originalUrl&$queryString
-  #else
-    $originalUrl?$queryString
-  #end
+## No indent here as it causes whitespace in the output.
+#if ($originalUrl.contains("?"))
+$originalUrl&#38;$queryString## prevent line break in output
+#else
+$originalUrl?$queryString## prevent line break in output
+#end
 #end
 
 ## The default stylesheet configuration option allows to override the default style.css CSS
@@ -41,30 +42,19 @@
   #set ($discard = $urlParametersMap.put("colorThemeVersion", $themeDoc.version))
 #end
 #set ($urlParameters = $escapetool.xml($escapetool.url($urlParametersMap)))
-#set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))
+#set ($defaultStyleURL = $escapetool.xml($xwiki.getSkinFile($defaultstyle, true)))
 
 <link href="#concatenateQueryParameter($defaultStyleURL, $urlParameters)" rel="stylesheet" type="text/css" media="all" />
-<link href="#concatenateQueryParameter($xwiki.getSkinFile('print.css', true), $urlParameters)" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
-#set ($a11y = "$!{request.getCookie('a11y').getValue()}")
-#if ($a11y == '')
-  #set ($a11y = "$!{xwiki.getUserPreference('accessibility')}")
-#end
-#if ($a11y == '1')
-  <link href="$xwiki.getSkinFile('css/accessibility.css', true)" rel="stylesheet" type="text/css" media="all" />
-#end
+<link href="#concatenateQueryParameter($escapetool.xml($xwiki.getSkinFile('print.css', true)), $urlParameters)" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
 ## The stylesheets configuration option allows to override the alternate stylesheets
 ## style1.css, style2.css and style3.css
 #set ($stylesheets = $xwiki.getSpacePreference('stylesheets'))
 #if ($stylesheets != '')
   #foreach ($stylesheet in $stylesheets.split(','))
     #if (!$stylesheet.equalsIgnoreCase($defaultstyle))
-      <link href="#concatenateQueryParameter($xwiki.getSkinFile($stylesheet, true), $urlParameters)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${foreach.count}" />
+      <link href="#concatenateQueryParameter($escapetool.xml($xwiki.getSkinFile($stylesheet, true)), $urlParameters)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${foreach.count}" />
     #end
   #end
 #end
-## IE specific stylesheets
-<!--[if IE]>
-  <link href="#concatenateQueryParameter($xwiki.getSkinFile('ie-all.css', true), $urlParameters)" rel="stylesheet" type="text/css" />
-<![endif]-->
 ## Hook for inserting CSS skin extensions
 #styleSheetExtensionHooks

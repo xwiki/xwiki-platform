@@ -16,7 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
+-->
 
 <!--
   LayoutCardsCard is a card component for the Cards Layout.
@@ -25,7 +25,11 @@
   inside the Livedata configuration.
 -->
 <template>
-  <div class="card">
+  <div
+      class="card"
+      :data-livedata-entry-index="entryIdx"
+      :data-livedata-entry-id="logic.getEntryId(entry)"
+  >
 
     <!-- Card title-->
     <div class="card-title">
@@ -65,7 +69,7 @@
       >
         <!-- Specify the handle to drag properties -->
         <template #handle>
-          <span class="fa fa-ellipsis-v"></span>
+          <XWikiIcon :icon-descriptor="{name: 'more-vertical'}"/>
         </template>
 
         <!-- Property Name -->
@@ -90,12 +94,14 @@ import LivedataEntrySelector from "../../LivedataEntrySelector.vue";
 import LivedataDisplayer from "../../displayers/LivedataDisplayer.vue";
 import XWikiDraggable from "../../utilities/XWikiDraggable.vue";
 import XWikiDraggableItem from "../../utilities/XWikiDraggableItem.vue";
+import XWikiIcon from "../../utilities/XWikiIcon";
 
 export default {
 
   name: "LayoutCardsCard",
 
   components: {
+    XWikiIcon,
     LivedataEntrySelector,
     LivedataDisplayer,
     XWikiDraggable,
@@ -106,6 +112,17 @@ export default {
 
   props: {
     entry: Object,
+    /**
+     * Index of the entry in the entries array.
+     * @since 14.10.20
+     * @since 15.5.5
+     * @since 15.10.1
+     * @since 16.0.0RC1
+     */
+    entryIdx: {
+      type: Number,
+      required: true
+    }
   },
 
   computed: {

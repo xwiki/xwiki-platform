@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
@@ -58,6 +59,24 @@ public class ReplaceUserRequest extends EntityRequest
      * @see #isReplaceDocumentCreator()
      */
     private static final String PROPERTY_REPLACE_DOCUMENT_CREATOR = "replaceDocumentCreator";
+
+    /**
+     * Default constructor.
+     */
+    public ReplaceUserRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public ReplaceUserRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * Sets the user reference to replace.

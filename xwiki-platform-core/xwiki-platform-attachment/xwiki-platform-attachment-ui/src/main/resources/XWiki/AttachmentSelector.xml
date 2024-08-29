@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.AttachmentSelector" locale="">
+<xwikidoc version="1.5" reference="XWiki.AttachmentSelector" locale="">
   <web>XWiki</web>
   <name>AttachmentSelector</name>
   <language/>
@@ -83,11 +83,14 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #end
   (% class="gallery" %)(((
   ## Only display the upload form if they have edit permission on targetAttachDocument
-  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
-    #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
-  #end
+  #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #if ("$!services.temporaryAttachments" != '')
+    #set ($unsortedAttachments = $services.temporaryAttachments.listAllAttachments($targetAttachDocument))
+    #set ($sortedAttachments = $collectiontool.sort($unsortedAttachments, "${options.sortAttachmentsBy}"))
+  #else
+    #set ($sortedAttachments = $collectiontool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #end
   #foreach ($attachment in $sortedAttachments)
     #set ($extension = $attachment.getFilename())
     #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
@@ -107,18 +110,46 @@ $xwiki.jsx.use($attachmentPickerDocName)
  * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
  *#
 #macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
-  #if ($options.displayImage &amp;&amp; $attachment.isImage())
-    #set ($cssClass = 'gallery_image')
+  #set ($hasTemporaryAttachment = "$!services.temporaryAttachments" != '')
+  #set ($canEdit = $xwiki.hasAccessLevel('edit', $xcontext.user, ${targetAttachDocument.fullName}))
+  #set ($isTemporaryAttachment = false)
+  #if(!$hasTemporaryAttachment)
+    #set ($canDeleteAttachment = $canEdit)
   #else
-    #set ($cssClass = '')
+    #set ($isTemporaryAttachment = $services.temporaryAttachments.temporaryAttachmentExists($attachment))
+    ## TODO: Update once it is made possible to delete temporary attachments (see XWIKI-20225).
+    #set ($canDeleteAttachment = !$isTemporaryAttachment &amp;&amp; $canEdit)
   #end
-  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "$!{cssClass}"} $currentValue)
+  #set ($cssClasses = [])
+  #if ($options.displayImage &amp;&amp; $attachment.isImage())
+    #set ($discard = $cssClasses.add('gallery_image'))
+  #end
+  #if ($isTemporaryAttachment)
+    #set ($discard = $cssClasses.add('temporary_attachment'))
+  #end
+  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "${stringtool.join($cssClasses, ' ')}"} $currentValue)
   #attachmentPicker_displayAttachmentDetails($attachment $options)
   #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
   #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
   #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
-  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, $escapetool.url({
+    "${options.get('classname')}_${options.get('object')}_${options.get('property')}": ${attachment.filename},
+    'form_token': $!{services.csrf.getToken()}
+  })))
+  ## Delete action is only proposed for users with the edit right on the document.
+  ## If the temporary attachment is available, the delete action is only allowed for non-temporary attachments.  
+  #set ($attachmentActions = [{'name' : 'select', 'url' : $selectURL}])
+  #if($canDeleteAttachment)
+    #set ($discard = $attachmentActions.add({'name' : 'delete', 'url' : $deleteURL}))
+  #end
+  #define($additionalContent)
+    #if ($isTemporaryAttachment)
+      #set ($titleMessage = $services.localization.render('attachment.attachmentSelector.attachmentBox.temporaryAttachmentTitle'))
+      #set ($titleMessage = $services.rendering.escape($titleMessage, 'xwiki/2.1'))
+      (% title="$titleMessage" %)$services.icon.render('clock')(%%)
+    #end
+  #end
+  #attachmentPicker_displayEndFrame ($attachmentActions $additionalContent)
 #end
 
 #**
@@ -130,7 +161,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *#
 #macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
   (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
-    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
+    (% class="gallery_attachmenttitle" title="$services.rendering.escape($!{boxOptions.value}, 'xwiki/2.1')" %)(((
+      $services.rendering.escape($boxOptions.text, 'xwiki/2.1')
+    )))
     (% class="gallery_attachmentframe" %)(((
 #end
 
@@ -146,13 +179,13 @@ $xwiki.jsx.use($attachmentPickerDocName)
     ## Compute the attachment reference because there's no getter.
     #set ($attachmentReference = $services.model.createAttachmentReference($attachment.document.documentReference,
       $attachment.filename))
-    #set ($attachmentStringReference = $services.model.serialize($attachmentReference, 'default'))
+    #set ($attachmentStringReference = $services.rendering.escape($services.model.serialize($attachmentReference, 'default'), 'xwiki/2.1'))
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
       #set ($queryString = $escapetool.url({'version': $attachment.version}))
       [[[[image:${attachmentStringReference}||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
     #else
-      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
+      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$services.rendering.escape($attachment.getFilename(), 'xwiki/2.1')(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
       * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachmentStringReference}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
@@ -172,14 +205,16 @@ $xwiki.jsx.use($attachmentPickerDocName)
  *          &lt;dt&gt;rel&lt;/dt&gt;
  *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
  *        &lt;/dl&gt;
+ * @param $additionalContent optional additional content that does not follow the structure of the actions 
  *#
-#macro (attachmentPicker_displayEndFrame $actions)
+#macro (attachmentPicker_displayEndFrame $actions $additionalContent)
     )))## attachmentframe
     (% class="gallery_actions" %)(((
       #foreach ($action in $actions)
         #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
         [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
       #end
+      $!additionalContent
     )))## actions
   )))## attachmentbox
 #end
@@ -336,8 +371,10 @@ $xwiki.jsx.use($attachmentPickerDocName)
   $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
+  #set ($cancelLinkName = $services.rendering.escape($services.rendering.escape($services.localization.render("${translationPrefix}.cancel"), 'xwiki/2.1'), 'xwiki/2.1'))
+  #set ($cancelLinkTarget = $services.rendering.escape($services.model.serialize($targetDocument), 'xwiki/2.1'))
   (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;${targetDocument}||class="button secondary" id="attachment-picker-close"]]
+  (% class="buttonwrapper secondary" %)[[$cancelLinkName&gt;&gt;$cancelLinkTarget||class="button secondary" id="attachment-picker-close"]]
   )))
 #end
 {{/velocity}}</content>
@@ -429,6 +466,68 @@ $xwiki.jsx.use($attachmentPickerDocName)
     </property>
     <property>
       <code>var XWiki = (function(XWiki) {
+  function uploadTemporaryAttachment() {
+    // Require jquery locally until we are able to fully migrate this code away from prototype.
+    const form = this.property.up('form');
+    require(['jquery'], function ($) {
+      const data = new FormData();
+      const uploadedFile = $('#attachfile')[0].files[0];
+      const filenameCheckbox = $("#uploadAttachment input[name='filename']");
+  
+      // TODO: Fix replace currently selected checkbox (see XWIKI-20181).
+      data.append('upload', uploadedFile);
+      const notification = new XWiki.widgets.Notification(
+        "$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
+      const params = {
+        'form_token': $(form).find('[name="form_token"]').val(),
+        'sheet': 'CKEditor.FileUploader',
+        'outputSyntax': 'plain'
+      };
+  
+      // Update the name of the file with the name of the currently selected attachment if required.
+      if (filenameCheckbox.prop('checked')) {
+        params['filename'] = filenameCheckbox.val()
+      }
+  
+      $.ajax({
+        'url': XWiki.currentDocument.getURL('get', new URLSearchParams(params).toString()),
+        method: 'POST',
+        data: data,
+        processData: false,
+        contentType: false, // Sets the 'multipart/form-data' automatically
+        headers: {
+          'X-XWiki-Temporary-Attachment-Support': true
+        }
+      }).done(function (response) {
+        #set ($successMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.success')))
+        notification.replace(new XWiki.widgets.Notification("$successMessage", 'done'));
+        // Add a field with the name of the uploaded file so that it is moved from the temporary
+        // attachments to the persisded ones on save.
+        $(form).append($('&lt;input/&gt;')
+          .prop('type', 'hidden')
+          .prop('name', 'uploadedFiles')
+          .prop('value', response.fileName))
+        $(form).find('input[type="hidden"].property-reference').prop('value', response.fileName);
+        this.updateAttachment(response.fileName, response.url);
+        this.dialog.closeDialog();
+      }.bind(this)).fail(function  () {
+        #set ($errorMessage = $escapetool.javascript($services.localization.render('attachment.attachmentSelector.temporaryUpload.failure')))notification.replace(new XWiki.widgets.Notification("$errorMessage", 'error'));
+      });
+    }.bind(this));
+  }
+  
+  function directUploadAttachment(uploadForm) {
+    // FIXME This fails in HTML5, will deal with it later:
+    // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
+    // uploadForm.xredirect.value = window.location.pathname;
+    document.observe('xwiki:document:saved', function () {
+      new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')",
+        'inprogress');
+      uploadForm.submit();
+    })
+    document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+  }
+
   /** Handles the gallery buttons directly in the current page without reloading the window. */
   XWiki.AttachmentPicker = Class.create({
     /**
@@ -490,21 +589,23 @@ $xwiki.jsx.use($attachmentPickerDocName)
             new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.error.badExtension')", 'error');
             hasErrors = true;
           }
+          const beforeUploadEvent = Event.fire(document, 'xwiki:actions:beforeUpload', {
+            file: fileInput.files[0]
+          });
+
+          if (beforeUploadEvent.defaultPrevented) {
+            hasErrors = true;
+          }
         }.bind(this));
-        // No form submission by AJAX right now, because file uploads can't be done this way without HTML5, this is future work
-        // Save the document before submitting, since the current form data will be lost otherwise
         if (!hasErrors) {
           if (this.directSave) {
             uploadForm.submit();
           } else {
-            // FIXME This fails in HTML5, will deal with it later:
-            // this.property.down('input').value = uploadForm.down('input[type="file"]').value;
-            // uploadForm.xredirect.value = window.location.pathname;
-            document.observe('xwiki:document:saved', function() {
-              new XWiki.widgets.Notification("$services.localization.render('xe.attachmentSelector.upload.inProgress')", 'inprogress');
-              uploadForm.submit();
-            })
-            document.fire('xwiki:actions:save', {'continue': true, form: this.property.up('form')});
+            if ("$!services.temporaryAttachments" != '') {
+              uploadTemporaryAttachment.call(this);
+            } else {
+              directUploadAttachment.call(this, uploadForm);
+            }
           }
         }
       }.bindAsEventListener(this));
@@ -603,18 +704,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
               this.dialog.closeDialog();
             }.bindAsEventListener(this),
             onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
+              var failureReason = response.statusText || 'Server not responding';
               if (targetElement._x_notif) {
                 targetElement._x_notif.replace(new XWiki.widgets.Notification("$services.localization.render('core.widgets.confirmationBox.notification.failed')" + failureReason, "error"));
               } else {
                 new XWiki.widgets.Notification(this.interactionParameters.failureMessageText + failureReason, "error");
               }
-            },
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
             },
             on0 : function(response) {
               response.request.options.onFailure(response);
@@ -1006,7 +1101,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmentbox {
   background: $theme.pageContentBackgroundColor;
   border: 1px solid $theme.borderColor;
-  border-radius: 5px;
+  border-radius: 8px;
   float: left;
   margin: ${boxMargin}px;
   overflow: hidden;
@@ -1028,7 +1123,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmenttitle {
   background: $theme.backgroundSecondaryColor;
   border-bottom: 1px dotted $theme.borderColor;
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
   font-size: 85%;
   padding: 3px ${boxPadding}px;
   overflow: hidden;
@@ -1119,9 +1214,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
   ## Make this box twice as large as the others
   width: ${uploadBoxSize}px;
 }
-* html .gallery_upload {
-  width: ${mathtool.add($uploadBoxSize, 2)}px;
-}
 .gallery_upload, .gallery_upload:hover {
   background-color: $theme.backgroundSecondaryColor;
 }
@@ -1206,7 +1298,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_cached</name>
-        <number>12</number>
+        <number>13</number>
         <prettyName>Cached</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -1219,14 +1311,14 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
-        <number>13</number>
+        <number>14</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1235,7 +1327,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <displayFormType>select</displayFormType>
         <displayType/>
         <name>async_enabled</name>
-        <number>11</number>
+        <number>12</number>
         <prettyName>Asynchronous rendering</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -1301,15 +1393,24 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -1340,6 +1441,16 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <priority>
+        <disabled>0</disabled>
+        <name>priority</name>
+        <number>11</number>
+        <numberType>integer</numberType>
+        <prettyName>Priority</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </priority>
       <supportsInlineMode>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
@@ -1414,7 +1525,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #set ($property = "$!{xcontext.macro.params.property}")
 #set ($object = $numbertool.toNumber("$!{xcontext.macro.params.object}").intValue())
 #if ("$!{object}" != $!{xcontext.macro.params.object})
-  #set ($object = ${doc.getObject($classname).number})
+  #set ($object = ${targetdoc.getObject($classname).number})
   #if ("$!{object}" == '')
     #set ($object = 0)
   #end
@@ -1426,9 +1537,18 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
   #set ($displayImage = false)
 #end
 #if ($displayImage)
-  #set ($alt = "$!{xcontext.macro.params.alternateText}")
-  #set ($width = "$!{xcontext.macro.params.width}")
-  #set ($height = "$!{xcontext.macro.params.height}")
+  #set ($alt = '')
+  #set ($width = '')
+  #set ($height = '')
+  #if ($xcontext.macro.params.alternateText)
+    #set ($alt = "$services.rendering.escape($!{xcontext.macro.params.alternateText}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.width)
+    #set ($width = "$services.rendering.escape($!{xcontext.macro.params.width}, 'xwiki/2.1')")
+  #end
+  #if ($xcontext.macro.params.height)
+    #set ($height = "$services.rendering.escape($!{xcontext.macro.params.height}, 'xwiki/2.1')")
+  #end
   #set ($imageParams = '')
   #if ("${width}" != '')
     #set($imageParams = "$!{imageParams} width=${width}")
@@ -1466,7 +1586,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
   #set ($savemode = 'form')
 #end
 
-#set ($propValue = "$!{doc.getObject($classname, $object).getProperty($property).value}")
+#set ($propValue = "$!{targetdoc.getObject($classname, $object).getProperty($property).value}")
 ##
 
 #macro (attachmentPicker_displayAttachment $name $displayImage $withLink $forceElement)
@@ -1493,9 +1613,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #set ($attachmentResource = '')
   #end
   #if ($displayImage)
-    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:${attachmentResource}$!{imageParams}]]#if($withLink)&gt;&gt;attach:${attachmentResource}||rel=lightbox]]#{end}#end)))##
+    (% class="$!{cssClass}#if (!$attachment) hidden#end" %)(((#if ("$!{attachmentResource}" != '' || $forceElement)#if($withLink)[[#end[[image:$services.rendering.escape(${attachmentResource}, 'xwiki/2.1')$!{imageParams}]]#if($withLink)&gt;&gt;attach:$services.rendering.escape(${attachmentResource},'xwiki/2.1')||rel=lightbox]]#{end}#end)))##
   #else
-    (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{attachmentName}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
+      (% class="$!{cssClass}" %)#if ("$!{attachmentResource}" != '' || $forceElement)#if ($withLink)[[attach:${attachmentResource}||rel=__blank]]#{else}(% class="displayed" %)#if($targetPermView)$!{services.rendering.escape($!{attachmentName}, 'xwiki/2.1')}#{else}Access Denied#{end}(% %)#{end}#end(%%)##
   #end
 #end
 
@@ -1503,7 +1623,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 ##  1. Edit the current page
 ##  2. View the target attachment page. (can be the same page)
 #macro (attachmentPicker_displayButton)
-  #if ($hasEdit &amp;&amp; $targetPermView)
+  #if ($targetPermView)
     #set ($queryString = {
       'docname': $doc.fullName,
       'classname': $classname,
@@ -1518,8 +1638,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
-      class="attachment-picker-start button" title="$buttontext"]](%%)##
+    #set ($linkLabel = $services.rendering.escape($services.rendering.escape($buttontext, 'xwiki/2.1'), 'xwiki/2.1'))
+    (% class="buttonwrapper" %)[[$linkLabel&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
+      class="attachment-picker-start button" title="$services.rendering.escape($buttontext, 'xwiki/2.1')"]](%%)##
   #end
 #end
 {{/velocity}}
@@ -1530,7 +1651,7 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
 #elseif ($xcontext.action == 'inline' || $xcontext.action == 'edit')
   (% class="attachment-picker" %)(((##
     #attachmentPicker_displayAttachment($propValue $displayImage false true) #attachmentPicker_displayButton()##
-    {{html}}&lt;input type="hidden" name="${classname}_${object}_${property}" value="${propValue}"/&gt;{{/html}}##
+    {{html}}&lt;input type="hidden" name="$escapetool.xml("${classname}_${object}_${property}")" value="$escapetool.xml("${propValue}")" class="property-reference"/&gt;{{/html}}##
   )))
 #else
   #attachmentPicker_displayAttachment($propValue $displayImage $link false)
@@ -1547,7 +1668,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Development</defaultCategory>
+      <defaultCategories>
+        <value>Development</value>
+      </defaultCategories>
     </property>
     <property>
       <description>A control to be used for object properties of the current document that are supposed to contain the name of an attachment from the current (or target) document. Allows uploading new attachments, and deleting attachments from the target document.  If no target document is specified, the current document will be used. Object properties are only saved to the current document.</description>
@@ -1557,6 +1680,9 @@ $xwiki.ssx.use($xcontext.macro.doc.fullName)##
     </property>
     <property>
       <name>Attachment Selector</name>
+    </property>
+    <property>
+      <priority/>
     </property>
     <property>
       <supportsInlineMode>1</supportsInlineMode>

@@ -1,0 +1,194 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.XWikiSyntaxLinks" locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxLinks</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxLinks</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редагування =
+
+== Посилання ==
+
+=== 1.0 Links ===
+
+|=(% style="width:20%" %)Функція|=Синтаксис XWiki 1.0|=(% style="width:20%" %)Результат
+|Посилання на сторінку в поточному просторі|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
+|Посилання з міткою|{{{[label&gt;WebHome]}}}|[[label&gt;&gt;WebHome]]
+|Посилання на синтаксис XWiki в мітці|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;bold label&lt;/strong&gt;&lt;/a&gt;}}}|[[**bold label**&gt;&gt;WebHome]]
+|Посилання на сторінку із зазначеним простором|{{{[Main.WebHome]}}}|[[Web Home&gt;&gt;Main.WebHome]]
+|Посилання на підвікі|{{{[subwiki:Main.WebHome]}}}|[[Web Home&gt;&gt;xwiki:Main.WebHome]]
+|Посилання, яке відкривається в новому вікні|{{{[label&gt;WebHome&gt;_blank]}}}|[[label&gt;&gt;WebHome||target="_blank"]]
+|Посилання на URL-адресу безпосередньо в тексті|{{{This is a URL: https://xwiki.org}}}|This is a URL: https://xwiki.org
+|Посилання на URL-адресу|{{{[https://xwiki.org]}}}|[[https://xwiki.org]]
+|Посилання на URL-адресу з міткою|{{{[XWiki&gt;https://xwiki.org]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Посилання на адресу електронної пошти|{{{[john@smith.net&gt;mailto:john@smith.net]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Посилання на зображення|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2}&lt;/a&gt;}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
+|Посилання на зображення з параметрами зображення|{{{&lt;a href="$xwiki.getURL("Space1.Page1")"&gt;{image:img.png|document=Space2.Page2|width=26|height=26}&lt;/a&gt;}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
+|Посилання на вкладення на поточній сторінці|(((
+{{info}}Детальніше [[Attach Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]]{{/info}}
+{{{{attach:text|file=img.png}}}}
+)))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Посилання на вкладення на іншій сторінці|(((
+{{info}}Детальніше [[Attach Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Attach%20Macro%20%28Radeox%29]]{{/info}}
+{{{{attach:text|document=Space.Page|file=img.png}}}}
+)))|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
+|Посилання на прив'язку на сторінці|{{{[label&gt;Space.Page#anchor]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|Посилання на заголовок на сторінці|(((
+{{{[label&gt;Space.Page#HMyheading]}}}
+)))|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+
+{{info}}Коли ви додаєте заголовок, створюється прив'язка з іменем "H", за якою йде заголовок із лише буквеними символами. Наприклад, для заголовка під назвою "My heading" створеним прив’язкою буде "HMyheading".{{/info}}
+
+{{velocity}}$subHeading Специфікація посилання синтаксис XWiki 2.0 $subHeading{{/velocity}}
+
+{{info}}
+Частина в ##( )## є обов'язковою, тоді як частини в ##[ ]## необов'язкові.
+{{/info}}
+
+Повний формат посилання – це **##[label&gt;&gt;] (resource) [@interWikiAlias] [||parameters]##**
+
+* **##label##**: Необов'язковий рядок, який відображатиметься користувачеві як ім'я посилання під час відтворення. Мітка може містити синтаксис XWiki. Якщо не вказано жодної мітки, буде згенеровано мітку за умовчанням. Шаблон генерації можна змінити, детальніше [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Наприклад: ##My Page##
+* **##resource##**: Повне посилання на посилання, використовуючи наступний синтаксис: **##(reference) [?queryString] [#anchor]##**
+** **##reference##**: Посилання на посилання в одній із наступних форм:
+*** **URL**: Будь-яка URL-адреса у формі **##protocol:~/~/path##**. Наприклад: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
+*** **Wiki page** Посилання у формі **##~[~[wikiName:] spaceNameList.] (pageName)##**. Наприклад: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
+**** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку в цій вікі. Наприклад: ##mywiki##
+**** **##spaceNameList##**: Необов'язковий список назв вікі-просторів, відокремлених крапками. Якщо не вказано простір, використовується поточний простір. Наприклад: ##Main##, ##A.B##, ##A.B.C##
+**** **##pageName##**: Обов'язковий рядок, що містить назву зв'язаної вікі-сторінки. Наприклад: ##WebHome##
+*** **Attachment** Посилання у формі **##attach~: [wikiPageName@] (attachmentName)##**. Наприклад: ##attach~:img.png##, ##attach~:mywiki:Main.WebHome@img.png##
+**** **##attach~:##** Обов'язковий рядок, що визначає ресурс як вкладення.
+**** **##wikiPageName##**: Необов'язковий рядок, який посилається на сторінку, яка містить вкладення, дивись вище "Wiki page".
+**** **##attachmentName##**: Назва вкладення, те як воно зберігається у вікі.
+*** **Email address** Посилання у формі **##mailto~: (emailAddress)##** (###anchor## невірне). Наприклад: ##mailto~:john@smith.com##
+**** **##mailto~:##** Обов'язковий рядок, що ідентифікує ресурс як електронну пошту.
+**** **##emailAddress##**: Цільова адреса електронної пошти. Наприклад: "##john@smith.com##"
+** **##queryString##**: Необов'язковий рядок запиту для вказівки параметрів, які використовуватимуться у відтвореній URL-адресі. Наприклад: ##mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: Необов'язкове ім'я прив'язки, що вказує на прив'язку, визначену в посиланні. Зверніть увагу, що в XWiki прив'язки створюються автоматично для заголовків і зображень. Наприклад: ##HTableOfContents##
+* **##interWikiAlias##**:Необов'язковий [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] псевдонім, що визначено на карті InterWiki (Детальніше [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Це дійсне лише для назв вікі-сторінок. Наприклад: ##wikipedia##
+* **##parameters##**: Необов'язковий список параметрів, що передаються за посиланням. Наприклад: ##target="~_blank"## (відкрити в новому вікні)
+
+=== 2.1 Links ===
+
+|=Функція|=Синтаксис XWiki 2.1|=Результат
+|Абсолютне посилання на сторінку ##PageB## розташованій у ##PageA##|{{{[[PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Відносне посилання на сторінку ##PageA## з поточної сторінки|{{{[[PageA]]}}} або {{{[[.PageA]]}}}|[[PageA&gt;&gt;]]
+|Відносне посилання на сторінку ##PageB## у ##PageA## з поточної сторінки|{{{[[.PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Посилання з міткою|(((
+{{{[[label&gt;&gt;PageA]]}}}
+
+{{info}}Синтаксис XWiki підтримується в мітках посилань.{{/info}}
+)))|[[label&gt;&gt;]]
+|Посилання із вікі-синтаксисом у мітці|{{{[[**bold label**&gt;&gt;PageA]]}}}|[[**bold label**&gt;&gt;]]
+|Посилання на зображення|{{{[[image:PageA@img.png&gt;&gt;PageA]]}}}|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;]]
+|Абсолютне посилання на сторінку ##PageB## розташованій у ##PageA## у вікі ##WikiA##|{{{[[WikiA:PageA.PageB]]}}}|[[PageB&gt;&gt;]]
+|Посилання, яке відкривається в новому вікні|{{{[[PageA||target="_blank"]]}}}|[[PageA&gt;&gt;]]
+|Неявне посилання на URL-адресу|{{{Це URL: https://xwiki.org}}}|Це URL: https://xwiki.org
+|Явне посилання на URL-адресу|{{{[[https://xwiki.org]]}}}|[[https://xwiki.org]]
+|Явне посилання на URL-адресу з міткою|{{{[[XWiki&gt;&gt;https://xwiki.org]]}}}|[[XWiki&gt;&gt;https://xwiki.org]]
+|Посилання на адресу електронної пошти|{{{[[john@smith.net&gt;&gt;mailto:john@smith.net]]}}}|[[john@smith.net&gt;&gt;mailto:john@smith.net]]
+|Посилання на вкладення на поточній сторінці|{{{[[attach:img.png]]}}}|[[img.png&gt;&gt;]]
+|Посилання на вкладення на іншій сторінці|{{{[[attach:PageA.PageB@img.png]]}}}|[[img.png&gt;&gt;]]
+|Посилання на прив'язку на сторінці|{{{[[PageA.PageB||anchor="anchor"]]}}}|[[PageB&gt;&gt;]]
+|Посилання на заголовок на сторінці|(((
+{{{[[PageA.PageB||anchor="HMyheading"]]}}}
+
+{{info}}Коли ви додаєте заголовок, створюється прив'язка з іменем "H", за якою йде заголовок із лише буквеними символами. Наприклад, для заголовка під назвою "My heading" створеним прив’язкою буде "HMyheading".{{/info}}
+)))|[[PageB&gt;&gt;]]
+|Посилання на прив’язку поточної сторінки|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;]]
+|Посилання на сторінку з рядком запиту|{{{[[PageA.PageB||queryString="param1=value1&amp;param2=value2"]]}}}|[[PageB&gt;&gt;]]
+|Посилання на поточну сторінку з рядком запиту|{{{[[label&gt;&gt;||queryString="param1=value1&amp;param2=value2"]]}}}|[[label&gt;&gt;]]
+
+{{velocity}}$subHeading Специфікація посилання синтаксис XWiki 2.1 $subHeading{{/velocity}}
+
+{{info}}
+Легенда: Частина в ##( )## є обов'язковою, тоді як частини в ##[ ]## необов'язкові.
+{{/info}}
+
+Повний формат посилання – це **##[label&gt;&gt;] (resource) [||parameters]##**
+
+* **##label##**: Необов'язковий рядок, який відображатиметься користувачеві як ім'я посилання під час відтворення. Мітка може містити синтаксис XWiki. Якщо не вказано жодної мітки, буде згенеровано мітку за умовчанням. Шаблон генерації можна змінити, детальніше [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]. Наприклад: ##My Page##
+* **##resource##**: Обов'язковий рядок із посиланням на посилання в одній із наведених нижче форм
+** **URL**: Будь-яка URL-адреса у формі **##[url:](protocol:~/~/path)##**. Examples: ##http:~/~/xwiki.org##, ##url:https:~/~/svn.xwiki.org/##
+*** **##url:##** Необов'язковий рядок, що ідентифікує ресурс як URL-адресу.
+*** **##protocol:~/~/path##**: Сама URL-адреса
+** **Wiki page**: Посилання у формі **##page:[(wikiName):](pageNameList)##**. Наприклад: ##page:Page##, ##page:myxwiki:Page##, ##page:ParentPage.ChildPage.SubChildPage##, ##page:../SiblingPage##, ##page:./ChildPage##
+*** **##page:##** Обов'язковий рядок, що визначає ресурс як сторінку XWiki. Те саме посилання можна використовувати як для термінальної, так і для нетермінальної сторінки, якщо обидві існують, це буде вказувати до нетермінальної сторінки.
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку всередині цієї вікі. Якщо вікі не вказано, використовується поточна вікі. Наприклад: ##mywiki##
+*** **##pageNameList##**: Обов'язковий список імен вікі-сторінок, відокремлених косою рискою, що вказує на синтаксис остаточної пов’язаної вікі-сторінки. Також можна використовувати ##.## і ##..## для позначення поточної або батьківської сторінки/вікі. Наприклад: ##Main##, ##A/B##, ##A/B/C##, ##../Sibling##, ##./Child##
+** **Wiki document**: Посилання у формі **##[doc:]~[~[(wikiName):](spaceNameList).](documentName)##**. Наприклад: ##doc:Welcome##, ##doc:Main.Welcome##, ##doc:mywiki:Main.Welcome##, ##Welcome##
+*** **##doc:##** Необов'язковий рядок, що ідентифікує ресурс як сторінку терміналу XWiki. Нетермінальна сторінка також може мати посилання таким чином, але вона повинна додати до власної назви ##.WebHome## part (e.g. ##doc:Sandbox.WebHome##).
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку всередині цієї вікі. Якщо вікі не вказано, використовується поточна вікі. Наприклад: ##mywiki##.
+*** **##spaceNameList##**: Необов'язковий список назв вікі-просторів, відокремлених крапками. Якщо простір не вказано, використовується поточний простір. Наприклад: ##Main##, ##A.B##, ##A.B.C##
+*** **##documentName##**: Обов'язковий рядок, що містить назву зв'язаної вікі-сторінки. Наприклад: ##Welcome##
+** **Wiki space**: Посилання у формі **##space:[(wikiName):](spaceNameList)##**. Наприклад: ##space:Main##, ##space:mywiki:Main##, ##space:A.B.C##
+*** **##space:##** Обов'язковий рядок, що ідентифікує ресурс як нетермінальну сторінку XWiki (тобто простір).
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку всередині цієї вікі. Якщо вікі не вказано, використовується поточна вікі. Наприклад: ##mywiki##
+*** **##spaceNameList##**: Обов'язковий список назв вікі-просторів, відокремлених крапками, які вказують на остаточний зв’язаний вікі-простір (або нетермінальну сторінку). Наприклад: ##Main##, ##A.B##, ##A.B.C##
+** **InterWiki page**: Посилання у формі **##interwiki:[(interWikiAlias):](pageName)##**. Наприклад: ##interwiki:wikipedia:XWiki##
+*** **##interwiki:##** Обов'язковий рядок, що ідентифікує ресурс як посилання InterWiki.
+*** **##interWikiAlias##**: Необов'язковий [[Inter Wiki&gt;&gt;https://en.wikipedia.org/wiki/InterWiki]] псевдонім, що визначено на карті InterWiki (Детальніше [[Admin Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/]]). Наприклад: ##wikipedia##
+*** **##pageName##**: Обов'язковий рядок, що містить назву сторінки, яке містить посилання. Наприклад: ##XWiki##
+** **Attachment**: Посилання у формі **##attach~:~{~{~{(wikiName):}(spaceNameList).}(pageName)@}(imageName)##**
+*** **##attach~:##** Обов'язковий рядок, який ідентифікує посилання як вкладення документа XWiki.
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку всередині цієї вікі. Якщо вікі не вказано, використовується поточна вікі. Наприклад: ##mywiki##.
+*** **##spaceNameList##**: Необов'язковий список назв вікі-просторів, відокремлених крапками. Якщо простір не вказано, використовується поточний простір. Наприклад: ##Main##, ##A.B##, ##A.B.C##
+*** **##pageName##**: Необов'язковий рядок, що містить назву вікі-сторінки, до якої приєднано зображення, на яке посилається. Наприклад: ##Welcome##
+*** **##attachmentName##**: Назва вкладення, те як воно зберігається у вікі. Наприклад: ##photo.png##
+** **Page Attachment**: Посилання у формі **##pageAttach~:~{~{~{(wikiName):}(pageNameList)/}(imageName)##**
+*** **##pageAttach~:##** Обов'язковий рядок, що визначає посилання як вкладення сторінки XWiki.
+*** **##wikiName##**: Необов'язковий рядок, що містить назву вікі. Посилання вказуватиме на сторінку всередині цієї вікі. Якщо вікі не вказано, використовується поточна вікі. Наприклад: ##mywiki##.
+*** **##pageNameList##**: Необов'язковий список назв вікі-сторінок, відокремлених косою рискою. Якщо сторінка не вказана, використовується поточна сторінка. Наприклад: ##Main##, ##A/B##, ##A/B/C##
+*** **##attachmentName##**: Name of the attachment as it is stored in the wiki. Example: ##photo.png##
+** **Email address**: Посилання у формі **##mailto{{{:(}}}emailAddress)##** (###anchor## is not valid). Наприклад: ##mailto~:john@smith.com##
+*** **##mailto~:##** Обов'язковий рядок, що ідентифікує ресурс як електронну пошту.
+*** **##emailAddress##**: Цільова адреса електронної пошти. Наприклад: ##john@smith.com##
+** **Relative path**: Посилання на сервер у формі **##path{{{:(}}}relPath)##**. Наприклад: ##path:$doc.getURL('reset')## створює цільову адресу ##http:~/~/server.domain.com/xwiki/bin/reset/Space/Page## where ##/xwiki/bin/reset/Space/Page## створено ##$doc.getURL('reset')##.
+*** **##path:##** Обов'язковий рядок, що визначає ресурс як відносний шлях.
+*** **##relPath##**: Обов'язковий рядок, що містить відносний шлях до ресурсу на сервері, який має бути зв'язаний.
+** **UNC (Windows Explorer)**: Посилання у формі **##unc{{{:(}}}path)##**. Посилання представлено як a ##file:~/~/## link. Наприклад: ##unc:C:Windows##, ##unc:~~myserverpathimg.png##, ##unc:home/user/somefile##
+*** **##unc:##** Обов'язковий рядок, що визначає ресурс як шлях UNC (Провідник Windows).
+*** **##path##**: Обов'язковий рядок, що містить локальний шлях ресурсу, до якого має доступ користувач. Наприклад: ##C:Windows##, ##~~myserverpathimg.png##, ##home/user/somefile##
+** **Untyped**: Якщо жоден із зазначених вище типів ресурсів не вказано (тобто в посиланні не вказано префікс ресурсу ##type:##), тоді посилання розглядатиметься як посилання на термінальну або нетермінальну сторінку XWiki за допомогою наступного алгоритму:
+*** **##Terminal page##** у поточному просторі, //only// якщо існує. Наприклад: ##~[~[A]]## розв'язано до еквівалента ##~[~[doc:currentSpace.A]]##
+*** **##Non-terminal page##** у поточному просторі. Наприклад: ##~[~[A]]## розв'язано до еквівалента ##~[~[space:currentSpace.A]]##, що є еквівалентом ##~[~[doc:currentSpace.A.WebHome]]##
+*** Якщо поточна сторінка є нетермінальною і 2 попередні перевірки вище не знайшли наявної сторінки, виконуються 2 додаткові перевірки:
+**** **##Terminal page##** як дочірня у батьківському просторі, //only// якщо існує. Наприклад: ##~[~[B]]## посилання всередині нетермінальної сторінки ##A.C## розв'язано до еквівалента ##~[~[doc:A.B]]##
+**** **##Non-terminal page##** як дочірня у батьківському просторі, незважаючи на те, існує той чи ні. Наприклад: ##~[~[B]]## посилання всередині нетермінальної сторінки ##A.C## розв'язано до еквівалента ##~[~[space:A.B]]##, що є еквівалентом ##~[~[doc:A.B.WebHome]]##
+*** //Note1 - Absolute links//: Якщо нетипове посилання містить 2 або більше компонентів, розділених крапками (тобто такі, що виглядають як назва простору та ім'я сторінки), наведений вище алгоритм визначить сторінку відносно поточної вікі, а не поточного простору. Наприклад: ##~[~[A.B]]## може бути вирішено будь-яким ##~[~[doc:currentWiki:A.B]]## (якщо існує) або ##~[~[space:currentWiki:A.B]##] (є еквівалентом ##~[~[doc:currentWiki:A.B.WebHome]]##) та ні ##~[~[doc:currentWiki:currentSpace.A.B]]## або ##~[~[doc:currentWiki:currentSpace.A.B.WebHome]]##.
+*** //Note2 - Special handling of ##.WebHome##//: Якщо невизначене посилання закінчується на ##.WebHome##, буде //завжди// розглядатись як термінальна сторінка. Наприклад: ##~[~[A.WebHome]]## завжди буде розв'язано до еквівалента ##~[~[doc:A.WebHome]]## та ні ##~[~[doc:A.WebHome.WebHome]]##.
+* **##parameters##**: Необов'язковий список параметрів, відокремлених пробілами, переданих до посилання. Наприклад: ##queryString="mydata1=5&amp;mydata2=Hello" anchor="HTableOfContents" target="~_blank"##
+** **##queryString##**: Необов'язковий рядок запиту для визначення параметрів, які будуть додані до цільової адреси посилання та використані у відтвореній URL-адресі. Наприклад: ##url:http:~/~/domain.com/path||queryString="mydata1=5&amp;mydata2=Hello"## створює цільову адресу ##http:~/~/domain.com/path?mydata1=5&amp;mydata2=Hello##
+** **##anchor##**: Необов'язкове ім'я прив'язки, що вказує на прив'язку, визначену в посиланні. Зверніть увагу, що в XWiki прив'язки створюються автоматично для заголовків і зображень. Наприклад: ##url:http:~/~/domain.com/path||anchor="HTableOfContents"## produces target address ##http:~/~/domain.com/path#HTableOfContents##
+** **##target##**: Необов'язковий параметр, який дозволяє відкрити цільове посилання в новому вікні. Наприклад: ##target="~_blank"##</content>
+</xwikidoc>

@@ -19,7 +19,10 @@
  */
 package org.xwiki.rendering.internal.transformation.macro;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,6 +30,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.transformation.macro.MacroTransformationConfiguration;
+
+import static org.xwiki.rendering.macro.AbstractMacro.DEFAULT_CATEGORY_DEPRECATED;
+import static org.xwiki.rendering.macro.AbstractMacro.DEFAULT_CATEGORY_INTERNAL;
 
 /**
  * All configuration options for the Macro Transformation subsystem.
@@ -53,5 +59,13 @@ public class XWikiMacroTransformationConfiguration implements MacroTransformatio
     public Properties getCategories()
     {
         return this.configuration.getProperty(PREFIX + "categories", Properties.class);
+    }
+
+    @Override
+    public Set<String> getHiddenCategories()
+    {
+        List<?> hiddenCategories = this.configuration.getProperty(PREFIX + "hiddenCategories", List.class,
+            List.of(DEFAULT_CATEGORY_INTERNAL, DEFAULT_CATEGORY_DEPRECATED));
+        return hiddenCategories.stream().map(String::valueOf).collect(Collectors.toSet());
     }
 }

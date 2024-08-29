@@ -1,0 +1,45 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="PDFExportIT.ResizedTable" locale="">
+  <web>PDFExportIT</web>
+  <name>ResizedTable</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>PDFExportIT.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>ResizedTable</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>(% style="width:1228px" %)
+|=Lorem|=(% style="width: 671px;" %)Ipsum
+|Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Imperdiet nulla malesuada pellentesque elit. Sapien et ligula ullamcorper malesuada. Gravida cum sociis natoque penatibus et magnis dis parturient montes. Nibh tortor id aliquet lectus proin nibh. Posuere lorem ipsum dolor sit amet consectetur adipiscing. Orci ac auctor augue mauris augue neque. Eget felis eget nunc lobortis mattis aliquam faucibus. Nunc lobortis mattis aliquam faucibus. Cursus mattis molestie a iaculis at erat pellentesque adipiscing commodo. Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Turpis egestas maecenas pharetra convallis posuere. Dignissim cras tincidunt lobortis feugiat vivamus at augue. Amet justo donec enim diam vulputate.|(% style="width:671px" %)Augue lacus viverra vitae congue eu consequat ac. Duis convallis convallis tellus id interdum velit laoreet id donec. Dictum at tempor commodo ullamcorper a. Volutpat consequat mauris nunc congue nisi vitae. Eget gravida cum sociis natoque penatibus et magnis dis. Elit scelerisque mauris pellentesque pulvinar. Tortor dignissim convallis aenean et tortor at risus viverra adipiscing. Est ullamcorper eget nulla facilisi etiam. Sit amet purus gravida quis blandit. Mauris in aliquam sem fringilla ut morbi tincidunt. Pellentesque habitant morbi tristique senectus et netus et malesuada fames. Eget egestas purus viverra accumsan in nisl nisi scelerisque eu. Massa sapien faucibus et molestie ac feugiat sed. Egestas congue quisque egestas diam in arcu. Consequat nisl vel pretium lectus quam id. Gravida rutrum quisque non tellus. Nulla facilisi nullam vehicula ipsum a arcu cursus. Quis vel eros donec ac odio tempor orci dapibus ultrices. Bibendum est ultricies integer quis auctor elit.
+|Augue interdum velit euismod in pellentesque. Lacus sed viverra tellus in hac. Enim nulla aliquet porttitor lacus luctus. Massa tempor nec feugiat nisl pretium fusce id velit ut. In eu mi bibendum neque. Praesent elementum facilisis leo vel fringilla est ullamcorper eget nulla. Aliquam malesuada bibendum arcu vitae elementum curabitur vitae. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Ullamcorper sit amet risus nullam eget felis eget nunc. Varius sit amet mattis vulputate enim nulla aliquet.|(% style="width:671px" %)Molestie a iaculis at erat pellentesque adipiscing commodo. Morbi leo urna molestie at elementum eu. Dictum at tempor commodo ullamcorper a lacus vestibulum. Eros in cursus turpis massa tincidunt dui ut. Mattis aliquam faucibus purus in massa tempor. Mauris pellentesque pulvinar pellentesque habitant. Morbi enim nunc faucibus a pellentesque. In metus vulputate eu scelerisque. Felis imperdiet proin fermentum leo. Suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Odio ut sem nulla pharetra diam sit amet nisl suscipit. Ullamcorper dignissim cras tincidunt lobortis feugiat vivamus. Felis imperdiet proin fermentum leo vel orci.
+
+ </content>
+</xwikidoc>

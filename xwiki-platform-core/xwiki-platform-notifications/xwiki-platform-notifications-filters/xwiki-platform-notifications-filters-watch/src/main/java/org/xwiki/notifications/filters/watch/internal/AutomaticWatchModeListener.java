@@ -42,6 +42,7 @@ import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -122,8 +123,14 @@ public class AutomaticWatchModeListener extends AbstractEventListener
         // No automatic filter for the user page, because it causes an infinite loop
         // user page updated -> filter created -> user page updated -> ...
         // But the user can still manually mark its page as watched
-        if (userReference == null || !context.getWiki().exists(userReference, context)
-            || userReference.equals(currentDoc.getDocumentReference())) {
+        try {
+            if (userReference == null || !context.getWiki().exists(userReference, context)
+                || userReference.equals(currentDoc.getDocumentReference())) {
+                return;
+            }
+        } catch (XWikiException e) {
+            this.logger.error("Failed to check if user with reference [{}] exists", userReference, e);
+
             return;
         }
 

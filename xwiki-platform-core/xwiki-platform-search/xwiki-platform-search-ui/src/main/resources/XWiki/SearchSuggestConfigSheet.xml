@@ -40,26 +40,24 @@
 
 {{velocity output="false"}}
 #macro (displayObjectPropertyValue $propertyName $mode)
-  #set ($output = $doc.display($propertyName, $mode))
-  #set ($output = $stringtool.removeStart($output, '{{html clean="false" wiki="false"}}'))
-  #set ($output = $stringtool.removeEnd($output, '{{/html}}'))
-  $output
+  #unwrapXPropertyDisplay($doc.display($propertyName, $mode))
 #end
 
 #macro (displaySearchSuggestSource $source)
+  #set ($evaluatedSource = $source.evaluate())
   #set ($icon = $source.getProperty('icon').value)
   #if ($icon.startsWith('icon:'))
     #set ($icon = $xwiki.getSkinFile("icons/silk/${icon.substring(5)}.png"))
   #else
     ## Evaluate the Velocity code for backward compatibility.
-    #set ($icon = "#evaluate($icon)")
+    #set ($icon = $evaluatedSource.icon)
   #end
   #set ($name = $source.getProperty('name').value)
   #if ($services.localization.get($name))
     #set ($name = $services.localization.render($name))
   #else
     ## Evaluate the Velocity code for backward compatibility.
-    #set ($name = "#evaluate($name)")
+    #set ($name =  $evaluatedSource.name)
   #end
   #set ($style = 'source-header')
   #if ("$source.getProperty('activated').value" == '1')
@@ -70,9 +68,9 @@
   #end
   &lt;li class="source"&gt;
     &lt;div class="$style"&gt;
-      &lt;img class="icon" src="$!icon" alt="" /&gt;
-      &lt;span class="limit"&gt;$!source.getProperty('resultsNumber').value&lt;/span&gt;
-      &lt;span class="name"&gt;$!name&lt;/span&gt;
+      &lt;img class="icon" src="$escapetool.xml($!icon)" alt="" /&gt;
+      &lt;span class="limit"&gt;$escapetool.xml($!source.getProperty('resultsNumber').value)&lt;/span&gt;
+      &lt;span class="name"&gt;$escapetool.xml($!name)&lt;/span&gt;
       #if ($editing)
         &lt;div class="actions"&gt;
           &lt;a class="delete" href="$doc.getURL('objectremove', $escapetool.url({
@@ -140,8 +138,9 @@
   &lt;ul class="nav nav-tabs searchEngines" role="tablist"&gt;
   #foreach ($engine in $collectiontool.sort($sources.keySet()))
     &lt;li#if ($engine == $searchEngine) class="active"#end role="presentation"&gt;
-      &lt;a href="#${engine}SearchSuggestSources" aria-controls="${engine}SearchSuggestSources"
-        role="tab" data-toggle="tab"&gt;$engine&lt;/a&gt;
+      #set ($escapedEngine = $escapetool.xml($engine))
+      &lt;a href="#${escapedEngine}SearchSuggestSources" aria-controls="${escapedEngine}SearchSuggestSources"
+        role="tab" data-toggle="tab"&gt;$escapedEngine&lt;/a&gt;
     &lt;/li&gt;
   #end
   &lt;/ul&gt;
@@ -153,7 +152,9 @@
     ## We can't use the UL element as tab panel because we break the HTML validation tests: "Bad value 'tabpanel' for
     ## attribute 'role' on element 'ul'". I don't understand the reason as there's no constraint on
     ## https://www.w3.org/TR/2010/WD-wai-aria-20100916/roles#tabpanel .
-    &lt;div class="tab-pane#if ($engine == $searchEngine) active#end" role="tabpanel" id="${engine}SearchSuggestSources"&gt;
+    #set ($escapedEngine = $escapetool.xml($engine))
+    &lt;div class="tab-pane#if ($engine == $searchEngine) active#end" role="tabpanel"
+      id="${escapedEngine}SearchSuggestSources"&gt;
       &lt;ul class="searchSuggestSources"&gt;
       #foreach ($source in $sources.get($engine))
         #displaySearchSuggestSource($source)
@@ -330,29 +331,26 @@
     // Let the others know that the DOM has been updated (e.g. to enhance the source fields with pickers).
     $(document).trigger('xwiki:dom:updated', {'elements': source.toArray()});
   }
-  $('.addSearchSuggestSource').click(function(event) {
+  $('.addSearchSuggestSource').on('click', function(event) {
     event.stopPropagation();
     event.preventDefault();
     if ($(this).hasClass('loading')) return;
     $(this).addClass('loading');
     var notification = new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.inProgress')", 'inprogress');
     var addLink = this;
-    $.get(targetDocument.getURL('objectadd'), {
+    Promise.resolve($.get(targetDocument.getURL('objectadd'), {
       form_token: $(this).closest('form').find('input[name="form_token"]').prop('value'),
       classname: 'XWiki.SearchSuggestSourceClass',
       xredirect: targetDocument.getURL('get', $.param({
         sheet: 'XWiki.SearchSuggestSourceSheet',
         xobjectNumber: '',
       }))
-    })
-    .done(function(data) {
+    })).then(function(data) {
       insertSource.call(addLink, data);
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.done')", 'done'));
-    })
-    .fail(function() {
+    }).catch(function() {
       notification.replace(new XWiki.widgets.Notification("$services.localization.render('core.editors.object.add.failed')", 'error'));
-    })
-    .always(function() {
+    }).finally(function() {
       $(addLink).removeClass('loading');
     });
   });

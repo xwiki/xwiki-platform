@@ -34,8 +34,8 @@ public interface PortletContainerInitializer
     void initializeSession(javax.portlet.PortletRequest request);
 
     /**
-     * @deprecated starting with 3.5M1, use the notion of Environment instead
+     * @deprecated use the notion of Environment instead
      */
-    @Deprecated
+    @Deprecated(since = "3.5M1")
     void initializeApplicationContext(PortletContext servletContext);
 }

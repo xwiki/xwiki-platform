@@ -19,8 +19,6 @@
  */
 package org.xwiki.user.test.po;
 
-import java.net.URL;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;

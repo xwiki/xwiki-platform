@@ -2,7 +2,7 @@
 
 /* Overriding skins */
 
-.legend {
+#import .legend {
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.titleColor;
   display: block;
@@ -17,7 +17,7 @@
   margin: 0;
 }
 
-div.loading {
+#import div.loading {
   min-height:200px;
 }
 
@@ -98,13 +98,13 @@ div.loading {
   text-transform: uppercase;
 }
 
-.selectLinks {
+#import .selectLinks {
   font-size: .8em;
   margin-right: .5em;
   text-align: right;
 }
 
-.selectLinks span {
+#import .selectLinks span {
   color: $theme.linkColor;
   cursor: pointer;
   margin-left: .2em;
@@ -120,12 +120,12 @@ div.loading {
   margin-bottom: 1em;
 }
 
-.documentName{
+#import .documentName{
   background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat scroll 0 0;
   padding-left: 20px;
 }
 
-.historyStrategyOption {
+#import .historyStrategyOption {
   line-height: 1.2em;
   margin-bottom: 0;
 }
@@ -139,11 +139,11 @@ div.loading {
   Used when javascript is disabled
 */
 
-ul {
+#import ul {
   list-style-position: outside !important;
 }
 
-ul.xlist li.xunderline {
+#import ul.xlist li.xunderline {
   border: 0 !important;
 }
 
@@ -151,20 +151,20 @@ ul.xlist li.xunderline {
   margin: 0 !important;
 }
 
-div#package ul.package {
+#import div#package ul.package {
   margin: 0 0 1em 0 !important;
   padding: 3px !important;
 }
 
-ul.package li.xitem div.xitemcontainer span.checkbox,
-ul.package li.xitem div.xitemcontainer input.space {
+#import ul.package li.xitem a.xitemcontainer span.checkbox,
+#import ul.package li.xitem a.xitemcontainer input.space {
   float: right;
 }
 
-ul.package li.xitem div.xitemcontainer {
+#import ul.package li.xitem a.xitemcontainer {
   text-indent: 0;
 }
-ul.package li.xitem div.xitemcontainer .spacename:before {
+#import ul.package li.xitem a.xitemcontainer .spacename:before {
   content: '\229F';
   display: inline-block;
   font-size: 16px;
@@ -174,22 +174,22 @@ ul.package li.xitem div.xitemcontainer .spacename:before {
   text-align: center;
   width: 16px;
 }
-ul.package li.xitem.collapsed div.xitemcontainer .spacename:before {
+#import ul.package li.xitem.collapsed a.xitemcontainer .spacename:before {
   content: '\229E'
 }
 
-ul.package li.collapsed div.xitemcontainer .pages {
+#import ul.package li.collapsed a.xitemcontainer .pages {
   display: none;
 }
 
-ul.package li.xitem div.xitemcontainer div.spacename {
+#import ul.package li.xitem a.xitemcontainer div.spacename {
   background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
   cursor: pointer;
   float: left;
   font-weight: bold;
 }
 
-ul.package li.xitem div.xitemcontainer div.selection {
+#import ul.package li.xitem a.xitemcontainer div.selection {
   color: $theme.textSecondaryColor;
   float: right;
   font-size: .8em;
@@ -197,10 +197,10 @@ ul.package li.xitem div.xitemcontainer div.selection {
   margin-right: .2em;
 }
 
-ul.pages {
+#import ul.pages {
   margin: 0 0 0 18px !important;
 }
 
-ul.pages li.xitem {
+#import ul.pages li.xitem {
   width: 100%;
 }

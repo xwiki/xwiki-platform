@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -52,9 +53,13 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -108,11 +113,20 @@ public class SaveAction extends EditAction
      */
     private static final String FORCE_SAVE_OVERRIDE = "override";
 
+    @Inject
     private DocumentRevisionProvider documentRevisionProvider;
 
+    @Inject
     private MergeManager mergeManager;
 
+    @Inject
     private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    @Inject
+    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     public SaveAction()
     {
@@ -213,6 +227,10 @@ public class SaveAction extends EditAction
             sectionDoc.readFromForm(form, context);
             String sectionContent = sectionDoc.getContent() + "\n";
             String content = tdoc.updateDocumentSection(sectionNumber, sectionContent);
+
+            // The list of attachments might have been modified by a new upload that is read in sectionDoc.readFromForm
+            // so we ensure to keep the updated list of attachments.
+            tdoc.setAttachmentList(sectionDoc.getAttachmentList());
             tdoc.setContent(content);
             tdoc.setComment(sectionDoc.getComment());
             tdoc.setMinorEdit(sectionDoc.isMinorEdit());
@@ -220,11 +238,12 @@ public class SaveAction extends EditAction
             tdoc.readFromForm(form, context);
         }
 
-        // TODO: handle Author
-        String username = context.getUser();
-        tdoc.setAuthor(username);
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        tdoc.getAuthors().setOriginalMetadataAuthor(currentUserReference);
+        request.getEffectiveAuthor().ifPresent(tdoc.getAuthors()::setEffectiveMetadataAuthor);
+
         if (tdoc.isNew()) {
-            tdoc.setCreator(username);
+            tdoc.getAuthors().setCreator(currentUserReference);
         }
 
         // Make sure we have at least the meta data dirty status
@@ -273,6 +292,7 @@ public class SaveAction extends EditAction
         // We get the comment to be used from the document
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
+        this.temporaryAttachmentSessionsManager.removeUploadedAttachments(tdoc.getDocumentReference());
 
         context.put(SAVED_OBJECT_VERSION_KEY, tdoc.getRCSVersion());
 
@@ -312,33 +332,6 @@ public class SaveAction extends EditAction
     {
         ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
         return configurationSource.getProperty("edit.conflictChecking.enabled", true);
-    }
-
-    private DocumentRevisionProvider getDocumentRevisionProvider()
-    {
-        if (this.documentRevisionProvider == null) {
-            this.documentRevisionProvider = Utils.getComponent(DocumentRevisionProvider.class);
-        }
-
-        return this.documentRevisionProvider;
-    }
-
-    private MergeManager getMergeManager()
-    {
-        if (this.mergeManager == null) {
-            this.mergeManager = Utils.getComponent(MergeManager.class);
-        }
-
-        return this.mergeManager;
-    }
-
-    private MergeConflictDecisionsManager getConflictDecisionsManager()
-    {
-        if (this.conflictDecisionsManager == null) {
-            this.conflictDecisionsManager = Utils.getComponent(MergeConflictDecisionsManager.class);
-        }
-
-        return this.conflictDecisionsManager;
     }
 
     /**
@@ -382,7 +375,7 @@ public class SaveAction extends EditAction
                 if (decisionType == ConflictDecision.DecisionType.CUSTOM) {
                     customValue = Collections.singletonList(customChoicesMap.get(conflictReference));
                 }
-                getConflictDecisionsManager().recordDecision(documentReference, context.getUserReference(),
+                this.conflictDecisionsManager.recordDecision(documentReference, context.getUserReference(),
                     conflictReference, decisionType, customValue);
             }
         }
@@ -426,7 +419,7 @@ public class SaveAction extends EditAction
         if (!latestVersion.equals(previousVersion) || latestVersionDate.after(editingVersionDate)) {
             try {
                 XWikiDocument previousDoc =
-                    getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
+                    this.documentRevisionProvider.getRevision(originalDoc, previousVersion.toString());
 
                 // We also check that the previousDoc revision exists to avoid an exception if it has been deleted
                 // Note that if we're here and the request says that the document is new, it's not necessarily a
@@ -475,11 +468,11 @@ public class SaveAction extends EditAction
                         recordConflictDecisions(context, modifiedDoc.getDocumentReferenceWithLocale());
 
                         MergeDocumentResult mergeDocumentResult =
-                            getMergeManager().mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
+                            this.mergeManager.mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
 
                         // Be sure to not keep the conflict decisions we might have made if new conflicts occurred
                         // we don't want to pollute the list of decisions.
-                        getConflictDecisionsManager().removeConflictDecisionList(
+                        this.conflictDecisionsManager.removeConflictDecisionList(
                             modifiedDoc.getDocumentReferenceWithLocale(), context.getUserReference());
 
                         // If we don't get any conflict, or if we want to force the merge even with conflicts,
@@ -492,7 +485,7 @@ public class SaveAction extends EditAction
                             // If we got merge conflicts and we don't want to force it, then we record the conflict in
                             // order to allow fixing them independently.
                         } else {
-                            getConflictDecisionsManager().recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
+                            this.conflictDecisionsManager.recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
                                 context.getUserReference(),
                                 mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT));
                         }

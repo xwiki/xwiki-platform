@@ -19,18 +19,19 @@
  */
 package org.xwiki.rendering.internal.macro.chart.source.table;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.axis.DateAxis;
-
+import org.junit.jupiter.api.Test;
 import org.xwiki.chart.model.ChartModel;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 
 import java.util.Date;
 import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests building a time table xy dataset from a table data source.
@@ -38,10 +39,11 @@ import java.text.SimpleDateFormat;
  * @version $Id$
  * @since 4.2M1
  */
-public class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
+@ComponentTest
+class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockDataSourceTest
 {
     @Test
-    public void testBuildTimeTableXY() throws Exception
+    void buildTimeTableXY() throws Exception
     {
         String content =
             "| Date | column 2 | column 3 | column 4\n" +
@@ -49,7 +51,7 @@ public class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockD
             "| 2012-01-01 10:30:20 |  22 | 23 | 24 \n";
         setUpContentExpectation(content);
 
-        getDataSource().buildDataset(content, map(
+        this.source.buildDataset(content, map(
             "type", "xy_line_and_shape",
             "dataset", "timetable_xy",
             "range", "A2-D3",
@@ -59,30 +61,30 @@ public class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockD
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss", new Locale("en"));
 
-        ChartModel chartModel = getDataSource().getChartModel();
+        ChartModel chartModel = this.source.getChartModel();
 
-        Assert.assertTrue(chartModel.getDataset() instanceof TimeTableXYDataset);
+        assertTrue(chartModel.getDataset() instanceof TimeTableXYDataset);
 
-        Assert.assertTrue(chartModel.getAxis(0) instanceof DateAxis);
-        Assert.assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
+        assertTrue(chartModel.getAxis(0) instanceof DateAxis);
+        assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
 
         TimeTableXYDataset dataset = (TimeTableXYDataset) chartModel.getDataset();
 
-        Assert.assertTrue(dataset.getSeriesCount() == 3);
+        assertTrue(dataset.getSeriesCount() == 3);
 
-        Assert.assertTrue(dataset.getSeriesKey(0).equals(" column 2 "));
-        Assert.assertTrue(dataset.getSeriesKey(1).equals(" column 3 "));
-        Assert.assertTrue(dataset.getSeriesKey(2).equals(" column 4"));
+        assertTrue(dataset.getSeriesKey(0).equals(" column 2 "));
+        assertTrue(dataset.getSeriesKey(1).equals(" column 3 "));
+        assertTrue(dataset.getSeriesKey(2).equals(" column 4"));
 
-        Assert.assertTrue(dataset.getTimePeriod(0).getStart().equals(new Date(0)));
-        Assert.assertTrue(dataset.getTimePeriod(0).getEnd().equals(dateFormat.parse("2012-01-01 10:30:10")));
+        assertTrue(dataset.getTimePeriod(0).getStart().equals(new Date(0)));
+        assertTrue(dataset.getTimePeriod(0).getEnd().equals(dateFormat.parse("2012-01-01 10:30:10")));
 
-        Assert.assertTrue(dataset.getTimePeriod(1).getStart().equals(dateFormat.parse("2012-01-01 10:30:10")));
-        Assert.assertTrue(dataset.getTimePeriod(1).getEnd().equals(dateFormat.parse("2012-01-01 10:30:20")));
+        assertTrue(dataset.getTimePeriod(1).getStart().equals(dateFormat.parse("2012-01-01 10:30:10")));
+        assertTrue(dataset.getTimePeriod(1).getEnd().equals(dateFormat.parse("2012-01-01 10:30:20")));
     }
 
     @Test
-    public void testYearInterval() throws Exception
+    void yearInterval() throws Exception
     {
         String content =
             "| Date | column 2 | column 3 | column 4\n" +
@@ -90,7 +92,7 @@ public class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockD
             "| 1971 |  22 | 23 | 24 \n";
         setUpContentExpectation(content);
 
-        getDataSource().buildDataset(content, map(
+        this.source.buildDataset(content, map(
             "type", "xy_line_and_shape",
             "dataset", "timetable_xy",
             "range", "A2-D3",
@@ -99,11 +101,11 @@ public class TableTimeTableXYBuilderTest extends AbstractMacroContentTableBlockD
             "domain_axis_type", "date",
             "time_period", "year"), null);
 
-        ChartModel chartModel = getDataSource().getChartModel();
+        ChartModel chartModel = this.source.getChartModel();
 
-        Assert.assertTrue(chartModel.getDataset() instanceof TimeTableXYDataset);
+        assertTrue(chartModel.getDataset() instanceof TimeTableXYDataset);
 
-        Assert.assertTrue(chartModel.getAxis(0) instanceof DateAxis);
-        Assert.assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
+        assertTrue(chartModel.getAxis(0) instanceof DateAxis);
+        assertTrue(chartModel.getAxis(1) instanceof ValueAxis);
     }
 }

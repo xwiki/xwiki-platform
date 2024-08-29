@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -34,7 +34,6 @@
   <modules>
     <!-- Sorted alphabetically -->
     <module>xwiki-platform-distribution-debian</module>
-    <module>xwiki-platform-distribution-fedora</module>
     <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-jetty-hsqldb</module>
     <module>xwiki-platform-distribution-resources</module>
@@ -45,8 +44,8 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.8.1</maven.version>
-    <maven.resolver.version>1.6.3</maven.resolver.version>
+    <maven.version>${maven.runtime.version}</maven.version>
+    <maven.resolver.version>${maven.resolver.runtime.version}</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
@@ -72,13 +71,6 @@
       instance.hbm.xml,notification-filter-preferences.hbm.xml
     </xwiki.db.common.extraMappings>
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
-    <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
-    <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
-    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml</xwiki.db.mariadb.extraMappings>
-    <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml</xwiki.db.hsqldb.extraMappings>
-    <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
-    <xwiki.db.derby.extraMappings>mailsender.hbm.xml</xwiki.db.derby.extraMappings>
-    <xwiki.db.h2.extraMappings>mailsender.hbm.xml</xwiki.db.h2.extraMappings>
 
     <!-- Features -->
     <platform.distribution.features>xwiki</platform.distribution.features>
@@ -97,10 +89,8 @@
   com.xpn.xwiki.plugin.feed.FeedPlugin,\
   com.xpn.xwiki.plugin.mail.MailPlugin,\
   com.xpn.xwiki.plugin.packaging.PackagePlugin,\
-  com.xpn.xwiki.plugin.svg.SVGPlugin,\
   com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
   com.xpn.xwiki.plugin.image.ImagePlugin,\
-  com.xpn.xwiki.plugin.diff.DiffPlugin,\
   com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
   com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
   com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
@@ -138,17 +128,79 @@
     <!-- Default location for XWiki's Data directory -->
     <xwikiDataDir>data</xwikiDataDir>
 
+    <!-- Default configuration for each database -->
+    <!-- HSQLDB -->
+    <xwiki.db.hsqldb>hsqldb</xwiki.db.hsqldb>
+    <xwiki.db.hsqldb.jdbc.groupId>${hsqldb.groupId}</xwiki.db.hsqldb.jdbc.groupId>
+    <xwiki.db.hsqldb.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.hsqldb.jdbc.artifactId>
+    <xwiki.db.hsqldb.jdbc.version>${hsqldb.version}</xwiki.db.hsqldb.jdbc.version>
+    <xwiki.db.hsqldb.dialect />
+    <xwiki.db.hsqldb.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.hsqldb.connection.url>
+    <xwiki.db.hsqldb.connection.username>sa</xwiki.db.hsqldb.connection.username>
+    <xwiki.db.hsqldb.connection.password />
+    <xwiki.db.hsqldb.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.hsqldb.connection.driver_class>
+    <xwiki.db.hsqldb.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hsqldb.hbm.xwiki>
+    <xwiki.db.hsqldb.hbm.feeds>feeds.hbm.xml</xwiki.db.hsqldb.hbm.feeds>
+    <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml</xwiki.db.hsqldb.extraMappings>
+    <xwiki.db.hsqldb.hbm.virtualMode />
+
+    <!-- MySQL -->
+    <xwiki.db.mysql>mysql</xwiki.db.mysql>
+    <xwiki.db.mysql.jdbc.groupId>${mysql.groupId}</xwiki.db.mysql.jdbc.groupId>
+    <xwiki.db.mysql.jdbc.artifactId>${mysql.artifactId}</xwiki.db.mysql.jdbc.artifactId>
+    <xwiki.db.mysql.jdbc.version>${mysql.version}</xwiki.db.mysql.jdbc.version>
+    <xwiki.db.mysql.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.mysql.connection.url>
+    <xwiki.db.mysql.connection.username>xwiki</xwiki.db.mysql.connection.username>
+    <xwiki.db.mysql.connection.password>xwiki</xwiki.db.mysql.connection.password>
+    <xwiki.db.mysql.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.mysql.connection.driver_class>
+    <xwiki.db.mysql.hbm.xwiki>xwiki.hbm.xml</xwiki.db.mysql.hbm.xwiki>
+    <xwiki.db.mysql.hbm.feeds>feeds.hbm.xml</xwiki.db.mysql.hbm.feeds>
+    <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
+
+    <!-- MariaDB -->
+    <xwiki.db.mariadb>mariadb</xwiki.db.mariadb>
+    <xwiki.db.mariadb.jdbc.groupId>${mariadb.groupId}</xwiki.db.mariadb.jdbc.groupId>
+    <xwiki.db.mariadb.jdbc.artifactId>${mariadb.artifactId}</xwiki.db.mariadb.jdbc.artifactId>
+    <xwiki.db.mariadb.jdbc.version>${mariadb.version}</xwiki.db.mariadb.jdbc.version>
+    <xwiki.db.mariadb.connection.url>jdbc:mariadb://localhost/xwiki?useSSL=false</xwiki.db.mariadb.connection.url>
+    <xwiki.db.mariadb.connection.username>xwiki</xwiki.db.mariadb.connection.username>
+    <xwiki.db.mariadb.connection.password>xwiki</xwiki.db.mariadb.connection.password>
+    <xwiki.db.mariadb.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.mariadb.connection.driver_class>
+    <xwiki.db.mariadb.hbm.xwiki>xwiki.hbm.xml</xwiki.db.mariadb.hbm.xwiki>
+    <xwiki.db.mariadb.hbm.feeds>feeds.hbm.xml</xwiki.db.mariadb.hbm.feeds>
+    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml</xwiki.db.mariadb.extraMappings>
+
+    <!-- Postgres SQL -->
+    <xwiki.db.pgsql>pgsql</xwiki.db.pgsql>
+    <xwiki.db.pgsql.jdbc.groupId>${pgsql.groupId}</xwiki.db.pgsql.jdbc.groupId>
+    <xwiki.db.pgsql.jdbc.artifactId>${pgsql.artifactId}</xwiki.db.pgsql.jdbc.artifactId>
+    <xwiki.db.pgsql.jdbc.version>${pgsql.version}</xwiki.db.pgsql.jdbc.version>
+    <xwiki.db.pgsql.connection.url>jdbc:postgresql:xwiki</xwiki.db.pgsql.connection.url>
+    <xwiki.db.pgsql.connection.username>xwiki</xwiki.db.pgsql.connection.username>
+    <xwiki.db.pgsql.connection.password>xwiki</xwiki.db.pgsql.connection.password>
+    <xwiki.db.pgsql.connection.driver_class>org.postgresql.Driver</xwiki.db.pgsql.connection.driver_class>
+    <xwiki.db.pgsql.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.pgsql.hbm.xwiki>
+    <xwiki.db.pgsql.hbm.feeds>feeds.hbm.xml</xwiki.db.pgsql.hbm.feeds>
+    <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
+    <xwiki.db.pgsql.hbm.virtualMode>schema</xwiki.db.pgsql.hbm.virtualMode>
+
+    <!-- Oracle -->
+    <xwiki.db.oracle>oracle</xwiki.db.oracle>
+    <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
+
     <!-- Set HSQLDB by default -->
-    <xwiki.db>hsqldb</xwiki.db>
-    <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
-    <xwiki.db.jdbc.artifactId>${hsqldb.artifactId}</xwiki.db.jdbc.artifactId>
-    <xwiki.db.jdbc.version>${hsqldb.version}</xwiki.db.jdbc.version>
-    <xwiki.db.connection.url>jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
-    <xwiki.db.connection.username>sa</xwiki.db.connection.username>
-    <xwiki.db.connection.password />
-    <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-    <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+    <xwiki.db>${xwiki.db.hsqldb}</xwiki.db>
+    <xwiki.db.jdbc.groupId>${xwiki.db.hsqldb.jdbc.groupId}</xwiki.db.jdbc.groupId>
+    <xwiki.db.jdbc.artifactId>${xwiki.db.hsqldb.jdbc.artifactId}</xwiki.db.jdbc.artifactId>
+    <xwiki.db.jdbc.version>${xwiki.db.hsqldb.jdbc.version}</xwiki.db.jdbc.version>
+    <xwiki.db.dialect>${xwiki.db.hsqldb.dialect}</xwiki.db.dialect>
+    <xwiki.db.connection.url>${xwiki.db.hsqldb.connection.url}</xwiki.db.connection.url>
+    <xwiki.db.connection.username>${xwiki.db.hsqldb.connection.username}</xwiki.db.connection.username>
+    <xwiki.db.connection.password>${xwiki.db.hsqldb.connection.password}</xwiki.db.connection.password>
+    <xwiki.db.connection.driver_class>${xwiki.db.hsqldb.connection.driver_class}</xwiki.db.connection.driver_class>
+    <xwiki.db.hbm.xwiki>${xwiki.db.hsqldb.hbm.xwiki}</xwiki.db.hbm.xwiki>
+    <xwiki.db.hbm.feeds>${xwiki.db.hsqldb.hbm.feeds}</xwiki.db.hbm.feeds>
+    <xwiki.db.hbm.virtualMode>${xwiki.db.hsqldb.hbm.virtualMode}</xwiki.db.hbm.virtualMode>
 
     <!-- The module triggering all WAR dependencies. Put in a property to be changed when legacy profile is enabled. -->
     <war.dependencies.artifactId>xwiki-platform-distribution-war-dependencies</war.dependencies.artifactId>
@@ -160,31 +212,20 @@
   </properties>
 
   <!-- Avoid enforce-upper-bounds rule complains (they're actually false positives since Extension Manager is not
-       affected by that) -->
+       affected by that)
+       Indicate the actual version instead of ${project.version} for xwiki-platform artifacts so that this parent pom
+       can be reused by contrib extensions. -->
   <dependencyManagement>
     <dependencies>
-      <!-- application-tour-ui -->
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>13.6-SNAPSHOT</version>
-        <type>xar</type>
+        <artifactId>xwiki-platform-webjars-api</artifactId>
+        <version>16.8.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-security-script</artifactId>
-        <version>13.6-SNAPSHOT</version>
-      </dependency>
-      <!-- application-ckeditor-ui -->
-      <dependency>
-        <groupId>org.xwiki.rendering</groupId>
-        <artifactId>xwiki-rendering-macro-html</artifactId>
-        <version>${rendering.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.xwiki.platform</groupId>
-        <artifactId>xwiki-platform-tree-webjar</artifactId>
-        <version>13.6-SNAPSHOT</version>
+        <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+        <version>16.8.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -268,7 +309,7 @@
         <plugin>
           <groupId>org.basepom.maven</groupId>
           <artifactId>duplicate-finder-maven-plugin</artifactId>
-          <version>1.5.0</version>
+          <version>2.0.1</version>
           <executions>
             <execution>
               <id>war-check-duplicates</id>
@@ -282,32 +323,6 @@
                 <checkCompileClasspath>false</checkCompileClasspath>
                 <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
-                  <!-- None of these should bundle org.w3c classes but at least they seem compatible.
-                       See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
-                       https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>org.apache.xmlgraphics</groupId>
-                        <artifactId>batik-ext</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.ElementTraversal</class>
-                      <class>org.w3c.dom.events.DocumentEvent</class>
-                      <class>org.w3c.dom.events.Event</class>
-                      <class>org.w3c.dom.events.EventException</class>
-                      <class>org.w3c.dom.events.EventListener</class>
-                      <class>org.w3c.dom.events.EventTarget</class>
-                      <class>org.w3c.dom.events.MouseEvent</class>
-                      <class>org.w3c.dom.events.MutationEvent</class>
-                      <class>org.w3c.dom.events.UIEvent</class>
-                    </classes>
-                  </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
                        don't see a solution ATM... -->
                   <exception>
@@ -331,59 +346,21 @@
                     <conflictingDependencies>
                       <dependency>
                         <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcmail-jdk15on</artifactId>
+                        <artifactId>bcmail-jdk18on</artifactId>
                       </dependency>
                       <dependency>
                         <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcpkix-jdk15on</artifactId>
+                        <artifactId>bcpkix-jdk18on</artifactId>
                       </dependency>
                       <dependency>
                         <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcprov-jdk15on</artifactId>
+                        <artifactId>bcprov-jdk18on</artifactId>
                       </dependency>
                     </conflictingDependencies>
                     <resources>
                       <resource>META-INF/BCKEY.DSA</resource>
                       <resource>META-INF/BCKEY.SF</resource>
                     </resources>
-                  </exception>
-                  <!-- XStream includes both xapp and xmlpull and XAPP bundle somes classes of xmlpull.
-                       See http://x-stream.github.io/jira/689/ for more.
-                   -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xmlpull</groupId>
-                        <artifactId>xmlpull</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3_min</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.xmlpull</package>
-                    </packages>
-                  </exception>
-                  <!-- Seems to be the same thing -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xpp3</groupId>
-                        <artifactId>xpp3</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>javax.xml.namespace</package>
-                    </packages>
                   </exception>
                   <!-- Does not seems to be an issue -->
                   <exception>
@@ -416,6 +393,22 @@
                     <resources>
                       <resource>PropertyList-1.0.dtd</resource>
                       <resource>properties.dtd</resource>
+                    </resources>
+                  </exception>
+                  <!-- Seems to be the same thing -->
+                  <exception>
+                    <conflictingDependencies>
+                      <dependency>
+                        <groupId>org.apache.httpcomponents.client5</groupId>
+                        <artifactId>httpclient5</artifactId>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
+                      </dependency>
+                    </conflictingDependencies>
+                    <resources>
+                      <resource>mozilla/public-suffix-list.txt</resource>
                     </resources>
                   </exception>
                   <!-- Remove when https://issues.redhat.com/browse/IPROTO-177 is fixed -->
@@ -475,6 +468,8 @@
                        TODO: find out what it's about...
                    -->
                   <ignoredResourcePattern>builddef.lst</ignoredResourcePattern>
+                  <!-- Silly mistakes... -->
+                  <ignoredResourcePattern>.gitignore</ignoredResourcePattern>
                 </ignoredResourcePatterns>
                 <ignoredClassPatterns>
                   <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->
@@ -501,7 +496,6 @@
                       <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
                       <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
                       <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
-                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
                     </excludes>
                   </bannedDependencies>
                 </rules>
@@ -523,67 +517,6 @@
         <war.dependencies.artifactId>${war.dependencies.artifactId.legacy}</war.dependencies.artifactId>
         <!-- We depend on legacy artifacts on purpose -->
         <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <properties>
-        <xwiki.db>mysql</xwiki.db>
-        <xwiki.db.jdbc.groupId>${mysql.groupId}</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>${mysql.artifactId}</xwiki.db.jdbc.artifactId>
-        <xwiki.db.jdbc.version>${mysql.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
-        <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
-        <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
-        <xwiki.db.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-      </properties>
-    </profile>
-    <profile>
-      <id>mariadb</id>
-      <properties>
-        <xwiki.db>mariadb</xwiki.db>
-        <xwiki.db.jdbc.groupId>${mariadb.groupId}</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>${mariadb.artifactId}</xwiki.db.jdbc.artifactId>
-        <xwiki.db.jdbc.version>${mariadb.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:mariadb://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
-        <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
-        <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
-        <xwiki.db.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
-        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-      </properties>
-    </profile>
-    <profile>
-      <id>pgsql</id>
-      <properties>
-        <xwiki.db>pgsql</xwiki.db>
-        <xwiki.db.jdbc.groupId>${pgsql.groupId}</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>${pgsql.artifactId}</xwiki.db.jdbc.artifactId>
-        <xwiki.db.jdbc.version>${pgsql.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:postgresql:xwiki</xwiki.db.connection.url>
-        <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
-        <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
-        <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
-        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-        <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
-      </properties>
-    </profile>
-    <profile>
-      <id>derby</id>
-      <properties>
-        <xwiki.db>derby</xwiki.db>
-        <xwiki.db.jdbc.groupId>${derby.groupId}</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>${derby.artifactId}</xwiki.db.jdbc.artifactId>
-        <xwiki.db.jdbc.version>${derby.version}</xwiki.db.jdbc.version>
-        <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
-        <xwiki.db.connection.username />
-        <xwiki.db.connection.password />
-        <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
-        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
     </profile>
   </profiles>

@@ -22,6 +22,7 @@ package org.xwiki.wiki.internal.descriptor.listener;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -51,6 +52,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 @Named("wikidescriptor")
 @Singleton
+@Priority(EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY)
 public class WikiDescriptorListener implements EventListener
 {
     /**

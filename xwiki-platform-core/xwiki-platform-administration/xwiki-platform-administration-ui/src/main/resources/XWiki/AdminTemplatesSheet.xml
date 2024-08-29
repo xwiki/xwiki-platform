@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.AdminTemplatesSheet" locale="">
+<xwikidoc version="1.5" reference="XWiki.AdminTemplatesSheet" locale="">
   <web>XWiki</web>
   <name>AdminTemplatesSheet</name>
   <language/>
@@ -44,7 +44,7 @@
 
 {{html}}
   &lt;form class="xform" action="$doc.getURL('create')" method="post"&gt;
-
+    &lt;fieldset&gt;
     #template('locationPicker_macros.vm')
     #locationPicker({
       'id': 'target',
@@ -94,6 +94,7 @@
       &lt;input type="hidden" name="template" value="XWiki.TemplateProviderTemplate"/&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input id="createTemplateProvider" type="submit" value="$services.localization.render('admin.templates.createprovider.create')" class="button"/&gt;&lt;/span&gt;
     &lt;/div&gt;
+    &lt;/fieldset&gt;
   &lt;/form&gt;
 {{/html}}
 )))
@@ -111,7 +112,7 @@
   == {{translation key="admin.templates.providerslist"/}} ==
 
     #foreach($providerFullname in $availableProviders)
-      * [[$xwiki.getDocument($providerFullname).getTitle()&gt;&gt;$providerFullname]]
+      * [[$services.rendering.escape($services.rendering.escape($xwiki.getDocument($providerFullname).plainTitle, $xwiki.currentContentSyntaxId), $xwiki.currentContentSyntaxId)&gt;&gt;$services.rendering.escape($providerFullname, $xwiki.currentContentSyntaxId)]]
     #end
   )))
 #end

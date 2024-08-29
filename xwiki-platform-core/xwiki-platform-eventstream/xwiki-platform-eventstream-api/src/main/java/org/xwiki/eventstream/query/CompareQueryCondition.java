@@ -19,9 +19,12 @@
  */
 package org.xwiki.eventstream.query;
 
+import java.lang.reflect.Type;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -62,7 +65,29 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
         /**
          * The property value is equals to the passed value.
          */
-        EQUALS
+        EQUALS,
+
+        /**
+         * The property value starts with the passed value.
+         * 
+         * @since 14.0RC1
+         */
+        STARTS_WITH,
+
+        /**
+         * The property value ends with the passed value.
+         * 
+         * @since 14.0RC1
+         */
+        ENDS_WITH,
+
+        /**
+         * The property value contains the passed value.
+         *
+         * @since 14.4RC1
+         */
+        @Unstable
+        CONTAINS
     }
 
     private final Object value;
@@ -88,6 +113,40 @@ public class CompareQueryCondition extends AbstractPropertyQueryCondition
     public CompareQueryCondition(String property, Object value, CompareType type, boolean reversed)
     {
         super(reversed, property);
+
+        this.value = value;
+        this.type = type;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param custom true if the property is a custom parameter
+     * @param value the value the property should be equal to
+     * @param type the type of comparison
+     * @param reversed true if the condition should be reversed
+     * @since 13.9RC1
+     */
+    public CompareQueryCondition(String property, boolean custom, Object value, CompareType type, boolean reversed)
+    {
+        super(reversed, property, custom);
+
+        this.value = value;
+        this.type = type;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param custom true if it's a custom event reversed
+     * @param customType the type in which that property was stored
+     * @param value the value the property should be equal to
+     * @param type the type of comparison
+     * @param reversed true if the condition should be reversed
+     * @since 14.2RC1
+     */
+    public CompareQueryCondition(String property, boolean custom, Type customType, Object value, CompareType type,
+        boolean reversed)
+    {
+        super(reversed, property, custom, customType);
 
         this.value = value;
         this.type = type;

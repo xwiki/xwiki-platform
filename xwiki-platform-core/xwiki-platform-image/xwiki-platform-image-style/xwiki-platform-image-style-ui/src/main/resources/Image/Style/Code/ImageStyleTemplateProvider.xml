@@ -1,0 +1,275 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="Image.Style.Code.ImageStyleTemplateProvider" locale="">
+  <web>Image.Style.Code</web>
+  <name>ImageStyleTemplateProvider</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Image.Style.Code.ImageStyleClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>ImageStyle Template Provider</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <object>
+    <name>Image.Style.Code.ImageStyleTemplateProvider</name>
+    <number>0</number>
+    <className>XWiki.TemplateProviderClass</className>
+    <guid>56856da3-5750-4dd8-a1ef-ce2550f1aad1</guid>
+    <class>
+      <name>XWiki.TemplateProviderClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <action>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>action</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>Action on create</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|saveandedit|saveandview</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </action>
+      <creationRestrictions>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>creationRestrictions</name>
+        <number>9</number>
+        <picker>1</picker>
+        <prettyName>Creation Restrictions</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> ,</separator>
+        <separators>,</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web from XWikiDocument doc</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </creationRestrictions>
+      <creationRestrictionsAreSuggestions>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>creationRestrictionsAreSuggestions</name>
+        <number>10</number>
+        <prettyName>Creation Restrictions Are Suggestions</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </creationRestrictionsAreSuggestions>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>description</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </description>
+      <icon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>icon</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>icon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </icon>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <spaces>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>spaces</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>spaces</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>,</separator>
+        <separators>,</separators>
+        <size>10</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </spaces>
+      <template>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>template</name>
+        <number>2</number>
+        <picker>1</picker>
+        <prettyName>template</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </template>
+      <terminal>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>terminal</name>
+        <number>5</number>
+        <prettyName>terminal</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </terminal>
+      <visibilityRestrictions>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <idField/>
+        <multiSelect>1</multiSelect>
+        <name>visibilityRestrictions</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>Visibility Restrictions</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> ,</separator>
+        <separators>,</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <sql>select distinct doc.web from XWikiDocument doc order by doc.web</sql>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </visibilityRestrictions>
+    </class>
+    <property>
+      <action>edit</action>
+    </property>
+    <property>
+      <creationRestrictions>
+        <value>Image.Style.Code.ImageStyles</value>
+      </creationRestrictions>
+    </property>
+    <property>
+      <creationRestrictionsAreSuggestions>0</creationRestrictionsAreSuggestions>
+    </property>
+    <property>
+      <description>Add a new ImageStyle entry.</description>
+    </property>
+    <property>
+      <icon/>
+    </property>
+    <property>
+      <name>ImageStyle</name>
+    </property>
+    <property>
+      <spaces/>
+    </property>
+    <property>
+      <template>Image.Style.Code.ImageStyleTemplate</template>
+    </property>
+    <property>
+      <terminal>1</terminal>
+    </property>
+    <property>
+      <visibilityRestrictions>
+        <value>Image.Style.Code.ImageStyles</value>
+      </visibilityRestrictions>
+    </property>
+  </object>
+</xwikidoc>

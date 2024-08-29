@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Translations" locale="ja">
+  <web>Help</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>help.tipsPanel.title=ヒント
+help.tipsPanel.noTipMessage=ヒントはありません！
+help.tipsPanel.gettingStartedTip=XWikiを初めて使う場合は、[[スタートガイド&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]]をご確認ください。
+help.tipsPanel.jumpToPageTip=Ctrl+GまたはMeta+Gでウィキのどのページにも移動できます。\n[[他のショートカット&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]]も見てみてください。
+help.tipsPanel.improveXWikiTip=あなたもXWikiを改善できることを知っていますか？5分程度の[[アンケートに答えて&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]プロジェクトを手伝ってください！
+help.tipsPanel.breadcrumbsTip=パンくずリストにある矢印をクリックすると、同レベルのページ、下位ページに移動できます。
+help.tipsPanel.advancedHiddenShortcutTip=x+x+x+aキーを押すと[[上級モード&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]]を有効にできます。x+x+x+hキーを押すと[[隠しページ&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]]を有効にできます。
+help.tipsPanel.linkAutocompleteWYSIWYGTip=WYSIWYGで編集する際は、##[## と入力し、続けて文字を入力するとリンク作成の候補を表示します。
+help.macroList.title=利用可能なマクロ
+help.macroList.id=ID
+help.macroList.name=名称
+help.macroList.categories=カテゴリー
+help.macroList.description=詳細
+help.macroList.visibility=見え方
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+############################################################################### 
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=カテゴリー
+
+#@deprecatedend
+</content>
+</xwikidoc>

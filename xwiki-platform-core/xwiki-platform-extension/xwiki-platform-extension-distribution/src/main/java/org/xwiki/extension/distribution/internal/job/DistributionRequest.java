@@ -32,7 +32,7 @@ public class DistributionRequest extends AbstractRequest implements Cloneable
     private static final long serialVersionUID = 1L;
 
     /**
-     * @see #getExtensions()
+     * @see #getWiki()
      */
     public static final String PROPERTY_WIKI = "wiki";
 

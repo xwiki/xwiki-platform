@@ -30,9 +30,6 @@ jest.mock("moment", function () {
   }
 });
 
-jest.mock("jquery", function () {
-});
-
 import DisplayerDate from "../../../displayers/DisplayerDate.vue";
 import {initWrapper} from "./displayerTestsHelper";
 
@@ -43,12 +40,10 @@ describe('DisplayerDate.vue', () => {
     expect(wrapper.text()).toMatch('formatted date')
   })
 
-  it('Switch to edit when double click', async () => {
+  it('Switch to edit mode', async () => {
     const wrapper = initWrapper(DisplayerDate, {});
 
-    const viewerDiv = wrapper.find('div[tabindex="0"]');
-
-    await viewerDiv.trigger('dblclick')
+    await wrapper.setData({isView: false});
 
     const input = wrapper.find('.editor-date');
     expect(input.element.value).toMatch('formatted date')

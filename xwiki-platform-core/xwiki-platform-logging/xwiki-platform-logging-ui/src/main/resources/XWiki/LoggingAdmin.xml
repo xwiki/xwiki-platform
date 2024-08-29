@@ -44,20 +44,28 @@
 ##
 ## Setting the logger level if button has been pressed ##
 ##
-#if ($request.loggeraction_set &amp;&amp; $request.logger_name &amp;&amp; $xwiki.hasAccessLevel('programming'))
+#set ($loggerName = $request.logger_name)
+#set ($loggerNameEscaped = $services.rendering.escape($escapetool.java($loggerName), 'xwiki/2.1'))
+#set ($loggerLevel = $request.logger_level)
+#set ($loggerLevelEscaped = $services.rendering.escape($escapetool.java($loggerLevel), 'xwiki/2.1'))
+#if ($request.loggeraction_set &amp;&amp; $loggerName &amp;&amp; $xwiki.hasAccessLevel('programming'))
   #set($logger_list = $logging.getLevels())
-  #if ($!logger_list.containsKey($request.logger_name))
+  #if ($!logger_list.containsKey($loggerName))
     #if ($request.logger_level == '')
-      {{success}}Logger ${request.logger_name} level has been unset.{{/success}}
-      #set($void = $logging.setLevel($request.logger_name, $null))
+      {{success}}
+        {{translation key='logging.admin.unsetLevel.success' parameters="~"${loggerNameEscaped}~""/}}
+      {{/success}}
+      #set($void = $logging.setLevel($loggerName, $null))
     #else
-      {{success}}Logger ${request.logger_name} level has been set to ${request.logger_level}.{{/success}}
-      #set($void = $logging.setLevel($request.logger_name, $request.logger_level))
+      {{success}}
+        {{translation key='logging.admin.setLevel.success'
+          parameters="~"${loggerNameEscaped}~",~"${loggerLevelEscaped}~""/}}
+      {{/success}}
+      #set($void = $logging.setLevel($loggerName, $request.logger_level))
     #end
   #else
-    {{error}}Failed to set log level: the logger "$request.logger_name" doesn't exist.{{/error}}
+    {{error}}{{translation key='logging.admin.setLevel.error' parameters="~"${loggerNameEscaped}~""/}}{{/error}}
   #end
-
 #end
 ##
 ## Live Data
@@ -77,6 +85,7 @@
     'filterable': false
   }))
 #end
+
 {{liveData
   id="logging"
   properties="$stringtool.join($properties, ',')"

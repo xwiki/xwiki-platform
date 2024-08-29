@@ -25,15 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-ui</artifactId>
   <name>XWiki Platform - Filter - UI</name>
   <packaging>xar</packaging>
   <description>Provide a generic UI to convert from a XWiki Filter input stream to an output stream with settings for each stream.</description>
   <properties>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-filter-ui</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Filter Streams Converter Application</xwiki.extension.name>
   </properties>

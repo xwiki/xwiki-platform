@@ -163,10 +163,10 @@ public class MentionsNotificationDisplayer implements NotificationDisplayer
      */
     private Optional<MentionEventParams> deserializeParam(Event event)
     {
-        Map<String, String> parameters = event.getParameters();
+        Map<String, Object> parameters = event.getCustom();
         if (parameters.containsKey(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY)) {
             return this.objectMapper
-                .unserialize(parameters.get(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY));
+                .unserialize((String) parameters.get(MentionsRecordableEventConverter.MENTIONS_PARAMETER_KEY));
         } else {
             return Optional.empty();
         }

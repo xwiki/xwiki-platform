@@ -525,6 +525,39 @@ public privileged aspect XWikiCompatibilityAspect
     }
 
     /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then empty String is returned.
+     *
+     * @param preference Preference name
+     * @param space The space for which this preference is requested
+     * @return The preference for this wiki and the current locale
+     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference)} instead
+     */
+    @Deprecated(since = "14.8RC1")
+    public String XWiki.getSpacePreferenceFor(String preference, String space)
+    {
+        return getSpacePreferenceFor(preference, space, "");
+    }
+
+    /**
+     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * <p>
+     * If the property is not set on any level then <code>defaultValue</code> is returned.
+     *
+     * @param preference Preference name
+     * @param space The space for which this preference is requested
+     * @param defaultValue default value to return if the preference does not exist or is empty
+     * @return The preference for this wiki and the current locale in long format
+     * @deprecated use {@link #getSpacePreferenceFor(String, SpaceReference, String)} instead
+     */
+    @Deprecated(since = "14.8RC1")
+    public String XWiki.getSpacePreferenceFor(String preference, String space, String defaultValue)
+    {
+        return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());
+    }
+
+    /**
      * @deprecated replaced by {@link XWiki#getSpacePreference(String)} since 2.3M1
      */
     @Deprecated
@@ -1197,5 +1230,60 @@ public privileged aspect XWikiCompatibilityAspect
     public List<String> XWiki.getConfiguredSyntaxes()
     {
         return this.xwiki.getConfiguredSyntaxes();
+    }
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
+     * RequestDispatcher, buffering the output, then returning it as a string.
+     *
+     * @param url URL of the servlet
+     * @return text result of the servlet
+     * @deprecated since 12.10.9, 13.4.3, 13.7RC1
+     */
+    @Deprecated
+    public String XWiki.invokeServletAndReturnAsString(String url)
+    {
+        return hasProgrammingRights() ? this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext()) : null;
+    }
+
+    /**
+     * Inserts a tooltip using toolTip.js
+     *
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @param params Parameters in Javascropt added to the tooltip config
+     * @return HTML with working tooltip
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message, String params)
+    {
+        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
+    }
+
+    /**
+     * Inserts a tooltip using toolTip.js
+     *
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @return HTML with working tooltip
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltip(String html, String message)
+    {
+        return this.xwiki.addTooltip(html, message, getXWikiContext());
+    }
+
+    /**
+     * Inserts the tooltip Javascript
+     *
+     * @return
+     * @deprecated since 16.0RC1, this method doesn't work for a long time since flamingo skin
+     */
+    @Deprecated(since = "16.0RC1")
+    public String XWiki.addTooltipJS()
+    {
+        return this.xwiki.addTooltipJS(getXWikiContext());
     }
 }

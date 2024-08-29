@@ -49,7 +49,7 @@ define(['jquery', 'xwiki-export-tree', 'xwiki-export-tree-filter'], function($) 
       }
       // We also need to handle the tree pagination.
       // See XWIKI-17425: A tree node with checkboxes and pagination is removed from the tree when you open it
-      if ($.isArray(data)) {
+      if (Array.isArray(data)) {
         var offset = (arguments[1] || {}).offset || 0;
         data = extractPage(data, offset);
       }
@@ -76,7 +76,7 @@ define(['jquery', 'xwiki-export-tree', 'xwiki-export-tree-filter'], function($) 
     var dataURL = dataURLPrefix + ';filters=' + (filter || '') + ',' + JSON.stringify(data);
     // The root node type and reference (id) are required in order to be able to express the selection of the top level
     // pages using exclusions (we have to use exclusions if there is a top level pagination node that is checked).
-    ($element || $('<div>')).attr('data-url', dataURL).data('root', {
+    ($element || $('<div></div>')).attr('data-url', dataURL).data('root', {
       id: 'xwiki',
       type: 'wiki'
     }).one('ready.jstree', function(event, data) {
@@ -474,7 +474,7 @@ define(['jquery', 'xwiki-export-tree', 'xwiki-export-tree-filter'], function($) 
     // Add the filters.
     Object.keys(data).forEach(function(filterId) {
       var filterList = container.find('ul.export-tree-filter');
-      $('<li><a href="#"/></li>').appendTo(filterList).find('a').attr('data-filter', filterId).text(filterId);
+      $('<li><a href="#"></a></li>').appendTo(filterList).find('a').attr('data-filter', filterId).text(filterId);
     });
 
     return createExportTree(data, defaultFilter, container.find('.export-tree'));

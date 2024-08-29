@@ -46,9 +46,10 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -256,7 +257,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      * <p>
      * This is a helper for document reference but you can use {@link #getEntityDocument(String, EntityType)} for any
      * other kind of reference.
@@ -284,7 +285,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param reference the reference of the document to be loaded
      * @param type the type of the reference
@@ -348,7 +349,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param fullName the full name of the XWiki document to be loaded
@@ -374,7 +375,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
+     * Loads a Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
      *
      * @param reference the reference of the XWiki document to be loaded
@@ -571,14 +572,16 @@ public class XWiki extends Api
 
     /**
      * Returns whether a page exists or not.
+     * <p>
+     * Since 14.9, if the check fail an exception is thrown.
      *
      * @param reference the reference of the page to check for its existence
      * @return true if the page exists, false if not
+     * @throws XWikiException when failing to check page existence
      * @since 13.3RC1
      * @since 12.10.7
      */
-    @Unstable
-    public boolean exists(PageReference reference)
+    public boolean exists(PageReference reference) throws XWikiException
     {
         return this.xwiki.exists(reference, getXWikiContext());
     }
@@ -603,7 +606,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
@@ -657,12 +660,17 @@ public class XWiki extends Api
     {
         try {
             if (reference != null && getContextualAuthorizationManager().hasAccess(Right.VIEW, reference)) {
-                XWikiDocument documentRevision = getDocumentRevisionProvider().getRevision(reference, revision);
+                DocumentRevisionProvider revisionProvider = getDocumentRevisionProvider();
+                revisionProvider.checkAccess(Right.VIEW, CurrentUserReference.INSTANCE, reference, revision);
+                XWikiDocument documentRevision = revisionProvider.getRevision(reference, revision);
 
                 if (documentRevision != null) {
                     return new Document(documentRevision, this.context);
                 }
             }
+        } catch (AuthorizationException e) {
+            LOGGER.info("Access denied for loading revision [{}] of document [{}]: [{}]", revision, reference,
+                ExceptionUtils.getRootCauseMessage(e));
         } catch (Exception e) {
             LOGGER.error("Failed to access revision [{}] of document {}", revision, reference, e);
         }
@@ -1011,18 +1019,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
-     * RequestDispatcher, buffering the output, then returning it as a string.
-     *
-     * @param url URL of the servlet
-     * @return text result of the servlet
-     */
-    public String invokeServletAndReturnAsString(String url)
-    {
-        return this.xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
-    }
-
-    /**
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
@@ -1161,35 +1157,6 @@ public class XWiki extends Api
     public String getSkinPreference(String preference, String defaultValue)
     {
         return this.xwiki.getSkinPreference(preference, defaultValue, getXWikiContext());
-    }
-
-    /**
-     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
-     * <p>
-     * If the property is not set on any level then empty String is returned.
-     *
-     * @param preference Preference name
-     * @param space The space for which this preference is requested
-     * @return The preference for this wiki and the current locale
-     */
-    public String getSpacePreferenceFor(String preference, String space)
-    {
-        return getSpacePreferenceFor(preference, space, "");
-    }
-
-    /**
-     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
-     * <p>
-     * If the property is not set on any level then <code>defaultValue</code> is returned.
-     *
-     * @param preference Preference name
-     * @param space The space for which this preference is requested
-     * @param defaultValue default value to return if the preference does not exist or is empty
-     * @return The preference for this wiki and the current locale in long format
-     */
-    public String getSpacePreferenceFor(String preference, String space, String defaultValue)
-    {
-        return this.xwiki.getSpacePreference(preference, space, defaultValue, getXWikiContext());
     }
 
     /**
@@ -1407,7 +1374,6 @@ public class XWiki extends Api
      * @return the list of available locales
      * @since 12.4RC1
      */
-    @Unstable
     public List<Locale> getAvailableLocales()
     {
         return this.xwiki.getAvailableLocales(getXWikiContext());
@@ -1632,7 +1598,6 @@ public class XWiki extends Api
      * @throws XWikiException if the document cannot be renamed properly.
      * @since 12.5RC1
      */
-    @Unstable
     public boolean renameDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         boolean overwrite, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences) throws XWikiException
@@ -1963,7 +1928,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -2014,7 +1979,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in view mode The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
@@ -2030,7 +1995,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
+     * API to retrieve the URL of a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
      * is important to always use the URL functions to generate URL and never hardcode URLs.
@@ -2085,7 +2050,7 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
+     * API to retrieve the URL of a Wiki Document in any mode, optionally adding an anchor. The URL is generated
      * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
@@ -2785,61 +2750,32 @@ public class XWiki extends Api
     }
 
     /**
-     * Generates a unique page name based on initial page name and already existing pages
+     * Generates a unique document name based on initial page name and already existing pages.
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
      *
-     * @param name
-     * @return a unique page name
+     * @param space the space where to add the document
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
      */
-    public String getUniquePageName(String name)
+    public String getUniquePageName(String space) throws XWikiException
     {
-        return this.xwiki.getUniquePageName(name, getXWikiContext());
+        return this.xwiki.getUniquePageName(space, getXWikiContext());
     }
 
     /**
-     * Generates a unique page name based on initial page name and already existing pages
+     * Generates a unique document name based on initial page name and already existing pages
+     * <p>
+     * Since 14.9, if the document exist check fail an exception is thrown.
      *
-     * @param space
-     * @param name
-     * @return a unique page name
+     * @param space the space where to add the document
+     * @param name the prefix of the document name
+     * @return a unique document name
+     * @throws XWikiException when failing to check document existence
      */
-    public String getUniquePageName(String space, String name)
+    public String getUniquePageName(String space, String name) throws XWikiException
     {
         return this.xwiki.getUniquePageName(space, name, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @param params Parameters in Javascropt added to the tooltip config
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message, String params)
-    {
-        return this.xwiki.addTooltip(html, message, params, getXWikiContext());
-    }
-
-    /**
-     * Inserts a tooltip using toolTip.js
-     *
-     * @param html HTML viewed
-     * @param message HTML Tooltip message
-     * @return HTML with working tooltip
-     */
-    public String addTooltip(String html, String message)
-    {
-        return this.xwiki.addTooltip(html, message, getXWikiContext());
-    }
-
-    /**
-     * Inserts the tooltip Javascript
-     *
-     * @return
-     */
-    public String addTooltipJS()
-    {
-        return this.xwiki.addTooltipJS(getXWikiContext());
     }
 
     /*
@@ -2924,7 +2860,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth() throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(this.context);
+        return this.context.getWiki().checkAuth(this.context);
     }
 
     /**
@@ -2939,7 +2875,13 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        XWikiUser user =
+            this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        if (user.isDisabled(this.context)) {
+            this.context.put(XWikiContext.INACTIVE_USER_REFERENCE, user.getUserReference());
+            user = null;
+        }
+        return user;
     }
 
     /**
@@ -2965,7 +2907,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @param wikiName wiki for which to get the path
      * @return The servlet path
@@ -2977,7 +2919,7 @@ public class XWiki extends Api
 
     /**
      * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
-     * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
+     * {@code xwiki.virtual.usepath} is enabled in xwiki.cfg, it is "wiki/wikiname/".
      *
      * @return The servlet path
      */
@@ -2988,7 +2930,7 @@ public class XWiki extends Api
 
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
-     * the config <tt>xwiki.webapppath</tt>.
+     * the config {@code xwiki.webapppath}.
      *
      * @return The servlet path
      */

@@ -139,7 +139,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     require(['jquery', 'xwiki-suggestPages'], function($) {
       // Load the required CSS.
       paths.css.selectize.forEach(function(url) {
-        var link = $('<link/>').attr({
+        $('<link/>').attr({
           type: 'text/css',
           rel: 'stylesheet',
           href: url
@@ -165,7 +165,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       // Disable the action buttons while the dropdown list of suggestions is open in order to prevent the form from
       // being submitted when a page is selected using the Enter key. We have to do this hack because the page picker
       // doesn't stop the propagation of the Enter key event when the dropdown is opened, as it does with the Esc key.
-      self.input.selectize.on('dropdown_open', $.proxy(enableActionButtons, null, false));
+      self.input.selectize.on('dropdown_open', enableActionButtons.bind(null, false));
       // Update the state of the action buttons after the dropdown is closed (either because a page was selected or
       // because the user pressed the Esc key). The state depends on whether the picker has a selected value.
       self.input.selectize.on('dropdown_close', updateActionButtons);

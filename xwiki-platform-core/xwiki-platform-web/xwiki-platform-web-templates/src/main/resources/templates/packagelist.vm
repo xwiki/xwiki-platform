@@ -29,9 +29,10 @@
         <div class="name">
           <a href="$!url" class="package" title="$services.localization.render('core.importer.selectThisPackage')">
             #set($maxnamelength = 40)
-            #packName($attach.filename)
+            #set ($packName = "#packName($attach.filename)")
+            $escapetool.xml($packName)
           </a>
-          <span class="version">$attach.version</span>
+          <span class="version">$escapetool.xml($attach.version)</span>
           <span class="xwikibuttonlinks">
             #set($redirect = $doc.getURL('import', 'section=Import'))
             #set($attachurl = $doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=$!{redirect}&amp;form_token=$!{services.csrf.getToken()}"))
@@ -40,15 +41,18 @@
           </span>
         </div>
         <div class="infos">
-          $services.localization.render('core.importer.packageInformationExtract', [
-            $xwiki.getUserName($attach.author, true),
-            $!xwiki.formatDate($attach.date)
-          ]) - <span class="size">(#dynamicsize($attach.longSize))</span>
+          #set ($userName = $xwiki.getUserName($attach.author, true))
+          #set ($formatDate = $!xwiki.formatDate($attach.date))
+          #set ($link = $escapetool.xml($services.localization.render('core.importer.packageInformationExtract', [
+            '__USERNAME__',
+            '__FORMAT_DATE__'
+          ])).replace('__USERNAME__', $userName).replace('__FORMAT_DATE__', $formatDate))
+          $link - <span class="size">(#dynamicsize($attach.longSize))</span>
         </div>
       </div>
     </li>
   #end
   </ul>
 #else
-  <span class="noitems">$services.localization.render('core.importer.noPackageAvailable')</span>
+  <span class="noitems">$escapetool.xml($services.localization.render('core.importer.noPackageAvailable'))</span>
 #end

@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxNewLineLineBreaks</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxNewLineLineBreaks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редагування =
+
+== Новий рядок/Розриви рядка ==
+
+=== 1.0 New Line Line Breaks ===
+
+Новий рядок - це символ повернення каретки. Розрив рядка — це примусовий новий рядок, який може з’явитися будь-де в тексті.
+
+{{info}}
+У XWiki Syntax 1.0 нові рядки не враховуються. Використовуйте замість цього розриви рядків.
+{{/info}}
+
+|=Функція|=Синтаксис XWiki 1.0|=Результат
+|Розрив рядка|{{{Рядок\\Новий рядок}}}|Рядок\\Новий рядок
+|Новий рядок|Рядок\\Новий рядок|Новий рядок
+
+=== 2.0 New Line Line Breaks ===
+
+Новий рядок - це символ повернення каретки. Розрив рядка — це примусовий новий рядок, який може з’явитися будь-де в тексті.
+
+|=Функція|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|Розрив рядка|{{{Рядок\\Новий рядок}}}|Рядок\\Новий рядок
+|Новий рядок|Рядок\\Новий рядок|Рядок\\Новий рядок</content>
+</xwikidoc>

@@ -80,10 +80,18 @@ rendering.macro.menu.name=Menü
 rendering.macro.menu.description=Zeigt ein Menü an, das mit einer einfachen Wiki-Syntax erstellt wurde (verschachtelte Listen und Links).
 rendering.macro.menu.parameter.id.name=id
 rendering.macro.menu.parameter.id.description=Optionale Menükennung, die auf das HTML-Element gesetzt wird, das das Menü umgibt. Mit dieser Kennung können Sie im JavaScript-Code auf das Menü DOM zugreifen oder in Funktionstests die Menüpunkte bestätigen.
+rendering.macro.menu.parameter.label.name=Beschriftung
+rendering.macro.menu.parameter.label.description=Optionale Menübeschriftung, die den Inhalt des Menüs beschreibt. Besonders wichtig für unterstützende Technologien und die Zugänglichkeit des Menüs.
 rendering.macro.menu.parameter.type.name=Typ
 rendering.macro.menu.parameter.type.description=Der optionale Menütyp bestimmt das Aussehen und das Verhalten des Menüs. Die unterstützten Werte sind: horizontal (Standardwert) und vertikal.
 rendering.macro.menu.content.description=Definieren Sie die Menüstruktur mit Hilfe der Wiki-Syntax. Jeder Menüpunkt sollte ein Listenelement sein und die Bezeichnung oder den Link des Menüpunkts enthalten. Verschachtelte Listen können Sie für Untermenüpunkte verwenden.
 
+# Menu UI
+menu.ui.openSubMenu=Das Untermenü öffnen.
+menu.ui.closeSubMenu=Das Untermenü schließen.
+menu.ui.horizontal.toggler.description=Das horizontale Menü umschalten.
+
 # Menu WebHome
-menu.description=Dies ist eine einfache Anwendung, mit der Sie Navigationsmenüs erstellen können, die entweder horizontal als obere Leiste nach dem Seitenkopf oder vertikal in einem Seitenpanel angezeigt werden.</content>
+menu.description=Dies ist eine einfache Anwendung, mit der Sie Navigationsmenüs erstellen können, die entweder horizontal als obere Leiste nach dem Seitenkopf oder vertikal in einem Seitenpanel angezeigt werden.
+</content>
 </xwikidoc>

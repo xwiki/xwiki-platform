@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.EntityReference;
 
@@ -59,6 +60,24 @@ public class EntityRequest extends AbstractCheckRightsRequest
      * @see #isDeep()
      */
     private static final String PROPERTY_DEEP = "deep";
+
+    /**
+     * Default constructor.
+     */
+    public EntityRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     * @since 14.7RC1
+     * @since 14.4.4
+     * @since 13.10.9
+     */
+    public EntityRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return the type of job that should perform this request; this is useful when different jobs use the same type of

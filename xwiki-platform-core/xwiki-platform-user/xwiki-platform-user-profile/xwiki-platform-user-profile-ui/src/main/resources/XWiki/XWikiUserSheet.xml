@@ -103,8 +103,7 @@
       ## By specifying the image width we enable server side resizing. The width value we use is greater than the
       ## available space because we don't want to loose too much of the image quality (we rely on the browser to fit the
       ## image in the available space).
-      #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
-      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
+      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($hasEdit) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
     #end
   )))
   ##########
@@ -303,14 +302,14 @@ Object.extend(XWiki, {
 
     updateField : function (fieldName, value) {
       var element = $$('input[name=' + fieldName + ']');
-      if (element &amp;&amp; element.size() &gt; 0) {
+      if (element &amp;&amp; element.length) {
         element[0].value = value;
       }
     },
 
     handleCancelAction : function() {
       var elements = $$('form .buttons input[type=submit][name=action_cancel]');
-      if (elements &amp;&amp; elements.size() &gt; 0) {
+      if (elements &amp;&amp; elements.length) {
         var button = elements[0];
         Event.stopObserving(button, 'click');
         button.observe('click', function(event){
@@ -454,7 +453,7 @@ return XWiki;
 
 #avatar img {
   border: 1px solid $theme.borderColor;
-  border-radius: 5px 5px 5px 5px;
+  border-radius: 8px 8px 8px 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   margin: 0 auto;
   padding: 0.3em;
@@ -514,13 +513,13 @@ return XWiki;
   margin-left: 14em;
 }
 
-.column h1 {
-  font-weight:bold;
-  font-size:115%;
-  margin:10px 0;
+.column h1, .column h2 {
+  font-weight: bold;
+  font-size: 115%;
+  margin: 10px 0;
 }
 
-.column h2 {
+.column h3 {
   font-size: 110%;
 }
 
@@ -538,7 +537,7 @@ div.userDashboard, #dashboardPane .dashboard {
 
 /* ----- Profile ----- */
 td.recentChangesLeft, .recentChangesMoreActions {
-  display:none;
+  display: none;
 }
 
 td.recentChangesRight {
@@ -557,10 +556,6 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
 }
 
-.userInfo {
-  -ms-word-break: break-all; /* IE8, IE9 */
-}
-
 .userInfo a {
   word-wrap: break-word;
 }
@@ -572,6 +567,7 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
 .userInfo h2 {
   font-size: larger;
   font-weight: bolder;
+  margin-top: 10px;
 }
         
 div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {
@@ -579,15 +575,9 @@ div.userInfo input[type="text"], div.userInfo input[type="password"], div.userIn
 }
 
 div.editProfileCategory {
-  float:right;
+  float: right;
 }
 
-div.editProfileCategory a {
-  display:block;
-  width: 16px;
-  height: 16px;
-  background: url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat;
-}
 
 /* Watchlist */
 
@@ -598,9 +588,9 @@ div.editProfileCategory a {
 }
 
 span#avatarUpload {
-  display:block;
-  width:$tabswidth;
-  position:absolute;
+  display: block;
+  width: $tabswidth;
+  position: absolute;
   font-size: 10px;
   font-weight: bold;
   background-color: white;
@@ -615,28 +605,35 @@ span#avatarUpload {
   margin: 0;
   padding: 0;
 }
+
 #networkPane .following li {
   padding: 2px 20px 2px 2px;
 }
+
 #networkPane .following li:hover {
   background-color: $theme.highlightColor;
 }
+
 #networkPane .following img {
   float: left;
   margin-right: 5px;
 }
+
 #networkPane .following .user-info {
   float: left;
 }
+
 #networkPane .following .user-id {
   font-size: .8em;
   font-weight: 900;
 }
+
 #networkPane .following .unfollow {
   float: right;
   margin-right: -16px;
   padding: 0;
 }
+
 ## --------------------------------------
 ## Picker style
 .attachment-picker {
@@ -644,6 +641,7 @@ span#avatarUpload {
   margin: auto;
   width: 100%;
 }
+
 .attachment-picker p {
   padding: 0;
   margin: 0;
@@ -652,6 +650,7 @@ span#avatarUpload {
 .attachment-picker .picture {
   z-index: -1;
 }
+
 .attachment-picker .buttonwrapper {
   margin: 0;
 }
@@ -677,6 +676,9 @@ span#avatarUpload {
 .dashboard .clearfloats:after, .dashboard .clearfloats:before {
   clear: right;
 }</code>
+    </property>
+    <property>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>userprofile</name>

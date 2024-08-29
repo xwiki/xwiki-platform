@@ -38,5 +38,9 @@
   <hidden>true</hidden>
   <content>admin.captcha=CAPTCHA
 captcha.admin.defaultCaptchaName.label=Standardmäßig Captcha
-captcha.admin.defaultCaptchaName.hint=Das Standard-Captcha-Verfahren. Im Extension Manager erhalten Sie weitere Verfahren, die installiert und genutzt werden können.</content>
+captcha.admin.defaultCaptchaName.hint=Das Standard-Captcha-Verfahren. Im Extension Manager erhalten Sie weitere Verfahren, die installiert und genutzt werden können.
+captcha.admin.configure.title={0} konfigurieren
+captcha.admin.sample.title=Beispiel-CAPTCHA
+captcha.admin.sample.description=Wie das konfigurierte CAPTCHA aussieht, wenn es beispielsweise in einem Formular angezeigt wird.
+</content>
 </xwikidoc>

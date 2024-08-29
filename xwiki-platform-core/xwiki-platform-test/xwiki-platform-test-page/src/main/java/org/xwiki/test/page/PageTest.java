@@ -28,6 +28,7 @@ import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.context.Execution;
@@ -60,6 +61,10 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONException;
+import net.sf.json.JSONSerializer;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -79,8 +84,6 @@ import static org.mockito.Mockito.when;
 @PageComponentList
 public class PageTest
 {
-    private static final String SKIN_PROPERTIES_PATH = "/skins/flamingo/skin.properties";
-
     @InjectMockitoOldcore
     protected MockitoOldcore oldcore;
 
@@ -133,6 +136,9 @@ public class PageTest
 
         CacheManager cacheManager = componentManager.registerMockComponent(CacheManager.class);
         when(cacheManager.createNewCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
+        CacheFactory cacheFactory = mock(CacheFactory.class);
+        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
+        when(cacheFactory.newCache(any(CacheConfiguration.class))).thenReturn(mock(Cache.class));
     }
 
     /**
@@ -196,6 +202,24 @@ public class PageTest
     protected Document renderHTMLPage(DocumentReference reference) throws Exception
     {
         return Jsoup.parse(renderPage(reference));
+    }
+
+    /**
+     * Load a given document reference, render it and parse it as JSON using {@link JSONSerializer}.
+     *
+     * @param reference the reference of the document to load, render, and parse as JSON
+     * @param <T> a subclass of {@link JSON}
+     * @return the result of the parsing of the rendering of the document using {@link JSONSerializer}
+     * @throws Exception in case of error when rendering or parsing the document
+     */
+    protected <T extends JSON> T renderJSONPage(DocumentReference reference) throws Exception
+    {
+        String jsonString = renderPage(reference);
+        try {
+            return (T) JSONSerializer.toJSON(jsonString.trim());
+        } catch (JSONException e) {
+            throw new RuntimeException(String.format("Failed to parse [%s]", jsonString), e);
+        }
     }
 
     /**

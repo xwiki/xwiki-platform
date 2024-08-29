@@ -114,14 +114,16 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         ExtensionEvent extensionEvent = (ExtensionEvent) event;
         InstalledExtension extension = (InstalledExtension) source;
 
-        if (EXTENSION_TYPE.equals(extension.getType())) {
-            if (event instanceof ExtensionInstalledEvent) {
+        if (event instanceof ExtensionInstalledEvent) {
+            if (EXTENSION_TYPE.equals(extension.getType())) {
                 extensionAdded(extension, extensionEvent.getNamespace());
-            } else if (event instanceof ExtensionUninstalledEvent) {
-                extensionDeleted(extension, extensionEvent.getNamespace());
-            } else {
-                extensionUpgraded(extension, (Collection<InstalledExtension>) data, extensionEvent.getNamespace());
             }
+        } else if (event instanceof ExtensionUninstalledEvent) {
+            if (EXTENSION_TYPE.equals(extension.getType())) {
+                extensionDeleted(extension, extensionEvent.getNamespace());
+            }
+        } else {
+            extensionUpgraded(extension, (Collection<InstalledExtension>) data, extensionEvent.getNamespace());
         }
     }
 
@@ -192,9 +194,13 @@ public class JARTranslationBundleFactoryListener implements EventListener, Initi
         String namespace)
     {
         for (InstalledExtension previousExtension : previousExtensions) {
-            extensionDeleted(previousExtension, namespace);
+            if (EXTENSION_TYPE.equals(previousExtension.getType())) {
+                extensionDeleted(previousExtension, namespace);
+            }
         }
-        extensionAdded(newExtension, namespace);
+        if (EXTENSION_TYPE.equals(newExtension.getType())) {
+            extensionAdded(newExtension, namespace);
+        }
     }
 
     /**

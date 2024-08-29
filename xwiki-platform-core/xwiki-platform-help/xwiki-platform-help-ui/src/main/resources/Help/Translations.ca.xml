@@ -47,7 +47,18 @@
 ### Missing: help.macroList.title=Available Macros
 ### Missing: help.macroList.id=Id
 ### Missing: help.macroList.name=Name
-### Missing: help.macroList.category=Category
 ### Missing: help.macroList.description=Description
-### Missing: help.macroList.visibility=Visibility</content>
+### Missing: help.macroList.visibility=Visibility
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+### Missing: help.macroList.category=Category
+
+#@deprecatedend</content>
 </xwikidoc>

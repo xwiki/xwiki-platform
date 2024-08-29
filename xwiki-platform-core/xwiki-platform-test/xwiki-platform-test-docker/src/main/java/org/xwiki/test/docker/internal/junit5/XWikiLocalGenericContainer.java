@@ -31,16 +31,8 @@ import org.testcontainers.containers.GenericContainer;
  * @version $Id$
  * @since 11.10
  */
-public class XWikiLocalGenericContainer<T extends GenericContainer<T>> extends GenericContainer<T>
+public class XWikiLocalGenericContainer<T extends XWikiGenericContainer<T>> extends XWikiGenericContainer<T>
 {
-    /**
-     * @see GenericContainer#GenericContainer() 
-     */
-    public XWikiLocalGenericContainer()
-    {
-        super();
-    }
-
     /**
      * @see GenericContainer#GenericContainer(String)
      *

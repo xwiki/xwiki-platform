@@ -111,11 +111,13 @@ public class XClassMigratorListener extends AbstractEventListener
         if (newPropertyClass != null) {
             BaseProperty<?> newProperty = newPropertyClass.newProperty();
 
-            if (previousPropertyClass != null) {
+            if (newProperty == null) {
+                migrate = false;                
+            } else if (previousPropertyClass != null) {
                 BaseProperty<?> previousProperty = previousPropertyClass.newProperty();
 
                 // New and previous class property generate different kind of properties
-                migrate = newProperty.getClass() != previousProperty.getClass();
+                migrate = previousProperty == null || newProperty.getClass() != previousProperty.getClass();
             } else {
                 migrate = true;
             }
@@ -210,7 +212,7 @@ public class XClassMigratorListener extends AbstractEventListener
     private boolean convert(BaseObject xobject, BaseProperty<?> property, BaseProperty<?> newProperty,
         PropertyClass newPropertyClass)
     {
-        if (property.getClass() != newProperty.getClass()) {
+        if (newProperty != null && property.getClass() != newProperty.getClass()) {
             BaseProperty<?> convertedProperty = this.propertyConverter.convertProperty(property, newPropertyClass);
 
             // Set new field

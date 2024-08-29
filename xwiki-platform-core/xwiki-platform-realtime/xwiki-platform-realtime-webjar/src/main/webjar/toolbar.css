@@ -1,0 +1,35 @@
+/* Note that we made the CSS selectors a bit more specific in order to overcome the CSS reset from CKEditor. */
+div.rt-toolbar {
+  /* The toolbar has 2 sides: left and right. */
+  display: flex;
+  justify-content: space-between;
+  /* Matches the height of the user avatar plus the vertical spacing. */
+  line-height: 24px;
+}
+
+.rt-toolbar .rt-toolbar-rightside {
+  /* The right side shows: merge message, spinner and lag. */
+  display: flex;
+}
+.rt-toolbar .rt-toolbar-rightside > div {
+  /* Leave some space between the merge message, spinner and lag. */
+  margin-left: 1em;
+}
+
+.rt-toolbar .rt-user-avatar, .rt-toolbar .rt-user-fake-avatar {
+  border-radius: 7px;
+  margin: 2px 3px 2px 6px;
+  vertical-align: top;
+}
+.rt-toolbar .rt-user-avatar {
+  max-width: 20px;
+  max-height: 20px;
+}
+.rt-toolbar .rt-user-fake-avatar {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 18px;
+  display: inline-block;
+  text-align: center;
+}

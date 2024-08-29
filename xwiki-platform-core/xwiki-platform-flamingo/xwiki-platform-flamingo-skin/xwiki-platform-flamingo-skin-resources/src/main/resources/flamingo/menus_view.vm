@@ -22,31 +22,33 @@
 ##
 #if ($isInServletMode)## Visible only in a page
   #template("menus_macros.vm")
-  
+
   ## Top Menu
   #xwikitopmenustart()
-    
+
     ## Left menu
     #xwikitopmenuleftstart()
       #displaySimpleSecureUIX('org.xwiki.platform.topmenu.left')
     #xwikitopmenuleftend()
-    
+
     ## Right menu
     #xwikitopmenurightstart()
       #displayDrawerActivator()
       #displaySimpleSecureUIX('org.xwiki.platform.topmenu.right')
-    #xwikitopmenurightend()    
-    
+    #xwikitopmenurightend()
+
   ## End of Top Menu
   #xwikitopmenuend()
-  
-  #template("drawer.vm")
 #end
 #**
  * Display the drawer activator with an humberger-style icon.
  *#
 #macro(displayDrawerActivator)
   <li>
-    <a class="icon-navbar drawer-toggle" id="tmDrawerActivator" title="$services.localization.render('core.menu.drawer')"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span>$services.icon.renderHTML('menu')</a>
+    <button type="button" id="tmDrawerActivator" class="btn btn-link icon-navbar drawer-opener" aria-controls="tmDrawer"
+      aria-expanded="false" title="$escapetool.xml($services.localization.render('core.menu.drawer'))"
+      ><span class="sr-only">$escapetool.xml($services.localization.render('core.menu.toggleNavigation'))</span
+      >$services.icon.renderHTML('menu')</button>
+    #template("drawer.vm")
   </li>
 #end

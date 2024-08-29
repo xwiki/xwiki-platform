@@ -33,10 +33,15 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
  * @since 9.11.6
  */
 @Component
-@Named("publicMessage")
+@Named(PublicMessageDescriptor.EVENT_TYPE)
 @Singleton
 public class PublicMessageDescriptor extends AbstractMessageDescriptor
 {
+    /**
+     * Event type described by this descriptor.
+     */
+    public static final String EVENT_TYPE = "publicMessage";
+
     /**
      * Construct a PublicMessageDescriptor.
      */
@@ -48,7 +53,7 @@ public class PublicMessageDescriptor extends AbstractMessageDescriptor
     @Override
     public String getEventType()
     {
-        return "publicMessage";
+        return EVENT_TYPE;
     }
 
     @Override

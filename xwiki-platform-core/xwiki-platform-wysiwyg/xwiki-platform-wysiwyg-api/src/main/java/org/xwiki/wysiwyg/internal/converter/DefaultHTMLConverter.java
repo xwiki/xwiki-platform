@@ -76,14 +76,14 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to parse the XHTML obtained after cleaning.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private Parser xhtmlParser;
 
     /**
      * The component used to parse the XHTML obtained after cleaning, when transformations are not executed.
      */
     @Inject
-    @Named("xhtml/1.0")
+    @Named("xhtml/5")
     private StreamParser xhtmlStreamParser;
 
     /**
@@ -113,7 +113,7 @@ public class DefaultHTMLConverter implements HTMLConverter
      * The component used to render a XDOM to XHTML.
      */
     @Inject
-    @Named("annotatedxhtml/1.0")
+    @Named("annotatedhtml/5.0")
     private BlockRenderer xhtmlRenderer;
 
     /**
@@ -164,12 +164,18 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String toHTML(String source, Syntax syntax, EntityReference sourceReference)
     {
+        return toHTML(source, syntax, sourceReference, false);
+    }
+
+    @Override
+    public String toHTML(String source, Syntax syntax, EntityReference sourceReference, boolean restricted)
+    {
         try {
             // Parse
             XDOM xdom = this.contentParser.parse(source, syntax, sourceReference);
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, syntax);
+            executeMacroTransformation(xdom, syntax, restricted);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -190,6 +196,12 @@ public class DefaultHTMLConverter implements HTMLConverter
 
     @Override
     public String parseAndRender(String dirtyHTML, Syntax syntax, EntityReference sourceReference)
+    {
+        return parseAndRender(dirtyHTML, syntax, sourceReference, false);
+    }
+
+    @Override
+    public String parseAndRender(String dirtyHTML, Syntax syntax, EntityReference sourceReference, boolean restricted)
     {
         boolean renderingContextPushed = false;
         try {
@@ -212,7 +224,7 @@ public class DefaultHTMLConverter implements HTMLConverter
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, syntax);
+            executeMacroTransformation(xdom, syntax, restricted);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -251,12 +263,13 @@ public class DefaultHTMLConverter implements HTMLConverter
         return false;
     }
 
-    private void executeMacroTransformation(XDOM xdom, Syntax syntax) throws TransformationException, ParseException
+    private void executeMacroTransformation(XDOM xdom, Syntax syntax, boolean restricted) throws TransformationException
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
         txContext.setSyntax(syntax);
-        txContext.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
+        txContext.setTargetSyntax(Syntax.ANNOTATED_HTML_5_0);
+        txContext.setRestricted(restricted);
 
         // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
         // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined

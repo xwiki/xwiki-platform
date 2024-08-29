@@ -45,7 +45,7 @@ public class ExcludeFilter implements UIExtensionFilter
     public List<UIExtension> filter(List<UIExtension> extensions, String... ids)
     {
         List<String> extensionIds = Arrays.asList(ids);
-        List<UIExtension> results = new ArrayList<UIExtension>();
+        List<UIExtension> results = new ArrayList<>();
 
         for (UIExtension extension : extensions) {
             if (!extensionIds.contains(extension.getId())) {

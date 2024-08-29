@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,6 +65,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -76,6 +78,7 @@ import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -84,6 +87,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -207,10 +213,17 @@ public class TestUtils
 
     private static String urlPrefix = XWikiExecutor.URL;
 
-    /** Cached secret token. TODO cache for each user. */
+    /**
+     * Cached secret token. TODO cache for each user.
+     */
     private String secretToken = null;
 
     private HttpClient httpClient;
+
+    /**
+     * @since 15.2RC1
+     */
+    private WCAGUtils wcagUtils = new WCAGUtils();
 
     /**
      * @since 8.0M1
@@ -285,6 +298,14 @@ public class TestUtils
         return TestUtils.context.getDriver();
     }
 
+    /**
+     * @since 15.2RC1
+     * @return the utils concerning wcag.
+     */
+    public WCAGUtils getWCAGUtils()
+    {
+        return this.wcagUtils;
+    }
     public Session getSession()
     {
         return this.new Session(getDriver().manage().getCookies(), getSecretToken());
@@ -296,17 +317,19 @@ public class TestUtils
         options.deleteAllCookies();
         if (session != null) {
             for (Cookie cookie : session.getCookies()) {
-                // Using a cookie with localhost domain apparently triggers the following error in firefox:
+                // Using a cookie for single component domain (i.e., without '.', like 'localhost' or 'xwikiweb') 
+                // apparently triggers the following error in firefox:
                 // org.openqa.selenium.UnableToSetCookieException:
                 //[Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE)
                 // [nsICookieManager.add]" nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"
                 // location: "JS frame :: chrome://marionette/content/cookie.js :: cookie.add :: line 177" data: no]
                 //
-                // According to the following stackoverflow thread
-                // https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+                // According to the following discussions:
+                // - https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+                // - https://github.com/mozilla/geckodriver/issues/1579
                 // a working solution is to put null in the cookie domain.
                 // Now we might need to fix this in our real code, but the situation is not quite clear for me.
-                if ("localhost".equals(cookie.getDomain())) {
+                if (cookie.getDomain() !=null && !cookie.getDomain().contains(".")) {
                     cookie = new Cookie(cookie.getName(), cookie.getValue(), null, cookie.getPath(),
                         cookie.getExpiry(), cookie.isSecure(), cookie.isHttpOnly());
                 }
@@ -550,19 +573,67 @@ public class TestUtils
     }
 
     /**
-     * Creates the Admin user and add it to the XWikiAdminGroup.
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
+     * Note that this method requires to be superadmin to be effective.
      *
      * @since 12.2
      */
     public void createAdminUser()
     {
-        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
-        addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
+        createAdminUser(false);
+    }
+
+    /**
+     * Creates the Admin user, add it to the XWikiAdminGroup and login.
+     * Note that this method requires to be superadmin to be effective.
+     *
+     * @param programming true of the user should also be given programming right
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public void createAdminUser(boolean programming)
+    {
+        String username = ADMIN_CREDENTIALS.getUserName();
+        String password = ADMIN_CREDENTIALS.getPassword();
+        LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
+        Page userPage = rest().page(userReference);
+        userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
+        org.xwiki.rest.model.jaxb.Object userObject = RestTestUtils.object("XWiki.XWikiUsers");
+
+        // Set password
+        userObject.getProperties().add(RestTestUtils.property("password", password));
+        userPage.getObjects().getObjectSummaries().add(userObject);
+
+        // Save the user page
+        try {
+            rest().save(userPage);
+        } catch (Exception e) {
+            fail("Failed to save the user with name [" + username + "]", e);
+        }
+
+        // Add the user to XWikiAllGroup
+        try {
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        } catch (Exception e) {
+            fail("Failed to add the user in the XWikiAllGroup group", e);
+        }
+
+        // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
+        try {
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+        } catch (Exception e) {
+            fail("Failed to add the user in the XWikiAdminGroup group", e);
+        }
+
+        // Give ADMIN right (and maybe PROGRAMMING right) to XWikiAdminGroup
+        setGlobalRights("XWiki.XWikiAdminGroup", "", programming ? "admin,programming" : "admin", true);
+
+        // Also login as Admin user
         loginAsAdmin();
     }
 
     /**
-     * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPrefrences} document.
+     * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPreferences} document.
      *
      * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
      *               Can be empty or null
@@ -574,9 +645,8 @@ public class TestUtils
      */
     public void setGlobalRights(String groups, String users, String rights, boolean enabled)
     {
-        EntityReference xwikiPreferencesReference = new EntityReference("XWikiPreferences", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
-        setRights(xwikiPreferencesReference, "XWiki.XWikiGlobalRights", groups, users, rights, enabled);
+        setRights(new LocalDocumentReference("XWiki", "XWikiPreferences"), "XWiki.XWikiGlobalRights", groups, users,
+            rights, enabled);
     }
 
     /**
@@ -588,7 +658,7 @@ public class TestUtils
      * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
      *              empty of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
-     * @param enabled true if the rights should be allowed, false if they should be disabled
+     * @param enabled true if the rights should be allowed, false if they should be denied
      * @since 12.2
      */
     public void setRights(EntityReference entityReference, String groups, String users, String rights, boolean enabled)
@@ -596,13 +666,42 @@ public class TestUtils
         setRights(entityReference, "XWiki.XWikiRights", groups, users, rights, enabled);
     }
 
+    /**
+     * Add or update a {@code XWikiRights} xobject to the specified space reference.
+     *
+     * @param space the reference to the space for which to set rights for
+     * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
+     *               Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
+     *              empty of null
+     * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
+     * @param enabled true if the rights should be allowed, false if they should be denied
+     * @since 14.10
+     */
+    public void setRightsOnSpace(SpaceReference space, String groups, String users, String rights, boolean enabled)
+    {
+        DocumentReference documentReference = new DocumentReference("WebPreferences", space);
+        setRights(documentReference, "XWiki.XWikiGlobalRights", groups, users, rights, enabled);
+    }
+
     private void setRights(EntityReference entityReference, String rightClassName, String groups, String users,
         String rights, boolean enabled)
     {
+        // Normalize users and groups
         String normalizedUsers = users == null ? "" : users;
         String normalizedGroups = groups == null ? "" : groups;
-        addObject(entityReference, rightClassName, "groups", normalizedGroups, "levels", rights,
-            "users", normalizedUsers, "allow", enabled ? "1" : "0");
+
+        // Add new rights object
+        try {
+            rest().addObject(entityReference, rightClassName,
+                "groups", normalizedGroups,
+                "users", normalizedUsers,
+                "levels", rights,
+                "allow", enabled ? 1 : 0);
+        } catch (Exception e) {
+            fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
+                + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
+        }
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -741,6 +840,16 @@ public class TestUtils
      * @since 4.5
      */
     public String getURLToDeleteSpace(String space)
+    {
+        return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
+    }
+
+    /**
+     * @param space the reference of the space to delete
+     * @return the URL that can be used to delete the specified pace
+     * @since 14.1RC1
+     */
+    public String getURLToDeleteSpace(EntityReference space)
     {
         return getURL(space, "WebHome", "deletespace", "confirm=1&async=false&affectChidlren=on");
     }
@@ -967,12 +1076,31 @@ public class TestUtils
     }
 
     /**
+     * @since 16.8.0RC1
+     */
+    public String serializeLocalReference(EntityReference reference)
+    {
+        return localReferenceSerializer.serialize(reference);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete
      * @since 4.5
      */
     public void deleteSpace(String space)
+    {
+        getDriver().get(getURLToDeleteSpace(space));
+    }
+
+    /**
+     * Accesses the URL to delete the specified space.
+     *
+     * @param space the reference of the space to delete
+     * @since 14.1RC1
+     */
+    public void deleteSpace(EntityReference space)
     {
         getDriver().get(getURLToDeleteSpace(space));
     }
@@ -1077,15 +1205,59 @@ public class TestUtils
      */
     public String executeAndGetBodyAsString(EntityReference reference, Map<String, ?> queryParameters) throws Exception
     {
-        String url = getURL(reference, "get", toQueryString(queryParameters));
+        gotoPage(getURL(reference, "get", toQueryString(queryParameters)));
+        
+        return getDriver().findElementWithoutWaiting(By.tagName("body")).getText();
+    }
 
-        GetMethod getMethod = executeGet(url);
+    /**
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        return executeWiki(wikiContent, wikiSyntax, null);
+    }
 
-        String result = getMethod.getResponseBodyAsString();
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("outputSyntax", "plain");
 
-        getMethod.releaseConnection();
+        return executeWiki(wikiContent, wikiSyntax, queryParameters);
+    }
 
-        return result;
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    {
+        LocalDocumentReference reference =
+            new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
+
+        // Remember the current credentials
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+
+        try {
+            // Make sure the page is saved with superadmin author
+            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+
+            // Save the page with the content to execute
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        } finally {
+            // Restore initial credentials
+            setDefaultCredentials(currentCredentials);
+        }
+
+        // Execute the content and return the result
+        return executeAndGetBodyAsString(reference, queryParameters);
     }
 
     /**
@@ -1105,7 +1277,11 @@ public class TestUtils
         for (EntityReference singleReference : spaceReference.removeParent(wikiReference).getReversedReferenceChain()) {
             path.add(singleReference.getName());
         }
-        if (reference.getType() == EntityType.DOCUMENT) {
+        // Add the page for attachments
+        if (reference.getType() == EntityType.ATTACHMENT) {
+            path.add(reference.getParent().getName());
+        }
+        if (reference.getType() == EntityType.DOCUMENT || reference.getType() == EntityType.ATTACHMENT) {
             path.add(reference.getName());
         }
         return path;
@@ -1117,6 +1293,14 @@ public class TestUtils
     public String getCurrentWiki()
     {
         return this.currentWiki;
+    }
+
+    /**
+     * @since 14.5
+     */
+    public void setCurrentWiki(String currentWiki)
+    {
+        this.currentWiki = currentWiki;
     }
 
     /**
@@ -1156,7 +1340,7 @@ public class TestUtils
      */
     public String getBaseBinURL()
     {
-        return getBaseURL() + "bin/";
+        return getBaseBinURL(this.currentWiki);
     }
 
     /**
@@ -1309,7 +1493,21 @@ public class TestUtils
     }
 
     /**
-     * This class represents all cookies stored in the browser. Use with getSession() and setSession()
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
+    }
+
+    /**
+     *This class represents all cookies stored in the browser. Use with getSession() and setSession()
      */
     public class Session
     {
@@ -1540,9 +1738,11 @@ public class TestUtils
     {
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
-            addQueryStringEntry(builder, entry.getKey(), entry.getValue());
-            builder.append('&');
+        if (queryParameters != null) {
+            for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
+                addQueryStringEntry(builder, entry.getKey(), entry.getValue());
+                builder.append('&');
+            }
         }
 
         return builder.toString();
@@ -1646,6 +1846,19 @@ public class TestUtils
     public ClassEditPage editClass(String space, String page)
     {
         gotoPage(space, page, "edit", "editor=class");
+        return new ClassEditPage();
+    }
+
+    /**
+     * Goes to a page in edit class mode.
+     *
+     * @param reference a document reference
+     * @return the {@link ClassEditPage} Page Object for the page
+     * @since 14.0RC1
+     */
+    public ClassEditPage editClass(DocumentReference reference)
+    {
+        gotoPage(reference, "edit", "editor=class");
         return new ClassEditPage();
     }
 
@@ -1884,7 +2097,8 @@ public class TestUtils
 
     /**
      * Set global xwiki configuration options (as if the xwiki.cfg file had been modified). This is useful for testing
-     * configuration options.
+     * configuration options. This requires the {@code Test.XWikiConfigurationPageForTest} page to have Programming
+     * Rights (if the PR checker is enabled, you'll need to exclude this reference so that it can have PR).
      *
      * @param configuration the configuration in {@link Properties} format. For example "param1=value2\nparam2=value2"
      * @throws IOException if an error occurs while parsing the configuration
@@ -1900,9 +2114,9 @@ public class TestUtils
                 + "ConfigurationSource\", \"xwikicfg\"))\n"
                 + "#set($props = $config.getProperties())\n");
 
-            // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
-        // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
+        // trick: We create a document, and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
             sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
                 .append(param.getValue()).append("'))\n");
@@ -2052,7 +2266,21 @@ public class TestUtils
 
     public String getString(String path, Map<String, ?> queryParams) throws Exception
     {
-        try (InputStream inputStream = getInputStream(getBaseURL(), path, queryParams)) {
+        return getString(getBaseURL(), path, queryParams);
+    }
+
+    /**
+     * Extended version to work in a docker context.
+     *
+     * @param baseURL the base url
+     * @param path an additional path added after the base url
+     * @param queryParams additional query parameter added to the computed url
+     * @return the context of the computed url
+     * @throws Exception in case of error when executing the request
+     */
+    public String getString(String baseURL, String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(baseURL, path, queryParams)) {
             return IOUtils.toString(inputStream);
         }
     }
@@ -2318,77 +2546,61 @@ public class TestUtils
             RestTestUtils.urlPrefix = newURLPrefix;
         }
 
-        private String toSpaceElement(Iterable<?> spaces)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            for (Object space : spaces) {
-                if (builder.length() > 0) {
-                    builder.append("/spaces/");
-                }
-
-                if (space instanceof EntityReference) {
-                    builder.append(((EntityReference) space).getName());
-                } else {
-                    builder.append(space.toString());
-                }
-            }
-
-            return builder.toString();
-        }
-
-        private String toSpaceElement(String spaceReference)
-        {
-            return toSpaceElement(
-                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
-        }
-
         protected Object[] toElements(Page page)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
-            if (page.getWiki() != null) {
-                elements.add(page.getWiki());
+            // Get locale
+            Locale locale;
+            if (StringUtils.isNotEmpty(page.getLanguage())) {
+                locale = LocaleUtils.toLocale(page.getLanguage());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                locale = null;
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(page.getSpace()));
+            // Wiki
+            WikiReference wikiReference;
+            if (page.getWiki() != null) {
+                wikiReference = new WikiReference(page.getWiki());
+            } else {
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
+            }
 
-            // Add name
-            elements.add(page.getName());
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(page.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            return elements.toArray();
+            // Document
+            DocumentReference documentReference = new DocumentReference(page.getName(), spaceReference, locale);
+
+            return toElements(documentReference);
         }
 
         public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
+            // Wiki
+            WikiReference wikiReference;
             if (obj.getWiki() != null) {
-                elements.add(obj.getWiki());
+                wikiReference = new WikiReference(obj.getWiki());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(obj.getSpace()));
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            // Add name
-            elements.add(obj.getPageName());
+            // Document
+            DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
 
-            if (!onlyDocument) {
-                // Add class
-                elements.add(obj.getClassName());
-
-                // Add number
-                elements.add(obj.getNumber());
+            // Object
+            EntityReference finalReference;
+            if (onlyDocument) {
+                finalReference = documentReference;
+            } else {
+                String objectName = obj.getClassName() + '[' + obj.getNumber() + ']';
+                finalReference = new ObjectReference(objectName, documentReference);
             }
 
-            return elements.toArray();
+            return toElements(finalReference);
         }
 
         public Object[] toElements(EntityReference reference)
@@ -2478,7 +2690,10 @@ public class TestUtils
                 expectedCodes = STATUS_CREATED_ACCEPTED;
             }
 
-            return TestUtils.assertStatusCodes(executePut(PageResource.class, page, toElements(page)), release,
+            Class resourceClass =
+                StringUtils.isEmpty(page.getLanguage()) ? PageResource.class : PageTranslationResource.class;
+
+            return TestUtils.assertStatusCodes(executePut(resourceClass, page, toElements(page)), release,
                 expectedCodes);
         }
 
@@ -2504,6 +2719,14 @@ public class TestUtils
             // Add page
             EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
             page.setName(documentReference.getName());
+
+            // Add locale
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                Locale locale = getLocale(reference);
+                if (locale != null) {
+                    page.setLanguage(locale.toString());
+                }
+            }
 
             return page;
         }
@@ -2606,6 +2829,33 @@ public class TestUtils
         }
 
         /**
+         * @since 15.2RC1
+         * @since 15.1
+         * @since 14.10.6
+         */
+        private void addObject(EntityReference documentReference, String rightClassName, Object... properties)
+            throws Exception
+        {
+            // Make sure the page exist (object add fail otherwise)
+            // TODO: improve object add API to allow adding an object in a page that does not yet exist
+            if (!exists(documentReference)) {
+                savePage(documentReference);
+            }
+
+            // Create the object
+            org.xwiki.rest.model.jaxb.Object rightsObject = object(documentReference, rightClassName);
+            for (int i = 0; i < properties.length; i += 2) {
+                String name = (String) properties[i + 0];
+                Object value = properties[i + 1];
+
+                rightsObject.withProperties(RestTestUtils.property(name, value));
+            }
+
+            // Add the object
+            add(rightsObject);
+        }
+
+        /**
          * Fail if the object does not exist.
          */
         public void update(org.xwiki.rest.model.jaxb.Object obj) throws Exception
@@ -2633,10 +2883,8 @@ public class TestUtils
         // TODO: make EntityReference#getParameter() public
         private Locale getLocale(EntityReference reference)
         {
-            if (reference instanceof DocumentReference) {
-                return ((DocumentReference) reference).getLocale();
-            } else if (reference instanceof LocalDocumentReference) {
-                return ((LocalDocumentReference) reference).getLocale();
+            if (reference instanceof AbstractLocalizedEntityReference) {
+                return ((AbstractLocalizedEntityReference) reference).getLocale();
             }
 
             return null;
@@ -2699,15 +2947,34 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams) throws Exception
+        {
+            return get(reference, queryParams, true);
+        }
+
+        /**
          * Return object model of the passed reference or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
+            return get(reference, Map.of(), failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams, boolean failIfNotFound)
+            throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            return get(resource, reference, failIfNotFound);
+            return get(resource, queryParams, reference, failIfNotFound);
         }
 
         /**
@@ -2735,13 +3002,32 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, queryParams, reference, true);
+        }
+
+        /**
          * Return object model of the passed reference with the passed resource URI or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+            return get(resourceURI, Map.of(), reference, failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
+            boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
             if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
@@ -2821,6 +3107,16 @@ public class TestUtils
         public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
+        {
+            return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception

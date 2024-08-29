@@ -21,9 +21,10 @@ package org.xwiki.security.authentication;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 
 /**
  * A dedicated {@link org.xwiki.resource.ResourceReference} to perform authentication related actions.
@@ -32,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 13.1RC1
  */
-@Unstable
 public class AuthenticationResourceReference extends AbstractResourceReference
 {
     /**
@@ -45,15 +45,20 @@ public class AuthenticationResourceReference extends AbstractResourceReference
      */
     public static final ResourceType TYPE = new ResourceType(RESOURCE_TYPE_ID);
 
-    private AuthenticationAction action;
+    private final WikiReference wikiReference;
+
+    private final AuthenticationAction action;
 
     /**
      * Default constructor.
-     * @param action the action of the reference.
+     *
+     * @param wikiReference the reference of the wiki where the action should be performed.
+     * @param action the action to perform.
      */
-    public AuthenticationResourceReference(AuthenticationAction action)
+    public AuthenticationResourceReference(WikiReference wikiReference, AuthenticationAction action)
     {
         setType(TYPE);
+        this.wikiReference = wikiReference;
         this.action = action;
     }
 
@@ -63,6 +68,17 @@ public class AuthenticationResourceReference extends AbstractResourceReference
     public AuthenticationAction getAction()
     {
         return action;
+    }
+
+    /**
+     * @return the reference of the wiki where the action should be performed.
+     * @since 14.6RC1
+     * @since 14.4.3
+     * @since 13.10.8
+     */
+    public WikiReference getWikiReference()
+    {
+        return wikiReference;
     }
 
     @Override
@@ -78,13 +94,30 @@ public class AuthenticationResourceReference extends AbstractResourceReference
 
         AuthenticationResourceReference that = (AuthenticationResourceReference) o;
 
-        return new EqualsBuilder().appendSuper(super.equals(o)).append(action, that.action)
+        return new EqualsBuilder()
+            .appendSuper(super.equals(o))
+            .append(action, that.action)
+            .append(wikiReference, that.wikiReference)
             .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(17, 37).appendSuper(super.hashCode()).append(action).toHashCode();
+        return new HashCodeBuilder(17, 37)
+            .appendSuper(super.hashCode())
+            .append(action)
+            .append(wikiReference)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .appendSuper(super.toString())
+            .append("wikiReference", wikiReference)
+            .append("action", action)
+            .toString();
     }
 }

@@ -20,15 +20,8 @@
 package com.xpn.xwiki.web;
 
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicNameValuePair;
 
 import com.xpn.xwiki.XWikiContext;
 

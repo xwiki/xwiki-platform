@@ -31,7 +31,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,7 +39,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
-import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.notifications.rest.NotificationsResource;
 import org.xwiki.notifications.rest.model.Notifications;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -48,10 +47,8 @@ import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFac
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.rest.XWikiResource;
 
-import com.rometools.rome.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation of {@link NotificationsResource}.
@@ -64,6 +61,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class DefaultNotificationsResource extends XWikiResource implements NotificationsResource
 {
     private static final String TRUE = "true";
+    private static final String ASYNC_ID = "asyncId";
 
     @Inject
     private ParametrizedNotificationManager newNotificationManager;
@@ -75,9 +73,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private InternalNotificationsRenderer notificationsRenderer;
 
     @Inject
-    private NotificationRSSManager notificationRSSManager;
-
-    @Inject
     private DefaultNotificationCacheManager cacheManager;
 
     @Inject
@@ -86,12 +81,15 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     @Inject
     private DefaultNotificationParametersFactory notificationParametersFactory;
 
+    @Inject
+    private RSSFeedRenderer rssFeedRenderer;
+
     @Override
     public Response getNotifications(String useUserPreferences, String userId, String untilDate,
         boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
         String maxCount, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
         String displayReadEvents, String displayReadStatus, String tags, String currentWiki, String async,
-        String asyncId) throws Exception
+        String asyncId, String target) throws Exception
     {
         // Build the response
         Response.ResponseBuilder response;
@@ -101,7 +99,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
         if (result instanceof String) {
             response = Response.status(Status.ACCEPTED);
-            response.entity(Collections.singletonMap("asyncId", result));
+            response.entity(Collections.singletonMap(ASYNC_ID, result));
         } else {
             // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
             XWikiContext xcontext = getXWikiContext();
@@ -165,7 +163,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             // 3. Search events
             result = this.executor.submit(cacheKey,
                 () -> getCompositeEvents(notificationParameters),
-                Boolean.parseBoolean(async), count);
+                Boolean.parseBoolean(async), count, true);
         }
 
         return result;
@@ -185,8 +183,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
-        if (xWikiUser == null) {
+        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
+        if (!StringUtils.isEmpty(userId) && xWikiUser == null) {
             response = Response.status(Status.UNAUTHORIZED);
         } else {
             Object result = getCompositeEvents(useUserPreferences, userId, null, true, null, pages, spaces, wikis,
@@ -195,7 +193,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
             if (result instanceof String) {
                 response = Response.status(Status.ACCEPTED);
-                response.entity(Collections.singletonMap("asyncId", result));
+                response.entity(Collections.singletonMap(ASYNC_ID, result));
             } else {
                 response = Response.ok(Collections.singletonMap("unread", result));
             }
@@ -215,9 +213,10 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String tags, String currentWiki) throws Exception
     {
         // Build the response
-        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        XWikiUser xWikiUser = getXWikiContext().getWiki().checkAuth(getXWikiContext());
         DocumentReference userIdDoc = this.documentReferenceResolver.resolve(userId);
-        if (xWikiUser == null || !userIdDoc.equals(xWikiUser.getUserReference())) {
+        if ((xWikiUser == null && !StringUtils.isEmpty(userId))
+            || (xWikiUser != null && !userIdDoc.equals(xWikiUser.getUserReference()))) {
             getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         } else {
@@ -226,24 +225,20 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                     spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
                     displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
-            SyndFeedOutput output = new SyndFeedOutput();
-            return output.outputString(notificationRSSManager.renderFeed(events));
+            return this.rssFeedRenderer.render(events);
         }
     }
 
     @Override
-    public Response postNotifications() throws Exception
+    public Response postNotifications(String useUserPreferences, String userId, String untilDate,
+        boolean untilDateIncluded, String blackList, String pages, String spaces, String wikis, String users,
+        String count, String displayOwnEvents, String displayMinorEvents, String displaySystemEvents,
+        String displayReadEvents, String displayReadStatus, String tags, String currentWiki, String async,
+        String asyncId, String target) throws Exception
     {
-        // We should seriously consider to stop using Restlet, because the @FormParam attribute does not work.
-        // See: https://github.com/restlet/restlet-framework-java/issues/1120
-        // That's why we need to use this workaround: manually getting the POST params in the request object.
-        XWikiRequest request = getXWikiContext().getRequest();
-        return getNotifications(request.get("useUserPreferences"), request.get("userId"), request.get("untilDate"),
-            BooleanUtils.toBooleanObject(request.get("untilDateIncluded")) != Boolean.FALSE, request.get("blackList"),
-            request.get("pages"), request.get("spaces"), request.get("wikis"), request.get("users"),
-            request.get("count"), request.get("displayOwnEvents"), request.get("displayMinorEvents"),
-            request.get("displaySystemEvents"), request.get("displayReadEvents"), request.get("displayReadStatus"),
-            request.get("tags"), request.get("currentWiki"), request.get("async"), request.get("asyncId"));
+        return getNotifications(useUserPreferences, userId, untilDate, untilDateIncluded, blackList, pages, spaces,
+            wikis, users, count, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
+            displayReadStatus, tags, currentWiki, async, asyncId, "alert");
     }
 
     private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,

@@ -21,7 +21,6 @@ package org.xwiki.ratings.events;
 
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Event sent whenever a new {@link Rating} is recorded.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.9RC1
  */
-@Unstable
 public class CreatedRatingEvent extends AbstractRatingEvent
 {
     /**

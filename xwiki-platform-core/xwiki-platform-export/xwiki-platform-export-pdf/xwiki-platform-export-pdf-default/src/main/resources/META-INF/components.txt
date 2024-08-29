@@ -1,0 +1,15 @@
+org.xwiki.export.pdf.internal.browser.AuthenticationCookieFilter
+org.xwiki.export.pdf.internal.chrome.ChromeManager
+org.xwiki.export.pdf.internal.chrome.ChromeManagerManager
+org.xwiki.export.pdf.internal.chrome.ChromeManagerProvider
+org.xwiki.export.pdf.internal.chrome.ChromePDFPrinter
+org.xwiki.export.pdf.internal.chrome.ChromeServiceFactory
+org.xwiki.export.pdf.internal.docker.ContainerManager
+org.xwiki.export.pdf.internal.docker.DockerClientFactory
+org.xwiki.export.pdf.internal.job.DefaultDocumentRenderer
+org.xwiki.export.pdf.internal.job.DefaultPDFExportJobRequestFactory
+org.xwiki.export.pdf.internal.job.DocumentMetadataExtractor
+org.xwiki.export.pdf.internal.job.DocumentMetadataScriptContextInitializer
+org.xwiki.export.pdf.internal.DefaultPDFExportConfiguration
+org.xwiki.export.pdf.internal.DefaultRequiredSkinExtensionsRecorder
+org.xwiki.export.pdf.internal.PDFExportConfigurationSource

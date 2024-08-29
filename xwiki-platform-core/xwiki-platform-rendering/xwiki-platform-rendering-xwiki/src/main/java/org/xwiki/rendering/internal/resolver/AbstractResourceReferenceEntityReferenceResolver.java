@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,6 +63,9 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
 
     @Inject
     protected DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    protected Logger logger;
 
     protected ResourceType resourceType;
 
@@ -176,7 +180,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
     {
         DocumentReference finalReference = reference;
 
-        if (!this.documentAccessBridge.exists(reference)) {
+        if (!exists(reference)) {
             // It does not exist, make it a space home page.
             SpaceReference spaceReference =
                 new SpaceReference(reference.getName(), (SpaceReference) reference.getParent());
@@ -193,7 +197,7 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
                 // already performed for it) OR, in the case of a non-terminal document, if it actually exists (by
                 // performing the exists check now). Otherwise, the default will remain the child non-terminal document.
                 if (!siblingReference.getName().equals(defaultDocumentName)
-                    || documentAccessBridge.exists(siblingReference)) {
+                    || exists(siblingReference)) {
                     finalReference = siblingReference;
                 }
             }
@@ -229,6 +233,18 @@ public abstract class AbstractResourceReferenceEntityReferenceResolver
         // If base reference not a space home page, no space sibling fallback
         // If finalReference exist, no space sibling fallback
         return sourceReference.getParent() == null && baseReference != null
-            && baseReference.getName().equals(defaultDocumentName) && !this.documentAccessBridge.exists(finalReference);
+            && baseReference.getName().equals(defaultDocumentName) && !exists(finalReference);
+    }
+
+    private boolean exists(DocumentReference documentReference)
+    {
+        try {
+            return this.documentAccessBridge.exists(documentReference);
+        } catch (Exception e) {
+            this.logger.error("Failed to check the existence of the document with reference [{}]", documentReference,
+                e);
+        }
+
+        return false;
     }
 }

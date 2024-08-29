@@ -50,7 +50,7 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class InstalledExtensionDocumentTree
 {
-    private static class InstalledExtensionDocumentTreeNode
+    private static final class InstalledExtensionDocumentTreeNode
     {
         public Set<Locale> customizedLocales;
 

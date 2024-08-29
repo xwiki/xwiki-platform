@@ -27,11 +27,12 @@
 #######################################################
 ##!source.syntax=xwiki/2.1
 {{velocity}}
-{{html wiki='true'}}
+{{html clean='false'}}
 #if($request.xpage == 'siblings')
   #template("startpage.vm")
     <div class="main layoutsubsection">
-      <div id="mainContentArea">
+      ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+      <main id="mainContentArea">
         <div class="xcontent">
 #end
 #######################################################
@@ -57,7 +58,7 @@
     'propertyDescriptors': [
       { 'id': '_actions', 'displayer': { 'id': 'actions', 'actions': ['copy', 'rename', 'rights', 'delete'] } }
     ],
-    'actions': [ { 'id': 'copy', 'allowProperty': '' } ]
+    'actions': [ { 'id': 'copy', 'allowProperty': 'doc.viewable', 'urlProperty': 'doc.copy_url' } ]
   }
 })
 ## childrenOf, exclude and $doc are variables used when rendering getdocuments.vm 
@@ -69,6 +70,8 @@
   'exclude': $doc.fullName,
   '$doc': $doc.documentReference
 }))
+{{/html}}
+
 {{liveData
   id='siblingsIndex'
   source='liveTable'
@@ -76,13 +79,15 @@
   properties='doc.title,doc.location,doc.date,doc.author,_actions'
   sort='doc.location:asc'
   }}$jsontool.serialize($liveDataConfig){{/liveData}}
+
+{{html clean='false'}}
 #######################################################
 ##                   FOOTER
 #######################################################
 #if($request.xpage == 'siblings')
-        </div> ## xcontent
-      </div> ## mainContentArea
-    </div> ## main
+        </div>## xcontent
+      </main>## mainContentArea
+    </div>## main
   #template('endpage.vm')
 #end
 {{/html}}

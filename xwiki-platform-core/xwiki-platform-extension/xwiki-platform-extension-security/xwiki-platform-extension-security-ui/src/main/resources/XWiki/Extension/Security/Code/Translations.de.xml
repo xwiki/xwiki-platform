@@ -1,0 +1,57 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Extension.Security.Code.Translations" locale="de">
+  <web>XWiki.Extension.Security.Code</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Extension.Security.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>extension.security.admin.title=Sicherheitslücken
+extension.security.indexed.started=Der Index begann am {0}.
+extension.security.indexed.on=Indiziert am {0}. Alle Erweiterungen, die nach diesem Datum installiert wurden, oder Sicherheitslücken, die nach diesem Datum veröffentlicht wurden, werden nicht angezeigt. Neue Sicherheitsscans werden in regelmäßigen Abständen durchgeführt.
+extension.security.indexed.nojob=Es konnte keine frühere Indizierung gefunden werden.
+extension.security.admin.generalWarning=Es ist zu beachten, dass dieser Sicherheitsscan nicht alle installierten Erweiterungen umfasst. Erweiterungen, die nicht über den Erweiterungsmanager aktualisiert werden können, sind derzeit nicht enthalten.
+extension.security.admin.configuration.title=Konfiguration
+extension.security.admin.environment.explanation=Die in diesem Abschnitt aufgeführten Erweiterungen haben bekannte Sicherheitslücken, können aber nicht über den Erweiterungsmanager aktualisiert werden. Das bedeutet, dass sie nur durch ein Upgrade von XWiki selbst oder seiner Umgebung (z. B. Servlet-Engine oder Docker-Container) behoben werden können.
+extension.security.notification.message=Wir haben {0} Erweiterungen mit bekannten Sicherheitslücken identifiziert, siehe die Details im {1} Bericht
+extension.security.experimental.warning=Sei Dir bewusst, dass diese Erweiterung derzeit noch experimentell ist und zur Darstellung von ungenauen Analysen führen kann. Daher sollten die vorgestellten Ergebnisse sorgfältig gelesen werden, bevor Du etwas unternimmst. 
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled=Scan aktiviert
+XWiki.Extension.Security.Code.ConfigClass_scanEnabled.hint=Wenn diese Option nicht markiert ist, wird der Sicherheitsscan nicht mehr ausgeführt
+XWiki.Extension.Security.Code.ConfigClass_scanDelay=Scanverzögerung
+XWiki.Extension.Security.Code.ConfigClass_scanDelay.hint=Die Anzahl der Stunden, die zwischen zwei Sicherheitsscans gewartet werden soll (Standard: 24h)
+XWiki.Extension.Security.Code.ConfigClass_scanURL=Scan-URL
+XWiki.Extension.Security.Code.ConfigClass_scanURL.hint=Die Url, die als Remote-Quelle für den Sicherheitsscan verwendet werden soll (Standard: https://api.osv.dev/v1/query)
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL=Bewertungen-URL
+XWiki.Extension.Security.Code.ConfigClass_falsePositiveURL.hint=Die Url, die als Remote-Quelle für die Sicherheitsüberprüfungen verwendet werden soll (Standard: https://extensions.xwiki.org/xwiki/bin/view/Extension/Extension/Security/Code/Reviews)
+</content>
+  </xwikidoc>

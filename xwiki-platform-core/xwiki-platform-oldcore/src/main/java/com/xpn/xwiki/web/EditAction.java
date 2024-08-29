@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -28,7 +29,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.csrf.CSRFToken;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,6 +54,13 @@ public class EditAction extends XWikiAction
      * The object used for logging.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Inject
+    private CSRFToken csrf;
 
     /**
      * Default constructor.
@@ -97,16 +109,54 @@ public class EditAction extends XWikiAction
      */
     protected XWikiDocument prepareEditedDocument(XWikiContext context) throws XWikiException
     {
-        // Determine the edited document (translation).
-        XWikiDocument editedDocument = getEditedDocument(context);
         EditForm editForm = (EditForm) context.getForm();
 
+        // Determine the edited document (translation).
+        XWikiDocument editedDocument = getEditedDocument(editForm, context);
+
+        // Remember dirty status
+        boolean metadataDirty = editedDocument.isMetaDataDirty();
+        boolean contentDirty = editedDocument.isContentDirty();
+
+        // Reset the dirty status to find out if the document was modified by inputs
+        editedDocument.setMetaDataDirty(false);
+        editedDocument.setContentDirty(false);
+
+        // Update the edited document based on form inputs
+        editedDocument.readDocMetaFromForm(editForm, context);
         // Update the edited document based on the template specified on the request.
         readFromTemplate(editedDocument, editForm.getTemplate(), context);
-
         // The default values from the template can be overwritten by additional request parameters.
-        updateDocumentTitleAndContentFromRequest(editedDocument, context);
-        editedDocument.readObjectsFromForm(editForm, context);
+        updateDocumentTitleAndContentFromRequest(editedDocument, editForm, context);
+        editedDocument.readAddedUpdatedAndRemovedObjectsFromForm(editForm, context);
+
+        // Check if the document in modified
+        if (editedDocument.isMetaDataDirty() || editedDocument.isContentDirty()) {
+            // If the document is modified make sure a valid CSRF is provided
+            String token = context.getRequest().getParameter("form_token");
+            if (!this.csrf.isTokenValid(token)) {
+                // or make the document restricted
+                editedDocument.setRestricted(true);
+            }
+        }
+
+        // Restore dirty status
+        editedDocument.setMetaDataDirty(editedDocument.isMetaDataDirty() || metadataDirty);
+        editedDocument.setContentDirty(editedDocument.isContentDirty() || contentDirty);
+
+        // If the metadata is modified, modify the effective metadata author
+        if (editedDocument.isMetaDataDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            editedDocument.setAuthor(userReference);
+        }
+
+        // If the content is modified, modify the content author
+        if (editedDocument.isContentDirty()) {
+            UserReference userReference =
+                this.documentReferenceUserReferenceResolver.resolve(context.getUserReference());
+            editedDocument.getAuthors().setContentAuthor(userReference);
+        }
 
         // Set the current user as creator, author and contentAuthor when the edited document is newly created to avoid
         // using XWikiGuest instead (because those fields were not previously initialized).
@@ -115,6 +165,7 @@ public class EditAction extends XWikiAction
             editedDocument.setAuthorReference(context.getUserReference());
             editedDocument.setContentAuthorReference(context.getUserReference());
         }
+        editedDocument.readTemporaryUploadedFiles(editForm);
 
         // Expose the edited document on the XWiki context and the Velocity context.
         putDocumentOnContext(editedDocument, context);
@@ -132,13 +183,14 @@ public class EditAction extends XWikiAction
      * Most of the code deals with the really bad way the default language can be specified (empty string, 'default' or
      * a real language code).
      *
+     * @param editForm the form inputs
      * @param context the XWiki context
      * @return the edited document translation based on the language specified on the request
      * @throws XWikiException if something goes wrong
      */
-    private XWikiDocument getEditedDocument(XWikiContext context) throws XWikiException
+    private XWikiDocument getEditedDocument(EditForm editForm, XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = context.getDoc();
+        XWikiDocument doc = context.getDoc();  
         boolean hasTranslation = doc != context.get("tdoc");
 
         // We have to clone the context document because it is cached and the changes we are going to make are valid
@@ -146,8 +198,6 @@ public class EditAction extends XWikiAction
         doc = doc.clone();
         context.put("doc", doc);
 
-        EditForm editForm = (EditForm) context.getForm();
-        doc.readDocMetaFromForm(editForm, context);
 
         String language = context.getWiki().getLanguagePreference(context);
         if (doc.isNew() && doc.getDefaultLanguage().equals("")) {
@@ -207,11 +257,12 @@ public class EditAction extends XWikiAction
      * parameters or based on the document section specified on the request.
      *
      * @param document the document whose title and content should be updated
+     * @param editForm the form inputs
      * @param context the XWiki context
      * @throws XWikiException if something goes wrong
      */
-    private void updateDocumentTitleAndContentFromRequest(XWikiDocument document, XWikiContext context)
-        throws XWikiException
+    private void updateDocumentTitleAndContentFromRequest(XWikiDocument document, EditForm editForm,
+        XWikiContext context) throws XWikiException
     {
         // Check if section editing is enabled and if a section is specified.
         boolean sectionEditingEnabled = context.getWiki().hasSectionEdit(context);
@@ -219,7 +270,6 @@ public class EditAction extends XWikiAction
         getCurrentScriptContext().setAttribute("sectionNumber", sectionNumber, ScriptContext.ENGINE_SCOPE);
 
         // Update the edited content.
-        EditForm editForm = (EditForm) context.getForm();
         if (editForm.getContent() != null) {
             document.setContent(editForm.getContent());
         } else if (sectionNumber > 0) {

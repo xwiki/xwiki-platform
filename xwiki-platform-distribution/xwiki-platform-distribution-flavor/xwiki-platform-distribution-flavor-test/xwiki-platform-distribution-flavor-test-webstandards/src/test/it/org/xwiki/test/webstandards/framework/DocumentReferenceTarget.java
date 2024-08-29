@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.webstandards.framework;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 
 public class DocumentReferenceTarget implements Target
@@ -39,5 +41,27 @@ public class DocumentReferenceTarget implements Target
     public String getName()
     {
         return documentReference.toString();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DocumentReferenceTarget that = (DocumentReferenceTarget) o;
+
+        return new EqualsBuilder().append(documentReference, that.documentReference)
+            .isEquals();
+    }
+
+    @Override public int hashCode()
+    {
+        return new HashCodeBuilder().append(documentReference).toHashCode();
     }
 }

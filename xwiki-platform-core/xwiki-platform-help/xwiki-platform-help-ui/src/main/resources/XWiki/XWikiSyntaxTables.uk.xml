@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxTables</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxTables</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Редагування =
+
+== Таблиці ==
+
+=== 1.0 Tables ===
+
+Дозволяє легко створювати вміст у форматі таблиці.
+
+|=Функція|=Синтаксис XWiki 1.0|=Результат
+|Стандартна таблиця|((({{{
+{table}
+Заголовок 1 | Заголовок 2
+Слово 1 | Слово 2
+{table}
+}}})))|(((
+|=Заголовок 1|=Заголовок 2
+|Слово 1|Слово 2
+)))
+|Параметризована таблиця|(((
+&lt;table style="background-color:red;text-align:center"&gt;
+   &lt;tbody&gt;
+     &lt;tr&gt;
+       &lt;td&gt;Заголовок 1&lt;/td&gt;
+       &lt;td style="background-color:yellow"&gt;Заголовок 2&lt;/td&gt;
+     &lt;/tr&gt;
+     &lt;tr&gt;
+       &lt;td&gt;Слово 1&lt;/td&gt;
+       &lt;td&gt;Слово 2&lt;/td&gt;
+     &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+)))|(((
+(% style="background-color:red;text-align:center" %)
+|=Заголовок 1|=(% style="background-color:yellow" %) Заголовок 2
+|Слово 1|Слово 2
+)))
+|Сортувальна таблиця з можливістю фільтрування|((({{{
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
+   &lt;tr class="sortHeader"&gt;
+     &lt;th&gt;Заголовок 1&lt;/th&gt;
+     &lt;th&gt;Заголовок 2&lt;/th&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+    &lt;td&gt;Комірка 11&lt;/td&gt;
+    &lt;td&gt;Комірка 12&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+    &lt;td&gt;Комірка 21&lt;/td&gt;
+    &lt;td&gt;Комірка 22&lt;/td&gt;
+   &lt;/tr&gt;
+&lt;/table&gt;
+}}}
+
+{{info}}Щоб дізнатися більше про покращені функції, див. [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="table1id" %)
+(% class="sortHeader" %)|=Заголовок 1|=Заголовок 2
+|Комірка 11|Комірка 12
+|Комірка 21|Комірка 22
+)))
+
+=== 2.0 Tables ===
+
+Дозволяє легко створювати вміст у форматі таблиці. Параметри для таблиці, рядка чи комірки також підтримуються в XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}.
+
+|=Функція|=Синтаксис XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Результат
+|Стандартна таблиця|((({{{
+|=Заголовок 1|=Заголовок 2
+|Слово 1|Слово 2
+}}}))) або ((({{{
+!=Заголовок 1!=Заголовок 2
+!!Слово 1!!Слово 2
+}}})))|(((
+|=Заголовок 1|=Заголовок 2
+|Слово 1|Слово 2
+)))
+|Параметризована таблиця|((({{{
+(% style="background-color:red;text-align:center" %)
+|=Заголовок 1|=(% style="background-color:yellow" %)Заголовок 2
+|Слово 1|Слово 2
+}}})))|(((
+(% style="background-color:red;text-align:center" %)
+|=Заголовок 1|=(% style="background-color:yellow" %)Заголовок 2
+|Слово 1|Слово 2
+)))
+|Сортувальна таблиця з можливістю фільтрування|((({{{
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Заголовок 1|=Заголовок 2
+|Комірка 11|Комірка 12
+|Комірка 21|Комірка 22
+}}}
+
+{{info}}Щоб дізнатися більше про покращені функції, див. [[Livetable Macro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Livetable+Macro]].{{/info}}
+)))|(((
+{{velocity}}
+$xwiki.ssfx.use("js/xwiki/table/table.css")
+$xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
+{{/velocity}}
+
+(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="sortHeader" %)|=Заголовок 1|=Заголовок 2
+|Комірка 11|Комірка 12
+|Комірка 21|Комірка 22
+)))</content>
+</xwikidoc>

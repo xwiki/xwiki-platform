@@ -54,8 +54,8 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.xml.EntityResolver;
 import org.xwiki.xml.XMLReaderFactory;
 import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.internal.DefaultXMLReaderFactory;
-import org.xwiki.xml.internal.LocalEntityResolver;
+import org.xwiki.xml.internal.LocalEntityResolverComponent;
+import org.xwiki.xml.internal.XMLReaderFactoryComponent;
 
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
@@ -68,9 +68,9 @@ import static org.junit.Assert.*;
  * @version $Id$
  */
 @ComponentList({
-    DefaultXMLReaderFactory.class,
+    XMLReaderFactoryComponent.class,
     XWikiXMLReaderFactory.class,
-    LocalEntityResolver.class
+    LocalEntityResolverComponent.class
 })
 public class XHTML2FOTest
 {

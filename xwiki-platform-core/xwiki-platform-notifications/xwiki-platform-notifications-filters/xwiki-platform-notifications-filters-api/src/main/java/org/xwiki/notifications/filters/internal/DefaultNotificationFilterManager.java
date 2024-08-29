@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -39,7 +40,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterDisplayer;
@@ -62,10 +62,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private static final String ERROR_MESSAGE = "Failed to get all the notification filters.";
 
     @Inject
-    private ComponentManager componentManager;
+    protected WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private ComponentManager componentManager;
 
     @Inject
     private ModelContext modelContext;
@@ -74,11 +74,8 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     private NotificationFilterDisplayer defaultNotificationFilterDisplayer;
 
     @Inject
-    private NotificationConfiguration configuration;
-
-    @Inject
     @Named("cached")
-    private ModelBridge modelBridge;
+    private FilterPreferencesModelBridge filterPreferencesModelBridge;
 
     @Override
     public Collection<NotificationFilter> getAllFilters(boolean allWikis) throws NotificationException
@@ -141,13 +138,11 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         Collection<NotificationFilter> filters = getAllFilters(
             user.getWikiReference().getName().equals(wikiDescriptorManager.getMainWikiId()));
         Map<String, Boolean> filterActivations = getToggeableFilterActivations(user);
-        boolean prefilteringEnabled = this.configuration.isEventPrefilteringEnabled();
         Iterator<NotificationFilter> it = filters.iterator();
         while (it.hasNext()) {
             NotificationFilter filter = it.next();
             boolean filterActivation = filterActivations.getOrDefault(filter.getName(), true);
-            if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase,
-                prefilteringEnabled)) {
+            if (!this.shouldFilterBeSelected(filter, filterActivation, onlyEnabled, filteringPhase)) {
                 it.remove();
             }
         }
@@ -155,10 +150,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     private boolean shouldFilterBeSelected(NotificationFilter filter, boolean filterActivation, boolean onlyEnabled,
-        NotificationFilter.FilteringPhase filteringPhase, boolean onlyExactPhase)
+        NotificationFilter.FilteringPhase filteringPhase)
     {
         return shouldFilterBeSelectedBasedOnStatus(filterActivation, onlyEnabled)
-            && shouldFilterBeSelectedBasedOnFilteringPhase(filter, filteringPhase, onlyExactPhase);
+            && shouldFilterBeSelectedBasedOnFilteringPhase(filter, filteringPhase);
     }
 
     private boolean shouldFilterBeSelectedBasedOnStatus(boolean filterActivation, boolean onlyEnabled)
@@ -175,7 +170,7 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     }
 
     private boolean shouldFilterBeSelectedBasedOnFilteringPhase(NotificationFilter filter,
-        NotificationFilter.FilteringPhase filteringPhase, boolean prefilteringEnabled)
+        NotificationFilter.FilteringPhase filteringPhase)
     {
         boolean result;
         Set<NotificationFilter.FilteringPhase> filterFilteringPhases = filter.getFilteringPhases();
@@ -185,17 +180,12 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
         // we consider that filters should properly set the filtering phases to be selected.
         } else if (filterFilteringPhases == null || filterFilteringPhases.isEmpty()) {
             result = false;
-        // if pre-filtering is enabled and we're requesting for post-filtering phases, we return only
+        // if we're requesting for post-filtering phases, we return only
         // the filters that only supports post-filtering: we don't need the other ones since they have been already
         // applied.
-        } else if (prefilteringEnabled && filteringPhase == NotificationFilter.FilteringPhase.POST_FILTERING) {
+        } else if (filteringPhase == NotificationFilter.FilteringPhase.POST_FILTERING) {
             result = Collections.singleton(NotificationFilter.FilteringPhase.POST_FILTERING)
                 .equals(filterFilteringPhases);
-        // if pre-filtering is not enabled, but we request pre-filtering filters only, it doesn't really make sense
-        // so we don't return any filters.
-        } else if (!prefilteringEnabled
-                && filteringPhase == NotificationFilter.FilteringPhase.PRE_FILTERING) {
-            result = false;
         // In other cases, we only want to ensure that one of the request phase is supported.
         } else if (filterFilteringPhases.contains(filteringPhase)) {
             result = true;
@@ -222,7 +212,10 @@ public class DefaultNotificationFilterManager implements NotificationFilterManag
     public Map<String, Boolean> getToggeableFilterActivations(DocumentReference user)
             throws NotificationException
     {
-        return modelBridge.getToggeableFilterActivations(user);
+        return filterPreferencesModelBridge.getToggleableFilterActivations(user)
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().isEnabled()));
     }
 
     @Override

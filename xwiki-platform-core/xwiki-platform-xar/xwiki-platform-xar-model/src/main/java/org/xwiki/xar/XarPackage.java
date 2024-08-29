@@ -44,6 +44,8 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -67,6 +69,8 @@ import javanet.staxutils.IndentingXMLStreamWriter;
  */
 public class XarPackage
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XarPackage.class);
+
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
         new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
@@ -188,9 +192,8 @@ public class XarPackage
      * 
      * @param xarStream an input stream to a XAR file
      * @throws IOException when failing to read the file
-     * @throws XarException when failing to parse the XAR package
      */
-    public void read(InputStream xarStream) throws IOException, XarException
+    public void read(InputStream xarStream) throws IOException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false);
 
@@ -210,9 +213,8 @@ public class XarPackage
      * 
      * @param zipFile the XAR file
      * @throws IOException when failing to read the file
-     * @throws XarException when failing to parse the XAR package
      */
-    public void read(ZipFile zipFile) throws IOException, XarException
+    public void read(ZipFile zipFile) throws IOException
     {
         Enumeration<ZipArchiveEntry> zipEntries = zipFile.getEntries();
 
@@ -220,12 +222,8 @@ public class XarPackage
             ZipArchiveEntry entry = zipEntries.nextElement();
 
             if (!entry.isDirectory()) {
-                InputStream stream = zipFile.getInputStream(entry);
-
-                try {
+                try (InputStream stream = zipFile.getInputStream(entry)) {
                     readEntry(stream, entry.getName());
-                } finally {
-                    stream.close();
                 }
             }
         }
@@ -247,7 +245,7 @@ public class XarPackage
         read(directory, directoryName);
     }
 
-    private void read(File directory, String rootDirectory) throws IOException, XarException
+    private void read(File directory, String rootDirectory) throws IOException
     {
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
@@ -262,23 +260,27 @@ public class XarPackage
         }
     }
 
-    private void readEntry(InputStream stream, String entryName) throws XarException, IOException
+    private void readEntry(InputStream stream, String entryName)
     {
-        if (entryName.equals(XarModel.PATH_PACKAGE)) {
-            readDescriptor(stream);
-        } else {
-            LocalDocumentReference reference = XarUtils.getReference(stream);
+        try {
+            if (entryName.equals(XarModel.PATH_PACKAGE)) {
+                readDescriptor(stream);
+            } else {
+                LocalDocumentReference reference = XarUtils.getReference(stream);
 
-            // Get current action associated to the document
-            int defaultAction = getDefaultAction(reference);
-            // Get current type associated to the document
-            String entryType = getEntryType(reference);
+                // Get current action associated to the document
+                int defaultAction = getDefaultAction(reference);
+                // Get current type associated to the document
+                String entryType = getEntryType(reference);
 
-            // Create entry
-            XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
+                // Create entry
+                XarEntry xarEntry = new XarEntry(reference, entryName, defaultAction, entryType);
 
-            // Register entry
-            putEntry(xarEntry);
+                // Register entry
+                putEntry(xarEntry);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to read entry with name [{}]", entryName, e);
         }
     }
 
@@ -515,6 +517,8 @@ public class XarPackage
 
         DocumentBuilder dBuilder;
         try {
+            // Prevent XXE attack
+            dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             dBuilder = dbFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new XarException("Failed to create a new Document builder", e);
@@ -583,31 +587,35 @@ public class XarPackage
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 if (element.getTagName().equals(XarModel.ELEMENT_FILES_FILE)) {
-                    String localeString = element.getAttribute(XarModel.ATTRIBUTE_LOCALE);
-                    String defaultActionString = getAttribute(element, XarModel.ATTRIBUTE_DEFAULTACTION);
-                    String entryType = getAttribute(element, XarModel.ATTRIBUTE_TYPE);
-                    String referenceString = element.getTextContent();
+                    try {
+                        String localeString = element.getAttribute(XarModel.ATTRIBUTE_LOCALE);
+                        String defaultActionString = getAttribute(element, XarModel.ATTRIBUTE_DEFAULTACTION);
+                        String entryType = getAttribute(element, XarModel.ATTRIBUTE_TYPE);
+                        String referenceString = element.getTextContent();
 
-                    // Parse reference
-                    LocalDocumentReference reference =
-                        new LocalDocumentReference(XarUtils.RESOLVER.resolve(referenceString, EntityType.DOCUMENT),
-                            LocaleUtils.toLocale(localeString));
+                        // Parse reference
+                        LocalDocumentReference reference =
+                            new LocalDocumentReference(XarUtils.RESOLVER.resolve(referenceString, EntityType.DOCUMENT),
+                                LocaleUtils.toLocale(localeString));
 
-                    // Parse default action
-                    int defaultAction =
-                        defaultActionString != null ? Integer.parseInt(defaultActionString) : XarModel.ACTION_OVERWRITE;
+                        // Parse default action
+                        int defaultAction = defaultActionString != null ? Integer.parseInt(defaultActionString)
+                            : XarModel.ACTION_OVERWRITE;
 
-                    // Get entry name associated to the document
-                    String entryName = getEntryName(reference);
+                        // Get entry name associated to the document
+                        String entryName = getEntryName(reference);
 
-                    // Create entry
-                    XarEntry packageFile = new XarEntry(reference, entryName, defaultAction, entryType);
+                        // Create entry
+                        XarEntry packageFile = new XarEntry(reference, entryName, defaultAction, entryType);
 
-                    // Register package file entry
-                    this.packageFiles.put(packageFile, packageFile);
+                        // Register package file entry
+                        this.packageFiles.put(packageFile, packageFile);
 
-                    // Update existing entry default action
-                    updateEntry(packageFile);
+                        // Update existing entry default action
+                        updateEntry(packageFile);
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to read element [{}]", XarModel.ELEMENT_FILES_FILE, e);
+                    }
                 }
             }
         }

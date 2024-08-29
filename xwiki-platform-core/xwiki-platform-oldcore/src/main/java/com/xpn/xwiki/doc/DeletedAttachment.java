@@ -57,7 +57,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /** Date of delete action. */
     private Date date;
 
-    /** The user who deleted the attachment, in the <tt>XWiki.UserName</tt> format. */
+    /** The user who deleted the attachment, in the {@code XWiki.UserName} format. */
     private String deleter;
 
     private String contentStore;

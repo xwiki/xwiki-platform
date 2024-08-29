@@ -744,19 +744,19 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </panel-bg>
-      <panel-default-text>
+      <panel-header-text>
         <customDisplay/>
         <disabled>0</disabled>
-        <name>panel-default-text</name>
+        <name>panel-header-text</name>
         <number>46</number>
         <picker>0</picker>
-        <prettyName>panel-default-text</prettyName>
+        <prettyName>panel-header-text</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </panel-default-text>
+      </panel-header-text>
       <text-color>
         <customDisplay/>
         <disabled>0</disabled>
@@ -794,7 +794,7 @@
       <brand-info>#336699</brand-info>
     </property>
     <property>
-      <brand-primary>#0088CC</brand-primary>
+      <brand-primary>#0075b0</brand-primary>
     </property>
     <property>
       <brand-success>#008000</brand-success>
@@ -836,7 +836,7 @@
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg>#0088CC</btn-primary-bg>
+      <btn-primary-bg>#0075b0</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color>#FFFFFF</btn-primary-color>
@@ -918,7 +918,7 @@
 </lessCode>
     </property>
     <property>
-      <link-color>#0088CC</link-color>
+      <link-color>#0075b0</link-color>
     </property>
     <property>
       <logo/>
@@ -951,7 +951,7 @@
       <panel-bg>#F5F5F5</panel-bg>
     </property>
     <property>
-      <panel-default-text>#333333</panel-default-text>
+      <panel-header-text/>
     </property>
     <property>
       <text-color>#333333</text-color>

@@ -44,14 +44,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.6RC1
  */
 @UITest
-public class LoginProtectionIT
+class LoginProtectionIT
 {
     private static DocumentReference AUTHENTICATION_CONFIGURATION =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Authentication"), "Configuration");
 
     @BeforeAll
-    public void setup(TestUtils setup)
+    void setup(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
         setup.createPage(AUTHENTICATION_CONFIGURATION, "");
         setup.addObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass",
             "failureStrategy", "captcha",
@@ -61,7 +62,7 @@ public class LoginProtectionIT
     }
 
     @AfterAll
-    public void tearDown(TestUtils setup)
+    void tearDown(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
         setup.deletePage(AUTHENTICATION_CONFIGURATION);
@@ -72,7 +73,7 @@ public class LoginProtectionIT
      */
     @Test
     @Order(1)
-    public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
+    void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration)
     {
         // fixture:

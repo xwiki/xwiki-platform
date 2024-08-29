@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -35,7 +34,6 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.RatingsManagerFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script service to manipulate ratings for different ratings hints.
@@ -50,7 +48,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Singleton
 @Named("ratings")
-@Unstable
 public class RatingsScriptService extends AbstractScriptRatingsManager implements Initializable, ScriptService
 {
     static final String EXECUTION_CONTEXT_PREFIX = "ratings.script.";
@@ -64,9 +61,6 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
     @Inject
     @Named("context")
     private ComponentManager componentManager;
-
-    @Inject
-    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
@@ -100,8 +94,7 @@ public class RatingsScriptService extends AbstractScriptRatingsManager implement
         } else {
             try {
                 RatingsManager ratingsManager = this.ratingsManagerFactory.getRatingsManager(managerHint);
-                scriptRatingsManager = this.componentManager
-                    .getInstance(DefaultScriptRatingsManager.class, managerHint);
+                scriptRatingsManager = this.componentManager.getInstance(DefaultScriptRatingsManager.class);
                 scriptRatingsManager.setRatingsManager(ratingsManager);
                 executionContext.setProperty(executionContextCacheKey, scriptRatingsManager);
             } catch (RatingsException e) {

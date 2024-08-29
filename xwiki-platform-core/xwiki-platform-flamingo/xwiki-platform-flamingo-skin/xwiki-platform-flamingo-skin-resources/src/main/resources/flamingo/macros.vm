@@ -193,7 +193,7 @@
   </div>
   #end
   <table id="${htmlLiveTableId}" class="xwiki-livetable"
-      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))">
+      data-settings="$escapetool.xml($jsontool.serialize($macro.settings))" data-xwiki-lightbox="false">
     #if("$!options.description" != '')
       <caption class="sr-only">$options.description</caption>
     #end
@@ -233,12 +233,12 @@
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
               #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
-              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+              <th scope="col" class="xwiki-livetable-display-header-text $!escapetool.xml($colprop.headerClass)
                   #if ($!colprop.type == 'hidden')hidden#end
                   #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}">#end
-                #if($isSortable)<a data-rel="${colname}">#end
-                $displayName
+                #if($isSortable)<a data-rel="${escapetool.xml($colname)}">#end
+                $escapetool.xml($displayName)
                 #if($isSortable)</a>#end
                 #if($isFilterable)</label>#end
                 #set($columnCount = $mathtool.add($columnCount, 1))
@@ -309,15 +309,18 @@
       #set ($filterType = 'text')
     #end
   #end
+  #set ($filterTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+    [$services.localization.render("${transprefix}$column")])))
   #if ($filterType == 'list' || $filterType == 'multilist')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column"
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
+      title="$!filterTitle"
       #if ($filterType == 'multilist')
         #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetablemulti.js', true))
         #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-select', 'css/bootstrap-select.css'),
           {'type': 'text/css', 'rel': 'stylesheet'}))
         class="xwiki-livetable-multilist" multiple="multiple">
       #else
-        ><option value="">$services.localization.render('platform.livetable.selectAll')</option>
+        ><option value="">$escapetool.xml($services.localization.render('platform.livetable.selectAll'))</option>
         <option disabled="disabled">────</option>
       #end
     #set ($storedValues = $xproperty.listValues)
@@ -328,20 +331,20 @@
       #if ($displayedValue == $l10nKey)
         #set ($displayedValue = $displayedValues.get($storedValue).value)
       #end
-      <option value="$storedValue">$displayedValue</option>
+      <option value="$!escapetool.xml($storedValue)">$!escapetool.xml($displayedValue)</option>
     #end
     </select>
   #elseif ($filterType == 'boolean')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column">
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
+      title="$!filterTitle">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column" type="text"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-        [$services.localization.render("${transprefix}$column")]))" />
+      title="$!filterTitle" />
   #elseif ($filterType == 'date')
     #set ($discard = $xwiki.jsfx.use('js/xwiki/table/livetabledate.js', true))
     #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-daterangepicker',
@@ -352,20 +355,27 @@
     #if ("$!dateFormat" == '')
       #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
     #end
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
-      data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
-      #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-      [$services.localization.render("${transprefix}$column")]))" />
+    #set($dateRangeFormat = $dateFormat + " - " + $dateFormat)
+    <div id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}-description" hidden>
+      $!escapetool.xml($services.localization.render('platform.livetable.filter.date.format.description',[$dateRangeFormat]))
+    </div>
+    <div role="combobox" id="xwiki-livetable-${htmlLiveTableId}-filter-date-combobox-${foreach.count}"
+      class="xwiki-livetable-display-header-filter-date-combobox" aria-expanded="false">
+      <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" type="text"
+        data-type="date" data-dateformat="$escapetool.xml($dateFormat)"
+        #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
+        title="$!filterTitle"
+        aria-describedby="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}-description"/>
+    </div>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
-      {'forceSkinAction' : true, 'language' : $xcontext.locale}))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js'))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
+      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
+      title="$!filterTitle">
     </select>
   #end
 #end

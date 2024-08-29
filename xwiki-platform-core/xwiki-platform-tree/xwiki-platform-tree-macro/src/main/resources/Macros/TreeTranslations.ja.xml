@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ja">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=ツリー
+rendering.macro.tree.description=マクロのコンテンツあるいはソースのパラメーターにより規定されたツリーの階層を表示します。
+rendering.macro.tree.parameter.reference.name=参照
+rendering.macro.tree.parameter.reference.description=ツリーの構造とコンテクストメニューを記述するリソースの参照。これはツリーのノードでアクションを実行する際に呼び出されます。このリソースは、ツリーのノードを開いた際にツリーを動的に（要求に応じて）呼び出し、ユーザーがツリーのノードで右クリックを行った際にコンテクストメニューを要求します。そのためリソースは静的ではありません。静的なツリーについては、マクロを代わりに使用してください。参照には、ドキュメントへの参照またはURL、パスのいずれかを設定できます。
+rendering.macro.tree.parameter.root.name=ルート
+rendering.macro.tree.parameter.root.description=ルートのノードのIDです。特定のノード（指定したルート）以下のノードを表示する際に役立ちます。ツリーは、ルートにあるノードの子供を最初のレベルに表示するため、ルートのノードは実際には表示されません。ルートのノードが指定されていない場合は、ツリー全体を表示します。
+rendering.macro.tree.parameter.showRoot.name=ルートを表示
+rendering.macro.tree.parameter.showRoot.description=ルートのノードを表示するか否かを選択。ルードのノードは多くの場合、ツリーを表示するコンテクストにより暗示されるため（例：ツリーの前のラベル）既定では表示しませんが、ルート以下に新しいノードを作成する際などには、表示すると役立つかもしれません。
+rendering.macro.tree.parameter.dragAndDrop.name=ドラッグアンドドロップ
+rendering.macro.tree.parameter.dragAndDrop.description=ユーザーがツリーノードをドラッグアンドドロップできるかどうかを指定。
+rendering.macro.tree.parameter.contextMenu.name=コンテクストメニュー
+rendering.macro.tree.parameter.contextMenu.description=ユーザーがツリーノードを右クリックした際にコンテクストメニューを表示するかどうかを選択。
+rendering.macro.tree.parameter.class.name=クラス
+rendering.macro.tree.parameter.class.description=ツリーの最上位にあるHTML要素に追加するCSSのクラス。
+rendering.macro.tree.parameter.icons.name=アイコン
+rendering.macro.tree.parameter.icons.description=ツリーのノードのアイコンを表示するか否かを選択。全てのツリーのノードが同じ種類の場合、または、水平のスペースを増やしたい場合は、隠すとよいかもしれません。
+rendering.macro.tree.parameter.edges.name=縁
+rendering.macro.tree.parameter.edges.description=同レベルのツリーのノードと、親レベルのノードをつなぐ縁を表示するかどうかを選択。
+rendering.macro.tree.parameter.links.name=リンク
+rendering.macro.tree.parameter.links.description=ノードのラベルをリンク（アンカー）のように表示し、機能させるかどうかを指定。
+rendering.macro.tree.parameter.checkboxes.name=チェックボックス
+rendering.macro.tree.parameter.checkboxes.description=ツリーの各ノードの前にチェックボックスを表示して、複数のノードを選択可能にするかどうかを選択。
+rendering.macro.tree.parameter.openTo.name=開く場所
+rendering.macro.tree.parameter.openTo.description=ツリーを展開するノードのID。ツリーのルートを含めて、指定したノードの上位にある全てのノードを開きます。
+rendering.macro.tree.parameter.finder.name=ファインダー
+rendering.macro.tree.parameter.finder.description=ツリーのノードを探すのに使用できるテキストのインプットを表示。インプットの結果はツリーの上に表示され、入力と並行して、ツリーの内容に応じた候補を表示します。候補を選択すると、ツリーは対応するノードにまで展開されます。
+rendering.macro.tree.parameter.limit.name=制限
+rendering.macro.tree.parameter.limit.description=初めに親ノードを展開した際に表示する子ノードの最大数。その他の子ノードは残りのノード数を示すリンクからアクセスできます。このパラメーターは子ノードをページ化し、子ノードの数が多いときにツリーのサイズを調整するのに使用されます。このツリーがパラメーターをツリーのソースに渡す際、パラメーターは、ソースが子ノードの件数を制限している動的なツリーでのみ機能します。
+rendering.macro.tree.content.description=入れ子式の順序なしHTMLリストを使ってツリー構造を記述できます。詳細はhttp://www.jstree.com/docs/html/を参照してください。
+tree.macro.editModeWarning=このツリーは編集モードで表示できません。
+</content>
+</xwikidoc>

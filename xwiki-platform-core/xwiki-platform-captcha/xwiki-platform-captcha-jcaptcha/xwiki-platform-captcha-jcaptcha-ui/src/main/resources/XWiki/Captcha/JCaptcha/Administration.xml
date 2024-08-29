@@ -104,7 +104,7 @@
           &lt;div class="engine $type #if ($currentType != $type)hidden#end radio"&gt;
             &lt;label&gt;
               &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" value="$engine" $maybeChecked /&gt;
-              $services.localization.render("captcha.jcaptcha.engine.$engine")
+              $escapetool.xml($services.localization.render("captcha.jcaptcha.engine.$engine"))
             &lt;/label&gt;
           &lt;/div&gt;
         #end
@@ -114,7 +114,7 @@
           &lt;label&gt;
             ## Note: Using the same input name for the "custom" option
             &lt;input type="radio" name="XWiki.Captcha.JCaptcha.ConfigurationClass_0_engine" class="customActivator" #if ($isCustom)checked="checked"#end /&gt;
-            Custom:
+            $escapetool.xml($services.localization.render('captcha.jcaptcha.engine.custom'))
           &lt;/label&gt;
           &lt;input type="text" class="customEngine" #if ($isCustom)checked="checked" value="$currentEngine"#end /&gt;
         &lt;/div&gt;
@@ -124,7 +124,7 @@
   &lt;div&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.requestURL" /&gt;
     &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()" /&gt;
-    &lt;input type="submit" class="button" value="$services.localization.render('admin.save')" /&gt;
+    &lt;input type="submit" class="button" value="$escapetool.xml($services.localization.render('admin.save'))" /&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
@@ -214,22 +214,22 @@
       <code>require(['jquery'], function($) {
   // Handler for saving the custom engine's value in the "custom" select's option when submitting
   // the JCaptcha settings form, since the first value is always used when multiple values are given.
-  $('form.jcaptcha').submit(function(e) {
+  $('form.jcaptcha').on('submit', function(e) {
     var customOption = $('input.customActivator');
     if (customOption.is(':checked')) {
       var customInput = $('.customEngine');
       customOption.val(customInput.val());
     }
-  })
+  });
 
   // Handler for changing the engine type.
-  $('#XWiki\\.Captcha\\.JCaptcha\\.ConfigurationClass_0_type').change(function(e) {
+  $('#XWiki\\.Captcha\\.JCaptcha\\.ConfigurationClass_0_type').on('change', function(e) {
     // Hide all engines except the ones for the new type.
     $('.jcaptcha .engine').addClass('hidden');
     $('.jcaptcha .engine.' + this.value).removeClass('hidden');
 
     // Check the first option for the new type.
-    $('.jcaptcha .engine:visible:first input').prop('checked', true);
+    $('.jcaptcha .engine:visible').first().find('input').prop('checked', true);
 
     // Clear the custom value since it will not match the new type.
     $('.customEngine').val('');

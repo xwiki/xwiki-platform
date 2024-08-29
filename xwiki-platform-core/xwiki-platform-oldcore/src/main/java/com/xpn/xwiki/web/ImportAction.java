@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Named;
@@ -70,9 +69,7 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSource;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.Package;
-import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -138,12 +135,7 @@ public class ImportAction extends XWikiAction
     {
         String all = request.get("all");
         if (!"1".equals(all)) {
-            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usefilter", 1) == 0) {
-                importPackageOld(packFile, request, context);
-            } else {
-                importPackageFilterStream(packFile, request, context);
-            }
-
+            importPackageFilterStream(packFile, request, context);
             if (!StringUtils.isBlank(request.getParameter("ajax"))) {
                 // If the import is done from an AJAX request we don't want to return a whole HTML page,
                 // instead we return "inline" the list of imported documents,
@@ -186,58 +178,6 @@ public class ImportAction extends XWikiAction
     private String getDocumentReference(String pageEntry)
     {
         return pageEntry.replaceAll(":[^:]*$", "");
-    }
-
-    private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
-        throws IOException, XWikiException
-    {
-        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
-
-        String[] pages = request.getParameterValues("pages");
-
-        importer.Import(packFile.getContentInputStream(context));
-        if (pages != null) {
-            // Skip document by default
-            List<DocumentInfoAPI> filelist = importer.getFiles();
-            for (DocumentInfoAPI dia : filelist) {
-                dia.setAction(DocumentInfo.ACTION_SKIP);
-            }
-
-            // Indicate with documents to import
-            for (String pageEntry : pages) {
-                String language = getLocale(pageEntry, request);
-                int iAction = getAction(pageEntry, language, request);
-
-                String docName = getDocumentReference(pageEntry);
-                if (language == null) {
-                    importer.setDocumentAction(docName, iAction);
-                } else {
-                    importer.setDocumentAction(docName, language, iAction);
-                }
-            }
-        }
-
-        // Set the appropriate strategy to handle versions
-        if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
-            importer.setPreserveVersion(false);
-            importer.setWithVersions(false);
-        } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
-            importer.setPreserveVersion(false);
-            importer.setWithVersions(true);
-        } else {
-            importer.setPreserveVersion(true);
-            importer.setWithVersions(false);
-        }
-
-        // Set the backup pack option
-        if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
-            importer.setBackupPack(true);
-        } else {
-            importer.setBackupPack(false);
-        }
-
-        // Import files
-        importer.install();
     }
 
     private void importPackageFilterStream(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)

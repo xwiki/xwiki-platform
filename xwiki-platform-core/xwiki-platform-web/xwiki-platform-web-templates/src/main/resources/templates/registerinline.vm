@@ -17,12 +17,10 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#template("register_macros.vm")
 #if (!$xwiki.hasAccessLevel('view', 'XWiki.Registration') || $xwiki.getDocument('XWiki.Registration').isNew())
   ## Display the static content included in this template, as there's no override in the wiki.
   <h1>$services.localization.render('core.register.title')</h1>
-  #if (!$reg || $reg < 0)
-    <p>$services.localization.render('core.register.welcome')</p>
-  #end
   #if ($reg && $reg <= 0)
     #if ($reg == -2)
       #error($services.localization.render('core.register.passwordMismatch'))
@@ -32,6 +30,11 @@
       #error($services.localization.render('core.register.invalidUsername'))
     #elseif ($reg == -8)
       #error($services.localization.render('core.register.userAlreadyExists'))
+    #elseif ($reg == -9)
+      #error($services.localization.render('core.register.invalidCaptcha'))
+    ## Note that -10 is reserved already (see api.XWiki#createUser)
+    #elseif($reg == -11)
+      #error($services.localization.render('core.register.mailSenderWronglyConfigured'))
     #else
       #error($services.localization.render('core.register.registerFailed', [$reg]))
     #end
@@ -41,63 +44,125 @@
       $escapetool.xml($request.xwikiname)]))
   #end
   #if (!$reg || $reg < 0)
-    <form id="register" action="" method="post" class="xform third">
-      <div>
-        <input type="hidden" name="form_token" value="$!services.csrf.token" />
-        <input type="hidden" name="register" value="1" />
-        <input type="hidden" name="xredirect" value="$!request.xredirect" />
-        #set ($class = $xwiki.getClass('XWiki.XWikiUsers'))
-        #set ($obj = $class.newObject())
-        #set ($serverobj = $class.newObject())
-        #set ($discard = $doc.use('XWiki.XWikiUsers'))
-        #if ($request.register_first_name)
-          $doc.set('first_name', $request.register_first_name)
+    <p>$services.localization.render('core.register.welcome')</p>
+    #set ($registrationConfig = $NULL)
+    #_loadConfig($registrationConfig)
+    #set($fields = [])
+    ##
+    ## The first name field, no checking.
+    #set($field =
+      {'name' : 'register_first_name',
+        'label' : $services.localization.render('core.register.firstName'),
+        'params' : {
+          'type' : 'text',
+          'size' : '60',
+          'autocomplete' : 'given-name'
+        }
+    })
+    #set($discard = $fields.add($field))
+    ##
+    ## The last name field, no checking.
+    #set($field =
+      {'name' : 'register_last_name',
+        'label' : $services.localization.render('core.register.lastName'),
+        'params' : {
+          'type' : 'text',
+          'size' : '60',
+          'autocomplete' : 'family-name'
+        }
+    })
+    #set($discard = $fields.add($field))
+    ##
+    ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
+    #set($field =
+      {'name' : 'xwikiname',
+        'label' : $services.localization.render('core.register.username'),
+        'params' : {
+          'type' : 'text',
+          'onfocus' : 'prepareName(document.forms.register);',
+          'size' : '60',
+          'autocomplete' : 'username'
+        },
+        'validate' : {
+          'mandatory' : {
+          'failureMessage' : $services.localization.render('core.validation.required.message')
+        }
+      }
+    })
+    #set($discard = $fields.add($field))
+    ## Make sure the chosen user name is not already taken
+    ## This macro is called by programmaticValidation for xwikiname (above)
+    #macro (nameAvailable, $name)
+      #if ($xwiki.exists("$userSpace$name"))
+      failed
+      #end
+    #end
+    ##
+    ##The password field, mandatory and must be at least 6 characters long.
+    ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+    #definePasswordFields($fields, 'register_password', 'register2_password', $registrationConfig.passwordOptions)
+    ##
+    ## The email address field, regex checked with an email pattern. Mandatory if registration uses email verification
+    #set($field =
+      {'name' : 'register_email',
+        'label' : $services.localization.render('core.register.email'),
+        'params' : {
+          'type' : 'text',
+          'size' : '60',
+          'autocomplete' : 'email'
+        },
+        'validate' : {
+          'regex' : {
+            'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
+            'failureMessage' : $services.localization.render('xe.admin.registration.invalidEmail')
+          }
+        }
+    })
+    #if($registrationConfig.useEmailVerification)
+      #set($field.validate.mandatory = {'failureMessage' : $services.localization.render('core.validation.required.message')})
+    #end
+    #set($discard = $fields.add($field))
+    ##
+    ## To disable the CAPTCHA on this page, comment out the next entry.
+    ## The CAPTCHA, not really an input field but still defined the same way.
+    #if($services.captcha && !$invited && $xcontext.getUser() == "XWiki.XWikiGuest" && $registrationConfig.requireCaptcha)
+      ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
+      ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
+      ## mandatory test is misleading.
+      ## Also, not filled back in if there is an error ('noReturn').
+      #set($field =
+        {'name' : 'captcha_placeholder',
+          'label' : $services.localization.render('core.captcha.instruction'),
+          'skipLabelFor' : true,
+          'type'  : 'html',
+          'html'  : "$!{services.captcha.default.display()}",
+          'noReturn' : true
+      })
+      #set($discard = $fields.add($field))
+    #end
+    #set($field =
+    {'name' : 'xredirect',
+      'params' : {
+        'type' : 'hidden',
+        'value': "$!escapetool.xml($!request.xredirect)"
+        }
+    })
+    #set($discard = $fields.add($field))
+    #set($field =
+    {'name' : 'register',
+      'params' : {
+        'type' : 'hidden',
+        'value': '1'
+      }
+    })
+    #set($discard = $fields.add($field))
+    <form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform third">
+      <div class="hidden">
+        #if ($request.xpage == 'registerinline')
+          #skinExtensionHooks
         #end
-        #if ($request.register_last_name)
-          $doc.set('last_name', $request.register_last_name)
-        #end
-        <dl>
-          #set ($prop = $class.first_name)
-          <dt><label for="register_${prop.name}">$services.localization.render('core.register.firstName')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
-
-          #set ($prop = $class.last_name)
-          <dt><label for="register_${prop.name}">$services.localization.render('core.register.lastName')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
-
-          <dt>
-            <label for="register_username">
-              $services.localization.render('core.register.username')
-              <span class="xRequired">$services.localization.render('core.validation.required')</span>
-            </label>
-          </dt>
-          <dd>
-            <input name="xwikiname" id="register_username" type="text" size="20"
-              onfocus="prepareName(document.forms.register);" />
-          </dd>
-
-          #set ($prop = $class.password)
-          <dt>
-            <label for="register_${prop.name}">
-              $services.localization.render('core.register.password')
-              <span class="xRequired">$services.localization.render('core.validation.required')</span>
-            </label>
-          </dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
-
-          <dt>
-            <label for="register2_${prop.name}">
-              $services.localization.render('core.register.passwordRepeat')
-              <span class="xRequired">$services.localization.render('core.validation.required')</span>
-            </label>
-          </dt>
-          <dd>$doc.displayEdit($prop, 'register2_',  $obj).replace('type=', 'autocomplete="off" type=')</dd>
-
-          #set ($prop = $class.email)
-          <dt><label for="register_${prop.name}">$services.localization.render('core.register.email')</label></dt>
-          <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
-        </dl>
       </div>
+      #generateHtml($fields, $request)
       <div class="buttons">
         <span class="buttonwrapper">
           <input type="submit" value="$services.localization.render('core.register.submit')" class="button"/>

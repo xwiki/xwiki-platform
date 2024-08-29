@@ -276,8 +276,7 @@
 #macro (displayProperty $propertyName $object $action)
   #set ($propertyClass = $object.xWikiClass.get($propertyName))
   #set ($isCheckbox = $propertyClass.getValue('displayFormType') == 'checkbox')
-  #set ($fieldDisplay = $stringtool.removeEnd($stringtool.removeStart($object.display($propertyName, $action),
-    '{{html clean="false" wiki="false"}}'), '{{/html}}'))
+  #set ($fieldDisplay = "#unwrapXPropertyDisplay($object.display($propertyName, $action))")
   &lt;dt&gt;
     &lt;label #if ($action == 'edit' &amp;&amp; !$isCheckbox)
         for="$escapetool.xml("${object.xWikiClass.name}_${object.number}_$propertyName")"#end&gt;
@@ -309,7 +308,8 @@
       $escapetool.url({
         'customize': true,
         'action': 'reset',
-        'xredirect': $xredirect
+        'xredirect': $xredirect,
+        'form_token': $services.csrf.token
       }),
       "$doc.fullName",
       'customize=true'
@@ -455,7 +455,7 @@
   /**
    * Live preview when the User Directory settings are modified.
    */
-  $('form.user-directory-settings').change(function(event) {
+  $('form.user-directory-settings').on('change', function(event) {
     // Default on user-level configuration.
     var configDocument = XWiki.currentDocument;
     if (configDocument.page !== 'UserDirectory' || configDocument.space !== 'Main') {
@@ -466,7 +466,7 @@
     var data = $(this).serialize();
     var oldLiveTableContainer = $('.xwiki-livetable-container').addClass('loading');
     // We can't use load() here because the live table has in-line script tags that have to be evaluated.
-    $.get(url, data).done(function(html) {
+    $.get(url, data).then(html =&gt; {
       var newLiveTableContainer = $('&lt;div/&gt;').html(html).find('.xwiki-livetable-container');
       oldLiveTableContainer.replaceWith(newLiveTableContainer);
       $(document).trigger('xwiki:dom:updated', {elements: newLiveTableContainer.toArray()});
@@ -476,7 +476,7 @@
   /**
    * User scope filtering (for sub-wikis).
    */
-  $('#userScopeFilter').change(function(event) {
+  $('#userScopeFilter').on('change', function(event) {
     var value = $(this).val();
     // The live table is recreated when an user directory setting is changed (live preview) so we can't cache the
     // reference to the live table instance.

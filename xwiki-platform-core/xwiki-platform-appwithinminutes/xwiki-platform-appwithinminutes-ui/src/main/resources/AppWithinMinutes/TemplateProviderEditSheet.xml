@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.TemplateProviderEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.TemplateProviderEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>TemplateProviderEditSheet</name>
   <language/>
@@ -100,6 +100,7 @@
       #set ($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
       #set ($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
       #set ($discard = $queryString.putAll({
+        'form_token': $services.csrf.getToken(),
         'template': 'AppWithinMinutes.LiveTableTemplate',
         "${appDescriptorClassName}_0_class": $classReference,
         'title': $appReference.name,
@@ -245,7 +246,7 @@
   #doEdit
   {{/html}}
 
-  {{iconPicker id="XWiki\\.TemplateProviderClass_0_icon" prefix="" /}}
+  {{iconPicker id="XWiki.TemplateProviderClass_0_icon" prefix="" /}}
 #end
 {{/velocity}}</content>
   <object>

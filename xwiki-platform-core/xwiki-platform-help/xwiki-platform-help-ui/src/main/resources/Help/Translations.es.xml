@@ -47,7 +47,18 @@ help.tipsPanel.linkAutocompleteWYSIWYGTip=Cuando edite en WYSIWYG, escriba ##[##
 help.macroList.title=Macros disponibles
 help.macroList.id=Id
 help.macroList.name=Nombre
-help.macroList.category=Categoría
 help.macroList.description=Descripción
-help.macroList.visibility=Visibilidad</content>
+help.macroList.visibility=Visibilidad
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+#@deprecatedstart
+
+## until 14.6RC1
+help.macroList.category=Categoría
+
+#@deprecatedend</content>
 </xwikidoc>

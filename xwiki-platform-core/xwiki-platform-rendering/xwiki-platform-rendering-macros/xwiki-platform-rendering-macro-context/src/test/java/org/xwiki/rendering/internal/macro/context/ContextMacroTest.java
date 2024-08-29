@@ -21,34 +21,57 @@ package org.xwiki.rendering.internal.macro.context;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.context.ContextMacroParameters;
+import org.xwiki.rendering.macro.context.TransformationContextMode;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.TestEnvironment;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ContextMacro}.
@@ -56,144 +79,220 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 8.3RC1
  */
-public class ContextMacroTest
+@ComponentTest
+@ComponentList({TestEnvironment.class, ContextMacroDocument.class})
+class ContextMacroTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ContextMacro> mocker = new MockitoComponentMockingRule<>(ContextMacro.class);
+    private static final DocumentReference AUTHOR = new DocumentReference("wiki", "XWiki", "author");
 
-    @Before
-    public void setUp() throws Exception
+    private static final DocumentReference TARGET_REFERENCE = new DocumentReference("wiki", "space", "target");
+
+    private static final DocumentReference SOURCE_REFERENCE = new DocumentReference("wiki", "space", "source");
+
+    @MockComponent
+    private DocumentAccessBridge dab;
+
+    @MockComponent
+    private BeanManager beanManager;
+
+    @MockComponent
+    private MacroContentParser parser;
+
+    @MockComponent
+    private AuthorizationManager authorization;
+
+    @MockComponent
+    @Named("macro")
+    private DocumentReferenceResolver<String> macroReferenceResolver;
+
+    @MockComponent
+    private DocumentReferenceResolver<String> resolver;
+
+    @InjectMockComponents
+    private ContextMacro macro;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    private BlockAsyncRendererExecutor executor;
+
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         // Macro Descriptor set up
-        BeanManager beanManager = this.mocker.getInstance(BeanManager.class);
         BeanDescriptor descriptor = mock(BeanDescriptor.class);
         when(descriptor.getProperties()).thenReturn(Collections.emptyList());
-        when(beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
+        when(this.beanManager.getBeanDescriptor(any())).thenReturn(descriptor);
+
+        when(this.dab.getCurrentAuthorReference()).thenReturn(AUTHOR);
+
+        when(this.macroReferenceResolver.resolve(eq("target"), any())).thenReturn(TARGET_REFERENCE);
+        when(this.resolver.resolve("source")).thenReturn(SOURCE_REFERENCE);
+
+        this.executor = this.componentManager.getInstance(BlockAsyncRendererExecutor.class);
     }
 
     @Test
-    public void executeWhenNoDocumentSpecified() throws Exception
+    void executeWhenNoDocumentSpecified() throws Exception
     {
+        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metadata = new MetaData();
+        metadata.addMetaData(MetaData.SOURCE, "source");
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
+        MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
+
+        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+        when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")));
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(null), eq(false)))
+            .thenReturn(contentXDOM);
+
         ContextMacroParameters parameters = new ContextMacroParameters();
 
+        when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
+
+        List<Block> result = this.macro.execute(parameters, "", macroContext);
+
+        verifyNoInteractions(this.executor);
+
+        assertEquals(Arrays.asList(new MetaDataBlock(contentXDOM.getChildren())), result);
+    }
+
+    @Test
+    void executeWithReferencedDocumentNotViewableByTheAuthor() throws Exception
+    {
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.VIEW, AUTHOR, TARGET_REFERENCE);
+
         try {
-            this.mocker.getComponentUnderTest().execute(parameters, "", new MacroTransformationContext());
+            executeInDOCUMENTContext();
+
             fail("Should have thrown an exception");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You must specify a 'document' parameter pointing to the document to set in the "
-                + "context as the current document.", expected.getMessage());
+            assertEquals("Author [wiki:XWiki.author] is not allowed to access target document [wiki:space.target]",
+                expected.getMessage());
         }
     }
 
     @Test
-    public void executeWithReferencedDocumentHavingProgrammingRightsButNotTheCallingDocument() throws Exception
+    void executeInCURRENTContext() throws Exception
     {
+        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metadata = new MetaData();
+        metadata.addMetaData(MetaData.SOURCE, "source");
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
         MacroTransformationContext macroContext = new MacroTransformationContext();
-        MacroBlock macroBlock = new MacroBlock("context", Collections.emptyMap(), false);
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
         macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
 
-        DocumentReferenceResolver<String> resolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        when(resolver.resolve("wiki:space.page", macroBlock)).thenReturn(
-            new DocumentReference("wiki", "space", "page"));
+        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+        when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.hasProgrammingRights()).thenReturn(false).thenReturn(true);
+        MetaData parserMetadata = new MetaData();
+        parserMetadata.addMetaData(MetaData.SOURCE, "target");
+        parserMetadata.addMetaData(MetaData.BASE, "target");
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+            .thenReturn(contentXDOM);
 
         ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("wiki:space.page");
+        parameters.setDocument("target");
+        parameters.setTransformationContext(TransformationContextMode.CURRENT);
 
-        try {
-            this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
-            fail("Should have thrown an exception");
-        } catch (MacroExecutionException expected) {
-            assertEquals("Current document must have programming rights since the context document provided ["
-                + "wiki:space.page] has programming rights.", expected.getMessage());
+        when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
+
+        List<Block> result = this.macro.execute(parameters, "", macroContext);
+
+        verifyNoInteractions(this.executor);
+
+        assertEquals(Arrays.asList(new MetaDataBlock(contentXDOM.getChildren(), parserMetadata)), result);
+    }
+
+    @Test
+    void executeInDOCUMENTContext() throws Exception
+    {
+        execute(false, TransformationContextMode.DOCUMENT, false);
+    }
+
+    @Test
+    void executeInDOCUMENTContextInRestrictedMode() throws Exception
+    {
+        execute(true, TransformationContextMode.DOCUMENT, false);
+    }
+
+    @Test
+    void executeWithRestricted() throws Exception
+    {
+        execute(false, null, true);
+    }
+
+    private void execute(boolean restrictedContext, TransformationContextMode mode, boolean restricted) throws Exception
+    {
+        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
+        MetaData metadata = new MetaData();
+        metadata.addMetaData(MetaData.SOURCE, "source");
+        XDOM pageXDOM = new XDOM(Arrays.asList(macroBlock), metadata);
+        MacroTransformationContext macroContext = new MacroTransformationContext();
+        macroContext.setSyntax(Syntax.XWIKI_2_0);
+        macroContext.setCurrentMacroBlock(macroBlock);
+        macroContext.setXDOM(pageXDOM);
+        macroContext.getTransformationContext().setRestricted(restrictedContext);
+
+        XDOM targetXDOM;
+        MetaData parserMetadata;
+        ContextMacroParameters parameters = new ContextMacroParameters();
+        if (mode != null) {
+            DocumentModelBridge dmb = mock(DocumentModelBridge.class);
+            when(this.dab.getTranslatedDocumentInstance(TARGET_REFERENCE)).thenReturn(dmb);
+            targetXDOM = new XDOM(Arrays.asList(new WordBlock("word")), metadata);
+            when(dmb.getPreparedXDOM()).thenReturn(targetXDOM);
+
+            parameters.setDocument("target");
+            parameters.setTransformationContext(mode);
+
+            parserMetadata = new MetaData();
+            parserMetadata.addMetaData(MetaData.SOURCE, "target");
+            parserMetadata.addMetaData(MetaData.BASE, "target");
+        } else {
+            targetXDOM = null;
+            parserMetadata = null;
         }
+        parameters.setRestricted(restricted);
+
+        XDOM contentXDOM = new XDOM(Arrays.asList(new WordBlock("test")), parserMetadata);
+        when(this.parser.parse(eq(""), same(null), same(macroContext), eq(false), eq(parserMetadata), eq(false)))
+            .thenReturn(contentXDOM);
+
+
+        when(this.executor.execute(any())).thenReturn(new WordBlock("result"));
+
+        this.macro.execute(parameters, "", macroContext);
+
+        ArgumentCaptor<BlockAsyncRendererConfiguration> configurationCaptor =
+            ArgumentCaptor.forClass(BlockAsyncRendererConfiguration.class);
+        verify(this.executor).execute(configurationCaptor.capture());
+
+        BlockAsyncRendererConfiguration configuration = configurationCaptor.getValue();
+        assertEquals(AUTHOR, configuration.getSecureAuthorReference());
+        assertEquals(SOURCE_REFERENCE, configuration.getSecureDocumentReference());
+        if (targetXDOM != null) {
+            assertSame(targetXDOM, configuration.getXDOM());
+        }
+        assertEquals(restrictedContext ? true : restricted, configuration.isResricted());
     }
 
     @Test
-    public void executeWithReferencedDocumentHavingProgrammingRightsAndCallingDocumentToo() throws Exception
+    void prepare() throws MacroPreparationException
     {
-        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
-        MacroTransformationContext macroContext = new MacroTransformationContext();
-        macroContext.setSyntax(Syntax.XWIKI_2_0);
-        macroContext.setCurrentMacroBlock(macroBlock);
+        MacroBlock macroBlock = new MacroBlock("cotext", Map.of(), false);
 
-        DocumentReferenceResolver<String> resolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        DocumentReference referencedDocumentReference = new DocumentReference("wiki", "space", "page");
-        when(resolver.resolve("wiki:space.page", macroBlock)).thenReturn(referencedDocumentReference);
+        this.macro.prepare(macroBlock);
 
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(dab.hasProgrammingRights()).thenReturn(true).thenReturn(true);
-        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
-
-        MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
-        when(parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(
-            new XDOM(Collections.emptyList()));
-
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("wiki:space.page");
-
-        this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
-    }
-
-    @Test
-    public void executeOk() throws Exception
-    {
-        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
-        MacroTransformationContext macroContext = new MacroTransformationContext();
-        macroContext.setSyntax(Syntax.XWIKI_2_0);
-        macroContext.setCurrentMacroBlock(macroBlock);
-
-        DocumentReferenceResolver<String> resolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        DocumentReference referencedDocumentReference = new DocumentReference("wiki", "space", "page");
-        when(resolver.resolve("wiki:space.page", macroBlock)).thenReturn(referencedDocumentReference);
-
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
-
-        MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
-        XDOM xdom = new XDOM(Arrays.asList((Block) new ParagraphBlock(Arrays.asList((Block) new LinkBlock(
-            Collections.emptyList(), new ResourceReference("", ResourceType.DOCUMENT), false)))));
-        when(parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(xdom);
-
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("wiki:space.page");
-
-        // Note: we're not testing the returned value here since this is done in integation tests.
-        this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
-    }
-
-    @Test
-    public void executeWithRelativeDocumentReferenceParameter() throws Exception
-    {
-        MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
-
-        MacroTransformationContext macroContext = new MacroTransformationContext();
-        macroContext.setSyntax(Syntax.XWIKI_2_0);
-        macroContext.setCurrentMacroBlock(macroBlock);
-
-        DocumentReferenceResolver<String> resolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "macro");
-        DocumentReference referencedDocumentReference = new DocumentReference("basewiki", "basespace", "page");
-        when(resolver.resolve("page", macroBlock)).thenReturn(referencedDocumentReference);
-
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        DocumentModelBridge dmb = mock(DocumentModelBridge.class);
-        when(dab.getTranslatedDocumentInstance(referencedDocumentReference)).thenReturn(dmb);
-
-        MacroContentParser parser = this.mocker.getInstance(MacroContentParser.class);
-        when(parser.parse(eq(""), same(macroContext), eq(false), any(MetaData.class), eq(false))).thenReturn(
-            new XDOM(Collections.emptyList()));
-
-        ContextMacroParameters parameters = new ContextMacroParameters();
-        parameters.setDocument("page");
-
-        this.mocker.getComponentUnderTest().execute(parameters, "", macroContext);
+        verify(this.parser).prepareContentWiki(macroBlock);
     }
 }

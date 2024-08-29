@@ -23,15 +23,17 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.util.XWikiSyntaxEscaper;
 import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroManager;
@@ -40,19 +42,31 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.test.mockito.StringReaderMatcher;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.syntax.Syntax.XHTML_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
  * Unit tests for {@link RenderingScriptService}.
@@ -60,234 +74,243 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 3.2M3
  */
-@ComponentList({ContextComponentManagerProvider.class})
-public class RenderingScriptServiceTest
+@ComponentTest
+@ComponentList({ ContextComponentManagerProvider.class, XWikiSyntaxEscaper.class })
+class RenderingScriptServiceTest
 {
-    @Rule
-    public MockitoComponentMockingRule<RenderingScriptService> mocker = new MockitoComponentMockingRule<>(
-        RenderingScriptService.class);
+    @InjectMockComponents
+    private RenderingScriptService renderingScriptService;
+
+    @MockComponent
+    private RenderingConfiguration baseConfiguration;
+
+    @MockComponent
+    private ExtendedRenderingConfiguration extendedConfiguration;
+
+    @MockComponent
+    private MacroManager macroManager;
+
+    @MockComponent
+    private MacroCategoryManager macroCategoryManager;
+
+    @MockComponent
+    private MacroIdFactory macroIdFactory;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private Parser parser;
+
+    @MockComponent
+    @Named("xwiki/2.0")
+    private BlockRenderer blockRenderer;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void parseAndRender() throws Exception
+    void parseAndRender() throws Exception
     {
-        Parser parser = this.mocker.registerMockComponent(Parser.class, "plain/1.0");
-        when(parser.parse(argThat(new StringReaderMatcher("some [[TODO]] stuff"))))
-            .thenReturn(new XDOM(Collections.<Block>emptyList()));
+        when(this.parser.parse(argThat(new StringReaderMatcher("some [[TODO]] stuff"))))
+            .thenReturn(new XDOM(List.of()));
 
-        BlockRenderer blockRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "xwiki/2.0");
-        doAnswer(new Answer<Void>()
-        {
-            @Override
-            public Void answer(InvocationOnMock invocationOnMock) throws Throwable
-            {
-                WikiPrinter printer = (WikiPrinter) invocationOnMock.getArguments()[1];
-                printer.print("some ~[~[TODO]] stuff");
-                return null;
-            }
-        }).when(blockRenderer).render(any(XDOM.class), any());
+        doAnswer(invocationOnMock -> {
+            ((WikiPrinter) invocationOnMock.getArguments()[1]).print("some ~[~[TODO]] stuff");
+            return null;
+        }).when(this.blockRenderer).render(any(XDOM.class), any());
 
-        XDOM xdom = this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0");
-        assertEquals("some ~[~[TODO]] stuff", this.mocker.getComponentUnderTest().render(xdom, "xwiki/2.0"));
+        XDOM xdom = this.renderingScriptService.parse("some [[TODO]] stuff", "plain/1.0");
+        assertEquals("some ~[~[TODO]] stuff", this.renderingScriptService.render(xdom, "xwiki/2.0"));
     }
 
     @Test
-    public void parseAndRenderWhenErrorInParse() throws Exception
+    void parseAndRenderWhenErrorInParse() throws Exception
     {
-        Parser parser = this.mocker.registerMockComponent(Parser.class, "plain/1.0");
-        when(parser.parse(new StringReader("some [[TODO]] stuff"))).thenThrow(new ParseException(("error")));
-
-        Assert.assertNull(this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0"));
+        when(this.parser.parse(new StringReader("some [[TODO]] stuff"))).thenThrow(new ParseException(("error")));
+        assertNull(this.renderingScriptService.parse("some [[TODO]] stuff", "plain/1.0"));
     }
 
     @Test
-    public void parseAndRenderWhenErrorInRender() throws Exception
+    void parseAndRenderWhenErrorInRender() throws Exception
     {
-        Parser parser = this.mocker.registerMockComponent(Parser.class, "plain/1.0");
-        when(parser.parse(new StringReader("some [[TODO]] stuff")))
-            .thenReturn(new XDOM(Collections.<Block>emptyList()));
+        when(this.parser.parse(new StringReader("some [[TODO]] stuff"))).thenReturn(new XDOM(List.of()));
 
-        XDOM xdom = this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0");
-        Assert.assertNull(this.mocker.getComponentUnderTest().render(xdom, "unknown"));
+        XDOM xdom = this.renderingScriptService.parse("some [[TODO]] stuff", "plain/1.0");
+        assertNull(this.renderingScriptService.render(xdom, "unknown"));
     }
 
     @Test
-    public void resolveSyntax() throws Exception
+    void resolveSyntax()
     {
-        assertEquals(Syntax.XWIKI_2_1, this.mocker.getComponentUnderTest().resolveSyntax("xwiki/2.1"));
+        assertEquals(XWIKI_2_1, this.renderingScriptService.resolveSyntax("xwiki/2.1"));
     }
 
     @Test
-    public void resolveSyntaxWhenInvalid() throws Exception
+    void resolveSyntaxWhenInvalid()
     {
-        Assert.assertNull(this.mocker.getComponentUnderTest().resolveSyntax("unknown"));
+        assertNull(this.renderingScriptService.resolveSyntax("unknown"));
     }
 
     @Test
-    public void escape10Syntax() throws Exception
+    void escape10Syntax()
     {
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
         // Note: Java escaped string "\\" == "\" (real string).
-        assertEquals("\\\\", this.mocker.getComponentUnderTest().escape("\\", Syntax.XWIKI_1_0));
-        assertEquals("\\*\\t\\e\\s\\t\\*", this.mocker.getComponentUnderTest()
-            .escape("*test*", Syntax.XWIKI_1_0));
+        assertEquals("\\\\", this.renderingScriptService.escape("\\", XWIKI_1_0));
+        assertEquals("\\*\\t\\e\\s\\t\\*", this.renderingScriptService.escape("*test*", XWIKI_1_0));
         assertEquals("\\a\\\\\\\\\\[\\l\\i\\n\\k\\>\\X\\.\\Y\\]",
-            this.mocker.getComponentUnderTest().escape("a\\\\[link>X.Y]", Syntax.XWIKI_1_0));
-        assertEquals("\\{\\p\\r\\e\\}\\v\\e\\r\\b\\a\\t\\i\\m\\{\\/\\p\\r\\e\\}", this.mocker
-            .getComponentUnderTest().escape("{pre}verbatim{/pre}", Syntax.XWIKI_1_0));
+            this.renderingScriptService.escape("a\\\\[link>X.Y]", XWIKI_1_0));
+        assertEquals("\\{\\p\\r\\e\\}\\v\\e\\r\\b\\a\\t\\i\\m\\{\\/\\p\\r\\e\\}",
+            this.renderingScriptService.escape("{pre}verbatim{/pre}", XWIKI_1_0));
         assertEquals("\\{\\m\\a\\c\\r\\o\\:\\s\\o\\m\\e\\=\\p\\a\\r\\a\\m\\e\\t\\e\\r\\}"
-            + "\\c\\o\\n\\t\\e\\n\\t" + "\\{\\m\\a\\c\\r\\o\\}",
-            this.mocker.getComponentUnderTest().escape("{macro:some=parameter}content{macro}", Syntax.XWIKI_1_0));
+                + "\\c\\o\\n\\t\\e\\n\\t" + "\\{\\m\\a\\c\\r\\o\\}",
+            this.renderingScriptService.escape("{macro:some=parameter}content{macro}", XWIKI_1_0));
     }
 
     @Test
-    public void escape20Syntax() throws Exception
+    void escape20Syntax()
     {
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
-        assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_0));
-        assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
-            .escape("**test**", Syntax.XWIKI_2_0));
+        assertEquals("~~", this.renderingScriptService.escape("~", XWIKI_2_0));
+        assertEquals("~*~*~t~e~s~t~*~*", this.renderingScriptService.escape("**test**", XWIKI_2_0));
         // Note: Java escaped string "\\" == "\" (real string).
         assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
-            this.mocker.getComponentUnderTest().escape("a\\\\[[link>>X.Y]]", Syntax.XWIKI_2_0));
-        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
-            this.mocker.getComponentUnderTest().escape("{{{verbatim}}}", Syntax.XWIKI_2_0));
-        assertEquals(
-                "~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
-                this.mocker.getComponentUnderTest().escape("{{macro some='parameter'}}content{{/macro}}",
-                    Syntax.XWIKI_2_0));
+            this.renderingScriptService.escape("a\\\\[[link>>X.Y]]", XWIKI_2_0));
+        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}", this.renderingScriptService.escape("{{{verbatim}}}", XWIKI_2_0));
+        assertEquals("~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
+            this.renderingScriptService.escape("{{macro some='parameter'}}content{{/macro}}", XWIKI_2_0));
     }
 
     @Test
-    public void escape21Syntax() throws Exception
+    void escape21Syntax()
     {
         // Since the logic is pretty simple (prepend every character with an escape character), the below tests are
         // mostly for exemplification.
-        assertEquals("~~", this.mocker.getComponentUnderTest().escape("~", Syntax.XWIKI_2_1));
-        assertEquals("~*~*~t~e~s~t~*~*", this.mocker.getComponentUnderTest()
-            .escape("**test**", Syntax.XWIKI_2_1));
+        assertEquals("~~", this.renderingScriptService.escape("~", XWIKI_2_1));
+        assertEquals("~*~*~t~e~s~t~*~*", this.renderingScriptService.escape("**test**", XWIKI_2_1));
         // Note: Java escaped string "\\" == "\" (real string).
         assertEquals("~a~\\~\\~[~[~l~i~n~k~>~>~X~.~Y~]~]",
-            this.mocker.getComponentUnderTest().escape("a\\\\[[link>>X.Y]]", Syntax.XWIKI_2_1));
-        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}",
-            this.mocker.getComponentUnderTest().escape("{{{verbatim}}}", Syntax.XWIKI_2_1));
-        assertEquals(
-                "~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
-                this.mocker.getComponentUnderTest().escape("{{macro some='parameter'}}content{{/macro}}",
-                    Syntax.XWIKI_2_1));
+            this.renderingScriptService.escape("a\\\\[[link>>X.Y]]", XWIKI_2_1));
+        assertEquals("~{~{~{~v~e~r~b~a~t~i~m~}~}~}", this.renderingScriptService.escape("{{{verbatim}}}", XWIKI_2_1));
+        assertEquals("~{~{~m~a~c~r~o~ ~s~o~m~e~=~'~p~a~r~a~m~e~t~e~r~'~}~}~c~o~n~t~e~n~t~{~{~/~m~a~c~r~o~}~}",
+            this.renderingScriptService.escape("{{macro some='parameter'}}content{{/macro}}", XWIKI_2_1));
     }
 
     @Test
-    public void escapeSpaces() throws Exception
+    void escapeSpaces()
     {
-        assertEquals("\\a\\ \\*\\t\\e\\s\\t\\*",
-            this.mocker.getComponentUnderTest().escape("a *test*", Syntax.XWIKI_1_0));
-        assertEquals("~a~ ~*~*~t~e~s~t~*~*",
-            this.mocker.getComponentUnderTest().escape("a **test**", Syntax.XWIKI_2_0));
-        assertEquals("~a~ ~*~*~t~e~s~t~*~*",
-            this.mocker.getComponentUnderTest().escape("a **test**", Syntax.XWIKI_2_1));
+        assertEquals("\\a\\ \\*\\t\\e\\s\\t\\*", this.renderingScriptService.escape("a *test*", XWIKI_1_0));
+        assertEquals("~a~ ~*~*~t~e~s~t~*~*", this.renderingScriptService.escape("a **test**", XWIKI_2_0));
+        assertEquals("~a~ ~*~*~t~e~s~t~*~*", this.renderingScriptService.escape("a **test**", XWIKI_2_1));
     }
 
     @Test
-    public void escapeNewLines() throws Exception
+    void escapeNewLines()
     {
-        assertEquals("\\a\\\n\\b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_1_0));
-        assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_0));
-        assertEquals("~a~\n~b", this.mocker.getComponentUnderTest().escape("a\nb", Syntax.XWIKI_2_1));
+        assertEquals("\\a\\\n\\b", this.renderingScriptService.escape("a\nb", XWIKI_1_0));
+        assertEquals("~a~\n~b", this.renderingScriptService.escape("a\nb", XWIKI_2_0));
+        assertEquals("~a~\n~b", this.renderingScriptService.escape("a\nb", XWIKI_2_1));
     }
 
     @Test
-    public void escapeWithNullInput() throws Exception
+    void escapeWithNullInput()
     {
-        Assert.assertNull("Unexpected non-null output for null input",
-            this.mocker.getComponentUnderTest().escape(null, Syntax.XWIKI_2_1));
+        assertNull(this.renderingScriptService.escape(null, XWIKI_2_1), "Unexpected non-null output for null input");
     }
 
     @Test
-    public void escapeWithEmptyInput() throws Exception
+    void escapeWithEmptyInput()
     {
-        assertEquals("", this.mocker.getComponentUnderTest().escape("", Syntax.XWIKI_2_1));
+        assertEquals("", this.renderingScriptService.escape("", XWIKI_2_1));
     }
 
     @Test
-    public void escapeWithNullSyntax() throws Exception
+    void escapeWithNullSyntax()
     {
-        Assert.assertNull("Unexpected non-null output for null syntax",
-            this.mocker.getComponentUnderTest().escape("anything", null));
+        assertNull(this.renderingScriptService.escape("anything", null), "Unexpected non-null output for null syntax");
     }
 
     @Test
-    public void escapeWithNullInputAndSyntax() throws Exception
+    void escapeWithNullInputAndSyntax()
     {
-        Assert.assertNull("Unexpected non-null output for null input and syntax", this.mocker.getComponentUnderTest()
-            .escape(null, null));
+        assertNull(this.renderingScriptService.escape(null, null),
+            "Unexpected non-null output for null input and syntax");
     }
 
     @Test
-    public void escapeWithUnsupportedSyntax() throws Exception
+    void escapeWithUnsupportedSyntax()
     {
-        Assert.assertNull("Unexpected non-null output for unsupported syntax", this.mocker.getComponentUnderTest()
-            .escape("unsupported", Syntax.XHTML_1_0));
+        assertNull(this.renderingScriptService.escape("unsupported", XHTML_1_0),
+            "Unexpected non-null output for unsupported syntax");
     }
 
     @Test
-    public void getMacroDescriptors() throws Exception
+    void getMacroDescriptors() throws Exception
     {
-        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
         MacroId macroId = new MacroId("macroid");
-        when(macroManager.getMacroIds(Syntax.XWIKI_2_1)).thenReturn(Collections.singleton(macroId));
+        when(this.macroManager.getMacroIds(XWIKI_2_1)).thenReturn(Collections.singleton(macroId));
         Macro macro = mock(Macro.class);
-        when(macroManager.getMacro(macroId)).thenReturn(macro);
+        when(this.macroManager.getMacro(macroId)).thenReturn(macro);
         MacroDescriptor descriptor = mock(MacroDescriptor.class);
         when(macro.getDescriptor()).thenReturn(descriptor);
 
-        List<MacroDescriptor> descriptors = this.mocker.getComponentUnderTest().getMacroDescriptors(Syntax.XWIKI_2_1);
+        List<MacroDescriptor> descriptors = this.renderingScriptService.getMacroDescriptors(XWIKI_2_1);
         assertEquals(1, descriptors.size());
         assertSame(descriptor, descriptors.get(0));
     }
 
     @Test
-    public void resolveMacroId() throws Exception
+    void resolveMacroId() throws Exception
     {
-        MacroId macroId = new MacroId("info", Syntax.XWIKI_2_1);
-        MacroIdFactory macroIdFactory = this.mocker.registerMockComponent(MacroIdFactory.class);
-        when(macroIdFactory.createMacroId(macroId.toString())).thenReturn(macroId);
+        MacroId macroId = new MacroId("info", XWIKI_2_1);
+        when(this.macroIdFactory.createMacroId(macroId.toString())).thenReturn(macroId);
 
-        assertSame(macroId, this.mocker.getComponentUnderTest().resolveMacroId(macroId.toString()));
+        assertSame(macroId, this.renderingScriptService.resolveMacroId(macroId.toString()));
     }
 
     @Test
-    public void resolveMacroIdInvalid() throws Exception
+    void resolveMacroIdInvalid() throws Exception
     {
-        MacroIdFactory macroIdFactory = this.mocker.registerMockComponent(MacroIdFactory.class);
-        when(macroIdFactory.createMacroId("foo")).thenThrow(new ParseException("Invalid macro id"));
+        when(this.macroIdFactory.createMacroId("foo")).thenThrow(new ParseException("Invalid macro id"));
 
-        assertNull(this.mocker.getComponentUnderTest().resolveMacroId("foo"));
+        assertNull(this.renderingScriptService.resolveMacroId("foo"));
+        assertEquals("Failed to resolve macro id [foo]. Root cause is: [ParseException: Invalid macro id]",
+            this.logCapture.getMessage(0));
+        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
     }
 
     @Test
-    public void getMacroDescriptor() throws Exception
+    void getMacroDescriptor() throws Exception
     {
         MacroId macroId = new MacroId("macroId");
         Macro macro = mock(Macro.class);
         MacroDescriptor macroDescriptor = mock(MacroDescriptor.class);
 
-        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
-        when(macroManager.exists(macroId)).thenReturn(true);
-        when(macroManager.getMacro(macroId)).thenReturn(macro);
+        when(this.macroManager.exists(macroId)).thenReturn(true);
+        when(this.macroManager.getMacro(macroId)).thenReturn(macro);
         when(macro.getDescriptor()).thenReturn(macroDescriptor);
 
-        assertSame(macroDescriptor, this.mocker.getComponentUnderTest().getMacroDescriptor(macroId));
+        assertSame(macroDescriptor, this.renderingScriptService.getMacroDescriptor(macroId));
     }
 
     @Test
-    public void getMacroDescriptorNotFound() throws Exception
+    void getMacroDescriptorNotFound()
     {
         MacroId macroId = new MacroId("macroId");
-        MacroManager macroManager = this.mocker.registerMockComponent(MacroManager.class);
-        when(macroManager.exists(macroId)).thenReturn(false);
+        when(this.macroManager.exists(macroId)).thenReturn(false);
 
-        assertNull(this.mocker.getComponentUnderTest().getMacroDescriptor(macroId));
+        assertNull(this.renderingScriptService.getMacroDescriptor(macroId));
+    }
+
+    @Test
+    void getMacroCategories()
+    {
+        MacroId macroId = new MacroId("macroId");
+        this.renderingScriptService.getMacroCategories(macroId);
+        verify(this.macroCategoryManager).getMacroCategories(macroId);
     }
 }

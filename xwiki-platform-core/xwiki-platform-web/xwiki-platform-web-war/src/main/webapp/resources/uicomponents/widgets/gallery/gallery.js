@@ -145,12 +145,15 @@ function init(event) {
   });
 }
 
-// When the document is loaded, install galleries
-(XWiki.isInitialized && init())
-|| document.observe('xwiki:dom:loading', init);
+// Don't initialize the galleries when exporting to PDF because we want to include all the images.
+if (XWiki.contextaction !== 'export') {
+  // When the document is loaded, install galleries
+  (XWiki.isInitialized && init())
+  || document.observe('xwiki:dom:loading', init);
 
-// Initialize the gallery when it is added after the page is loaded.
-document.observe('xwiki:dom:updated', init);
+  // Initialize the gallery when it is added after the page is loaded.
+  document.observe('xwiki:dom:updated', init);
+}
 
 // End XWiki augmentation.
 return XWiki;

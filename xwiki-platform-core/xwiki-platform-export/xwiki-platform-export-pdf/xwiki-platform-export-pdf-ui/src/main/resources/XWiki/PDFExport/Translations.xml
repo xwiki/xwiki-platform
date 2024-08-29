@@ -1,0 +1,157 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.PDFExport.Translations" locale="">
+  <web>XWiki.PDFExport</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>export.pdf.options.template=Template
+export.pdf.options.template.hint=The PDF template controls the information displayed on the cover page, in the table of contents as well as in the header and footer of each page.
+export.pdf.options.loadFailure=Failed to load the PDF export options.
+
+export.pdf.hint=Export as Portable Document Format (PDF) using the Web Browser
+export.pdf.modal.close=Close
+export.pdf.inProgress=Exporting as PDF...
+export.pdf.failed=Failed to export as PDF
+export.pdf.lastError=The PDF export log contains errors: {0}
+export.pdf.canceling=Canceling PDF export...
+export.pdf.canceled=PDF export canceled
+export.pdf.cancelFailed=Failed to cancel the PDF export
+export.pdf.loading=Loading...
+export.pdf.pageReadyTimeout=Timeout waiting for web page to be ready for print.
+
+export.pdf.templates.default=Default template
+export.pdf.templates.default.versionInfo=Version {0} authored by {1} on {2}
+export.pdf.template.name=PDF Template
+export.pdf.template.hint=Template used by PDF export
+export.pdf.template.provider=PDF Template Provider
+export.pdf.template.skinExtensionInfo=The CSS and JavaScript skin extensions provided by this page are also part of the PDF template and thus are loaded automatically when the PDF template is used.
+
+admin.export.pdf=PDF Export
+admin.export.pdf.description=Configure how wiki pages are exported to PDF.
+
+export.pdf.admin.status=Status
+export.pdf.admin.configuration=Configuration
+export.pdf.admin.saveComment=Updated the PDF export configuration from the Administration
+export.pdf.admin.reset=Reset
+export.pdf.admin.reset.hint=Restore the default configuration
+export.pdf.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+
+export.pdf.config.default=(default)
+export.pdf.config.empty=(empty)
+
+export.pdf.generator.label=Generator
+export.pdf.generator.hint=The tool used to generate the PDF.
+export.pdf.generator.checking=Checking if the PDF generator is available...
+export.pdf.generator.checkFailed=Failed to check if the PDF generator is available.
+export.pdf.generator.available=Available
+export.pdf.generator.unavailable=The PDF generator is currently unavailable.
+export.pdf.generator.userBrowser.label=User Browser
+export.pdf.generator.userBrowser.hint=The PDF is generated client-side using the print function provided by the user's own web browser.
+export.pdf.generator.chromeDockerContainer.label=Chrome Docker Container
+export.pdf.generator.chromeDockerContainer.hint=The PDF is generated server-side using a headless Chrome web browser running inside a Docker container on the same server as XWiki.
+export.pdf.generator.remoteChrome.label=Remote Chrome
+export.pdf.generator.remoteChrome.hint=The PDF is generated server-side using a remote Chrome web browser that may run on a different server than XWiki.
+
+XWiki.PDFExport.TemplateClass_cover=Cover
+XWiki.PDFExport.TemplateClass_cover.hint=The information displayed on the first page. E.g. the title and the author
+XWiki.PDFExport.TemplateClass_toc=Table of Contents
+XWiki.PDFExport.TemplateClass_toc.hint=Usually lists the content headings along with their page numbers.
+XWiki.PDFExport.TemplateClass_header=Header
+XWiki.PDFExport.TemplateClass_header.hint=The information displayed at the top of each page, except for the cover page. E.g. the title
+XWiki.PDFExport.TemplateClass_footer=Footer
+XWiki.PDFExport.TemplateClass_footer.hint=The information displayed at the bottom of each page, except for the cover page. E.g. the number of the page
+XWiki.PDFExport.TemplateClass_metadata=Metadata
+XWiki.PDFExport.TemplateClass_metadata.hint=The script that is evaluated for each wiki page included in the PDF export to produce the metadata to display in the PDF header or footer. The metadata is specified using a special binding named metadata whose value is a Map&lt;String, String&gt;. The metadata ends up in the HTML as attributes of the heading used to display the title of each wiki page.
+
+XWiki.PDFExport.ConfigurationClass_templates=Templates
+XWiki.PDFExport.ConfigurationClass_templates.hint=The list of PDF templates the user can select from when exporting wiki pages to PDF.
+XWiki.PDFExport.ConfigurationClass_serverSide=Server Side
+XWiki.PDFExport.ConfigurationClass_serverSide.hint=Whether the PDF export should be performed server-side, e.g. using a headless Chrome web browser running inside a Docker container, or client-side, using the user's web browser instead.
+XWiki.PDFExport.ConfigurationClass_chromeHost=Chrome Host
+XWiki.PDFExport.ConfigurationClass_chromeHost.hint=The host running the headless Chrome web browser, specified either by its name or by its IP address.
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort=Chrome Remote Debugging Port
+XWiki.PDFExport.ConfigurationClass_chromeRemoteDebuggingPort.hint=The port number used for communicating with the headless Chrome web browser.
+XWiki.PDFExport.ConfigurationClass_xwikiURI=XWiki URI
+XWiki.PDFExport.ConfigurationClass_xwikiURI.hint=The base URI that the headless Chrome browser should use to access the XWiki instance (e.g. the print preview page). Examples: localhost, localhost:9293, http://localhost, https://localhost:8080
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage=Chrome Docker Image
+XWiki.PDFExport.ConfigurationClass_chromeDockerImage.hint=The Docker image used to create the Docker container running the headless Chrome web browser.
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName=Chrome Docker Container Name
+XWiki.PDFExport.ConfigurationClass_chromeDockerContainerName.hint=The name of the Docker container running the headless Chrome web browser. This is especially useful when reusing an existing container.
+XWiki.PDFExport.ConfigurationClass_dockerNetwork=Docker Network
+XWiki.PDFExport.ConfigurationClass_dockerNetwork.hint=The name or id of the Docker network to add the Chrome Docker container to. This is useful when XWiki itself runs inside a Docker container and you want to have the Chrome container in the same network in order for them to communicate.
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout=Page Ready Timeout
+XWiki.PDFExport.ConfigurationClass_pageReadyTimeout.hint=The number of seconds to wait for the web page to be ready for print before timing out.
+XWiki.PDFExport.ConfigurationClass_maxContentSize=Maximum Content Size
+XWiki.PDFExport.ConfigurationClass_maxContentSize.hint=The maximum content size, in kilobytes (KB), that can be included in a single PDF export. Use 0 to disable the limit.
+XWiki.PDFExport.ConfigurationClass_replaceFOP=Replace FOP
+XWiki.PDFExport.ConfigurationClass_replaceFOP.hint=Replace the old PDF export based on Apache Formatting Objects Processor (FOP).</content>
+  <object>
+    <name>XWiki.PDFExport.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>ae160b70-3d8e-4891-8a71-501dd4f361bc</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

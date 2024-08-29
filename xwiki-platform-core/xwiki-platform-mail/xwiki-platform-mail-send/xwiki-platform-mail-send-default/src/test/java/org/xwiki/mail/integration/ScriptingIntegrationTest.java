@@ -124,7 +124,7 @@ public class ScriptingIntegrationTest extends AbstractMailIntegrationTest
     private MockitoComponentManager componentManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeComponent
     public void registerConfiguration() throws Exception

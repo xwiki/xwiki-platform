@@ -1,9 +1,13 @@
 org.xwiki.uiextension.internal.DefaultUIExtensionManager
 org.xwiki.uiextension.internal.UIExtensionClassDocumentInitializer
+org.xwiki.uiextension.internal.UIExtensionRequiredRightsAnalyzer
+org.xwiki.uiextension.internal.WikiUIExtension
 org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder
 org.xwiki.uiextension.internal.filter.ExcludeFilter
 org.xwiki.uiextension.internal.filter.SelectFilter
 org.xwiki.uiextension.internal.filter.SortByCustomOrderFilter
 org.xwiki.uiextension.internal.filter.SortByIdFilter
 org.xwiki.uiextension.internal.filter.SortByParameterFilter
+org.xwiki.uiextension.internal.macro.UIExtensionMacro
+org.xwiki.uiextension.internal.macro.UIExtensionsMacro
 org.xwiki.uiextension.script.UIExtensionScriptService

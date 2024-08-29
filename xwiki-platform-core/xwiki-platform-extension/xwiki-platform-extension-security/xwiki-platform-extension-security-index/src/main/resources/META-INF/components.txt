@@ -1,0 +1,9 @@
+org.xwiki.extension.security.internal.ExtensionSecurityJob
+org.xwiki.extension.security.internal.ExtensionSecurityScheduler
+org.xwiki.extension.security.internal.analyzer.osv.OsvExtensionSecurityAnalyzer
+org.xwiki.extension.security.internal.analyzer.VulnerabilityIndexer
+org.xwiki.extension.security.internal.analyzer.osv.OsvResponseAnalyzer
+org.xwiki.extension.security.internal.listener.ExtensionSecurityInitializerListener
+org.xwiki.extension.security.internal.listener.ExtensionSecurityConfigDelayXObjectPropertyListener
+org.xwiki.extension.security.internal.DefaultReviewsFetcher
+org.xwiki.extension.security.internal.ReviewMapFilter

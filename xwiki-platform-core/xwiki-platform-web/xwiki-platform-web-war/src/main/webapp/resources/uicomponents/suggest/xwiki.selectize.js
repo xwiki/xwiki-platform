@@ -17,30 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'selectize': $services.webjars.url('org.webjars:selectize.js', 'js/standalone/selectize.min')
-})
-#set ($l10n = {
-  'selectTypedText': $services.localization.render('web.uicomponents.suggest.selectTypedText', ['{0}'])
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, l10n) {
-  "use strict";
-
-require.config({
-  paths,
-  shim: {
-    'selectize': ['jquery']
-  }
+define('xwiki-selectize-messages', {
+  prefix: 'web.uicomponents.suggest.',
+  keys: [
+    'selectTypedText'
+  ]
 });
 
-define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], function($, Selectize) {
+define('xwiki-selectize', [
+  'jquery',
+  'selectize',
+  'xwiki-l10n!xwiki-selectize-messages',
+  'xwiki-events-bridge'
+], function($, Selectize, l10n) {
   var optionTemplate = [
     '<div class="xwiki-selectize-option" data-value="">',
-      '<span class="xwiki-selectize-option-icon" />',
-      '<span class="xwiki-selectize-option-label" />',
+      '<span class="xwiki-selectize-option-icon"></span>',
+      '<span class="xwiki-selectize-option-label"></span>',
     '</div>'
   ].join('');
 
@@ -70,7 +63,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     }
     var url = option && option.url;
     if (typeof url === 'string') {
-      var anchor = $('<a class="xwiki-selectize-option-label" />').attr('href', url);
+      var anchor = $('<a class="xwiki-selectize-option-label"></a>').attr('href', url);
       output.find('.xwiki-selectize-option-label').replaceWith(anchor);
     }
     var label = (option && typeof option === 'object') ? (option.label || option.value) : option;
@@ -85,10 +78,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     // We need a wrapper around the icon in order to center it because it looks better if the labels are aligned when
     // the suggestions are displayed on separate lines in the drop down list. We don't need to center the icon for the
     // selected suggestions because they are displayed in-line so the labels don't have to be aligned.
-    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"/>');
+    output.find('.xwiki-selectize-option-icon').wrap('<span class="xwiki-selectize-option-icon-wrapper"></span>');
     var hint = option && option.hint;
     if (typeof hint === 'string' && hint !== '') {
-      output.append($('<div class="xwiki-selectize-option-hint"/>').text(hint));
+      output.append($('<div class="xwiki-selectize-option-hint"></div>').text(hint));
     }
     return output;
   }
@@ -120,15 +113,20 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     onDropdownOpen: function(dropdown) {
       dropdown.addClass('active');
     },
-    persist: false,
-    preload: 'focus',
+    // We normally don't want to persist the custom values (free text) that the user selects but unfortunately Selectize
+    // marks all loaded values (fetched from the server) as user values and so they get removed on delete / backspace if
+    // we don't enable persistence. It's better to have some extra suggestions (coming from the free text selected by
+    // the user) than to miss some suggestions because they were wrongly removed. We could try to patch Selectize to fix
+    // the way it handles custom user suggestions but it's safer to simply enable persistence.
+    persist: true,
+    preload: true,
     render: {
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        var label = escapeHTML(l10n.selectTypedText).replace('{0}', '<em/>');
+        var label = escapeHTML(l10n.get('selectTypedText', '__typedText__')).replace('__typedText__', '<em></em>');
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
-        var output = $('<div class="create option"/>').html(label);
+        var output = $('<div class="create option"></div>').html(label);
         output.find('em').text(data.input);
         return output;
       }
@@ -154,10 +152,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
     selectize.items.reduce(function(deferred, value) {
-      return deferred.then(function() {
-        return loadSelectedValue(selectize, value);
-      });
-    }, $.Deferred().resolve()).always(function() {
+      return deferred.then(() => loadSelectedValue(selectize, value));
+    }, Promise.resolve()).finally(function() {
       selectize.loading = Math.max(selectize.loading - 1, 0);
       if (!selectize.loading) {
         wrapper.removeClass(selectize.settings.loadingClass);
@@ -166,29 +162,29 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   var loadSelectedValue = function(selectize, value) {
-    var deferred = $.Deferred();
-    var load;
-    if (typeof selectize.settings.loadSelected === 'function') {
-      load = selectize.settings.loadSelected;
-    } else {
-      load = selectize.settings.load;
-    }
-    if (value && typeof load === 'function') {
-      load.call(selectize, value, function(options) {
-        $.isArray(options) && options.forEach(function(option) {
-          var value = option[selectize.settings.valueField];
-          if (selectize.options.hasOwnProperty(value)) {
-            selectize.updateOption(value, option);
-          } else {
-            selectize.addOption(option);
-          }
+    return new Promise((resolve, reject) => {
+      var load;
+      if (typeof selectize.settings.loadSelected === 'function') {
+        load = selectize.settings.loadSelected;
+      } else {
+        load = selectize.settings.load;
+      }
+      if (value && typeof load === 'function') {
+        load.call(selectize, value, function(options) {
+          Array.isArray(options) && options.forEach(function(option) {
+            var value = option[selectize.settings.valueField];
+            if (selectize.options.hasOwnProperty(value)) {
+              selectize.updateOption(value, option);
+            } else {
+              selectize.addOption(option);
+            }
+          });
+          resolve();
         });
-        deferred.resolve();
-      });
-    } else {
-      deferred.resolve();
-    }
-    return deferred.promise();
+      } else {
+        resolve();
+      }
+    });
   };
 
   var customize = function() {
@@ -342,6 +338,3 @@ require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n]));

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
   <artifactId>xwiki-platform-mail</artifactId>
@@ -33,7 +33,9 @@
   <description>Display and Send emails</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-mail-api</module>
     <module>xwiki-platform-mail-general</module>
+    <module>xwiki-platform-mail-resender-ui</module>
     <module>xwiki-platform-mail-script</module>
     <module>xwiki-platform-mail-send</module>
     <module>xwiki-platform-mail-ui</module>

@@ -1,0 +1,90 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Displays the UI for What's New
+## Block indexing of this page by search engines so that the XWiki news don't get indexed for all public XWiki
+## instances and so that the source of the news remain the defined news source locations.
+## See also https://developers.google.com/search/docs/crawling-indexing/block-indexing
+#set ($discard = $response.setHeader('X-Robots-Tag', 'noindex'))
+#template("startpage.vm")
+<div class="main layoutsubsection">
+  #template("hierarchy.vm")
+  ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
+  <main id="mainContentArea">
+    #set($titleToDisplay = $services.localization.render('platform.whatsnew.title'))
+    ## Do not display the content menu or the "last modified by" since the page is not about the current document and
+    ## it would be weird to display actions or info about the current doc's content.
+    <div class="xcontent">
+      <div class="row document-header">
+        <div class="document-info col-xs-12">
+          #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
+            $services.rendering.render($uix.execute(), 'xhtml/1.0')
+          #end
+          <div id="document-title"><h1>$titleToDisplay</h1></div>
+        </div>
+      </div>
+      #try()
+      <div class="xwiki-whatsnew-container">
+        #set ($newsSource = $services.whatsnew.configuredNewsSource)
+        ## TODO: For now, show all categories until we implement support for either Admin UI selection of categories
+        ## or we decide to automatically show categories based on whether the current user is a simple or advanced user,
+        ## and whether he/she has Admin rights on the wiki.
+        #set ($newsSource = $newsSource.forCategories("simple_user, advanced_user, admin_user, extension"))
+        #set ($newsItems = $newsSource.build())
+        #if ($newsItems.size() > 0)
+          #foreach($newsItem in $newsItems)
+            <div class="xwiki-whatsnew-item">
+              ## The title is expected to be in plain text
+              <h2><a class="xwiki-whatsnew-item-title" href="$escapetool.xml($newsItem.originURL.get())"
+              >$escapetool.xml($newsItem.title.get())</a></h2>
+              ## Format the date according to the user's defined format for the current wiki
+              #set ($formattedDate = $xwiki.formatDate($newsItem.publishedDate.get()))
+              <p class="xwiki-whatsnew-item-date">$escapetool.xml($formattedDate)</p>
+              <div class="xwiki-whatsnew-item-description">
+                ## Render the description using the syntax it's written in.
+                #set ($description = $newsItem.description.get())
+                #set ($syntax = $description.syntax)
+                ## Ideally we would use the rendering context syntax (fallbacking to the skin syntax) but we're missing
+                ## a way to access that information from velocity and in practice browsers use HTML 5. This could cause
+                ## issues if this vm is rendered in a non-browser context.
+                #set ($skinSyntax = 'html/5.0')
+                #if ($skinSyntax == "$syntax.toIdString()")
+                  ## Note: the description content is already clean and safe to be rendered
+                  $description.content
+                #else
+                  ## Convert the source item description to the skin syntax
+                  #set ($xdom = $services.rendering.parse($description.content, $syntax))
+                  $services.rendering.render($xdom, $skinSyntax)
+                #end
+              </div>
+            </div>
+          #end
+        #else
+          No news!
+        #end
+      </div>
+      #end
+      #if ("$!exception" != '')
+        #displayException('Error displaying XWiki News', $exception)
+      #end
+      <div class="clearfloats"></div>
+    </div> ## xcontent
+  </main>## mainContentArea
+</div>## main
+#template("endpage.vm")

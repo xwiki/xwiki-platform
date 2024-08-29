@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.fileupload;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
+import org.xwiki.attachment.validation.AttachmentValidationException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,9 +61,11 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
      *
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
-    public void loadFileList() throws XWikiException
+    public void loadFileList() throws XWikiException, AttachmentValidationException
     {
         getProtectedPlugin().loadFileList(getXWikiContext());
     }
@@ -74,8 +77,11 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      */
-    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir) throws XWikiException
+    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir)
+        throws XWikiException, AttachmentValidationException
     {
         getProtectedPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir, getXWikiContext());
     }
@@ -150,7 +156,7 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * files with the same form field name you should use {@link #getFileItemNames()}
      *
      * @param formfieldName The name of the form field.
-     * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The file name, or {@code null} if no file was uploaded for that form field.
      */
     public String getFileName(String formfieldName)
     {

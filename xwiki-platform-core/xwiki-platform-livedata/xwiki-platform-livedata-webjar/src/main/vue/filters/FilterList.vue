@@ -23,20 +23,24 @@
 -->
 <template>
   <!-- A simple text input that will be enhanced by the selectize widget. -->
-  <span v-show="isVisible">
-    <input :value="value" class="filter-list livedata-filter" ref="input"/>
+  <span v-if="isReady" v-show="isVisible">
+    <input :value="value" class="filter-list livedata-filter" ref="input"
+      :aria-label="this.$t('livedata.filter.list.label')"
+    />
   </span>
+  <XWikiLoader v-else/>
 </template>
 
 <script>
 import filterMixin from "./filterMixin.js";
 import $ from "jquery";
 import "xwiki-selectize";
+import XWikiLoader from "../utilities/XWikiLoader";
 
 export default {
 
   name: "filter-list",
-
+  components: {XWikiLoader},
   // Add the filterMixin to get access to all the generic filter methods and computed properties inside this component.
   mixins: [filterMixin],
 
@@ -44,6 +48,12 @@ export default {
     isAdvanced: {
       type: Boolean,
       default: false
+    }
+  },
+
+  data() {
+    return {
+      isReady: false
     }
   },
 
@@ -55,12 +65,21 @@ export default {
 
     // Settings used when creating the selectize widget.
     selectizeSettings () {
+      let options = this.config.options || [];
+      // If the current filter has the empty operator and no existing option has an empty value, the default
+      // empty option is added.
+      // The empty option is not displayed in the advanced filtering panel nor when the empty operator is not available.
+      if (!this.isAdvanced && this.hasEmptyOperator && this.filterEntry?.operator === 'empty' &&
+        !options.some(((value) => value.value === '')))
+      {
+        options.push(this.getDefaultEmptyOption())
+      }
       const settings = {
         // Allow free text because we want to support the contains and startsWith operators.
         create: true,
         // Take the list of (initial) options from the filter configuration. This list will be extended with the results
         // obtained from the configured search URL.
-        options: this.config.options,
+        options,
         // Limit the selection to a single value because:
         // * selecting multiple values increases the height of the filter row when table layout is used
         // * constraint (filter) values should be strings; this isn't a limitation of the live data model, but using
@@ -73,8 +92,14 @@ export default {
             // When no values are selected, simply remove the filter.
             this.removeFilter();
           } else if (value !== this.value) {
-            // If the selected value has an empty value, than use the empty filter, otherwise use the contains filter.
-            this.applyFilter(value, value === '' ? 'empty' : 'contains');
+            // If the selected value has an empty value, then use the empty operator, otherwise use the default operator
+            // Note that this imply that any filter list descriptor needs to have an empty operator defined.
+            if (value === '') {
+              this.applyFilter(value, 'empty');
+            } else {
+              // Fallback on default operator.
+              this.applyFilter(value);
+            }
           }
         },
       };
@@ -103,8 +128,8 @@ export default {
         // TODO: Support multiple search URLs (sources). See suggestUsersAndGroups.js for an example.
         const searchURL = this.config.searchURL.replace('{encodedQuery}', encodeURIComponent(text));
         $.getJSON(searchURL, searchParams)
-          .done((results) => callback(this.getResultsAdapter(results)))
-          .fail(() => callback(this.getResultsAdapter()));
+          .then(results => callback(this.getResultsAdapter(results)))
+          .catch(() => callback(this.getResultsAdapter()));
       };
     },
 
@@ -119,10 +144,7 @@ export default {
       // An empty option is automatically added to the results only when hasEmptyOperator is true, no empty 
       // option is already found, and we are not in an advanced filter panel.
       if (!this.isAdvanced && this.hasEmptyOperator && !adaptedResults.some((value) => value.value === '')) {
-        adaptedResults.unshift({
-          value: '',
-          label: this.$t('livedata.filter.list.emptyLabel')
-        })
+        adaptedResults.unshift(this.getDefaultEmptyOption());
       }
 
       return adaptedResults;
@@ -139,6 +161,13 @@ export default {
         hint: metaData.hint,
       };
     },
+
+    getDefaultEmptyOption() {
+      return {
+        value: '',
+        label: this.$t('livedata.filter.list.emptyLabel')
+      }
+    }
   },
 
   // Update the selectize widget whenever the filter value changes.
@@ -149,8 +178,19 @@ export default {
   },
 
   // Create the selectize widget.
-  mounted () {
+  async mounted () {
+    // Wait for the translations to be loaded, otherwise the empty option label might be displayed untranslated.
+    await this.logic.translationsLoaded();
+    this.isReady = true;
+    // It is important to wait for the next tick to be sure that the input reference is available in the dom, for 
+    // selectize to be able to enhance it.
+    await this.$nextTick();
     $(this.$refs.input).xwikiSelectize(this.selectizeSettings);
+    if (this.filterEntry?.operator === 'empty') {
+      // The empty string is ignored by default. We change the value to empty string plus a coma value separator to
+      // take it into account.
+      $(this.$refs.input).val(',').trigger('change');
+    }
   },
 
   // Destroy the selectize widget.

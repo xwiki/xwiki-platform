@@ -20,6 +20,8 @@
 package org.xwiki.mail;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -28,6 +30,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Base64;
+import org.xwiki.stability.Unstable;
 
 /**
  * Extension of the {@link javax.mail.internet.MimeMessage} in order to support processing by this mail API.
@@ -41,9 +44,16 @@ public class ExtendedMimeMessage extends MimeMessage
 
     private static final String MESSAGE_ID_HEADER = "Message-ID";
     private static final String TO_HEADER = "To";
+    private static final String BCC_HEADER = "Bcc";
+    private static final String CC_HEADER = "Cc";
     private static final String XMAIL_TYPE_HEADER = "X-MailType";
 
     private String uniqueMessageId;
+
+    /**
+     * See {@link #getExtraData(String)}.
+     */
+    private Map<String, Object> extraDataMap = new HashMap<>();
 
     /**
      * Create a new extended MimeMessage.
@@ -172,11 +182,16 @@ public class ExtendedMimeMessage extends MimeMessage
     @Override
     public void setHeader(String name, String value) throws MessagingException
     {
-        if (uniqueMessageId != null && MESSAGE_ID_HEADER.equals(name) || TO_HEADER.equals(name)) {
+        if (uniqueMessageId != null && MESSAGE_ID_HEADER.equals(name) || isRecipientHeader(name)) {
             // Clear cached unique messageId when the headers used to compute it are changed
             uniqueMessageId = null;
         }
         super.setHeader(name, value);
+    }
+
+    private boolean isRecipientHeader(String name)
+    {
+        return TO_HEADER.equals(name) || CC_HEADER.equals(name) || BCC_HEADER.equals(name);
     }
 
     /**
@@ -205,6 +220,36 @@ public class ExtendedMimeMessage extends MimeMessage
             }
         }
         return uniqueMessageId;
+    }
+
+    /**
+     * See {@link #getExtraData(String)}.
+     *
+     * @param key the key under which the extra data value is registered
+     * @param value the extra data value
+     * @since 14.10.16
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public void addExtraData(String key, Object value)
+    {
+        this.extraDataMap.put(key, value);
+    }
+
+    /**
+     * @param key the key under which the extra data value has been registered
+     * @return the extra data associated to this message. This is an easy way to pass some arbitrary data and get it
+     *         back when a {@link MailListener} method is called. This data is not used by the mail sending process
+     *         itself.
+     * @since 14.10.16
+     * @since 15.5.3
+     * @since 15.8RC1
+     */
+    @Unstable
+    public Object getExtraData(String key)
+    {
+        return this.extraDataMap.get(key);
     }
 
     private String getNotNullMessageId() throws MessagingException

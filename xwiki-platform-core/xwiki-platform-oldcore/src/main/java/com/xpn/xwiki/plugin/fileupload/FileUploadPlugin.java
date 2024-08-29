@@ -31,6 +31,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.environment.Environment;
 import org.xwiki.text.StringUtils;
 
@@ -71,6 +73,12 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     public static final String UPLOAD_MAXSIZE_PARAMETER = "upload_maxsize";
 
     /**
+     * The default maximum size for uploaded documents. This limit can be changed using the {@code upload_maxsize}
+     * XWiki preference.
+     */
+    public static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
+
+    /**
      * The name of the parameter that can be set in the global XWiki preferences to override the default size threshold
      * for on-disk storage.
      */
@@ -82,21 +90,17 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadPlugin.class);
 
     /**
-     * The default maximum size for uploaded documents. This limit can be changed using the <tt>upload_maxsize</tt>
-     * XWiki preference.
-     */
-    private static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
-
-    /**
      * The default maximum size for in-memory stored uploaded documents. If a file is larger than this limit, it will be
      * stored on disk until the current request finishes. This limit can be changed using the
-     * <tt>upload_sizethreshold</tt> XWiki preference.
+     * {@code upload_sizethreshold} XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
 
     private Environment environment;
 
     private String temporaryDirectory;
+
+    private AttachmentValidator attachmentValidator;
 
     /**
      * @param name the plugin name
@@ -175,9 +179,11 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param context Context of the request.
      * @throws XWikiException An XWikiException is thrown if the request could not be parsed.
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList()
      */
-    public void loadFileList(XWikiContext context) throws XWikiException
+    public void loadFileList(XWikiContext context) throws XWikiException, AttachmentValidationException
     {
         XWiki xwiki = context.getWiki();
         loadFileList(
@@ -190,14 +196,17 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * Loads the list of uploaded files in the context if there are any uploaded files.
      *
      * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in memory.
+     * @param uploadSizeThreshold the threshold over which the file data should be stored on disk, and not in
+     *     memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @param context Context of the request.
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum
+     *     filesize is reached)
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
     public void loadFileList(long uploadMaxSize, int uploadSizeThreshold, String tempdir, XWikiContext context)
-        throws XWikiException
+        throws XWikiException, AttachmentValidationException
     {
         LOGGER.debug("Loading uploaded files");
 
@@ -210,7 +219,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         }
 
         Collection<FileItem> fileItems =
-            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest());
+            FileUploadUtils.getFileItems(uploadMaxSize, uploadSizeThreshold, tempdir, context.getRequest(),
+                getAttachmentValidator());
         List<FileItem> items;
         if (fileItems instanceof List) {
             items = (List<FileItem>) fileItems;
@@ -377,7 +387,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
-     * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The file name, or {@code null} if no file was uploaded for that form field.
      */
     public String getFileName(String formfieldName, XWikiContext context)
     {
@@ -392,7 +402,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      *
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
-     * @return The corresponding FileItem, or <tt>null</tt> if no file was uploaded for that form field.
+     * @return The corresponding FileItem, or {@code null} if no file was uploaded for that form field.
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {
@@ -421,6 +431,14 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
             this.environment = Utils.getComponent(Environment.class);
         }
         return this.environment;
+    }
+
+    private AttachmentValidator getAttachmentValidator()
+    {
+        if (this.attachmentValidator == null) {
+            this.attachmentValidator = Utils.getComponent(AttachmentValidator.class);
+        }
+        return this.attachmentValidator;
     }
 
     private String getTemporaryDirectory(XWiki xwiki)

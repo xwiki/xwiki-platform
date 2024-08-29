@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
 
 <!-- =============================================================== -->
 <!-- Configure the Jetty Request Log                                 -->
@@ -32,21 +32,38 @@
   <!-- (Use RequestLogHandler for a context specific RequestLog    -->
   <!-- =========================================================== -->
   <Set name="RequestLog">
-    <New id="RequestLog" class="org.eclipse.jetty.server.AsyncNCSARequestLog">
-      <!-- Set the request logs inside the xwiki permanent directory -->
-      <Set name="filename"><Property name="xwiki.data.dir" default="." />/<Property>
-        <Name>jetty.requestlog.filePath</Name>
-        <Deprecated>requestlog.filename</Deprecated>
-        <Default><Property name="jetty.requestlog.dir" default="logs"/>/yyyy_mm_dd.request.log</Default>
-      </Property>
-      </Set>
-      <Set name="filenameDateFormat"><Property name="jetty.requestlog.filenameDateFormat" deprecated="requestlog.filenameDateFormat" default="yyyy_MM_dd"/></Set>
-      <Set name="retainDays"><Property name="jetty.requestlog.retainDays" deprecated="requestlog.retain" default="90"/></Set>
-      <Set name="append"><Property name="jetty.requestlog.append" deprecated="requestlog.append" default="false"/></Set>
-      <Set name="extended"><Property name="jetty.requestlog.extended" deprecated="requestlog.extended" default="false"/></Set>
-      <Set name="logCookies"><Property name="jetty.requestlog.cookies" deprecated="requestlog.cookies" default="false"/></Set>
-      <Set name="LogTimeZone"><Property name="jetty.requestlog.timezone" deprecated="requestlog.timezone" default="GMT"/></Set>
-      <Set name="LogLatency"><Property name="jetty.requestlog.loglatency" default="false"/></Set>
+    <New id="RequestLog" class="org.eclipse.jetty.server.CustomRequestLog">
+      <!-- Writer -->
+      <Arg>
+        <New class="org.eclipse.jetty.server.AsyncRequestLogWriter">
+          <Arg>
+            <Call name="resolvePath" class="org.eclipse.jetty.xml.XmlConfiguration">
+              <Arg><Property name="jetty.base"/></Arg>
+              <Arg>
+                <Property name="jetty.requestlog.filePath">
+                  <Default>
+                    <Property name="jetty.requestlog.dir" default="logs"/>/yyyy_mm_dd.request.log
+                  </Default>
+                </Property>
+              </Arg>
+            </Call>
+          </Arg>
+
+          <Set name="filenameDateFormat"><Property name="jetty.requestlog.filenameDateFormat" default="yyyy_MM_dd"/></Set>
+          <Set name="retainDays"><Property name="jetty.requestlog.retainDays" default="90"/></Set>
+          <Set name="append"><Property name="jetty.requestlog.append" default="false"/></Set>
+          <Set name="timeZone"><Property name="jetty.requestlog.timezone" default="GMT"/></Set>
+        </New>
+      </Arg>
+
+      <!-- Format String -->
+      <Arg>
+        <Property name="jetty.requestlog.formatString" deprecated="jetty.customrequestlog.formatString">
+          <Default>
+            <Get class="org.eclipse.jetty.server.CustomRequestLog" name="EXTENDED_NCSA_FORMAT"/>
+          </Default>
+        </Property>
+      </Arg>
     </New>
   </Set>
 </Configure>

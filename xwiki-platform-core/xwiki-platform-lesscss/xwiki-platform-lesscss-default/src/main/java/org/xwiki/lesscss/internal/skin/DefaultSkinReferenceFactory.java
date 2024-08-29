@@ -69,18 +69,19 @@ public class DefaultSkinReferenceFactory implements SkinReferenceFactory
 
         DocumentReference skinDocRef = documentReferenceResolver.resolve(skinName, new WikiReference(currentWikiId));
 
-        if (xwiki.exists(skinDocRef, xcontext)) {
-            try {
-                XWikiDocument skinDoc = xwiki.getDocument(skinDocRef, xcontext);
-                DocumentReference skinClassDocRef = new DocumentReference(skinDocRef.getWikiReference().getName(),
-                        "XWiki", "XWikiSkins");
+        XWikiDocument skinDoc;
+        try {
+            skinDoc = xwiki.getDocument(skinDocRef, xcontext);
+        } catch (XWikiException e) {
+            throw new LESSCompilerException(String.format("Unable to read document [%s]", skinDocRef), e);
+        }
 
-                if (skinDoc.getXObjectSize(skinClassDocRef) > 0) {
-                    return createReference(skinDocRef);
-                }
+        if (!skinDoc.isNew()) {
+            DocumentReference skinClassDocRef =
+                new DocumentReference(skinDocRef.getWikiReference().getName(), "XWiki", "XWikiSkins");
 
-            } catch (XWikiException e) {
-                throw new LESSCompilerException(String.format("Unable to read document [%s]", skinDocRef), e);
+            if (skinDoc.getXObjectSize(skinClassDocRef) > 0) {
+                return createReference(skinDocRef);
             }
         }
 

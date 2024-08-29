@@ -45,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -190,16 +189,20 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void addField(String name, PropertyInterface element)
     {
-        Set<String> properties = getPropertyList();
-        if (!properties.contains(name)) {
-            if (((BaseCollection) element).getNumber() == 0) {
-                ((BaseCollection) element).setNumber(properties.size() + 1);
+        if (element != null) {
+            Set<String> properties = getPropertyList();
+            if (!properties.contains(name)) {
+                if (((BaseCollection) element).getNumber() == 0) {
+                    ((BaseCollection) element).setNumber(properties.size() + 1);
+                }
             }
+
+            super.addField(name, element);
+
+            setDirty(true);
+        } else {
+            LOGGER.warn("Cannot add null field with name [{}] in [{}].", name, this);
         }
-
-        super.addField(name, element);
-
-        setDirty(true);
     }
 
     /**
@@ -361,11 +364,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (safeget(property.getName()) == null) {
                 deprecatedObjectProperties.add(property);
             } else {
-                String propertyClass = ((PropertyClass) safeget(property.getName())).newProperty().getClassType();
-                String objectPropertyClass = property.getClassType();
+                BaseProperty emptyProperty = ((PropertyClass) safeget(property.getName())).newProperty();
+                if (emptyProperty != null) {
+                    String propertyClass = emptyProperty.getClassType();
+                    String objectPropertyClass = property.getClassType();
 
-                if (!propertyClass.equals(objectPropertyClass)) {
-                    deprecatedObjectProperties.add(property);
+                    if (!propertyClass.equals(objectPropertyClass)) {
+                        deprecatedObjectProperties.add(property);
+                    }
                 }
             }
         }
@@ -734,7 +740,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, (String) null);
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, false);
+    }
+
+    /**
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, boolean restricted)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, (String) null, restricted);
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, EditorType editorType)
@@ -745,7 +761,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, null);
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, false);
+    }
+
+    /**
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor, boolean restricted)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, null, restricted);
     }
 
     /**
@@ -773,6 +799,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor,
         String contenttype)
+    {
+        return addTextAreaField(fieldName, fieldPrettyName, cols, rows, editor, contenttype, false);
+    }
+
+    /**
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows, String editor,
+        String contenttype, boolean restricted)
     {
         boolean result = false;
 
@@ -829,6 +866,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             textAreaClass.setRows(rows);
             result = true;
         }
+
+        textAreaClass.setRestricted(restricted);
 
         return result;
     }
@@ -1477,62 +1516,67 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     }
 
     @Override
-    public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
-        XWikiContext context, MergeResult mergeResult)
+    public MergeManagerResult<ElementInterface, Object> merge(ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context)
     {
+        MergeManagerResult<ElementInterface, Object> mergeResult =
+            super.merge(previousElement, newElement, configuration, context);
+
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
+
+        BaseClass modifiableResult = (BaseClass) mergeResult.getMergeResult();
 
         MergeManagerResult<String, String> customClassMergeResult =
             getMergeManager().mergeObject(previousClass.getCustomClass(),
                 newClass.getCustomClass(), getCustomClass(), configuration);
         mergeResult.getLog().addAll(customClassMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customClassMergeResult.isModified());
-        setCustomClass(customClassMergeResult.getMergeResult());
+        modifiableResult.setCustomClass(customClassMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(previousClass.getCustomMapping(),
+        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(
+            previousClass.getCustomMapping(),
             newClass.getCustomMapping(), getCustomMapping(), configuration);
         mergeResult.getLog().addAll(customMappingMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customMappingMergeResult.isModified());
-        setCustomMapping(customMappingMergeResult.getMergeResult());
+        modifiableResult.setCustomMapping(customMappingMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(previousClass.getDefaultWeb(),
+        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(
+            previousClass.getDefaultWeb(),
             newClass.getDefaultWeb(), getDefaultWeb(), configuration);
         mergeResult.getLog().addAll(defaultWebMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultWebMergeResult.isModified());
-        setDefaultWeb(defaultWebMergeResult.getMergeResult());
+        modifiableResult.setDefaultWeb(defaultWebMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultViewSheetMergeResult =
             getMergeManager().mergeObject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
                 getDefaultViewSheet(), configuration);
         mergeResult.getLog().addAll(defaultViewSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultViewSheetMergeResult.isModified());
-        setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
+        modifiableResult.setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultEditSheetMergeResult =
             getMergeManager().mergeObject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
                 getDefaultEditSheet(), configuration);
         mergeResult.getLog().addAll(defaultEditSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultEditSheetMergeResult.isModified());
-        setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
+        modifiableResult.setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> validationScriptMergeResult =
             getMergeManager().mergeObject(previousClass.getValidationScript(), newClass.getValidationScript(),
                 getValidationScript(), configuration);
         mergeResult.getLog().addAll(validationScriptMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || validationScriptMergeResult.isModified());
-        setValidationScript(validationScriptMergeResult.getMergeResult());
+        modifiableResult.setValidationScript(validationScriptMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> nameFieldMergeResult =
             getMergeManager().mergeObject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
                 configuration);
         mergeResult.getLog().addAll(nameFieldMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || nameFieldMergeResult.isModified());
-        setNameField(nameFieldMergeResult.getMergeResult());
+        modifiableResult.setNameField(nameFieldMergeResult.getMergeResult());
 
-        // Properties
-
-        super.merge(previousElement, newElement, configuration, context, mergeResult);
+        return mergeResult;
     }
 
     @Override
@@ -1589,14 +1633,16 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        super.setOwnerDocument(ownerDocument);
+        if (this.ownerDocument != ownerDocument) {
+            super.setOwnerDocument(ownerDocument);
 
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
-        }
+            if (this.ownerDocument != null) {
+                setDocumentReference(this.ownerDocument.getDocumentReference());
+            }
 
-        if (ownerDocument != null && this.isDirty) {
-            ownerDocument.setMetaDataDirty(true);
+            if (ownerDocument != null && this.isDirty) {
+                ownerDocument.setMetaDataDirty(true);
+            }
         }
     }
 

@@ -91,7 +91,7 @@ public class BreadcrumbElement extends BaseElement
         getDriver().waitUntilElementDisappears(By.cssSelector("#" + containerId + " .ellipsis"));
 
         // Update the internal reference
-        this.container = getDriver().findElementById(containerId);
+        this.container = getDriver().findElement(By.id(containerId));
     }
 
     public boolean canBeExpanded()

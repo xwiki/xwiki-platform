@@ -46,7 +46,7 @@
 Erlaubt es Inhalte einzugeben, die nicht formatiert werden (in anderen Worten wird die XWiki Syntax nicht beachtet).
 
 {{info}}
-In XWiki Syntax 1.0 schützt das [[Pre Makro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] nur XWiki Syntax und Radeox Makros. HTML Code und Groovy/Velocity Skripte hingegen werden weiterhin ausgeführt.
+In XWiki Syntax 1.0 schützt das [[Pre Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Pre%20Macro%20%28Radeox%29]] nur XWiki Syntax und Radeox Makros. HTML Code und Groovy/Velocity Skripte hingegen werden weiterhin ausgeführt.
 {{/info}}
 
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
@@ -58,7 +58,7 @@ mehrzeiliger
 Inhalt
 {/pre}
 }}}
-{{info}}Es ist ebenfalls möglich das [[Code Makro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] zu verwenden, jedoch dieses zeigt den Inhalt standardmäßig in einer Box.{{/info}}
+{{info}}Es ist ebenfalls möglich das [[Code Makro&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Code%20Macro%20%28Radeox%29]] zu verwenden, jedoch dieses zeigt den Inhalt standardmäßig in einer Box.{{/info}}
 )))|((({{{
 mehrzeiliger
 *wortgetreuer*

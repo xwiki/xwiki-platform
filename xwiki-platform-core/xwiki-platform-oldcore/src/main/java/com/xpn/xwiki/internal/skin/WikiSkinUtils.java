@@ -129,23 +129,24 @@ public class WikiSkinUtils
     {
         if (skinDocument != null) {
             // Try to find a XWikiSkinFileOverrideClass object
-            BaseObject obj = skinDocument.getXObject(XWikiSkinFileOverrideClassDocumentInitializer.DOCUMENT_REFERENCE, 
+            BaseObject obj = skinDocument.getXObject(XWikiSkinFileOverrideClassDocumentInitializer.DOCUMENT_REFERENCE,
                 XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_PATH, resource, false);
             if (obj != null) {
                 ObjectPropertyReference reference = new ObjectPropertyReference(
-                    XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT,
-                        obj.getReference());
+                    XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT, obj.getReference());
                 return new ObjectPropertyWikiResource(getPath(reference), skin, reference,
                     skinDocument.getAuthorReference(), this.xcontextProvider,
-                        obj.getLargeStringValue(XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT));
+                    obj.getLargeStringValue(XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT),
+                    skinDocument.getDate().toInstant());
             }
-            
+
             // Try parsing the object property
             BaseProperty<ObjectPropertyReference> property = getSkinResourceProperty(resource, skinDocument);
             if (property != null) {
                 ObjectPropertyReference reference = property.getReference();
                 return new ObjectPropertyWikiResource(getPath(reference), skin, reference,
-                    skinDocument.getAuthorReference(), this.xcontextProvider, (String) property.getValue());
+                    skinDocument.getAuthorReference(), this.xcontextProvider, (String) property.getValue(),
+                    skinDocument.getDate().toInstant());
             }
 
             // Try parsing a document attachment
@@ -187,7 +188,7 @@ public class WikiSkinUtils
 
         return null;
     }
-    
+
     public String getSkinProperty(String skin, String property)
     {
         BaseObject obj = getSkinObject(skin);

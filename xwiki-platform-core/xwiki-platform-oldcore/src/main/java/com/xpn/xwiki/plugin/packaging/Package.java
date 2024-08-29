@@ -53,6 +53,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
@@ -1314,7 +1315,8 @@ public class Package
 
     protected Document fromXml(InputStream xml) throws DocumentException
     {
-        SAXReader reader = new SAXReader();
+        SAXReader reader = getSAXReader();
+
         Document domdoc = reader.read(xml);
 
         Element docEl = domdoc.getRootElement();
@@ -1375,7 +1377,7 @@ public class Package
     {
         File[] files = dir.listFiles();
 
-        SAXReader reader = new SAXReader();
+        SAXReader reader = getSAXReader();
 
         int count = 0;
         for (File file : files) {
@@ -1483,7 +1485,7 @@ public class Package
                 files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
             }
 
-            // If the document name does not exists in the space map of docs, we create it.
+            // If the document name does not exist in the space map of docs, we create it.
             if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
                 files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
                     new ArrayList<Map<String, String>>());
@@ -1500,5 +1502,18 @@ public class Package
         JSONObject jsonObject = JSONObject.fromObject(json);
 
         return jsonObject;
+    }
+
+    private SAXReader getSAXReader()
+    {
+        try {
+            SAXReader reader = new SAXReader();
+            // Note: Prevent XXE attacks by disabling completely DTDs. This is possible since XWiki's XAR content is
+            // not supposed to contain DTDs.
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            return reader;
+        } catch (SAXException e) {
+            throw new RuntimeException("Failed to configure the XML parser to read XAR data", e);
+        }
     }
 }

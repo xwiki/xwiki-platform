@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <!-- Jetty lifecycle listener that prints a message to open a browser when the server is started. This is to provide
        information to newbies so that they know what to do after the server is started.
   -->
-  <Call name="addLifeCycleListener">
+  <Call name="addBean">
     <Arg>
       <New class="org.xwiki.tools.jetty.listener.NotifyListener" />
     </Arg>

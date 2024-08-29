@@ -1,0 +1,29 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validates the highlighting of a script binding
+.#-----------------------------------------------------
+{{code source="script:myvar"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [source=script:myvar]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpecialSymbol [<]
+onWord [i]
+onSpecialSymbol [>]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onWord [script]
+beginFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+onSpecialSymbol [<]
+onSpecialSymbol [/]
+onWord [i]
+onSpecialSymbol [>]
+endFormat [NONE] [[style]=[font-weight: bold; color: #008000; ]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [source=script:myvar]
+endDocument

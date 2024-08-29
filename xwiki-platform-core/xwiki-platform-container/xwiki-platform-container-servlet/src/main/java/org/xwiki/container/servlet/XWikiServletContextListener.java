@@ -29,6 +29,7 @@ import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
+import org.xwiki.container.servlet.internal.HttpSessionManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.extension.handler.ExtensionInitializer;
@@ -115,6 +116,14 @@ public class XWikiServletContextListener implements ServletContextListener
             this.componentManager.getInstance(ExtensionInitializer.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize installed extensions", e);
+        }
+
+        // Register the  HttpSessionManager as a listener.
+        try {
+            HttpSessionManager httpSessionManager = this.componentManager.getInstance(HttpSessionManager.class);
+            servletContextEvent.getServletContext().addListener(httpSessionManager);
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to initialize HttpSessionManager", e);
         }
 
         // Now that the Application Context is set up and the component are registered, send the Component instance

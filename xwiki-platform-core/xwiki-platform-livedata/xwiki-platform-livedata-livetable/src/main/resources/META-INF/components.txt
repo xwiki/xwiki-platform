@@ -6,6 +6,7 @@ org.xwiki.livedata.internal.livetable.LiveTableLiveDataPropertyStore
 org.xwiki.livedata.internal.livetable.LiveTableLiveDataSource
 org.xwiki.livedata.internal.livetable.LiveTableRequestHandler
 org.xwiki.livedata.internal.livetable.LiveTableResultsURLDocumentReferenceResolver
+org.xwiki.livedata.internal.livetable.LiveTableLiveDataResultsRenderer
 org.xwiki.livedata.internal.livetable.PropertyTypeSupplier
 org.xwiki.livedata.script.livetable.LiveTableScriptService
 org.xwiki.livedata.internal.livetable.ModelBridge

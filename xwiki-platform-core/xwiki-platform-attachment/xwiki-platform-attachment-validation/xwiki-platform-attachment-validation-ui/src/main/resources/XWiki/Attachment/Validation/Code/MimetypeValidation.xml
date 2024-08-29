@@ -1,0 +1,358 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Attachment.Validation.Code.MimetypeValidation" locale="">
+  <web>XWiki.Attachment.Validation.Code</web>
+  <name>MimetypeValidation</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MimetypeValidation</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity wiki="false"}}
+#if ($request.documentReference)
+$jsontool.serialize({
+  "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes($request.documentReference),
+  "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes($request.documentReference)
+})
+#end
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.Attachment.Validation.Code.MimetypeValidation</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bafb7389-590c-496f-8293-b9b541c5bd4c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('attachment-validation-mimetype-messages', {
+  prefix: 'attachment.validation.mimetype.',
+  keys: [
+    'errorMessage',
+    'allowedMimetypes',
+    'blockerMimetypes'
+  ]
+});
+
+require(['jquery', 'xwiki-l10n!attachment-validation-mimetype-messages', 'xwiki-events-bridge'], ($, l10n) =&gt; {
+  function checkMimetype(mimetypes, mimetype) {
+    return mimetypes.some(mimetypePattern =&gt; {
+      const indexOfJoker = mimetypePattern.indexOf('*');
+      if (indexOfJoker === -1) {
+        return mimetypePattern === mimetype;
+      } else {
+        const prefix = mimetypePattern.substring(0, indexOfJoker);
+        const suffix = mimetypePattern.substring(indexOfJoker + 1, mimetypePattern.length);
+        return mimetype.startsWith(prefix) &amp;&amp; mimetype.endsWith(suffix);
+      }
+    });
+  }
+
+  const configCache = {};
+
+  $(document).on('xwiki:actions:beforeUpload', function (event, data) {
+    let jsonString;
+    if (data.documentReference) {
+      if (!configCache[data.documentReference]) {
+        $.ajax({
+          url: new XWiki.Document(XWiki.Model.resolve('XWiki.Attachment.Validation.Code.MimetypeValidation',
+            XWiki.EntityType.DOCUMENT)).getURL('get', $.param({
+            outputSyntax: 'plain',
+            documentReference: data.documentReference
+          })),
+          async: false,
+          method: 'GET',
+          success: function (getData) {
+            configCache[data.documentReference] = getData;
+          }
+        })
+      }
+      jsonString = configCache[data.documentReference];
+    } else {
+      jsonString = document.getElementById('attachment-validation-mimetypes-configuration').textContent;
+    }
+    const config = JSON.parse(jsonString);
+    const mimeType = data.file.type.toLowerCase();
+    const allowedMimetypes = config.allowedMimetypes;
+    const blockerMimetypes = config.blockerMimetypes;
+    const hasAllowedMimetypes = allowedMimetypes.length &gt; 0;
+    const hasBlockerMimetypes = blockerMimetypes.length &gt; 0;
+    const hasInvalidMimetype = hasAllowedMimetypes &amp;&amp; !checkMimetype(allowedMimetypes, mimeType)
+      || hasBlockerMimetypes &amp;&amp; checkMimetype(blockerMimetypes, mimeType);
+    if (hasInvalidMimetype) {
+      let localizedMessage = l10n.get('errorMessage', data.file.name, mimeType);
+      if (hasAllowedMimetypes) {
+        localizedMessage += '&lt;br/&gt;' + l10n.get('allowedMimetypes', allowedMimetypes);
+      }
+      if (hasBlockerMimetypes) {
+        localizedMessage += '&lt;br/&gt;' + l10n.get('blockerMimetypes', blockerMimetypes)
+      }
+      new XWiki.widgets.Notification(localizedMessage, "error");
+      event.preventDefault();
+    }
+  });
+})</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Attachment.Validation.Code.MimetypeValidation</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>0dcff845-07f6-42be-8b5f-8dc1e8806ebf</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>, </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+{{html clean='false'}}
+&lt;script type='application/json' id='attachment-validation-mimetypes-configuration'&gt;$jsontool.serialize({
+  "allowedMimetypes": $services.attachmentValidation.getAllowedMimetypes(),
+  "blockerMimetypes": $services.attachmentValidation.getBlockerMimetypes()
+}).replace('&lt;', '\u003C').replace('{{/', '\u007B\u007B\u002F')&lt;/script&gt;
+{{/html}}
+{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.header.after</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.attachment.validation.mimetype.header.after.config</name>
+    </property>
+    <property>
+      <parameters/>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
+</xwikidoc>

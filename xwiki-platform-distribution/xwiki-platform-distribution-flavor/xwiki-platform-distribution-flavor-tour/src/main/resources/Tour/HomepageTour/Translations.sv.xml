@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="Tour.HomepageTour.Translations" locale="sv">
+  <web>Tour.HomepageTour</web>
+  <name>Translations</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Tour.HomepageTour.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## Homepage Tour (by steps order)
+tour.homepageTour.welcome.title=Välkommen till XWiki
+tour.homepageTour.welcome.content=Den här demonstrationen tar ett par minuter och ger dig möjlighet att upptäcka wikins gränssnitt och grundläggande funktioner.
+tour.homepageTour.panels.title=Paneler
+tour.homepageTour.panels.contentA=Dessa paneler länkar till wikins applikationer och sidor.
+tour.homepageTour.panels.contentB=En administratör kan anpassa dessa och bestämma vilka paneler som visas.
+tour.homepageTour.breadcrumbs.title=Brödsmulor
+tour.homepageTour.breadcrumbs.contentA=Brödsmulorna visar ett spår till sidans plats i sidhierarkin och möjliggör navigering.
+tour.homepageTour.breadcrumbs.contentB=Knappen {0} tar dig alltid tillbaka till wikins förstasida.
+tour.homepageTour.pageContent.title=Sidinnehåll
+tour.homepageTour.pageContent.contentA=På den här ytan visas artikelinnehållet i aktuell sida.
+tour.homepageTour.pageContent.contentB=Redigera den här sidan för att lägga till tabeller, listor, makron och struktur för att organisera information och kunskap.
+tour.homepageTour.pageMenu.title=Sidmeny
+tour.homepageTour.pageMenu.contentA=Den här menyn innehåller sidrelaterade operationer. Om man har tillräckliga användarrättigheter kan man redigera, skapa nya, administrera och radera sidor.
+tour.homepageTour.pageMenu.contentB=Knappen {0} öppnar fler operationer såsom exportera, skriv ut och dela sida.
+tour.homepageTour.pageTabs.title=Sidtabbar
+tour.homepageTour.pageTabs.contentA=Kommentarer är ett bra sätt för användare att diskutera sidan.
+tour.homepageTour.pageTabs.contentB=Det går även att bifoga filer, jämföra sidversioner och se sidinformation.
+tour.homepageTour.header.title=Sidhuvud
+tour.homepageTour.header.contentA=Du kan söka i innehållet, bevaka siduppdateringar eller navigera till din användarprofil.
+tour.homepageTour.header.contentB=Knappen {0} öppnar en låda med wikirelaterade operationer såsom administration och olika index.
+tour.homepageTour.tourComplete.title=Demonstrationsturen är klar
+tour.homepageTour.tourComplete.contentA=Det här avslutar demonstrationen om XWikis gränssnitt och grundläggande funktioner.
+tour.homepageTour.tourComplete.contentB=Titta i {0}dokumentationen{1} för att få mer detaljerad information om varje funktion.
+</content>
+</xwikidoc>

@@ -18,15 +18,23 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
+# This is the top level mod used when starting Jetty in start_xwiki.*
+# It's called with "--module=xwiki" on the command line to start Jetty.
+
 [depend]
 ext
 resources
 server
 logging
 http
-annotations
-deploy
+http-forwarded
+ee8-annotations
+ee8-deploy
 requestlog
+ee8-websocket-javax
+ee8-websocket-jetty
+ee8-apache-jsp
+console-capture
 
 [xml]
 etc/jetty-xwiki.xml

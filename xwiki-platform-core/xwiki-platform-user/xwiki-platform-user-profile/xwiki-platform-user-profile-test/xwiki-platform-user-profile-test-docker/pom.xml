@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile-test</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test-docker</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Functional Docker Tests</name>
@@ -60,17 +60,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <!-- Runtime dependencies required by the Live Data macro. -->
+    <!-- Needed in order to test email obfuscation in the User profile page -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-macro</artifactId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-livedata-livetable</artifactId>
-      <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
@@ -114,14 +109,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables>
                 <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
                      WEB-INF/lib -->
-                <property>
-                  <name>xwiki.test.ui.profiles</name>
-                  <value>clover</value>
-                </property>
-              </systemProperties>
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

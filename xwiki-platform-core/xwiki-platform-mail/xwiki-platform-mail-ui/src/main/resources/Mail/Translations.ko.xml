@@ -1,0 +1,83 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="ko">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=메일
+admin.email.description=메일 발송 매개변수를 구성하고 메일 상태를 봅니다.
+admin.emailgeneral=고급
+admin.emailgeneral.description=메일 주소 난독화와 같은 고급 메일 매개 변수를 구성합니다.
+admin.emailsend=메일 송신
+admin.emailsend.description=메일 송신 파라미터를 설정합니다.
+admin.emailstatus=메일 송신 상태
+admin.emailstatus.description=보낸 메일의 상태를 보고 오류가 발생한 메일을 다시 보냅니다.
+admin.emailstatus.hint=메일 상태를 찾을 수 없는 경우, 메일을 발송한 속성이 메일 상태를 유지하도록 지정하지 않았기 때문일 수 있습니다.
+Mail.GeneralMailConfigClass_obfuscate=전자 메일 주소 난독화
+Mail.GeneralMailConfigClass_obfuscate.hint=이는 이메일 속성 유형의 기본 사용자 지정 표시기를 덮어쓰지 않는 한 이메일 유형의 개체 속성에 저장된 이메일 주소에만 영향을 미칩니다. 예시: a...@domain.syslog
+Mail.SendMailConfigClass_from=송신원 이메일 주소
+Mail.SendMailConfigClass_from.hint=알림 전자 메일을 보내는 데 사용되는 기본 전자 메일 주소
+Mail.SendMailConfigClass_bcc=숨은 참조 이메일 주소
+Mail.SendMailConfigClass_bcc.hint=메일을 보낼 때 사용할 숨은 참조 메일 주소의 기본 쉼표로 구분된 목록
+Mail.SendMailConfigClass_host=이메일 서버
+Mail.SendMailConfigClass_host.hint=송신지 SMTP 서버. 기본값은 "localhost" 입니다
+Mail.SendMailConfigClass_port=이메일 서버 포트
+Mail.SendMailConfigClass_port.hint=사용하는 SMTP 서버의 포트. 기본값은 25 입니다
+Mail.SendMailConfigClass_username=이메일 서버 사용자 이름
+Mail.SendMailConfigClass_username.hint=SMTP 서버에 접속하기 위한 사용자 이름, 인증이 필요한 경우에만
+Mail.SendMailConfigClass_password=이메일 서버 비밀번호
+Mail.SendMailConfigClass_password.hint=SMTP 서버에 접속하기 위한 패스워드, 인증이 필요한 경우에만
+Mail.SendMailConfigClass_properties=기타 속성
+Mail.SendMailConfigClass_properties.hint=사용할 추가 JavaMail 속성 목록(예: TLS의 경우 "mail.disc.starttls.enable=true")
+Mail.SendMailConfigClass_sendWaitTime=전송 대기 시간
+Mail.SendMailConfigClass_sendWaitTime.hint=각 메일이 발송되는 지연 시간,ms (기본값은 8초)
+Mail.SendMailConfigClass_discardSuccessStatuses=성공 상태 폐기?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=성공적으로 발송된 메일에 대한 메일 상태 유지 여부와 상관없이(기본값은 true)
+Mail.SendMailStatus_livetable.date=날짜
+Mail.SendMailStatus_livetable.batchId=Batch ID
+Mail.SendMailStatus_livetable.type=유형
+Mail.SendMailStatus_livetable.recipients=수신자
+Mail.SendMailStatus_livetable.state=상태
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=오류
+Mail.SendMailStatus_livetable.actions=작업
+Mail.SendMailStatus_livetable.resend=다시 보내기
+Mail.SendMailStatus_livetable.delete=삭제
+mailSender.admin.resendSuccess=메일이 성공적으로 재발송되었습니다
+mailSender.admin.resendFailure=메일 재발송에 실패하였습니다. 자세한 내용을 보려면 클릭하십시오.
+mailSender.admin.deleteSuccess=메일이 정상적으로 삭제되었습니다
+mailSender.admin.deleteFailure=메일 삭제에 실패하였습니다. 자세한 내용을 보려면 클릭하십시오.
+</content>
+</xwikidoc>

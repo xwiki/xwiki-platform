@@ -21,6 +21,8 @@
 extraction:
   java:
     index:
+      # XWiki on master is using Java 11
+      java_version: "11"
       # Use the snapshot profile so that the XWiki Maven Remote repository is specified for locating snapshot
       # artifacts.
       build_command: "mvn clean install -Psnapshot"

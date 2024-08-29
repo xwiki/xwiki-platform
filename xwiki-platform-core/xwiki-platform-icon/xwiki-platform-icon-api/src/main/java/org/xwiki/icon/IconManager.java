@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to render an icon, depending on the current icon theme set on the preferences.
@@ -205,7 +204,6 @@ public interface IconManager
      * @throws IconException in case of error when accessing the current icon set
      * @since 13.4RC1
      */
-    @Unstable
     default boolean hasIcon(String iconName) throws IconException
     {
         return getIconNames().contains(iconName);
@@ -220,7 +218,6 @@ public interface IconManager
      * @throws IconException in case of error when accessing the current icon set
      * @since 13.4RC1
      */
-    @Unstable
     default boolean hasIcon(String iconSetName, String iconName) throws IconException
     {
         return getIconNames(iconSetName).contains(iconName);

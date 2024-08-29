@@ -21,7 +21,7 @@
   <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
     <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
   </div>
@@ -60,10 +60,10 @@
 ## If the Rights Manager Plugin is not enabled, then return an empty JSON result.
 #if ("$!usersService" != '')
   ## The live table offset starts from 1 so we need to subtract 1.
-  #if ($request.wiki == 'local')
+  #if ($request.wiki == 'local' || $request.scope == 'local')
     #set ($users = $usersService.getAllMatchedLocalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedLocalUsers($filterMap))
-  #elseif ($request.wiki == 'global')
+  #elseif ($request.wiki == 'global' || $request.scope == 'global')
     #set ($users = $usersService.getAllMatchedGlobalUsers($filterMap, $limit, $mathtool.sub($offset, 1), $orderList))
     #set ($countUsers = $usersService.countAllMatchedGlobalUsers($filterMap))
   #else
@@ -84,65 +84,75 @@
   'rows': []
 })
 #foreach ($user in $users)
-  #set ($grayed = $xcontext.user == $user.fullName)
-  #set ($wikiName = $user.wiki)
-  #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
-    #set ($wikiName = 'local')
-  #end
-  #set ($userObject = $user.getObject($userClassName))
-  ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
-  #set ($row = {
-    'username': $user.documentReference.name,
-    'fullname': $user.fullName,
-    'wikiname': $wikiName,
-    'firstname': $userObject.getValue('first_name'),
-    'lastname': $userObject.getValue('last_name'),
-    'userurl': $user.getURL(),
-    'usersaveurl': $user.getURL('save'),
-    'userinlineurl': $user.getURL('edit', 'xpage=edituser'),
-    'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Users'),
-    'grayed': $grayed
-  })
-  #if ($user.wiki == $xcontext.mainWikiName)
-    #set ($scope = 'global')
+  #if ($services.security.authorization.hasAccess('view', $user.documentReference))
+    #set ($grayed = $xcontext.user == $user.fullName)
+    #set ($wikiName = $user.wiki)
+    #if ($wikiName != $xcontext.mainWikiName || $wikiName == $xcontext.database)
+      #set ($wikiName = 'local')
+    #end
+    #set ($userObject = $user.getObject($userClassName))
+    ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
+    #set ($row = {
+      'username': $user.documentReference.name,
+      'fullname': $user.fullName,
+      'wikiname': $wikiName,
+      'firstname': $userObject.getValue('first_name'),
+      'lastname': $userObject.getValue('last_name'),
+      'userurl': $user.getURL(),
+      'usersaveurl': $user.getURL('save'),
+      'userinlineurl': $user.getURL('edit', 'xpage=edituser'),
+      'docurl': $xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'section=Users'),
+      'grayed': $grayed
+    })
+    #if ($user.wiki == $xcontext.mainWikiName)
+      #set ($scope = 'global')
+    #else
+      #set ($scope = 'local')
+    #end
+    #set ($hasEdit = $services.security.authorization.hasAccess('edit', $user.documentReference))
+    #set ($disabled = $xwiki.getUser($user.documentReference).isDisabled())
+    #set ($hasEnable = $hasEdit && $disabled)
+    ## Prevent users from disabling their own accounts.
+    #set ($hasDisable = $hasEdit && !$disabled && $xcontext.userReference != $user.documentReference)
+    ## Delete user accounts only after they have been disabled. Also prevent users from deleting their own accounts.
+    #set ($hasDelete = $disabled && $xcontext.userReference != $user.documentReference
+      && $services.security.authorization.hasAccess('delete', $user.documentReference))
+    #set ($discard = $row.putAll({
+      'doc_fullName': $user.fullName,
+      'doc_wiki': $user.wiki,
+      'doc_url': $user.getURL(),
+      'doc_viewable': true,
+      'doc_hasadmin': $xwiki.hasAdminRights(),
+      'doc_hasedit': $hasEdit,
+      'doc_edit_url': $user.getURL('edit'),
+      'doc_hasdelete': $hasDelete,
+      'doc_delete_url': $user.getURL('delete'),
+      'doc_hasdisable': $hasDisable,
+      'doc_disable_url': $xwiki.getURL('XWiki.XWikiUserProfileSheet', 'get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'action': 'disable',
+        'userId': $user.documentReference,
+        'csrf': $services.csrf.token
+      })),
+      'doc_hasenable': $hasEnable,
+      'doc_enable_url': $xwiki.getURL('XWiki.XWikiUserProfileSheet', 'get', $escapetool.url({
+        'outputSyntax': 'plain',
+        'action': 'enable',
+        'userId': $user.documentReference,
+        'csrf': $services.csrf.token
+      })),
+      'name': "#displayUserAliasWithAvatar($user.documentReference $disabled)",
+      'first_name': $userObject.getValue('first_name'),
+      'last_name': $userObject.getValue('last_name'),
+      'scope': $services.localization.render("xe.admin.groups.$scope")
+    }))
   #else
-    #set ($scope = 'local')
+    #set($row = {
+      'doc_viewable': false,
+      'doc_fullName': 'obfuscated'
+    })
   #end
-  #set ($hasEdit = $services.security.authorization.hasAccess('edit', $user.documentReference))
-  #set ($disabled = $xwiki.getUser($user.documentReference).isDisabled())
-  #set ($hasEnable = $hasEdit && $disabled)
-  ## Prevent users from disabling their own accounts.
-  #set ($hasDisable = $hasEdit && !$disabled && $xcontext.userReference != $user.documentReference)
-  ## Delete user accounts only after they have been disabled. Also prevent users from deleting their own accounts.
-  #set ($hasDelete = $disabled && $xcontext.userReference != $user.documentReference
-    && $services.security.authorization.hasAccess('delete', $user.documentReference))
-  #set ($discard = $row.putAll({
-    'doc_fullName': $user.fullName,
-    'doc_wiki': $user.wiki,
-    'doc_url': $user.getURL(),
-    'doc_viewable': $services.security.authorization.hasAccess('view', $user.documentReference),
-    'doc_hasadmin': $xwiki.hasAdminRights(),
-    'doc_hasedit': $hasEdit,
-    'doc_edit_url': $user.getURL('edit'),
-    'doc_hasdelete': $hasDelete,
-    'doc_delete_url': $user.getURL('delete'),
-    'doc_hasdisable': $hasDisable,
-    'doc_disable_url': $user.getURL('save', $escapetool.url({
-      "${userClassName}_0_active": 0,
-      'comment': $services.localization.render('core.users.disable.saveComment'),
-      'form_token': $services.csrf.token
-    })),
-    'doc_hasenable': $hasEnable,
-    'doc_enable_url': $user.getURL('save', $escapetool.url({
-      "${userClassName}_0_active": 1,
-      'comment': $services.localization.render('core.users.enable.saveComment'),
-      'form_token': $services.csrf.token
-    })),
-    'name': "#displayUserAliasWithAvatar($user.documentReference $disabled)",
-    'first_name': $userObject.getValue('first_name'),
-    'last_name': $userObject.getValue('last_name'),
-    'scope': $services.localization.render("xe.admin.groups.$scope")
-  }))
   #set ($discard = $data.rows.add($row))
 #end
+#livetable_filterObfuscated($data)
 #jsonResponse($data)

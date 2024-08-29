@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.skinx;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -83,8 +84,9 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
             return "";
         }
 
-        return String.format("<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\" />",
-                getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME, context));
+        return "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + XMLUtils.escapeAttributeValue(
+            getDocumentSkinExtensionURL(documentReference, documentName, PLUGIN_NAME,
+                context)) + "\" />\n";
     }
 
     @Override

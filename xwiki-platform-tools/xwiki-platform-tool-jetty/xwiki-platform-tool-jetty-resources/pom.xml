@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -34,6 +34,14 @@
   <properties>
     <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
     <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
+
+    <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
+         The reason is that our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
+
+         Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
+    -->
+    <jetty.version>${jetty.server.version}</jetty.version>
+    <slf4j.version>${jetty.server.slf4j.version}</slf4j.version>
   </properties>
   <dependencies>
     <dependency>
@@ -42,6 +50,7 @@
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
+    <!-- Needed for the org.apache.commons.io.output.TeeOutputStream class used to split the Jetty logs -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -52,18 +61,6 @@
       <artifactId>jetty-server</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
-    </dependency>
-    <!-- We need to bundle the Servlet API in the Jetty JARs. This is normally drawn transitively by the jetty-server
-         artifact above. However, since we declare the Servlet API dependency (javax.servlet:javax.servlet-api) with
-         a "provided" scope in our top level POM, the Assembly plugin doesn't include it by default. -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty
-           used. -->
-      <version>3.1.0</version>
-      <optional>true</optional>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -91,8 +88,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-annotations</artifactId>
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-annotations</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
@@ -107,6 +104,38 @@
       <artifactId>jetty-jndi</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-slf4j-impl</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- Note: We don't provide Jetty Websocket API only JSR356 -->
+    <dependency>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-server</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-client</artifactId>
+      <version>${jetty.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <!-- We need a EL implementation for Hibernate Validator -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   <build>

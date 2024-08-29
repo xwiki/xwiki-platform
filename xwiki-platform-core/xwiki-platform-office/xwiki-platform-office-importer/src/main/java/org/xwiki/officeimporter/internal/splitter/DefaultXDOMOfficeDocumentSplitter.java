@@ -19,24 +19,22 @@
  */
 package org.xwiki.officeimporter.internal.splitter;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.splitter.OfficeDocumentSplitterParameters;
 import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.refactoring.WikiDocument;
@@ -44,7 +42,9 @@ import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
 
 /**
  * Default implementation of {@link XDOMOfficeDocumentSplitter}.
@@ -57,33 +57,6 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSplitter
 {
     /**
-     * Document access bridge.
-     */
-    @Inject
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * Plain text renderer used for rendering heading names.
-     */
-    @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainTextRenderer;
-
-    /**
-     * Document name serializer used for serializing document names into strings.
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
-     */
-    @Inject
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
-
-    /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
      */
     @Inject
@@ -93,47 +66,76 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * Used by {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor}.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Override
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
-        throws OfficeImporterException
+        OfficeDocumentSplitterParameters parameters) throws OfficeImporterException
     {
-        // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        String strBaseDoc = this.entityReferenceSerializer.serialize(baseDocumentReference);
+        ComponentManager componentManager = this.componentManagerProvider.get();
         Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
             new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
 
         // Create splitting and naming criterion for refactoring.
-        SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
-        NamingCriterion namingCriterion = DocumentSplitterUtils.getNamingCriterion(
-            namingCriterionHint, strBaseDoc, this.docBridge, this.plainTextRenderer);
+        SplittingCriterion splittingCriterion =
+            new HeadingLevelSplittingCriterion(parameters.getHeadingLevelsToSplit());
+        NamingCriterion namingCriterion;
+        try {
+            namingCriterion = componentManager.getInstance(NamingCriterion.class, parameters.getNamingCriterionHint());
+        } catch (ComponentLookupException e) {
+            throw new OfficeImporterException("Failed to create the naming criterion.", e);
+        }
+        namingCriterion.getParameters().setBaseDocumentReference(parameters.getBaseDocumentReference());
+        namingCriterion.getParameters().setUseTerminalPages(parameters.isUseTerminalPages());
 
         // Create the root document required by refactoring module.
-        WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
+        WikiDocument rootDoc =
+            new WikiDocument(parameters.getBaseDocumentReference(), officeDocument.getContentDocument(), null);
         List<WikiDocument> documents = this.documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
 
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
-            DocumentReference targetReference = this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
             TargetDocumentDescriptor targetDocumentDescriptor =
-                new TargetDocumentDescriptor(targetReference, this.componentManager);
+                new TargetDocumentDescriptor(doc.getDocumentReference(), componentManager);
             if (doc.getParent() != null) {
-                DocumentReference targetParent =
-                    this.currentMixedDocumentReferenceResolver.resolve(doc.getParent().getFullName());
-                targetDocumentDescriptor.setParentReference(targetParent);
+                targetDocumentDescriptor.setParentReference(doc.getParent().getDocumentReference());
             }
 
             // Rewire artifacts.
-            Set<File> artifactsFiles = DocumentSplitterUtils.relocateArtifacts(doc, officeDocument);
+            Map<String, OfficeDocumentArtifact> artifactsMap = relocateArtifacts(doc, officeDocument);
 
             // Create the resulting XDOMOfficeDocument.
-            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsFiles,
-                this.componentManager, officeDocument.getConverterResult());
+            XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifactsMap, componentManager,
+                officeDocument.getConverterResult());
             result.put(targetDocumentDescriptor, splitDocument);
         }
 
+        return result;
+    }
+
+    /**
+     * Copy artifacts (i.e. embedded images) from the original office document to a specific wiki document corresponding
+     * to a section. Only the artifacts from that section are copied.
+     * 
+     * @param sectionDoc the newly created wiki document corresponding to a section of the original office document
+     * @param officeDocument the office document being splitted into wiki documents
+     * @return the relocated artifacts
+     */
+    private Map<String, OfficeDocumentArtifact> relocateArtifacts(WikiDocument sectionDoc,
+        XDOMOfficeDocument officeDocument)
+    {
+        Map<String, OfficeDocumentArtifact> artifacts = officeDocument.getArtifactsMap();
+        Map<String, OfficeDocumentArtifact> result = new HashMap<>();
+        List<ImageBlock> imageBlocks =
+            sectionDoc.getXdom().getBlocks(new ClassBlockMatcher(ImageBlock.class), Axes.DESCENDANT);
+        for (ImageBlock imageBlock : imageBlocks) {
+            String imageReference = imageBlock.getReference().getReference();
+            OfficeDocumentArtifact artifact = artifacts.get(imageReference);
+            if (artifact != null) {
+                result.put(imageReference, artifact);
+            }
+        }
         return result;
     }
 }

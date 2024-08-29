@@ -1,25 +1,24 @@
 <!--
-  * See the NOTICE file distributed with this work for additional
-  * information regarding copyright ownership.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
-
- <!--
+<!--
   The LivedataLayout component is used to display formatted data to the user.
 
   There are several layout, which are defined by their unique id.
@@ -35,6 +34,9 @@
 -->
 <template>
   <div class="livedata-layout">
+    <p class="livedata-layout-description" :id="descriptionId" v-if="hasDescription">
+      {{ description }}
+    </p>
 
       <!--
         We are using the <keep-alive> tag in order to keep the layout mounted
@@ -47,6 +49,7 @@
         <component
           v-if="layoutComponent"
           :is="layoutComponent"
+          :aria-describedby="descriptionId"
         ></component>
       </keep-alive>
 
@@ -55,9 +58,13 @@
 
 
 <script>
+// We import explicitly the most used layout to avoid having to load it dynamically during the component rendering.
+import LayoutTable from "./table/LayoutTable.vue";
 export default {
 
   name: "LivedataLayout",
+  
+  components: { LayoutTable },
 
   inject: ["logic"],
 
@@ -76,6 +83,15 @@ export default {
 
   computed: {
     data () { return this.logic.data; },
+    description() {
+      return this.data?.meta?.description;
+    },
+    hasDescription() {
+      return this.description && this.description !== '';
+    },
+    descriptionId() {
+      return `${this.logic.data.id}-description`;
+    }
   },
 
 
@@ -149,8 +165,3 @@ export default {
 
 };
 </script>
-
-
-<style>
-
-</style>

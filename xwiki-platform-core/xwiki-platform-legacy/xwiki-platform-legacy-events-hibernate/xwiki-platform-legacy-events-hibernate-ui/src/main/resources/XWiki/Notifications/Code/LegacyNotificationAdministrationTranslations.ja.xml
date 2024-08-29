@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.LegacyNotificationAdministrationTranslations" locale="ja">
+  <web>XWiki.Notifications.Code</web>
+  <name>LegacyNotificationAdministrationTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>legacy.event.migration.description=XWikiは12.6にイベント（通知）の新しい保存に切り替えました。多くのイベントをもつ古いウィキでイベントをコピーするには長い時間がかかり、また、イベントの維持が常に望ましいとは限らないので、ウィキの管理者に委ねることにしました。それらに対処しないと、以前の通知が失われたように見えるかもしれません。マイグレーションはバックグラウンドで実行されます。
+legacy.event.count.store=標準保存のイベントの数
+legacy.event.count.legacy=レガシー保存のイベントの数
+legacy.event.migration.alltime=全期間
+legacy.event.migration.since=これ以降
+legacy.event.migration.start=マイグレーションを開始
+</content>
+</xwikidoc>

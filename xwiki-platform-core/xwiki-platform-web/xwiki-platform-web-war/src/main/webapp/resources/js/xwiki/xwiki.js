@@ -307,11 +307,12 @@ Object.extend(XWiki, {
    */
   makeRenderingErrorsExpandable: function(content) {
     $(content || 'body').select(".xwikirenderingerror").each(function(error) {
-        if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
+        var description = error.next(".xwikirenderingerrordescription");
+        if(description.innerHTML !== "" && description.hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
             error.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.error.readTechnicalInformation'))";
             Event.observe(error, "click", function(event){
-                   event.element().next().toggleClassName("hidden");
+                   event.element().closest(".xwikirenderingerror").next(".xwikirenderingerrordescription").toggleClassName("hidden");
             });
         }
     });
@@ -359,7 +360,7 @@ Object.extend(XWiki, {
                       }
                     }
                     return false;
-                  }
+                  };
                   if (!contains(values, "noopener")) {
                     values.push("noopener");
                   }
@@ -423,7 +424,9 @@ Object.extend(XWiki, {
                         'platform.core.rendering.noRendererForSectionEdit'));
                       editSectionLink.href = '#' + (node.id || '');
                   } else {
-                      editSectionLink.href = window.docediturl + "?section=" + sectionCount;
+                      // FIXME: Use the xwiki-meta module to get the form token when we switch to jQuery/RequireJS.
+                      var formToken = document.documentElement.getAttribute('data-xwiki-form-token');
+                      editSectionLink.href = window.docediturl + "?section=" + sectionCount + '&form_token=' + formToken;
                   }
 
                   node.appendChild(editSectionLink);
@@ -431,172 +434,6 @@ Object.extend(XWiki, {
               }
           }
       }
-  },
-
-  /**
-   * Display a modal box allowing to create the new document from a template when clicking on broken links.
-   *
-   * @param container where to look for broken links
-   */
-  insertCreatePageFromTemplateModalBoxes: function(container) {
-      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
-          XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
-              initialize : function($super, interactionParameters) {
-                  var content =  new Element('div', {'class': 'modal-popup'});
-                  content.insert(interactionParameters.content);
-                  $super(
-                          content,
-                          {
-                              "show"  : { method : this.showDialog,  keys : [] },
-                              "close" : { method : this.closeDialog, keys : ['Esc'] }
-                          },
-                          {
-                              displayCloseButton : true,
-                              verticalPosition : "center",
-                              backgroundColor : "#FFF"
-                          }
-                  );
-                  this.showDialog();
-                  this.setClass("createpage-modal-popup");
-              }
-          });
-
-          var spans = $(container || 'body').select("span.wikicreatelink:not(.skipCreatePagePopup)");
-          for (var i = 0; i < spans.length; i++) {
-              spans[i].down('a').observe('click', function(event) {
-                  // Remove the fragment identifier from the link URL.
-                  new Ajax.Request(event.findElement('a').href.replace(/#.*$/, ''), {
-                      method:'get',
-                      parameters: {
-                        xpage: 'createinline',
-                        ajax: 1
-                      },
-                      onSuccess: function(transport) {
-                          var redirect = transport.getHeader('redirect');
-                          if (redirect) {
-                            window.location = redirect;
-                          } else {
-                            // The create action actually loads some JS and CSS. This modal box needs them too, but we
-                            // load them on demand.
-                            // We display an notification while the browser fetch the resources/
-                            var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
-                            // Add the CSS
-                            var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css', 
-                              'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
-                            $(document.head).insert(newStyle);
-                            // Add the JS
-                            require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
-                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)"],
-                                    function($) {
-                                       // We are sure that the JS have been loaded, so we finally display
-                                       // the create popup
-                                       new XWiki.widgets.CreatePagePopup({content: transport.responseText});
-                                       notification.hide();
-                                    });
-                          }
-                      },
-                      onFailure: function() {
-                        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}).show();
-                      }
-                  });
-                  event.stop();
-              });
-          }
-      }
-  },
-
-  /**
-   * Watchlist methods.
-   * 
-   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not 
-   * break the retro-compatibility but we can consider removing it.
-   */
-  watchlist : {
-
-    /**
-     * Mapping between link IDs and associated actions.
-     */
-    actionsMap : {
-        'tmWatchDocument' : 'adddocument',
-        'tmUnwatchDocument' : 'removedocument',
-        'tmWatchSpace' : 'addspace',
-        'tmUnwatchSpace' : 'removespace',
-        'tmWatchWiki' : 'addwiki',
-        'tmUnwatchWiki' : 'removewiki'
-    },
-
-    /**
-     * Mapping allowing to know which action to display when a previous action has been executed.
-     */
-    flowMap : {
-        'tmWatchDocument' : 'tmUnwatchDocument',
-        'tmUnwatchDocument' : 'tmWatchDocument',
-        'tmWatchSpace' : 'tmUnwatchSpace',
-        'tmUnwatchSpace' : 'tmWatchSpace',
-        'tmWatchWiki' : 'tmUnwatchWiki',
-        'tmUnwatchWiki' : 'tmWatchWiki'
-    },
-
-    /**
-     * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
-     *
-     * @param element the element that fired the action.
-     */
-    executeAction : function(element) {
-        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
-        var myAjax = new Ajax.Request(
-          surl,
-          {
-            method: 'get',
-            onComplete: function() {
-              if (element.nodeName == 'A') {
-                element.up().toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
-              } else {
-                element.toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
-              }
-            }
-          });
-    },
-
-    /**
-     * Initialize watchlist UI.
-     */
-    initialize: function(container) {
-        container = $(container || 'body');
-        for (var button in XWiki.watchlist.actionsMap) {
-          var element = container.down('#' + button);
-          if (element) {
-            var self = this;
-
-            if (element.nodeName != 'A') {
-              element = $(button).down('A');
-            }
-            
-            if (!element) {
-              // This is supposed to happen every time since the watchlist icons are implemented in the notifications
-              // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a 
-              // custom solution (bootstrap-switch).
-              // For these reasons, we stop the initialization here.
-              // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
-              return;
-            }
-
-            // unregister previously registered handler if any
-            element.stopObserving('click');
-            element.observe('click', function(event) {
-                Event.stop(event);
-                var element = event.element();
-                while (element.id == '') {
-                    element = element.up();
-                }
-                XWiki.watchlist.executeAction(element);
-              });
-          }
-        }
-    }
   },
 
   cookies: {
@@ -668,33 +505,6 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Extracts the file name from the value of the specified file input.
-   */
-  extractFileName: function(fileInput) {
-    fileInput = $(fileInput);
-    if (fileInput.files && fileInput.files.length > 0) {
-      // Modern browsers provide additional information about the selected file(s).
-      return fileInput.files[0].name;
-    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
-      // Most browsers hide the real path for security reasons.
-      return fileInput.value.substr(12);
-    } else {
-      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
-      if (lastPathSeparatorIndex >= 0) {
-        // Unix-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
-      if (lastPathSeparatorIndex >= 0) {
-        // Windows-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      // The file input value is just the file name.
-      return fileInput.value;
-    }
-  },
-
-  /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
@@ -736,8 +546,6 @@ Object.extend(XWiki, {
     this.makeRenderingErrorsExpandable(container);
     this.fixLinksTargetAttribute(container);
     this.insertSectionEditLinks(container);
-    this.insertCreatePageFromTemplateModalBoxes(container);
-    this.watchlist.initialize(container);
     this.registerPanelToggle(container);
   }
 });
@@ -866,7 +674,7 @@ function rmClass(o, className){
  * @return
  */
 function openURL(url) {
-    win = open( url, "win", "titlebar=0,width=990,height=500,resizable,scrollbars");
+    var win = open( url, "win", "titlebar=0,width=990,height=500,resizable,scrollbars");
     if( win ) {
         win.focus();
     }
@@ -879,7 +687,7 @@ function openURL(url) {
  * @return
  */
 function openHelp() {
-    win = open( "http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/WebHome?xpage=print", "XWikiSyntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+    var win = open( "http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/WebHome?xpage=print", "XWikiSyntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
     if( win ) {
         win.focus();
     }
@@ -995,23 +803,22 @@ function prepareName(form) {
  * @param message Translated warning message.
  */
 function checkAdvancedContent(message) {
-    result = false;
     if (!document.forms.edit) {
         return true;
     }
-    data = document.forms.edit.content.value;
-    myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig")
-    results = data.match(myRE)
-    if (results&&results.length>0)
-        result = true;
 
-    myRE2 = new RegExp("(#(set|include|if|end|for)|#(#) Advanced content|public class|/\* Advanced content \*/)", "ig")
-    results = data.match(myRE2)
-    if (results&&results.length>0)
-        result = true;
+    var data = document.forms.edit.content.value;
+    var myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig");
+    var results = data.match(myRE);
+    var result = results && results.length;
 
-    if (result==true)
+    var myRE2 = new RegExp("(#(set|include|if|end|for)|#(#) Advanced content|public class|/\* Advanced content \*/)", "ig");
+    results = data.match(myRE2);
+    result = result || (results && results.length);
+
+    if (result) {
         return confirm(message);
+    }
 
     return true;
 }
@@ -1297,7 +1104,7 @@ function BrowserDetect() {
     this.isWin    = (ua.indexOf('win') != -1);
     this.isWin32  = (this.isWin && ( ua.indexOf('95') != -1 || ua.indexOf('98') != -1 || ua.indexOf('nt') != -1 || ua.indexOf('win32') != -1 || ua.indexOf('32bit') != -1 || ua.indexOf('xp') != -1) );
     this.isMac    = (ua.indexOf('mac') != -1);
-    this.isUnix   = (ua.indexOf('unix') != -1 || ua.indexOf('sunos') != -1 || ua.indexOf('bsd') != -1 || ua.indexOf('x11') != -1)
+    this.isUnix   = (ua.indexOf('unix') != -1 || ua.indexOf('sunos') != -1 || ua.indexOf('bsd') != -1 || ua.indexOf('x11') != -1);
     this.isLinux  = (ua.indexOf('linux') != -1);
 
     // specific browser shortcuts
@@ -1414,7 +1221,7 @@ XWiki.Document = Class.create({
       return encodeURIComponent(spaceSegment);
     }).join('/spaces/');
     url = url.replace("__space__", spaceSegments);
-    url = url.replace("__page__", this.page);
+    url = url.replace("__page__", encodeURIComponent(this.page));
     if (entity) {
       url += "/" + entity;
     }
@@ -1425,6 +1232,52 @@ XWiki.Document = Class.create({
   },
   getDocumentReference : function() {
     return this.documentReference;
+  }
+});
+XWiki.Attachment = Class.create({
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment('filename',
+   *            new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'))
+   */
+  initialize : function(filenameOrAttachmentReference, document) {
+    if (typeof filenameOrAttachmentReference === 'string') {
+      // The first argument is a filename.
+      this.filename = filenameOrAttachmentReference;
+      this.document = document;
+    } else {
+      // The first argument is an attachment reference (or it is null).
+      // We ignore the other argument since all the needed information is on the reference
+      this.initializeFromReference(filenameOrAttachmentReference);
+    }
+  },
+  /**
+   * Constructor.
+   *
+   * Example: new XWiki.Attachment(new XWiki.AttachmentReference('filename',
+   *            new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page')))
+   */
+  initializeFromReference : function(attachmentReference) {
+    this.filename = attachmentReference.name;
+    this.document = new XWiki.Document(attachmentReference.parent);
+  },
+  /**
+   * Gets a URL pointing to this attachment.
+   */
+  getURL : function(queryString, fragment) {
+    // Make sure to not have a double // in the computed URL for WebHome documents since that will fail on Tomcat by
+    // default.
+    var downloadURL = this.document.getURL('download');
+    var attachmentURL = downloadURL + (downloadURL.endsWith('/') ? 'WebHome/' : '/')
+        + encodeURIComponent(this.filename);
+    if (queryString) {
+      attachmentURL += '?' + queryString;
+    }
+    if (fragment) {
+      attachmentURL += '#' + fragment;
+    }
+    return attachmentURL;
   }
 });
 /* Initialize the document URL factory, and create XWiki.currentDocument.
@@ -1491,61 +1344,19 @@ XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
  * or pass it as the 'element' value of the memo of a 'xwiki:addBehavior:withTip' event.
  */
 (function(){
-  var placeholderPolyfill;
-  if ('placeholder' in document.createElement('input')) {
-    // For browsers that do support the 'placeholder' attribute, we just add support for the older way of supporting this through the 'withTip' classname and the default input value.
-    placeholderPolyfill = function(event) {
-      var item = event.memo.element;
-      if (item.placeholder === '') {
-        if (item.hasClassName('useTitleAsTip')) {
-          // The place-holder text is different than the initial (default) input value.
-          item.placeholder = item.title;
-        } else {
-          // Use the initial (default) input value as place-holder.
-          item.placeholder = item.defaultValue;
-          item.value = '';
-        }
-      }
-    }
-  } else {
-    // For browsers that don't support the 'placeholder' attribute, we simulate it with 'focus' and 'blur' event handlers.
-    var onFocus = function() {
-      var empty = this.hasClassName('empty');
-      this.removeClassName('empty');
-      if (empty) {
-        this.value = '';
+  var placeholderPolyfill = function(event) {
+    var item = event.memo.element;
+    if (item.placeholder === '') {
+      if (item.hasClassName('useTitleAsTip')) {
+        // The place-holder text is different than the initial (default) input value.
+        item.placeholder = item.title;
       } else {
-        this.select();
+        // Use the initial (default) input value as place-holder.
+        item.placeholder = item.defaultValue;
+        item.value = '';
       }
     }
-    var onBlur = function() {
-      if (this.value == '') {
-        this.value = this.defaultValue;
-        this.addClassName('empty');
-      }
-    }
-    placeholderPolyfill = function(event) {
-      var item = event.memo.element;
-      // Backup the initial input value because IE resets it when the default value is set.
-      var initialValue = item.value;
-      if (item.readAttribute('placeholder')) {
-        item.defaultValue = item.readAttribute('placeholder');
-      } else if (item.hasClassName('useTitleAsTip')) {
-        item.defaultValue = item.title;
-      }
-      // Restore the initial input value;
-      item.value = initialValue;
-      if (item.value == item.defaultValue) {
-        // The 'empty' CSS class has two functions:
-        // * display the placeholder value with a different color
-        // * distinguish between the case when the user has left the input empty and the case when he typed exactly the
-        //   default value (which should be valid).
-        item.addClassName('empty');
-      }
-      item.observe('focus', onFocus.bindAsEventListener(item));
-      item.observe('blur', onBlur.bindAsEventListener(item));
-    }
-  }
+  };
   document.observe('xwiki:addBehavior:withTip', placeholderPolyfill);
   document.observe('xwiki:dom:loaded', function() {
     $$("input.withTip", "textarea.withTip", "[placeholder]").each(function(item) {
@@ -1628,7 +1439,7 @@ document.observe('xwiki:dom:loaded', function() {
                 options.script = options.script(item);
               }
               // Create the Suggest.
-              var suggest = new XWiki.widgets.Suggest(item, options);
+              new XWiki.widgets.Suggest(item, options);
               item.addClassName('initialized');
             }
           })});
@@ -1745,7 +1556,7 @@ document.observe('xwiki:dom:loaded', function() {
       if (event.element().descendantOf && !event.element().descendantOf(parentInputSection) && event.element() != parentInputSection && event.element() != editParentTrigger) {
         hideParentSection();
       }
-    })
+    });
   }
 });
 }
@@ -1779,11 +1590,9 @@ document.observe("xwiki:dom:loaded", function() {
         }
       }
     });
-    if (!browser.isIE6x) { // IE6 is too dumb to be supported
-      Event.observe(window, 'scroll', handleScroll);
-      // Make sure the annotations settings panel shows up in the right place
-      document.observe('xwiki:annotations:settings:loaded', handleScroll);
-    }
+    Event.observe(window, 'scroll', handleScroll);
+    // Make sure the annotations settings panel shows up in the right place
+    document.observe('xwiki:annotations:settings:loaded', handleScroll);
   }
 
   /**
@@ -1792,7 +1601,7 @@ document.observe("xwiki:dom:loaded", function() {
   function handleScroll() {
     var menuExtras = $$('.annotationsettings');
     var extraHeight = 0;
-    if (menuExtras && menuExtras.size() > 0) {
+    if (menuExtras && menuExtras.length) {
       menu.__fm_extra = menuExtras[0];
       createGhost(menu.__fm_extra);
       extraHeight = menu.__fm_extra.getHeight();
@@ -1861,4 +1670,212 @@ document.observe("xwiki:dom:loaded", function() {
       element.__fm_ghost.hide();
     }
   }
+});
+
+/**
+ * Intercept asynchronous HTTP requests and look for the custom X-XWIKI-HTML-HEAD and X-XWIKI-HTML-SCRIPTS response
+ * headers that are used by the server to extend the page HTML head asynchronously.
+ */
+ (function() {
+  /**
+   * Collect the URLs of all the external stylesheets an JavaScript files that are already loaded (or in the process of
+   * being loaded) because their associated tag is in the DOM.
+   */
+  var getLoadedResources = function() {
+    var resources = [];
+    [...document.querySelectorAll('link[href], script[src]')].forEach(function(resource) {
+      resources.push(resource.getAttribute('href') || resource.getAttribute('src'))
+    });
+    return resources;
+  };
+
+  /**
+   * Injects the given HTML into the page head after removing the stylesheets and JavaScript files that are already
+   * present in the page head (othewise they may be loaded again).
+   *
+   * @param {String} html the HTML to extend the page head with
+   */
+  var extendPageHead = function(html) {
+    var loadedResources;
+    // Force the execution of script tags when adding them dynamically, since inserting via innerHTML will not trigger
+    // it.
+    var range = document.createRange();
+    range.setStart(document.head, 0);
+    var contentToInject = range.createContextualFragment(html);
+    // Inject only the resources that are not already loaded.
+    [...contentToInject.querySelectorAll('link[href], script[src]')].forEach(function(resource) {
+      if (!loadedResources) {
+        loadedResources = getLoadedResources();
+      }
+      var url = resource.getAttribute('href') || resource.getAttribute('src');
+      if(loadedResources.indexOf(url) < 0) {
+        if (resource.getAttribute('src') && !resource.hasAttribute('async')) {
+          // Scripts that are dynamically created and added to the document are async by default, which means there are
+          // no guarantees they will execute in the same order they were added.
+          // See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#compatibility_notes
+          resource.async = false;
+        }
+        document.head.appendChild(resource);
+      }
+    });
+  };
+
+  /**
+   * Handles some of XWiki's custom HTTP response headers.
+   *
+   * @param {Function} getHeader the function that can be used to access the response headers
+   */
+  var handleResponseHeaders = function(getHeader) {
+    extendPageHead(getHeader('X-XWIKI-HTML-HEAD'));
+    // Preserve the behavior from async.js where the scripts were injected after the response body was injected. The
+    // delayed execution allows other request listeners (including the one from async.js) to be called before the
+    // scripts are injected (because in-line scripts may look up the HTML elements from the response body right away so
+    // the response body needs to be injected before).
+    setTimeout(function() {
+      extendPageHead(getHeader('X-XWIKI-HTML-SCRIPTS'));
+    }, 0);
+  };
+
+  /**
+   * Overwrite the XMLHttpRequest#open() method in order to inject the form token and to add our load listener on all
+   * requests made from this page.
+   */
+  var interceptXMLHttpRequest = function() {
+    var originalOpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function() {
+      this.addEventListener('load', function() {
+        handleResponseHeaders(this.getResponseHeader.bind(this));
+      });
+      const result = originalOpen.apply(this, arguments);
+      // Send the form token on same-origin requests only to prevent leaking the token to third-parties.
+      if (arguments.length >= 2 && window.location.origin === (new URL(arguments[1], window.location.href)).origin) {
+        // Make sure this is really safe in case this should be called in some unexpected situation.
+        const formToken = document?.documentElement?.dataset?.xwikiFormToken;
+        if (formToken) {
+          this.setRequestHeader("XWiki-Form-Token", formToken);
+        }
+      }
+      return result;
+    };
+  };
+
+  /**
+   * Overwrite the fetch function in order to inject the form token and add our own response callback on all fetch
+   * requests made from this page.
+   */
+  var interceptFetch = function() {
+    var originalFetch = window.fetch;
+    if (originalFetch) {
+      window.fetch = function() {
+        // Inject the form token.
+        let modifiedArguments = arguments;
+        // Make sure this is really safe in case this should be called in some unexpected situation.
+        const formToken = document?.documentElement?.dataset?.xwikiFormToken;
+        if (formToken) {
+          let request = null;
+          // Convert the arguments to a request, as Request expects the same arguments as fetch() but provides
+          // convenient ways to modify the headers (and fetch accepts a request as parameter).
+          if (arguments.length === 1 && arguments[0] instanceof Request) {
+            request = arguments[0];
+          } else if (arguments.length) {
+            request = new Request(...arguments);
+          }
+          // Only handle expected cases and same-origin requests to prevent leaking the token to third-parties,
+          // leave the arguments alone otherwise.
+          if (request !== null && window.location.origin === (new URL(request.url, window.location.href).origin)) {
+            request.headers.append("XWiki-Form-Token", formToken);
+            modifiedArguments = [request];
+          }
+        }
+        return originalFetch.apply(this, modifiedArguments).then(function(response) {
+          handleResponseHeaders(response.headers.get.bind(response.headers));
+          return response;
+        });
+      };
+    }
+  };
+
+  // Intercept right away, as early as possible, in order to be sure we catch all requests.
+  interceptXMLHttpRequest();
+  interceptFetch();
+})();
+
+/**
+ * Initializes the submit-once protection on the current page. Search for all form elements with a 'xwiki-submit-once'
+ * class on the document (or on an updated sub-part of the dom). For each form, once the form is submitted, disable all
+ * submit buttons. Note that currently we are expecting the form to be submitted without client side validation. It is
+ * not advised to add the xwiki-submit-once class on forms with client side validation. Also, note that the value of
+ * the disabled buttons will not be sent server side. Therefore, it is not advised to use the 'xwiki-submit-once' class
+ * when this value is required.
+ *
+ *  @since 14.10.18
+ *  @since 15.5.3
+ *  @since 15.8
+ */
+require(['jquery'], ($) => {
+  /**
+   * Initializes the root element by adding event listeners to all forms with the class 'xwiki-submit-once'.
+   * When a form is submitted, re-submission is prevented by disabling all submit buttons.
+   *
+   * @param {Element} rootElement - The root element where the forms are located
+   */
+  function init(rootElement) {
+    $(rootElement)
+      .find('form.xwiki-submit-once')
+      .off('submit.xwiki-submit-once')
+      .on('submit.xwiki-submit-once', (e) => {
+        // Prevents re-submission by disabling all buttons of the form.
+        $(e.target).find('input[type="submit"], input[type="image"], button[type="submit"]').prop('disabled', true);
+      });
+  }
+
+  $(document).on('xwiki:dom:updated', (event, data) => {
+    const containers = data?.elements || [document.documentElement];
+    containers.forEach(init);
+  });
+  $(() => init(document.documentElement));
+});
+
+require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
+    function init(rootElement) {
+        if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
+            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
+        }
+    }
+
+    function loadCreateModal(event) {
+        event.preventDefault();
+        let linkElement = $(this);
+        let link = linkElement.attr('href').replace(/#.*$/, '');
+        // FIXME: we should load translation another way
+        let notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
+        $.get(link, {
+            'xpage': 'createinline',
+            'ajax': 1,
+            'form_token': xm.form_token
+        }).done(function (data, status, jqXHR) {
+            let redirect = jqXHR.getResponseHeader('redirect');
+            if (redirect) {
+                window.location = redirect;
+            } else {
+                let createModalContainer = $('#createModalContainer');
+                if (createModalContainer.length === 0) {
+                    createModalContainer = $('<div id="createModalContainer">');
+                    $('body').append(createModalContainer);
+                }
+                createModalContainer.html(data);
+                $(document).trigger('xwiki:dom:updated', {'elements': createModalContainer.toArray()});
+                createModalContainer.find('.modal').modal('show');
+                notification.hide();
+            }
+        }).fail(function (data) {
+            notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}));
+        })
+    }
+
+    $(document).on('xwiki:dom:updated', (event, data) => {
+        const containers = data?.elements || [document.documentElement];
+        containers.forEach(init);
+    });
+    $(() => init(document.documentElement));
 });

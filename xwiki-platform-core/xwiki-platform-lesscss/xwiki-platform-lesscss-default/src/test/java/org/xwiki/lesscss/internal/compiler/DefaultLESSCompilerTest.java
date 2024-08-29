@@ -50,7 +50,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -173,7 +173,7 @@ public class DefaultLESSCompilerTest
                 mocker.getComponentUnderTest().compile(lessResourceReference, false, false, "skin", true));
 
         // Verify that the cache is disabled
-        verifyZeroInteractions(cache);
+        verifyNoInteractions(cache);
     }
 
     @Test

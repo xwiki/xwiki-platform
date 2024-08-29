@@ -26,8 +26,11 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -51,9 +54,9 @@ import com.xpn.xwiki.web.Utils;
  * <p>
  * The API provides a method {@link SkinExtensionPluginApi#use(String)}, which, when called, marks an extension as used
  * in the current result. Later on, all the used extensions are inserted in the content, by replacing the first
- * occurrence of the following string: <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>, where the actual extension
+ * occurrence of the following string: {@code <!-- canonical.plugin.classname -->}, where the actual extension
  * type classname is used. For example, JS extensions are inserted in place of
- * <tt>&lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;</tt>.
+ * {@code <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->}.
  * </p>
  *
  * @see SkinExtensionPluginApi
@@ -66,12 +69,33 @@ import com.xpn.xwiki.web.Utils;
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin implements RenderingCacheAware
 {
     /**
+     * The name of the preference (in the configuration file) specifying what is the default value of the defer, in case
+     * nothing is specified in the parameters of this extension.
+     *
+     * @since 14.1RC1
+     */
+    public static final String DEFER_DEFAULT_PARAM = "xwiki.plugins.skinx.deferred.default";
+
+    /**
      * The URL delimiter part of query parameters.
+     *
+     * @since 11.6RC1
+     * @since 11.3.2
      */
     protected static final String QUERY_PARAMETER_DELIMITER = "?";
 
+    /**
+     * The separator between parameters.
+     *
+     * @since 14.1RC1
+     */
+    static final String PARAMETER_SEPARATOR = "&";
+
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
+
+    /** Parameter name force skin action. */
+    private static final String FORCE_SKIN_ACTION = "forceSkinAction";
 
     /** The name of the context key for the list of pulled extensions. */
     protected final String contextKey = this.getClass().getCanonicalName();
@@ -139,8 +163,8 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * Returns the list of always used extensions of this type. Which resources are always used depends on the type of
-     * resource, for example document based StyleSheet extensions have a property in the object, <tt>use</tt>, which can
-     * have the value <tt>always</tt> to declare that an extension should always be used.
+     * resource, for example document based StyleSheet extensions have a property in the object, {@code use}, which can
+     * have the value {@code always} to declare that an extension should always be used.
      *
      * @param context The current request context.
      * @return A set of resource names that should be pulled in the current response. Note that this method is called
@@ -150,7 +174,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * Determines if the requested document contains on page skin extension objects of this type. True if at least one
-     * of the extension objects has the <tt>currentPage</tt> value for the <tt>use</tt> property.
+     * of the extension objects has the {@code currentPage} value for the {@code use} property.
      *
      * @param context the current request context
      * @return a boolean specifying if the current document contains on page skin extensions
@@ -161,6 +185,32 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SkinExtensionPluginApi((AbstractSkinExtensionPlugin) plugin, context);
+    }
+
+    /**
+     * @param filename The name of the file to get the URL for.
+     * @param context The current request context.
+     * @return The (unescaped) URL of the skin file.
+     * @since 14.1RC1
+     */
+    String getSkinFileURL(String filename, XWikiContext context)
+    {
+        boolean forceSkinAction = BooleanUtils.toBoolean((Boolean) getParameter(FORCE_SKIN_ACTION, filename,
+            context));
+
+        StringBuilder url = new StringBuilder(context.getWiki().getSkinFile(filename, forceSkinAction, context));
+        if (forceSkinAction) {
+            String parameters =
+                StringUtils.removeStart(parametersAsQueryString(filename, context), PARAMETER_SEPARATOR);
+            if (!StringUtils.isEmpty(parameters)) {
+                String queryParamDelimiter =
+                    StringUtils.contains(url, QUERY_PARAMETER_DELIMITER) ? PARAMETER_SEPARATOR
+                        : QUERY_PARAMETER_DELIMITER;
+                url.append(queryParamDelimiter).append(parameters);
+            }
+        }
+
+        return url.toString();
     }
 
     private void useResource(String resource, XWikiContext context)
@@ -179,14 +229,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      */
     public void use(String resource, XWikiContext context)
     {
-        useResource(resource, context);
-
-        // In case a previous call added some parameters, remove them, since the last call for a resource always
-        // discards previous ones.
-        getParametersMap(context).remove(resource);
-
-        // Register the use of the resource in case the current execution is an asynchronous renderer
-        getSkinExtensionAsync().use(getName(), resource, null);
+        use(resource, null, context);
     }
 
     /**
@@ -206,8 +249,14 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     {
         useResource(resource, context);
 
-        // Associate parameters to the resource
-        getParametersMap(context).put(resource, parameters);
+        // In case a previous call added some parameters, remove them, since the last call for a resource always
+        // discards previous ones.
+        if (parameters == null) {
+            getParametersMap(context).remove(resource);
+        } else {
+            // Associate parameters to the resource
+            getParametersMap(context).put(resource, parameters);
+        }
 
         getSkinExtensionAsync().use(getName(), resource, parameters);
     }
@@ -331,8 +380,8 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * This method converts the parameters for an extension to a query string that can be used with
      * {@link com.xpn.xwiki.doc.XWikiDocument#getURL(String, String, String, XWikiContext) getURL()} and printed in the
-     * XHTML result. The parameters separator is the escaped &amp;amp;. The query string already starts with an
-     * &amp;amp; if at least one parameter exists.
+     * XHTML result. The parameters separator is the escaped &amp;. The query string already starts with an
+     * &amp; if at least one parameter exists.
      *
      * @param resource The pulled resource whose parameters should be converted.
      * @param context The current request context.
@@ -344,17 +393,17 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         StringBuilder query = new StringBuilder();
         for (Entry<String, Object> parameter : parameters.entrySet()) {
             // Skip the parameter that forces the file extensions to be sent through the /skin/ action
-            if ("forceSkinAction".equals(parameter.getKey())) {
+            if (FORCE_SKIN_ACTION.equals(parameter.getKey())) {
                 continue;
             }
-            query.append("&amp;");
+            query.append(PARAMETER_SEPARATOR);
             query.append(sanitize(parameter.getKey()));
             query.append("=");
-            query.append(sanitize(parameter.getValue().toString()));
+            query.append(sanitize(Objects.toString(parameter.getValue(), "")));
         }
         // If the main page is requested unminified, also send unminified extensions
         if ("false".equals(context.getRequest().getParameter("minify"))) {
-            query.append("&amp;minify=false");
+            query.append("&minify=false");
         }
         return query.toString();
     }
@@ -382,7 +431,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * {@inheritDoc}
      * <p>
      * At the end of the request, insert the links to the pulled resources in the response, in the place marked by an
-     * XML comment of the format <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>.
+     * XML comment of the format {@code <!-- canonical.plugin.classname -->}.
      * </p>
      *
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endParsing(String, XWikiContext)
@@ -443,5 +492,21 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
         }
 
         return this.async;
+    }
+
+    /**
+     * If the loading of given JavaScript script shall be deferred.
+     *
+     * @param name Name of the script to be loaded (page, file or resource name).
+     * @param context The context to get the parameter from.
+     * @return If the loading shall be deferred, defaults to the preference in the configuration file, which defaults
+     * to true.
+     * @since 14.1RC1
+     */
+    boolean isDefer(String name, XWikiContext context)
+    {
+        String defaultDeferString = context.getWiki().Param(DEFER_DEFAULT_PARAM);
+        boolean defaultDefer = StringUtils.isEmpty(defaultDeferString) || Boolean.parseBoolean(defaultDeferString);
+        return BooleanUtils.toBooleanDefaultIfNull((Boolean) getParameter("defer", name, context), defaultDefer);
     }
 }

@@ -1,0 +1,138 @@
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.# Test captioned images with style attributes.
+.#-----------------------------------------------------
+[[Caption1>>image:my.png]]
+
+[[Caption2>>image:my.png||data-xwiki-image-style="style1"]]
+
+[[Caption3>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px; width: 20px;" %)
+[[Caption4>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px; width: 200px;" %)
+[[Caption5>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px; width: 200px" %)
+[[Caption6>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px;" %)
+[[Caption6>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px" %)
+[[Caption7>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px" %)
+[[Caption8>>image:my.png||height="100"]]
+.#-----------------------------------------------------
+.expect|xwiki/2.1
+.#-----------------------------------------------------
+[[Caption1>>image:my.png]]
+
+[[Caption2>>image:my.png||data-xwiki-image-style="style1"]]
+
+[[Caption3>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px; width: 20px;" %)
+[[Caption4>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px;" %)
+[[Caption5>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px;" %)
+[[Caption6>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px;" %)
+[[Caption6>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px;" %)
+[[Caption7>>image:my.png||width="200" height="100"]]
+
+(% style="border: 1px" %)
+[[Caption8>>image:my.png||height="100"]]
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginFigure [[class]=[image]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png]
+beginFigureCaption
+beginParagraph
+onWord [Caption1]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image]]
+beginFigure [[class]=[image][data-xwiki-image-style]=[style1]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-1] [[data-xwiki-image-style]=[style1]]
+beginFigureCaption
+beginParagraph
+onWord [Caption2]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][data-xwiki-image-style]=[style1]]
+beginFigure [[class]=[image][style]=[width: 200px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-2] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption3]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[width: 200px;]]
+beginFigure [[class]=[image][style]=[border: 1px; width: 20px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-3] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption4]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 20px;]]
+beginFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-4] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption5]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+beginFigure [[class]=[image][style]=[border: 1px; width: 200px]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-5] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption6]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 200px]]
+beginFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-6] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption6]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+beginFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-7] [[height]=[100][width]=[200]]
+beginFigureCaption
+beginParagraph
+onWord [Caption7]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px; width: 200px;]]
+beginFigure [[class]=[image][style]=[border: 1px]]
+onImage [Typed = [false] Type = [url] Reference = [my.png]] [false] [Imy.png-8] [[height]=[100]]
+beginFigureCaption
+beginParagraph
+onWord [Caption8]
+endParagraph
+endFigureCaption
+endFigure [[class]=[image][style]=[border: 1px]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<img src="my.png" id="Imy.png" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption1</p></div><img src="my.png" data-xwiki-image-style="style1" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption2</p></div><img src="my.png" width="200" height="100" id="Imy.png-2" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption3</p></div><img src="my.png" width="200" height="100" id="Imy.png-3" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption4</p></div><img src="my.png" width="200" height="100" id="Imy.png-4" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption5</p></div><img src="my.png" width="200" height="100" id="Imy.png-5" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption6</p></div><img src="my.png" width="200" height="100" id="Imy.png-6" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption6</p></div><img src="my.png" width="200" height="100" id="Imy.png-7" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption7</p></div><img src="my.png" height="100" id="Imy.png-8" class="wikigeneratedid" alt="my.png"/><div class="figcaption"><p>Caption8</p></div>
+.#-----------------------------------------------------
+.expect|html/5.0
+.#-----------------------------------------------------
+<figure class="image"><img src="my.png" id="Imy.png" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption1</p></figcaption></figure><figure class="image" data-xwiki-image-style="style1"><img src="my.png" data-xwiki-image-style="style1" id="Imy.png-1" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption2</p></figcaption></figure><figure class="image" style="width: 200px;"><img src="my.png" width="200" height="100" id="Imy.png-2" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption3</p></figcaption></figure><figure style="border: 1px; width: 20px;" class="image"><img src="my.png" width="200" height="100" id="Imy.png-3" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption4</p></figcaption></figure><figure style="border: 1px; width: 200px;" class="image"><img src="my.png" width="200" height="100" id="Imy.png-4" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption5</p></figcaption></figure><figure style="border: 1px; width: 200px" class="image"><img src="my.png" width="200" height="100" id="Imy.png-5" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption6</p></figcaption></figure><figure style="border: 1px; width: 200px;" class="image"><img src="my.png" width="200" height="100" id="Imy.png-6" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption6</p></figcaption></figure><figure style="border: 1px; width: 200px;" class="image"><img src="my.png" width="200" height="100" id="Imy.png-7" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption7</p></figcaption></figure><figure style="border: 1px" class="image"><img src="my.png" height="100" id="Imy.png-8" class="wikigeneratedid" alt="my.png"/><figcaption><p>Caption8</p></figcaption></figure>

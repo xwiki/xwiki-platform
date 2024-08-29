@@ -69,8 +69,8 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13, XARFilterUtils.ROLEHINT_12,
-    XARFilterUtils.ROLEHINT_11})
+@Component(hints = {XARFilterUtils.ROLEHINT_15, XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13,
+    XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter
 {
@@ -329,9 +329,13 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 this.writer.writeElement(XarDocumentModel.ELEMENT_PARENT,
                     toString((EntityReference) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT)));
             }
-            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
-                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_AUTHOR,
-                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_EFFECTIVEMEDATAAUTHOR,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_REVISION_ORIGINALMEDATAAUTHOR,
+                    (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR));
             }
             if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CUSTOMCLASS)) {
                 this.writer.writeElement(XarDocumentModel.ELEMENT_CUSTOMCLASS,
@@ -721,7 +725,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                     this.localSerializer.serialize(this.currentDocumentReference));
             }
             this.writer.writeElement(XARObjectModel.ELEMENT_NUMBER,
-                toString((Integer) parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
+                toString(parameters.get(WikiObjectFilter.PARAMETER_NUMBER)));
             this.writer.writeElement(XARObjectModel.ELEMENT_CLASSNAME, this.currentObjectClass);
 
             if (parameters.containsKey(WikiObjectFilter.PARAMETER_GUID)) {

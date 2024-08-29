@@ -16,14 +16,13 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
-
+-->
 
 <!--
-  LivedataEntrySelectorAll component allow the user to select
-  all the entry of the Livedata.
-  By default, it only select all the entries on the current page.
-  It comes with a dropdown that allow to select entries more globally:
+  the LivedataEntrySelectorAll component allows the user to select
+  all the entries of the Livedata.
+  By default, it only selects all the entries on the current page.
+  It comes with a dropdown that allows selecting entries more globally:
   - select entries matching current configuration
   - TODO: select all entries of the Livedata
 

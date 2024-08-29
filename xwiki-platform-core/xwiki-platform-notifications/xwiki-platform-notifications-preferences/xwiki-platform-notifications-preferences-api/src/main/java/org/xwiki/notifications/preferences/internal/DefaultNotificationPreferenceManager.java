@@ -44,6 +44,8 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProvider;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
  * This is the default implementation of {@link NotificationPreferenceManager}.
@@ -57,13 +59,17 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
 {
     @Inject
     @Named("cached")
-    private ModelBridge cachedModelBridge;
+    private NotificationPreferenceModelBridge cachedNotificationPreferenceModelBridge;
 
     @Inject
     private ComponentManager componentManager;
 
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     private List<NotificationPreferenceProvider> getProviders() throws NotificationException
     {
@@ -135,7 +141,7 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
     @Override
     public void setStartDateForUser(DocumentReference user, Date startDate) throws NotificationException
     {
-        cachedModelBridge.setStartDateForUser(user, startDate);
+        cachedNotificationPreferenceModelBridge.setStartDateForUser(user, startDate);
     }
 
     @Override
@@ -172,5 +178,13 @@ public class DefaultNotificationPreferenceManager implements NotificationPrefere
                         providerHint, e);
             }
         }
+    }
+
+    @Override
+    public String getNotificationGroupingStrategy(UserReference userReference, String target)
+        throws NotificationException
+    {
+        return this.cachedNotificationPreferenceModelBridge
+            .getEventGroupingStrategyHint(this.userReferenceSerializer.serialize(userReference), target);
     }
 }

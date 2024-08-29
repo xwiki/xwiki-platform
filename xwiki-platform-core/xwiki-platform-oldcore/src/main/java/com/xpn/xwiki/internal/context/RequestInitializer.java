@@ -23,10 +23,13 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -110,12 +113,21 @@ public class RequestInitializer
      * @param contextStore the enabled context elements
      * @param xcontext the XWiki context
      */
+    @SuppressWarnings("unchecked")
     public void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
     {
         URL url = restoreURL(storedWikiId, contextStore, xcontext);
 
         Map<String, String[]> parameters =
             (Map<String, String[]>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_PARAMETERS);
+        Map<String, List<String>> headers =
+            (Map<String, List<String>>) contextStore.get(XWikiContextContextStore.PROP_REQUEST_HEADERS);
+        Cookie[] cookies = (Cookie[]) contextStore.get(XWikiContextContextStore.PROP_REQUEST_COOKIES);
+        String remoteAddr = (String) contextStore.get(XWikiContextContextStore.PROP_REQUEST_REMOTE_ADDR);
+
+        SerializableHttpSessionWrapper sessionWrapper =
+            (SerializableHttpSessionWrapper) contextStore.get(XWikiContextContextStore.PROP_REQUEST_SESSION);
+        HttpSession session = sessionWrapper != null ? sessionWrapper.getSession() : null;
 
         boolean daemon;
 
@@ -133,6 +145,15 @@ public class RequestInitializer
                 if (parameters == null) {
                     parameters = request.getParameterMap();
                 }
+                if (cookies == null) {
+                    cookies = request.getCookies();
+                }
+                if (remoteAddr == null) {
+                    remoteAddr = request.getRemoteAddr();
+                }
+                if (session == null) {
+                    session = request.getSession();
+                }
             }
 
             // We don't want to take into account the context request URL when generating URLs
@@ -147,17 +168,18 @@ public class RequestInitializer
 
         // Set the context request
         if (url != null) {
-            restoreRequest(url, contextPath, parameters, daemon, xcontext);
+            XWikiServletRequestStub stubRequest = new XWikiServletRequestStub.Builder().setRequestURL(url)
+                .setContextPath(contextPath).setRequestParameters(parameters).setHeaders(headers).setCookies(cookies)
+                .setRemoteAddr(remoteAddr).setHttpSession(session).build();
+            // Indicate that the URL should be taken into account when generating a URL.
+            stubRequest.setDaemon(daemon);
+            restoreRequest(url, stubRequest, xcontext);
         }
     }
 
-    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, boolean daemon,
-        XWikiContext xcontext)
+    private void restoreRequest(URL url, XWikiServletRequestStub stubRequest, XWikiContext xcontext)
     {
-        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters);
         xcontext.setRequest(stubRequest);
-        // Indicate that the URL should be taken into account when generating a URL
-        stubRequest.setDaemon(daemon);
         this.container.setRequest(new ServletRequest(stubRequest));
 
         // Update to create the URL factory
@@ -167,5 +189,7 @@ public class RequestInitializer
             xcontext.setURLFactory(urlFactory);
         }
         urlFactory.init(xcontext);
+
+        xcontext.setURL(url);
     }
 }

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="">
+<xwikidoc version="1.5" reference="XWiki.OfficeImporterTranslations" locale="">
   <web>XWiki</web>
   <name>OfficeImporterTranslations</name>
   <language/>
@@ -38,8 +38,22 @@
   <hidden>true</hidden>
   <content>office.createForm.type.name=Page from Office
 office.createForm.type.description=Import Office documents into wiki pages
+
 office.form.error.noDocument=You must use the {0}create action{1} to import an Office document.
-office.form.append.hint=The document already exists! Append the result to the existing wiki page
+
+office.import.document.hint=Select the office document to import.
+office.import.target.hint=The page where the content of the office document will be imported.
+office.import.overwriteContent=Overwrite existing content
+office.import.overwriteContent.hint=The target page already exists. You can either overwrite its content or append to the existing content.
+office.import.overwriteContent.confirmationMessage=Are you sure you want to overwrite the content of the target page?
+office.import.overwriteContent.confirmationAction=Overwrite
+office.import.headingLevelsToSplit.hint=Import the selected heading levels and their corresponding sections in separate child pages, linked from the parent page.
+office.import.childPagesNaming.hint=Choose how to name the child pages created when the imported content is split.
+office.import.terminalChildPages=Terminal Child Pages
+office.import.terminalChildPages.hint=Advanced: Make the created child pages terminal. Terminal pages can't have children and are generally used in applications, development or in older versions of XWiki.
+office.import.inProgress=Importing office document...
+office.import.done=Office document imported
+office.import.failed=Office import failed
 
 office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).
 office.config.serverPort.hint=The port number used for connecting to the Office server instance
@@ -48,7 +62,18 @@ office.config.serverPath.hint=The path to the Office installation
 office.config.serverState.connected=Connected
 office.config.serverState.notConnected=Not Connected
 office.config.serverState.confError=Invalid Configuration
-office.config.serverState.error=Error</content>
+office.config.serverState.error=Error
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 14.10.2, 15.0RC1
+#######################################
+office.form.append.hint=The document already exists! Append the result to the existing wiki page
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
   <object>
     <name>XWiki.OfficeImporterTranslations</name>
     <number>0</number>
@@ -67,6 +92,8 @@ office.config.serverState.error=Error</content>
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

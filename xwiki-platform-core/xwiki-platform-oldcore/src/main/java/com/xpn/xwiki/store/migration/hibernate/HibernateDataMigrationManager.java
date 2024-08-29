@@ -23,6 +23,7 @@ package com.xpn.xwiki.store.migration.hibernate;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -40,7 +41,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.internal.store.hibernate.MigrationResourceAccessor;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -55,6 +55,7 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
+import liquibase.sdk.resource.MockResourceAccessor;
 
 /**
  * Migration manager for hibernate store.
@@ -72,6 +73,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      * contains at least one valid liquibase XML definition.
      */
     private static final String LIQUIBASE_RESOURCE = "liquibase-xwiki/";
+
+    /**
+     * Name for which the change log is served.
+     */
+    public static final String CHANGELOG_NAME = "liquibase.xml";
 
     /**
      * @return store system for execute store-specific actions.
@@ -209,76 +215,71 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     }
 
     /**
-     * Get agregated liquibase change logs from a set of migration.
-     *
-     * @param migrations the set of migration to visit
-     * @param preHibernate if true, get pre-hibernate schema update changelogs.
-     * @return retrieved change logs
-     * @throws DataMigrationException if an issue occurs in a migrator during retrieval of a change log
-     * @since 4.3
-     */
-    private String getLiquibaseChangeLogs(Collection<XWikiMigration> migrations, boolean preHibernate)
-        throws DataMigrationException
-    {
-        StringBuilder changeLogs = new StringBuilder(10000);
-        if (migrations != null) {
-            for (XWikiMigration migration : migrations) {
-                if (migration.dataMigration instanceof HibernateDataMigration) {
-                    String changeLog;
-                    if (preHibernate) {
-                        changeLog =
-                            ((HibernateDataMigration) migration.dataMigration).getPreHibernateLiquibaseChangeLog();
-                    } else {
-                        changeLog = ((HibernateDataMigration) migration.dataMigration).getLiquibaseChangeLog();
-                    }
-                    if (changeLog != null) {
-                        changeLogs.append(changeLog);
-                    }
-                }
-            }
-        }
-
-        if (!preHibernate) {
-            // Add liquibase changes from resources if any
-            try {
-                if (getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements()) {
-                    changeLogs.append("<includeAll path=\"").append(LIQUIBASE_RESOURCE).append("\"/>");
-                }
-            } catch (IOException ignored) {
-                // ignored
-            }
-        }
-
-        return changeLogs.toString();
-    }
-
-    /**
      * Run liquibase for a given set of change logs
      *
      * @param migrations the set of migration to visit
      * @param preHibernate if true, use pre-hibernate schema update changelogs.
      * @throws XWikiException
      * @throws DataMigrationException
-     * @since 4.3
      */
     private void liquibaseUpdate(Collection<XWikiMigration> migrations, boolean preHibernate)
         throws XWikiException, DataMigrationException
     {
-        String liquibaseChangeLogs = getLiquibaseChangeLogs(migrations, preHibernate);
+        final String database = getXWikiContext().getWikiId();
+
+        // Execute migrations
+        if (migrations != null) {
+            for (XWikiMigration migration : migrations) {
+                if (migration.dataMigration instanceof HibernateDataMigration) {
+                    liquibaseUpdate((HibernateDataMigration) migration.dataMigration, preHibernate, database);
+                }
+            }
+        }
+
+        if (!preHibernate) {
+            // Execute liquibase changes from resources if any
+            try {
+                if (getClass().getClassLoader().getResources(LIQUIBASE_RESOURCE).hasMoreElements()) {
+                    this.logger.info("Execute liquibase changes from [{}] resource on database [{}]",
+                        LIQUIBASE_RESOURCE, database);
+                }
+            } catch (IOException ignored) {
+                // ignored
+            }
+        }
+    }
+
+    private void liquibaseUpdate(HibernateDataMigration migration, boolean preHibernate, String database)
+        throws XWikiException, DataMigrationException
+    {
+        String liquibaseChangeLogs;
+        if (preHibernate) {
+            liquibaseChangeLogs = migration.getPreHibernateLiquibaseChangeLog();
+        } else {
+            liquibaseChangeLogs = migration.getLiquibaseChangeLog();
+        }
+
         if (liquibaseChangeLogs == null || liquibaseChangeLogs.length() == 0) {
             return;
         }
 
-        final String database = getXWikiContext().getWikiId();
-
         if (this.logger.isInfoEnabled()) {
             if (preHibernate) {
-                this.logger.info("Running early schema updates (using liquibase) for database [{}]", database);
+                this.logger.info("Running early schema updates (using liquibase) for migration [{}] on database [{}]",
+                    migration.getName(), database);
             } else {
-                this.logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
+                this.logger.info(
+                    "Running additional schema updates (using liquibase) for migration [{}] on database [{}]",
+                    migration.getName(), database);
             }
         }
 
+        liquibaseUpdate(liquibaseChangeLogs, database);
+    }
+
+    private void liquibaseUpdate(String liquibaseChangeLogs, String database)
+        throws XWikiException, DataMigrationException
+    {
         final StringBuilder changeLogs = new StringBuilder(10000);
         changeLogs.append(getLiquibaseChangeLogHeader());
         changeLogs.append(liquibaseChangeLogs);
@@ -301,8 +302,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                         // properly (See XWIKI-8813).
                         lbDatabase.setDefaultSchemaName(store.getSchemaFromWikiName(getXWikiContext()));
 
-                        lb = new Liquibase(MigrationResourceAccessor.CHANGELOG_NAME,
-                            new MigrationResourceAccessor(changeLogs.toString()), lbDatabase);
+                        lb = new Liquibase(CHANGELOG_NAME,
+                            new MockResourceAccessor(Map.of(CHANGELOG_NAME, changeLogs.toString())), lbDatabase);
                     } catch (LiquibaseException e) {
                         throw new HibernateException(new XWikiException(
                             XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION, String

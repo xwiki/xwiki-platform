@@ -19,8 +19,10 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -74,9 +76,33 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         documentPicker.toggleLocationAdvancedEdit();
         documentPicker.setParent(space);
         documentPicker.setName(page);
-        this.createButton.click();
+        // Wait until the location has been updated such that no unexpected scrolling happens while the submit button
+        // is pressed.
+        List<String> path = new ArrayList<>();
+        path.add("");
+        path.addAll(List.of(StringUtils.split(space, ".")));
+        path.add(page);
+        documentPicker.waitForLocation(path);
+
+        this.clickOnCreateButton();
 
         return new TemplateProviderInlinePage();
+    }
+
+    private void clickOnCreateButton()
+    {
+        // Livevalidation blocks the form submission until the validated fields are valid. Until the form is validated,
+        // Livevalidation prevents the submission button to be clicked.
+        // On some rare cases, the click of the button is done too early and the form submission is prevented.
+        // To be sure that the form is validated before clicking, wait for the two fields validation messages to be
+        // displayed before clicking.
+        getDriver().waitUntilCondition(input ->
+            getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_valid")).size() == 2);
+
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
+        this.createButton.click();
+        getDriver().waitUntilPageIsReloaded();
     }
 
     /**
@@ -94,7 +120,8 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
 
     public List<WebElement> getExistingTemplatesLinks()
     {
-        // A bit unreliable here, but it's the best I can do.
-        return getDriver().findElements(By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
+        // A bit unreliable here, but it's the best I can do. Don't wait as these links are part of the static HTML.
+        return getDriver().findElementsWithoutWaiting(
+            By.xpath("//ul[preceding-sibling::*[. = 'Available Template Providers']]//a"));
     }
 }

@@ -67,8 +67,8 @@
       #set ($template = 'Panels.PanelTemplate')
     #end
     #set ($pcontent = "{{velocity}}${util.newline}${escapetool.h}panelheader('${title.replace('''', '''''')}')${util.newline}${util.newline}${escapetool.h}panelfooter()${util.newline}{{/velocity}}")
-    #set ($redirectparams = "template=${escapetool.url($template)}&amp;Panels.PanelClass_0_name=${escapetool.url($title)}&amp;Panels.PanelClass_0_content=${escapetool.url($pcontent)}&amp;parent=${escapetool.url($!request.parent)}")
-    #set ($redirecturl = $newPanelDoc.getURL('inline', $redirectparams))
+    #set ($redirectparams = "template=${escapetool.url($template)}&amp;Panels.PanelClass_0_name=${escapetool.url($title)}&amp;Panels.PanelClass_0_content=${escapetool.url($pcontent)}&amp;parent=${escapetool.url($!request.parent)}&amp;form_token=${request.form_token}")
+    #set ($redirecturl = $newPanelDoc.getURL('edit', $redirectparams))
   #end
   $response.sendRedirect($redirecturl)
 #end

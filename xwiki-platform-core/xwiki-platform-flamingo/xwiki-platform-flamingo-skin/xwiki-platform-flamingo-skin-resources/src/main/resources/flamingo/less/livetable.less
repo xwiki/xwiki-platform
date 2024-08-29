@@ -18,32 +18,32 @@
        display: block;
       }
     }
-     
+
     .xwiki-livetable-display-header tr {
       width: 50%;
       float: left;
-      
+
       th.xwiki-livetable-display-header-text {
         background-color: @table-border-color;
       }
-      
+
       &:first-child{
         border-right: 0;
       }
-      
+
       &.xwiki-livetable-display-filters{
         border-left: 0;
       }
     }
-    
+
     .xwiki-livetable-display-header{ // I'm forced to be that specific to override the rules of livetable.css
       border-top: 2px solid @table-border-color;
-    
+
       .xwiki-livetable-display-header-text, .xwiki-livetable-display-header-filter {
         height: @input-height-base + @padding-base-vertical;
         vertical-align: middle;
       }
-      
+
       .xwiki-livetable-display-header-text {
         &, label, a {
           font-weight: bold;
@@ -51,14 +51,14 @@
         }
       }
     }
-    
+
     // Re-use mix-ins from "tables.less"
     .xwiki-livetable-display-body {
       .responsive-table-tbody();
-      
+
       > tr {
         .responsive-table-tbody-tr();
-        
+
         > td, > th {
           .responsive-table-tbody-tr-tdth();
         }
@@ -71,36 +71,36 @@
 // see: http://jira.xwiki.org/browse/XWIKI-11583
 @media only screen and (max-width: @screen-xs-max) {
   .skin-flamingo { // Needed to override the rules from livetable.css and usersandgroups.css
-  
+
     #usersandgroupstable td.rights{
       padding-left: 50% !important; // overwrite usersandgroups.css
     }
-    
+
     #usersandgroupstable.rights .rights {
       width: 100% !important; // overwrite usersandgroups.css
     }
-  
+
     .xwiki-livetable-display-header {
-          
+
       > .userorgroups-header {
         width: 100%;
-        
+
         > .rights {
           // Hide the headers that do not propose filtering
           display: none;
         }
       }
-      
+
       > #usersandgroupstable-filters {
         width: 100%;
       }
-      
+
       #unregistered {
         .responsive-table-tbody-tr();
         width: 100%;
         border: 0;
         border-bottom: 2px solid @table-border-color;
-        
+
         > td {
           .responsive-table-tbody-tr-tdth();
           width: 100%;
@@ -109,7 +109,7 @@
     }
 
     // Overwrite XWiki.AdminSheet
-    #userstable, #groupstable, #usersandgroupstable, #alldocstable { 
+    #usersandgroupstable, #alldocstable { 
       .xwiki-livetable-display-body td {
         border-color: @table-border-color;
         width: 100%;

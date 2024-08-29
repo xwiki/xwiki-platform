@@ -50,7 +50,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest
+@UITest(properties = {
+    // Notes:
+    // - .*.testCodeToExecutionAndAutoSandboxing.WebHome is needed since this test verifies that even if user has
+    //   PR, if XWiki.ConfigurableClass is saved (thus with programming rights), it is resaved automatically to not
+    //   have them.
+    // - .*.testLockingAndUnlocking.* is needed because the test itself requires PR to call the
+    //   $doc.getDocument().getLock() API for lack of a public API doing the same.
+    "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:.*ConfigurableClassIT\\."
+        + "(testCodeToExecutionAndAutoSandboxing.WebHome"
+        + "|testLockingAndUnlocking.TestConfigurable1"
+        + "|testLockingAndUnlocking.TestConfigurable2)"
+})
 class ConfigurableClassIT
 {
     @BeforeEach
@@ -71,7 +82,7 @@ class ConfigurableClassIT
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
             "heading", "Some Heading",
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "configurationClass", setup.serializeReference(testReference),
             "linkPrefix", "TheLinkPrefix");
 
@@ -101,14 +112,14 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", app1Section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean");
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", app2Section,
-            "configureGlobally", "false",
+            "scope", "SPACE",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
@@ -166,8 +177,9 @@ class ConfigurableClassIT
 
     /**
      * If CodeToExecute is defined in a configurable app, then it should be evaluated.
-     * Also header should be evaluated and not just printed.
-     * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
+     * Also, header should be evaluated and not just printed.
+     * We test with a user having Programming Rights, since if XWiki.ConfigurableClass is saved with programming
+     * rights, it should resave itself so that it doesn't have them, and we want to verify this.
      */
     @Test
     @Order(3)
@@ -183,7 +195,7 @@ class ConfigurableClassIT
             + "T${code}uld also be displayed.";
         setupConfigurableApplication(setup, testReference,
             "displayInSection", testReference.getLastSpaceReference().getName(),
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "codeToExecute", codeToExecute,
             "heading", heading
             );
@@ -201,10 +213,10 @@ class ConfigurableClassIT
             setup.gotoPage(configurableClassReference, "view",
                 "editor=globaladmin&section=" + testReference.getLastSpaceReference().getName());
             ViewPage viewPage = new ViewPage();
-            viewPage.waitUntilPageJSIsLoaded();
             String content = viewPage.getContent();
             assertTrue(content.contains("This should be displayed."));
             assertTrue(content.contains("This should also be displayed."));
+            // Since the user has PR, the following is expected to be true
             assertTrue(content.contains("This should be displayed too."));
             // It's false because of the dropPermission in ConfigurableClass (but supposed to be fixed at some point)
             assertTrue(content.contains("Has Programming permission: false"));
@@ -232,7 +244,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -260,7 +272,7 @@ class ConfigurableClassIT
         assertFalse(asp.hasHeading(2, "HSomeHeading"));
 
         // Switch application to non-global
-        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "configureGlobally", false);
+        setup.updateObject(testReference, "XWiki.ConfigurableClass", 0, "scope", "SPACE");
 
         // Check that it is available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
@@ -307,7 +319,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -354,7 +366,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -384,7 +396,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test);
@@ -410,7 +422,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "codeToExecute", test,
@@ -418,7 +430,7 @@ class ConfigurableClassIT
 
         setup.addObject(testReference, "XWiki.ConfigurableClass",
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Other Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "TextArea, Select");
@@ -444,7 +456,7 @@ class ConfigurableClassIT
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(testReference),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -489,14 +501,14 @@ class ConfigurableClassIT
 
         setupConfigurableApplication(false, setup, page1,
             "displayInSection", section1,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page1),
             "propertiesToShow", "String, Boolean, TextArea, Select");
 
         setupConfigurableApplication(false, setup, page2,
             "displayInSection", section2,
-            "configureGlobally", "true",
+            "scope", "WIKI",
             "heading", "Some Heading",
             "configurationClass", setup.serializeReference(page2),
             "propertiesToShow", "String, Boolean, TextArea, Select");
@@ -508,7 +520,7 @@ class ConfigurableClassIT
 
         // We have to switch user context without logging out, logging out removes all locks.
         // We have to open a new window because otherwise the lock is removed when we leave the administration page.
-        setup.getDriver().findElementByLinkText(testPageName).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
+        setup.getDriver().findElement(By.linkText(testPageName)).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
         String firstTab = setup.getDriver().getWindowHandle();
 
         // It might take a bit of time for the driver to know there's another window.
@@ -523,7 +535,6 @@ class ConfigurableClassIT
 
         // Go to the document, it will create a lock.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section1);
-        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
@@ -536,7 +547,6 @@ class ConfigurableClassIT
         setup.getDriver().switchTo().window(firstTab);
 
         asp = AdministrationSectionPage.gotoPage(section2);
-        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
         viewPage = setup.gotoPage(page1);

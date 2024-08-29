@@ -37,20 +37,17 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>annotations.title=Anmerken
-annotations.menu.loading=Lade Anmerkungseinstellungen
+annotations.menu.loading=Lade Anmerkungs-Einstellungen
 annotations.menu.loaderror=Fehlgeschlagen:
 annotations.tab.info.noannotations=Keine Anmerkungen auf dieser Seite
-
 annotations.settings.display=Zeige Anmerkungen
 annotations.settings.error.wrongsyntax=Anmerkungen sind nicht verfügbar in Dokumenten mit XWiki/1.0 Syntax.
 annotations.settings.error.notarget=Kein Dokument angegeben, für das die Anmerkungseinstellungen abgerufen werden sollen.
-
 annotations.annotated.loading=Lade Dokument mit Anmerkungen
 annotations.annotated.loaderror=Fehlgeschlagen:
 annotations.annotated.loaderror.wrongresponse=Falsch formatierte Serverantwort
 annotations.annotated.error.noannotatedelement=Anmerkungen konnten nicht geladen werden, da der Inhalt nicht verfügbar ist.
 annotations.annotated.error.wrongsyntax=Anmerkungen werden auf Seiten mit XWiki/1.0 Syntax nicht unterstützt.
-
 annotations.action.edit.text=[Bearbeiten]
 annotations.action.edit.tooltip=Anmerkung bearbeiten
 annotations.action.edit.submit.text=Aktualisieren
@@ -58,43 +55,37 @@ annotations.action.edit.cancel.text=Abbrechen
 annotations.action.edit.success=Anmerkung wurde erfolgreich aktualisiert.
 annotations.action.edit.loaderror=Fehlgeschlagen:
 annotations.action.edit.error.notfound=Diese Anmerkung existiert nicht mehr. Bitte laden Sie die Seite erneut, um die Ansicht zu aktualisieren.
-
 annotations.action.delete.text=[Löschen]
 annotations.action.delete.tooltip=Anmerkung löschen
 annotations.action.delete.confirm=Sind Sie sicher, dass Sie diese Anmerkung löschen möchten?
 annotations.action.delete.inProgress=Anmerkung wird gelöscht...
 annotations.action.delete.done=Anmerkung gelöscht
 annotations.action.delete.failed=Löschen von Anmerkung fehlgeschlagen:
-
 annotations.action.create.submit.text=Anmerkung hinzufügen
 annotations.action.create.cancel.text=Abbrechen
 annotations.action.create.selection.invalid=Bitte wählen Sie einen nicht-leeren Text im Dokument aus.
 annotations.action.create.form.loaderror=Fehlgeschlagen:
-annotations.action.create.success=Anmerkung hinzugefügt
+annotations.action.create.success=Anmerkung wurde hinzugefügt.
 annotations.action.create.loaderror=Fehlgeschlagen:
 annotations.action.create.error.unauthorized=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen.
-annotations.action.create.error.unauthorizedguest=Sie sind nicht berechtigt Anmerkungen in diesem Dokument zu erstellen. Bitte melden Sie sich an.
+annotations.action.create.error.unauthorizedguest=Sie sind nicht berechtigt, Anmerkungen in diesem Dokument zu erstellen. Bitte melden Sie sich an.
 annotations.action.create.helpmessage=Um eine Anmerkung einem Teil des Textes hinzuzufügen, markieren Sie ihn und drücken Sie {0}.
 annotations.action.create.error.wrongsyntax=Anmerkungen werden in Dokumenten mit XWiki/1.0 Syntax nicht unterstützt.
 annotations.action.create.error.notarget=Nicht spezifiziertes Ziel (Dokument) für das Erstellen von Anmerkungen.
-
 annotations.action.view.hide.text=verbergen
 annotations.action.view.form.loaderror=Fehlgeschlagen:
 annotations.action.view.error.notfound=Diese Anmerkung existiert nicht mehr. Bitte laden Sie die Seite erneut, um die Ansicht zu aktualisieren.
 annotations.action.view.thread=Diskussion lesen
-
 annotations.altered.text=Diese Anmerkung konnte nicht angezeigt werden, da der Text mit der Anmerkung nicht gefunden wurde im Dokument:
 annotations.updated.text=Die Anmerkung wurde nach einem Update des Dokuments automatisch neu positioniert. Ursprünglich:
 annotations.action.validate.text=[Überprüfen]
 annotations.action.validate.tooltip=Überprüfe das automatische Aktualisieren des markierten Textes für dieser Anmerkung
 annotations.action.validate.success=Anmerkung wurde erfolgreich überprüft.
 annotations.action.validate.loaderror=Fehlgeschlagen:
-
 annotations.filters.show=Verfeinere die Anzeigekriterien
 annotations.filters.nooption=Es sind keine Werte für das Filtern von "{0}" vorhanden
 annotations.filters.anyvalue=beliebiger Wert
 annotations.filters.clearvalue=zurücksetzen
-
 annotations.config.title=Anmerkungen Einstellungsmenü
 annotations.config.display.title=Anmerkungen Anzeigeeinstellungen
 annotations.config.type.title=Anmerkungen Ausführungseinstellungen
@@ -103,14 +94,14 @@ annotations.config.activate.explanation=Die folgenden zwei Einstellungen erlaube
 annotations.config.type.explanation=Füge Eigenschaft zu dieser Klasse hinzu wenn zusätzliche Eigenschaften für die Anmerkungen festgelegt werden sollen.
 admin.annotations=Anmerkungen
 admin.annotations.description=Seite-Anmerkungen konfigurieren
-
 AnnotationCode.AnnotationConfig_activated=Anmerkungen sind aktiviert
 AnnotationCode.AnnotationConfig_activated.hint=Entscheiden, ob Anmerkungen im aktuellen Wiki aktiviert sind
 AnnotationCode.AnnotationConfig_exceptionSpaces=Außer für die folgenden Bereiche
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deaktivieren Sie Anmerkungen für die folgende Teilmenge von Positionen:
 AnnotationCode.AnnotationConfig_displayed=Anmerkungen standardmäßig anzeigen
-AnnotationCode.AnnotationConfig_displayed.hint=Entscheiden, ob Anmerkungen standardmäßig angezeigt werden oder nur, wenn "Anmerkungen anzeigen" auf jeder Seite aktiviert ist
+AnnotationCode.AnnotationConfig_displayed.hint=Entschieden Sie ob Anmerkungen standardmäßig angezeigt werden sollen, oder nur wenn "Anmerkungen anzeigen" auf der jeweiligen Seite ausgewählt ist
 AnnotationCode.AnnotationConfig_displayHighlight=Anmerkungen standardmäßig im Text hervorheben
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Entscheide, ob Anmerkungen immer hervorgehoben werden, oder nur wenn die Maus sich über dem entsprechenden Bereich befindet
-AnnotationCode.AnnotationConfig_annotationClass=XWiki Klasse, welche zum Speichern der Anmerkungen verwendet wird</content>
+AnnotationCode.AnnotationConfig_annotationClass=XWiki Klasse, welche zum Speichern der Anmerkungen verwendet wird
+</content>
 </xwikidoc>

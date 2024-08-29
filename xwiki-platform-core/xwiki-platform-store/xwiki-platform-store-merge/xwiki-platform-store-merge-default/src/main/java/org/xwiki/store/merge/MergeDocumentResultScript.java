@@ -23,11 +23,13 @@ import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.diff.Conflict;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.util.Programming;
 
 /**
  * Represents the result of a 3-way merge on documents performed in the {@link MergeScriptService}.
@@ -47,6 +49,8 @@ public class MergeDocumentResultScript
 
     private final Document mergedDocument;
 
+    private boolean hasProgramming;
+
     /**
      * Default constructor.
      *
@@ -57,12 +61,31 @@ public class MergeDocumentResultScript
      */
     public MergeDocumentResultScript(MergeDocumentResult mergeDocumentResult, XWikiContext context)
     {
+        this(mergeDocumentResult, context, false);
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param mergeDocumentResult the actual result obtained through
+     *          {@link MergeManager#mergeDocument(DocumentModelBridge, DocumentModelBridge, DocumentModelBridge,
+     *              MergeConfiguration)}.
+     * @param context the current context.
+     * @param hasProgramming {@code true} if the user has programming right (See {@link #getMergeDocumentResult()}).
+     * @since 15.5RC1
+     * @since 14.10.12
+     */
+    @Unstable
+    public MergeDocumentResultScript(MergeDocumentResult mergeDocumentResult, XWikiContext context,
+        boolean hasProgramming)
+    {
         this.mergeDocumentResult = mergeDocumentResult;
 
         this.previousDocument = ((XWikiDocument) mergeDocumentResult.getPreviousDocument()).newDocument(context);
         this.currentDocument = ((XWikiDocument) mergeDocumentResult.getCurrentDocument()).newDocument(context);
         this.nextDocument = ((XWikiDocument) mergeDocumentResult.getNextDocument()).newDocument(context);
         this.mergedDocument = ((XWikiDocument) mergeDocumentResult.getMergeResult()).newDocument(context);
+        this.hasProgramming = hasProgramming;
     }
 
     /**
@@ -111,5 +134,35 @@ public class MergeDocumentResultScript
     public List<Conflict<Object>> getAllConflicts()
     {
         return this.mergeDocumentResult.getConflicts();
+    }
+
+    /**
+     * @return the actual {@link MergeDocumentResult} only if the author of the script has programming rights, else
+     * return {@code null}.
+     * @since 15.5RC1
+     * @since 14.10.12
+     */
+    @Unstable
+    @Programming
+    public MergeDocumentResult getMergeDocumentResult()
+    {
+        if (this.hasProgramming) {
+            return this.mergeDocumentResult;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return {@code true} if the merge contains at least one content conflict but only contains conflicts related to
+     * the content.
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    public boolean hasOnlyContentConflicts()
+    {
+        return !getContentConflicts().isEmpty()
+            && getContentConflicts().size() == this.mergeDocumentResult.getConflictsNumber();
     }
 }

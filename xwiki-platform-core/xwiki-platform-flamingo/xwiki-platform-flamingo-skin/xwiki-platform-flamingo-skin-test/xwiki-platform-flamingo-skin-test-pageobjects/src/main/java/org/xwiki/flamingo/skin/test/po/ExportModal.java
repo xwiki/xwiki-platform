@@ -20,8 +20,9 @@
 package org.xwiki.flamingo.skin.test.po;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseModal;
+import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.XWikiSelectWidget;
 
 /**
  * Represents the Export modal.
@@ -31,35 +32,53 @@ import org.xwiki.test.ui.po.BaseModal;
  */
 public class ExportModal extends BaseModal
 {
-    private static final String EXPORT_MODAL_ID = "exportModal";
-    private static final String OTHER_FORMAT_PANE_LINK = "Other Formats";
+    private XWikiSelectWidget exportFormatSelect;
 
-    /**.
-     * Simple constructor.
+    /**
+     * Default constructor.
      */
     public ExportModal()
     {
-        super(By.id(EXPORT_MODAL_ID));
+        super(By.id("exportModal"));
+        this.exportFormatSelect =
+            new XWikiSelectWidget(this.container.findElement(By.className("xwiki-export-formats")), "exportFormat");
     }
 
     /**
-     * Opens the pane "Other Format".
-     * @return the pane for "Other Format" export.
+     * Opens the export modal for the given page.
+     * 
+     * @param viewPage the page for which to open the export modal
+     * @return the export modal
+     * @since 14.10
      */
-    public OtherFormatPane openOtherFormatPane()
+    public static ExportModal open(ViewPage viewPage)
     {
-        getDriver().waitUntilElementIsVisible(By.id(EXPORT_MODAL_ID));
-        getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK).click();
+        // The export modal is present but hidden on page load. We instantiate the page object before opening the modal
+        // in order to prevent the fade effect (see BaseModal).
+        ExportModal exportModal = new ExportModal();
 
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModalOtherCollapse.collapse.in"));
-        return new OtherFormatPane();
+        viewPage.clickMoreActionsSubMenuEntry("tmExport");
+
+        return exportModal;
     }
 
     /**
-     * @return the container of this modal.
+     * @return the widget used to select the export format
+     * @since 14.10
      */
-    public WebElement getContainer()
+    public XWikiSelectWidget getExportFormatSelect()
     {
-        return container;
+        return this.exportFormatSelect;
+    }
+
+    /**
+     * Select the specified export format.
+     * 
+     * @param format the export format to select
+     * @since 14.10
+     */
+    public void exportAs(String format)
+    {
+        getExportFormatSelect().selectByLabel(format);
     }
 }

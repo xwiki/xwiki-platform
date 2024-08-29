@@ -20,6 +20,7 @@
 package org.xwiki.extension.index.internal;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,17 +30,17 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
-import org.xwiki.extension.version.Version;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 /**
  * Update the index when an extension is installed/uninstalled.
- * 
+ *
  * @version $Id$
  * @since 12.10
  */
@@ -73,28 +74,39 @@ public class ExtensionInstallListener extends AbstractEventListener
         // TODO: make that asynchronous
         try {
             if (event instanceof ExtensionUninstalledEvent) {
-                onInstalled(((ExtensionEvent) event).getExtensionId(), (((ExtensionEvent) event).getNamespace()));
-            } else if (event instanceof ExtensionInstalledEvent || event instanceof ExtensionUpgradedEvent) {
-                onUninstalled(((ExtensionEvent) event).getExtensionId(), (((ExtensionEvent) event).getNamespace()));
+                onUninstalled(((ExtensionEvent) event).getExtensionId(), ((ExtensionEvent) event).getNamespace());
+            } else if (event instanceof ExtensionInstalledEvent) {
+                onInstalled(((ExtensionEvent) event).getExtensionId(), ((ExtensionEvent) event).getNamespace());
+            } else if (event instanceof ExtensionUpgradedEvent) {
+                ExtensionUpgradedEvent extensionUpgradedEvent = (ExtensionUpgradedEvent) event;
+                String namespace = extensionUpgradedEvent.getNamespace();
+                onUpgraded(extensionUpgradedEvent.getExtensionId(), ((Collection<InstalledExtension>) data), namespace);
             }
         } catch (Exception e) {
             this.logger.error("Failed to update the local extension store", e);
         }
     }
 
+    private void onUpgraded(ExtensionId extensionId, Collection<InstalledExtension> previousExtensions,
+        String namespace) throws SolrServerException, IOException
+    {
+        for (InstalledExtension previousExtension : previousExtensions) {
+            this.store.updateInstalled(previousExtension.getId(), namespace, false);
+        }
+
+        this.store.updateInstalled(extensionId, namespace, true);
+        this.store.commit();
+    }
+
     private void onInstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        this.store.updateCompatible(extensionId, namespace, false, null);
+        this.store.updateInstalled(extensionId, namespace, true);
         this.store.commit();
     }
 
     private void onUninstalled(ExtensionId extensionId, String namespace) throws SolrServerException, IOException
     {
-        Version compatibleVersion = this.store.getCompatibleVersion(extensionId.getId(), namespace);
-
-        if (compatibleVersion == null) {
-            this.store.updateCompatible(extensionId, namespace, true, null);
-            this.store.commit();
-        }
+        this.store.updateInstalled(extensionId, namespace, false);
+        this.store.commit();
     }
 }

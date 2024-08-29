@@ -32,6 +32,8 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 3.4M1
  */
+// FIXME: Right now the components implementing this interface are never called, making this role pretty much useless
+// Migration should use HibernateDataMigration instead See: https://jira.xwiki.org/browse/XWIKI-19399
 @Role
 public interface DataMigration
 {

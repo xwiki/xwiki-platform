@@ -22,7 +22,6 @@ package org.xwiki.platform.notifications.test.po.preferences.filters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.platform.notifications.test.po.AbstractNotificationsSettingsPage;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 /**
@@ -31,11 +30,8 @@ import org.xwiki.test.ui.XWikiWebDriver;
  * @version $Id$
  * @since 13.2RC1
  */
-@Unstable
 public class SystemNotificationFilterPreference extends AbstractNotificationFilterPreference
 {
-    private String description;
-
     /**
      * Default constructor.
      * @param parentPage the page where the settings are displayed.
@@ -46,7 +42,14 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
         XWikiWebDriver webDriver)
     {
         super(parentPage, row, webDriver);
-        this.description = row.findElement(By.className("filterType")).getText();
+    }
+
+    /**
+     * @return the name of the filter.
+     */
+    public String getName()
+    {
+        return getRow().findElement(By.cssSelector("td[data-title='Name'] .view")).getText();
     }
 
     /**
@@ -54,6 +57,6 @@ public class SystemNotificationFilterPreference extends AbstractNotificationFilt
      */
     public String getDescription()
     {
-        return description;
+        return getRow().findElement(By.cssSelector("td[data-title='Description'] .view")).getText();
     }
 }

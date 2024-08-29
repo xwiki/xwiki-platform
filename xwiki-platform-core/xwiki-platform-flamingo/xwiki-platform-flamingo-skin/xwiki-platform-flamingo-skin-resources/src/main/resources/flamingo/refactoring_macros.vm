@@ -85,13 +85,14 @@
 #end
 
 #macro (displayLinksCheckbox $options)
-  #set ($hidden = !$isAdvancedUser && !$isSuperAdmin)
+  #set ($hidden = (!$isAdvancedUser && !$isSuperAdmin) || $options.hidden)
   ## We hide this option for simple users (instead of simply removing it) because we want to submit the default value
   ## (i.e. we want to make sure the links are updated for simple users).
   <dt#if ($hidden) class="hidden"#end>
     <label>
       #set ($checked = !$request.updateLinks || $request.updateLinks == 'true')
-      <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end />
+      <input type="checkbox" name="updateLinks" value="true" #if ($checked)checked="checked"#end
+        #if ($options.disabled)disabled#end />
       $services.localization.render($options.label)
     </label>
     ## The value submitted when the checkbox is not checked, used to preserve the form state.
@@ -101,8 +102,44 @@
     #set ($backLinksCount = $doc.backlinks.size())
     #set ($backLinksURL = $escapetool.xml($doc.getURL('view', 'viewer=backlinks')))
     <span class="xHint">
-      $services.localization.render($options.hint, ["<a href='$backLinksURL'>", $backLinksCount, '</a>'])
+      #set ($backlinksMessage = $escapetool.xml($services.localization.render($options.hint, [
+        '__STARTLINK__',
+        $backLinksCount,
+        '__ENDLINK__'
+      ])).replace('__STARTLINK__', "<a href='$backLinksURL'>").replace('__ENDLINK__', '</a>'))
+      $backlinksMessage
     </span>
+  </dd>
+#end
+
+#macro(displayAutoRedirectCheckbox $options)
+  ##--------------------
+  ## Auto redirect field
+  ##--------------------
+  ## We set Autoredirect to off by default for the following reasons:
+  ## - Several users have reported a usability issue about automatic redirects. The way they express it is the
+  ##   following: "I have duplicates pages in my wiki. I don't understand why this is happening. I'm choosing to
+  ##   rename pages and not to copy them but I still get duplicates in the Navigation panel".
+  ## - Automatic redirects are especially useful for public wikis where users can have bookmark on pages and you
+  ##   don't want to break them. It can also be useful for internal wikis but it's less an issue.
+  ## - Even for public wikis not all pages need automatic redirects. Technical pages don't need them for example.
+  ## - We don't have management UIs for redirects FTM and reducing the number of redirects make the wiki easier
+  ##   to manage.
+  ## In the future we'll offer a config option to define the default behavior, see
+  ## http://jira.xwiki.org/browse/XWIKI-13384
+  #set ($checked = $request.autoRedirect == 'true')
+  #set ($hidden = $options.hidden)
+  <dt #if ($hidden) class="hidden"#end>
+    <label>
+      <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end
+        #if ($options.disabled)disabled#end/>
+      $escapetool.xml($services.localization.render($options.label))
+    </label>
+    ## The value submitted when the checkbox is not checked, used to preserve the form state.
+    <input type="hidden" name="autoRedirect" value="false" />
+  </dt>
+  <dd #if ($hidden) class="hidden"#end>
+    <span class="xHint">$escapetool.xml($services.localization.render($options.hint))</span>
   </dd>
 #end
 

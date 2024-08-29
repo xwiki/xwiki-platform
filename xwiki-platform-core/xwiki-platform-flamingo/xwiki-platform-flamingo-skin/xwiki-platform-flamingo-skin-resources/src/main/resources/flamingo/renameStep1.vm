@@ -35,6 +35,7 @@
   #warning($services.localization.render('core.rename.warningRenameUser'))
 #end
   <form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
+  <fieldset>
   <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -65,32 +66,10 @@
           'label': 'core.rename.links.label',
           'hint': 'core.rename.links.hint'
         })
-        ##--------------------
-        ## Auto redirect field
-        ##--------------------
-        ## We set Autoredirect to off by default for the following reasons:
-        ## - Several users have reported a usability issue about automatic redirects. The way they express it is the
-        ##   following: "I have duplicates pages in my wiki. I don't understand why this is happening. I'm choosing to
-        ##   rename pages and not to copy them but I still get duplicates in the Navigation panel".
-        ## - Automatic redirects are especially useful for public wikis where users can have bookmark on pages and you
-        ##   don't want to break them. It can also be useful for internal wikis but it's less an issue.
-        ## - Even for public wikis not all pages need automatic redirects. Technical pages don't need them for example.
-        ## - We don't have management UIs for redirects FTM and reducing the number of redirects make the wiki easier
-        ##   to manage.
-        ## In the future we'll offer a config option to define the default behavior, see
-        ## http://jira.xwiki.org/browse/XWIKI-13384
-        #set ($checked = $request.autoRedirect == 'true')
-        <dt>
-          <label>
-            <input type="checkbox" name="autoRedirect" value="true" #if ($checked)checked="checked"#end />
-            $services.localization.render('core.rename.autoRedirect.label')
-          </label>
-          ## The value submitted when the checkbox is not checked, used to preserve the form state.
-          <input type="hidden" name="autoRedirect" value="false" />
-        </dt>
-        <dd>
-          <span class="xHint">$services.localization.render('core.rename.autoRedirect.hint')</span>
-        </dd>
+        #displayAutoRedirectCheckbox({
+          'label': 'core.rename.autoRedirect.label',
+          'hint': 'core.rename.autoRedirect.hint'
+        })
       </dl>
     </div>
     <div class="col-xs-12 col-lg-6">
@@ -154,5 +133,6 @@
       <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
     </span>
   </div>
-</form>
+  </fieldset>
+  </form>
 </div>

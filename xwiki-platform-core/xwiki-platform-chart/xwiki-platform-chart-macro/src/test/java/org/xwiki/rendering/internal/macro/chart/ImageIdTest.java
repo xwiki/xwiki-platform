@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.chart;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
 
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit tests for {@link ImageId}.
@@ -30,17 +30,17 @@ import org.junit.Assert;
  * @version $Id$
  * @since 4.2M1
  */
-public class ImageIdTest
+class ImageIdTest
 {
     /**
      * Verify id are different even when using same parameters (but different instances of parameters).
      */
     @Test
-    public void testGetIdWithSameParametersButDifferentInstances()
+    void getIdWithSameParametersButDifferentInstances()
     {
         ChartMacroParameters parameters1 = new ChartMacroParameters();
         ChartMacroParameters parameters2 = new ChartMacroParameters();
 
-        Assert.assertFalse(new ImageId(parameters1).getId().equals(new ImageId(parameters2).getId()));
+        assertFalse(new ImageId(parameters1).getId().equals(new ImageId(parameters2).getId()));
     }
 }

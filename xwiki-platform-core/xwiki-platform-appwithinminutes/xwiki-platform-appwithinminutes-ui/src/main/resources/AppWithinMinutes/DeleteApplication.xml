@@ -92,8 +92,9 @@
     'form_token': $services.csrf.token
   })
   #if ("$!request.xredirect" != '')
-    #set ($cancelURL = $request.xredirect)
-    #set ($confirmParams.xredirect = $cancelURL)
+    #getSanitizedURLAttributeValue('a','href',$request.xredirect,$doc.getURL(),$cancelURL)
+    ## We don't sanitize those parameters as the sanitation will be handled server side.
+    #set ($confirmParams.xredirect = $request.xredirect)
   #end
   #set ($confirmURL = $doc.getURL($xcontext.action, $escapetool.url($confirmParams)))
   {{html}}

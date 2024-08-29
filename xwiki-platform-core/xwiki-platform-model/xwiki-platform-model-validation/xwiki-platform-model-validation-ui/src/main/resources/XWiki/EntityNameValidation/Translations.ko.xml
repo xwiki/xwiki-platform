@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="ko">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>ko</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=현재 명명 전략
+entitynamevalidation.currentStrategy.hint=이름 전략은 문서를 생성하거나 이름을 바꾸거나 저장할 때 사용됩니다.
+entitynamevalidation.useTransformation.label=자동으로 이름 변환
+entitynamevalidation.useTransformation.hint=활성화하면 가능한 경우 이름 전략을 사용하여 이름을 자동으로 조정합니다.
+entitynamevalidation.useValidation.label=저장하기 전에 이름을 확인하세요
+entitynamevalidation.useValidation.hint=활성화된 경우 이름 전략은 저장하기 전에 이름의 유효성을 검사합니다. 이 기능을 사용하면 일부 기존 문서가 저장되지 않을 수 있으므로 주의해서 사용하세요.
+entitynamevalidation.replacementCharacter.configuration=캐릭터 교체 전략 구성
+entitynamevalidation.testStrategy.label=선택한 전략을 테스트해 보세요
+entitynamevalidation.testStrategy.hint=선택한 이름 전략의 동작을 확인할 수 있습니다
+entitynamevalidation.testStrategy.placeholder=테스트할 페이지 이름을 여기에 입력하세요
+entitynamevalidation.testStrategy.validName=선택한 전략에 이 이름이 유효합니까?
+entitynamevalidation.testStrategy.transformedName=선택한 전략에 따른 변환 후의 이름:
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=금지된 문자
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=대체 문자
+entitynamevalidation.replacementCharacter.livetable._actions=행위
+entitynamevalidation.replacementCharacter.add=새로운 캐릭터 추가
+entitynamevalidation.replacementCharacter.addNewCharacter=금지하거나 대체할 새 문자 추가
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=새로운 금지된 캐릭터
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=이 문자는 페이지 이름에 금지됩니다
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=여기에 새로운 금지 문자를 입력하세요
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=새로운 대체 캐릭터
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=이 문자는 페이지 이름에서 금지된 문자를 대체합니다. 지정하지 않으면 금지된 문자가 페이지 이름에서 제거됩니다.
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=여기에 새 대체 문자를 입력하거나 비워 두세요
+entitynamevalidation.replacementCharacter.create.inProgress=새로운 금지 캐릭터가 추가됩니다...
+entitynamevalidation.replacementCharacter.create.done=새로운 금지 캐릭터가 추가되었습니다.
+entitynamevalidation.replacementCharacter.create.failed=새로운 금지 문자를 추가하는 중 오류가 발생했습니다.
+entitynamevalidation.replacementCharacter.removeCharacter=금지된 문자 삭제
+entitynamevalidation.replacementCharacter.removeCharacter.warning=이 금지된 문자를 삭제하시겠습니까?
+entitynamevalidation.replacementCharacter.removeCharacter.remove=삭제
+entitynamevalidation.replacementCharacter.remove.inProgress=금지된 캐릭터를 삭제하는 중입니다...
+entitynamevalidation.replacementCharacter.remove.done=금지된 캐릭터가 삭제되었습니다.
+entitynamevalidation.replacementCharacter.remove.failed=금지된 문자를 삭제하는 중 오류가 발생했습니다.
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=None
+entitynamevalidation.admin.heading=이름 전략
+admin.namestrategies=이름 전략
+</content>
+  </xwikidoc>

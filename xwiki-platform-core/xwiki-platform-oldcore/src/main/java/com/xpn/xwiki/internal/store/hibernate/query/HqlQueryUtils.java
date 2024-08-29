@@ -36,10 +36,13 @@ import org.slf4j.LoggerFactory;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.AllColumns;
+import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -229,6 +232,25 @@ public final class HqlQueryUtils
         return false;
     }
 
+    private static boolean isAllowedAllTableColumns(ExpressionList parameters, Map<String, String> tables)
+    {
+        return parameters.getExpressions().get(0) instanceof AllTableColumns
+            && isTableAllowed(getTableName(((AllTableColumns) parameters.getExpressions().get(0)).getTable(), tables));
+    }
+
+    private static boolean isAllowedAllColumns(ExpressionList parameters, Map<String, String> tables)
+    {
+        return parameters.getExpressions().get(0) instanceof AllColumns && tables.size() == 1
+            && isTableAllowed(tables.values().iterator().next());
+    }
+
+    private static boolean isAllowedCountFunction(Function function, ExpressionList parameters,
+        Map<String, String> tables)
+    {
+        return parameters.getExpressions().size() == 1 && function.getName().equals("count")
+            && (isAllowedAllColumns(parameters, tables) || isAllowedAllTableColumns(parameters, tables));
+    }
+
     private static boolean isSelectExpressionAllowed(Expression expression, Map<String, String> tables)
     {
         if (expression instanceof Column) {
@@ -240,14 +262,15 @@ public final class HqlQueryUtils
         } else if (expression instanceof Function) {
             Function function = (Function) expression;
 
-            if (function.isAllColumns()) {
-                // Validate that allowed table is passed to the method
+            ExpressionList parameters = function.getParameters();
+            if (isAllowedCountFunction(function, parameters, tables)) {
+                // count(*)
+                // count(table.*)
                 // TODO: add support for more that "count" maybe
-                return function.getName().equals("count") && tables.size() == 1
-                    && isTableAllowed(tables.values().iterator().next());
+                return true;
             } else {
-                // Validate that allowed columns are used as parameters
-                for (Expression parameter : function.getParameters().getExpressions()) {
+                // Validate that allowed expressions are used as function parameters
+                for (Expression parameter : parameters.getExpressions()) {
                     if (!isSelectExpressionAllowed(parameter, tables)) {
                         return false;
                     }

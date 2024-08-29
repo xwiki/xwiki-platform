@@ -48,9 +48,14 @@
 #foreach ($key in $l10nKeys)
   #set ($discard = $l10n.put($key, $services.localization.render($key)))
 #end
+#set ($iconNames = ['pencil', 'cross', 'add'])
+#set ($icons = {})
+#foreach ($iconName in $iconNames)
+  #set ($discard = $icons.put($iconName, $services.icon.renderHTML($iconName)))
+#end
 #[[*/
 // Start JavaScript-only code.
-(function(paths, l10n) {
+(function(paths, l10n, icons) {
   "use strict";
 
 require.config({paths});
@@ -75,12 +80,17 @@ XWiki.Dashboard = Class.create( {
     // find out all the gadget-containers in element and add them ids
     this.containers = element.select(".gadget-container");
     this.createDragAndDrops();
-    this.addGadgetsHandlers();
+    this.addGadgetsHandlers();``
+    // Create the section to contain add buttons
+    var sectionAddButtons = new Element('section', {
+      'class': 'containeradd'
+    })
+    this.element.insert({'top' : sectionAddButtons});
     this.addNewGadgetHandler();
     this.addNewContainerHandler();
 
-    // add save listener, to save the dashboard before submit of the form
-    document.observe("xwiki:actions:save", this.saveChanges.bindAsEventListener(this));
+    // Save the dashboard before the edit form is submitted.
+    document.observe("xwiki:actions:beforeSave", this.saveChanges.bindAsEventListener(this));
   },
 
   /**
@@ -259,12 +269,14 @@ XWiki.Dashboard = Class.create( {
       'title': l10n['dashboard.gadget.actions.delete.tooltip']
     });
     removeIcon.observe('click', this.onRemoveGadget.bindAsEventListener(this));
+    removeIcon.update(icons.cross);
 
     var editIcon = new Element('span', {
       'class': 'edit action',
       'title': l10n['dashboard.gadget.actions.edit.tooltip']
     });
     editIcon.observe('click', this.onEditGadgetClick.bindAsEventListener(this));
+    editIcon.update(icons.pencil);
 
     var actionsContainer = new Element('div', {'class' : 'gadget-actions'})
     actionsContainer.insert(editIcon);
@@ -278,20 +290,18 @@ XWiki.Dashboard = Class.create( {
   addNewGadgetHandler : function() {
     // create the button
     var addButton = new Element('div', {
-      'class': 'addgadget',
+      'class': 'btn btn-success addgadget',
       'title': l10n['dashboard.actions.add.tooltip']
     });
-    addButton.update(l10n['dashboard.actions.add.button']);
+    addButton.update(icons.add + l10n['dashboard.actions.add.button']);
     addButton.observe('click', this.onAddGadgetClick.bindAsEventListener(this));
     // check if the warning is there, if it is, put the button under it
     var warning = this.element.down('.differentsource');
     if (warning) {
       warning.insert({'after' : addButton});
     } else {
-      this.element.insert({'top' : addButton});
+      this.element.down('.containeradd').insert(addButton);
     }
-    // and put a clearfloats after the add
-    addButton.insert({'after' : new Element('div', {'class' : 'clearfloats'})});
   },
 
   /**
@@ -309,7 +319,7 @@ XWiki.Dashboard = Class.create( {
     }
     button.addClassName('loading');
     require(['gadgetWizard'], function(gadgetWizard) {
-      gadgetWizard(gadget).done(callback).always(function() {
+      gadgetWizard(gadget).then(callback).finally(() => {
         button.removeClassName('loading');
       });
     });
@@ -356,10 +366,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(
             l10n['dashboard.actions.add.failed'] + failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -378,24 +385,35 @@ XWiki.Dashboard = Class.create( {
   onEditGadgetClick : function(event) {
     var gadget = event.element().up('.gadget');
 
+    /**
+     * Finds the first direct child element of the given element with the specified class name.
+     *
+     * @param {Element} element - the element to search for the child in
+     * @param {string} className - the class name of the child element to find
+     * @returns {Element|undefined} the direct child element with the specified class name, or undefined if not found
+     */
+    function findDirectChildWithClass(element, className) {
+      return element.immediateDescendants().filter((e) => e.hasClassName(className)).first();
+    }
+
     if (gadget) {
       // check if it is a macro
-      var gadgetMetadata = gadget.down('.metadata');
+      const gadgetMetadata = findDirectChildWithClass(gadget, 'metadata');
       if (!gadgetMetadata) {
         return;
       }
-      var macroMetadata = gadgetMetadata.down('.isMacro');
+      const macroMetadata = findDirectChildWithClass(gadgetMetadata, 'isMacro');
       if (macroMetadata && macroMetadata.innerHTML == 'true') {
         // it's a macro, edit it
         // get the gadget id
         var gadgetId = this._getGadgetId(gadget);
         var title, macroCall;
         // get the gadget metadata, start the wizard
-        var titleMetadata = gadgetMetadata.down(".title");
+        const titleMetadata = findDirectChildWithClass(gadgetMetadata, 'title');
         if (titleMetadata) {
           title = titleMetadata.innerHTML;
         }
-        var macroCommentMetadata = gadgetMetadata.down('.content');
+        const macroCommentMetadata = findDirectChildWithClass(gadgetMetadata, 'content');
         if (macroCommentMetadata) {
           var macroComment = macroCommentMetadata.innerHTML;
           macroCall = this._parseMacroCallComment(macroComment);
@@ -461,10 +479,7 @@ XWiki.Dashboard = Class.create( {
           window.location.reload();
         }.bind(this),
         onFailure : function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           this._x_notification.replace(new XWiki.widgets.Notification(l10n['dashboard.gadget.actions.edit.failed'] +
             failureReason, "error", {timeout: 5}));
         }.bind(this),
@@ -525,13 +540,12 @@ XWiki.Dashboard = Class.create( {
   addNewContainerHandler : function() {
     // create the button
     var addButton = new Element('div', {
-      'class': 'addcontainer',
+      'class': 'btn btn-success addcontainer',
       'title': l10n['dashboard.actions.columns.add.tooltip']
     });
-    addButton.update(l10n['dashboard.actions.columns.add.button']);
+    addButton.update(icons.add + l10n['dashboard.actions.columns.add.button']);
     addButton.observe('click', this.onAddColumn.bindAsEventListener(this));
-    var addGadgetButton = this.element.down('.addgadget');
-    addGadgetButton.insert({'before' : addButton});
+    this.element.down('.containeradd').insert(addButton);
   },
 
   /**
@@ -608,10 +622,7 @@ XWiki.Dashboard = Class.create( {
           }
         }.bind(this),
         onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
+          var failureReason = response.statusText || 'Server not responding';
           // show the error message at the bottom
           this._x_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.edit.failed'] + failureReason,
             "error", {timeout: 5});
@@ -651,10 +662,9 @@ XWiki.Dashboard = Class.create( {
 
     // stop the event, so that it doesn't actually send the request just yet, we'll send it when we're done with saving
     event.stop();
-    event.memo.originalEvent.stop();
 
     // get the element of the event
-    var eventElt = event.memo.originalEvent.element();
+    var eventElt = event.element();
 
     // start to submit the edit, notify
     this._x_edit_notification = new XWiki.widgets.Notification(l10n['dashboard.actions.save.loading'], "inprogress");
@@ -723,7 +733,9 @@ function init() {
     // edit first dashboard FIXME: to create a dashboard editor for all dashboards
     var dashboardRootElt = $$('.dashboard')[0];
     if (dashboardRootElt) {
-      new XWiki.Dashboard(dashboardRootElt);
+      require(['scriptaculous/dragdrop'], function() {
+        new XWiki.Dashboard(dashboardRootElt);
+      });
     }
   }
   return true;
@@ -734,4 +746,4 @@ function init() {
 || document.observe("xwiki:dom:loaded", init);
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $l10n]));
+}).apply(']]#', $jsontool.serialize([$paths, $l10n, $icons]));

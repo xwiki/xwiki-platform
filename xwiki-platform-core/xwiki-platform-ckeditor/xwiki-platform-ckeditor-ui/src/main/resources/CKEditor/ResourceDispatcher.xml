@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.ResourceDispatcher" locale="">
+  <web>CKEditor</web>
+  <name>ResourceDispatcher</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity wiki="false"}}
+#set ($resourceType = $request.type)
+#set ($resourceReference = $request.reference)
+#set ($resourceURL = $NULL)
+#if ($resourceType == 'attach')
+  #set ($attachmentReference = $services.model.resolveAttachment($resourceReference))
+  #set ($documentFullName = $services.model.serialize($attachmentReference.parent))
+  #set ($resourceURL = $xwiki.getAttachmentURL($documentFullName, $attachmentReference.name))
+#elseif ($resourceType == 'doc')
+  #set ($resourceURL = $xwiki.getURL($resourceReference))
+#elseif ($resourceType == 'icon')
+  #set ($resourceURL = $xwiki.getSkinFile("icons/silk/${resourceReference}.png"))
+#elseif ($resourceType == 'user')
+  #set ($userReference = $services.model.resolveDocument($resourceReference, 'user'))
+  #set ($resourceURL = $xwiki.getURL($userReference))
+#end
+#if ("$!resourceType" != '')
+  #if ($resourceURL)
+    #set ($parts = $resourceURL.split('#', 2))
+    #set ($resourceURL = $parts.get(0))
+    #set ($anchor = "$!request.getParameter('parameters[anchor]')")
+    #if ($parts.size() == 2 &amp;&amp; $anchor == '')
+      ## Keep the original anchor.
+      #set ($anchor = $parts.get(1))
+    #end
+    #set ($parts = $resourceURL.split('\?', 2))
+    #set ($resourceURL = $parts.get(0))
+    #set ($queryString = "$!request.getParameter('parameters[queryString]')")
+    #if ($parts.size() == 2)
+      ## Insert the new query string before the original one so that the new parameter values take precedence.
+      #set ($queryString = "$queryString&amp;$parts.get(1)")
+    #end
+    $response.sendRedirect("$resourceURL?$queryString#$anchor")
+  #else
+    $response.sendError(404)
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

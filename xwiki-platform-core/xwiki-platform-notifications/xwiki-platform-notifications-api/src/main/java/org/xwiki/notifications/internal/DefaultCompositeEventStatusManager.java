@@ -20,8 +20,9 @@
 package org.xwiki.notifications.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
@@ -46,39 +47,47 @@ import org.xwiki.notifications.CompositeEventStatusManager;
 @Singleton
 public class DefaultCompositeEventStatusManager implements CompositeEventStatusManager
 {
+    private static final int BATCH_SIZE = 50;
+
     @Inject
-    private EventStatusManager eventStatusManager;
+    private EventStore eventStore;
 
     @Override
     public List<CompositeEventStatus> getCompositeEventStatuses(List<CompositeEvent> compositeEvents, String entityId)
-            throws Exception
+        throws Exception
     {
-        // Creating a list of all events to avoid multiple calls to getEventStatuses() and so multiple calls to the
-        // database.
-        List<Event> allEvents = new ArrayList<>();
-        // But maintain a mapping between eventId and their composite event status
-        Map<String, CompositeEventStatus> map = new HashMap<>();
+        // Maintain a mapping between eventId and their composite event status
+        Map<String, CompositeEventStatus> statusMap = new HashMap<>();
+        List<CompositeEventStatus> results = new ArrayList<>();
+        LinkedList<Event> eventsToProcess = new LinkedList<>();
+
+        // Prepare the maps
         for (CompositeEvent compositeEvent : compositeEvents) {
             CompositeEventStatus compositeEventStatus = new CompositeEventStatus(compositeEvent);
+            results.add(compositeEventStatus);
             for (Event event : compositeEvent.getEvents()) {
-                map.put(event.getId(), compositeEventStatus);
+                statusMap.put(event.getId(), compositeEventStatus);
+                eventsToProcess.add(event);
             }
-            allEvents.addAll(compositeEvent.getEvents());
         }
-        // Put the event statuses into the composite events statuses
-        for (EventStatus eventStatus : getEventStatuses(allEvents, entityId)) {
-            map.get(eventStatus.getEvent().getId()).add(eventStatus);
-        }
-        List<CompositeEventStatus> results = new ArrayList<>();
-        // Keep the same order than inputs
-        for (CompositeEvent event : compositeEvents) {
-            results.add(map.get(event.getEvents().get(0).getId()));
-        }
+
+        // Process the events status by batch
+        do {
+            List<Event> subList = new ArrayList<>();
+            for (int i = 0; i < BATCH_SIZE && !eventsToProcess.isEmpty(); i++) {
+                Event event = eventsToProcess.pop();
+                subList.add(event);
+            }
+            for (EventStatus eventStatus : getEventStatuses(subList, entityId)) {
+                statusMap.get(eventStatus.getEvent().getId()).add(eventStatus);
+            }
+        } while (!eventsToProcess.isEmpty());
+
         return results;
     }
 
     private List<EventStatus> getEventStatuses(List<Event> events, String entityId) throws Exception
     {
-        return eventStatusManager.getEventStatus(events, Arrays.asList(entityId));
+        return this.eventStore.getEventStatuses(events, Collections.singletonList(entityId));
     }
 }

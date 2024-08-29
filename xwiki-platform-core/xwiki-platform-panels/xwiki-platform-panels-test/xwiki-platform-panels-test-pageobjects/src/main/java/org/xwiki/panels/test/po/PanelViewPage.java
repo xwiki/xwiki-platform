@@ -19,6 +19,8 @@
  */
 package org.xwiki.panels.test.po;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -29,10 +31,22 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class PanelViewPage extends ViewPage
 {
+    @FindBy(className = "xwikipanelcontents")
+    private WebElement content;
+
     @SuppressWarnings("unchecked")
     @Override
     protected PanelEditPage createInlinePage()
     {
         return new PanelEditPage();
+    }
+
+    /**
+     * @since 15.1RC1
+     * @since 14.10.5
+     */
+    public WebElement getPanelContent()
+    {
+        return this.content;
     }
 }

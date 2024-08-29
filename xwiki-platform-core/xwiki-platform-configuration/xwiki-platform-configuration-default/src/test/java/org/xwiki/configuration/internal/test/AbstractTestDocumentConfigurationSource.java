@@ -19,11 +19,6 @@
  */
 package org.xwiki.configuration.internal.test;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.lang.reflect.Type;
 import java.util.function.Consumer;
 
@@ -48,9 +43,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Utility to test all extensions of {@link AbstractDocumentConfigurationSource}.
@@ -115,6 +114,15 @@ public abstract class AbstractTestDocumentConfigurationSource
             document.addXObject(baseObject);
         }
         consumer.accept(baseObject);
+        xcontext.getWiki().saveDocument(document, xcontext);
+    }
+
+    protected void removeConfigObject(DocumentReference documentReference) throws XWikiException
+    {
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+        LocalDocumentReference classReference = getClassReference();
+        document.removeXObjects(classReference);
         xcontext.getWiki().saveDocument(document, xcontext);
     }
 

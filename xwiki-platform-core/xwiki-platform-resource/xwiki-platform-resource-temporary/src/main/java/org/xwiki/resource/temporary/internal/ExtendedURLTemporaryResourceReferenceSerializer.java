@@ -32,8 +32,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
@@ -46,7 +44,6 @@ import org.xwiki.url.URLNormalizer;
  * @since 6.1M2
  */
 @Component
-@Named("standard/tmp")
 @Singleton
 public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
@@ -61,15 +58,14 @@ public class ExtendedURLTemporaryResourceReferenceSerializer
 
     @Override
     public ExtendedURL serialize(TemporaryResourceReference reference)
-        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        List<String> segments = new LinkedList<String>();
+        List<String> segments = new LinkedList<>();
         segments.add("tmp");
         segments.add(reference.getModuleId());
         segments.add(serialize(reference.getOwningEntityReference()));
         segments.addAll(reference.getResourcePath());
         // A modifiable map is used here so parameters can be added to the URL later.
-        Map<String, List<String>> parameters = new HashMap<String, List<String>>(reference.getParameters());
+        Map<String, List<String>> parameters = new HashMap<>(reference.getParameters());
         ExtendedURL result = new ExtendedURL(segments, parameters);
         return this.extendedURLNormalizer.normalize(result);
     }

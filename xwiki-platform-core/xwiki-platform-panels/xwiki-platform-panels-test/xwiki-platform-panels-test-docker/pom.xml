@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-panels-test</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-panels-test-docker</artifactId>
@@ -79,6 +79,15 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
+    </dependency>
+    <!-- The JavaScript code used in the Navigation panel configuration and the Applications panel configuration needs
+      to display localized messages and for this it needs to fetch them through REST so we need an implementation of the
+      localization REST API. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-rest-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- ================================
          Test only dependencies
@@ -135,14 +144,11 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
+              <systemPropertyVariables>
                 <!-- Tell the Docker-based test to activate the Clover profile so that the Clover JAR is added to
                      WEB-INF/lib -->
-                <property>
-                  <name>xwiki.test.ui.profiles</name>
-                  <value>clover</value>
-                </property>
-              </systemProperties>
+                <xwiki.test.ui.profiles>clover</xwiki.test.ui.profiles>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>

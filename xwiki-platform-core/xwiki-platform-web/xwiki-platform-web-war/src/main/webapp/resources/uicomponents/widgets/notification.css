@@ -6,7 +6,7 @@
   right: 0;
   margin: auto;
   text-align: center;
-  z-index: 1200;
+  z-index: 10051; /* One more than the z-index of bootstrap's modal. */
   display: block !important;
   max-width: 80%;
 }
@@ -19,7 +19,7 @@
   background: #333 2px center no-repeat;
   border: none;
   padding: 8px 15px;
-  border-radius: 4px;
+  border-radius: 7px;
   color: #fff;
   line-height: 20px;
   margin-bottom: 10px;

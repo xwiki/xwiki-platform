@@ -19,8 +19,12 @@
  */
 package org.xwiki.observation.remote.test;
 
+import java.io.File;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
@@ -28,14 +32,20 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.Environment;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Base class to easily emulate two instances of observation manager communicating with each other by network.
  * 
  * @version $Id$
  */
+@ComponentTest
 public abstract class AbstractROMTestCase
 {
     protected MockitoComponentManager componentManager1 = new MockitoComponentManager();
@@ -49,6 +59,18 @@ public abstract class AbstractROMTestCase
     private ObservationManager observationManager1;
 
     private ObservationManager observationManager2;
+
+    @XWikiTempDir
+    private File tmpDir1;
+
+    @XWikiTempDir
+    private File tmpDir2;
+    
+    @Mock
+    private Environment environment1;
+
+    @Mock
+    private Environment environment2;
 
     @BeforeEach
     public void beforeEach() throws Exception
@@ -64,12 +86,21 @@ public abstract class AbstractROMTestCase
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
         getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);
 
+        DefaultComponentDescriptor<Environment> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(Environment.class);
+        componentDescriptor.setRoleHint("default");
+        this.componentManager1.registerComponent(componentDescriptor, this.environment1);
+        this.componentManager2.registerComponent(componentDescriptor, this.environment2);
+        
+        when(this.environment1.getPermanentDirectory()).thenReturn(this.tmpDir1);
+        when(this.environment2.getPermanentDirectory()).thenReturn(this.tmpDir2);
+
         this.observationManager1 = getComponentManager1().getInstance(ObservationManager.class);
         this.observationManager2 = getComponentManager2().getInstance(ObservationManager.class);
     }
 
     @AfterEach
-    private void afterEach() throws Exception
+    void afterEach() throws Exception
     {
         cleanExecution(this.componentManager1);
         cleanExecution(this.componentManager2);

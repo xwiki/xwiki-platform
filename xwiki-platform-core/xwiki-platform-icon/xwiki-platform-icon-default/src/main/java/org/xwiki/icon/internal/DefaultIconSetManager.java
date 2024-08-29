@@ -21,6 +21,7 @@ package org.xwiki.icon.internal;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -47,6 +49,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Default implementation of {@link org.xwiki.icon.IconSetManager}.
@@ -89,6 +93,9 @@ public class DefaultIconSetManager implements IconSetManager
     @Named("all")
     private ConfigurationSource configurationSource;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public IconSet getCurrentIconSet() throws IconException
     {
@@ -103,7 +110,7 @@ public class DefaultIconSetManager implements IconSetManager
 
         // Get the icon set
         DocumentReference iconThemeDocRef = documentReferenceResolver.resolve(iconTheme);
-        if (!StringUtils.isBlank(iconTheme) && documentAccessBridge.exists(iconThemeDocRef)) {
+        if (!StringUtils.isBlank(iconTheme) && exists(iconThemeDocRef)) {
             iconSet = iconSetCache.get(iconThemeDocRef);
             if (iconSet == null) {
                 // lazy loading
@@ -114,6 +121,15 @@ public class DefaultIconSetManager implements IconSetManager
         }
 
         return iconSet;
+    }
+
+    private boolean exists(DocumentReference iconThemeDocRef) throws IconException
+    {
+        try {
+            return this.documentAccessBridge.exists(iconThemeDocRef);
+        } catch (Exception e) {
+            throw new IconException("Failed to check if the icon theme age exist", e);
+        }
     }
 
     @Override
@@ -148,36 +164,69 @@ public class DefaultIconSetManager implements IconSetManager
         }
 
         // Get the icon set from the cache
-        IconSet iconSet = iconSetCache.get(name, wikiDescriptorManager.getCurrentWikiId());
+        IconSet iconSet = this.iconSetCache.get(name, this.wikiDescriptorManager.getCurrentWikiId());
 
         // Load it if it is not loaded yet
         if (iconSet == null) {
+            List<String> results;
+
             try {
                 // Search by name
                 String xwql = "FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name";
-                Query query = queryManager.createQuery(xwql, Query.XWQL);
+                Query query = this.queryManager.createQuery(xwql, Query.XWQL);
                 query.bindValue("name", name);
-                List<String> results = query.execute();
-                if (results.isEmpty()) {
-                    return null;
-                }
-
-                // Get the first result
-                String docName = results.get(0);
-                DocumentReference docRef = documentReferenceResolver.resolve(docName);
-
-                // Load the icon theme
-                iconSet = iconSetLoader.loadIconSet(docRef);
-
-                // Put it in the cache
-                iconSetCache.put(docRef, iconSet);
-                iconSetCache.put(name, wikiDescriptorManager.getCurrentWikiId(), iconSet);
+                results = query.execute();
             } catch (QueryException e) {
                 throw new IconException(String.format("Failed to load the icon set [%s].", name), e);
             }
+
+            iconSet = loadIconSetFromCandidateDocuments(name, results);
         }
 
         // Return the icon set
+        return iconSet;
+    }
+
+    private IconSet loadIconSetFromCandidateDocuments(String name, List<String> candidateDocuments) throws IconException
+    {
+        List<IconException> iconExceptions = new ArrayList<>();
+        IconSet iconSet = null;
+
+        // Try all results to find the first one that loads successfully.
+        for (String docName : candidateDocuments) {
+            DocumentReference docRef = this.documentReferenceResolver.resolve(docName);
+
+            try {
+                // Load the icon theme
+                iconSet = this.iconSetLoader.loadIconSet(docRef);
+
+                // Put it in the cache
+                this.iconSetCache.put(docRef, iconSet);
+                this.iconSetCache.put(name, this.wikiDescriptorManager.getCurrentWikiId(), iconSet);
+
+                break;
+            } catch (IconException e) {
+                // Store the exception first, maybe there is another icon theme with the same name that loads
+                // successfully.
+                iconExceptions.add(e);
+            }
+        }
+
+        if (iconSet == null && !iconExceptions.isEmpty()) {
+            if (iconExceptions.size() > 1) {
+                iconExceptions.stream().skip(1)
+                    .forEach(e -> this.logger.warn("Failed loading icon set [{}] from multiple matching "
+                            + "documents, ignored this additional exception, reason: [{}].", name,
+                        getRootCauseMessage(e)));
+                throw new IconException(String.format("Failed to load the icon set [%s] from %d documents, "
+                        + "reporting the first exception, see the log for additional errors.",
+                    name, candidateDocuments.size()),
+                    iconExceptions.get(0));
+            } else {
+                throw iconExceptions.get(0);
+            }
+        }
+
         return iconSet;
     }
 

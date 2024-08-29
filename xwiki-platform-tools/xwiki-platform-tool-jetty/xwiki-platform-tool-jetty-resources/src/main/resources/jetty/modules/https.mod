@@ -18,10 +18,10 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Adds HTTPS protocol support to the TLS(SSL) Connector
+Adds HTTPS protocol support to the TLS(SSL) Connector.
 
 [tags]
 connector
@@ -32,9 +32,9 @@ ssl
 [depend]
 ssl
 
-[optional]
-http2
+[after]
 http-forwarded
 
 [xml]
 etc/jetty-https.xml
+

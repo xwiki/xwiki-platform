@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceDeletedEvent;
@@ -32,6 +34,7 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
@@ -55,7 +58,10 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
     public static final String NAME = "NotificationPreferenceEventGeneratorListener";
 
     private static final RegexEntityReference REFERENCE =
-        BaseObjectReference.any(DefaultModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
+        BaseObjectReference.any(DefaultNotificationPreferenceModelBridge.NOTIFICATION_PREFERENCE_CLASS_STRING);
+
+    private static final RegexEntityReference GROUPING_STRATEGY_PREFERENCE_REFERENCE =
+        BaseObjectReference.any(NotificationEventGroupingStrategyPreferenceDocumentInitializer.REFERENCE_STRING);
 
     @Inject
     private ObservationManager observation;
@@ -65,19 +71,37 @@ public class NotificationPreferenceEventGeneratorListener extends AbstractEventL
      */
     public NotificationPreferenceEventGeneratorListener()
     {
-        super(NAME, new XObjectAddedEvent(REFERENCE), new XObjectUpdatedEvent(REFERENCE),
-            new XObjectDeletedEvent(REFERENCE));
+        super(NAME,
+            new XObjectAddedEvent(REFERENCE),
+            new XObjectUpdatedEvent(REFERENCE),
+            new XObjectDeletedEvent(REFERENCE),
+            new XObjectAddedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectUpdatedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE),
+            new XObjectDeletedEvent(GROUPING_STRATEGY_PREFERENCE_REFERENCE)
+        );
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof XObjectAddedEvent) {
-            this.observation.notify(new NotificationPreferenceAddedEvent(), null);
+            this.observation.notify(new NotificationPreferenceAddedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
         } else if (event instanceof XObjectUpdatedEvent) {
-            this.observation.notify(new NotificationPreferenceUpdatedEvent(), null);
+            this.observation.notify(new NotificationPreferenceUpdatedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
         } else if (event instanceof XObjectDeletedEvent) {
-            this.observation.notify(new NotificationPreferenceDeletedEvent(), null);
+            this.observation.notify(new NotificationPreferenceDeletedEvent(),
+                getEntityReference(((XWikiDocument) source).getDocumentReference()));
+        }
+    }
+
+    private EntityReference getEntityReference(DocumentReference source)
+    {
+        if (source.getLocalDocumentReference().equals(DefaultNotificationPreferenceModelBridge.GLOBAL_PREFERENCES)) {
+            return source.getWikiReference();
+        } else {
+            return source;
         }
     }
 }

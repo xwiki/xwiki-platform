@@ -19,9 +19,11 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -40,6 +43,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -68,6 +73,15 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private UserReferenceSerializer<String> userReferenceSerializer;
+
+    // TODO: relying on this serializer should be prevented by properly rewriting XWiki#getPlainUserName
+    //  to use UserReference
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
 
     /**
      * Used to serialize entity reference to be used in dynamic field names.
@@ -122,7 +136,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         addLocales(translatedDocument, translatedDocument.getLocale(), solrDocument);
 
         // Get both serialized user reference string and pretty user name
-        setAuthors(solrDocument, translatedDocument, entityReference);
+        setAuthors(solrDocument, translatedDocument);
 
         // Document dates.
         solrDocument.setField(FieldUtils.CREATIONDATE, translatedDocument.getCreationDate());
@@ -131,8 +145,14 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // Document translations have their own hidden fields
         solrDocument.setField(FieldUtils.HIDDEN, translatedDocument.isHidden());
 
+        // Add links found in the document
+        setLinks(solrDocument, translatedDocument, xcontext);
+
         // Add any extra fields (about objects, etc.) that can improve the findability of the document.
         setExtras(documentReference, solrDocument, locale);
+
+        // Extract more metadata
+        this.extractorUtils.extract(documentReference, translatedDocument, solrDocument);
 
         return true;
     }
@@ -140,26 +160,58 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     /**
      * @param solrDocument the Solr document
      * @param translatedDocument the XWiki document
-     * @param entityReference the document reference
      */
-    private void setAuthors(SolrInputDocument solrDocument, XWikiDocument translatedDocument,
-        EntityReference entityReference)
+    private void setAuthors(SolrInputDocument solrDocument, XWikiDocument translatedDocument)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentAuthors authors = translatedDocument.getAuthors();
 
-        String authorString = entityReferenceSerializer.serialize(translatedDocument.getAuthorReference());
+        UserReference originalAuthor = authors.getOriginalMetadataAuthor();
+        String authorString = this.userReferenceSerializer.serialize(originalAuthor);
         solrDocument.setField(FieldUtils.AUTHOR, authorString);
-        String authorDisplayString =
-            xcontext.getWiki().getPlainUserName(translatedDocument.getAuthorReference(), xcontext);
+        String authorDisplayString = xcontext.getWiki().getPlainUserName(
+            this.documentReferenceUserReferenceSerializer.serialize(originalAuthor), xcontext);
         solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
 
-        String creatorString = entityReferenceSerializer.serialize(translatedDocument.getCreatorReference());
+        UserReference creator = authors.getCreator();
+        String creatorString = this.userReferenceSerializer.serialize(creator);
         solrDocument.setField(FieldUtils.CREATOR, creatorString);
-        String creatorDisplayString =
-            xcontext.getWiki().getPlainUserName(translatedDocument.getCreatorReference(), xcontext);
+        String creatorDisplayString = xcontext.getWiki().getPlainUserName(
+            this.documentReferenceUserReferenceSerializer.serialize(creator), xcontext);
         solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
     }
 
+    private void setLinks(SolrInputDocument solrDocument, XWikiDocument translatedDocument, XWikiContext xcontext)
+    {
+        // Extract links
+        // TODO: support more than EntityReference (extract and index any type of link found in the content)
+        Set<EntityReference> references = translatedDocument.getUniqueLinkedEntities(xcontext);
+
+        if (!references.isEmpty()) {
+            Set<String> links = new HashSet<>(references.size());
+            Set<String> linksExtended = new HashSet<>(references.size() * 2);
+
+            // Serialize the links and resolve the extended links
+            for (EntityReference reference : references) {
+                String referenceString = this.linkSerializer.serialize(reference);
+
+                links.add(referenceString);
+                linksExtended.add(referenceString);
+
+                // Add the reference without parameters as well as all its parents to the extended list
+                extendLink(reference, linksExtended);
+            }
+
+            // Add the links to the Solr document
+            for (String link : links) {
+                solrDocument.addField(FieldUtils.LINKS, link);
+            }
+            for (String linkExtended : linksExtended) {
+                solrDocument.addField(FieldUtils.LINKS_EXTENDED, linkExtended);
+            }
+        }
+    }
+    
     /**
      * @param documentReference the document's reference.
      * @param solrDocument the Solr document where to add the data.
@@ -208,7 +260,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         Object value = typedValue.getValue();

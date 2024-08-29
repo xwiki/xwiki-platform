@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Request;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 
@@ -63,6 +64,21 @@ public class WikiCreationRequest extends AbstractRequest
     private static final String PROPERTY_FAIL_ON_EXISTS = PROPERTY_PREFIX + "failOnExist";
 
     private static final String PROPERTY_WIKI_SOURCE = PROPERTY_PREFIX + "wikiSource";
+
+    /**
+     * Default constructor.
+     */
+    public WikiCreationRequest()
+    {
+    }
+
+    /**
+     * @param request the request to copy
+     */
+    public WikiCreationRequest(Request request)
+    {
+        super(request);
+    }
 
     /**
      * @return id of the wiki to create
@@ -133,7 +149,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public boolean isTemplate()
     {
-        return getProperty(PROPERTY_IS_TEMPLATE);
+        return getProperty(PROPERTY_IS_TEMPLATE, false);
     }
 
     /**
@@ -257,7 +273,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public boolean isFailOnExist()
     {
-        return getProperty(PROPERTY_FAIL_ON_EXISTS);
+        return getProperty(PROPERTY_FAIL_ON_EXISTS, true);
     }
 
     /**

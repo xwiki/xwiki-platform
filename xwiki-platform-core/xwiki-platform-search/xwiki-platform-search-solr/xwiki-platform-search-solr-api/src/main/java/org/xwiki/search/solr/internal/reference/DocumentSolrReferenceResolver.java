@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.reference;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
@@ -38,7 +39,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 
-import com.google.common.collect.Iterables;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -81,48 +81,54 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Override
     public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException
     {
-        List<EntityReference> result = new ArrayList<EntityReference>();
-
         XWikiContext xcontext = this.xcontextProvider.get();
 
         DocumentReference documentReference = new DocumentReference(reference);
 
-        if (xcontext.getWiki().exists(documentReference, xcontext)) {
-            // Document itself
-            result.add(documentReference);
-
-            // FIXME: Assumption - Only original documents contain objects and attachments, because objects are
-            // not translatable.
-            // https://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
-            if (documentReference.getLocale() == null || documentReference.getLocale().equals(Locale.ROOT)) {
-                XWikiDocument document;
-                try {
-                    document = getDocument(documentReference);
-                } catch (Exception e) {
-                    throw new SolrIndexerException(String.format("Failed to get document [%s]", documentReference), e);
-                }
-
-                // Document translations
-                List<Locale> translatedLocales;
-                try {
-                    translatedLocales = document.getTranslationLocales(xcontext);
-                } catch (XWikiException e) {
-                    throw new SolrIndexerException(String.format("Failed to get document [%s] translations",
-                        documentReference), e);
-                }
-
-                for (Locale translatedLocale : translatedLocales) {
-                    DocumentReference translatedDocumentReference =
-                        new DocumentReference(documentReference, translatedLocale);
-                    result.add(translatedDocumentReference);
-                }
-
-                // Attachments
-                addAttachmentsReferences(document, result);
-
-                // Objects
-                addObjectsReferences(document, result);
+        try {
+            if (!xcontext.getWiki().exists(documentReference, xcontext)) {
+                return Collections.emptyList();
             }
+        } catch (XWikiException e) {
+            throw new SolrIndexerException(
+                "Failed to test if the document with reference [" + documentReference + "] exists", e);
+        }
+
+        List<EntityReference> result = new ArrayList<>();
+        // Document itself
+        result.add(documentReference);
+
+        // FIXME: Assumption - Only original documents contain objects and attachments, because objects are
+        // not translatable.
+        // https://jira.xwiki.org/browse/XWIKI-69 is the long standing issue on which the second assumption relies.
+        if (documentReference.getLocale() == null || documentReference.getLocale().equals(Locale.ROOT)) {
+            XWikiDocument document;
+            try {
+                document = getDocument(documentReference);
+            } catch (Exception e) {
+                throw new SolrIndexerException(String.format("Failed to get document [%s]", documentReference), e);
+            }
+
+            // Document translations
+            List<Locale> translatedLocales;
+            try {
+                translatedLocales = document.getTranslationLocales(xcontext);
+            } catch (XWikiException e) {
+                throw new SolrIndexerException(
+                    String.format("Failed to get document [%s] translations", documentReference), e);
+            }
+
+            for (Locale translatedLocale : translatedLocales) {
+                DocumentReference translatedDocumentReference =
+                    new DocumentReference(documentReference, translatedLocale);
+                result.add(translatedDocumentReference);
+            }
+
+            // Attachments
+            addAttachmentsReferences(document, result);
+
+            // Objects
+            addObjectsReferences(document, result);
         }
 
         return result;
@@ -139,7 +145,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
             AttachmentReference attachmentReference = attachment.getReference();
 
             try {
-                Iterables.addAll(result, this.attachmentResolverProvider.get().getReferences(attachmentReference));
+                this.attachmentResolverProvider.get().getReferences(attachmentReference).forEach(result::add);
             } catch (Exception e) {
                 this.logger.error("Failed to resolve references for attachment [" + attachmentReference + "]", e);
             }
@@ -159,7 +165,7 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
                     BaseObjectReference objectReference = object.getReference();
 
                     try {
-                        Iterables.addAll(result, this.objectResolverProvider.get().getReferences(objectReference));
+                        this.objectResolverProvider.get().getReferences(objectReference).forEach(result::add);
                     } catch (Exception e) {
                         this.logger.error("Failed to resolve references for object [" + objectReference + "]", e);
                     }

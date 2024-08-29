@@ -20,15 +20,14 @@
 package org.xwiki.velocity;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
@@ -50,7 +49,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @AllComponents
-public class XWikiWebappResourceLoaderTest
+class XWikiWebappResourceLoaderTest
 {
     @MockComponent
     private ConfigurationSource configuration;
@@ -62,7 +61,7 @@ public class XWikiWebappResourceLoaderTest
     private MockitoComponentManager componentManager;
 
     @Test
-    public void testVelocityInitialization() throws Exception
+    void testVelocityInitialization() throws Exception
     {
         this.componentManager.registerMemoryConfigurationSource();
 
@@ -73,18 +72,16 @@ public class XWikiWebappResourceLoaderTest
         when(servletContext.getResourceAsStream("/templates/macros.vm"))
             .thenReturn(new ByteArrayInputStream(new byte[0]));
 
-        VelocityFactory factory = this.componentManager.getInstance(VelocityFactory.class);
-
         Properties properties = new Properties();
         properties.setProperty(RuntimeConstants.RESOURCE_LOADERS, "xwiki");
         properties.setProperty(RuntimeConstants.RESOURCE_LOADER + ".xwiki." + RuntimeConstants.RESOURCE_LOADER_CLASS,
             XWikiWebappResourceLoader.class.getName());
 
-        VelocityEngine engine = factory.createVelocityEngine("key", properties);
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
 
         // Ensure Velocity has been correctly initialized by trying to evaluate some content.
         StringWriter out = new StringWriter();
-        engine.evaluate(new VelocityContext(), out, "template", "#set ($var = 'value')$var");
+        velocityManager.evaluate(out, "template", new StringReader("#set ($var = 'value')$var"));
         assertEquals("value", out.toString());
     }
 }

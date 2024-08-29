@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Registration" locale="">
+<xwikidoc version="1.5" reference="XWiki.Registration" locale="">
   <web>XWiki</web>
   <name>Registration</name>
   <language/>
@@ -56,8 +56,8 @@
   ## If this document is changed such that it must have programming permission in order to run, change this to false.
   #set($sandbox = true)
   ##
-  ## Load the configuration from a seperate document.
-  #loadConfig('XWiki.RegistrationConfig')
+  #set ($registrationConfig = $NULL)
+  #_loadConfig($registrationConfig)
   ##
   #*
    * You may include this document in other documents using {{include reference="XWiki.Registration"/}}
@@ -163,7 +163,8 @@
       'label' : $services.localization.render('core.register.firstName'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'given-name'
       }
     })
   #set($discard = $fields.add($field))
@@ -174,7 +175,8 @@
       'label' : $services.localization.render('core.register.lastName'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'family-name'
       }
     })
   #set($discard = $fields.add($field))
@@ -186,7 +188,8 @@
       'params' : {
         'type' : 'text',
         'onfocus' : 'prepareName(document.forms.register);',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'username'
       },
       'validate' : {
         'mandatory' : {
@@ -209,7 +212,7 @@
   ##
   ##The password field, mandatory and must be at least 6 characters long.
   ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
-  #definePasswordFields($fields, 'register_password', 'register2_password', $passwordOptions)
+  #definePasswordFields($fields, 'register_password', 'register2_password', $registrationConfig.passwordOptions)
   ##
   ## The email address field, regex checked with an email pattern. Mandatory if registration uses email verification
   #set($field =
@@ -217,7 +220,8 @@
       'label' : $services.localization.render('core.register.email'),
       'params' : {
         'type' : 'text',
-        'size' : '60'
+        'size' : '60',
+        'autocomplete' : 'email'
       },
       'validate' : {
         'regex' : {
@@ -226,7 +230,7 @@
         }
       }
     })
-  #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
+  #if($registrationConfig.useEmailVerification)
     #set($field.validate.mandatory = {'failureMessage' : $services.localization.render('core.validation.required.message')})
   #end
   #set($discard = $fields.add($field))
@@ -272,7 +276,7 @@
   #if($services.captcha
       &amp;&amp; !$invited
       &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest"
-      &amp;&amp; $requireCaptcha)
+      &amp;&amp; $registrationConfig.requireCaptcha)
     ## The CAPTCHA field, programmatically checked to make sure the CAPTCHA is right.
     ## Not checked by javascript because javascript can't check the CAPTCHA and the Ok message because it passes the
     ## mandatory test is misleading.
@@ -333,7 +337,7 @@
   #end
   ##
   ## Display the heading
-  $heading
+  $registrationConfig.heading
   ## If the submit button has been pressed, then we test the input and maybe create the user.
   #if($request.getParameter('xwikiname'))
     ## Do server side validation of input fields.
@@ -347,7 +351,7 @@
   ## If the registration was not successful or if the user hasn't submitted the info yet
   ## Then we display the registration form.
   #if(!$registrationDone)
-    $welcomeMessage
+    $registrationConfig.welcomeMessage
 
     {{html clean="false"}}
       &lt;form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
@@ -415,6 +419,9 @@
       {{translation key="core.register.userAlreadyExists"/}}
     #elseif($reg == -4)
       {{translation key="core.register.invalidUsername"/}}
+    #elseif ($reg == -9)
+      {{translation key="core.register.invalidCaptcha"/}}
+    ## Note that -10 is reserved already (see api.XWiki#createUser)
     #elseif($reg == -11)
       {{translation key="core.register.mailSenderWronglyConfigured"/}}
     #else
@@ -442,16 +449,16 @@
     #if("$!request.getParameter($redirectParam)" != '')
       #set($redirect = $request.getParameter($redirectParam))
     #else
-      #set($redirect = $defaultRedirect)
+      #set($redirect = $registrationConfig.defaultRedirect)
     #end
     ## Display a "registration successful" message
 
-    #evaluate($registrationSuccessMessage)
+    #evaluate($registrationConfig.registrationSuccessMessage)
 
     ## Empty line prevents message from being forced into a &lt;p&gt; block.
 
     ## Give the user a login button which posts their username and password to loginsubmit
-    #if($loginButton)
+    #if($registrationConfig.loginButton)
 
       {{html clean=false wiki=false}}
         &lt;form id="loginForm" action="$loginURL" method="post"&gt;
@@ -466,7 +473,7 @@
           &lt;/div&gt;
         &lt;/form&gt;
         ## We don't want autoLogin if we are administrators adding users...
-        #if ($autoLogin &amp;&amp; $request.xpage != 'registerinline')
+        #if ($registrationConfig.autoLogin &amp;&amp; $request.xpage != 'registerinline')
           &lt;script&gt;
             document.observe('xwiki:dom:loaded', function() {
               document.forms['loginForm'].submit();
@@ -517,35 +524,6 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </heading>
-    <liveValidation_defaultFieldOkMessage>
-      <customDisplay/>
-      <disabled>0</disabled>
-      <hint/>
-      <name>liveValidation_defaultFieldOkMessage</name>
-      <number>4</number>
-      <picker>0</picker>
-      <prettyName>Default field okay message</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </liveValidation_defaultFieldOkMessage>
-    <liveValidation_enabled>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>checkbox</displayFormType>
-      <displayType/>
-      <hint/>
-      <name>liveValidation_enabled</name>
-      <number>3</number>
-      <prettyName>Enable Javascript field validation</prettyName>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </liveValidation_enabled>
     <loginButton_autoLogin_enabled>
       <customDisplay/>
       <defaultValue/>
@@ -660,6 +638,7 @@
       <number>9</number>
       <picker>0</picker>
       <prettyName>Registration Successful Message</prettyName>
+      <restricted>0</restricted>
       <rows>12</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>
@@ -692,6 +671,7 @@
       <number>2</number>
       <picker>0</picker>
       <prettyName>Welcome message</prettyName>
+      <restricted>0</restricted>
       <rows>12</rows>
       <size>40</size>
       <unmodifiable>0</unmodifiable>

@@ -117,7 +117,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private static final String INTERNAL = "internal";
 
     /** Stub statistic class used to compute new ids from existing objects. */
-    private static class StatsIdComputer extends XWikiStats
+    private static final class StatsIdComputer extends XWikiStats
     {
         private static final long serialVersionUID = 1L;
 

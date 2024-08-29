@@ -32,6 +32,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
@@ -58,21 +59,28 @@ public class DefaultEventFactory implements EventFactory
     @Inject
     private DocumentAccessBridge bridge;
 
+    @Inject
+    private RemoteObservationManagerConfiguration remoteObservation;
+
     @Override
     public Event createEvent()
     {
-        Event result = new DefaultEvent();
+        DefaultEvent result = new DefaultEvent();
         result.setId(UUID.randomUUID().toString());
         result.setGroupId(getCurrentGroupId());
         result.setUser(new DocumentReference(this.resolver.resolve(this.bridge.getCurrentUser(), EntityType.DOCUMENT)));
         result.setDate(new Date());
+        result.setRemoteObservationId(this.remoteObservation.getId());
         return result;
     }
 
     @Override
     public Event createRawEvent()
     {
-        return new DefaultEvent();
+        DefaultEvent result =  new DefaultEvent();
+        result.setRemoteObservationId(this.remoteObservation.getId());
+
+        return result;
     }
 
     /**

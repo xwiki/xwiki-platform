@@ -45,7 +45,6 @@ skin.sheet.add=Добавить
 skin.sheet.overrideTemplateWarning=Этот раздел позволяет переопределить шаблон скина. Это технический вопрос, и вы должны знать о последствиях.
 skin.sheet.deprecatedPropertiesWarning=Этот раздел здесь для целей обратной совместимости. Вы должны использовать механизм «переопределенных шаблонов» выше.
 skin.sheet.nojs=Без JavaScript вы не сможете использовать этот раздел. Но вместо этого вы можете использовать {0}Редактор объектов{1} и вручную добавить {2} объекты.
-
 skin.sheet.js.deleting=Удаление...
 skin.sheet.js.deletingDone=Шаблон был удален!
 skin.sheet.js.error.csrf=Проверка CSRF не удалась при сохранении. Обновите ваш браузер, чтобы повторить попытку.
@@ -67,8 +66,9 @@ skin.sheet.js.addingDone=Шаблон добавлен!
 #######################################
 ## until 7.1M1
 #######################################
-### Missing: skin.sheet.overridedTemplates=Overridden templates
+skin.sheet.overridedTemplates=Переопределенные шаблоны
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

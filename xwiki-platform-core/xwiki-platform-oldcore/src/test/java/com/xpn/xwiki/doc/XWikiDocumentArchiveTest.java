@@ -19,41 +19,43 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
-import org.jmock.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link XWikiDocumentArchive}.
  *
  * @version $Id$
  */
-public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+class XWikiDocumentArchiveTest
 {
     private XWikiContext context;
 
-    private Mock mockXWiki;
-
-    @Override
-    protected void setUp() throws Exception
+    @BeforeEach
+    void setUp(MockitoOldcore mockitoOldcore) throws Exception
     {
-        super.setUp();
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
-        this.mockXWiki.stubs().method("getConfig").will(returnValue(new XWikiConfig()));
-
-        this.context = new XWikiContext();
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        this.context = mockitoOldcore.getXWikiContext();
     }
     
     /**
@@ -63,7 +65,8 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
      *
      * @todo simplify this test. Not sure how to do it. I guess we could create a real document.
      */
-    public void testUpdateArchiveWhenSpaceInUsername() throws Exception
+    @Test
+    void updateArchiveWhenSpaceInUsername() throws Exception
     {
         String originalArchive = "head\t1.1;\n" +
             "access;\n" +
@@ -166,8 +169,9 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         // with a space works.
         new XWikiDocumentArchive(123456789L).setArchive(archive.getArchive(context));
     }
-    
-    public void testUpdateLoad() throws XWikiException
+
+    @Test
+    void updateLoad() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         doc.setContent("content 1.1");
@@ -217,8 +221,9 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         archive.updateArchive(doc, author, new Date(), "2.1", new Version(3,3), context);
         assertEquals(new Version(3,3), archive.getLatestVersion());
     }
-    
-    public void testRemoveVersions() throws XWikiException
+
+    @Test
+    void removeVersions() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
@@ -252,12 +257,93 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         assertEquals(doc11.getComment(), actual.getComment());
     }
 
+    @Test
+    void getNodes() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+        assertEquals(new Version(2,3), archive.getLatestVersion());
+
+        Collection<XWikiRCSNodeInfo> nodes = archive.getNodes(new Version("3.0"), new Version("2.2"));
+        assertEquals(2, nodes.size());
+        Iterator<XWikiRCSNodeInfo> iterator = nodes.iterator();
+        assertEquals(new Version("2.3"), iterator.next().getVersion());
+        assertEquals(new Version("2.2"), iterator.next().getVersion());
+
+        nodes = archive.getNodes(new Version("2.2"), new Version("2.2"));
+        assertEquals(1, nodes.size());
+        iterator = nodes.iterator();
+        assertEquals(new Version("2.2"), iterator.next().getVersion());
+    }
+
+    @Test
+    void getNextFullVersions() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        // We have a full version every 5 nodes, so we're injecting 15 versions
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+
+        doc.setContent("content 2.4\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.4", new Version(2,4), context);
+
+        // 5 nodes so far,
+        // let's add 5
+
+        for (int i = 1; i <= 5; i++) {
+            String version = String.format("3.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+
+        // let's add 7
+        for (int i = 1; i <= 7; i++) {
+            String version = String.format("4.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+        assertEquals(new Version(4,7), archive.getLatestVersion());
+
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("2.3")));
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("1.1")));
+        assertEquals(new Version("2.4"), archive.getNextFullVersion(new Version("2.1")));
+        assertEquals(new Version("3.5"), archive.getNextFullVersion(new Version("3.1")));
+        assertEquals(new Version("4.7"), archive.getNextFullVersion(new Version("4.6")));
+        assertEquals(new Version("4.5"), archive.getNextFullVersion(new Version("4.4")));
+    }
+
     /**
      * Verify issue "When loading a revision of a document the creation date is incorrectly set as the last
      * modification date".
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-2029">XWIKI-2029</a>
      */
-    public void testVerifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
+    @Test
+    void verifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
@@ -280,7 +366,8 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         assertEquals(creationDate, latest.getCreationDate());
     }
 
-    public void testVerifyDiffAndFullRevisionAlgorithm() throws Exception
+    @Test
+    void verifyDiffAndFullRevisionAlgorithm() throws Exception
     {
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());

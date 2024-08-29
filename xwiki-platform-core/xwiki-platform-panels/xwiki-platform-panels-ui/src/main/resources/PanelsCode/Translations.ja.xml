@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="ja">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=ここではアプリケーションバー（既定では左側）に表示されるアプリケーションを選択できます。どの新しいアプリケーションもそこに表示されます。アプリケーションを削除したい場合は、最初のボックスから別のボックスへとアイコンをドラッグアンドドロップしてください。アプリケーションを任意の順番に並び替えることができます。変更の保存を忘れないでください！
+platform.panels.applications.displayedapps=バーにあるアプリケーション
+platform.panels.applications.blacklistedapps=バーにないアプリケーション
+platform.panels.applications.save=保存
+platform.panels.applications.revert=リセット
+platform.panels.applications.ajax.success=設定を保存しました。
+platform.panels.applications.ajax.csrf=CSRFを検証できませんでした。ページの再読み込みを試してください。
+platform.panels.applications.ajax.noright=PanelsCode.ApplicationsPanelConfigurationを編集する権限がありません。
+platform.panels.applications.ajax.error=変更を保存できませんでした。
+admin.panels.applications=アプリケーションパネル
+admin.panels.applications.description=アプリケーションパネルに表示するアプリケーションを管理。
+admin.panels.navigation=ナビゲーションパネル
+admin.panels.navigation.description=ナビゲーションパネルに表示するアプリケーションを管理。
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=最上位の拡張機能のページを除外
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=インストール済の拡張機能に属する最上位のページをナビゲーションツリーから除外します（ページの変更が意図されていない場合）。
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=最上位のアプリケーションのページを除外
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=App Within Minutesで作成したアプリケーションに属する最上位のページをナビゲーションツリーから除外します。
+PanelsCode.NavigationConfigurationClass_exclusions=除外するページ
+PanelsCode.NavigationConfigurationClass_exclusions.hint=ナビゲーションツリーから除外するページの一覧。
+PanelsCode.NavigationConfigurationClass_inclusions=含むページ
+PanelsCode.NavigationConfigurationClass_inclusions.hint=以前のフィルターで除外された場合でもナビゲーションツリーに含めるページの一覧。
+platform.panels.navigation.configuration.excludedPages=除外したページ
+platform.panels.navigation.configuration.excludedPages.hint=ドラッグアンドドロップでページをナビゲーションツリーから除いたり戻したりできます。
+platform.panels.navigation.configuration.excludedPages.empty=なし
+platform.panels.navigation.configuration.topLevelExtensionPages=最上位の拡張機能のページ
+platform.panels.navigation.configuration.topLevelApplicationPages=最上位のアプリケーションのページ
+platform.panels.navigation.configuration.otherPages=その他のページ
+platform.panels.navigation.configuration.saveComment=管理機能でナビゲーションパネルの設定を更新しました
+</content>
+</xwikidoc>

@@ -56,6 +56,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -143,6 +144,9 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     @Inject
     private AuthorizationManager authorizationManager;
 
+    @Inject
+    private WikiTranslationConfiguration configuration;
+
     /**
      * Used to cache on demand document bundles (those that are not registered as components).
      */
@@ -207,7 +211,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         loadTranslations(this.wikiManager.getMainWikiId());
 
         // Listeners
-        this.observation.addListener(this.listener);
+        this.observation.addListener(this.listener, EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY);
         this.observation.addListener(this.wikilistener);
     }
 
@@ -216,6 +220,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         XWikiContext xcontext = this.xcontextProvider.get();
         WikiReference wikiReference = new WikiReference(wiki);
 
+        List<String> documents;
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
@@ -223,21 +228,25 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                     TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
-            
-            List<String> documents = query.execute();
-            for (String documentName : documents) {
-                DocumentReference reference = currentResolver.resolve(documentName, wikiReference);
+
+            documents = query.execute();
+        } catch (Exception e) {
+            this.logger.error("Failed to find translation documents", e);
+
+            return ;
+        }
+
+        for (String documentName : documents) {
+            DocumentReference reference = this.currentResolver.resolve(documentName, wikiReference);
+
+            try {
                 XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
-                try {
-                    registerTranslationBundle(document);
-                } catch (Exception e) {
-                    this.logger.error("Failed to register translation bundle from document [{}]",
-                        document.getDocumentReference(), e);
-                }
+                registerTranslationBundle(document);
+            } catch (Exception e) {
+                this.logger.error("Failed to load and register the translation bundle from document [{}]", reference,
+                    e);
             }
-        } catch (Exception e) {
-            this.logger.error("Failed to load existing translations", e);
         }
     }
 
@@ -293,7 +302,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         }
 
         if (document.isNew()) {
-            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exists",
+            throw new TranslationBundleDoesNotExistsException(String.format("Document [%s] does not exist",
                 documentReference));
         }
 
@@ -316,7 +325,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         try {
             documentBundle =
                 new ComponentDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
-                    this.componentManagerProvider.get(), this.translationParser, descriptor);
+                    this.componentManagerProvider.get(), this.translationParser, descriptor, this);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
         }
@@ -427,6 +436,23 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     }
 
     /**
+     * Checks that the author of a document defining a translation bundle has the necessary rights to make it
+     * available, based on the scope of the default locale translation bundle.
+     *
+     * @param document the document defining the translation bundle to check
+     * @param defaultLocaleDocument the document containing the default locale translation bundle
+     * @throws AccessDeniedException when the document author does not have enough rights for the defined scope
+     */
+    protected void checkRegistrationAuthorizationForDocumentLocaleBundle(XWikiDocument document,
+        XWikiDocument defaultLocaleDocument) throws AccessDeniedException
+    {
+        Scope scope = getScope(defaultLocaleDocument);
+        if (scope != null && scope != Scope.ON_DEMAND) {
+            checkRegistrationAuthorization(document, scope);
+        }
+    }
+
+    /**
      * @param document the translation document
      * @param scope the scope
      * @throws AccessDeniedException thrown when the document author does not have enough right for the provided
@@ -434,13 +460,25 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     private void checkRegistrationAuthorization(XWikiDocument document, Scope scope) throws AccessDeniedException
     {
+        EntityReference entityReference;
         switch (scope) {
             case GLOBAL:
                 this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
+                this.authorizationManager.checkAccess(Right.PROGRAM, document.getContentAuthorReference(), null);
                 break;
             case WIKI:
-                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), document
-                    .getDocumentReference().getWikiReference());
+                entityReference = document.getDocumentReference().getWikiReference();
+                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), entityReference);
+                this.authorizationManager.checkAccess(Right.ADMIN, document.getContentAuthorReference(),
+                    entityReference);
+                break;
+            case USER:
+                if (this.configuration.isRestrictUserTranslations()) {
+                    entityReference = document.getDocumentReference();
+                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getAuthorReference(), entityReference);
+                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getContentAuthorReference(),
+                        entityReference);
+                }
                 break;
             default:
                 break;
@@ -468,7 +506,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      * 
      * @param document the translation document
      * @param scope the translation scope
-     * @param create true if the component manager should be created if it does not exists
+     * @param create true if the component manager should be created if it does not exist
      * @return the component manager corresponding to the provided {@link Scope}
      */
     private ComponentManager getComponentManager(XWikiDocument document, Scope scope, boolean create)

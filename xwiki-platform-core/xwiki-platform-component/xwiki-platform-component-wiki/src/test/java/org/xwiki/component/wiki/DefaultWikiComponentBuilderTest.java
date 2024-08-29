@@ -21,86 +21,58 @@ package org.xwiki.component.wiki;
 
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MapUtils;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.wiki.internal.DefaultWikiComponentBuilder;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-@MockingRequirement(DefaultWikiComponentBuilder.class)
-public class DefaultWikiComponentBuilderTest extends AbstractMockingComponentTestCase implements WikiComponentConstants
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+/**
+ * Validate {@link DefaultWikiComponentBuilder}.
+ * 
+ * @version $Id$
+ */
+@ComponentTest
+class DefaultWikiComponentBuilderTest implements WikiComponentConstants
 {
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private WikiComponentBuilder builder;
+    @InjectMockComponents
+    private DefaultWikiComponentBuilder builder;
 
+    @MockComponent
     private WikiComponentBridge bridge;
 
-    @Before
-    public void configure() throws Exception
+    @Test
+    void buildComponentsWithoutProgrammingRights() throws Exception
     {
-        this.builder = getComponentManager().getInstance(WikiComponentBuilder.class);
-        this.bridge = getComponentManager().getInstance(WikiComponentBridge.class);
+        WikiComponentException expected = assertThrows(WikiComponentException.class, () -> this.builder.buildComponents(DOC_REFERENCE));
+
+        assertEquals("Registering wiki components requires programming rights", expected.getMessage());
     }
 
     @Test
-    public void buildComponentsWithoutProgrammingRights() throws Exception
+    void buildComponents() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
-                will(returnValue(false));
-            }
-        });
-
-        try {
-            this.builder.buildComponents(DOC_REFERENCE);
-            Assert.fail("Should have thrown an exception");
-        } catch (WikiComponentException expected) {
-            Assert.assertEquals("Registering wiki components requires programming rights", expected.getMessage());
-        }
-    }
-
-    @Test
-    public void buildComponents() throws Exception
-    {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(bridge).getAuthorReference(DOC_REFERENCE);
-                will(returnValue(AUTHOR_REFERENCE));
-                oneOf(bridge).getRoleType(DOC_REFERENCE);
-                will(returnValue(TestRole.class));
-                oneOf(bridge).getRoleHint(DOC_REFERENCE);
-                will(returnValue("test"));
-                oneOf(bridge).getScope(DOC_REFERENCE);
-                will(returnValue(WikiComponentScope.WIKI));
-                oneOf(bridge).getHandledMethods(DOC_REFERENCE);
-                will(returnValue(MapUtils.EMPTY_MAP));
-                oneOf(bridge).getDependencies(DOC_REFERENCE);
-                will(returnValue(MapUtils.EMPTY_MAP));
-                oneOf(bridge).getDeclaredInterfaces(DOC_REFERENCE);
-                will(returnValue(ListUtils.EMPTY_LIST));
-                oneOf(bridge).getSyntax(DOC_REFERENCE);
-                will(returnValue(Syntax.XWIKI_2_1));
-                oneOf(bridge).hasProgrammingRights(DOC_REFERENCE);
-                will(returnValue(true));
-            }
-        });
+        when(this.bridge.getAuthorReference(DOC_REFERENCE)).thenReturn(AUTHOR_REFERENCE);
+        when(this.bridge.getRoleType(DOC_REFERENCE)).thenReturn(TestRole.class);
+        when(this.bridge.getRoleHint(DOC_REFERENCE)).thenReturn("test");
+        when(this.bridge.getScope(DOC_REFERENCE)).thenReturn(WikiComponentScope.WIKI);
+        when(this.bridge.getSyntax(DOC_REFERENCE)).thenReturn(Syntax.XWIKI_2_1);
+        when(this.bridge.hasProgrammingRights(DOC_REFERENCE)).thenReturn(true);
 
         List<WikiComponent> components = this.builder.buildComponents(DOC_REFERENCE);
 
-        Assert.assertEquals(1, components.size());
+        assertEquals(1, components.size());
     }
 }

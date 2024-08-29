@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.OfficeImporterResults" locale="">
+<xwikidoc version="1.5" reference="XWiki.OfficeImporterResults" locale="">
   <web>XWiki</web>
   <name>OfficeImporterResults</name>
   <language/>
@@ -37,7 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($displayDocExtra = false)
+#set ($displayDocExtra = false)
 #if ($isguest)
   #error($services.localization.render('xe.officeimporter.notallowed'))
 #else
@@ -45,7 +45,8 @@
 ## Validate Input File ##
 #########################
   #set ($mainDocRef = $services.wiki.currentWikiDescriptor.mainPageReference)
-  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')&gt;&gt;path:$xwiki.getURL($mainDocRef, 'create', 'type=office')]]")
+  #set ($goBack = "[[$services.localization.render('xe.officeimporter.results.goback')" +
+    "&gt;&gt;path:$xwiki.getURL($mainDocRef, 'create', 'type=office')]]")
   #set ($fileUpload = $xwiki.fileupload)
   #set ($fileName = $fileUpload.getFileName("filePath"))
   #if (!$fileName)
@@ -64,16 +65,12 @@
 ###########################
   #set ($target = $request.target)
   #if ("$!target" != '')
-    ## Use the parent space if the target space is not specified.
     #set ($targetDocumentReference = $services.model.resolveDocument($target))
   #end
 ##########################
 ## Append Configuration ##
 ##########################
-  #set ($appendContent = false)
-  #if ($request.appendContent)
-    #set ($appendContent = true)
-  #end
+  #set ($appendContent = $request.overwriteContent != 'true')
 #############################
 ## Filtering Configuration ##
 #############################
@@ -84,45 +81,40 @@
 #############################
 ## Splitting Configuration ##
 #############################
-  #set ($splitDocument = false)
-  #if ($request.splitDocument)
-    #set ($splitDocument = true)
-    #set ($headingLevels = $request.getParameterValues("headingLevelsToSplit"))
-    #if (!$headingLevels)
-      #set ($headingLevels = ['1'])
-    #end
-  #end  
+  #set ($splitDocument = $request.splitDocument == 'true')
+  #set ($headingLevels = ${request.getParameterValues('headingLevelsToSplit')|['1']})
+  #set ($terminalChildPages = $request.terminalChildPages == 'true')
 ############
 ## Import ##
 ############
   #if($fileName)
-    #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
-    #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference, $filterStyles))
+    #set ($resultDocumentLink = "[[**$services.localization.render('xe.officeimporter.results.result')**" +
+      "&gt;&gt;doc:$services.model.serialize($targetDocumentReference)]]")
+    #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference,
+      $filterStyles))
     #if ($xdomOfficeDoc)
       #if (!$splitDocument)
-        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, $parentReference, $null, $appendContent))
+        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, $appendContent))
         #if ($result)
-          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
+          {{info}}
+          $services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack])
+          {{/info}}
         #else
-          {{error}}$services.officeimporter.errorMessage{{/error}}
+          {{error}}$services.rendering.escape($services.officeimporter.errorMessage, 'xwiki/2.1'){{/error}}
         #end
       #else
-        #set ($docsMap = $services.officeimporter.split($xdomOfficeDoc, $headingLevels, $request.childPagesNamingMethod, $targetDocumentReference))
+        #set ($docsMap = $services.officeimporter.split($xdomOfficeDoc, $headingLevels, $request.childPagesNamingMethod,
+          $terminalChildPages, $targetDocumentReference))
         #if ($docsMap)
-          #foreach ($targetDescriptor in $docsMap.keySet())
-            #set ($splitXdomOfficeDoc = $docsMap.get($targetDescriptor))
-            #set ($_parentReference = $targetDescriptor.parentReference)
-            #if (!$_parentReference)
-              ## Set the parent for the root document created by the split.
-              #set ($_parentReference = $parentReference)
-            #end
-            #set ($result = $services.officeimporter.save($splitXdomOfficeDoc, $targetDescriptor.documentReference,
-              $_parentReference, null, $appendContent))
+          #foreach ($entry in $docsMap.entrySet())
+            #set ($result = $services.officeimporter.save($entry.value, $entry.key.documentReference, $appendContent))
             #if (!$result)
-              {{warning}}$services.officeimporter.errorMessage{{/warning}}
+              {{warning}}$services.rendering.escape($services.officeimporter.errorMessage, 'xwiki/2.1'){{/warning}}
             #end
           #end
-          {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
+          {{info}}
+          $services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack])
+          {{/info}}
         #else
           {{error}}$services.officeimporter.errorMessage{{/error}}
         #end

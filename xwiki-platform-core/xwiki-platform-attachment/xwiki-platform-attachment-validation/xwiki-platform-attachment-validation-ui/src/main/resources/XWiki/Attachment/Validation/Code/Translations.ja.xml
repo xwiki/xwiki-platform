@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Attachment.Validation.Code.Translations" locale="ja">
+  <web>XWiki.Attachment.Validation.Code</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.attachmentsrestriction=添付ファイルの制限
+attachment.validation.filesize.errorMessage=ファイル {0} は大きすぎます（{1}）。最大のサイズは{2}です。
+attachment.validation.mimetype.errorMessage=ファイル {0} のmimetype {1} が不正です。
+attachment.validation.mimetype.allowedMimetypes=許可されているmimetypes：{0}
+attachment.validation.mimetype.blockerMimetypes=許可されていないmimetypes：{0}
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes=許可されているmimetype
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_allowedMimetypes.hint=許可する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、許可するmimetypeの一覧をコンマで分割して指定できます。アスタリスク（*）を使うと、全ての種類のファイルを許可できます。一覧を設定すると、指定されていないmimetypeの添付ファイルは拒否されます。たとえば、プレーンテキストと全種類の画像を許可したい場合は、text/plain,image/*のように設定してください。
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes=ブロックされているmimetype 
+XWiki.Attachment.Validation.Code.AttachmentMimetypeRestrictionClass_blockedMimetypes.hint=拒否する添付ファイルのmimetypeの一覧を規定。既定ではこの一覧は空ですが、ブロックするmimetypeの一覧をコンマで分割して指定できます。アスタリスク（*）を使うと、全ての種類のファイルをブロックできます。一覧を設定すると、指定されていないmimetypeの添付ファイルはブロックされます。たとえば、プレーンテキストと全種類の画像をブロックしたい場合は、text/plain,image/*のように設定してください。
+</content>
+</xwikidoc>

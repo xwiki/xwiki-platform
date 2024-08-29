@@ -41,7 +41,6 @@ import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -67,7 +66,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest
+@UITest(
+    // Required so that calls to TestUtils#setPropertyInXWikiCfg() can succeed.
+    properties = {
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:Test\\.XWikiConfigurationPageForTest"
+    }
+)
 public class EditIT
 {
     @BeforeAll
@@ -337,7 +341,6 @@ public class EditIT
 
             // Ensure the page is properly loaded after a save and view
             ViewPage viewPage = new ViewPage();
-            viewPage.waitUntilPageJSIsLoaded();
             assertEquals("Foo bar", viewPage.getContent());
 
             // check with preview
@@ -452,7 +455,6 @@ public class EditIT
         // Tab2 = A first edit from a tab.
 
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab1.setContent("A second edit from another tab.");
         wikiEditPageTab1.clickSaveAndContinue(false);
@@ -486,7 +488,6 @@ public class EditIT
 
         // The merge should be automatic.
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A second edit from another tab.\nAnother line.");
         viewPage = wikiEditPageTab1.clickSaveAndView();
         assertEquals("A second edit from another tab.\nAnother line.\nA new line.", viewPage.getContent());
@@ -499,7 +500,6 @@ public class EditIT
         // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line."
 
         setup.switchTab(secondTabHandle);
-        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // the page will be reloaded by choice
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab2.setContent("A fourth edit from second tab.\nAnother line.");
@@ -582,14 +582,12 @@ public class EditIT
 
         // Step 4: Edit different places, ensure the automatic merge is performed and the editor refreshed
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue();
         // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line with other few changes."
 
         setup.switchTab(secondTabHandle);
-        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // The editor will be reloaded because of the merge
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab2.setContent("A fourth edit from another tab.\nAnother line.\nYet another line.");
@@ -607,7 +605,6 @@ public class EditIT
         // Tab2 = "A fourth edit from another tab.\nAnother line."
         //                + "\nYet another line with other few changes.\nAnd again a new line"
         setup.switchTab(firstTabHandle);
-        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue(false);
@@ -680,7 +677,7 @@ public class EditIT
 
         wikiEditPageTab1.setContent(
               "First line."
-            + "\nSecond line."
+            + "\n<script>alert('Second line.')</script>"
             + "\nLine N°4"
             + "\nFifth line."
             + "\n6th line."
@@ -693,9 +690,9 @@ public class EditIT
         assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
         assertEquals(Arrays.asList("@@ -1,6 +1,6 @@",
             " First line.",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             " Fifth line.",
             "-<del>Six</del>th line.",
@@ -708,9 +705,9 @@ public class EditIT
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
             " First line.",
             "@@ -2,2 +2,2 @@",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             "[Conflict Resolution]",
             "@@ -4,1 +4,1 @@",
@@ -730,7 +727,7 @@ public class EditIT
 
         assertEquals(Conflict.DecisionType.CURRENT, conflict.getCurrentDecision());
         assertFalse(conflict.isDecisionChangeEmpty());
-        assertEquals("Second line.\nLine N°4", conflict.getDecisionChange());
+        assertEquals("<script>alert('Second line.')</script>\nLine N°4", conflict.getDecisionChange());
         conflict.setDecision(Conflict.DecisionType.PREVIOUS);
         assertFalse(conflict.isDecisionChangeEmpty());
         assertEquals("Second line.\nThird line.", conflict.getDecisionChange());
@@ -801,7 +798,7 @@ public class EditIT
         SpaceReference spaceReference = new SpaceReference(reference.getWikiReference().getName(),
             Arrays.asList(spaceName1, spaceName2));
         DocumentReference documentReference = new DocumentReference(documentName, spaceReference);
-        setup.gotoPage(documentReference, "create");
+        setup.gotoPage(documentReference, "create", "template=");
         CreatePagePage createPagePage = new CreatePagePage();
         createPagePage.waitForErrorMessage();
         assertTrue(createPagePage.getErrorMessage()
@@ -837,7 +834,6 @@ public class EditIT
         wikiEditPage.setContent("fourth edit");
 
         viewPage = setup.gotoPage(testReference);
-        viewPage.waitUntilPageJSIsLoaded();
 
         // view page -> wiki editor
         setup.getDriver().navigate().back();
@@ -935,10 +931,10 @@ public class EditIT
     {
         // Fixture: enable the XHTML syntax.
         setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
-            "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0");
+            "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0,xhtml/5,html/5.0");
         setup.deletePage(testReference);
 
-        String pageContent = "= First heading =\n"
+        String pageContent = "== First heading ==\n"
             + "\n"
             + "Paragraph containing some **bold content**.\n"
             + "\n"
@@ -968,7 +964,7 @@ public class EditIT
             wikiEditPage.setContent(newContent);
 
             DocumentSyntaxPicker documentSyntaxPicker = new DocumentInformationPanel().getSyntaxPicker();
-            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentSyntaxPicker.getAvailableSyntaxes());
+            assertEquals(Arrays.asList("xhtml/1.0", "xwiki/2.1"), documentSyntaxPicker.getAvailableSyntaxes());
             assertEquals("xwiki/2.1", documentSyntaxPicker.getSelectedSyntax());
 
             SyntaxConversionConfirmationModal confirmationModal = documentSyntaxPicker.selectSyntaxById("xhtml/1.0");
@@ -976,9 +972,9 @@ public class EditIT
                 .contains("from the previous XWiki 2.1 syntax to the selected XHTML 1.0 syntax?"));
             confirmationModal.confirmSyntaxConversion();
 
-            String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
+            String expectedContent = "<h2 id=\"HFirstheading\" class=\"wikigeneratedid\">"
                 + "<span>First heading</span>"
-                + "</h1>"
+                + "</h2>"
                 + "<p>Paragraph containing some <strong>bold content</strong>.</p>"
                 + "<p>A new paragraph with some new content.</p>";
             assertEquals(expectedContent, wikiEditPage.getExactContent());
@@ -1053,7 +1049,7 @@ public class EditIT
         setup.addObject(testReference, className, "prop", "22");
         // This should be put inside setup#addObject in the future, since addObject leads to the open of
         // the Object Editor.
-        new ObjectEditPage().waitUntilPageIsLoaded();
+        new ObjectEditPage();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         ViewPage viewPage = new ViewPage();
         assertEquals("value: 22", viewPage.getContent());

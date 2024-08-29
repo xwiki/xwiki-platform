@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Macro.Translations" locale="ja">
+  <web>XWiki.Notifications.Code.Macro</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.notifications.name=通知
+rendering.macro.notifications.description=ウィキで生じたイベントの通知を表示。
+rendering.macro.notifications.parameter.count.name=件数
+rendering.macro.notifications.parameter.count.description=既定で表示するイベントの最大数
+rendering.macro.notifications.parameter.useUserPreferences.name=ユーザーの設定を使用
+rendering.macro.notifications.parameter.useUserPreferences.description=真の場合、通知に関するユーザーの設定を使用
+rendering.macro.notifications.parameter.displayOwnEvents.name=自分のイベントを表示
+rendering.macro.notifications.parameter.displayOwnEvents.description=真の場合、現在のユーザーのイベントを他のイベントと同様に表示します。それ以外の場合は表示しません。
+rendering.macro.notifications.parameter.displayMinorEvents.name=軽微なイベントを表示
+rendering.macro.notifications.parameter.displayMinorEvents.description=真の場合、ページの軽微な修正に関するイベントを他のイベントと同様に表示します。それ以外の場合は表示しません。
+rendering.macro.notifications.parameter.displaySystemEvents.name=システムのイベントを表示
+rendering.macro.notifications.parameter.displaySystemEvents.description=真の場合、XWikiのソフトウェアによって引き起こされたイベントを他のイベントと同様に表示します。それ以外の場合は表示しません。
+rendering.macro.notifications.parameter.displayReadEvents.name=既読イベントを表示
+rendering.macro.notifications.parameter.displayReadEvents.description=真の場合、ユーザーが既読に設定したイベントを他のイベントと同様に表示します。それ以外の場合は表示しません。
+rendering.macro.notifications.parameter.wikis.name=ウィキ
+rendering.macro.notifications.parameter.wikis.description=考慮するウィキの一覧（コンマで分割）。このパラメーターはuseUserPreferencesが"真"に設定されている場合は無視されます。
+rendering.macro.notifications.parameter.spaces.name=スペース
+rendering.macro.notifications.parameter.spaces.description=考慮するスペースの一覧（コンマで分割）。このパラメーターはuseUserPreferencesが"真"に設定されている場合は無視されます。
+rendering.macro.notifications.parameter.pages.name=ページ
+rendering.macro.notifications.parameter.pages.description=対象とするページの一覧（完全な参照、コンマで分割）。useUserPreferencesが「真」の場合、このパラメーターは無視されます。
+rendering.macro.notifications.parameter.displayReadStatus.name="既読"のステータスを表示
+rendering.macro.notifications.parameter.displayReadStatus.description=イベントの状態（既読に設定されたかどうか）を表示するか否か
+rendering.macro.notifications.parameter.users.name=ユーザー
+rendering.macro.notifications.parameter.users.description=考慮するユーザーの一覧（コンマで分割）。このパラメーターはuseUserPreferencesが"真"に設定されている場合は無視されます。
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=フォローされているユーザーのみを表示
+rendering.macro.notifications.parameter.displayWatchedUsersOnly.description=指定したユーザー一覧によって実行されるイベントのみを表示（空の場合、現在のユーザーをフォローしているユーザーの一覧を使用します）。
+rendering.macro.notifications.parameter.displayRSSLink.name=RSSのリンクを表示
+rendering.macro.notifications.parameter.displayRSSLink.description=現在のマクロのRSSへのリンクを表示。
+rendering.macro.notifications.parameter.tags.name=タグ
+rendering.macro.notifications.parameter.tags.description=考慮するタグの一覧（コンマで分割）。現在のウィキでのみ機能します。このパラメーターは"useUserPreferences"が"真"に設定されている場合は無視されます。
+notifications.macro.noWatchedUsers=あなたは誰もフォローしていません。
+notifications.macro.whenNotView=通知マクロ。'閲覧'モードで表示されます。
+notifications.macro.markEventAsRead=イベントを既読に設定
+notifications.macro.showEventDetails=イベントの詳細を表示
+notifications.menu.nothing=通知はありません！
+notifications.menu.more=以前の通知を読み込む
+notifications.menu.details=詳細（{0}）
+</content>
+</xwikidoc>

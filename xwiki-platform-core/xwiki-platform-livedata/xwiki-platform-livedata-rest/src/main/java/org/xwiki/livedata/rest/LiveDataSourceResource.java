@@ -27,7 +27,6 @@ import javax.ws.rs.QueryParam;
 
 import org.xwiki.livedata.LiveDataSource;
 import org.xwiki.livedata.rest.model.jaxb.Source;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes a {@link LiveDataSource} through REST.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Path("/liveData/sources/{sourceId}")
-@Unstable
 public interface LiveDataSourceResource
 {
     /**

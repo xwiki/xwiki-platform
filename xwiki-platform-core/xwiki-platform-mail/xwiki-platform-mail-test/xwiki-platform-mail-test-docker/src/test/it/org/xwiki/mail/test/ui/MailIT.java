@@ -70,18 +70,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "xwikiDbHbmCommonExtraMappings=mailsender.hbm.xml",
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
-        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:MailIT\\..*\n"
-            + "mail.sender.database.resendAutomaticallyAtStartup=false",
+        // TODO: Mail.MailResender can be removed when XWIKI-20557 is closed
+        "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:(MailIT\\..*|Mail\\.MailResender)",
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
-        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-8271
+        // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
         // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
         // WEB-INF/lib.
-        "org.python:jython-slim:2.7.2",
+        "org.python:jython-slim:2.7.3",
         // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
         // by XWiki at startup, i.e. before extensions are provisioned for the tests
         "org.xwiki.platform:xwiki-platform-scheduler-api"
@@ -250,8 +250,28 @@ class MailIT
         // now that the mail server is set correctly.
         verifyIndividualResend();
 
-        // Step 9: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
+        // Step 9: Verify we can delete a mail in the UI
+        verifyMailDelete();
+
+        // Step 10: Try to resend the failed email by scheduling and triggering the Resend Scheduler Job
         verifyMailResenderSchedulerJob(setup);
+    }
+
+    private void verifyMailDelete()
+    {
+        // Delete the mail in send_success state from the verifyIndividualResend() test
+        MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
+        TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
+        tableLayout.filterColumn("Status", "send_success");
+        int count = tableLayout.countRows();
+        statusPage.clickAction(1, "mailsendingaction_delete");
+
+        // Wait for the success message to be displayed
+        statusPage.waitUntilContent("\\QThe mail has been deleted successfully\\E");
+
+        // Verify that the LT has one item less
+        tableLayout = statusPage.getLiveData().getTableLayout();
+        assertEquals(count - 1, tableLayout.countRows());
     }
 
     private void verifyIndividualResend()
@@ -259,7 +279,7 @@ class MailIT
         MailStatusAdministrationSectionPage statusPage = MailStatusAdministrationSectionPage.gotoPage();
         TableLayoutElement tableLayout = statusPage.getLiveData().getTableLayout();
         tableLayout.filterColumn("Status", "send_error");
-        tableLayout.clickAction(1, "mailsendingaction_resend");
+        statusPage.clickAction(1, "mailsendingaction_resend");
 
         // Refresh the page and verify the mail to to@doe.com is in send_success state now
         statusPage = MailStatusAdministrationSectionPage.gotoPage();
@@ -271,13 +291,16 @@ class MailIT
 
     private void verifyMailResenderSchedulerJob(TestUtils setup) throws Exception
     {
-        // Send a mail that we set in prepare_error state for the test below. This is achieved using a custom
+        // Note: we don't need to disable automatic resend for the Mail Scheduler job since by default it only resends
+        // once per day and since the XWiki is just created, the resend will ony happen in about 24 hours from now,
+        // leaving enough time for the test to finish...
+
+        // Send a mail that we set in prepare_success state for the test below. This is achieved using a custom
         // Test DatabaseMailListener component.
         sendMailWithPrepareSuccessState(setup);
 
-        // Navigate to the scheduler job UI, schedule and then trigger the mail resender job
+        // Navigate to the scheduler job UI, and trigger the mail resender job so that it executes now
         SchedulerHomePage shp = SchedulerHomePage.gotoPage();
-        shp.clickJobActionSchedule("Mail Resender");
         shp.clickJobActionTrigger("Mail Resender");
 
         // Wait and assert the received email due to the resend.

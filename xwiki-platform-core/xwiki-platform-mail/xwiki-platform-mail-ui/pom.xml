@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <packaging>xar</packaging>
   <artifactId>xwiki-platform-mail-ui</artifactId>
@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Application</xwiki.extension.name>
+    <!-- Category to display in the Extension Manager. -->
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
@@ -48,17 +50,6 @@
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
-    </dependency>
-    <!-- The Mail module provides a Mail Resender Scheduler Job -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-scheduler-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-      <!-- Optional because if the Scheduler UI is not there, all the mail sender features will still work. It's just
-           the Resender scheduler job that won't be available -->
-      <optional>true</optional>
     </dependency>
     <!-- We also need a default implementation of the Mail Sender API at runtime -->
     <dependency>
@@ -81,20 +72,4 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <configuration>
-          <entries>
-            <entry>
-              <document>Mail.MailResender</document>
-              <type>demo</type>
-            </entry>
-          </entries>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

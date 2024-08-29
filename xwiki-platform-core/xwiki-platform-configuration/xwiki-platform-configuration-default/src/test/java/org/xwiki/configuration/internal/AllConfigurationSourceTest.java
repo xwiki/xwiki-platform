@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class AllConfigurationSourceTest
+class AllConfigurationSourceTest
 {
     @MockComponent
     @Named("xwikiproperties")
@@ -55,7 +55,7 @@ public class AllConfigurationSourceTest
     private AllConfigurationSource configuration;
 
     @Test
-    public void getProperty()
+    void getProperty()
     {
         assertNull(this.configuration.getProperty("key"));
 

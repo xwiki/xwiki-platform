@@ -17,16 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($paths = {
-  'xwiki-selectize': $xwiki.getSkinFile('uicomponents/suggest/xwiki.selectize.js', true)
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths) {
-  "use strict";
-
-require.config({paths});
 
 /**
  * Utils
@@ -37,14 +27,14 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
       if (suggestions.length < params.limit) {
         return source.call(null, params).then(function(response) {
           // Success.
-          if ($.isArray(response)) {
+          if (Array.isArray(response)) {
             suggestions.push.apply(suggestions, response.slice(0, params.limit - suggestions.length));
             suggestions.sort(suggestionComparator);
           }
           return suggestions;
         }, function() {
           // Failure.
-          return $.Deferred().resolve(suggestions);
+          return suggestions;
         });
       } else {
         return suggestions;
@@ -60,7 +50,7 @@ define('xwiki-selectize-utils', ['jquery'], function($) {
     loadSuggestions: function(sources, params) {
       return sources.reduce(function(promise, source) {
         return promise.then(maybeLoadMoreSuggestions(source, params));
-      }, $.Deferred().resolve([]));
+      }, Promise.resolve([]));
     }
   };
 });
@@ -76,13 +66,14 @@ define('xwiki-suggestUsers', ['jquery', 'xwiki-selectize-utils', 'xwiki-selectiz
         loadUsers(select.attr('data-userScope'), {
           'input': text,
           'limit': 10,
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       },
       loadSelected: function(text, callback) {
         loadUsers(select.attr('data-userScope'), {
           'input': text,
+          'limit': 1,
           'exactMatch': true
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       }
     };
   };
@@ -133,13 +124,13 @@ define('xwiki-suggestGroups', ['jquery', 'xwiki-selectize-utils', 'xwiki-selecti
         loadGroups(select.attr('data-userScope'), {
           'input': text,
           'limit': 10
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       },
       loadSelected: function(text, callback) {
         loadGroups(select.attr('data-userScope'), {
           'input': text,
           'exactMatch': true
-        }).done(callback).fail(callback);
+        }).then(callback, callback);
       }
     };
   };
@@ -187,6 +178,3 @@ require(['jquery', 'xwiki-suggestUsers', 'xwiki-suggestGroups', 'xwiki-events-br
   $(document).on('xwiki:dom:updated', init);
   $(init);
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths]));

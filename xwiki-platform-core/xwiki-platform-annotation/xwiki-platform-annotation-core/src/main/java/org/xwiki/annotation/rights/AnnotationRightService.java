@@ -67,4 +67,16 @@ public interface AnnotationRightService
      * @return {@code true} if the user can edit the annotation, {@code false} otherwise
      */
     boolean canEditAnnotation(String annotationId, String target, String userName);
+
+    /**
+     * Checks if the user can upload attachment to the page as part of adding or editing an annotation.
+     * @param target the target of the page where to upload the attachment
+     * @param userName the name of the user performing the upload
+     * @return {@code true} if the user can upload the attachment, {@code false} otherwise
+     * @since 14.10
+     */
+    default boolean canUploadAttachment(String target, String userName)
+    {
+        return false;
+    }
 }

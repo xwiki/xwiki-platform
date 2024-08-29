@@ -170,7 +170,7 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
         // FIXME: This doesn't trigger the :hover CSS pseudo class. The click still works because the delete X (text) is
         // not really hidden: it is displayed with white color (the page background-color).
         new Actions(getDriver().getWrappedDriver()).moveToElement(column).perform();
-        column.findElement(By.className("delete")).click();
+        getDriver().scrollTo(column.findElement(By.className("delete"))).click();
     }
 
     /**
@@ -248,11 +248,5 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
     {
         List<WebElement> warnings = getDriver().findElementsWithoutWaiting(getForm(), By.className("warningmessage"));
         return warnings.size() == 1 && warnings.get(0).isDisplayed();
-    }
-
-    @Override
-    public ApplicationHomeEditPage waitUntilPageIsLoaded()
-    {
-        return this;
     }
 }

@@ -243,7 +243,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
-    public boolean exists(DocumentReference documentReference)
+    public boolean exists(DocumentReference documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {
@@ -255,7 +255,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     @Override
     @Deprecated
-    public boolean exists(String documentReference)
+    public boolean exists(String documentReference) throws XWikiException
     {
         XWikiContext context = getContext();
         if (context != null) {
@@ -539,7 +539,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return pc == null ? null : pc.newProperty().getClass().getName();
+        if (pc != null) {
+            BaseProperty property = pc.newProperty();
+            if (property != null) {
+                return property.getClass().getName();
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -585,18 +592,26 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public byte[] getAttachmentContent(String documentReference, String attachmentFilename) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentReference, xcontext).getAttachment(attachmentFilename)
-            .getContent(xcontext);
+        XWikiAttachment attachment =
+            xcontext.getWiki().getDocument(documentReference, xcontext).getAttachment(attachmentFilename);
+        return attachment != null ? attachment.getContent(xcontext) : new byte[0];
     }
 
     @Override
+    @Deprecated(since = "14.7RC1")
     public InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception
     {
+        return getAttachmentContent((EntityReference) attachmentReference);
+    }
+
+    @Override
+    public InputStream getAttachmentContent(EntityReference reference) throws Exception
+    {
         XWikiContext xcontext = getContext();
-        XWikiDocument attachmentDocument =
-            xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
-        return new ByteArrayInputStream(
-            attachmentDocument.getAttachment(attachmentReference.getName()).getContent(xcontext));
+        EntityReference documentReference = reference.extractReference(EntityType.DOCUMENT);
+        XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
+        XWikiAttachment attachment = attachmentDocument.getAttachment(reference.getName());
+        return attachment != null ? attachment.getContentInputStream(xcontext) : null;
     }
 
     @Override
@@ -607,6 +622,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
         setAttachmentContent(doc, attachmentReference.getName(), attachmentData, xcontext);
     }
+
+    @Override
+    public void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
+        throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(), xcontext);
+
+        setAttachmentContent(doc, attachmentReference.getName(), attachmentData, xcontext);
+    }
+
 
     @Override
     @Deprecated
@@ -622,14 +648,20 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     private void setAttachmentContent(XWikiDocument doc, String attachmentFilename, byte[] attachmentData,
         XWikiContext xcontext) throws Exception
     {
+        setAttachmentContent(doc, attachmentFilename,
+            new ByteArrayInputStream(attachmentData != null ? attachmentData : new byte[0]), xcontext);
+    }
+
+    private void setAttachmentContent(XWikiDocument doc, String attachmentFilename, InputStream attachmentData,
+        XWikiContext xcontext) throws Exception
+    {
         if (doc.getAttachment(attachmentFilename) == null) {
             doc.setComment("Add new attachment " + attachmentFilename);
         } else {
             doc.setComment("Update attachment " + attachmentFilename);
         }
 
-        doc.setAttachment(attachmentFilename,
-            new ByteArrayInputStream(attachmentData != null ? attachmentData : new byte[0]), xcontext);
+        doc.setAttachment(attachmentFilename, attachmentData, xcontext);
 
         doc.setAuthorReference(getCurrentUserReference());
         if (doc.isNew()) {

@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -37,7 +35,6 @@ import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.url.ExtendedURL;
 
 import com.xpn.xwiki.internal.web.LegacyAction;
@@ -49,12 +46,9 @@ import com.xpn.xwiki.internal.web.LegacyAction;
  * @version $Id$
  * @since 13.0
  */
-@Unstable
 public class LegacyActionServlet extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(LegacyActionServlet.class);
 
     private ResourceTypeResolver<ExtendedURL> typeResolver;
 
@@ -84,7 +78,6 @@ public class LegacyActionServlet extends HttpServlet
         } catch (ComponentLookupException e) {
             throw new ServletException("Failed to lookup the resource reference resolve for ExtendedURL", e);
         }
-
     }
 
     @Override

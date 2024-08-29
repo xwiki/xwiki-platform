@@ -21,18 +21,17 @@ package org.xwiki.officeimporter.internal.builder;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -49,7 +48,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.converter.OfficeConverterResult;
+import org.xwiki.officeimporter.document.OfficeDocumentArtifact;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.document.FileOfficeDocumentArtifact;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ExpandedMacroBlock;
@@ -69,8 +70,11 @@ import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
@@ -79,7 +83,7 @@ import static org.mockito.Mockito.*;
  * @since 2.1M1
  */
 @ComponentTest
-public class DefaultPresentationBuilderTest
+class DefaultPresentationBuilderTest
 {
     @InjectMockComponents
     private DefaultPresentationBuilder presentationBuilder;
@@ -117,7 +121,7 @@ public class DefaultPresentationBuilderTest
     }
 
     @Test
-    public void build() throws Exception
+    void build() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
@@ -131,17 +135,18 @@ public class DefaultPresentationBuilderTest
 
         OfficeConverterResult officeConverterResult = mock(OfficeConverterResult.class);
         when(officeConverterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
+        // Slide numbers including 10 so that we can validate that XWIKI-19565 has been fixed.
+        List<Integer> slideNumbers = Arrays.asList(0, 1, 2, 10);
         File firstSlide = new File(this.outputDirectory, "img0.html");
-        File secondSlide = new File(this.outputDirectory, "img1.html");
         when(officeConverterResult.getOutputFile()).thenReturn(firstSlide);
-        Set<File> allFiles = new HashSet<>();
+
         // list of files usually created by jodconverter for a presentation
-        allFiles.add(firstSlide);
-        allFiles.add(new File(this.outputDirectory, "img0.jpg"));
-        allFiles.add(new File(this.outputDirectory, "text0.html"));
-        allFiles.add(secondSlide);
-        allFiles.add(new File(this.outputDirectory, "img1.jpg"));
-        allFiles.add(new File(this.outputDirectory, "text1.html"));
+        Set<File> allFiles = new HashSet<>();
+        slideNumbers.forEach(slideNumber -> {
+            allFiles.add(new File(this.outputDirectory, String.format("img%d.html", slideNumber)));
+            allFiles.add(new File(this.outputDirectory, String.format("text%d.html", slideNumber)));
+            allFiles.add(new File(this.outputDirectory, String.format("img%d.jpg", slideNumber)));
+        });
 
         // We create the files since some IO operations will happen on them
         for (File file : allFiles) {
@@ -150,7 +155,7 @@ public class DefaultPresentationBuilderTest
 
         when(officeConverterResult.getAllFiles()).thenReturn(allFiles);
 
-        when(this.officeConverter.convertDocument(Collections.singletonMap("file.odp", officeFileStream), "file.odp",
+        when(this.officeConverter.convertDocument(Collections.singletonMap("input.odp", officeFileStream), "input.odp",
             "img0.html")).thenReturn(officeConverterResult);
 
         HTMLCleanerConfiguration config = mock(HTMLCleanerConfiguration.class);
@@ -158,7 +163,8 @@ public class DefaultPresentationBuilderTest
 
         Document xhtmlDoc = XMLUtils.createDOMDocument();
         xhtmlDoc.appendChild(xhtmlDoc.createElement("html"));
-        String presentationHTML = "<p><img src=\"file-slide0.jpg\"/></p><p><img src=\"file-slide1.jpg\"/></p>";
+        String presentationHTML = slideNumbers.stream().map(slideNumber ->
+            String.format("<p><img src=\"file-slide%d.jpg\"/></p>", slideNumber)).collect(Collectors.joining());
         when(this.officeHTMLCleaner.clean(any(Reader.class), eq(config)))
             .then(returnMatchingDocument(presentationHTML, xhtmlDoc));
 
@@ -168,10 +174,11 @@ public class DefaultPresentationBuilderTest
         XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
-        Set<File> expectedArtifacts = new HashSet<>();
-        expectedArtifacts.add(new File(this.outputDirectory, "file-slide0.jpg"));
-        expectedArtifacts.add(new File(this.outputDirectory, "file-slide1.jpg"));
-        assertEquals(expectedArtifacts, result.getArtifactsFiles());
+        Map<String, OfficeDocumentArtifact> expectedArtifacts = slideNumbers.stream()
+            .map(slideNumber -> new FileOfficeDocumentArtifact(String.format("file-slide%d.jpg", slideNumber),
+                new File(this.outputDirectory, String.format("img%d.jpg", slideNumber))))
+            .collect(Collectors.toMap(OfficeDocumentArtifact::getName, Function.identity()));
+        assertEquals(expectedArtifacts, result.getArtifactsMap());
 
         assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 

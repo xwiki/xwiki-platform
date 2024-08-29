@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -34,12 +35,8 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class InplaceEditablePage extends ViewPage
 {
-    @Override
-    public void waitUntilPageJSIsLoaded()
-    {
-        // Wait until the JavaScript code of the in-place editor registers its listener on the Edit button.
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#tmEdit > a[role='button'][data-editor='inplace']"));
-    }
+    @FindBy(id = "commentinput")
+    private WebElement versionSummaryInput;
 
     /**
      * Click on the Edit button and wait for the in-place editor to load.
@@ -99,7 +96,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage setDocumentTitle(String title)
     {
-        WebElement titleInput = getDriver().findElementById("document-title-input");
+        WebElement titleInput = getDriver().findElement(By.id("document-title-input"));
         titleInput.clear();
         titleInput.sendKeys(title);
         return this;
@@ -119,13 +116,51 @@ public class InplaceEditablePage extends ViewPage
     }
 
     /**
+     * @return {@code true} if the document title input has an invalid value (e.g. empty value when document titles are
+     *         mandatory), {@code false} otherwise
+     */
+    public boolean isDocumentTitleInvalid()
+    {
+        return !getDriver().findElementsWithoutWaiting(By.cssSelector("input#document-title-input:invalid")).isEmpty();
+    }
+
+    /**
+     * @return the message displayed when the document title validation fails
+     */
+    public String getDocumentTitleValidationMessage()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getDomProperty("validationMessage");
+    }
+
+    /**
+     * @return the value displayed in the document title input when there's no value set by the user
+     */
+    public String getDocumentTitlePlaceholder()
+    {
+        return getDriver().findElement(By.id("document-title-input")).getAttribute("placeholder");
+    }
+
+    /**
+     * Sets the value of the version summary field.
+     * 
+     * @param versionSummary the new version summary
+     * @return this page object
+     */
+    public InplaceEditablePage setVersionSummary(String versionSummary)
+    {
+        this.versionSummaryInput.clear();
+        this.versionSummaryInput.sendKeys(versionSummary);
+        return this;
+    }
+
+    /**
      * Clicks on the Cancel button and waits for the page to be rendered in view mode.
      * 
      * @return this page object
      */
     public InplaceEditablePage cancel()
     {
-        getDriver().findElementByCssSelector("input[name='action_cancel']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_cancel']")).click();
         return waitForView();
     }
 
@@ -160,7 +195,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage save(String expectedSuccessMessage)
     {
-        getDriver().findElementByCssSelector("input[name='action_saveandcontinue']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_saveandcontinue']")).click();
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
         }
@@ -199,7 +234,7 @@ public class InplaceEditablePage extends ViewPage
      */
     public InplaceEditablePage saveAndView(String expectedSuccessMessage)
     {
-        getDriver().findElementByCssSelector("input[name='action_save']").click();
+        getDriver().findElement(By.cssSelector("input[name='action_save']")).click();
         if (expectedSuccessMessage != null) {
             waitForNotificationSuccessMessage(expectedSuccessMessage);
             return waitForView();

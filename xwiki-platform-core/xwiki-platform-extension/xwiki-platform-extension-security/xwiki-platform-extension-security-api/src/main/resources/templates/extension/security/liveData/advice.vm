@@ -1,0 +1,79 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## Since 15.8RC1
+## This template renders the advice of an extension in the form of a button opening a modal with further explanations. 
+## ---------------------------------------------------------------------------
+#template("extension.vm")
+#set ($modalId = "${extensionId}--${extensionVersion}")
+## Replace the special chars to have a valid element id.
+#set ($modalId = $modalId.replaceAll('[.:]', '-'))
+#set ($extensionFullId = "${extensionId}/${extensionVersion}")
+#set ($buttonLabel = $services.localization.render('extension.security.liveData.advice.modal.openButton',
+  [$extensionFullId]))
+<button type="button"
+        class="btn btn-default btn-xs"
+        data-toggle="modal"
+        data-target="#$escapetool.xml($modalId)"
+        aria-controls="$escapetool.xml($modalId)"
+        title="$escapetool.xml($buttonLabel)">
+  <span class="sr-only"> $escapetool.xml($buttonLabel)</span>
+  $services.icon.renderHTML('question')
+</button>
+<div class="modal fade security-vulnerability-detail-modal" tabindex="-1" role="dialog"
+     id="$escapetool.xml($modalId)">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">$services.icon.renderHTML('cross')</span>
+        </button>
+        <h2 class="modal-title">
+          $escapetool.xml($services.localization.render('extension.security.liveData.advice'))
+        </h2>
+      </div>
+      <div class="modal-body">
+        #if ($adviceId == 'extension.security.analysis.advice.upgradeFromEM')
+          #define($extensionManagerLink)<a href="$escapetool.xml($extensionManagerUrl)">##
+$escapetool.xml($services.localization.render("${adviceId}.0"))##
+</a>#end
+          $escapetool.xml($services.localization.render($adviceId, ['__link__'])).replaceFirst('__link__', $extensionManagerLink)
+        #else
+          $escapetool.xml($services.localization.render($adviceId))
+        #end
+        #if ($backwardDependencies)
+          <ul>
+          #foreach ($backwardDependency in $backwardDependencies.entrySet())
+            <li>
+              <a href="$escapetool.xml($extensionManagerLinkResolver.apply($backwardDependency.key.id))">
+                $escapetool.xml($backwardDependency.key)
+              </a>
+              <ul>
+                #foreach($namespace in $backwardDependency.value)
+                  <li>#displayExtensionNamespace($namespace)</li>
+                #end
+              </ul>
+            </li>
+          #end
+          </ul>
+        #end
+      </div>
+    </div>
+  </div>
+</div>

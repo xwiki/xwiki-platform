@@ -19,9 +19,10 @@
  */
 package org.xwiki.crypto.script;
 
+import java.nio.charset.StandardCharsets;
+
 import org.xwiki.crypto.pkix.params.CertifiedKeyPair;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
-import org.xwiki.crypto.script.internal.AbstractScriptingStore;
 import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.KeyStoreException;
 import org.xwiki.crypto.store.StoreReference;
@@ -72,7 +73,7 @@ public class ScriptingKeyStore extends AbstractScriptingStore
     public void store(CertifiedKeyPair keyPair, String password) throws KeyStoreException, AccessDeniedException
     {
         checkAccess(Right.EDIT);
-        store.store(storeReference, keyPair, password.getBytes(UTF8));
+        store.store(storeReference, keyPair, password.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -100,7 +101,7 @@ public class ScriptingKeyStore extends AbstractScriptingStore
     public CertifiedKeyPair retrieve(String password) throws KeyStoreException, AccessDeniedException
     {
         checkAccess(Right.VIEW);
-        return store.retrieve(storeReference, password.getBytes(UTF8));
+        return store.retrieve(storeReference, password.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -131,6 +132,6 @@ public class ScriptingKeyStore extends AbstractScriptingStore
         throws KeyStoreException, AccessDeniedException
     {
         checkAccess(Right.VIEW);
-        return store.retrieve(storeReference, publicKey, password.getBytes(UTF8));
+        return store.retrieve(storeReference, publicKey, password.getBytes(StandardCharsets.UTF_8));
     }
 }

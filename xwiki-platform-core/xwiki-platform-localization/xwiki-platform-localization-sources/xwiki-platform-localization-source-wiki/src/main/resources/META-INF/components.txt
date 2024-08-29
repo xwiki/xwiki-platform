@@ -1,3 +1,5 @@
+org.xwiki.localization.wiki.internal.DefaultWikiTranslationConfiguration
 org.xwiki.localization.wiki.internal.DocumentTranslationBundleFactory
 org.xwiki.localization.wiki.internal.DocumentTranslationBundleInitializer
 org.xwiki.localization.wiki.internal.TranslationDocumentClassInitializer
+org.xwiki.localization.wiki.internal.TranslationDocumentObjectRequiredRightAnalyzer

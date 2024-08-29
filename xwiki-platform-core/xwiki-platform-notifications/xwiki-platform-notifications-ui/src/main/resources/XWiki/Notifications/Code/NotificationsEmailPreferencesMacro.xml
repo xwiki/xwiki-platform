@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsEmailPreferencesMacro" locale="">
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.NotificationsEmailPreferencesMacro" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsEmailPreferencesMacro</name>
   <language/>
@@ -145,10 +145,10 @@
       'target': target,
       'user': targetUser,
       'csrf': xm.form_token
-    }).done(function (data) {
+    }).then(data =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.saved')), 'done'));
-    }).fail(function (data) {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.savingfailed')), 'error'));
     });
@@ -172,10 +172,10 @@
       'target': target,
       'user': targetUser,
       'csrf': xm.form_token
-    }).done(function (data) {
+    }).then(data =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.saved')), 'done'));
-    }).fail(function (data) {
+    }).catch(() =&gt; {
       notification.replace(new XWiki.widgets.Notification($jsontool.serialize($services.localization.render(
         'notifications.settings.savingfailed')), 'error'));
     });
@@ -232,7 +232,7 @@
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -307,15 +307,24 @@
         <values>Optional|Mandatory|No content</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </contentType>
-      <defaultCategory>
+      <defaultCategories>
+        <cache>0</cache>
         <disabled>0</disabled>
-        <name>defaultCategory</name>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>defaultCategories</name>
         <number>4</number>
-        <prettyName>Default category</prettyName>
-        <size>30</size>
+        <prettyName>Default categories</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultCategory>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </defaultCategories>
       <description>
         <contenttype>PureText</contenttype>
         <disabled>0</disabled>
@@ -398,8 +407,8 @@
       <code>{{velocity}}
 #if (!$services.notification.areEmailsEnabled())
   {{warning}}
-    {{localization key="notifications.settings.email.disabled" /}}
-  {{warning}}
+    {{translation key="notifications.settings.email.disabled" /}}
+  {{/warning}}
 #elseif (!$xcontext.userReference)
   {{info}}
     {{translation key="notifications.settings.email.forGuest" /}}
@@ -414,7 +423,7 @@
   {{/error}}
 #elseif ($wikimacro.parameters.target == 'user' &amp;&amp; "$!wikimacro.parameters.user" != "" &amp;&amp; !$services.security.authorization.hasAccess('admin', $wikimacro.parameters.user.reference) &amp;&amp; !$xcontext.userReference.equals($wikimacro.parameters.user.reference))
   {{error}}
-    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="$wikimacro.parameters.user" /}}
+    {{translation key="notifications.settings.error.userReferenceAdminForbidden" parameters="$~"${services.rendering.escape($escapetool.java($wikimacro.parameters.user), 'xwiki/2.1')}~"" /}}
   {{/error}}
 #else
   
@@ -425,42 +434,41 @@
   #end
   #set ($dataUser = "")
   #if ($wikimacro.parameters.target == 'user')
-    #set ($dataUser = "data-user=""$services.model.serialize($targetUser)""")
+    #set ($dataUser = "data-user=""$escapetool.xml($services.model.serialize($targetUser))""")
   #end
   #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsEmailPreferencesMacro'))
   {{html clean="false"}}
     &lt;div class="notification-top-panel-preferences notifEmailPreferences" data-target="$escapetool.xml($wikimacro.parameters.target)" $dataUser&gt;
       &lt;div class="xform"&gt;
-        ## TODO: handle the interval for the wiki target too
-        #if ($wikimacro.parameters.target == 'user')
         &lt;dl&gt;
-          &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency'))&lt;/label&gt;
-          &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
+          &lt;dt&gt;&lt;label for='preference_notification_email_frequency'&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency'))&lt;/label&gt;
+            &lt;p id='preference_notification_email_frequency_hint' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.frequency.hint'))&lt;/p&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
-            #set ($targetDocument = $xwiki.getDocument($targetUser))
-            #set ($interval = 'daily')
-            #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
-            #if ("$!objPref" != '')
-              #set ($objInterval = $objPref.getValue('interval'))
-              #if ("$!objInterval" != '')
-                #set ($interval = $objInterval)
+            #if ($wikimacro.parameters.target == 'user')
+              #set ($interval = $services.notification.preferences.getInterval($targetUser))
+            #else
+              #set ($interval = 'DAILY')
+              #set ($targetDocument = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
+              #set ($objPref = $targetDocument.getObject('XWiki.Notifications.Code.NotificationEmailPreferenceClass'))
+              #if ("$!objPref" != '')
+                #set ($objInterval = $objPref.getValue('interval'))
+                #if ("$!objInterval" != '')
+                  #set ($interval = $objInterval.toUpperCase())
+                #end
               #end
             #end
-            &lt;select class="notificationEmailInterval"&gt;
-              &lt;option value="hourly" #if($interval == 'hourly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly'))&lt;/option&gt;
-              &lt;option value="daily"  #if($interval == 'daily')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily'))&lt;/option&gt;
-              &lt;option value="weekly" #if($interval == 'weekly')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly'))&lt;/option&gt;
-              &lt;option value="live" #if($interval == 'live')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live'))&lt;/option&gt;
+            &lt;select id='preference_notification_email_frequency' class="notificationEmailInterval" aria-describedby='preference_notification_email_frequency_hint'&gt;
+              #foreach ($frequency in ['hourly', 'daily', 'weekly', 'live'])
+                #set ($frequencyUpperCase = $frequency.toUpperCase())
+                &lt;option value="$frequencyUpperCase" #if($interval == $frequencyUpperCase)selected="selected"#end&gt;$escapetool.xml($services.localization.render("XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_$frequency"))&lt;/option&gt;
+              #end
             &lt;/select&gt;
           &lt;/dd&gt;
         &lt;/dl&gt;
-        #else
-          #set ($targetDocument = $xwiki.getDocument($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'NotificationAdministration')))
-        #end
         &lt;dl&gt;
-          &lt;dt&gt;&lt;label&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType'))&lt;/label&gt;
-          &lt;p class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.diffType.hint'))&lt;/p&gt;
+          &lt;dt&gt;&lt;label for='preference_notification_change_details'&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType'))&lt;/label&gt;
+          &lt;p id='preference_notification_change_details_hint' class="xHint"&gt;$escapetool.xml($services.localization.render('notifications.settings.email.diffType.hint'))&lt;/p&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
             #if ($wikimacro.parameters.target == 'user')
@@ -475,7 +483,7 @@
                 #set ($diffType = $objDiffType)
               #end
             #end
-            &lt;select class="notificationEmailDiffType"&gt;
+            &lt;select id='preference_notification_change_details' class="notificationEmailDiffType" aria-describedby='preference_notification_change_details_hint'&gt;
               &lt;option value="NOTHING" #if($diffType == 'NOTHING')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING'))&lt;/option&gt;
               &lt;option value="STANDARD"  #if($diffType == 'STANDARD')selected="selected"#end&gt;$escapetool.xml($services.localization.render('XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD'))&lt;/option&gt;
             &lt;/select&gt;
@@ -498,7 +506,9 @@
       <contentType>No content</contentType>
     </property>
     <property>
-      <defaultCategory>Notifications</defaultCategory>
+      <defaultCategories>
+        <value>Notifications</value>
+      </defaultCategories>
     </property>
     <property>
       <description>Display the preferences of the current user about notification emails.</description>

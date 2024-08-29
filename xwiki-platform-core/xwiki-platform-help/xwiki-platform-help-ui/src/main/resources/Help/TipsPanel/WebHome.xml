@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Help.TipsPanel.WebHome" locale="">
+<xwikidoc version="1.5" reference="Help.TipsPanel.WebHome" locale="">
   <web>Help.TipsPanel</web>
   <name>WebHome</name>
   <language/>
@@ -66,16 +66,18 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>1</multiSelect>
         <name>async_context</name>
         <number>8</number>
         <prettyName>Context elements</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator> </separator>
+        <separator>, </separator>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>author=Author|doc.reference=Document|wiki=Wiki|request.parameters=Request parameters|request.url=Request URL|locale=Language|user=User</values>
+        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -93,6 +95,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>category</name>
         <number>1</number>
@@ -111,6 +115,7 @@
         <name>content</name>
         <number>5</number>
         <prettyName>Executed Content</prettyName>
+        <restricted>0</restricted>
         <rows>25</rows>
         <size>120</size>
         <unmodifiable>0</unmodifiable>
@@ -122,6 +127,7 @@
         <name>description</name>
         <number>2</number>
         <prettyName>Description</prettyName>
+        <restricted>0</restricted>
         <rows>5</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
@@ -140,6 +146,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>type</name>
         <number>4</number>
@@ -173,7 +181,13 @@
 #set ($uixs = $services.uix.getExtensions('org.xwiki.platform.help.tipsPanel'))
 #if ($uixs.size() &gt; 0)
   #set ($index = $mathtool.random(0, $uixs.size()))
-  $uixs.get($index).getParameters().get('tip')
+  #set ($uix = $uixs.get($index))
+  #set ($tip = $uix.getParameters().get('tip'))
+  #if ($tip)
+    {{context restricted="true" source="script:tip"/}}
+  #else
+    {{uiextension id="$services.rendering.escape($uix.id, 'xwiki/2.1')"/}}
+  #end
 #else
   $services.localization.render('help.tipsPanel.noTipMessage')
 #end

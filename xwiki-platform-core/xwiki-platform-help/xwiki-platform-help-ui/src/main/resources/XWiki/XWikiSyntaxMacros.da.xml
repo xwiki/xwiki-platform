@@ -47,7 +47,7 @@ Der er to slags makroer i XWiki Syntax 1.0:
 * Velocity makoer (kaldt med ###makronavn(param1 ... paramN)## syntaks)
 * Radeox makroer (kaldt med ##{makronavn:param1=value1|...|paramN=valueN}## syntaks)
 
-{{info}}For en fuld liste af makroer, se [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{info}}For en fuld liste af makroer, se [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}
 
 |=Funktion|=XWiki Syntax 1.0
@@ -80,6 +80,6 @@ Radeox makroer kan ikke bruges i XWiki Syntax {{velocity}}$crtSyntaxVer{{/veloci
 {{/info}}
 
 {{info}}
-For en komplet liste af makroer, check  [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+For en komplet liste af makroer, check  [[Extensions wiki&gt;&gt;https://extensions.xwiki.org/]].
 {{/info}}</content>
 </xwikidoc>

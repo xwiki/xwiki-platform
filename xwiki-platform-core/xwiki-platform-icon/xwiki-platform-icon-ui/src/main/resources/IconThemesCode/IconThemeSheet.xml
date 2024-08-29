@@ -42,10 +42,9 @@
 This document is an Icon Theme.
 {{/info}}
 
-
-{{{
-$doc.content
-}}}
+(%class="code"%)(((
+$services.rendering.escape($doc.content, 'xwiki/2.1')
+)))
 #else
 Sheet of [[IconThemesCode.IconThemeClass]]
 #end

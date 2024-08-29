@@ -1,0 +1,35 @@
+#
+# Systemd unit file for XWiki
+#
+
+[Unit]
+Description=XWiki Jetty Application Server
+Documentation=https://www.xwiki.org
+After=network.target
+RequiresMountsFor=/var/lib/xwiki/data
+
+[Service]
+WorkingDirectory=/var/lib/xwiki/
+
+# Lifecycle
+Type=simple
+ExecStart=/bin/bash /usr/lib/xwiki-jetty/start_xwiki.sh
+ExecStop=/bin/bash /usr/lib/xwiki-jetty/stop_xwiki.sh
+Restart=on-abort
+
+# Logging
+SyslogIdentifier=xwiki
+
+# Security
+User=xwiki
+Group=xwiki
+PrivateTmp=yes
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadOnlyPaths=/etc/xwiki
+ReadWritePaths=/var/lib/xwiki/data/
+ReadWritePaths=/var/lib/xwiki/tmp/
+ReadWritePaths=/var/log/xwiki/
+
+[Install]
+WantedBy=multi-user.target

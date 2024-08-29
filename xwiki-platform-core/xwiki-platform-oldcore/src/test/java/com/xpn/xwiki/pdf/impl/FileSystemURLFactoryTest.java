@@ -58,7 +58,7 @@ public class FileSystemURLFactoryTest
     private MockitoOldcore oldcore;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     private FileSystemURLFactory urlFactory;
 

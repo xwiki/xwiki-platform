@@ -19,93 +19,122 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import static org.hamcrest.CoreMatchers.any;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mockito.Mockito.when;
-
 import java.io.Reader;
-import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.MissingParserException;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.xwiki.rendering.syntax.Syntax.PLAIN_1_0;
+import static org.xwiki.rendering.syntax.Syntax.XWIKI_2_1;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.parser.DefaultContentParser}.
+ * Unit tests for {@link DefaultContentParser}.
  *
  * @version $Id$
  * @since 6.0M2
  */
+@ComponentTest
 @ComponentList(ContextComponentManagerProvider.class)
-public class DefaultContentParserTest
+class DefaultContentParserTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<ContentParser> mocker =
-        new MockitoComponentMockingRule<>(DefaultContentParser.class);
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private static final DocumentReference DOCUMENT_REFERENCE = new DocumentReference("wiki", "space", "page");
+
     private static final String SOURCE = "wiki:space.page";
 
-    @Before
-    public void configure() throws Exception
-    {
-        Parser parser = mocker.registerMockComponent(Parser.class, Syntax.PLAIN_1_0.toIdString());
-        when(parser.parse(argThat(any(Reader.class)))).thenReturn(new XDOM(Collections.<Block>emptyList()));
+    @InjectMockComponents
+    private DefaultContentParser defaultContentParser;
 
-        EntityReferenceSerializer<String> serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        when(serializer.serialize(DOCUMENT_REFERENCE)).thenReturn(SOURCE);
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
+
+    private Parser plain10parser;
+
+    @BeforeEach
+    void setUp(MockitoComponentManager componentManager) throws Exception
+    {
+        this.plain10parser = componentManager.registerMockComponent(Parser.class, PLAIN_1_0.toIdString());
+        when(this.plain10parser.parse(argThat(CoreMatchers.any(Reader.class)))).thenReturn(new XDOM(emptyList()));
+        when(this.serializer.serialize(DOCUMENT_REFERENCE)).thenReturn(SOURCE);
     }
 
     @Test
-    public void parseHasNoMetadataSource() throws Exception
+    void parseHasNoMetadataSource() throws Exception
     {
-        XDOM xdom = mocker.getComponentUnderTest().parse("", Syntax.PLAIN_1_0);
+        XDOM xdom = this.defaultContentParser.parse("", PLAIN_1_0);
 
         assertThat(xdom.getMetaData().getMetaData(MetaData.SOURCE), nullValue());
     }
 
     @Test
-    public void parseIsAddingMetadataSource() throws Exception
+    void parseIsAddingMetadataSource() throws Exception
     {
-        XDOM xdom = mocker.getComponentUnderTest().parse("", Syntax.PLAIN_1_0, DOCUMENT_REFERENCE);
+        XDOM xdom = this.defaultContentParser.parse("", PLAIN_1_0, DOCUMENT_REFERENCE);
 
         assertThat(xdom.getMetaData().getMetaData(MetaData.SOURCE), equalTo(SOURCE));
     }
 
     @Test
-    public void parseWhenNoParser() throws Exception
+    void parseWhenNoParser()
     {
-        thrown.expect(MissingParserException.class);
-        thrown.expectMessage("Failed to find a parser for syntax [XWiki 2.1]");
-        thrown.expectCause(any(ComponentLookupException.class));
-        mocker.getComponentUnderTest().parse("", Syntax.XWIKI_2_1, DOCUMENT_REFERENCE);
+        MissingParserException missingParserException = assertThrows(MissingParserException.class,
+            () -> this.defaultContentParser.parse("", XWIKI_2_1, DOCUMENT_REFERENCE));
+        assertEquals(ComponentLookupException.class, missingParserException.getCause().getClass());
+        assertEquals("Failed to find a parser for syntax [XWiki 2.1]", missingParserException.getMessage());
     }
 
     @Test
-    public void parseWhenNullSource() throws Exception
+    void parseWhenNoParserFail() throws Exception
     {
-        XDOM xdom = mocker.getComponentUnderTest().parse(null, Syntax.PLAIN_1_0);
+        when(this.plain10parser.parse(any())).thenThrow(StackOverflowError.class);
+
+        ParseException parseErrorException =
+            assertThrows(ParseException.class, () -> this.defaultContentParser.parse("content", PLAIN_1_0));
+
+        assertEquals(StackOverflowError.class, parseErrorException.getCause().getClass());
+        assertEquals("Failed to parse with syntax [plain/1.0].", parseErrorException.getMessage());
+    }
+
+    @Test
+    void parseWhenNoParserFailWithSource() throws Exception
+    {
+        when(this.plain10parser.parse(any())).thenThrow(StackOverflowError.class);
+
+        ParseException parseErrorException =
+            assertThrows(ParseException.class, () -> this.defaultContentParser.parse("content", PLAIN_1_0, null));
+
+        assertEquals(StackOverflowError.class, parseErrorException.getCause().getClass());
+        assertEquals("Failed to parse with syntax [plain/1.0].", parseErrorException.getMessage());
+    }
+
+    @Test
+    void parseWhenNullSource() throws Exception
+    {
+        XDOM xdom = this.defaultContentParser.parse(null, Syntax.PLAIN_1_0);
         assertEquals(0, xdom.getChildren().size());
     }
 }

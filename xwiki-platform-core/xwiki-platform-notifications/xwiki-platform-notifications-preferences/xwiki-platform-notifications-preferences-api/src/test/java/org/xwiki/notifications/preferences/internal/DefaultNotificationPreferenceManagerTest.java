@@ -56,7 +56,7 @@ public class DefaultNotificationPreferenceManagerTest
     public final MockitoComponentMockingRule<DefaultNotificationPreferenceManager> mocker =
             new MockitoComponentMockingRule<>(DefaultNotificationPreferenceManager.class);
 
-    private ModelBridge modelBridge;
+    private NotificationPreferenceModelBridge notificationPreferenceModelBridge;
 
     private NotificationPreference mockPreference11;
     private NotificationPreference mockPreference12;
@@ -80,7 +80,7 @@ public class DefaultNotificationPreferenceManagerTest
     @Before
     public void setUp() throws Exception
     {
-        modelBridge = mocker.registerMockComponent(ModelBridge.class, "cached");
+        notificationPreferenceModelBridge = mocker.registerMockComponent(NotificationPreferenceModelBridge.class, "cached");
 
         Map<NotificationPreferenceProperty, Object> map1 = new HashMap<>();
         map1.put(NotificationPreferenceProperty.EVENT_TYPE, "update");

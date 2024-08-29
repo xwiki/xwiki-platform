@@ -47,7 +47,8 @@ public class DockerTestUtilsTest
     public void getResultFileLocation() throws Exception
     {
         UITest uiTest = DockerTestUtilsTest.MyClass.class.getAnnotation(UITest.class);
-        TestConfiguration configuration = new TestConfiguration(uiTest);
+        UITestTestConfigurationResolver resolver = new UITestTestConfigurationResolver();
+        TestConfiguration configuration = resolver.resolve(uiTest);
         ExtensionContext extensionContext = mock(ExtensionContext.class);
         when(extensionContext.getRequiredTestClass()).thenReturn((Class) DockerTestUtilsTest.class);
         when(extensionContext.getRequiredTestMethod()).thenReturn(

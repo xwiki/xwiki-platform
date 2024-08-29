@@ -156,6 +156,6 @@ class NavigationPanelAdministrationIT
     {
         navPanelAdminPage.save();
         driver.navigate().refresh();
-        return new NavigationPanelAdministrationPage().waitUntilPageIsLoaded();
+        return new NavigationPanelAdministrationPage();
     }
 }

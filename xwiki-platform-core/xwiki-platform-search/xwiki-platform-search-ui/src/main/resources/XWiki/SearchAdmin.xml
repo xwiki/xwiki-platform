@@ -34,7 +34,7 @@
   <title>Search administration</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference='XWiki.SearchCode' /}}
 
@@ -55,7 +55,8 @@
     &lt;dd&gt;
       &lt;select name='XWiki.SearchConfigClass_0_engine'&gt;
       #foreach ($availableSearchExtension in $availableSearchExtensions)
-        &lt;option value="$availableSearchExtension.id" #if($availableSearchExtension.id == $searchEngine)selected='selected'#end&gt;$availableSearchExtension.parameters.label&lt;/option&gt;
+        &lt;option value="$escapetool.xml($availableSearchExtension.id)" #if($availableSearchExtension.id == $searchEngine)
+        selected='selected'#end &gt;$escapetool.xml($availableSearchExtension.parameters.label)&lt;/option&gt;
       #end
       &lt;/select&gt;
     &lt;/dd&gt;
@@ -76,17 +77,20 @@
     {{html clean="false"}}
     &lt;ul class="nav nav-tabs" role="tablist"&gt;
       &lt;li role="presentation" class="active"&gt;
-        &lt;a href="#${searchEngine}Config" aria-controls="${searchEngine}Config" role="tab" data-toggle="tab"&gt;
-          $searchExtension.parameters.label
+        &lt;a href="#${escapetool.xml($searchEngine)}Config" aria-controls="${escapetool.xml($searchEngine)}Config"
+          role="tab"
+          data-toggle="tab"&gt;
+          $escapetool.xml($searchExtension.parameters.label)
         &lt;/a&gt;
       &lt;/li&gt;
     &lt;/ul&gt;
     {{/html}}
 
     (% class="tab-content" %)(((
-      (% role="tabpanel" class="tab-pane active" id="${searchEngine}Config" %)(((
+      (% role="tabpanel" class="tab-pane active" id="${services.rendering.escape($searchEngine, 'xwiki/2.1')}Config"
+      %)(((
         ## Use context='new' in the include so that we can use PR.
-        {{include reference="$searchAdminPage" context='new'}}
+        {{include reference="$services.rendering.escape($searchAdminPage, 'xwiki/2.1')" context='new'}}
       )))
     )))
   #end

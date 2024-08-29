@@ -27,6 +27,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -60,7 +61,7 @@ public class LiveDataElement extends BaseElement
      */
     public TableLayoutElement getTableLayout()
     {
-        TableLayoutElement tableLayoutElement = new TableLayoutElement(this.id);
+        TableLayoutElement tableLayoutElement = new TableLayoutElement(this);
         tableLayoutElement.waitUntilReady();
         return tableLayoutElement;
     }
@@ -95,36 +96,153 @@ public class LiveDataElement extends BaseElement
         return getFootnotes().stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
-    private void waitUntilReady()
+    /**
+     * @return if the live data has finished loading and is ready for service
+     */
+    public boolean isReady()
     {
-        // First the Live Data macro displays a simple div with the loading class.
-        // This div is replaced by the Live Data Vue template once vue is loaded.
-        getDriver().waitUntilCondition(
-            input -> {
-                try {
-                    String[] classes =
-                        getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class")
-                            .split("\\s+");
-                    return !Arrays.asList(classes).contains("loading");
-                } catch (NoSuchElementException | StaleElementReferenceException e) {
-                    // If there is no such element that mean the Live data is not loaded yet (or is missing).
-                    // If the element is stale, that means the element was removed from the DOM in the meantime, because
-                    // the initial div produced by the live data macro was replaced by the Vue template.
-                    return false;
-                }
-            });
+        return isVueLoaded() && areComponentsLoaded();
+    }
 
-        // Then, once the Vue template is loaded, a div with the loading class is inserted until the rest of the data 
-        // and components required to display the Live Data are loaded too. 
-        getDriver().waitUntilCondition(
-            input -> getDriver().findElement(By.id(this.id)).findElements(By.cssSelector(".xwiki-livedata .loading"))
-                .isEmpty()
-        );
+    private WebElement openDropDownMenu()
+    {
+        WebElement dropdownMenu = getRootElement().findElement(By.cssSelector(".livedata-dropdown-menu "));
+        dropdownMenu.click();
+        return dropdownMenu;
+    }
+
+    /**
+     * Click on the refresh button from the actions menu.
+     *
+     * @since 15.5
+     */
+    public void refresh()
+    {
+        openDropDownMenu().findElement(By.cssSelector(".livedata-action-refresh")).click();
+    }
+
+    /**
+     * @return the id of the Live Data
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * Change the pagination number of the current live data.
+     *
+     * @param paginationNumber the new pagination number (e.g., 15 or 100), this must be a known pagination
+     * @return the current page object
+     * @since 15.9RC1
+     * @since 15.5.3
+     */
+    public LiveDataElement setPagination(int paginationNumber)
+    {
+        WebElement element = getRootElement().findElement(By.cssSelector(".pagination-page-size select"));
+        new Select(element).selectByValue(Integer.toString(paginationNumber));
+        return this;
+    }
+
+    /**
+     *
+     * @return the possible pagination sizes.
+     * @since 16.5.0
+     */
+    public List<Integer> getPaginationPageSizes()
+    {
+        WebElement element = getRootElement().findElement(By.cssSelector(".pagination-page-size select"));
+        return new Select(element)
+            .getOptions()
+            .stream()
+            .map(WebElement::getText)
+            .map(Integer::parseInt)
+            .collect(Collectors.toList());
+    }
+
+    public void waitUntilReady()
+    {
+        getDriver().waitUntilCondition(input -> isVueLoaded());
+
+        getDriver().waitUntilCondition(input -> areComponentsLoaded());
+    }
+
+    private boolean areComponentsLoaded()
+    {
+        // Once the Vue template is loaded, a div with the loading class is inserted until the rest of the data
+        // and components required to display the Live Data are loaded too.
+        return getRootElement().findElements(By.cssSelector(".xwiki-livedata > .loading"))
+            .isEmpty();
+    }
+
+    private boolean isVueLoaded()
+    {
+        // First the Live Data macro displays a simple div with the loading class. This div is replaced by the Live
+        // Data Vue template once vue is loaded.
+        try {
+            String[] classes =
+                getDriver().findElementWithoutWaiting(By.id(this.id)).getAttribute("class").split("\\s+");
+            return !Arrays.asList(classes).contains("loading");
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            // If there is no such element that mean the Live data is not loaded yet (or is missing).
+            // If the element is stale, that means the element was removed from the DOM in the meantime, because
+            // the initial div produced by the live data macro was replaced by the Vue template.
+            return false;
+        }
     }
 
     private List<WebElement> getFootnotes()
     {
         return getDriver().findElementWithoutWaiting(By.id(this.id))
             .findElements(By.cssSelector(".footnotes > .footnote"));
+    }
+
+    private WebElement getRootElement()
+    {
+        return getDriver().findElement(By.id(this.id));
+    }
+
+    /**
+     * Open the panel for advanced filter and returns it.
+     * @return an instance of {@link FiltersPanelElement} once it's opened.
+     * @since 16.3.0RC1
+     */
+    public FiltersPanelElement openFiltersPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Filter...")).click();
+        return new FiltersPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-filter")));
+    }
+
+    /**
+     * Open the panel for advanced sorting and returns it.
+     * @return an instance of {@link SortPanelElement} once it's opened.
+     * @since 16.3.0RC1
+     */
+    public SortPanelElement openSortPanel()
+    {
+        openDropDownMenu().findElement(By.linkText("Sort...")).click();
+        return new SortPanelElement(this,
+            getRootElement().findElement(By.className("livedata-advanced-panel-sort")));
+    }
+
+    /**
+     * Clear all custom sorting that might have been put.
+     */
+    public void clearAllSort()
+    {
+        SortPanelElement sortPanelElement = openSortPanel();
+        sortPanelElement.clearAllSort();
+        sortPanelElement.closePanel();
+    }
+
+    /**
+     * Clear all custom filters that might have been put.
+     */
+    public void clearAllFilters()
+    {
+        FiltersPanelElement filtersPanelElement = openFiltersPanel();
+        filtersPanelElement.clearAllFilters();
+        filtersPanelElement.closePanel();
     }
 }

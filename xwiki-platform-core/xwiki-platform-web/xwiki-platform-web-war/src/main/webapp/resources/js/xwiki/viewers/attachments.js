@@ -53,13 +53,10 @@ viewers.Attachments = Class.create({
   counter : 1,
   /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
-    if ($("attachform")) {
-      // If the upload form is already visible, enhance it.
-      this.prepareForm();
-    } else {
-      // Otherwise, we wait for a notification for the AJAX loading of the Attachments metadata tab.
-      this.addTabLoadListener();
-    }
+    // Initialize the event listener to prepare the form when the Attachments tab is loaded or reloaded, or prepare the form straight away.
+    // prepareForm won't be called twice as it is skipped once #attachform exists. 
+    this.addTabLoadListener();
+    this.prepareForm();
   },
   /** Enhance the upload form with JS behaviors. */
   prepareForm : function() {
@@ -84,9 +81,10 @@ viewers.Attachments = Class.create({
   attachHTML5Uploader : function(input) {
     if (typeof(XWiki.FileUploader) != 'undefined') {
       input.multiple = true;
+      // Since the attachments liveData is refreshed on file upload, we skip updating the attachments container.
       return new XWiki.FileUploader(input, {
-        'responseContainer' : $('_attachments'),
-        'responseURL' : XWiki.currentDocument.getURL('get', 'xpage=attachmentslist&forceTestRights=1'),
+        'responseContainer' : document.createElement('div'),
+        'responseURL' : '',
         'maxFilesize' : parseInt(input.readAttribute('data-max-file-size'))
       });
     }
@@ -195,20 +193,16 @@ viewers.Attachments = Class.create({
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
   /**
-   * Getting the button that triggers the modal.
-   */
-  $(document).on('show.bs.modal', '#deleteAttachment', function(event) {
-    $(this).data('relatedTarget', $(event.relatedTarget));
-  });
-  /**
    * Event on deleteAttachment button.
    */
-  $(document).on('click', '#deleteAttachment input.btn-danger', function() {
-    var modal = $('#deleteAttachment');
-    var button = modal.data('relatedTarget');
+  $(document).on('click', '.deleteAttachment input.btn-danger', function(e) {
+    e.preventDefault();
+    var modal = $(e.currentTarget).closest('.deleteAttachment');
+    var button = $(modal.data('relatedTarget'));
+    var liveData = button.closest('.liveData').data('liveData');
     var notification;
     /**
-     * Ajax request made for deleting an attachment. Delete the HTML element on succes. Disable the delete button
+     * Ajax request made for deleting an attachment. Refresh liveData on success. Disable the delete button
      * before the request is send, so the user cannot resend it in case it takes longer.
      * Display error message on failure.
      */
@@ -219,10 +213,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         notification = new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.inProgress'], 'inprogress');
       },
       success : function() {
-        var attachment = button.closest('.attachment');
-        // Remove the corresponding HTML element from the UI and update the attachment count.
-        attachment.remove();
-        updateCount();
+        liveData.updateEntries().then(() => {
+          if (liveData.data.id === 'docAttachments') {
+            updateCount(liveData.data.data.count);
+          }
+        });
         notification.replace(new XWiki.widgets.Notification(l10n['core.viewers.attachments.delete.done'], 'done'));
       },
       error: function() {
@@ -233,28 +228,58 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     })
   });
   /**
-   * Updating the number of files in AttachmentsTab and in More actions menu.
+   * On delete action, show a confirmation modal and save the element that triggered this event to be able to access
+   * information after confirmation.
    */
-  var updateCount = function() {
+  $(document).on('click', '.attachmentActions .actiondelete', function(event) {
+    event.preventDefault();
+    var modal = $(event.currentTarget).closest('.liveData').next('.deleteAttachment');
+    modal.data('relatedTarget', event.currentTarget);
+    modal.modal('show');
+  });
+  /**
+   * Update the locations that display the attachments count with the new number or, when it is not provided, make
+   * another request to get it.
+   */
+  var updateCount = function(attachmentsNumber) {
+    if (attachmentsNumber && attachmentsNumber >= 0) {
+      updateAttachmentsNumber(attachmentsNumber);
+    } else {
+      $.ajax({
+        url: XWiki.currentDocument.getURL('get', 'xpage=xpart&vm=attachmentsjson.vm'),
+        success: function(data) {
+          updateAttachmentsNumber(data.totalrows);
+        }
+      });
+    }
+  };
+  /**
+   * Update the number of attachments from AttachmentsTab and More actions menu.
+   *
+   * @param attachmentsNumber the total number of attachments 
+   */
+  var updateAttachmentsNumber = function(attachmentsNumber) {
     var itemCount = $('#Attachmentstab').find('.itemCount');
-    var attachmentsNumber = $("#Attachmentspane .attachment").size();
-    if(itemCount) {
+    if (itemCount) {
       itemCount.text(l10n['docextra.extranb'].replace("__number__", attachmentsNumber));
     };
-    if($('#tmAttachments').length) {
+    var tmAttachments = $('#tmAttachments');
+    if (tmAttachments.length) {
       // Calling normalize() because a text node needs to be modified and so all consecutive text nodes are merged.
-      $('#tmAttachments')[0].normalize();
+      tmAttachments[0].normalize();
       var attachmentsLabel = ' ' + l10n['docextra.attachments'] + ' ';
       var label = attachmentsLabel + l10n['docextra.extranb'];
       label = label.replace("__number__", attachmentsNumber);
-      $('#tmAttachments').contents().last()[0].nodeValue=label;
+      tmAttachments.contents().last()[0].nodeValue = label;
     }
   };
   /**
    * Firing updateCount event when an attachment is successfully uploaded.
    */
   $(document).on('xwiki:html5upload:done', function() {
-    updateCount();
+    $("#docAttachments").data('liveData').updateEntries().then(() => {
+      updateCount($("#docAttachments").data('liveData').data.data.count);
+    });
   });
 
   /**

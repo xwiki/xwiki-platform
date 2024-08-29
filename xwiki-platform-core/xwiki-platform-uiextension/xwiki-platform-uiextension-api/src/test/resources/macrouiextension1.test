@@ -1,0 +1,15 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+{{uiextension id="testextension1"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [uiextension] [id=testextension1]
+beginParagraph
+onWord [extension1]
+endParagraph
+endMacroMarkerStandalone [uiextension] [id=testextension1]
+endDocument

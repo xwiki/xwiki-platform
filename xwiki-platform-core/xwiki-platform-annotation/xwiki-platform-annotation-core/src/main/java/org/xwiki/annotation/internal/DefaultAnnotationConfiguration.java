@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -80,11 +81,21 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Inject
     protected DocumentAccessBridge dab;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public boolean isInstalled()
     {
-        return dab.exists(new DocumentReference(getCurrentWikiReference().getName(),
-            AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME));
+        try {
+            return dab.exists(new DocumentReference(getCurrentWikiReference().getName(),
+                AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME,
+                AnnotationConfiguration.CONFIGURATION_PAGE_NAME));
+        } catch (Exception e) {
+            this.logger.error("Failed to test if the annotation configuration page exists", e);
+        }
+
+        return false;
     }
 
     @Override
@@ -98,7 +109,7 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     {
         List<String> exceptionSpaces = configuration.get().getProperty("exceptionSpaces", List.class);
 
-        List<SpaceReference> result = new ArrayList<SpaceReference>();
+        List<SpaceReference> result = new ArrayList<>();
         for (String exceptionSpace : exceptionSpaces) {
             result.add(new SpaceReference(exceptionSpace, getCurrentWikiReference()));
         }
@@ -131,9 +142,9 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
      */
     protected WikiReference getCurrentWikiReference()
     {
-        EntityReference wikiReference = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI);
+        EntityReference wikiEntityReference = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI);
 
-        return wikiReference instanceof WikiReference ? (WikiReference) wikiReference
-            : new WikiReference(wikiReference);
+        return wikiEntityReference instanceof WikiReference wikiReference ? wikiReference
+            : new WikiReference(wikiEntityReference);
     }
 }

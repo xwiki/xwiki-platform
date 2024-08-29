@@ -111,4 +111,12 @@ public class DocumentStringUserReferenceSerializerTest
 
         assertEquals("XWiki.XWikiGuest", this.serializer.serialize(CurrentUserReference.INSTANCE));
     }
+
+    @Test
+    void serializeCurrentUserReferenceWhenCurrentUserIsSuperAdmin()
+    {
+        when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(SuperAdminUserReference.INSTANCE);
+
+        assertEquals("XWiki.superadmin", this.serializer.serialize(CurrentUserReference.INSTANCE));
+    }
 }

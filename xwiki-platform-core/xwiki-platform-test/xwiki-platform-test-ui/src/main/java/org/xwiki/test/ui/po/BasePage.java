@@ -34,12 +34,17 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.ui.WCAGContext;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
+
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 
 /**
  * Represents the common actions possible on all Pages.
@@ -50,9 +55,6 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
 public class BasePage extends BaseElement
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
-
-    private static final By DRAWER_MATCHER = By.id("tmDrawer");
-
     /**
      * Used for sending keyboard shortcuts to.
      */
@@ -65,14 +67,11 @@ public class BasePage extends BaseElement
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
 
-    @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@role, 'button')]")
+    @FindBy(xpath = "//div[@id='tmCreate']/a[contains(@class, 'btn')]")
     private WebElement tmCreate;
 
-    @FindBy(xpath = "//div[@id='tmMoreActions']/a[contains(@role, 'button')]")
+    @FindBy(xpath = "//div[@id='tmMoreActions']/button")
     private WebElement moreActionsMenu;
-
-    @FindBy(id = "tmDrawerActivator")
-    private WebElement drawerActivator;
 
     @FindBy(xpath = "//input[@id='tmWatchDocument']/../span[contains(@class, 'bootstrap-switch-label')]")
     private WebElement watchDocumentLink;
@@ -80,7 +79,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmPage")
     private WebElement pageMenu;
 
-    @FindBys({ @FindBy(id = "tmRegister"), @FindBy(tagName = "a") })
+    @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
     @FindBy(xpath = "//a[@id='tmLogin']")
@@ -113,16 +112,27 @@ public class BasePage extends BaseElement
     @FindBy(id = "companylogo")
     protected WebElement logo;
 
+    private DrawerMenu drawerMenu = new DrawerMenu();
+
     /**
      * Note: when reusing instances of BasePage, the constructor is not doing the work anymore and the
-     * waitUntilPageJSIsLoaded() method needs to be executed manually, when needed.
+     * {@link #waitUntilPageIsReady()} method needs to be executed manually, when needed.
      * <p>
      * Note2: Never call the constructor before navigating to the page you need to test first.
      */
     public BasePage()
     {
         super();
-        waitUntilPageJSIsLoaded();
+        waitUntilPageIsReady();
+
+        // WCAG validation is done in the constructor, but after the page is done loading, once it is ready.
+        // This allows WCAG tests to use the already existing UITest framework and setup.
+        // At every BasePage (and child classes) instantiation, a wcag validation on it will be done if the build setup
+        // is configured as such.
+        // This doesn't trigger any assertion in the current test.
+        // However once the test suite ends, in XWikiDockerExtension#afterAll, there is an assertion made to make sure
+        // no WCAG rules are broken.
+        validateWCAG();
     }
 
     public String getPageTitle()
@@ -190,7 +200,7 @@ public class BasePage extends BaseElement
     public void edit()
     {
         WebElement editMenuButton =
-            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@role, 'button')]"));
+            getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]"));
         editMenuButton.click();
     }
 
@@ -199,7 +209,7 @@ public class BasePage extends BaseElement
      */
     public String getEditURL()
     {
-        return getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).getAttribute("href");
+        return getDriver().findElement(By.xpath("//div[@id='tmEdit']/a[contains(@class, 'btn')]")).getAttribute("href");
     }
 
     /**
@@ -274,80 +284,24 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Waits until the page has loaded. Normally we don't need to call this method since a click in Selenium2 is a
-     * blocking call. However there are cases (such as when using a shortcut) when we asynchronously load a page.
-     * 
-     * @return this page
-     * @since 3.2M3
+     * Refresh the page and wait for the javascript to be also loaded.
+     *
+     * @since 14.1
      */
-    public BasePage waitUntilPageIsLoaded()
+    public BasePage reloadPage()
     {
-        getDriver().waitUntilElementIsVisible(By.id("footerglobal"));
+        getDriver().navigate().refresh();
+        waitUntilPageIsReady();
         return this;
     }
 
     /**
-     * @since 7.2M3
+     * @return the PO for the Drawer Menu
+     * @since 15.2RC1
      */
-    public void toggleDrawer()
+    public DrawerMenu getDrawerMenu()
     {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
-            this.mainContainerDiv.click();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
-        } else {
-            // The drawer is not visible, so we open it
-            this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
-        }
-    }
-
-    /**
-     * @return true if the drawer used to be hidden
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean showDrawer()
-    {
-        if (!isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is not visible, so we open it
-            this.drawerActivator.click();
-            getDriver().waitUntilElementIsVisible(DRAWER_MATCHER);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return true if the drawer used to be displayed
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean hideDrawer()
-    {
-        if (isElementVisible(DRAWER_MATCHER)) {
-            // The drawer is visible, so we close it by clicking outside the drawer
-            // We don't perform directly a click since it could lead to a
-            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay-upper above it.
-            // The click through action is performed with a move and click, which is what we really want.
-            getDriver().createActions().click(this.mainContainerDiv).perform();
-            getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @since 8.4.5
-     * @since 9.0RC1
-     */
-    public boolean isDrawerVisible()
-    {
-        return isElementVisible(DRAWER_MATCHER);
+        return this.drawerMenu;
     }
 
     /**
@@ -363,7 +317,7 @@ public class BasePage extends BaseElement
      */
     public void clickMoreActionsSubMenuEntry(String id)
     {
-        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]"), id);
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmMoreActions']/button"), id);
     }
 
     /**
@@ -426,7 +380,6 @@ public class BasePage extends BaseElement
      * Specific delete action when the delete action is performed on a page.
      *
      * @return a specialized confirmation page for page deletion
-     *
      * @since 12.8RC1
      */
     public DeletePageConfirmationPage deletePage()
@@ -473,7 +426,7 @@ public class BasePage extends BaseElement
      */
     public LoginPage login()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         this.loginLink.click();
         return new LoginPage();
     }
@@ -485,12 +438,12 @@ public class BasePage extends BaseElement
     {
         // We need to show the drawer because #getText() does not allow getting hidden text (but allow finding the
         // element and its attributes...)
-        boolean hide = showDrawer();
+        boolean hide = getDrawerMenu().show();
 
         String user = this.userLink.getText();
 
         if (hide) {
-            hideDrawer();
+            getDrawerMenu().hide();
         }
 
         return user;
@@ -522,17 +475,15 @@ public class BasePage extends BaseElement
     public ViewPage clickLocale(Locale locale)
     {
         // Open drawer
-        toggleDrawer();
+        getDrawerMenu().toggle();
 
         // Open Languages
         WebElement languagesElement = getDriver().findElementWithoutWaiting(By.xpath("//a[@id='tmLanguages']"));
         languagesElement.click();
 
         // Wait for the languages submenu to be open
-        getDriver().waitUntilCondition(webDriver ->
-                getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu")).getAttribute("class")
-                        .contains("collapse in")
-        );
+        getDriver().waitUntilCondition(webDriver -> getDriver().findElementWithoutWaiting(By.id("tmLanguages_menu"))
+            .getAttribute("class").contains("collapse in"));
 
         // Click passed locale
         WebElement localeElement = getDriver().findElementWithoutWaiting(
@@ -547,7 +498,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
-        toggleDrawer();
+        getDrawerMenu().show();
         getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
@@ -560,7 +511,7 @@ public class BasePage extends BaseElement
      */
     public RegistrationPage register()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         this.registerLink.click();
         return new RegistrationPage();
     }
@@ -649,7 +600,7 @@ public class BasePage extends BaseElement
     public String getErrorContent()
     {
         return getDriver()
-            .findElementWithoutWaiting(By.xpath("//div[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/pre[contains(@class, 'xwikierror')]"))
             .getText();
     }
 
@@ -660,8 +611,8 @@ public class BasePage extends BaseElement
      */
     public boolean hasLeftPanel(String panelTitle)
     {
-        return getDriver().hasElementWithoutWaiting(By.xpath(
-            "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
+        return getDriver().hasElementWithoutWaiting(
+            By.xpath("//div[@id = 'leftPanels']/div/h2[@class = 'xwikipaneltitle' and text() = '" + panelTitle + "']"));
     }
 
     public boolean isForbidden()
@@ -676,8 +627,21 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Use the following keyboard shortcut and wait for a new page to load.
-     * This should be only used for shortcuts that indeed loads a new page.
+     * @return the full text of an {@code xwikimessage} box displayed in the full content (e.g. in case of error).
+     * @since 15.1RC1
+     * @since 14.10.6
+     */
+    public String getXWikiMessageContent()
+    {
+        return getDriver()
+            .findElementWithoutWaiting(By.xpath("//main[@id = 'mainContentArea']/div[contains(@class, 'xwikimessage')]"))
+            .getText();
+    }
+
+    /**
+     * Use the following keyboard shortcut and wait for a new page to load. This should be only used for shortcuts that
+     * indeed loads a new page.
+     * 
      * @param shortcut the keyboard key combination to perform.
      */
     private void useShortcutKeyAndLoads(CharSequence... shortcut)
@@ -688,7 +652,72 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * Execute WCAG tests on the current base page. Test results are cached using a key of current URL + PO class name.
+     *
+     * @since 15.2RC1
+     */
+    public void validateWCAG()
+    {
+        validateWCAG(getUtil().getWCAGUtils().getWCAGContext());
+    }
+
+    /**
+     * Execute WCAG tests on the current base page. Test results are cached using a key of current URL + PO class name.
+     *
+     * @param wcagContext the current WCAG context
+     * @since 15.2RC1
+     */
+    public void validateWCAG(WCAGContext wcagContext)
+    {
+        validateWCAG(wcagContext, true);
+    }
+
+    /**
+     * Execute WCAG tests on the current base page.
+     *
+     * @param wcagContext the current WCAG context
+     * @param checkCache if set to true, the WCAGContext cache will be checked before starting the validation and it'll
+     *                   be cancelled if the key (current URL + PO class name) is found in the cache.
+     * @since 15.2RC1
+     */
+    public void validateWCAG(WCAGContext wcagContext, boolean checkCache)
+    {
+        if (!wcagContext.isWCAGEnabled()) {
+            // Block WCAG validation if it is not enabled, in all cases.
+            return;
+        }
+
+        try {
+            long startTime = System.currentTimeMillis();
+            // Run WCAG tests on the current UI page if the current URL + PO class name are not in the cache, or if checking
+            // the cache is disabled.
+            if (!checkCache || wcagContext.isNotCached(this.getPageURL(), this.getClass().getName())) {
+                XWikiWebDriver driver = this.getDriver();
+                AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
+                Results axeResult = axeBuilder.analyze(driver);
+                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                long stopTime = System.currentTimeMillis();
+                long deltaTime = stopTime - startTime;
+                LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",
+                    this.getPageURL(), this.getClass().getName(), deltaTime);
+                wcagContext.addWCAGTime(deltaTime);
+            } else {
+                // If the identifying pair is already in the cache, don't perform accessibility validation.
+                LOGGER.debug("[{} : {}] This combination of URL:class was already WCAG-checked.",
+                    this.getPageURL(), this.getClass().getName());
+            }
+        } catch (Exception e) {
+            if (wcagContext.shouldWCAGStopOnError()) {
+                throw e;
+            } else {
+                LOGGER.debug("Error during WCAG execution, but ignored thanks to wcagStopOnError flag: ", e);
+            }
+        }
+    }
+
+    /**
      * Use keyboard shortcuts to go to edit page.
+     * 
      * @return a new {@link EditPage}
      * @since 11.9RC1
      */
@@ -700,6 +729,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to wiki edit page.
+     * 
      * @return a new {@link WikiEditPage}
      * @since 11.9RC1
      */
@@ -711,6 +741,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to WYSIWYG edit page.
+     * 
      * @return a new {@link WYSIWYGEditPage}
      * @since 11.9RC1
      */
@@ -722,6 +753,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to Inline Form edit page.
+     * 
      * @return a new {@link InlinePage}
      * @since 11.9RC1
      */
@@ -733,8 +765,9 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rights edit page.
+     * 
      * @return a new {@link BasePage}: it can be actually either a {@link RightsEditPage} or an AdministrationPage
-     *          depending if the page is terminal or not.
+     *         depending if the page is terminal or not.
      * @since 11.9RC1
      */
     public BasePage useShortcutKeyForRightsEditing()
@@ -745,6 +778,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to object edit page.
+     * 
      * @return a new {@link ObjectEditPage}
      * @since 11.9RC1
      */
@@ -756,6 +790,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to class edit page.
+     * 
      * @return a new {@link ClassEditPage}
      * @since 11.9RC1
      */
@@ -767,6 +802,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to delete page.
+     * 
      * @return a new {@link ConfirmationPage}
      * @since 11.9RC1
      */
@@ -778,6 +814,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to rename page.
+     * 
      * @return a new {@link RenamePage}
      * @since 11.9RC1
      */
@@ -789,6 +826,7 @@ public class BasePage extends BaseElement
 
     /**
      * Use keyboard shortcuts to go to the source view of a page.
+     * 
      * @return a new {@link ViewPage}
      * @since 11.9RC1
      */

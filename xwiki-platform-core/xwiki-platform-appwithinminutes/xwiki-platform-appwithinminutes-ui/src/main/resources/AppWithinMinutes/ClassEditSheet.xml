@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AppWithinMinutes.ClassEditSheet" locale="">
+<xwikidoc version="1.5" reference="AppWithinMinutes.ClassEditSheet" locale="">
   <web>AppWithinMinutes</web>
   <name>ClassEditSheet</name>
   <language/>
@@ -104,7 +104,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #foreach ($category in $services.query.xwql($categoryListStatement).execute())
       #set ($categoryDoc = $xwiki.getDocument($category))
       &lt;li&gt;
-        &lt;div class="category"&gt;$categoryDoc.plainTitle&lt;/div&gt;
+        &lt;div class="category"&gt;$escapetool.xml($categoryDoc.plainTitle)&lt;/div&gt;
         #set ($formFieldsForCategoryStatement = "from doc.object($formFieldClassName) as field where field.category = :category order by field.priority")
         #set ($formFieldsForCategoryQuery = $services.query.xwql($formFieldsForCategoryStatement).bindValue('category', $category))
         &lt;ul&gt;
@@ -119,7 +119,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #else
               #set ($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
             #end
-            #set ($formFieldIconRendered = "&lt;img src='$formFieldIconURL' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
+            #set ($formFieldIconRendered = "&lt;img src='$escapetool.xml($formFieldIconURL)' alt='$escapetool.xml($formFieldDoc.plainTitle)' class='icon' /&gt;")
           #end
           &lt;li class="field"&gt;
             $formFieldIconRendered
@@ -135,11 +135,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #set ($fieldURL = $doc.getURL('edit', $escapetool.url({
               'xpage': 'plain',
               'sheet': 'AppWithinMinutes.ClassEditSheet',
+              'form_token': $services.csrf.getToken(),
               'template': 'AppWithinMinutes.ClassTemplate',
               'field': $formFieldDoc.fullName,
               'xeditmode': 'text'
             })))
-            &lt;input type="hidden" value="$fieldURL" class="data"/&gt;
+            &lt;input type="hidden" value="$escapetool.xml($fieldURL)" class="data"/&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;
@@ -426,8 +427,6 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Display the edit class form.
  *#
 #macro (displayEditForm)
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/effects.js'))
-  #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
   #set ($discard = $xwiki.jsx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassEditSheet'))
   #set ($discard = $xwiki.ssx.use('AppWithinMinutes.ClassSheetGenerator'))
@@ -717,6 +716,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       })
       #if (!$xwiki.exists($templateProviderReference))
         #set ($discard = $queryString.putAll({
+          'form_token': $services.csrf.getToken(),
           'template': 'XWiki.TemplateProviderTemplate',
           'parent': $doc.fullName
         }))
@@ -809,6 +809,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -856,6 +858,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1018,6 +1022,8 @@ return XWiki;
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1065,6 +1071,8 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -1599,11 +1607,7 @@ return XWiki;
 }(XWiki || {}));
 
 (function() {
-  function init() {
-    var form = $('inline');
-    if (!form) {
-      return false;
-    }
+  function initForm(form) {
     // Let the sheet handle the form submit. The form is submitted by default to the preview action which dispatches the
     // request to the save action if the save button is detected on the request parameters. By submitting to the edit
     // action the edit sheet is evaluated and thus it can handle the save by itself.
@@ -1641,9 +1645,18 @@ return XWiki;
     // Make the palette and the canvas live.
     new XWiki.FormFieldPalette('palette');
     new XWiki.FormCanvas('canvas');
-
-    return true;
   }
+
+  function init() {
+    var form = $('inline');
+    if (form) {
+      require(['scriptaculous/dragdrop'], function() {
+        initForm(form);
+      });
+    }
+    return form;
+  }
+
   (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 }).call();
 
@@ -1788,6 +1801,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -1816,6 +1831,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -1851,6 +1868,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -2035,6 +2054,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -2063,6 +2084,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
         <number>6</number>
@@ -2098,6 +2121,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>

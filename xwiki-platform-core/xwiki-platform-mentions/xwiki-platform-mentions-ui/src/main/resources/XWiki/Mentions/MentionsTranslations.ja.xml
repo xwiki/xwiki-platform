@@ -1,0 +1,60 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Mentions.MentionsTranslations" locale="ja">
+  <web>XWiki.Mentions</web>
+  <name>MentionsTranslations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>MentionsTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.mention.name=ユーザーメンション
+rendering.macro.mention.description=ユーザーメンションを挿入。
+rendering.macro.mention.parameter.reference.name=参照
+rendering.macro.mention.parameter.reference.description=メンションされたユーザーまたはグループの参照。
+rendering.macro.mention.parameter.style.name=表示のスタイル
+rendering.macro.mention.parameter.style.description=メンションを表示するスタイル（これはユーザーメンションにのみ適用されます）。
+rendering.macro.mention.parameter.anchor.name=アンカー
+rendering.macro.mention.parameter.anchor.description=メンションへのリンクに使用するアンカー（このアンカーはできるだけドキュメントに固有であるべきです）。
+rendering.macro.mention.parameter.type.name=種類
+rendering.macro.mention.parameter.type.description=メンションされたアクターの種類。
+org.xwiki.mentions.DisplayStyle.FULL_NAME=ユーザーの氏名
+org.xwiki.mentions.DisplayStyle.FIRST_NAME=ユーザーの名のみ
+org.xwiki.mentions.DisplayStyle.LOGIN=ユーザー名
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor=メンションの色
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=現在のユーザーのメンションの色（メモ：CSSのbackground-colorの属性に使用します）。
+XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=自分のメンションの色
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated=引用を有効にする
+XWiki.Mentions.MentionsConfigurationClass_quoteActivated.hint=メンションを囲むテキストの引用をユーザーメンションの通知に含むかどうかを規定。
+mentions.tip=WYSIWYGで編集中の場合、@の後に文字を入力すると、メンションするユーザーの候補が表示されます。
+mentions.configuration.heading=メンションの設定
+</content>
+</xwikidoc>

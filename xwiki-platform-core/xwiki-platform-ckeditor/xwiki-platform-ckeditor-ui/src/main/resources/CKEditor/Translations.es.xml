@@ -1,0 +1,145 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="es">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Plugins desactivados
+CKEditor.ConfigClass_removePlugins.hint=La lista de plugins que están desactivados.
+CKEditor.ConfigClass_removeButtons=Funcionalidades de la barra de herramientas desactivadas
+CKEditor.ConfigClass_removeButtons.hint=La lista de funcionalidades de la barra de herramientas que están desactivadas.
+CKEditor.ConfigClass_linkShowAdvancedTab=Enlace: Mostrar la pestaña Avanzado
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Te permite definir atributos del enlace como el id, nombre, clase o estilo.
+CKEditor.ConfigClass_linkShowTargetTab=Enlace: Mostrar la pestaña Destino
+CKEditor.ConfigClass_linkShowTargetTab.hint=Te permite definir el atributo de destino del enlace (p.e. abrir el enlace en una pestaña nueva).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Cargar extensiones JavaScript de Skin
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Algunas macros de renderizado se muestran utilizando código JavaScript. Cargar el código JavaScript mejora la presentación WYSIWYG del editor pero puede provocar problemas si el código JavaScript interfiere con el código del CKEditor o si cambia contenido fuera de los límites de salida de la macro.
+CKEditor.ConfigClass_advanced=Configuración avanzada
+CKEditor.ConfigClass_advanced.hint=Puedes escribir un fragmento de código JavaScript para modificar la configuración del objeto directamente. Clica la {0}documentación de CKEditor{1} para la lista de propiedades de configuración disponibles.
+ckeditor.content.placeholder=Comienza a teclear aquí...
+ckeditor.admin.saveComment=Configuración de CKEditor actualizada desde la Administración
+ckeditor.admin.reset=Reiniciar
+ckeditor.admin.reset.hint=Restablecer la configuración predeterminada
+ckeditor.admin.reset.confirmation=¿Estás seguro de querer restablecer la configuración predeterminada? Perderás todos tus cambios.
+ckeditor.plugin.link.options=Opciones
+ckeditor.plugin.link.anchor=Ancla
+ckeditor.plugin.link.queryString=Cadena de consulta
+ckeditor.plugin.link.defaultLabel=teclea la etiqueta del enlace
+ckeditor.plugin.link.openInNewTab=Abrir el enlace en una pestaña nueva
+ckeditor.plugin.macro.placeholder=macro:{0}
+ckeditor.plugin.macro.buttonHint=Macro de XWiki
+ckeditor.plugin.macro.editButtonHint=Editar la macro
+ckeditor.plugin.macro.refreshFailed=Error al refrescar el contenido editado.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Insertar la macro {0}
+ckeditor.plugin.office.importer.title=Importar fichero de Office
+ckeditor.plugin.office.importer.filePath=Ruta del fichero
+ckeditor.plugin.office.importer.filePath.hint=Escoge el fichero Office a importar. Se subirá y adjuntará el fichero esta página y su contenido será insertado en el contenido de la página.
+ckeditor.plugin.office.importer.filterStyles=Filtrar estilos
+ckeditor.plugin.office.importer.filterStyles.hint=Filtrar estilos de texto como fuente, color, alineación, márgenes. La estructura del contenido incluyendo niveles de cabecera, párrafos, listas y tables se mantiene.
+ckeditor.plugin.office.importer.useOfficeViewer=Utilizar el Visor de Office
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Activa esta opción si no planeas editar el contenido del fichero Office tras importarlo o si no quieres mezclar el contenido del fichero Office con el contenido que estás editando en estos momentos.
+ckeditor.plugin.office.importer.required=Requerido
+ckeditor.plugin.office.importer.import=Importar
+ckeditor.plugin.office.importer.inProgress=Importando fichero de Office...
+ckeditor.plugin.office.importer.done=Fichero Office importado con éxito.
+ckeditor.plugin.office.importer.fail=Error de importación Office.
+ckeditor.plugin.office.importer.noUploadURL=La URL de subida del fichero no está configurada.
+ckeditor.plugin.office.importer.failedToLoadForm=Error al cargar el formulario.
+ckeditor.plugin.resource.notSpecified=No se especifica el {0}.
+ckeditor.plugin.save.leaveConfirmationMessage=Hay cambios sin guardar. ¿Quieres descartarlos?
+ckeditor.plugin.save.failed=No se puede guardar el contenido por un error interno de CKEditor. Deberías intentar copiar tus cambios importantes y recargar el editor.
+ckeditor.plugin.source.conversionFailed=Error al ejecutar la conversión.
+ckeditor.plugin.toolbar.basicStyles=Estilos básicos
+ckeditor.plugin.toolbar.lists=Listas
+ckeditor.plugin.toolbar.bulletedlist=Lista con viñetas
+ckeditor.plugin.toolbar.numberedlist=Lista numérica
+ckeditor.plugin.toolbar.insert=Insertar
+ckeditor.plugin.toolbar.horizontalrule=Línea horizontal
+ckeditor.plugin.toolbar.specialchar=Carácter especial
+ckeditor.plugin.toolbar.infoBox=Cuadro informativo
+ckeditor.plugin.toolbar.successBox=Cuadro de éxito
+ckeditor.plugin.toolbar.warningBox=Cuadro de advertencia
+ckeditor.plugin.toolbar.errorBox=Cuadro de error
+ckeditor.plugin.toolbar.toc=Tabla de contenidos
+ckeditor.plugin.toolbar.include=Incluir
+ckeditor.plugin.toolbar.code=Fragmento de código
+ckeditor.plugin.toolbar.otherMacros=Otras macros
+ckeditor.plugin.syntax.update.inProgress=Actualizando el editor WYSIWYG
+ckeditor.plugin.syntax.update.done=Editor WYSIWYG actualizado
+ckeditor.plugin.syntax.update.failed=Error al actualizar el editor WYSIWYG
+ckeditor.plugin.syntax.wysiwygModeUnsupported=La sintaxis {0} no soporta el modo de edición WYSIWYG .
+ckeditor.inline.failedToInit=Error al inicializar CKEditor.
+modal.ok=OK
+modal.cancel=Cancelar
+modal.close=Cerrar
+resource.attach.label=Adjunto
+resource.attach.placeholder=Ruta.A.La.Página@adjunto.png
+resource.data.label=Data URI
+resource.doc.label=Página
+resource.doc.placeholder=Ruta.A.La.Página
+resource.icon.label=Icono
+resource.mailto.label=Dirección de correo electrónico
+resource.mailto.placeholder=usuario@example.org
+resource.path.label=Ruta
+resource.path.placeholder=/ruta/al/fichero
+resource.unc.label=Ruta UNC
+resource.unc.placeholder=//servidor/recursoCompartido/ruta/al/fichero
+resource.unknown.label=Desconocido
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/imagen.png
+resource.user.label=Usuario
+resource.user.placeholder=alias
+resourcePicker.attach.hint=Seleccionar un adjunto
+resourcePicker.doc.hint=Seleccionar una página
+entityResourceSuggester.doc.placeholder=Encontrar una página...
+entityResourceSuggester.attach.placeholder=Encontrar un adjunto...
+entityResourcePicker.select=Seleccionar
+entityResourcePicker.doc.title=Seleccionar página
+entityResourcePicker.attach.title=Seleccionar adjunto
+macroSelector.title=Seleccionar macro
+macroSelector.filter.text.placeholder=Teclea para filtrar
+macroSelector.filter.category.all=Todas las macros
+macroSelector.filter.category.other=Otras
+macroSelector.failedToRetrieveMacros=Error al recuperar la lista de macros disponibles.
+macroSelector.select=Seleccionar
+macroEditor.title=Editar macro
+macroEditor.more=Más
+macroEditor.changeMacro=Cambiar macro
+macroEditor.submit=Enviar
+macroEditor.content=Contenido
+macroEditor.noParameters=Esta macro no tiene parámetros.
+macroEditor.descriptorRequestFailed=Error al recuperar el descriptor de la macro {0}.
+</content>
+</xwikidoc>

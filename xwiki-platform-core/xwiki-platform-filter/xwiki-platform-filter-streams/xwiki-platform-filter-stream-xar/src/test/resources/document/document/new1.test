@@ -2,7 +2,7 @@
 .input|xwiki+xar/1.4
 .# Make sure XAR without deprecated stuff works well
 .#------------------------------------------------------------------------------
-<xwikidoc version="1.4" reference="space.page" locale="">
+<xwikidoc version="1.5" reference="space.page" locale="">
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>XWiki.creator</creator>

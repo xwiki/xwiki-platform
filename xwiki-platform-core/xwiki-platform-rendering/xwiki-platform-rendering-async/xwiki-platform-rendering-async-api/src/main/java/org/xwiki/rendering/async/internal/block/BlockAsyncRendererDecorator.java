@@ -20,7 +20,6 @@
 package org.xwiki.rendering.async.internal.block;
 
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.rendering.async.internal.AsyncRenderer;
 
 /**
  * Give a chance to prepare and cleanup before and after the actual renderer execution.
@@ -37,6 +36,8 @@ public interface BlockAsyncRendererDecorator
      * @param renderer the renderer to execute
      * @return the result of the renderer execution
      * @throws RenderingException when failing to execute the renderer
+     * @since 14.10
      */
-    BlockAsyncRendererResult render(AsyncRenderer renderer, boolean async, boolean cached) throws RenderingException;
+    BlockAsyncRendererResult render(BlockAsyncRenderer renderer, boolean async, boolean cached)
+        throws RenderingException;
 }

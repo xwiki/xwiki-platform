@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-maintainer</artifactId>
   <name>XWiki Platform - Annotations - Maintainer</name>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.incava</groupId>
       <artifactId>java-diff</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.2</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -92,6 +92,12 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

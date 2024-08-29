@@ -29,10 +29,11 @@
 <p>
   <strong>$services.localization.render('like.application.name')</strong>
     #if ($document)
-      <a href="$document.getExternalURL()">$document.getRenderedTitle('plain/1.0')</a>
+      <a href="$escapetool.xml($document.getExternalURL())">$document.getRenderedTitle('html/5.0')</a>
     #end
   .<br/>
-    $services.localization.render('notifications.events.org.xwiki.like.events.LikeRecordableEvent.description.by.1user', ["#displayNotificationEventUsers($event.users, false)"])
+    $services.localization.render('notifications.events.org.xwiki.like.events.LikeRecordableEvent.description.by.1user',
+        'html/5.0', ["#displayNotificationEventUsers($event.users, false)"])
 </p>
 ###
 ### Display dates
@@ -40,8 +41,9 @@
 <p>
     #set ($dates = $event.dates)
     #if ($dates.size() > 1)
-        $services.localization.render('notifications.events.lastChange', [$xwiki.formatDate($event.dates.get(0))])
+        $services.localization.render('notifications.events.lastChange',
+            'html/5.0', [$xwiki.formatDate($event.dates.get(0))])
     #else
-        $xwiki.formatDate($event.dates.get(0))
+        $escapetool.xml($xwiki.formatDate($event.dates.get(0)))
     #end
 </p>

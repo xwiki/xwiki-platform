@@ -23,20 +23,24 @@ import java.net.URL;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.xwiki.environment.Environment;
 import org.xwiki.skin.Resource;
-import org.xwiki.skin.Skin;
-import org.xwiki.test.AllLogRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.url.URLConfiguration;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,17 +49,19 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class EnvironmentSkinTest
+@ComponentTest
+class EnvironmentSkinTest
 {
-    @Rule
-    public AllLogRule allLogRule = new AllLogRule();
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    private Skin skin;
+    private EnvironmentSkin skin;
 
-    private Environment environment = mock(Environment.class);
+    @Mock
+    private Environment environment;
 
-    @Before
-    public void setUp()
+    @BeforeEach
+    void setUp()
     {
         @SuppressWarnings("unchecked")
         Provider<XWikiContext> xcontextProvider = mock(Provider.class);
@@ -68,21 +74,30 @@ public class EnvironmentSkinTest
     }
 
     @Test
-    public void getLocalResource() throws Exception
+    void getLocalResource() throws Exception
     {
         String relativePath = "o;ne/t?w&o/../t=hr#e e";
         String fullPath = "/skins/test/" + relativePath;
         when(this.environment.getResource(fullPath)).thenReturn(new URL("http://resourceURL"));
 
-        Resource<?> resource = skin.getLocalResource(relativePath);
+        Resource<?> resource = this.skin.getLocalResource(relativePath);
         assertEquals(fullPath, resource.getPath());
     }
 
     @Test
-    public void getLocalResourceWithBreakInAttempt() throws Exception
+    void getLocalResourceWithBreakInAttempt()
     {
-        assertNull(skin.getLocalResource("one/../../two"));
+        assertNull(this.skin.getLocalResource("one/../../two"));
         assertEquals("Direct access to skin file [/skins/two] refused. Possible break-in attempt!",
-            allLogRule.getMessage(0));
+            this.logCapture.getMessage(0));
+    }
+
+    @Test
+    void exists() throws Exception
+    {
+        when(this.environment.getResource("/skins/test/skin.properties"))
+            .thenReturn(new URL("http://resourceURL"), (URL) null);
+        assertTrue(this.skin.exists());
+        assertFalse(this.skin.exists());
     }
 }

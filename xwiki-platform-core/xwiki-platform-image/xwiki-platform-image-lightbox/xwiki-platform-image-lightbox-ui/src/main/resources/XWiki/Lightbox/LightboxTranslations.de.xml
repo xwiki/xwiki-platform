@@ -1,0 +1,63 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Lightbox.LightboxTranslations" locale="de">
+  <web>XWiki.Lightbox</web>
+  <name>LightboxTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>LightboxTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Admin section
+admin.lightbox=Lightbox
+admin.lightbox.description=Konfigurieren der Lightbox-Galerie für Bilder
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled=Lightbox aktivieren
+XWiki.Lightbox.LightboxConfigurationClass_isLightboxEnabled.hint=Die Möglichkeit aktivieren, Bilder in einer Lightbox zu öffnen.
+
+# Gallery template
+image.lightbox.autoPlay.title=Slideshow
+image.lightbox.caption.label=Bildunterschrift
+image.lightbox.imageId.title=Bild-ID
+image.lightbox.imageId.copy.title=Bild-ID kopieren
+image.lightbox.imageId.copy.copied=In den Zwischenspeicher kopiert
+image.lightbox.imageId.permalink=Permalink
+image.lightbox.date.label=Datum
+image.lightbox.download.title=Download
+image.lightbox.escape.title=Schließen
+image.lightbox.fileName.label=Dateiname
+image.lightbox.fullscreen.title=Vollbild
+image.lightbox.gallery.title=Bildergalerie
+image.lightbox.nextSlide.title=Nächstes Bild
+image.lightbox.prevSlide.title=Vorheriges Bild
+image.lightbox.publisher.label=Bildverlag
+image.lightbox.toggler.label=Die Bildaktionen öffnen
+</content>
+</xwikidoc>

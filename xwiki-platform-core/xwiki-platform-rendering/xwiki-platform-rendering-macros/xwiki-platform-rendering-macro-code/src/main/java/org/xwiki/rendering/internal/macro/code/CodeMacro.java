@@ -25,9 +25,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,8 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
+import org.xwiki.rendering.macro.code.source.CodeMacroSource;
+import org.xwiki.rendering.macro.code.source.CodeMacroSourceFactory;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
@@ -86,7 +90,11 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * Used to lookup highlight parsers.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private CodeMacroSourceFactory sourceFactory;
 
     /**
      * The logger to log.
@@ -100,23 +108,46 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     public CodeMacro()
     {
         super("Code", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION, false), CodeMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_FORMATTING));
     }
 
     @Override
-    protected List<Block> parseContent(CodeMacroParameters parameters, String content,
+    protected boolean isContentChecked()
+    {
+        return false;
+    }
+
+    private CodeMacroSource getContent(CodeMacroParameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
+        if (parameters.getSource() != null) {
+            return this.sourceFactory.getContent(parameters.getSource(), context);
+        }
+
+        return content != null ? new CodeMacroSource(null, content, null) : null;
+    }
+
+    @Override
+    protected List<Block> parseContent(CodeMacroParameters parameters, String inputContent,
+        MacroTransformationContext context) throws MacroExecutionException
+    {
+        CodeMacroSource source = getContent(parameters, inputContent, context);
+
+        if (source == null) {
+            return null;
+        }
+
         List<Block> result;
         try {
             if (LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
-                if (StringUtils.isEmpty(content)) {
+                if (StringUtils.isEmpty(source.getContent())) {
                     result = Collections.emptyList();
                 } else {
-                    result = this.plainTextParser.parse(new StringReader(content)).getChildren().get(0).getChildren();
+                    result = this.plainTextParser.parse(new StringReader(source.getContent())).getChildren().get(0)
+                        .getChildren();
                 }
             } else {
-                result = highlight(parameters, content);
+                result = highlight(parameters, source);
             }
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to highlight content", e);
@@ -129,9 +160,9 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             result = Arrays.asList(new FormatBlock(result, Format.NONE, formatParameters));
         } else {
             try {
-                CodeLayoutHandler layoutHandler =
-                    this.componentManager.getInstance(CodeLayoutHandler.class, parameters.getLayout().getHint());
-                result = layoutHandler.layout(result, content);
+                CodeLayoutHandler layoutHandler = this.componentManagerProvider.get()
+                    .getInstance(CodeLayoutHandler.class, parameters.getLayout().getHint());
+                result = layoutHandler.layout(result, source.getContent());
             } catch (ComponentLookupException e) {
                 this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied",
                     parameters.getLayout().name(), e);
@@ -146,34 +177,40 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * Return a highlighted version of the provided content.
      * 
      * @param parameters the code macro parameters.
-     * @param content the content to highlight.
+     * @param source the source to highlight.
      * @return the highlighted version of the provided content.
      * @throws ParseException the highlight parser failed.
      * @throws ComponentLookupException failed to find highlight parser for provided language.
      */
-    protected List<Block> highlight(CodeMacroParameters parameters, String content)
+    private List<Block> highlight(CodeMacroParameters parameters, CodeMacroSource source)
         throws ParseException, ComponentLookupException
     {
         HighlightParser parser;
 
-        if (parameters.getLanguage() != null) {
-            if (this.componentManager.hasComponent(HighlightParser.class, parameters.getLanguage())) {
+        String language = parameters.getLanguage();
+        if (language == null) {
+            language = source.getLanguage();
+        }
+
+        ComponentManager componentManager = this.componentManagerProvider.get();
+
+        if (language != null) {
+            if (componentManager.hasComponent(HighlightParser.class, language)) {
                 try {
-                    parser = this.componentManager.getInstance(HighlightParser.class, parameters.getLanguage());
-                    return parser.highlight(parameters.getLanguage(), new StringReader(content));
+                    parser = componentManager.getInstance(HighlightParser.class, language);
+                    return parser.highlight(language, new StringReader(source.getContent()));
                 } catch (ComponentLookupException e) {
-                    this.logger.error("Faild to load highlighting parser for language [{}]", parameters.getLanguage(),
-                        e);
+                    this.logger.error("Faild to load highlighting parser for language [{}]", language, e);
                 }
             }
         }
 
         this.logger.debug(
             "Can't find any specific highlighting parser for language [{}]. Trying the default highlighting parser.",
-            parameters.getLanguage());
+            language);
 
-        parser = this.componentManager.getInstance(HighlightParser.class, "default");
+        parser = componentManager.getInstance(HighlightParser.class, "default");
 
-        return parser.highlight(parameters.getLanguage(), new StringReader(content));
+        return parser.highlight(language, new StringReader(source.getContent()));
     }
 }

@@ -1,0 +1,327 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="uk">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Вимкнені плагіни
+CKEditor.ConfigClass_removePlugins.hint=Перелік плагінів, які були вимкнені.
+CKEditor.ConfigClass_removeButtons=Вимкнені функції панелі інструментів
+CKEditor.ConfigClass_removeButtons.hint=Перелік функцій панелі інструментів, які були вимкнені.
+CKEditor.ConfigClass_linkShowAdvancedTab=Посилання: Показати вкладку "Додатково"
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Дозволяє встановлювати атрибути посилання, такі як id, ім’я, клас або стиль.
+CKEditor.ConfigClass_linkShowTargetTab=Посилання: Показати цільову вкладку
+CKEditor.ConfigClass_linkShowTargetTab.hint=Дозволяє встановити атрибут цільового посилання (наприклад, відкрити посилання в новій вкладці).
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Завантажте розширення для скіна JavaScript
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Деякі макроси візуалізації відображаються за допомогою коду JavaScript. Завантаження коду JavaScript покращує аспект WYSIWYG редактора, але це може спричинити проблеми, якщо код JavaScript заважає коду CKEditor або якщо він змінює вміст поза межами виведення макросу.
+CKEditor.ConfigClass_advanced=Розширені настройки
+CKEditor.ConfigClass_advanced.hint=Ви можете написати фрагмент коду Javascript, щоб безпосередньо змінити об’єкт конфігурації. Див. {0}документацію CKEditor{1}, щоб отримати список доступних властивостей конфігурації.
+ckeditor.content.placeholder=Почніть набирати текст...
+ckeditor.admin.saveComment=Оновлено налаштування CKEditor з Адміністрування
+ckeditor.admin.reset=Скинути
+ckeditor.admin.reset.hint=Відновити налаштування за умовчанням
+ckeditor.admin.reset.confirmation=Ви впевнені, що хочете відновити налаштування за умовчанням? Усі внесені вами зміни буде втрачено.
+ckeditor.plugin.link.options=Параметри
+ckeditor.plugin.link.anchor=Якір
+ckeditor.plugin.link.queryString=Рядок запиту
+ckeditor.plugin.link.defaultLabel=введіть ярлик посилання
+ckeditor.plugin.link.openInNewTab=Відкрити посилання у новій вкладці
+ckeditor.plugin.link.upload=Завантажити вкладення
+ckeditor.plugin.link.uploadHint=Посилання на нещодавно завантажене вкладення.
+ckeditor.plugin.link.uploadProgress=Завантаження {0}...
+ckeditor.plugin.link.uploadSuccess=Успішно завантажено {0}
+ckeditor.plugin.link.uploadError=Не вдалося завантажити {0}
+ckeditor.plugin.list.listType.none=Нічого
+ckeditor.plugin.macro.placeholder=макрос:{0}
+ckeditor.plugin.macro.buttonHint=XWiki макрос
+ckeditor.plugin.macro.editButtonHint=Редагувати макрос
+ckeditor.plugin.macro.refreshFailed=Не вдалося оновити відредагований вміст.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Вставити {0} макрос
+ckeditor.plugin.macro.installPending=Встановлення {0} {1}...
+ckeditor.plugin.macro.installSuccessful={0} {1} успішно встановлено.
+ckeditor.plugin.macro.installFailed=Не вдалося встановити {0} {1}.
+ckeditor.plugin.office.importer.title=Імпорт файлу Office
+ckeditor.plugin.office.importer.filePath=Шлях до файлу
+ckeditor.plugin.office.importer.filePath.hint=Виберіть файл Office для імпорту. Цей файл буде завантажено, додано як вкладення до сторінки, а його вміст буде додано як вміст на сторінку.
+ckeditor.plugin.office.importer.filterStyles=Стилі фільтрів
+ckeditor.plugin.office.importer.filterStyles.hint=Фільтруйте стилі тексту, такі як шрифти, вирівнювання, колір або відступи. Зберігається структура рівнів заголовків, списків або абзаців.
+ckeditor.plugin.office.importer.useOfficeViewer=Використовувати програму перегляду Office
+ckeditor.plugin.office.importer.useOfficeViewer.hint=Позначте цей параметр, якщо ви не плануєте редагувати вміст файлу Office після імпорту або якщо ви не хочете змішувати вміст файлу Office з вмістом, який ви редагуєте наразі.
+ckeditor.plugin.office.importer.required=Обов'язковий
+ckeditor.plugin.office.importer.import=Імпорт
+ckeditor.plugin.office.importer.inProgress=Імпортування файлу Office...
+ckeditor.plugin.office.importer.done=Файл Office імпортовано.
+ckeditor.plugin.office.importer.fail=Не вдалося імпортувати файл Office.
+ckeditor.plugin.office.importer.noUploadURL=URL-адреса завантаження файлу не налаштована.
+ckeditor.plugin.office.importer.failedToLoadForm=Не вдалося завантажити форму.
+ckeditor.plugin.resource.notSpecified={0} не вказано.
+ckeditor.plugin.save.leaveConfirmationMessage=Є незбережені зміни. Ви хочете відмовитися від них?
+ckeditor.plugin.save.failed=Вміст неможливо зберегти через внутрішню помилку CKEditor. Спробуйте скопіювати важливі зміни та перезавантажити редактор.
+ckeditor.plugin.source.conversionFailed=Не вдалося виконати перетворення.
+ckeditor.plugin.toolbar.basicStyles=Основні стилі
+ckeditor.plugin.toolbar.lists=Списки
+ckeditor.plugin.toolbar.bulletedlist=Маркований список
+ckeditor.plugin.toolbar.numberedlist=Нумерований список
+ckeditor.plugin.toolbar.insert=Вставити
+ckeditor.plugin.toolbar.horizontalrule=Роздільник
+ckeditor.plugin.toolbar.specialchar=Спеціальний символ
+ckeditor.plugin.toolbar.infoBox=Інформаційне повідомлення
+ckeditor.plugin.toolbar.successBox=Повідомлення про успіх
+ckeditor.plugin.toolbar.warningBox=Попереджувальне повідомлення
+ckeditor.plugin.toolbar.errorBox=Повідомлення про помилку
+ckeditor.plugin.toolbar.toc=Зміст
+ckeditor.plugin.toolbar.include=Додати сторінку
+ckeditor.plugin.toolbar.code=Фрагмент коду
+ckeditor.plugin.toolbar.otherMacros=Інші макроси
+ckeditor.plugin.syntax.update.inProgress=Оновлення редактора WYSIWYG
+ckeditor.plugin.syntax.update.done=Оновлено редактор WYSIWYG
+ckeditor.plugin.syntax.update.failed=Не вдалося оновити редактор WYSIWYG
+ckeditor.plugin.syntax.wysiwygModeUnsupported=Синтаксис {0} не підтримує WYSIWYG-режим редагування.
+ckeditor.plugin.icon.iconsFetchFailed=Не вдалося отримати список піктограм.
+ckeditor.plugin.icon.iconThemesFetchFailed=Не вдалося отримати доступні теми піктограм.
+ckeditor.plugin.image.imageEditor.standardTab.title=Звичайний
+ckeditor.plugin.image.imageEditor.advancedTab.title=Розширений
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.label=Стилі зображення
+ckeditor.plugin.image.imageEditor.standardTab.imageStyles.hint=Виберіть стиль, який потрібно застосувати до зображення.
+ckeditor.plugin.image.imageEditor.standardTab.alt.label=Альтернативний текст
+ckeditor.plugin.image.imageEditor.standardTab.alt.hint=Визначте альтернативний текст зображення, якщо зображення не може бути відображено.
+ckeditor.plugin.image.imageEditor.standardTab.caption.label=Підпис
+ckeditor.plugin.image.imageEditor.standardTab.caption.hint=Увімкніть і визначте підпис до зображення.
+ckeditor.plugin.image.imageEditor.standardTab.caption.ariaLabel=Увімкніть і визначте підпис до зображення.
+ckeditor.plugin.image.imageEditor.advancedTab.size.label=Розмір
+ckeditor.plugin.image.imageEditor.advancedTab.size.width.label=Ширина
+ckeditor.plugin.image.imageEditor.advancedTab.size.height.label=Висота
+ckeditor.plugin.image.imageEditor.advancedTab.size.hint=Задайте розмір зображення.
+ckeditor.plugin.image.imageEditor.advancedTab.border.label=Рамка
+ckeditor.plugin.image.imageEditor.advancedTab.border.hint=Якщо позначено, зображення буде відображено у рамці
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.label=Вирівнювання
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.hint=Визначте вирівнювання зображення.
+### Missing: ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.none=None
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.start=Ліворуч
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.center=По центру
+ckeditor.plugin.image.imageEditor.advancedTab.alignment.option.end=Праворуч
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.label=Перенесення тексту
+ckeditor.plugin.image.imageEditor.advancedTab.textWrap.hint=Якщо позначено, текст обтикається навколо зображення.
+ckeditor.plugin.image.imageSelector.treeTab.title=Дерево
+ckeditor.plugin.image.imageSelector.uploadTab.title=Завантажити
+ckeditor.plugin.image.imageSelector.uploadTab.file.title=Файл
+ckeditor.plugin.image.imageSelector.uploadTab.file.hint=Виберіть локальний файл, який потрібно додати на сторінку.
+ckeditor.plugin.image.imageSelector.uploadTab.uploadButton=Завантажити
+ckeditor.plugin.image.imageSelector.iconTab.title=Піктограма
+ckeditor.plugin.image.imageSelector.iconTab.icon.title=Піктограма
+ckeditor.plugin.image.imageSelector.iconTab.icon.hint=Ідентифікатор піктограми, яка відображатиметься як зображення.
+ckeditor.plugin.image.imageSelector.iconTab.icon.placeholder=прийняти
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.title=Url
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.title=Url
+ckeditor.plugin.image.imageSelector.urlTab.url.hint=URL-адреса зображення для відображення.
+### Missing: ckeditor.plugin.image.imageSelector.urlTab.url.placeholder=https://...
+ckeditor.plugin.image.slash.currentPageBadge=Ця сторінка
+ckeditor.plugin.image.slash.externalBadge=Зовнішній
+ckeditor.plugin.image.slash.loading=Завантаження...
+ckeditor.plugin.image.slash.upload=Завантажити зображення
+ckeditor.plugin.image.slash.uploadProgress=Завантаження {0}...
+ckeditor.plugin.image.slash.uploadSuccess=Успішно завантажено {0}
+ckeditor.plugin.image.slash.uploadError=Не вдалося завантажити {0}
+ckeditor.plugin.slash.group.Layout=Макет
+ckeditor.plugin.slash.group.Content=Вміст
+ckeditor.plugin.slash.group.Formatting=Форматування
+ckeditor.plugin.slash.group.Navigation=Навігація
+ckeditor.plugin.slash.group.Actions=Дії
+ckeditor.plugin.slash.group.Table=Таблиця
+ckeditor.plugin.slash.group.Macro=Макрос
+ckeditor.plugin.slash.action.h1.hint=Заголовок першого рівня.
+ckeditor.plugin.slash.action.h2.hint=Заголовок другого рівня.
+ckeditor.plugin.slash.action.h3.hint=Заголовок третього рівня.
+ckeditor.plugin.slash.action.h4.hint=Заголовок четвертого рівня.
+ckeditor.plugin.slash.action.h5.hint=Заголовок п'ятого рівня.
+ckeditor.plugin.slash.action.h6.hint=Заголовок шостого рівня.
+ckeditor.plugin.slash.action.p.name=Параграф
+ckeditor.plugin.slash.action.p.hint=Створіть параграф зі звичайним текстом.
+ckeditor.plugin.slash.action.ul.hint=Створіть простий маркований список.
+ckeditor.plugin.slash.action.ol.hint=Створіть простий нумерований список.
+ckeditor.plugin.slash.action.table.hint=Додайте простий табличний вміст на свою сторінку.
+ckeditor.plugin.slash.action.blockquote.name=Цитата
+ckeditor.plugin.slash.action.blockquote.hint=Позначте цитату.
+ckeditor.plugin.slash.action.info.hint=Підкресліть важливе повідомлення.
+ckeditor.plugin.slash.action.info.defaultContent=Введіть своє інформаційне повідомлення тут.
+ckeditor.plugin.slash.action.success.hint=Відмітити виконану роботу.
+ckeditor.plugin.slash.action.success.defaultContent=Введіть тут повідомлення про успіх.
+ckeditor.plugin.slash.action.warning.hint=Напишіть попереджувальне повідомлення.
+ckeditor.plugin.slash.action.warning.defaultContent=Введіть своє попереджувальне повідомлення тут.
+ckeditor.plugin.slash.action.error.hint=Напишіть повідомлення про помилку.
+ckeditor.plugin.slash.action.error.defaultContent=Введіть своє повідомлення про помилку тут.
+ckeditor.plugin.slash.action.hr.hint=Позначте тематичну розрив між блоками контенту: наприклад, зміна сцени в оповіданні або зсув теми в розділі.
+ckeditor.plugin.slash.action.a.hint=Створіть посилання на іншу сторінку.
+ckeditor.plugin.slash.action.img.hint=Вбудуйте або завантажте зображення.
+ckeditor.plugin.slash.action.icon.name=Піктограма
+ckeditor.plugin.slash.action.icon.hint=Вставити піктограму.
+ckeditor.plugin.slash.action.mention.name=Згадування
+ckeditor.plugin.slash.action.mention.hint=Згадайте кого-небудь, щоб надіслати йому сповіщення.
+ckeditor.plugin.slash.action.emoji.name=Емодзі
+ckeditor.plugin.slash.action.emoji.hint=Виберіть емодзі, щоб вставити.
+ckeditor.plugin.slash.action.code.hint=Напишіть фрагмент коду.
+ckeditor.plugin.slash.action.toc.hint=Надайте огляд розділів вмісту.
+ckeditor.plugin.slash.action.include.hint=Включіть вміст з інших сторінок.
+ckeditor.plugin.slash.action.macros.name=Огляд макросів
+ckeditor.plugin.slash.action.macros.hint=Знайдіть потрібний макрос.
+ckeditor.plugin.slash.action.find.hint=Замінити декілька входжень даного тексту.
+ckeditor.plugin.slash.action.table_row_before.hint=Вставте новий рядок таблиці перед поточним.
+ckeditor.plugin.slash.action.table_row_after.hint=Вставте новий рядок таблиці після поточного.
+ckeditor.plugin.slash.action.table_row_delete.name=Видалити рядок
+ckeditor.plugin.slash.action.table_row_delete.hint=Видалити поточний рядок таблиці.
+ckeditor.plugin.slash.action.table_col_before.hint=Вставте новий стовпець таблиці перед поточним.
+ckeditor.plugin.slash.action.table_col_after.hint=Вставте новий стовпець таблиці після поточного.
+ckeditor.plugin.slash.action.table_col_delete.name=Видалити стовпець
+ckeditor.plugin.slash.action.table_col_delete.hint=Видалити поточний стовпець таблиці.
+ckeditor.plugin.slash.action.table_cell_split_horizontal.hint=Розділити поточну комірку таблиці горизонтально.
+ckeditor.plugin.slash.action.table_cell_split_vertical.hint=Розділити поточну комірку таблиці вертикально.
+ckeditor.plugin.slash.action.table_cell_merge_right.name=Об'єднати комірку праворуч
+ckeditor.plugin.slash.action.table_cell_merge_right.hint=Об'єднати поточну комірку таблиці з наступною.
+ckeditor.plugin.slash.action.table_cell_merge_down.name=Об'єднати комірки вниз
+ckeditor.plugin.slash.action.table_cell_merge_down.hint=Об'єднайте поточну комірку таблиці з наведеною нижче.
+ckeditor.plugin.slash.action.table_cell_before.hint=Вставте нову комірку таблиці перед поточною.
+ckeditor.plugin.slash.action.table_cell_after.hint=Вставте нову комірку таблиці після поточної.
+ckeditor.plugin.slash.action.table_cell_delete.name=Видалити комірку
+ckeditor.plugin.slash.action.table_cell_delete.hint=Вилучити поточну комірку таблиці.
+ckeditor.plugin.slash.action.table_delete.hint=Видалити поточну таблицю з вмісту.
+ckeditor.plugin.slash.placeholder=Введіть "/" для швидких дій...
+ckeditor.plugin.slash.dropdown.hint=Виберіть елемент для автозаповнення.
+ckeditor.plugin.focusedplaceholder.placeholder.body=Тіло
+ckeditor.plugin.focusedplaceholder.placeholder.address=Адреса
+ckeditor.plugin.focusedplaceholder.placeholder.aside=Убік
+ckeditor.plugin.focusedplaceholder.placeholder.footer=Нижній колонтитул
+ckeditor.plugin.focusedplaceholder.placeholder.header=Верхній колонтитул
+ckeditor.plugin.focusedplaceholder.placeholder.h1=Заголовок 1
+ckeditor.plugin.focusedplaceholder.placeholder.h2=Заголовок 2
+ckeditor.plugin.focusedplaceholder.placeholder.h3=Заголовок 3
+ckeditor.plugin.focusedplaceholder.placeholder.h4=Заголовок 4
+ckeditor.plugin.focusedplaceholder.placeholder.h5=Заголовок 5
+ckeditor.plugin.focusedplaceholder.placeholder.h6=Заголовок 6
+ckeditor.plugin.focusedplaceholder.placeholder.main=Основний зміст
+ckeditor.plugin.focusedplaceholder.placeholder.nav=Навігація
+ckeditor.plugin.focusedplaceholder.placeholder.section=Розділ
+ckeditor.plugin.focusedplaceholder.placeholder.blockquote=Цитата
+ckeditor.plugin.focusedplaceholder.placeholder.dl=Список визначень
+ckeditor.plugin.focusedplaceholder.placeholder.dt=Запис визначення
+ckeditor.plugin.focusedplaceholder.placeholder.dd=Опис
+ckeditor.plugin.focusedplaceholder.placeholder.figcaption=Підпис
+ckeditor.plugin.focusedplaceholder.placeholder.figure=Рисунок
+ckeditor.plugin.focusedplaceholder.placeholder.ol=Упорядкований список
+ckeditor.plugin.focusedplaceholder.placeholder.ul=Невпорядкований список
+ckeditor.plugin.focusedplaceholder.placeholder.menu=Меню (невпорядкований список)
+ckeditor.plugin.focusedplaceholder.placeholder.li=Елемент списку
+ckeditor.plugin.focusedplaceholder.placeholder.p=Параграф
+ckeditor.plugin.focusedplaceholder.placeholder.pre=Попередньо форматований
+ckeditor.plugin.focusedplaceholder.placeholder.caption=Назва
+ckeditor.plugin.focusedplaceholder.placeholder.th=Верхній колонтитул
+ckeditor.plugin.focusedplaceholder.placeholder.td=Комірка
+ckeditor.inline.failedToInit=Не вдалося ініціалізувати CKEditor.
+ckeditor.upload.error.csrf=Токен CSRF відсутній.
+ckeditor.upload.error.emptyReturn=Помилка під час завантаження файлу: можливо, він перевищує налаштований максимальний розмір завантаження.
+### Missing: modal.ok=OK
+modal.cancel=Скасувати
+modal.close=Закрити
+resource.attach.label=Вкладення
+resource.attach.placeholder=Шлях.До.Сторінки@зображення.png
+resource.data.label=Дата URI
+resource.doc.label=Сторінка
+resource.doc.placeholder=Шлях.До.Сторінки
+resource.icon.label=Піктограма
+resource.mailto.label=Адреса електронної пошти
+### Missing: resource.mailto.placeholder=user@example.org
+resource.path.label=Шлях
+resource.path.placeholder=/шлях/до/файлу
+resource.unc.label=Шлях UNC
+resource.unc.placeholder=//сервер/спільний доступ/шлях/до/файлу
+resource.unknown.label=Невідомий
+### Missing: resource.url.label=URL
+### Missing: resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=Користувач
+resource.user.placeholder=псевдонім
+resourcePicker.attach.hint=Виберіть вкладення
+resourcePicker.doc.hint=Виберіть сторінку
+entityResourceSuggester.doc.placeholder=Знайти сторінку...
+entityResourceSuggester.attach.placeholder=Знайти вкладення...
+entityResourcePicker.select=Вибрати
+entityResourcePicker.doc.title=Вибір сторінки
+entityResourcePicker.attach.title=Вибір вкладення
+macroSelector.title=Вибір макросу
+macroSelector.filter.text.placeholder=Введіть, щоб відфільтрувати
+macroSelector.filter.category.all=Всі макроси
+macroSelector.filter.category.other=Інше
+macroSelector.filter.category.notinstalled=Не встановлені
+macroSelector.failedToRetrieveMacros=Не вдалося отримати список доступних макросів.
+macroSelector.select=Вибрати
+macroSelector.recommended=Рекомендовані
+macroSelector.install=Встановлені
+macroSelector.install.confirm=Ви збираєтеся встановити розширення {0} {1}. Ви дійсно бажаєте продовжити?
+macroSelector.install.notAllowed=Вам заборонено встановлювати це розширення
+macroSelector.filter.category.placeholder=Виберіть категорію...
+macroEditor.title=Редагувати макрос
+macroEditor.more=Більше
+macroEditor.changeMacro=Змінити макрос
+macroEditor.submit=Надіслати
+macroEditor.content=Вміст
+macroEditor.noParameters=У цього макросу немає параметрів.
+macroEditor.descriptorRequestFailed=Не вдалося отримати дескриптор макросу {0}.
+macroEditor.installRequestFailed=Не вдалося встановити макрос {0}.
+
+
+imageEditor.modal.changeImage.button=Змінити зображення
+imageEditor.modal.loadFail.message=Не вдалося отримати форму редактора зображень.
+imageEditor.modal.title=Редагувати зображення
+imageEditor.modal.insertButton=Вставити
+imageEditor.modal.updateButton=Оновити
+imageEditor.modal.initialization.fail=Не вдалося отримати форму вибору зображення.
+imageEditor.modal.outscaleWarning=Один із розмірів більший за вихідне зображення ({0}). Результатом може бути зниження якості показаного зображення.
+imageSelector.modal.title=Вибрати зображення
+imageSelector.modal.selectButton=Вибрати
+imageSelector.modal.loadFail.message=Не вдалося отримати форму вибору зображення.
+imageSelector.modal.fileUpload.success=Файл завантажено.
+imageSelector.modal.fileUpload.fail=Не вдалося завантажити файл.
+imageSelector.modal.fileUpload.abort=Завантаження файлу перервано.
+imageSelector.modal.initialization.fail=Не вдалося отримати форму вибору зображення.
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## Deprecated since 14.10
+imageEditor.modal.backToEditor.button=Назад
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=Дерево документів
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

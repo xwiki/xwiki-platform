@@ -23,19 +23,21 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jmock.Expectations;
-import org.junit.Before;
+import javax.inject.Named;
+
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.macro.chart.source.DataSource;
+import org.xwiki.rendering.internal.listener.ListenerRegistry;
 import org.xwiki.rendering.internal.parser.reference.DefaultUntypedLinkReferenceParser;
 import org.xwiki.rendering.internal.parser.reference.type.AttachmentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.DocumentResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.SpaceResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.wikimodel.WikiModelParserListenerBuilder;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
@@ -43,13 +45,15 @@ import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextBlockRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
+import org.xwiki.rendering.internal.syntax.DefaultSyntaxRegistry;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Helper to write unit tests for Table-based data sources.
@@ -73,29 +77,24 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
     DocumentResourceReferenceTypeParser.class,
     SpaceResourceReferenceTypeParser.class,
     AttachmentResourceReferenceTypeParser.class,
-    RelativeStringEntityReferenceResolver.class
+    RelativeStringEntityReferenceResolver.class,
+    ListenerRegistry.class,
+    WikiModelParserListenerBuilder.class,
+    DefaultSyntaxRegistry.class
 })
 //@formatter:on
-@MockingRequirement(value = MacroContentTableBlockDataSource.class,
-    exceptions={ComponentManager.class, BlockRenderer.class})
-public abstract class AbstractMacroContentTableBlockDataSourceTest extends AbstractMockingComponentTestCase
+abstract class AbstractMacroContentTableBlockDataSourceTest
 {
-    private MacroContentTableBlockDataSource source;
+    @InjectMockComponents
+    @Named("inline")
+    protected MacroContentTableBlockDataSource source;
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.source = getComponentManager().getInstance(DataSource.class, "inline");
-    }
-
-    protected MacroContentTableBlockDataSource getDataSource()
-    {
-        return this.source;
-    }
+    @InjectComponentManager
+    private ComponentManager componentManager;
 
     protected Map<String, String> map(String... keyValues)
     {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         for (int i = 0; i < keyValues.length; i += 2) {
             map.put(keyValues[i], keyValues[i + 1]);
@@ -104,19 +103,19 @@ public abstract class AbstractMacroContentTableBlockDataSourceTest extends Abstr
         return map;
     }
 
-    protected void setUpContentExpectation(final String macroContent) throws Exception
+    protected void setUpContentExpectation(String macroContent) throws Exception
     {
-        final MacroContentParser parser = getComponentManager().getInstance(MacroContentParser.class);
+        DefaultComponentDescriptor<ComponentManager> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(ComponentManager.class);
+        componentDescriptor.setRoleHint("context");
+        this.componentManager.registerComponent(componentDescriptor, this.componentManager);
 
-        // In order to make it easy to write unit tests, we allow tests to pass a string written in XWiki/2.0 synyax
+        // In order to make it easy to write unit tests, we allow tests to pass a string written in XWiki/2.0 syntax
         // which we then parser to generate an XDOM that we use in the expectation.
-        final XDOM expectedXDOM = getComponentManager().<Parser>getInstance(Parser.class,
+        XDOM expectedXDOM = this.componentManager.<Parser>getInstance(Parser.class,
             Syntax.XWIKI_2_0.toIdString()).parse(new StringReader(macroContent));
 
-        getMockery().checking(new Expectations() {{
-            // Simulate parsing the macro content that returns a XDOM not containing a table
-            oneOf(parser).parse(macroContent, null, true, false);
-                will(returnValue(expectedXDOM));
-        }});
+        MacroContentParser parser = this.componentManager.getInstance(MacroContentParser.class);
+        when(parser.parse(macroContent, null, true, false)).thenReturn(expectedXDOM);
     }
 }

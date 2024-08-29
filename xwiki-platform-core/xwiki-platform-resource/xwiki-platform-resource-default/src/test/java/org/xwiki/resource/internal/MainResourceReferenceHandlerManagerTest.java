@@ -30,14 +30,14 @@ import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link MainResourceReferenceHandlerManager}.
@@ -46,13 +46,13 @@ import static org.mockito.Mockito.*;
  * @since 6.1M2
  */
 @ComponentTest
-public class MainResourceReferenceHandlerManagerTest
+class MainResourceReferenceHandlerManagerTest
 {
     @InjectMockComponents
     private MainResourceReferenceHandlerManager handlerManager;
 
     @Test
-    public void handleWithOrder(ComponentManager componentManager) throws Exception
+    void handleWithOrder(ComponentManager componentManager) throws Exception
     {
         // First Handler component will lower priority
         ResourceReferenceHandler testHandler = mock(ResourceReferenceHandler.class, "handler1");
@@ -79,7 +79,7 @@ public class MainResourceReferenceHandlerManagerTest
     }
 
     @Test
-    public void matches()
+    void matches()
     {
         ResourceReferenceHandler resourceReferenceHandler1 = mock(ResourceReferenceHandler.class);
         ResourceReferenceHandler resourceReferenceHandler2 = mock(ResourceReferenceHandler.class);

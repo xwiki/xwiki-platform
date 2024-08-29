@@ -45,6 +45,7 @@ import org.xwiki.rest.model.jaxb.Space;
 import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.rest.resources.ClientResource;
 import org.xwiki.rest.resources.SyntaxesResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationVersionResource;
@@ -84,6 +85,12 @@ public class DomainObjectFactory
         syntaxesLink.setHref(syntaxesUri);
         syntaxesLink.setRel(Relations.SYNTAXES);
         xwiki.getLinks().add(syntaxesLink);
+
+        String clientUri = uri(baseUri, ClientResource.class);
+        Link clientLink = objectFactory.createLink();
+        clientLink.setHref(clientUri);
+        clientLink.setRel(Relations.CLIENT);
+        xwiki.getLinks().add(clientLink);
 
         return xwiki;
     }

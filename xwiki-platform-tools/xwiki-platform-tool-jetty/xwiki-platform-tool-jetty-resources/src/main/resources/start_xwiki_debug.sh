@@ -78,8 +78,16 @@ if [ -z "$JETTY_DEBUG_PORT" ]; then
   JETTY_DEBUG_PORT=5005
 fi
 
+# Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
+JAVA_TMP="${PRGDIR}/tmp"
+XWIKI_OPTS="$XWIKI_OPTS -Djava.io.tmpdir=${JAVA_TMP}"
+# Make sure the Java tmpdir exist since Jenkins does not create it
+if [ ! -d ${JAVA_TMP} ]; then
+  mkdir ${JAVA_TMP}
+fi
+
 # The location where to store the process id
-XWIKI_LOCK_DIR="/var/tmp"
+XWIKI_LOCK_DIR="${JAVA_TMP}"
 
 # By default suspend is false for debug
 SUSPEND="n"
@@ -138,7 +146,7 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx1024m"
 fi
 XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=${JETTY_DEBUG_PORT}"
+XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
@@ -165,8 +173,6 @@ if [ -n "$YOURKIT_PATH" ]; then
   export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:${YOURKIT_PATH}"
 fi
 
-echo Starting Jetty on port ${JETTY_PORT}, please wait...
-
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}
 XWIKI_OPTS="$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR"
@@ -180,14 +186,10 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
-# Set up the Jetty Base directory (used for custom Jetty configuration) to point to the Data Directory
-# Also created some Jetty directorie that Jetty would otherwise create at first startup. We do this to avoid
-# cryptic messages in the logs such as: "MKDIR: ${jetty.base}/lib"
-JETTY_BASE=$XWIKI_DATA_DIR/jetty
-mkdir -p $JETTY_BASE/lib/ext 2>/dev/null
+# Set up the Jetty Base directory (used for custom Jetty configuration) to be the current directory where this file is.
+# Also make sure the log directory exists since Jetty won't create it.
+JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
-mkdir -p $JETTY_BASE/resources 2>/dev/null
-mkdir -p $JETTY_BASE/webapps 2>/dev/null
 
 # Specify Jetty's home and base directories
 JETTY_HOME=jetty
@@ -205,53 +207,65 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.http.port=$JETTY_PORT"
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
-# Check version of Java (when in non-interactive mode)
-if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
-  # Returns the Java version.
-  # 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
-  java_version() {
-    local result
-    local java_cmd
-    if [[ -n $(type -p java) ]]; then
-      java_cmd=java
-    elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
-      java_cmd="$JAVA_HOME/bin/java"
-    fi
-    local IFS=$'\n'
-    # remove \r for Cygwin
-    local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
-    if [[ -z $java_cmd ]]; then
-      result=no_java
-    else
-      for line in $lines; do
-        if [[ (-z $result) && ($line = *"version \""*) ]]; then
-          local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
-          # on macOS, sed doesn't support '?'
-          if [[ $ver = "1."* ]]; then
-            result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
-          else
-            result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
-          fi
+# Returns the Java version.
+# 8 for 1.8.0_nn, 9 for 9-ea etc, and "no_java" for undetected
+java_version() {
+  local result
+  local java_cmd
+  if [[ -n $(type -p java) ]]; then
+    java_cmd=java
+  elif [[ (-n "$JAVA_HOME") && (-x "$JAVA_HOME/bin/java") ]]; then
+    java_cmd="$JAVA_HOME/bin/java"
+  fi
+  local IFS=$'\n'
+  # remove \r for Cygwin
+  local lines=$("$java_cmd" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+  if [[ -z $java_cmd ]]; then
+    result=no_java
+  else
+    for line in $lines; do
+      if [[ (-z $result) && ($line = *"version \""*) ]]; then
+        local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+        # on macOS, sed doesn't support '?'
+        if [[ $ver = "1."* ]]; then
+          result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+        else
+          result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
         fi
-      done
-    fi
-    echo "$result"
-  }
-  JAVA_VERSION="$(java_version)"
+      fi
+    done
+  fi
+  echo "$result"
+}
+
+# Check version of Java (when in non-interactive mode)
+JAVA_VERSION="$(java_version)"
+if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
   if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
     echo "No Java found. You need Java installed for XWiki to work."
     exit 0
   fi
-  if [ "$JAVA_VERSION" -lt 8 ]; then
-    echo This version of XWiki requires Java 8 or greater.
+  if [ "$JAVA_VERSION" -lt 11 ]; then
+    echo This version of XWiki requires Java 11 or greater.
     exit 0
   fi
-  if [ "$JAVA_VERSION" -gt 11 ]; then
+  if [ "$JAVA_VERSION" -gt 17 ]; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       exit 0
     fi
   fi
+fi
+
+# TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 is fixed. In summary we need this to allow the XWiki
+# code or 3rd party code to use reflection to access private variables (setAccessible() calls).
+# See https://tinyurl.com/tdhkn6mp
+if [ "$JAVA_VERSION" -gt 11 ]; then
+  XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
+  XWIKI_OPENS_IO="--add-opens java.base/java.io=ALL-UNNAMED"
+  XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
+  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.util.concurrent=ALL-UNNAMED"
+  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_IO $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
 fi
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command
@@ -273,4 +287,4 @@ echo $XWIKI_PID > $XWIKI_LOCK_FILE
 
 # This replaces the shell with the java process without starting a new process. This must be the last line
 # of this script as anything after won't be executed.
-exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar --module=xwiki $JETTY_OPTS
+exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar $JETTY_OPTS

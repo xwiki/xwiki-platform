@@ -45,7 +45,7 @@
 
 |=Formateringstyp|=XWiki syntax 1.0|=Resultat
 |Bild från bilaga till aktuell sida|(((
-{{info}}Se [[bildmakrot&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Image+Macro+%28Radeox%29]] för detaljer{{/info}}
+{{info}}Se [[bildmakrot&gt;&gt;https://extensions.xwiki.org/xwiki/bin/view/Extension/Old%20XWiki%201.0%20syntax%20renderer/Image%20Macro%20%28Radeox%29]] för detaljer{{/info}}
 {{{{image:img.png}}}}
 )))|image:XWiki.XWikiSyntaxImages@img.png
 |Bild från bilaga i annat dokument|{{{{image:img.png|document=Rum.Sida}}}}|image:XWiki.XWikiSyntaxImages@img.png

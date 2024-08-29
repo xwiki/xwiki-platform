@@ -108,7 +108,7 @@ public class SimpleSearchPane extends BaseElement
     public SearchResultsPane selectRepository(String repositoryId)
     {
         getRepositorySelect().selectByValue(repositoryId);
-        new BasePage().waitUntilPageIsLoaded();
+        new BasePage();
         return new SearchResultsPane();
     }
 

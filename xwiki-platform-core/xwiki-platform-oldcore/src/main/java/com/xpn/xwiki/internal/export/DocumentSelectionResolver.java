@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
@@ -105,6 +107,16 @@ public class DocumentSelectionResolver
     @Named("document")
     private QueryFilter documentQueryFilter;
 
+    /**
+     * We need to use a provider instead of a direct injection because the default implementation uses
+     * {@link ComponentInstantiationStrategy#PER_LOOKUP} (because it caches the user preference regarding hidden pages).
+     * Basically we need a new filter instance each time the selection is resolved because the current user is usually
+     * different.
+     */
+    @Inject
+    @Named("hidden/document")
+    private Provider<QueryFilter> hiddenDocumentQueryFilterProvider;
+
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
@@ -128,6 +140,17 @@ public class DocumentSelectionResolver
      */
     public Collection<DocumentReference> getSelectedDocuments()
     {
+        return getSelectedDocuments(false);
+    }
+
+    /**
+     * @param filterHiddenDocuments {@code true} to apply the hidden document filter, based on the user preferences, to
+     *            the documents that are not selected explicitly (by an exact match) but implicitly, by a partial match,
+     *            {@code false} otherwise
+     * @return the list of documents selected by the current request
+     */
+    public Collection<DocumentReference> getSelectedDocuments(boolean filterHiddenDocuments)
+    {
         Map<DocumentReference, Collection<DocumentReference>> selection = getSelectionFromRequest();
         EntityTreeFilter filter = getFilterFromRequest();
         if (filter != null) {
@@ -141,7 +164,7 @@ public class DocumentSelectionResolver
         selection.keySet().removeAll(selectedDocuments);
 
         // Add the partial match.
-        selectedDocuments.addAll(getSelectedDocuments(selection));
+        selectedDocuments.addAll(getSelectedDocuments(selection, filterHiddenDocuments));
 
         return selectedDocuments;
     }
@@ -153,11 +176,14 @@ public class DocumentSelectionResolver
     }
 
     private Collection<DocumentReference> getSelectedDocuments(
-        Map<DocumentReference, Collection<DocumentReference>> selection)
+        Map<DocumentReference, Collection<DocumentReference>> selection, boolean filterHiddenDocuments)
     {
+        // Reuse the same hidden document query filter for all wikis because it's for the same user.
+        Optional<QueryFilter> hiddenDocumentQueryFilter =
+            filterHiddenDocuments ? Optional.of(this.hiddenDocumentQueryFilterProvider.get()) : Optional.empty();
         Map<String, Object[]> queriesByWiki = buildQueriesByWiki(selection);
-        return queriesByWiki.entrySet().stream().map(this::executeQuery).flatMap(Set::stream)
-            .collect(Collectors.toSet());
+        return queriesByWiki.entrySet().stream().map(entry -> executeQuery(entry, hiddenDocumentQueryFilter))
+            .flatMap(Set::stream).collect(Collectors.toSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -227,7 +253,8 @@ public class DocumentSelectionResolver
         return constraints;
     }
 
-    private Set<DocumentReference> executeQuery(Map.Entry<String, Object[]> entry)
+    private Set<DocumentReference> executeQuery(Map.Entry<String, Object[]> entry,
+        Optional<QueryFilter> hiddenDocumentQueryFilter)
     {
         String wikiName = entry.getKey();
         String statement = entry.getValue()[0].toString();
@@ -237,6 +264,9 @@ public class DocumentSelectionResolver
         try {
             Query query = this.queryManager.createQuery(statement, Query.HQL);
             query.setWiki(wikiName).bindValues(parameters).addFilter(this.documentQueryFilter);
+            if (hiddenDocumentQueryFilter.isPresent()) {
+                query.addFilter(hiddenDocumentQueryFilter.get());
+            }
             return new LinkedHashSet<>(query.execute());
         } catch (QueryException e) {
             this.logger.error("Failed to retrieve the selected documents from wiki [{}].", wikiName, e);

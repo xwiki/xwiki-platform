@@ -45,6 +45,10 @@
         maven:oldversionnedextension/10.0
       </xwiki.extension.features>
       <xwiki.extension.category>flavor</xwiki.extension.category>
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/mymacro1
+      org.xwiki.rendering.macro.Macro/mymacro2
+    </xwiki.extension.components>
     </properties>
     <licenses>
       <license>

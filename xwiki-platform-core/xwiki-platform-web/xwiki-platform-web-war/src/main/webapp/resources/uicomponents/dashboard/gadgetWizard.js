@@ -20,8 +20,8 @@
 /*!
 #set ($paths = {
   'css': {
-    'macroWizard': $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar',
-      'plugins/xwiki-macro/macroWizard.min.css', {'evaluate': true})
+    'macroWizard': $services.webjars.url('org.xwiki.platform:xwiki-platform-ckeditor-plugins',
+      'xwiki-macro/macroWizard.min.css', {'evaluate': true})
   }
 })
 #set ($l10nKeys = [
@@ -45,7 +45,7 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
     '<li class="macro-parameter" data-id="$gadgetTitle">' +
       '<div class="macro-parameter-name"></div>' +
       '<div class="macro-parameter-description"></div>' +
-      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' + 
+      '<input type="text" class="macro-parameter-field" name="$gadgetTitle"/>' +
     '</li>'
   );
   gadgetTitleTemplate.find('.macro-parameter-name').text(l10n['dashboard.gadgetEditor.gadgetTitle.label']);
@@ -60,11 +60,11 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   var getMacroWizard = function(ckeditor) {
-    var deferred = $.Deferred();
-    require(['macroWizard'], function(macroWizard) {
-      deferred.resolve(ckeditor, macroWizard);
+    return new Promise((resolve, reject) => {
+      require(['macroWizard'], function(macroWizard) {
+        resolve({ckeditor, macroWizard});
+      });
     });
-    return deferred.promise();
   };
 
   var getDefaultGadgetTitle = function(macroEditor) {
@@ -125,12 +125,13 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
 
   var runGadgetWizard = function(gadget, ckeditor, macroWizard) {
     currentGadget = gadget || {};
-    return macroWizard(getMacroCall(gadget, ckeditor)).then(function(macroCall) {
+    // The macro wizard is returning a jQuery.Deferred() object that we convert to a standard Promise.
+    return Promise.resolve(macroWizard(getMacroCall(gadget, ckeditor))).then(function(macroCall) {
       return {
         title: $('.macro-editor input[name="$gadgetTitle"]').val(),
         content: ckeditor.plugins.registered['xwiki-macro'].serializeMacroCall(macroCall)
       };
-    }).always(function() {
+    }).finally(function() {
       currentGadget = null;
       restoreMacroSelector();
       restoreMacroEditor();
@@ -138,7 +139,10 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   return function(gadget) {
-    return ckeditorPromise.then(getMacroWizard).then($.proxy(runGadgetWizard, null, gadget));
+    // xwiki-ckeditor module is still using jQuery.Deferred() because it needs to support older versions of XWiki that
+    // have to work with obsolete browsers, but we can convert it easily to a standard Promise.
+    return Promise.resolve(ckeditorPromise).then(getMacroWizard)
+      .then(data => runGadgetWizard(gadget, data.ckeditor, data.macroWizard));
   };
 });
 

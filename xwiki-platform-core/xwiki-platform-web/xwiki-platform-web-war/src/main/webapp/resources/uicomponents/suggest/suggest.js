@@ -311,7 +311,7 @@ var XWiki = (function(XWiki){
 
         // Only set this source if it has at least one suggestion.
         if (filteredSourceSuggestions.length) {
-          filteredSuggestions[sourceId] = sourceSuggestions;
+          filteredSuggestions[sourceId] = filteredSourceSuggestions;
         }
       }
 
@@ -448,7 +448,7 @@ var XWiki = (function(XWiki){
       if (!jsondata) {
         return null;
       }
-      if (Object.isArray(jsondata)) {
+      if (Array.isArray(jsondata)) {
         var results = jsondata;
       } else {
         var results = this._getNestedProperty(jsondata, source.resultsParameter || this.options.resultsParameter);
@@ -526,12 +526,13 @@ var XWiki = (function(XWiki){
       // Don't enforce the width if it wasn't specified to let the container adjust its width to fit the suggest items.
       div.style[this.options.width ? 'width' : 'minWidth'] = containerWidth + "px";
 
-      // set mouseover functions for div
-      // when mouse pointer leaves div, set a timeout to remove the list after an interval
-      // when mouse enters div, kill the timeout so the list won't be removed
+      // set focus functions for div
+      // when focus leaves div, set a timeout to remove the list after an interval
+      // when focus enters div, kill the timeout so the list won't be removed
       var pointer = this;
-      div.onmouseover = function(){ pointer.killTimeout() }
-      div.onmouseout = function(){ pointer.resetTimeout() }
+      div.addEventListener("focusin", () => pointer.killTimeout());
+      div.addEventListener("focusout", () => pointer.resetTimeout());
+      div.addEventListener("mouseout", () => pointer.clearHighlight())
 
       this.resultContainer = new Element("div", {'class':'resultContainer'});
       div.appendChild(this.resultContainer);
@@ -599,7 +600,7 @@ var XWiki = (function(XWiki){
             });
             iconImage.src = source.icon;
           }
-          sourceHeader.insert(source.name)
+          sourceHeader.insert(source.name);
           sourceContainer.insert( sourceHeader );
           var classes = "sourceContent " + (this.options.unifiedLoader ? "" : "loading");
           sourceContainer.insert( new Element('div', {'class':classes}));
@@ -626,15 +627,15 @@ var XWiki = (function(XWiki){
     if (withEnableButton && !this.container.down('.hide-button')) {
       var positions = this.options.hideButton.positions;
       for (var i=0; i< positions.length; i++) {
-        var hideButton = new Element('span', {'class' : 'hide-button'}).update(this.options.hideButton.text),
-            toInsert = {};
+        var hideButton = new Element('button', {'class' : 'hide-button', 'type' : 'button'})
+          .update(this.options.hideButton.text), toInsert = {};
         toInsert[positions[i]] = new Element('div', {'class' : 'hide-button-wrapper'}).update(hideButton);
         hideButton.observe('click', this.clearSuggestions.bindAsEventListener(this));
         this.container.insert(toInsert);
       }
     }
 
-    var ev = this.container.fire("xwiki:suggest:containerPrepared", {
+    this.container.fire("xwiki:suggest:containerPrepared", {
       'container' : this.container,
       'suggest' : this
     });
@@ -651,7 +652,6 @@ var XWiki = (function(XWiki){
   createList: function(arr, source)
   {
     this._createList(arr, source);
-
     if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,
@@ -727,9 +727,12 @@ var XWiki = (function(XWiki){
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
         containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
-        noHighlight: true // we do the highlighting ourselves
+        noHighlight: true, // we do the highlighting ourselves
+        containerTagName: 'a'
       });
-
+      // When the url is empty, we need to put a correct default value to avoid unexpected page loads/reloads
+      item.containerElement.setAttribute('href', arr[i].url || 'javascript:void(0)');
+      item.listItemElement.addEventListener('focusin', (event) => pointer.setHighlight(event.currentTarget));
       list.addItem(item);
     }
 
@@ -856,7 +859,7 @@ var XWiki = (function(XWiki){
     if (!list)
       return false;
 
-    var n, elem;
+    var elem;
 
     if (this.iHighlighted) {
       // If there is already a highlighted element, we look for the next or previous highlightable item in the list
@@ -895,9 +898,8 @@ var XWiki = (function(XWiki){
       // according to which key, up or down, has been pressed.
       if (key == Event.KEY_DOWN) {
         if (list.down('div.results')) {
-          elem = list.down('div.results').down('li')
-        }
-        else {
+          elem = list.down('div.results').down('li');
+        } else {
           elem = list.down('li');
         }
       }
@@ -973,7 +975,7 @@ var XWiki = (function(XWiki){
         'url': text(this.iHighlighted.down(".suggestURL")),
         'icon' : icon ? icon.src : '',
         'originalEvent' : event
-      }
+      };
 
       var selection, newFieldValue;
       if (this.sInput == "" && this.fld.value == "") {
@@ -1049,7 +1051,7 @@ var XWiki = (function(XWiki){
     var pointer = this;
     if (ele && ele.parentNode) {
       if (this.options.fadeOnClear && window.Effect) {
-        var fade = new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
+        new Effect.Fade(ele, {duration: "0.25", afterFinish : function() {
           if($(pointer.container)) {
             $(pointer.container).remove();
           }

@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="zh">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=禁用的插件
+CKEditor.ConfigClass_removePlugins.hint=已禁用的插件列表。
+CKEditor.ConfigClass_removeButtons=禁用的工具栏功能
+CKEditor.ConfigClass_removeButtons.hint=已被禁用的工具栏功能列表。
+CKEditor.ConfigClass_linkShowAdvancedTab=链接：显示“高级”选项卡
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=允许您设置链接属性，例如id，name，class或style。
+### Missing: CKEditor.ConfigClass_linkShowTargetTab=Link: Show Target Tab
+### Missing: CKEditor.ConfigClass_linkShowTargetTab.hint=Allows you to set the link target attribute (e.g. to open the link in a new tab).
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
+### Missing: CKEditor.ConfigClass_advanced=Advanced Configuration
+### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+
+### Missing: ckeditor.admin.saveComment=Updated the CKEditor configuration from the Administration
+### Missing: ckeditor.admin.reset=Reset
+### Missing: ckeditor.admin.reset.hint=Restore the default configuration
+### Missing: ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
+
+### Missing: ckeditor.plugin.link.options=Options
+### Missing: ckeditor.plugin.link.anchor=Anchor
+### Missing: ckeditor.plugin.link.queryString=Query String
+### Missing: ckeditor.plugin.link.defaultLabel=type the link label
+### Missing: ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+
+### Missing: ckeditor.plugin.macro.placeholder=macro:{0}
+### Missing: ckeditor.plugin.macro.buttonHint=XWiki Macro
+### Missing: ckeditor.plugin.macro.editButtonHint=Edit Macro
+### Missing: ckeditor.plugin.macro.refreshFailed=Failed to refresh the edited content.
+### Missing: ckeditor.plugin.macro.dedicatedInsertButtonHint=Insert {0} macro
+
+### Missing: ckeditor.plugin.office.importer.title=Import Office File
+### Missing: ckeditor.plugin.office.importer.filePath=File Path
+### Missing: ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+### Missing: ckeditor.plugin.office.importer.filterStyles=Filter Styles
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+### Missing: ckeditor.plugin.office.importer.required=Required
+### Missing: ckeditor.plugin.office.importer.import=Import
+### Missing: ckeditor.plugin.office.importer.inProgress=Importing office file...
+### Missing: ckeditor.plugin.office.importer.done=Office file successfully imported.
+### Missing: ckeditor.plugin.office.importer.fail=Office import failed.
+### Missing: ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
+### Missing: ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
+
+### Missing: ckeditor.plugin.resource.notSpecified=The {0} is not specified.
+### Missing: ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
+### Missing: ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
+### Missing: ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+
+### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+### Missing: ckeditor.plugin.toolbar.lists=Lists
+### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+### Missing: ckeditor.plugin.toolbar.numberedlist=Numbered List
+### Missing: ckeditor.plugin.toolbar.insert=Insert
+### Missing: ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
+### Missing: ckeditor.plugin.toolbar.specialchar=Special Character
+### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
+### Missing: ckeditor.plugin.toolbar.successBox=Success Box
+### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
+### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
+### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
+### Missing: ckeditor.plugin.toolbar.include=Include
+### Missing: ckeditor.plugin.toolbar.code=Code Snippet
+### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
+
+### Missing: ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
+### Missing: ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+
+### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+
+### Missing: modal.ok=OK
+### Missing: modal.cancel=Cancel
+### Missing: modal.close=Close
+
+### Missing: resource.attach.label=Attachment
+### Missing: resource.attach.placeholder=Path.To.Page@attachment.png
+### Missing: resource.data.label=Data URI
+### Missing: resource.doc.label=Page
+### Missing: resource.doc.placeholder=Path.To.Page
+### Missing: resource.icon.label=Icon
+### Missing: resource.mailto.label=Mail Address
+### Missing: resource.mailto.placeholder=user@example.org
+### Missing: resource.path.label=Path
+### Missing: resource.path.placeholder=/path/to/file
+### Missing: resource.unc.label=UNC Path
+### Missing: resource.unc.placeholder=//server/share/path/to/file
+### Missing: resource.unknown.label=Unknown
+### Missing: resource.url.label=URL
+### Missing: resource.url.placeholder=http://www.example.org/image.png
+### Missing: resource.user.label=User
+### Missing: resource.user.placeholder=alias
+
+### Missing: resourcePicker.attach.hint=Select an attachment
+### Missing: resourcePicker.doc.hint=Select a page
+
+### Missing: entityResourceSuggester.doc.placeholder=Find a page...
+### Missing: entityResourceSuggester.attach.placeholder=Find an attachment...
+
+### Missing: entityResourcePicker.select=Select
+### Missing: entityResourcePicker.doc.title=Select Page
+### Missing: entityResourcePicker.attach.title=Select Attachment
+
+### Missing: macroSelector.title=Select Macro
+### Missing: macroSelector.filter.text.placeholder=Type to filter
+### Missing: macroSelector.filter.category.all=All Macros
+### Missing: macroSelector.filter.category.other=Other
+### Missing: macroSelector.failedToRetrieveMacros=Failed to retrieve the list of available macros.
+### Missing: macroSelector.select=Select
+
+### Missing: macroEditor.title=Edit Macro
+### Missing: macroEditor.more=More
+### Missing: macroEditor.changeMacro=Change Macro
+### Missing: macroEditor.submit=Submit
+### Missing: macroEditor.content=Content
+### Missing: macroEditor.noParameters=This macro has no parameters.
+### Missing: macroEditor.descriptorRequestFailed=Failed to retrieve the {0} macro descriptor.</content>
+</xwikidoc>

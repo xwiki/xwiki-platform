@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.EditForm" locale="">
+<xwikidoc version="1.5" reference="AnnotationCode.EditForm" locale="">
   <web>AnnotationCode</web>
   <name>EditForm</name>
   <language/>
@@ -36,19 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AnnotationCode.Macros" /}}
+  <content>{{template name="display_macros.vm" /}}
 
-{{velocity output="false"}}
-#if ("$!{request.reference}" != '')
-  #set($annotationReference = $services.model.resolveDocument($request.reference))
-#elseif("$!{request.wiki}" != '' &amp;&amp; "$!{request.space}" != '' &amp;&amp; "$!{request.page}" != '')
-  #set($annotationReference = $services.model.createDocumentReference("$!{request.wiki}", "$!{request.space}", "$!{request.page}"))
-#end
-{{/velocity}}
+{{include reference="AnnotationCode.Macros" /}}
 
 {{velocity filter="none"}}
 {{html clean="false"}}
+## The annotation edit form is loaded asynchronously so we need to send back also the required JavaScript and CSS
+## resources (besides the form HTML).
+#initRequiredSkinExtensions()
 #displayEditBoxFromReference("$!{request.id}", $annotationReference)
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

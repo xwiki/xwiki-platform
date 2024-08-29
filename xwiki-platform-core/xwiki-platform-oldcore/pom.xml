@@ -25,26 +25,23 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Old Core</description>
   <properties>
-    <xwiki.extension.features>
-      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      com.xpn.xwiki.platform:xwiki-core,
-
-      <!-- The old org.xwiki.platform:xwiki-platform-filter-instance-oldcore has been merged with oldcore -->
-      org.xwiki.platform:xwiki-platform-filter-instance-oldcore
-    </xwiki.extension.features>
+    <xwiki.extension.features>${xwiki.platform.oldcore.extension.features}</xwiki.extension.features>
     <!-- Skipping revapi since xwiki-platform-legacy-oldcore wraps this module and runs checks on it -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <xwiki.jacoco.instructionRatio>0.35</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
     <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+
+    <!-- Workaround a limitation in Eclipse M2E which prevent using classes from OldCore test-jar in other module's main classes -->
+    <m2e.disableTestClasspathFlag>true</m2e.disableTestClasspathFlag>
   </properties>
   <dependencies>
     <dependency>
@@ -67,11 +64,15 @@
     <!-- CSS4J (used for PDF export) -->
     <dependency>
       <groupId>io.sf.carte</groupId>
-      <artifactId>xml-dtd</artifactId>
+      <artifactId>css4j</artifactId>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.sf.carte</groupId>
+      <artifactId>xml-dtd</artifactId>
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
@@ -134,7 +135,7 @@
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
          xwiki-commons-groovy which has dependencies on all the various groovy jars and thus they'll be bundled -->
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
     </dependency>
 
@@ -182,10 +183,6 @@
 
     <!-- XML processing -->
     <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
-    <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
       <!-- Only needed at runtime -->
@@ -220,12 +217,6 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-svgrasterizer</artifactId>
     </dependency>
-    <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
-    <dependency>
-      <groupId>org.apache.xmlgraphics</groupId>
-      <artifactId>batik-codec</artifactId>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Misc -->
     <!-- Better date manipulation than what JDK provides -->
@@ -233,7 +224,12 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
-    <!-- Mail sender -->
+    <!-- Mails -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-api</artifactId>
@@ -300,7 +296,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-image-api</artifactId>
+      <artifactId>xwiki-platform-image-processing-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -368,11 +364,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-formula-renderer</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-cache-api</artifactId>
       <version>${commons.version}</version>
@@ -429,7 +420,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-security-api</artifactId>
+      <artifactId>xwiki-platform-security-authorization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -572,6 +563,16 @@
       <artifactId>xwiki-platform-model-validation-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-link</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-attachment-validation-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
 
@@ -600,10 +601,21 @@
       <version>1.6</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-jmock</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -619,6 +631,18 @@
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
+    <dependency>
+      <groupId>org.mortbay.jasper</groupId>
+      <artifactId>apache-el</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-index-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -666,10 +690,6 @@
                 **/api/DocumentSection.java,
                 **/api/Object.java,
                 **/api/XWiki.java,
-                **/atom/lifeblog/LifeblogServices.java,
-                **/atom/lifeblog/UserBlog.java,
-                **/atom/WSSEHttpHeader.java,
-                **/atom/XWikiHelper.java,
                 **/content/parsers/RenamePageReplaceLinkHandler.java,
                 **/criteria/api/XWikiCriteriaService.java,
                 **/criteria/impl/DurationFactory.java,
@@ -772,7 +792,6 @@
                 **/objects/StringListProperty.java,
                 **/pdf/impl/PdfExportImpl.java,
                 **/pdf/impl/PdfURLFactory.java,
-                **/plugin/autotag/FrenchStemmer.java,
                 **/plugin/mail/MailPluginApi.java,
                 **/plugin/mail/MailPlugin.java,
                 **/plugin/packaging/DocumentFilter.java,
@@ -783,28 +802,11 @@
                 **/plugin/packaging/PackageException.java,
                 **/plugin/packaging/Package.java,
                 **/plugin/packaging/PackagePlugin.java,
-                **/plugin/query/DefaultQuery.java,
-                **/plugin/query/HibernateQuery.java,
-                **/plugin/query/IQueryFactory.java,
-                **/plugin/query/IQuery.java,
-                **/plugin/query/OrderClause.java,
-                **/plugin/query/QueryPluginApi.java,
-                **/plugin/query/QueryPlugin.java,
-                **/plugin/query/SecHibernateQuery.java,
-                **/plugin/query/SepStringBuffer.java,
-                **/plugin/query/XWikiCriteria.java,
-                **/plugin/query/XWikiNamespaceResolver.java,
-                **/plugin/query/XWikiQueryConstants.java,
-                **/plugin/query/XWikiQuery.java,
-                **/plugin/svg/SVGPluginApi.java,
-                **/plugin/svg/SVGPlugin.java,
                 **/plugin/XWikiPluginManager.java,
                 **/pref/api/XWikiPrefService.java,
                 **/pref/impl/xwiki/XWikiPrefServiceImpl.java,
-                **/render/DefaultVelocityManager.java,
+                **/velocity/XWikiVelocityManager.java,
                 **/render/WikiSubstitution.java,
-                **/render/XWikiScriptContextInitializer.java,
-                **/render/XWikiVelocityContextInitializer.java,
                 **/render/groovy/XWikiPageClassLoader.java,
                 **/security/XWikiSecurityManager.java,
                 **/store/DBCPConnectionProvider.java,
@@ -821,7 +823,7 @@
                 **/store/migration/hibernate/R6079XWIKI1878DataMigration.java,
                 **/store/migration/hibernate/R7350XWIKI2079DataMigration.java,
                 **/store/migration/hibernate/R40000XWIKI6990DataMigration.java,
-                **/store/migration/hibernate/R130200001XWIKI18429DataMigration.java,
+                **/store/migration/hibernate/AbstractResizeMigration.java,
                 **/store/XWikiAttachmentStoreInterface.java,
                 **/store/XWikiBatcherFactory.java,
                 **/store/XWikiBatcher.java,
@@ -836,12 +838,6 @@
                 **/store/XWikiHibernateStore.java,
                 **/store/XWikiStoreInterface.java,
                 **/store/XWikiVersioningStoreInterface.java,
-                **/test/smtp/SimpleSmtpServer.java,
-                **/test/smtp/SmtpActionType.java,
-                **/test/smtp/SmtpMessage.java,
-                **/test/smtp/SmtpRequest.java,
-                **/test/smtp/SmtpResponse.java,
-                **/test/smtp/SmtpState.java,
                 **/user/api/XWikiAuthService.java,
                 **/user/api/XWikiGroupService.java,
                 **/user/api/XWikiRightNotFoundException.java,
@@ -870,7 +866,6 @@
                 **/web/CancelAction.java,
                 **/web/DeleteAction.java,
                 **/web/DeleteAttachmentAction.java,
-                **/web/DotAction.java,
                 **/web/DownloadAction.java,
                 **/web/DownloadRevAction.java,
                 **/web/EditAction.java,
@@ -883,14 +878,11 @@
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,
-                **/web/InlineAction.java,
-                **/web/LifeBlogAction.java,
                 **/web/LockAction.java,
                 **/web/ObjectAddAction.java,
                 **/web/ObjectAddForm.java,
                 **/web/ObjectRemoveAction.java,
                 **/web/ObjectRemoveForm.java,
-                **/web/PrepareEditForm.java,
                 **/web/PreviewAction.java,
                 **/web/PreviewForm.java,
                 **/web/PropAddAction.java,
@@ -903,8 +895,6 @@
                 **/web/SaveAction.java,
                 **/web/SkinAction.java,
                 **/web/StatusAction.java,
-                **/web/SVGAction.java,
-                **/web/TexAction.java,
                 **/web/UploadAction.java,
                 **/web/Utils.java,
                 **/web/ViewAttachRevAction.java,
@@ -930,7 +920,8 @@
                 **/web/XWikiURLFactoryServiceImpl.java,
                 **/web/XWikiURLFactoryService.java,
                 <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-                **/stats/impl/xwiki/XWikiStatsReader.java
+                **/stats/impl/xwiki/XWikiStatsReader.java,
+                **/com/xpn/xwiki/internal/filter/output/AbstractEntityOutputFilterStream.java
               </excludes>
               <resourceExcludes>
                 ApplicationResources*.properties
@@ -943,10 +934,14 @@
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <configuration>
-          <excludes>
-            <!-- Exclude a test vm file since the tests don't execute velocity on it -->
-            <exclude>src/test/**/classloader_template.vm</exclude>
-          </excludes>
+          <licenseSets>
+            <licenseSet>
+              <excludes>
+                <!-- Exclude a test vm file since the tests don't execute velocity on it -->
+                <exclude>src/test/**/classloader_template.vm</exclude>
+              </excludes>
+            </licenseSet>
+          </licenseSets>
         </configuration>
       </plugin>
     </plugins>

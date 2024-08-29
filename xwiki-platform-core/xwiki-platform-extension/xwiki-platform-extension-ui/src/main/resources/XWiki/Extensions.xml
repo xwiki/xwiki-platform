@@ -170,7 +170,7 @@
         &lt;div class="box infomessage"&gt;
         #if ($indexJobStatus.state != 'FINISHED')
           $escapetool.xml($services.localization.render('extensions.search.indexed.started', [$xwiki.formatDate($indexJobStatus.startDate)]))
-          #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+          #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
           #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
               'xpage': 'job_status_json',
               'outputSyntax': 'plain',

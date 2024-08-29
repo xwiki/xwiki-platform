@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationException;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
@@ -38,6 +39,10 @@ import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of the {@link LocalizationManager} component.
@@ -50,7 +55,8 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
 public class DefaultLocalizationManager implements LocalizationManager
 {
     /**
-     * Provides access to different bundles based on their hint. Needed in {@link #use(String, String)}.
+     * Provides access to different bundles based on their hint (needed in {@link #use(String, String)} and access to
+     * the various syntax renderers (needed in {@link #getTranslation(String, Locale, Syntax, Object...)}.
      */
     @Inject
     @Named("context")
@@ -92,9 +98,41 @@ public class DefaultLocalizationManager implements LocalizationManager
     }
 
     @Override
+    public String getTranslationPlain(String key, Locale locale, Object... parameters)
+    {
+        String result;
+        try {
+            result = getTranslation(key, locale, Syntax.PLAIN_1_0, parameters);
+        } catch (LocalizationException e) {
+            // This shouldn't happen since a Plain Text Renderer should always be present in XWiki
+            result = null;
+        }
+        return result;
+    }
+
+    @Override
+    public String getTranslation(String key, Locale locale, Syntax targetSyntax, Object... parameters)
+        throws LocalizationException
+    {
+        String result;
+
+        Translation translation = getTranslation(key, locale);
+        if (translation == null) {
+            result = null;
+        } else {
+            Block block = translation.render(parameters);
+            DefaultWikiPrinter wikiPrinter = new DefaultWikiPrinter();
+            BlockRenderer renderer = getSyntaxRenderer(targetSyntax);
+            renderer.render(block, wikiPrinter);
+            result = wikiPrinter.toString();
+        }
+
+        return result;
+    }
+
+    @Override
     public TranslationBundle getTranslationBundle(String bundleType, String bundleId)
         throws TranslationBundleDoesNotExistsException, TranslationBundleFactoryDoesNotExistsException
-
     {
         if (this.componentManagerProvider.get().hasComponent(TranslationBundle.class, bundleType + ':' + bundleId)) {
             try {
@@ -123,5 +161,23 @@ public class DefaultLocalizationManager implements LocalizationManager
         TranslationBundle bundle = getTranslationBundle(bundleType, bundleId);
 
         this.bundleContext.addBundle(bundle);
+    }
+
+    @Override
+    public Locale getDefaultLocale()
+    {
+        return Locale.getDefault();
+    }
+
+    private BlockRenderer getSyntaxRenderer(Syntax syntax) throws LocalizationException
+    {
+        BlockRenderer result;
+        try {
+            result = this.componentManagerProvider.get().getInstance(BlockRenderer.class, syntax.toIdString());
+        } catch (ComponentLookupException e) {
+            throw new LocalizationException(String.format("Failed to render the translation using the [%s] syntax",
+                syntax), e);
+        }
+        return result;
     }
 }

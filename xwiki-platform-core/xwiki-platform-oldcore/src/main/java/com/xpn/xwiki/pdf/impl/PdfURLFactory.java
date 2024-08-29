@@ -38,6 +38,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  *
  * @version $Id$
  */
+@Deprecated(since = "14.7")
 public class PdfURLFactory extends FileSystemURLFactory
 {
     private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
@@ -117,7 +118,7 @@ public class PdfURLFactory extends FileSystemURLFactory
         XWikiContext context)
     {
         // Save Entity Reference pointed to by this URL in the Context so that it can be used at export time in the
-        // PDF URIResolver code.
+        // PDFResourceResolver code.
         Map<String, AttachmentReference> attachmentMap =
             (Map<String, AttachmentReference>) context.get(PDF_EXPORT_CONTEXT_KEY);
         if (attachmentMap == null) {

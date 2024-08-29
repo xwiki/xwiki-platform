@@ -147,7 +147,7 @@ public class XWikiHibernateStoreTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager) throws Exception
@@ -242,6 +242,7 @@ public class XWikiHibernateStoreTest
         when(session.createQuery("delete from XWikiLock as lock where lock.userName=:userName")).thenReturn(query);
         when(xcontext.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
         when(xcontext.getUser()).thenReturn("XWiki.LoggerOutter");
+        when(this.hibernateStore.beginTransaction()).thenReturn(true);
 
         // Fire the logout event.
         eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, xcontext);

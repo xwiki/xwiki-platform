@@ -47,7 +47,7 @@ public interface UIExtension
      * A map of parameters provided by the extension. When providing a new Extension Point the developer must document
      * the list of parameters he requires.
      *
-      * @return a map of parameters provided by the extension
+     * @return a map of parameters provided by the extension
      */
     Map<String, String> getParameters();
 
@@ -55,4 +55,14 @@ public interface UIExtension
      * @return the {@link Block} that must be rendered when this extension is displayed
      */
     Block execute();
+
+    /**
+     * @param inline true if the UI extension is executed in an inline context
+     * @return the {@link Block} that must be rendered when this extension is displayed
+     * @since 14.0RC1
+     */
+    default Block execute(boolean inline)
+    {
+        return execute();
+    }
 }

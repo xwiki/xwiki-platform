@@ -49,9 +49,9 @@ import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtens
 import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
-import org.xwiki.extension.xar.job.diff.DocumentVersionReference;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentVersionReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
@@ -70,7 +70,7 @@ import org.xwiki.xar.XarException;
 @Singleton
 @Named(XarExtensionHandler.TYPE)
 public class XarInstalledExtensionRepository extends AbstractInstalledExtensionRepository<XarInstalledExtension>
-    implements InstalledExtensionRepository, Initializable
+    implements Initializable
 {
     @Inject
     private transient InstalledExtensionRepository installedRepository;
@@ -231,12 +231,8 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
      */
     public Collection<XarInstalledExtension> getXarInstalledExtensions(DocumentReference reference)
     {
-        if (reference instanceof DocumentVersionReference) {
-            DocumentVersionReference versionReference = (DocumentVersionReference) reference;
-
-            if (versionReference.getVersion() instanceof ExtensionId) {
-                ExtensionId extensionId = (ExtensionId) versionReference.getVersion();
-
+        if (reference instanceof DocumentVersionReference versionReference) {
+            if (versionReference.getVersion() instanceof ExtensionId extensionId) {
                 if (extensionId != null) {
                     return Arrays.asList((XarInstalledExtension) getInstalledExtension(extensionId));
                 }

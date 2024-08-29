@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,9 +37,11 @@ import org.xwiki.localization.macro.TranslationMacroParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.MacroPreparationException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -104,7 +107,7 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         super("Translation", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             TranslationMacroParameters.class);
 
-        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
+        setDefaultCategories(Set.of(DEFAULT_CATEGORY_CONTENT));
     }
 
     @Override
@@ -149,6 +152,12 @@ public class TranslationMacro extends AbstractMacro<TranslationMacroParameters>
         }
 
         return blocks;
+    }
+
+    @Override
+    public void prepare(MacroBlock macroBlock) throws MacroPreparationException
+    {
+        this.macroContentParser.prepareContentWiki(macroBlock);
     }
 
     @Override

@@ -37,6 +37,7 @@ import org.xwiki.logging.LogTree;
 import org.xwiki.logging.LogUtils;
 import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.logging.Message;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -157,26 +158,48 @@ public class LoggingScriptService implements ScriptService
      */
     public LogEvent translate(LogEvent logEvent)
     {
-        if (logEvent.getTranslationKey() != null) {
-            Translation translation = this.localization.getTranslation(logEvent.getTranslationKey());
-
-            if (translation != null) {
-                return LogUtils.translate(logEvent, (String) translation.getRawSource());
-            }
-        }
-
-        return logEvent;
+        return (LogEvent) translate((Message) logEvent);
     }
 
     /**
-     * Log a deprecated message, only if the {@link LoggerConfiguration#isDeprecatedLogEnabled()} is {@code true}.
-     * Note that the deprecated message is displayed as a warning with the {@code [DEPRECATED]} suffix.
+     * Translate the passed {@link Message} based on the translation message corresponding to the translation key stored
+     * in the {@link Message}.
+     * <p>
+     * The translation message pattern use the same syntax than standard message pattern except that it's optionally
+     * possible to provide a custom index as in <code>Some {1} translation {0} message</code> in order to modify the
+     * order of the argument which can be required depending on the language.
+     * 
+     * @param message the {@link Message} to translate
+     * @return the translated version of the passed {@link Message}
+     * @since 15.0RC1
+     * @since 14.10.1
+     */
+    @Unstable
+    public Message translate(Message message)
+    {
+        if (message != null) {
+            String translationKey = message.getTranslationKey();
+
+            if (translationKey != null) {
+                Translation translation = this.localization.getTranslation(message.getTranslationKey());
+
+                if (translation != null) {
+                    return LogUtils.translate(message, (String) translation.getRawSource());
+                }
+            }
+        }
+
+        return message;
+    }
+
+    /**
+     * Log a deprecated message, only if the {@link LoggerConfiguration#isDeprecatedLogEnabled()} is {@code true}. Note
+     * that the deprecated message is displayed as a warning with the {@code [DEPRECATED]} suffix.
      *
      * @param loggerName the name of the logger to be used for the deprecated message.
      * @param message the message to be displayed for explaining the deprecation.
      * @since 13.1RC1
      */
-    @Unstable
     public void deprecate(String loggerName, String message)
     {
         if (this.loggerConfiguration.isDeprecatedLogEnabled()) {

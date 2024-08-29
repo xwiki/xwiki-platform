@@ -17,26 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-/*!
-#set ($jsExtension = '.min')
-#if (!$services.debug.minify)
-  #set ($jsExtension = '')
-#end
-#set ($paths = {
-  'JobRunner': $services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', "jobRunner$jsExtension")
-})
-#set ($l10n = {
-  'answering': $services.localization.render('job.question.notification.answering'),
-  'canceling': $services.localization.render('job.question.notification.canceling')
-})
-#[[*/
-// Start JavaScript-only code.
-(function(paths, contextPath, l10n) {
-  "use strict";
+define('xwiki-job-messages', {
+  prefix: 'job.question.notification.',
+  keys: [
+    'answering',
+    'canceling'
+  ]
+});
 
-require.config({paths});
-
-require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
+require([
+  'jquery',
+  'xwiki-meta',
+  'xwiki-job-runner',
+  'xwiki-l10n!xwiki-job-messages'
+], function($, xm, JobRunner, l10n) {
   var updateProgress = function(jobUI, job) {
     jobUI.find('.ui-progress-background').toggle(job.state !== 'NONE');
     jobUI.find('.ui-progress-message').toggle(job.state === 'NONE');
@@ -50,8 +44,8 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     var percent = Math.floor((job.progress.offset || 0) * 100);
     jobUI.find('.ui-progress-bar').css('width', percent + '%');
     var jobLog = job.log.items || [];
-    if (jobLog.size() > 0) {
-      jobUI.find('.ui-progress-message').html(jobLog[jobLog.size() - 1].renderedMessage);
+    if (jobLog.length) {
+      jobUI.find('.ui-progress-message').html(jobLog[jobLog.length - 1].renderedMessage);
     }
   };
 
@@ -60,12 +54,13 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
 
     if (typeof answerCallback === 'function') {
       // Display the question
-      var displayerURL = contextPath + '/job/wiki/' + xm.wiki + '/question/' + job.id.join('/');
+      var encodedJobId = job.id.map(encodeURIComponent).join('/');
+      var displayerURL = XWiki.contextPath + '/job/wiki/' + xm.wiki + '/question/' + encodedJobId;
 
       // Remember the answer callback
       jobQuestion.data('answerCallback', answerCallback);
 
-      $.ajax(displayerURL).done($.proxy(updateQuestionContent, jobQuestion));
+      $.get(displayerURL).then(updateQuestionContent.bind(jobQuestion));
     } else {
       jobQuestion.empty();
     }
@@ -90,7 +85,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
     jobLogUI.find('.log-item-loading').removeClass('log-item-loading');
     $.each(jobLog, function(index, item) {
       var classNames = ['log-item', 'log-item-' + item.level];
-      if (job.state !== 'FINISHED' && index === jobLog.size() - 1) {
+      if (job.state !== 'FINISHED' && index === jobLog.length - 1) {
         classNames.push('log-item-loading');
       }
       $(document.createElement('li')).addClass(classNames.join(' ')).html(item.renderedMessage).appendTo(jobLogUI);
@@ -196,9 +191,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
               );
 
             // Send the answer
-            answerCallback(properties).done(new function() {
-              notif.hide();
-            });
+            answerCallback(properties).then(() => notif.hide());
           }
         }
       }
@@ -231,7 +224,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
             return {
               url: url,
               data: {
-                'logOffset': jobLog.find('.log-item').size()
+                'logOffset': jobLog.find('.log-item').length
               }
             };
           };
@@ -246,7 +239,7 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
           if (typeof data === 'function') {
             return data();
           } else {
-            var answerURL = contextPath + '/job/question/' + jobId.join('/');
+            var answerURL = XWiki.contextPath + '/job/question/' + jobId.map(encodeURIComponent).join('/');
 
             return {
               url: answerURL,
@@ -257,12 +250,8 @@ require(['jquery', 'xwiki-meta', 'JobRunner'], function($, xm, JobRunner) {
       }
 
       new JobRunner(runnerConfig).resume()
-        .progress($.proxy(updateStatus, this))
-        .done($.proxy(notifyJobDone, this))
-        .fail($.proxy(notifyConnectionFailure, this));
+        .progress(updateStatus.bind(this))
+        .then(notifyJobDone.bind(this), notifyConnectionFailure.bind(this));
     }
   });
 });
-
-// End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$paths, $request.contextPath, $l10n]));

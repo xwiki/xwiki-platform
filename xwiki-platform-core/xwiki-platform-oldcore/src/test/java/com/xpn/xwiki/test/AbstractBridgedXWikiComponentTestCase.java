@@ -34,10 +34,13 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
-import org.xwiki.refactoring.internal.LinkRefactoring;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.ModelBridge;
+import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -172,7 +175,26 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         // Avoid error when loading components for refactoring-api
         registerMockComponent(ModelBridge.class);
-        registerMockComponent(LinkRefactoring.class);
+        registerMockComponent(ReferenceUpdater.class);
+
+        // Mocks for UserReference
+        Mock mockUserReferenceResolver = mock(UserReferenceResolver.class);
+        DefaultComponentDescriptor<UserReferenceResolver<DocumentReference>> userReferenceResolverDescriptor =
+            new DefaultComponentDescriptor<>();
+        userReferenceResolverDescriptor.setRoleType(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class));
+        userReferenceResolverDescriptor.setRoleHint("document");
+        getComponentManager().registerComponent(userReferenceResolverDescriptor,
+            (UserReferenceResolver<DocumentReference>) mockUserReferenceResolver.proxy());
+
+        Mock mockUserReferenceSerializer = mock(UserReferenceSerializer.class);
+        DefaultComponentDescriptor<UserReferenceSerializer<DocumentReference>> userReferenceSerializerDescriptor =
+            new DefaultComponentDescriptor<>();
+        userReferenceSerializerDescriptor.setRoleType(
+            new DefaultParameterizedType(null, UserReferenceSerializer.class, DocumentReference.class));
+        userReferenceSerializerDescriptor.setRoleHint("document");
+        getComponentManager().registerComponent(userReferenceSerializerDescriptor,
+            (UserReferenceSerializer<DocumentReference>) mockUserReferenceSerializer.proxy());
     }
 
     @Override

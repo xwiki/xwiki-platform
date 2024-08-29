@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1" locale="uk">
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiSyntax</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Загальні =
+
+== Вступ ==
+
+{{comment}}будь ласка, не перекладайте підзаголовки{{/comment}}
+=== 1.0 Introduction ===
+
+Синтаксис XWiki 1.0 був першою спробою реалізувати синтаксис стилю Wiki у XWiki. Він мав певні обмеження, і деяке форматування можна було досягти лише шляхом вставки необробленого HTML. Рекомендуємо використовувати новіший синтаксис; синтаксис XWiki 1.0 підтримується лише для зворотної сумісності.
+
+Окрім синтаксису, специфічного для XWiki, ми також змінили наш основний механізм візуалізації у XWiki 1.7 (раніше це був Radeox) на користь нашого власного механізму, який є обгорткою розширеного набору навколо [[Wikimodel&gt;&gt;https://code.google.com /p/wikimodel/]] і [[Doxia&gt;&gt;https://maven.apache.org/doxia/]] (і, можливо, інші в майбутньому). Це дозволило нам надати інші синтаксиси у вікі: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki тощо&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage )&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.0 Introduction ===
+
+Починаючи з XWiki 1.7, ми представили новий синтаксис вікі. Ми назвали старий синтаксис //XWiki Syntax 1.0//, а новий синтаксис логічно було названо //XWiki Syntax 2.0//. Основними причинами впровадження нового синтаксису були:
+* Виправлено обмеження та неоднозначність синтаксису XWiki 1.0 (який був натхненний як Radeox — основним механізмом візуалізації — так і TWiki).
+** Не оптимальні символи. Наприклад, символом жирного шрифту були поодинокі зірки. Це створювало проблеми, коли користувачі вводили текст із зірочками, оскільки цей текст помилково вважався жирним, хоча це не так. Тому ми раціоналізували синтаксис, використовуючи скрізь принаймні подвійні символи.
+** Неоднозначності. Наприклад, існувала неоднозначність між виділеним жирним шрифтом елементом, який розпочав рядок, і маркованим списком. Аби переписати редактор WYSIWYG, щоб він міг бути детермінованим, потрібно було усунути неоднозначності.
+* Будьте ближче до [[синтаксису Creole 1.0&gt;&gt;https://www.wikicreole.org/]], який стає стандартом для синтаксису вікі. Крім того, креольська спільнота знайшла час, щоб проаналізувати всі наявні синтаксиси вікі, перш ніж прийняти рішення щодо символів. Таким чином, зробивши вдалий вибір.
+
+На додаток до цих специфічних для XWiki синтаксисів ми також змінили наш основний механізм візуалізації (раніше Radeox) на користь нашого власного механізму, який є обгорткою розширеного набору навколо [[Wikimodel&gt;&gt;https://code.google.com/p/ wikimodel/]] і [[Doxia&gt;&gt;https://maven.apache.org/doxia/]] (і, можливо, інші в майбутньому). Це дозволило нам надати інші синтаксиси у вікі: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki тощо&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage )&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.1 Introduction ===
+
+Синтаксис XWiki 2.0 виявився досить корисним і надійним загалом; однак після його впровадження було виявлено кілька недоліків. Відповідні вдосконалення було закріплено у XWiki Syntax 2.1. Деякі нові можливості цього синтаксису:
+* Гомогенізація синтаксису посилань і зображень для кращої чіткості, узгодженості та можливості розширення.
+* Додано можливість відображати піктограми, вставляти зображення за допомогою схеми URI даних, створювати посилання на файли за допомогою нотації UNC і посилатися на відносні URL-адреси.
+
+{{info}}Оскільки синтаксис XWiki 2.1 базується на синтаксисі XWiki 2.0, увесь синтаксис із синтаксису XWiki 2.0 дійсний, якщо специфікації 2.1 не передбачають інше.{{/info}}</content>
+</xwikidoc>

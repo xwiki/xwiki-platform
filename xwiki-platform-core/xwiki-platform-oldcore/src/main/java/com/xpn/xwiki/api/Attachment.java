@@ -84,7 +84,7 @@ public class Attachment extends Api
     {
         long longSize = getLongSize();
 
-        return longSize > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
+        return longSize > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longSize;
     }
 
     /**
@@ -259,7 +259,7 @@ public class Attachment extends Api
      * Allow to easily access any revision of an attachment.
      *
      * @param rev Version to access, in the "Major.minor" format.
-     * @return Attachment API object, or <tt>null</tt> if the requested version does not exist.
+     * @return Attachment API object, or {@code null} if the requested version does not exist.
      * @throws XWikiException In case of an error.
      */
     public Attachment getAttachmentRevision(String rev) throws XWikiException

@@ -33,8 +33,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,6 +56,9 @@ import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -107,6 +116,9 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     @Inject
+    protected ContextualAuthorizationManager authorization;
+
+    @Inject
     private ModelFactory modelFactory;
 
     @Inject
@@ -117,16 +129,24 @@ public class BaseAttachmentsResource extends XWikiResource
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
-     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document name,
-     *            attachment name, author and type)
+     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document
+     *     name, attachment name, author and type)
      * @param offset defines the start of the range
      * @param limit the maximum number of attachments to include in the range
-     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the returned
-     *            attachment metadata
+     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the
+     *     returned attachment metadata
      * @return the list of attachments from the specified scope that match the given filters and that are within the
-     *         specified range
+     *     specified range
      * @throws XWikiRestException if we fail to retrieve the attachments
      */
     protected Attachments getAttachments(EntityReference scope, Map<String, String> filters, Integer offset,
@@ -142,15 +162,19 @@ public class BaseAttachmentsResource extends XWikiResource
 
             List<Object> queryResults = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
             attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
+                // Apply passed filters
                 .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
+                // Filter out attachments the current user is not allowed to see
+                .filter(a -> authorization.hasAccess(Right.VIEW, a.getReference()))
+                // Convert XWikiAttachment to REST Attachment
                 .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
-                .collect(Collectors.toList()));
+                .toList());
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
             xcontext.setWikiId(database);
         }
-
+        
         return attachments;
     }
 
@@ -348,25 +372,37 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     protected AttachmentInfo storeAndRetrieveAttachment(Document document, String attachmentName, InputStream content,
-        Boolean withPrettyNames) throws XWikiException
+        Boolean withPrettyNames) throws XWikiException, AttachmentValidationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        boolean alreadyExisting = document.getAttachment(attachmentName) != null;
+        XWikiDocument previousDoc = xcontext.getDoc();
+        try {
+            // The context needs to be updated with the document where the attachment will be attached to be able to 
+            // resolve the configuration when validating the attachment mimetype.
+            xcontext.setDoc(document.getDocument());
+            boolean alreadyExisting = document.getAttachment(attachmentName) != null;
 
-        XWikiAttachment xwikiAttachment =
-            createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
-        // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
-        // updated version.
-        Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
-        Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
-            new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
-            false);
+            XWikiAttachment xwikiAttachment =
+                createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()),
+                    content);
 
-        return new AttachmentInfo(attachment, alreadyExisting);
+            // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
+            // updated version.
+            Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
+            Attachment attachment = this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(),
+                new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()),
+                withPrettyNames,
+                false);
+
+            return new AttachmentInfo(attachment, alreadyExisting);
+        } finally {
+            // Restore the context to its initial value.
+            xcontext.setDoc(previousDoc);
+        }
     }
 
     protected XWikiAttachment createOrUpdateAttachment(AttachmentReference attachmentReference, InputStream content)
-        throws XWikiException
+        throws XWikiException, AttachmentValidationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
@@ -381,7 +417,19 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
 
-        // Set the document author.
+        try {
+            this.componentManagerProvider.get().<AttachmentValidator>getInstance(AttachmentValidator.class)
+                .validateAttachment(new XWikiAttachmentAccessWrapper(attachment, xcontext));
+        } catch (ComponentLookupException e) {
+            throw new XWikiException(
+                String.format("Failed to instantiate a [%s] component.", AttachmentValidator.class.getName()), e);
+        }
+
+        // Set the document creator / author.
+        if (document.isNew()) {
+            document.getAuthors()
+                .setCreator(this.documentReferenceUserReferenceResolver.resolve(xcontext.getUserReference()));
+        }
         document.setAuthorReference(xcontext.getUserReference());
 
         // Calculate and store the attachment media type.

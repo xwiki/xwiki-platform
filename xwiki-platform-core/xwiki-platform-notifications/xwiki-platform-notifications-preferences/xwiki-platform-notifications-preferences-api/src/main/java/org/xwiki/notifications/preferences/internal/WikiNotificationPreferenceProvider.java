@@ -72,7 +72,7 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
     @Override
     public List<NotificationPreference> getPreferencesForWiki(WikiReference wiki) throws NotificationException
     {
-        return cachedModelBridge.getNotificationsPreferences(wiki);
+        return cachedNotificationPreferenceModelBridge.getNotificationsPreferences(wiki);
     }
 
     @Override
@@ -80,8 +80,9 @@ public class WikiNotificationPreferenceProvider extends AbstractDocumentNotifica
             throws NotificationException
     {
         if (target instanceof WikiReference) {
-            cachedModelBridge.saveNotificationsPreferences(new DocumentReference(GLOBAL_PREFERENCES,
-                    (WikiReference) target), preferences);
+            cachedNotificationPreferenceModelBridge
+                .saveNotificationsPreferences(new DocumentReference(GLOBAL_PREFERENCES, (WikiReference) target),
+                    preferences);
         } else {
             logger.warn("Preference's target [{}] is not a wiki reference. The corresponding preference will not be"
                     + " saved.");

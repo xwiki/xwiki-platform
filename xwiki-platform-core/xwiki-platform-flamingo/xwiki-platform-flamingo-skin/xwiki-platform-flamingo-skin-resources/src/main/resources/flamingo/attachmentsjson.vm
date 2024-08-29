@@ -1,0 +1,121 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+#template('attachment_macros.vm')
+#template('hierarchy_macros.vm')
+#if ($xcontext.action == 'get')
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  ## The offset sent by the live table starts at 1.
+  #set ($offset = $offset - 1)
+  #if (!$offset || $offset < 0)
+    #set ($offset = 0)
+  #end
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  ##
+  ## Apply live table filters.
+  ##
+  #set ($constraints = ['attachment.docId = doc.id', 'doc.id = :docId'])
+  #set ($queryParameters = [{
+    'name': 'docId',
+    'match': 'exact',
+    'value': $doc.getId()
+  }])
+  #maybeApplyStringFilter('mimeType' 'prefix' $constraints $queryParameters)
+  #maybeApplyStringFilter('filename' 'partial' $constraints $queryParameters)
+  #maybeApplyIntegerRangeFilter('filesize' $constraints $queryParameters)
+  #maybeApplyDateRangeFilter('date' $constraints $queryParameters)
+  #maybeApplyStringFilter('author' 'partial' $constraints $queryParameters)
+  #set ($whereClause = '')
+  #if ($constraints.size() > 0)
+    #set ($whereClause = 'where ' + $stringtool.join($constraints, ' and '))
+  #end
+  ##
+  ## Determine the sort field and direction.
+  ##
+  #set ($validSortFields = ['mimeType', 'filename', 'doc.fullName', 'filesize', 'date', 'author'])
+  #set ($sortField = $request.sort)
+  #if (!$validSortFields.contains($sortField))
+    #set ($sortField = 'filename')
+  #end
+  #set ($caseInsensitiveSort = $sortField != 'date' && $sortField != 'filesize')
+  #if (!$sortField.startsWith('doc.'))
+    #set ($sortField = "attachment.$sortField")
+  #end
+  #set ($direction = 'asc')
+  #if ("$!request.dir" == 'desc')
+    #set ($direction = 'desc')
+  #end
+  #if ($caseInsensitiveSort)
+    #set ($orderByClause = "order by lower($sortField) $direction, $sortField $direction")
+  #else
+    #set ($orderByClause = "order by $sortField $direction")
+  #end
+  ##
+  ## Compute the final query.
+  ##
+  #set ($query =  $services.query.hql("$whereClause $orderByClause"))
+  #set ($discard = $query.addFilter('attachment'))
+  #set ($discard = $query.setLimit($limit).setOffset($offset))
+  #foreach ($queryParameter in $queryParameters)
+    #if ($queryParameter.match == 'exact')
+      #set ($discard = $query.bindValue($queryParameter.name, $queryParameter.value))
+    #elseif ($queryParameter.match == 'prefix')
+      #set ($query = $query.bindValue($queryParameter.name).literal($queryParameter.value).anyChars().query())
+    #else
+      ## Partial match.
+      #set ($query = $query.bindValue($queryParameter.name).anyChars().literal($queryParameter.value).anyChars().query())
+    #end
+  #end
+  #set ($attachmentsReferences = $query.execute())
+  #set ($queryString = $escapetool.url({
+    'form_token': $services.csrf.token,
+    'xredirect': "$doc.getURL()#Attachments"
+  }))
+  #set ($results = {
+    "totalrows": $query.count(),
+    "returnedrows": $mathtool.min($attachmentsReferences.size(), $limit),
+    "offset": $mathtool.add($offset, 1),
+    "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
+    "rows": []
+  })
+  #foreach ($attachmentReference in $attachmentsReferences)
+    #set ($hasAccess = $services.security.authorization.hasAccess('view', $attachmentReference))
+    #set ($row = {
+      'doc_viewable': $hasAccess
+    })
+    #if ($hasAccess)
+      #set ($attachment = $doc.getAttachment($attachmentReference.name))
+      #set ($authorReference = $services.model.resolveDocument($attachment.author))
+      #set ($discard = $row.putAll({
+        'id': $attachment.filename,
+        'filename': "#displayFileNameAndVersion($attachmentReference $attachment)",
+        'mimeType': "#displayAttachmentMimeType($attachment)",
+        'filesize': "#displayAttachmentSize($attachment.longSize)",
+        'date': $xwiki.formatDate($attachment.date),
+        'author': "#displayUserNameWithAvatar($attachment.author)",
+        'actions': "#displayAttachmentActions($attachment)"
+      }))
+    #end
+    #set ($discard = $results.rows.add($row))
+  #end
+  #jsonResponse($results)
+#end

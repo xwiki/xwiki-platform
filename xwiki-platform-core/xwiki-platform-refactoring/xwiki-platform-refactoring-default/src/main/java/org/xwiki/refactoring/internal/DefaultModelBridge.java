@@ -21,8 +21,10 @@ package org.xwiki.refactoring.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -35,6 +37,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -46,6 +49,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
 
 import com.xpn.xwiki.XWiki;
@@ -131,6 +135,9 @@ public class DefaultModelBridge implements ModelBridge
     private EntityReferenceResolver<String> relativeStringEntityReferenceResolver;
 
     @Inject
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
+
+    @Inject
     private JobProgressManager progressManager;
 
     @Inject
@@ -138,6 +145,9 @@ public class DefaultModelBridge implements ModelBridge
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
+    private Provider<LinkStore> linkStoreProvider;
 
     @Override
     public boolean create(DocumentReference documentReference)
@@ -234,8 +244,8 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext xcontext = this.xcontextProvider.get();
         DocumentReference redirectClassReference =
             new DocumentReference(REDIRECT_CLASS_REFERENCE, oldReference.getWikiReference());
-        if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
-            try {
+        try {
+            if (xcontext.getWiki().exists(redirectClassReference, xcontext)) {
                 XWikiDocument oldDocument = xcontext.getWiki().getDocument(oldReference, xcontext);
                 int number = oldDocument.createXObject(redirectClassReference, xcontext);
                 String location = this.defaultEntityReferenceSerializer.serialize(newReference);
@@ -243,13 +253,12 @@ public class DefaultModelBridge implements ModelBridge
                 oldDocument.setHidden(true);
                 xcontext.getWiki().saveDocument(oldDocument, "Create automatic redirect.", xcontext);
                 this.logger.info("Created automatic redirect from [{}] to [{}].", oldReference, newReference);
-            } catch (XWikiException e) {
-                this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference,
-                    e);
+            } else {
+                this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
+                    oldReference, newReference, redirectClassReference);
             }
-        } else {
-            this.logger.warn("We can't create an automatic redirect from [{}] to [{}] because [{}] is missing.",
-                oldReference, newReference, redirectClassReference);
+        } catch (XWikiException e) {
+            this.logger.error("Failed to create automatic redirect from [{}] to [{}].", oldReference, newReference, e);
         }
     }
 
@@ -271,28 +280,29 @@ public class DefaultModelBridge implements ModelBridge
     }
 
     @Override
-    public boolean exists(DocumentReference reference)
+    public boolean exists(DocumentReference reference) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         return xcontext.getWiki().exists(reference, xcontext);
     }
 
     @Override
-    public List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference, String wikiId)
+    public Set<DocumentReference> getBackLinkedDocuments(EntityReference reference) throws RefactoringException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        String previousWikiId = xcontext.getWikiId();
+        Set<EntityReference> references;
         try {
-            xcontext.setWikiId(wikiId);
-
-            return xcontext.getWiki().getStore().loadBacklinks(documentReference, true, xcontext);
-        } catch (XWikiException e) {
-            this.logger.error("Failed to retrieve the back-links for document [{}] on wiki [{}].", documentReference,
-                wikiId, e);
-            return Collections.emptyList();
-        } finally {
-            xcontext.setWikiId(previousWikiId);
+            references = this.linkStoreProvider.get().resolveBackLinkedEntities(reference);
+        } catch (Exception e) {
+            throw new RefactoringException("Failed to resolve backlinks for entity [" + reference + "]", e);
         }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        Set<DocumentReference> documentReferences = new HashSet<>(references.size());
+        for (EntityReference entityReference : references) {
+            documentReferences.add(this.documentReferenceResolver.resolve(entityReference, xcontext));
+        }
+
+        return documentReferences;
     }
 
     @Override

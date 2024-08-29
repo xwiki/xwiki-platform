@@ -23,11 +23,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model</artifactId>
-    <version>13.6-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-model-validation</artifactId>
-  <name>XWiki Platform - Model Validation</name>
-  <description>XWiki Platform - Model Validation give mechanisms to validate XWiki Model</description>
+  <name>XWiki Platform - Model - Validation - Parent POM</name>
+  <description>Validations for the XWiki Model</description>
   <packaging>pom</packaging>
   <modules>
     <module>xwiki-platform-model-validation-api</module>

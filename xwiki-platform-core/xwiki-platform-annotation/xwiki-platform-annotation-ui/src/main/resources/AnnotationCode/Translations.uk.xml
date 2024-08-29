@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="uk">
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>uk</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>annotations.title=Примітки
+annotations.menu.loading=Завантаження налаштувань приміток
+annotations.menu.loaderror=Не вдалося:
+annotations.tab.info.noannotations=Примітки відсутні для цього документу
+annotations.settings.display=Показати примітки
+annotations.settings.error.wrongsyntax=Примітки не доступні для документів написаних синтаксисом XWiki/1.0.
+annotations.settings.error.notarget=Не вказано документ для якого необхідно завантажити налаштування приміток.
+annotations.annotated.loading=Завантаження документа з примітками
+annotations.annotated.loaderror=Не вдалося:
+annotations.annotated.loaderror.wrongresponse=Неправильно відформатована відповідь сервера
+annotations.annotated.error.noannotatedelement=Примітки неможливо завантажити оскільки вміст недоступний.
+annotations.annotated.error.wrongsyntax=Примітки не доступні для документів написаних синтаксисом XWiki/1.0.
+annotations.action.edit.text=[Змінити]
+annotations.action.edit.tooltip=Змінити цю примітку
+annotations.action.edit.submit.text=Оновити
+annotations.action.edit.cancel.text=Скасувати
+annotations.action.edit.success=Примітку було успішно змінено.
+annotations.action.edit.loaderror=Не вдалося:
+annotations.action.edit.error.notfound=Цієї примітки більше не існує. Будь-ласка оновіть сторінку щоб побачити її поточний вигляд.
+annotations.action.delete.text=[Видалити]
+annotations.action.delete.tooltip=Видалити цю примітку
+annotations.action.delete.confirm=Ви впевнені, що хочете видалити цю примітку?
+annotations.action.delete.inProgress=Видалення примітки...
+annotations.action.delete.done=Примітку видалено
+annotations.action.delete.failed=Не вдалося видалити примітку:
+annotations.action.create.submit.text=Додати примітку
+annotations.action.create.cancel.text=Скасувати
+annotations.action.create.selection.invalid=Будь-ласка виділіть непорожню частину тексту в документі.
+annotations.action.create.form.loaderror=Не вдалося:
+annotations.action.create.success=Примітку було успішно додано.
+annotations.action.create.loaderror=Не вдалося:
+annotations.action.create.error.unauthorized=Ви не вповноважені додавати примітки до цього документу.
+annotations.action.create.error.unauthorizedguest=Ви не вповноважені додавати примітки до цього документу. Спробуйте перше увійти.
+annotations.action.create.helpmessage=Щоб додати примітку до тексту, виділіть його та натисніть {0}.
+annotations.action.create.error.wrongsyntax=Примітки не доступні для документів написаних синтаксисом XWiki/1.0.
+annotations.action.create.error.notarget=Не вказано цільового документу для додавання примітки.
+annotations.action.view.hide.text=сховати
+annotations.action.view.form.loaderror=Не вдалося:
+annotations.action.view.error.notfound=Цієї примітки більше не існує. Будь-ласка оновіть сторінку щоб побачити її поточний вигляд.
+annotations.action.view.thread=Переглянути ланцюг
+annotations.altered.text=Ця примітка більше не може бути показана оскільки анотований текст не було знайдено в документі:
+annotations.updated.text=Цю примітку було автоматично пересунуто після зміни документа. Раніше:
+annotations.action.validate.text=[Перевірити]
+annotations.action.validate.tooltip=Перевіряти автоматичну зміну виділеного тексту, що відповідає цій примітці
+annotations.action.validate.success=Примітку було успішно перевірено.
+annotations.action.validate.loaderror=Не вдалося:
+annotations.filters.show=Фільтр
+annotations.filters.nooption=Нема що фільтрувати для "{0}"
+annotations.filters.anyvalue=будь-що
+annotations.filters.clearvalue=очистити
+annotations.config.title=Панель конфігурації приміток
+annotations.config.display.title=Налаштування зображення приміток
+annotations.config.type.title=Налаштування типу приміток
+annotations.config.activate.title=Налаштування активації приміток
+annotations.config.activate.explanation=Наступні дві настройки дозволяють вказати, в яких просторах діють примітки. Перший параметр визначає загальне правило, а другий визначає перелік просторів-винятків, для яких це правило не повинно застосовуватися. Наприклад, активоване "так" і простори-винятки "XWiki" і "Main" означає, що примітки будуть діяти на всі простори, за винятком "XWiki" і "Main", тоді як активоване "ні" і простір-виняток "Documents" означає, що примітки будуть діяти тільки для простору "Documents" .
+annotations.config.type.explanation=Додайте в цей клас додаткові властивості, потрібні для Ваших приміток.
+admin.annotations=Примітки
+admin.annotations.description=Налаштувати примітки документа
+AnnotationCode.AnnotationConfig_activated=Примітки активовані
+AnnotationCode.AnnotationConfig_activated.hint=Вирішіть, чи примітки активні у вікі
+AnnotationCode.AnnotationConfig_exceptionSpaces=Крім наступних місць розташувань
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Вимкніть примітки для такої підмножини місць розташувань:
+AnnotationCode.AnnotationConfig_displayed=Відображати примітки за умовчанням
+AnnotationCode.AnnotationConfig_displayed.hint=Вирішіть, чи відображатимуться примітки за умовчанням, чи лише тоді, коли на кожному документі встановлено прапорець "Показувати примітки"
+AnnotationCode.AnnotationConfig_displayHighlight=Виділити примітки за умовчанням
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Вирішіть, чи має відображатися виділена примітка завжди, чи лише під час наведення курсора на примітку чи структуру примітки
+AnnotationCode.AnnotationConfig_annotationClass=Клас XWiki, що визначає структуру приміток
+</content>
+</xwikidoc>

@@ -36,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,11 +52,11 @@ class ExtendedURLTest
     @Test
     void extractParameters() throws Exception
     {
-        URL url = new URL("http://localhost:8080/xwiki/?foo=bar&toto&foo=baz");
+        URL url = new URL("http://localhost:8080/xwiki/?foo=bar&to%26to%3Dto&foo=b%26z");
         ExtendedURL extendedURL = new ExtendedURL(url, null);
         Map<String, List<String>> parameters = extendedURL.extractParameters(url.toURI());
-        assertThat(parameters, hasEntry(is("foo"), hasItems("bar", "baz")));
-        assertThat(parameters, hasEntry(is("toto"), is(empty())));
+        assertThat(parameters, hasEntry(is("foo"), hasItems("bar", "b&z")));
+        assertThat(parameters, hasEntry(is("to&to=to"), is(empty())));
     }
 
     @Test
@@ -131,6 +132,22 @@ class ExtendedURLTest
         assertNotEquals(extendedURL1, extendedURL3);
         assertNotEquals(extendedURL1, extendedURL4);
         assertNotEquals(extendedURL3, extendedURL4);
+
+        assertFalse(extendedURL1.equals(null));
+        assertTrue(extendedURL1.equals(extendedURL1));
+        assertFalse(extendedURL1.equals(extendedURL1.getWrappedURL()));
+    }
+
+    @Test
+    void verifyHashCode() throws Exception
+    {
+        ExtendedURL extendedURL1 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
+        // Multiple calls return the same value.
+        assertEquals(extendedURL1.hashCode(), extendedURL1.hashCode());
+
+        ExtendedURL extendedURL2 = new ExtendedURL(new URL("http://localhost:8080/some/path"), null);
+        // Equal objects have the same hash code.
+        assertEquals(extendedURL1.hashCode(), extendedURL2.hashCode());
     }
 
     @Test

@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects.classes;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,10 @@ import org.xwiki.edit.Editor;
 import org.xwiki.edit.EditorManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxContent;
+import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -45,6 +50,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class TextAreaClass extends StringClass
 {
+    private static final String FAILED_VELOCITY_EXECUTION_WARNING =
+        "Failed to execute velocity code in text area property [{}]: [{}]";
+
+    private static final String RESTRICTED = "restricted";
+
     /**
      * Possible values for the editor meta property.
      * <p>
@@ -219,7 +229,7 @@ public class TextAreaClass extends StringClass
     @Override
     public BaseProperty newProperty()
     {
-        BaseProperty property = new LargeStringProperty();
+        BaseProperty<?> property = new LargeStringProperty();
         property.setName(getName());
 
         return property;
@@ -339,11 +349,36 @@ public class TextAreaClass extends StringClass
     {
         String contentType = getContentType();
 
-        if (contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode")) {
-            return true;
-        } else {
-            return false;
-        }
+        return contentType != null && !contentType.equals("puretext") && !contentType.equals("velocitycode");
+    }
+
+    /**
+     * Indicate if the content of this property should be executed in a restricted content (provided the type indicate
+     * that this content should be executed).
+     * 
+     * @return true if the content of this property should be executed in a restricted content, false otherwise
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public boolean isRestricted()
+    {
+        return getIntValue(RESTRICTED, 0) == 1;
+    }
+
+    /**
+     * Indicate if the content of this property should be executed in a restricted content (provided the type indicate
+     * that this content should be executed).
+     * 
+     * @param restricted true if the content of this property should be executed in a restricted content, false
+     *            otherwise
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    public void setRestricted(boolean restricted)
+    {
+        setIntValue(RESTRICTED, restricted ? 1 : 0);
     }
 
     @Override
@@ -353,6 +388,7 @@ public class TextAreaClass extends StringClass
         String editorType = getEditorType(context);
         EditorManager editorManager = Utils.getComponent(EditorManager.class);
         Editor<SyntaxContent> editor = editorManager.getDefaultEditor(SyntaxContent.class, editorType);
+        XWikiDocument ownerDocument = getObjectDocument(object, context);
         Map<String, Object> parameters = new HashMap<>();
         String fieldName = prefix + name;
         parameters.put("id", fieldName);
@@ -360,8 +396,24 @@ public class TextAreaClass extends StringClass
         parameters.put("cols", getSize());
         parameters.put("rows", getRows());
         parameters.put("disabled", isDisabled());
+        parameters.put(RESTRICTED, isRestricted() || (ownerDocument != null && ownerDocument.isRestricted()));
         parameters.put("sourceDocumentReference", object.getDocumentReference());
-        Syntax syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        Syntax syntax = null;
+        String contentType = getContentType();
+
+        // We set the syntax by first checking the content type: if it's pure text or velocity code
+        // the syntax is necessarily plain syntax.
+        // Else we check if the wanted editor is puretext: in such case we also consider that the syntax is plain/text
+        // finally we fallback on actual document syntax.
+        // FIXME: if the content type is WIKI_TEXT we should probably force the syntax to Wiki syntax, but which one:
+        // 2.0, 2.1?
+        if (StringUtils.equalsIgnoreCase(ContentType.PURE_TEXT.toString(), contentType)
+            || StringUtils.equalsIgnoreCase(ContentType.VELOCITY_CODE.toString(), contentType))
+        {
+            syntax = Syntax.PLAIN_1_0;
+        } else {
+            syntax = "puretext".equals(editorType) ? Syntax.PLAIN_1_0 : getObjectDocumentSyntax(object, context);
+        }
         SyntaxContent syntaxContent = new SyntaxContent(object.getStringValue(name), syntax);
         try {
             buffer.append(editor.render(syntaxContent, parameters));
@@ -387,40 +439,116 @@ public class TextAreaClass extends StringClass
         if (contentType == ContentType.PURE_TEXT) {
             super.displayView(buffer, name, prefix, object, context);
         } else if (contentType == ContentType.VELOCITY_CODE) {
-            StringBuffer result = new StringBuffer();
-            super.displayView(result, name, prefix, object, context);
-            if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0)) {
-                buffer.append(context.getWiki().parseContent(result.toString(), context));
-            } else {
-                // Don't do anything since this mode is deprecated and not supported in the new rendering.
-                buffer.append(result);
-            }
+            displayVelocityCode(buffer, name, prefix, object, context);
         } else {
-            BaseProperty property = (BaseProperty) object.safeget(name);
+            BaseProperty<?> property = (BaseProperty<?>) object.safeget(name);
             if (property != null) {
                 String content = property.toText();
                 XWikiDocument sdoc = getObjectDocument(object, context);
 
+                if (contentType == ContentType.VELOCITYWIKI) {
+                    content = maybeEvaluateContent(name, isolated, content, sdoc);
+                }
+
                 if (sdoc != null) {
-                    if (contentType == ContentType.VELOCITYWIKI) {
-                        // Start with a pass of Velocity
-                        // TODO: maybe make velocity+wiki a syntax so that getRenderedContent can directly take care
-                        // of that
-                        VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
-                        content = velocityEvaluator.evaluateVelocityNoException(content,
-                            isolated ? sdoc.getDocumentReference() : null);
-                    }
+                    sdoc = ensureContentAuthorIsMetadataAuthor(sdoc);
 
                     buffer.append(
-                        context.getDoc().getRenderedContent(content, sdoc.getSyntax(), sdoc, isolated, context));
+                        context.getDoc().getRenderedContent(content, sdoc.getSyntax(), isRestricted(), sdoc,
+                            isolated, context));
                 } else {
-                    buffer.append(content);
+                    buffer.append(XMLUtils.escapeElementText(content));
                 }
             }
         }
     }
 
-    private XWikiDocument getObjectDocument(BaseCollection object, XWikiContext context)
+    private static XWikiDocument ensureContentAuthorIsMetadataAuthor(XWikiDocument sdoc)
+    {
+        XWikiDocument result;
+
+        // Make sure the right author is used to execute the textarea
+        // Clone the document to avoid changing the cached document instance
+        if (!Objects.equals(sdoc.getAuthors().getEffectiveMetadataAuthor(), sdoc.getAuthors().getContentAuthor())) {
+            result = sdoc.clone();
+            result.getAuthors().setContentAuthor(sdoc.getAuthors().getEffectiveMetadataAuthor());
+        } else {
+            result = sdoc;
+        }
+
+        return result;
+    }
+
+    private String maybeEvaluateContent(String name, boolean isolated, String content, XWikiDocument sdoc)
+    {
+        if (sdoc != null) {
+            // Start with a pass of Velocity
+            // TODO: maybe make velocity+wiki a syntax so that getRenderedContent can directly take care
+            // of that
+            AuthorExecutor authorExecutor = Utils.getComponent(AuthorExecutor.class);
+            VelocityEvaluator velocityEvaluator = Utils.getComponent(VelocityEvaluator.class);
+            try {
+                return authorExecutor.call(() -> {
+                    String result;
+                    // Check script right inside the author executor as otherwise the context author might not be
+                    // correct.
+                    if (isDocumentAuthorAllowedToEvaluateScript(sdoc)) {
+                        result = velocityEvaluator.evaluateVelocityNoException(content,
+                            isolated ? sdoc.getDocumentReference() : null);
+                    } else {
+                        result = content;
+                    }
+                    return result;
+                }, sdoc.getAuthorReference(), sdoc.getDocumentReference());
+            } catch (Exception e) {
+                LOGGER.warn(FAILED_VELOCITY_EXECUTION_WARNING, name, ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return content;
+    }
+
+    private void displayVelocityCode(StringBuffer buffer, String name, String prefix, BaseCollection<?> object,
+        XWikiContext context)
+    {
+        StringBuffer result = new StringBuffer();
+        super.displayView(result, name, prefix, object, context);
+        XWikiDocument sdoc = getObjectDocument(object, context);
+        if (getObjectDocumentSyntax(object, context).equals(Syntax.XWIKI_1_0) && sdoc != null) {
+            try {
+                Utils.getComponent(AuthorExecutor.class).call(() -> {
+                    // Check script right inside the author executor as otherwise the context author might not be
+                    // correct.
+                    if (isDocumentAuthorAllowedToEvaluateScript(sdoc)) {
+                        buffer.append(context.getWiki().parseContent(result.toString(), context));
+                    } else {
+                        buffer.append(result);
+                    }
+                    return null;
+                }, sdoc.getAuthorReference(), sdoc.getDocumentReference());
+            } catch (Exception e) {
+                LOGGER.warn(FAILED_VELOCITY_EXECUTION_WARNING, name, ExceptionUtils.getRootCauseMessage(e));
+                buffer.append(result);
+            }
+        } else {
+            // Don't do anything since this mode is deprecated and not supported in the new rendering.
+            buffer.append(result);
+        }
+    }
+
+    private boolean isDocumentAuthorAllowedToEvaluateScript(XWikiDocument document)
+    {
+        boolean isAllowed = !isRestricted() && !document.isRestricted();
+
+        if (isAllowed) {
+            ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+            isAllowed = authorization.hasAccess(Right.SCRIPT);
+        }
+
+        return isAllowed;
+    }
+
+    private XWikiDocument getObjectDocument(BaseCollection<?> object, XWikiContext context)
     {
         try {
             XWikiDocument doc = object.getOwnerDocument();
@@ -441,7 +569,7 @@ public class TextAreaClass extends StringClass
         return null;
     }
 
-    private Syntax getObjectDocumentSyntax(BaseCollection object, XWikiContext context)
+    private Syntax getObjectDocumentSyntax(BaseCollection<?> object, XWikiContext context)
     {
         XWikiDocument doc = getObjectDocument(object, context);
 

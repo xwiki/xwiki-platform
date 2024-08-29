@@ -20,6 +20,7 @@
 package com.xpn.xwiki.doc;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -29,8 +30,8 @@ import org.xwiki.model.reference.EntityReference;
  * document so that it can easily be found.
  * <p>
  * An additional {@link javax.annotation.Priority Priority} annotation can be added to affect the order in which the
- * initializer will be executed when a wiki is initialized. If not specified, {@value #DEFAULT_PRIORITY} will be
- * assumed.
+ * initializer will be executed when a wiki is initialized. If not specified,
+ * {@value ComponentDescriptor#DEFAULT_PRIORITY} will be assumed.
  *
  * @version $Id$
  */
@@ -41,7 +42,9 @@ public interface MandatoryDocumentInitializer
      * Default priority with which a document initializer will be executed along side other document initializers.
      *
      * @since 7.0RC1
+     * @deprecated use {@link ComponentDescriptor#DEFAULT_PRIORITY} instead
      */
+    @Deprecated(since = "15.4RC1")
     int DEFAULT_PRIORITY = 1000;
 
     /**
@@ -53,7 +56,7 @@ public interface MandatoryDocumentInitializer
     /**
      * Update the provided document according to the need.
      *
-     * @param document the existing document to update
+     * @param document the document to update or a new document if it doesn't exist already
      * @return true if the document has been modified, false otherwise
      */
     boolean updateDocument(XWikiDocument document);

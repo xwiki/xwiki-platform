@@ -40,6 +40,11 @@ org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.FSPathStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.PathStringDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultSymbolScheme
+org.xwiki.model.internal.reference.WithParametersStringEntityReferenceResolver
+org.xwiki.model.internal.reference.WithParametersStringEntityReferenceSerializer
+org.xwiki.model.internal.reference.WithPatametersSymbolScheme
+org.xwiki.model.internal.reference.WithTypeAndParametersStringEntityReferenceSerializer
+org.xwiki.model.internal.reference.WithTypeStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.converter.EntityReferenceConverter
 org.xwiki.model.internal.reference.converter.WikiReferenceConverter
 org.xwiki.model.script.ModelScriptService

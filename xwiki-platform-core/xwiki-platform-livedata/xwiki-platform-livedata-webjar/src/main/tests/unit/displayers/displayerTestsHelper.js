@@ -19,6 +19,9 @@
  */
 
 import {mount} from '@vue/test-utils'
+import $ from "jquery";
+import Vue from "vue";
+import Vue2TouchEvents from "vue2-touch-events";
 
 /**
  * Generic Vue component initializer for the displayers tests. Calls `mount()` from `@vue/test-utils` with preconfigured
@@ -63,12 +66,38 @@ import {mount} from '@vue/test-utils'
  */
 export function initWrapper(displayer, {props, logic, editBus, mocks})
 {
+  global.XWiki = {}
+
+  // Defines jQUery globally if it is not already done.
+  if (!global.$) {
+    global.$ = global.jQuery = $;
+  }
+
+  // Mocks daterangepicker
+  global.$.fn.daterangepicker = jest.fn(() => {
+    return {show: jest.fn()}
+  });
+
+  // Mock $.data
+  global.$.fn.data = jest.fn(() => {
+    return {show: jest.fn()}
+  });
+
+  // Mock fetch.
+  global.fetch = jest.fn(() => ({
+    json: jest.fn()
+  }));
+
   // Creates a div in the document body. It will be used as the attach point when mounting the Vue component.
   // This is useful for some assertions, for instance when testing which element is on focus.
   const elem = document.createElement('div')
   if (document.body) {
     document.body.appendChild(elem)
   }
+
+  // Vue2TouchEvents needs to be explicitly registered because otherwise it is initialize by a parent component, hence
+  // not initialized for the tests.
+  Vue.use(Vue2TouchEvents)
 
   return mount(displayer, {
     attachTo: elem,
@@ -119,14 +148,16 @@ export function initWrapper(displayer, {props, logic, editBus, mocks})
             isEditable()
             {
               return true;
-            }
+            },
+            onAnyEvent: () => {}
           }, editBus)
         },
         footnotes: {
           put() {},
           reset() {},
           list() { return []; }
-        }
+        },
+        isContentTrusted: () => true
       }, logic),
     },
     mocks: Object.assign({

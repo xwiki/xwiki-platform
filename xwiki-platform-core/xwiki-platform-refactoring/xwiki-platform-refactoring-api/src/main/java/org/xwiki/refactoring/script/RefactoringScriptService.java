@@ -51,7 +51,6 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides refactoring-specific scripting APIs.
@@ -550,7 +549,6 @@ public class RefactoringScriptService implements ScriptService
      * recycle bin or deleting it permanently. {@code false} otherwise.
      * @since 12.8RC1
      */
-    @Unstable
     public boolean isRecycleBinSkippingAllowed()
     {
         return this.configuration.isRecycleBinSkippingActivated() && this.documentAccessBridge.isAdvancedUser();

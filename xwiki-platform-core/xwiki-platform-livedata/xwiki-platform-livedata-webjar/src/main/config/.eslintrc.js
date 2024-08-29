@@ -21,12 +21,14 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
+    'jest/globals': true
   },
   'extends': [
-    'plugin:vue/essential',
+    'plugin:vue/recommended',
     'eslint:recommended'
   ],
+  plugins: ['jest'],
   parserOptions: {
     parser: '@babel/eslint-parser'
   },
@@ -43,7 +45,7 @@ module.exports = {
   globals: {
     define: 'readonly',
     // We need to be able to set the public path at runtime.
-    __webpack_public_path__: 'writable',
+    '__webpack_public_path__': 'writable',
     XWiki: 'writable'
   }
 };

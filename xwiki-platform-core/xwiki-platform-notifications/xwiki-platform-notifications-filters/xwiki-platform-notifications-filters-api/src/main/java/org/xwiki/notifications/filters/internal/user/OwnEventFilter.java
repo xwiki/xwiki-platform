@@ -63,7 +63,8 @@ public class OwnEventFilter implements NotificationFilter, ToggleableNotificatio
     public FilterPolicy filterEvent(Event event, DocumentReference user,
             Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
-        return user != null && user.equals(event.getUser()) ? FilterPolicy.FILTER : FilterPolicy.NO_EFFECT;
+        return event.getTarget().isEmpty() && user != null && user.equals(event.getUser()) ? FilterPolicy.FILTER
+            : FilterPolicy.NO_EFFECT;
     }
 
     @Override

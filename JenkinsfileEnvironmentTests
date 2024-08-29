@@ -1,0 +1,135 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+// It's assumed that Jenkins has been configured to implicitly load the vars/*.groovy libraries.
+// Note that the version used is the one defined in Jenkins but it can be overridden as follows:
+// @Library("XWiki@<branch, tag, sha1>") _
+// See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
+
+// Flow:
+// - This file is triggered by any change to xwiki-platform
+// - If this file is not called with any "type" parameter passed, then set up a crontab that will call this file
+//   again at some specific time, passing a "type" parameter with "docker-latest", "docker-all" and "docker-unsupported"
+//   values.
+// - If this file is called with a "type" parameter, execute the corresponding environment tests.
+// - If this file is triggered by a manual build, ask the user to choose between th different environment tests to
+//   execute and run them immediately.
+
+// If the build has been manually triggered:
+// - if the type is known, then execute the tests
+// - if the type is not known, it means it's the first execution and the job is not parameterized yet. Thus,
+//   parameterize it and schedule the next run. If you want to execute it, you'll need to trigger the build a second
+//   time and choose the type.
+if (currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause')) {
+  def validValues = ['docker-latest', 'docker-all', 'docker-unsupported']
+  if (validValues.contains(params.type)) {
+    buildDocker(params.type)
+  } else {
+    properties(getCustomJobProperties())
+    // Aborting so that the build isn't displayed as successful, as we want to focus on the failing env tests builds.
+    currentBuild.result = 'ABORTED'
+  }
+} else if (params.type && params.type != 'none' && params.type != 'docker-latest') {
+  // Always build docker-all and docker-unsupported, as they execute only every week and every month and it's unlikely
+  // there's been no changes since their last execution. We could check specifically for that but it's simpler to just
+  // always execute them!
+  buildDocker(params.type)
+} else if (params.type && params.type != 'none') {
+  // Only execute if the "XWiki/xwiki-platform/<current branch>" job's last execution date is later than this current
+  // job's last execution date. In other words, don't re-run the environment tests if there's been no source code
+  // changes. This helps save agent build time and is better for global warming (less energy used)!
+  def times = compareCurrentLastBuildTimeWithOtherJob("XWiki/xwiki-platform/${env.BRANCH_NAME ?: 'master'}")
+  if (times && times > 0) {
+    buildDocker(params.type)
+  } else if (!times) {
+    // Something is not right:
+    // - there's no 'XWiki/xwiki-platform' job
+    // - the 'XWiki/xwiki-platform' job has never been executed
+    // - the current job has never been executed
+    // In all these cases, we just execute the environment tests.
+    echoXWiki 'Error computing jobs last build times, triggering a docker tests build to be safe...'
+    buildDocker(params.type)
+  } else {
+    echoXWiki 'Not executing the docker tests since there\'s been no rebuild of "XWiki/xwiki-platform" since last execution. Aborting.'
+    // Aborting so that the build isn't displayed as successful without doing anything.
+    currentBuild.result = 'ABORTED'
+  }
+} else {
+  // We're not in the cron. Just set the crontab to schedule the job.
+  echoXWiki "Nothing to build at the moment, waiting for the crontab to be triggered..."
+  properties(getCustomJobProperties())
+  // Aborting so that the build isn't displayed as successful, as we want to focus on the failing env tests builds.
+  currentBuild.result = 'ABORTED'
+}
+
+private void buildDocker(buildType)
+{
+  def dockerConfigurationList
+  def dockerModuleList
+  def customJobProperties
+  node() {
+    // Checkout platform to find all docker configurations and test modules so that we can then parallelize executions
+    // of configs and modules across Jenkins agents.
+    checkout skipChangeLog: true, scm: scm
+    dockerConfigurationList = dockerConfigurations(buildType)
+    if (buildType == 'docker-unsupported') {
+      dockerModuleList = ['xwiki-platform-core/xwiki-platform-menu']
+    } else {
+      dockerModuleList = dockerModules()
+    }
+    customJobProperties = getCustomJobProperties()
+  }
+
+  xwikiDockerBuild {
+    configurations = dockerConfigurationList
+    modules = dockerModuleList
+    // Set the next execution date/time
+    jobProperties = customJobProperties
+    label = 'environment'
+    type = buildType
+  }
+}
+
+private def getCustomJobProperties()
+{
+  // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+  // take time to execute and thus we cannot run them all the time.
+  // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+  // we execute the environment tests or not.
+  // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+  // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+  // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+  //
+  // Notes:
+  // - docker-latest: We start them at 10PM to have more time available for them so that we're sure they're finished on
+  //   the next morning when committers start pushing code. That's why we don't use @midnight.
+  // - docker-all: We don't use @weekly for docker-all since we want them to execute on weekends only so that they
+  //   don't execute at the same time as docker-latest during standard week days, as it'll mean that all agents will
+  //   be used and be available for standard builds during the working days.
+  return [
+    parameters([string(defaultValue: 'none', description: 'Docker Job type', name: 'type')]),
+    pipelineTriggers([
+      parameterizedCron('''H 22 * * * %type=docker-latest
+H 0 * * 6 %type=docker-all
+@monthly %type=docker-unsupported'''),
+      cron("@monthly")
+    ])
+  ]
+}

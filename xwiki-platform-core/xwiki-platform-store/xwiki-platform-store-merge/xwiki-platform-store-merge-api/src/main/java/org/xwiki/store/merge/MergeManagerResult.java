@@ -22,9 +22,13 @@ package org.xwiki.store.merge;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.diff.Conflict;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
+import org.xwiki.stability.Unstable;
 
 /**
  * This represents the result of a merge operation: it contains both the result of the merge, the possible conflicts
@@ -45,7 +49,7 @@ public class MergeManagerResult<R, C>
 
     private R mergeResult;
 
-    private final LogQueue log;
+    private LogQueue log;
 
     private boolean modified;
 
@@ -85,11 +89,29 @@ public class MergeManagerResult<R, C>
     }
 
     /**
-     * @return all the conflicts occured during this merge
+     * This methods returns all the conflicts that occurred during the merge, and that have been properly recorded.
+     * Note that right now the merge mechanism doesn't record all the conflicts as a {@link Conflict} instance:
+     * some of the conflicts are only recorded as an error log.
+     * @return all the conflicts that occurred during this merge
      */
     public List<Conflict<C>> getConflicts()
     {
         return this.conflicts;
+    }
+
+    /**
+     * Retrieve the total number of conflicts: both the conflicts recorded as {@link Conflict} and the conflicts
+     * recorded only as error logs.
+     * @return the total number of conflicts
+     * @see #getConflicts()
+     * @since 14.10.12
+     * @since 15.5RC1
+     */
+    @Unstable
+    public int getConflictsNumber()
+    {
+        // Each conflicts recorded, is recorded with its own error log.
+        return (this.log.getLogs(LogLevel.ERROR).size() - this.conflicts.size()) + this.conflicts.size();
     }
 
     /**
@@ -110,6 +132,18 @@ public class MergeManagerResult<R, C>
     }
 
     /**
+     * Specify the log queue to be used: this method should mainly be used when wrapping a result.
+     * @param logQueue the log queue to be used.
+     * @since 14.10.7
+     * @since 15.2RC1
+     */
+    @Unstable
+    public void setLog(LogQueue logQueue)
+    {
+        this.log = logQueue;
+    }
+
+    /**
      * @return the log associated to the merge
      */
     public LogQueue getLog()
@@ -125,5 +159,50 @@ public class MergeManagerResult<R, C>
         // TODO: only the list of conflicts should be considered here: the various merge operation should
         // create proper conflicts, and not log errors.
         return !(this.getConflicts().isEmpty() && this.log.getLogs(LogLevel.ERROR).isEmpty());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MergeManagerResult<?, ?> that = (MergeManagerResult<?, ?>) o;
+
+        return new EqualsBuilder()
+            .append(modified, that.modified)
+            .append(conflicts, that.conflicts)
+            .append(mergeResult, that.mergeResult)
+            // we cannot compare logs for equality, but we compare hasConflicts since it's using log error emptyness
+            .append(this.hasConflicts(), that.hasConflicts())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(69, 33)
+            .append(conflicts)
+            .append(mergeResult)
+            // we cannot compare logs for equality, but we compare hasConflicts since it's using log error emptyness
+            .append(this.hasConflicts())
+            .append(modified)
+            .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("conflicts", conflicts)
+            .append("mergeResult", mergeResult)
+            .append("log", log)
+            .append("modified", modified)
+            .toString();
     }
 }

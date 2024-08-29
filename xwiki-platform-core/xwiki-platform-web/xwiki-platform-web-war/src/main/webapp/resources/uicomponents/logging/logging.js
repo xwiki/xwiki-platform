@@ -32,7 +32,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
         logMessage.css({
           "cursor" : "pointer"
         });
-        logMessage.click(function() {
+        logMessage.on('click', function() {
           stacktrace.toggle();
         });
       }
@@ -63,7 +63,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       $(getTarget(this)).addClass('hidden');
     });
     // Expand/Collapse on click.
-    container.find('.collapse-toggle').click(function () {
+    container.find('.collapse-toggle').on('click', function() {
       $(this).toggleClass('collapsed');
       $(getTarget(this)).toggleClass('hidden');
     });

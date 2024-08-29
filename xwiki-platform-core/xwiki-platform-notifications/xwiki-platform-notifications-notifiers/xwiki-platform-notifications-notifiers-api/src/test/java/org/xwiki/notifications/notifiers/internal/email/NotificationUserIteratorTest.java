@@ -21,6 +21,8 @@ package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.Arrays;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -30,7 +32,9 @@ import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.preferences.NotificationEmailInterval;
+import org.xwiki.notifications.preferences.internal.email.DefaultNotificationEmailUserPreferenceManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -40,6 +44,9 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,13 +67,14 @@ import static org.mockito.Mockito.when;
 // @formatter:off
 @ComponentList({
     IntervalUsersManager.class,
-    EntityReferenceFactory.class
+    EntityReferenceFactory.class,
+    DefaultNotificationEmailUserPreferenceManager.class
 })
 // @formatter:on
 class NotificationUserIteratorTest
 {
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @InjectMockComponents
     private NotificationUserIterator userIterator;
@@ -83,6 +91,20 @@ class NotificationUserIteratorTest
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
+    @MockComponent
+    private NotificationConfiguration notificationConfiguration;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
+    @MockComponent
+    private UserReferenceResolver<String> stringUserReferenceResolver;
+
     @BeforeEach
     void setUp()
     {
@@ -94,42 +116,61 @@ class NotificationUserIteratorTest
     {
         // Mocks
         Query query = mock(Query.class);
-        when(this.queryManager.createQuery(ArgumentMatchers.eq("select distinct doc.fullName from Document doc, "
-            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 order by doc.fullName"),
-            eq(Query.XWQL))).thenReturn(query);
+        when(this.queryManager.createQuery("select distinct doc.fullName from Document doc, "
+            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 "
+                + "order by doc.fullName",
+            Query.XWQL)).thenReturn(query);
         when(query.execute()).thenReturn(Arrays.asList("XWiki.UserA", "XWiki.UserB", "XWiki.UserC", "XWiki.UserD"));
 
-        DocumentReference userA = new DocumentReference("wikiA", "XWiki", "UserA");
-        DocumentReference userB = new DocumentReference("wikiA", "XWiki", "UserB");
-        DocumentReference userC = new DocumentReference("wikiA", "XWiki", "UserC");
-        DocumentReference userD = new DocumentReference("wikiA", "XWiki", "UserD");
-        when(this.resolver.resolve("XWiki.UserA", new WikiReference("wikiA"))).thenReturn(userA);
-        when(this.resolver.resolve("XWiki.UserB", new WikiReference("wikiA"))).thenReturn(userB);
-        when(this.resolver.resolve("XWiki.UserC", new WikiReference("wikiA"))).thenReturn(userC);
-        when(this.resolver.resolve("XWiki.UserD", new WikiReference("wikiA"))).thenReturn(userD);
+        DocumentReference userDocA = new DocumentReference("wikiA", "XWiki", "UserA");
+        DocumentReference userDocB = new DocumentReference("wikiA", "XWiki", "UserB");
+        DocumentReference userDocC = new DocumentReference("wikiA", "XWiki", "UserC");
+        DocumentReference userDocD = new DocumentReference("wikiA", "XWiki", "UserD");
+
+        when(this.resolver.resolve("XWiki.UserA", new WikiReference("wikiA"))).thenReturn(userDocA);
+        when(this.resolver.resolve("XWiki.UserB", new WikiReference("wikiA"))).thenReturn(userDocB);
+        when(this.resolver.resolve("XWiki.UserC", new WikiReference("wikiA"))).thenReturn(userDocC);
+        when(this.resolver.resolve("XWiki.UserD", new WikiReference("wikiA"))).thenReturn(userDocD);
+
+        UserReference userA = mock(UserReference.class, "userA");
+        UserReference userB = mock(UserReference.class, "userB");
+        UserReference userC = mock(UserReference.class, "userC");
+        UserReference userD = mock(UserReference.class, "userD");
+
+        when(this.userReferenceSerializer.serialize(userA)).thenReturn(userDocA);
+        when(this.userReferenceSerializer.serialize(userB)).thenReturn(userDocB);
+        when(this.userReferenceSerializer.serialize(userC)).thenReturn(userDocC);
+        when(this.userReferenceSerializer.serialize(userD)).thenReturn(userDocD);
+
+        when(this.userReferenceResolver.resolve(userDocA)).thenReturn(userA);
+        when(this.userReferenceResolver.resolve(userDocB)).thenReturn(userB);
+        when(this.userReferenceResolver.resolve(userDocC)).thenReturn(userC);
+        when(this.userReferenceResolver.resolve(userDocD)).thenReturn(userD);
+
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("wikiA");
 
         DocumentReference classReference = new DocumentReference("wikiA",
             Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
-        when(documentAccessBridge.getProperty(userA, classReference, "interval")).thenReturn("weekly");
-        when(documentAccessBridge.getProperty(userB, classReference, "interval")).thenReturn("daily");
-        when(documentAccessBridge.getProperty(userC, classReference, "interval")).thenReturn(null);
-        when(documentAccessBridge.getProperty(userD, classReference, "interval")).thenReturn("daily");
+        when(documentAccessBridge.getProperty(userDocA, classReference, "interval")).thenReturn("weekly");
+        when(documentAccessBridge.getProperty(userDocB, classReference, "interval")).thenReturn("daily");
+        when(documentAccessBridge.getProperty(userDocC, classReference, "interval")).thenReturn(null);
+        when(documentAccessBridge.getProperty(userDocD, classReference, "interval")).thenReturn("daily");
 
         // Test with DAILY interval
         this.userIterator.initialize(NotificationEmailInterval.DAILY);
 
         assertTrue(this.userIterator.hasNext());
-        assertEquals(userB, this.userIterator.next());
+        assertEquals(userDocB, this.userIterator.next());
         assertTrue(this.userIterator.hasNext());
-        assertEquals(userC, this.userIterator.next());
+        assertEquals(userDocC, this.userIterator.next());
         assertTrue(this.userIterator.hasNext());
-        assertEquals(userD, this.userIterator.next());
+        assertEquals(userDocD, this.userIterator.next());
         assertFalse(this.userIterator.hasNext());
 
         // Test with WEEKLY interval
         this.userIterator.initialize(NotificationEmailInterval.WEEKLY);
         assertTrue(this.userIterator.hasNext());
-        assertEquals(userA, this.userIterator.next());
+        assertEquals(userDocA, this.userIterator.next());
         assertFalse(this.userIterator.hasNext());
 
         // Checks

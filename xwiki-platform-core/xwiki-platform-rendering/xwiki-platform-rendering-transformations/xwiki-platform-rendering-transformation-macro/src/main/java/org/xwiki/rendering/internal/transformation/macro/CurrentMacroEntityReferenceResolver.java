@@ -55,10 +55,10 @@ public class CurrentMacroEntityReferenceResolver implements EntityReferenceResol
     @Override
     public EntityReference resolve(String representation, EntityType entityType, Object... parameters)
     {
-        // There must one parameter and it must be of type Block
-        if (parameters.length != 1 || !(parameters[0] instanceof Block)) {
-            throw new IllegalArgumentException(String.format("You must pass one parameter of type [%s]",
-                Block.class.getName()));
+        // There must be at least 1 parameter and the first parameter must be of type Block
+        if (parameters.length < 1 || !(parameters[0] instanceof Block)) {
+            throw new IllegalArgumentException(String.format("There must be at least one parameter, with the first "
+                + "parameter of type [%s]", Block.class.getName()));
         }
 
         Block currentBlock = (Block) parameters[0];
@@ -70,12 +70,30 @@ public class CurrentMacroEntityReferenceResolver implements EntityReferenceResol
 
         // If no Source MetaData was found resolve against the current entity as a failsafe solution.
         if (metaDataBlock == null) {
-            result = this.currentEntityReferenceResolver.resolve(representation, entityType);
+            result = resolveWhenNoBASEMetaData(representation, entityType, parameters);
         } else {
             String sourceMetaData = (String) metaDataBlock.getMetaData().getMetaData(MetaData.BASE);
             result =
                 this.currentEntityReferenceResolver.resolve(representation, entityType,
                     this.currentEntityReferenceResolver.resolve(sourceMetaData, EntityType.DOCUMENT));
+        }
+
+        return result;
+    }
+
+    private EntityReference resolveWhenNoBASEMetaData(String representation, EntityType entityType,
+        Object... parameters)
+    {
+        EntityReference result;
+
+        // Rebuild a parameter list without the first one, to be able to pass it to the current resolver and
+        // thus support passing an Entity Reference for example.
+        if (parameters.length > 1) {
+            Object[] newParameters = new Object[parameters.length - 1];
+            System.arraycopy(parameters, 1, newParameters, 0, parameters.length - 1);
+            result = this.currentEntityReferenceResolver.resolve(representation, entityType, newParameters);
+        } else {
+            result = this.currentEntityReferenceResolver.resolve(representation, entityType);
         }
 
         return result;

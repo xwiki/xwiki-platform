@@ -39,11 +39,10 @@
   <content>captcha.jcaptcha=JCaptcha
 captcha.jcaptcha.displayer.image.alt=Bild-CAPTCHA
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Ihr Browser unterstützt das Audioelement nicht.
-### Missing: captcha.jcaptcha.displayer.audio.play=Listen
+captcha.jcaptcha.displayer.audio.play=Zuhören
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha ist nicht richtig konfiguriert
 captcha.jcaptcha.displayer.refresh=Neu laden
 captcha.jcaptcha.displayer.answer.placeholder=Antwort
-
 XWiki.Captcha.JCaptcha.ConfigurationClass_type=Typ
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=Der Typ des anzuzeigenden CAPTCHAs.
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Bild
@@ -51,15 +50,16 @@ XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Ton
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Text
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Engine
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=Die CaptchaEngine-Implementierung, die verwendet werden soll, wenn der ausgewählte CAPTCHA-Typ angezeigt wird.
-
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Default Gimpy (Gmail)
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Einfache Liste
-### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
 ### Missing: captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
 captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Einfache Liste
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Einfache Mathematik</content>
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Einfache Mathematik
+captcha.jcaptcha.engine.custom=Benutzerdefiniert:
+</content>
 </xwikidoc>

@@ -8,7 +8,7 @@ set -e
 #########################
 
 # Restart tomcat9 service (only if it's active)
-if systemctl -q is-active tomcat9.service
+if ( systemctl -q is-active tomcat9.service || systemctl -q is-enabled tomcat9.service )
 then
- service tomcat9 restart
+  deb-systemd-invoke restart tomcat9.service
 fi

@@ -22,6 +22,7 @@ package org.xwiki.model.internal.reference;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -115,6 +116,27 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
     {
+        // If the type is not provided, try to extract it from the string
+        if (type == null) {
+            Character entityTypeSeparator = getSymbolScheme().getEntityTypeSeparator();
+            if (entityTypeSeparator != null) {
+                type = Enum.valueOf(EntityType.class, StringUtils
+                    .substringBefore(entityReferenceRepresentation, entityTypeSeparator).toUpperCase(Locale.ENGLISH));
+                entityReferenceRepresentation =
+                    StringUtils.substringAfter(entityReferenceRepresentation, entityTypeSeparator);
+            } else {
+                throw new IllegalArgumentException(
+                    "Impossible to extract the type from the reference: the symbol scheme does not indicate any");
+            }
+        }
+
+        // We have no idea what to know without a type
+        if (type == null) {
+            throw new IllegalArgumentException(
+                "Impossible to parse an entity reference without knowing the entity type");
+        }
+
+        // Get the type setup
         Map<Character, EntityType> typeSetup = getTypeSetup(type);
 
         // Check if the type require anything specific
@@ -213,7 +235,7 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
 
         EntityReference evaluatedReference = reference;
 
-        EntityReference evaluatedParent = evaluateKeywords(reference.getParent());
+        EntityReference evaluatedParent = evaluateKeywords(reference.getParent(), parameters);
 
         if (reference.getName().equals(getSymbolScheme().getCurrentReferenceKeyword(reference.getType()))) {
             if (evaluatedParent == null) {
@@ -371,7 +393,8 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                 value = unescape(value);
             }
 
-            parsedParameters.put(key != null ? key : defaultParameter, value);
+            String parameterName = key != null ? key : defaultParameter;
+            parsedParameters.put(parameterName, getSymbolScheme().resolveParameter(parameterName, value));
         }
     }
 

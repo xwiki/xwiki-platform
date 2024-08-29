@@ -44,6 +44,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
@@ -124,7 +125,6 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         Locale locale = LocaleUtils.toLocale((String) remoteDataMap.get(DOC_LANGUAGE));
 
         XWikiDocument doc = new XWikiDocument(docReference, locale);
-
         XWikiDocument origDoc = new XWikiDocument(docReference, locale);
 
         // We have to get deleted document from the trash (hoping it is in the trash...)
@@ -144,6 +144,11 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         }
 
         doc.setOriginalDocument(origDoc);
+
+        // Force invalidating the cache to be sure it return (and keep) the right document
+        if (xcontext.getWiki().getStore() instanceof XWikiCacheStore) {
+            ((XWikiCacheStore) xcontext.getWiki().getStore()).invalidate(doc);
+        }
 
         return doc;
     }

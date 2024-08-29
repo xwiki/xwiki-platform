@@ -22,7 +22,7 @@
     <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userReference $avatarURL 120)
-      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
+      <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" alt="" />
     </span>
       <a href="$xwiki.getURL($userReference)">$escapetool.xml($userReference.name)</a>
     </div>
@@ -59,16 +59,23 @@
         #set ($userDoc = $xwiki.getDocument($userReference.reference))
         #set ($userProperties = $services.user.getProperties($userReference))
         #set ($userObject = $user.getObject('XWiki.XWikiUsers'))
-        #set ($row = {
-            'grayed': $grayed,
-            'doc_fullName': $userDoc.fullName,
-            'doc_wiki': $userDoc.wiki,
-            'doc_url': $userDoc.getURL(),
-            'doc_viewable': $services.security.authorization.hasAccess('view', $userDoc.documentReference),
-            'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
-            'first_name': $userProperties.firstName,
-            'last_name': $userProperties.lastName
-        })
+        #if ($services.security.authorization.hasAccess('view', $userDoc.documentReference))
+            #set ($row = {
+                'grayed': $grayed,
+                'doc_fullName': $userDoc.fullName,
+                'doc_wiki': $userDoc.wiki,
+                'doc_url': $userDoc.getURL(),
+                'doc_viewable': true,
+                'name': "#displayUserAliasWithAvatar($userDoc.documentReference $disabled)",
+                'first_name': $userProperties.firstName,
+                'last_name': $userProperties.lastName
+            })
+        #else
+            #set ($row = {
+                'doc_viewable': false,
+                'doc_fullName': 'obfuscated'
+            })
+        #end
         #set ($discard = $userRows.add($row))
     #end
     ## ===
@@ -81,32 +88,53 @@
     #else
       #set ($totalRows = $likeRecords.size())
     #end
-    {
+    
+    #set ($map = {
         "totalrows": $totalRows,
-        "returnedrows":  $likeRecords.size(),
+        "returnedrows": $likeRecords.size(),
         "offset": $newOffset,
         "reqNo": $numbertool.toNumber($request.reqNo),
-        "rows": $jsontool.serialize($userRows)
-    }
+        "rows": $userRows
+    })
+    #livetable_filterObfuscated($map)
+    $jsontool.serialize($map)
 #else
-    <h1>$escapetool.xml($services.localization.render('like.likers.title', [$doc.plainTitle]))</h1>
-    #set($columns = ["name", "first_name", "last_name"])
-    #set($columnsProperties = {
-        "name" : { "type" : "text", "sortable": false, "filterable": false, "html": true },
-        "first_name" : { "type" : "text", "sortable": false, "filterable": false},
-        "last_name" : { "type" : "text", "sortable": false, "filterable": false}
-    })
-    #set ($queryParams = {
-        "livetable": "true",
-        "xpage": "likers",
-        "outputSyntax": "plain"
-    })
-    ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
-    #set($options = {
-        'url': $doc.getURL('get', $escapetool.url($queryParams)),
-        'outputOnlyHtml': true,
-        'translationPrefix' : "xe.admin.users."
-    })
-
-    #livetable("likers" $columns $columnsProperties $options)
+  #set($titleToDisplay = $services.localization.render('like.likers.title', ["<a href='$doc.getURL()'>$escapetool.xml($doc.plainTitle)</a>"]))
+  #template('contentheader.vm')
+  ## We rely on the same column name than the Users administration, so we use same translation prefix for now.
+  #set ($sourceParameters = {
+    'template': 'likers.vm',
+    'livetable': 'true',
+    'outputSyntax': 'plain',
+    '$doc': $doc.documentReference,
+    'translationPrefix' : 'xe.admin.users.'
+  })
+  ## The id of the live data needs to be complex in order to avoid 'id collision' that would break
+  ## the liveData.
+  $services.liveData.render({
+    'id': 'likersTable',
+    'properties': 'name,first_name,last_name',
+    'source': 'liveTable',
+    'sourceParameters': $escapetool.url($sourceParameters)
+  }, {
+    'meta': {
+      'propertyDescriptors': [
+        {
+          'id': 'name',
+          'displayer': 'html',
+          'sortable': false,
+          'filterable': false
+        },
+        {
+          'id': 'first_name',
+          'sortable': false,
+          'filterable': false
+        },{
+          'id': 'last_name',
+          'sortable': false,
+          'filterable': false
+        }
+      ]
+    }
+  })
 #end

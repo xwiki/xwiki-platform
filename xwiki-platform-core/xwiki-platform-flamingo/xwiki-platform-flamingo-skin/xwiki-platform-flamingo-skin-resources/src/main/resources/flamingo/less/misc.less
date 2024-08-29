@@ -16,6 +16,12 @@
   }
 }
 
+// Suggests ===================================================================
+
+div.suggestItems .hide-button {
+  .text-muted-smaller;
+}
+
 // Labels =====================================================================
 
 .language {
@@ -121,15 +127,11 @@
   }
 }
 
-// FIX: Editor
-.editor-wysiwyg #titleinput { // IMPROVEMENT: Better spacing
-  //padding-bottom: @padding-grid-vertical;
-}
-
 // FIX: Livetables
 .xwiki-livetable {
   .pagesizeselect { // PROBLEM: General styling reset
     height: auto;
+    width: auto;
   }
 }
 
@@ -200,15 +202,33 @@
 // FIX: login
 #loginForm {
   .panel {
-    max-width: 450px;
+    max-width: @loginFormMaxWidth;
     margin: auto;
     text-align: left;
   }
   .xAdditional {
+    &.recoverPassword {
+      text-align: right;
+    }
+    flex-grow: 1;
     font-size: .8em;
     font-weight: normal;
-    float: right;
     margin-top: .3em;
+  }
+  .submitSection {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1em;
+  }
+}
+
+.resetpasswordpanel, .forgotusernamepanel {
+  max-width: @loginFormMaxWidth;
+  margin: auto;
+  text-align: left;
+
+  .resetpasswordlinks, .forgotusernamelinks {
+    margin-top: 1em;
   }
 }
 
@@ -275,7 +295,7 @@
     // Increase the minimum width because the hint is displayed on multiple lines.
     min-width: 320px;
     // Fixes list padding overwritten by the panel styles.
-    padding: @line-height-computed/4 0;
+    padding: (@line-height-computed / 4) 0;
 
     li .xHint {
       // The hint can be displayed on multiple lines.
@@ -285,7 +305,7 @@
 }
 
 .export-tree-legend {
-  margin: @line-height-computed/4 0 0;
+  margin: (@line-height-computed / 4) 0 0;
 }
 dl.export-tree-legend dt,
 dl.export-tree-legend dd {
@@ -310,7 +330,7 @@ dl.export-tree-legend dt + dd {
 #moreExportOptionsToggle {
   color: @text-muted;
   display: inline-block;
-  margin-bottom: @line-height-computed/2;
+  margin-bottom: (@line-height-computed / 2);
 }
 #moreExportOptionsToggle .more,
 #moreExportOptionsToggle.collapsed .less {
@@ -337,76 +357,59 @@ dl.export-tree-legend dt + dd {
 
 // Viewer = changes -----------------------------------------------------------
 #changes-info {
-  background-color: @xwiki-background-secondary-color;
-  border: @border-width solid @xwiki-border-color;
   margin-top: (@grid-gutter-width / 2);
   margin-bottom: (@grid-gutter-width / 2);
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
   position: relative;
-  /* Background arrow */
-  &:before {
-    background: @xwiki-page-content-bg;
-    height: 2em;
-    right: 50%;
-    top: 4em;
-    width: 2em;
-  }
-  &:after {
-    border-bottom: 2em solid transparent;
-    border-left: 3em solid @xwiki-page-content-bg;
-    border-top: 2em solid transparent;
-    left: 50%;
-    top: 3em;
-  }
-  &:before, &:after {
-    content: "";
-    display: block;
-    position: absolute;
-  }
 }
 
 #changes-info-boxes {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  column-gap: 5vw;
+  row-gap: 1vh;
 }
 
 .changes-info-box {
   flex: 1;
-  padding: 0 (@main-padding / 2);
-}
-
-.changes-info-box, #changes-info-comment {
+  padding: (@main-padding / 4) (@main-padding / 2);
+  background-color: @xwiki-background-secondary-color;
+  border-radius: @border-radius-large;
   text-align: center;
 }
 
 .changes-info-title {
   .h3;
-}
-
-@media (max-width: @screen-xs-max) {
-  #changes-info:before, #changes-info:after {
-    display: none; /* Hide the arrow for small resolutions */
-  }
+  margin-top: 0;
 }
 
 .changes-version {
   white-space: nowrap;
 }
 
+.changes-arrow {
+  font-size: inherit;
+}
+
 .changes-arrow, .changes-arrow-left, .changes-arrow-right {
   &, &:hover, &:active, &:visited, &:focus {
-    color: @xwiki-page-content-bg;
-    text-decoration: none;
+    vertical-align: baseline;
     font-weight: 700;
   }
 }
 
-.changes-arrow-left, .changes-arrow-right {
-  font-size: 7em;
-  line-height: 1;
+#changes-arrows-box {
+  font-size: 1.5em;
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Make sure the right change arrow stays on the right even when the left one is not here. */
+#changes-arrows-box:not(:has(> .changes-arrow-left)) {
+  justify-content: right;
 }
 
 .changes-body > .changes-body-header {
@@ -476,12 +479,17 @@ a.html-diff-context-toggle {
 }
 .deleteWarningButtons {
   margin: 0;
-  padding: @line-height-computed / 2;
+  padding: (@line-height-computed / 2);
 }
 
 // Tree Webjar (XWIKI-15089) ---------------------------------------------------
 .skin-flamingo .jstree-xwiki .jstree-clicked {
   background-color: @nav-link-hover-bg; /* $theme.highlightColor */
+  border-radius: @border-radius-small;
+}
+
+.skin-flamingo .jstree-xwiki .jstree-anchor:hover {
+  border-radius: @border-radius-small;
 }
 
 .previewdiff-diff-options {
@@ -492,7 +500,11 @@ a.html-diff-context-toggle {
   }
 }
 
-// Locale Picker
-.bootstrap-select.btn-group .dropdown-menu li.active small.text-muted {
-  color: inherit;
+// Select
+.xwiki-select-option-highlighted {
+  background-color: @breadcrumb-bg;
+}
+
+.xwiki-select-option-selected {
+  background-color: @nav-link-hover-bg;
 }

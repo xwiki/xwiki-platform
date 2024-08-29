@@ -1,0 +1,262 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.Translations" locale="ja">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=通知
+notifications.filters.cancel=キャンセル
+notifications.filters.submit=保存
+notifications.filters.type.label=フィルターの種類：
+notifications.filters.type.hint=指定した場所のイベントに関するフィルターの働き方
+notifications.filters.location.label=フィルターのスコープ：
+notifications.filters.location.hint=フィルターの対象となるウィキの箇所を指定してください。
+
+## Advanced filters options
+notifications.settings.filters.advanced=フィルタリングの上級設定
+notifications.filters.advanced.toggles.hint=これらのフィルターは既定で有効になっています。各フィルターの隣にあるボタンを使うと無効にできます。
+notifications.filters.advanced.toggles.table.name=フィルター名
+notifications.filters.advanced.toggles.table.description=詳細
+notifications.filters.advanced.toggles.table.toggle=切り替える
+notifications.filters.advanced.modal.close=閉じる
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=システムフィルター
+notifications.filters.description.systemUserNotificationFilter=イベントが特別にあなたを対象としていない限り、システムからの通知を表示しない
+notifications.filters.name.ownEventsNotificationFilter=自分のイベントのフィルター
+notifications.filters.description.ownEventsNotificationFilter=イベントが特別にあなたを対象としていない限り、自分のアクティビティーに関する通知を表示しない
+notifications.filters.name.eventReadAlertFilter=既読イベントのフィルタリング（アラート）
+notifications.filters.description.eventReadAlertFilter=既読に設定した通知を表示しない
+notifications.filters.name.eventReadEmailFilter=既読イベントのフィルタリング（Eメール）
+notifications.filters.description.eventReadEmailFilter=既読に設定した通知を表示しない
+notifications.filters.name.minorEventAlertNotificationFilter=軽微なイベント（アラート）
+notifications.filters.description.minorEventAlertNotificationFilter=ページの軽微な変更に関する通知を表示しない
+notifications.filters.name.minorEventEmailNotificationFilter=軽微なイベント（Eメール）
+notifications.filters.description.minorEventEmailNotificationFilter=ページの軽微な変更についての通知を表示しない
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=通知のフィルタリングの範囲
+notifications.filters.preferences.scopeNotificationFilter.page=ページのみ
+notifications.filters.preferences.scopeNotificationFilter.space=ページと下位ページ
+notifications.filters.preferences.scopeNotificationFilter.wiki=ウィキ
+
+## Notifications toggles
+notifications.toggle.disabled.hint=これらの場所を監視したい場合は、設定から通知を有効にする必要があります
+
+## Notifications formats
+notifications.format.alert=アラート
+notifications.format.email=Eメール
+
+## Filter preferences settings
+notifications.filters.preferences.delete.inProgress=削除しています…
+notifications.filters.preferences.delete.done=フィルターの設定を削除しました！
+notifications.filters.preferences.delete.error=フィルターの設定を削除できませんでした
+notifications.filters.preferences.setEnabled.inProgress=保存しています…
+notifications.filters.preferences.setEnabled.done=フィルターの設定を保存しました！
+notifications.filters.preferences.setEnabled.error=フィルターの設定を保存できませんでした
+notifications.filters.preferences.allEvents=全てのイベント（無効化されているイベントを含む）
+
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=システムフィルター
+notifications.settings.filters.preferences.system.hint=受け取る通知をより柔軟にコントロールできるシステムフィルター。
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.system.table.name=名称
+notifications.settings.filters.preferences.system.table.filterType=詳細
+notifications.settings.filters.preferences.system.table.notificationFormats=フォーマット
+notifications.settings.filters.preferences.system.table.isEnabled=有効ですか？
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=カスタムフィルター
+notifications.settings.filters.preferences.custom.hint=フィルターを作成すると、受け取る通知をコントロールできます。
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=場所
+notifications.settings.filters.preferences.custom.table.filterType=フィルターアクション
+notifications.settings.filters.preferences.custom.table.eventTypes=イベント
+notifications.settings.filters.preferences.custom.table.notificationFormats=フォーマット
+notifications.settings.filters.preferences.custom.table.isEnabled=有効ですか？
+notifications.settings.filters.preferences.custom.table._actions=アクション
+notifications.filters.type.custom.inclusive=イベントを通知
+notifications.filters.type.custom.exclusive=イベントを無視
+
+
+## Add filter modal
+notifications.settings.addFilter=フィルターを追加
+notifications.settings.addFilter.hint=特定の場所のイベントのフィルターを作成。フィルターを使うと、イベントと通知のチャンネルに応じて、通知を送信するかあるいは防ぐかを決められます。
+notifications.filters.preferences.custom.addFilter.location.label=場所
+notifications.filters.preferences.custom.addFilter.location.hint=このフィルターは、ここで選択した場所で起こるイベントに適用されます。1つ以上の場所を選択してください。
+notifications.filters.preferences.custom.addFilter.type.label=アクション
+notifications.filters.preferences.custom.addFilter.type.hint=このフィルターでは、選択した場所で起こるイベントを通知あるいは無視できます。イベントに関して行いたいアクションを選択してください。
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=イベントを通知
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=イベントを無視
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=チャンネル
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=このフィルターは、以下で選択したコミュニケーションチャンネルに送信する通知にのみ適用されます。1つ以上のチャンネルを選択してください。
+notifications.filters.preferences.custom.addFilter.eventType.label=イベント
+notifications.filters.preferences.custom.addFilter.eventType.hint=このフィルターは、以上で選択した場所のうち、ここで選択したイベントに適用されます。1つ以上のイベントを選択してください。
+notifications.menu.header=通知
+notifications.menu.header.settings=設定
+notifications.menu.clear=全て消去
+notifications.menu.clearing=通知を消去しています
+notifications.menu.cleared=通知を消去しました
+notifications.settings.title=通知の設定
+notifications.settings.error.notAdmin=確認には管理者の権限が必要です。
+notifications.settings.menu=通知のメニュー
+notifications.settings.menu.hint=通知のメニューはページの右上にあります。ベル（{0}）をクリックすると表示できます
+notifications.settings.email=Eメール
+notifications.settings.email.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
+notifications.settings.email.disabled=通知メールは無効化されています。管理者に連絡してください。
+notifications.settings.email.hint=定期的にウィキでの出来事の要約をEメールで送信します
+notifications.settings.email.title=Eメールの設定
+notifications.settings.email.frequency=Eメールの頻度
+notifications.settings.email.frequency.hint=ウィキでの出来事の要約をEメールで受信したい頻度を選択してください。
+notifications.settings.email.diffType.hint=全ての変更に関してEメールで受け取りたい詳細のレベルを選択してください。
+notifications.settings.saving=設定を保存しています…
+notifications.settings.saved=保存しました！
+notifications.settings.savingfailed=設定を保存できませんでした
+notifications.settings.filters=フィルター（{0}）
+notifications.settings.errorFilterWiki=エラー：ページではなくウィキを選択してください
+notifications.settings.preferences=設定
+notifications.settings.preferences.hint=起こっているイベントをストリームまたはEメールで通知。
+notifications.settings.applications.title=アプリケーション
+notifications.settings.applications.hint=これは通知を送信できるアプリケーションの一覧です。いずれも有効化あるいは無効化できます。
+notifications.settings.applications.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
+notifications.settings.applications.appName=名称
+notifications.settings.events=イベント
+notifications.settings.watch.title=監視中のページ
+notifications.settings.watch.autowatchmode=自動ページ監視
+notifications.settings.watch.autowatchmode.hint=作業を行ったページを監視したいかどうかを決定してください
+notifications.settings.watch.forGuest=通知設定を変更するにはログインあるいは登録が必要です。
+notifications.settings.watch.disabled=監視中の構成要素が無効化されています。管理者に連絡してください。
+notifications.events.by={0}により編集。
+notifications.events.lastChange=最終更新： {0}。
+notifications.events.lastComment=最新のコメント：{0}。
+notifications.preferences.scope.table.scope=スコープ
+notifications.preferences.scope.table.location=場所
+notifications.preferences.scope.table.scopeFilterType=フィルターの種類
+notifications.preferences.scope.table._actions=アクション
+notifications.email.title=このウィキのイベント：
+notifications.email.subject=このウィキの{0}個のイベント
+notifications.email.seeChanges=変更：{0}
+notifications.email.linkDetails=詳細を参照
+notifications.rss.feedLink=RSSフィード
+notifications.rss.feedLinkDescription=通知のイベントフィード
+notifications.rss.feedTitle=通知のRSSフィード
+notifications.rss.feedDescription=このRSSフィードはプロフィールのページでカスタマイズできます。
+notifications.rss.seeChanges=変更：{0}
+notifications.rss.defaultTitleWithPage={0}の新しいイベント
+notifications.rss.defaultTitle=新しいイベント
+notifications.globalsettings.email=通知のEメール
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=毎日
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=毎時間
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=毎週
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=ライブ
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=変更の詳細
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=なし
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=標準
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=含める
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=含めない
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=なし
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=修正を行ったとき
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=大きな修正を行ったとき
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=新しいページを作成したとき
+
+## Common notification settings errors
+notifications.settings.error.userReferenceNotSupported=指定したユーザーの参照はサポートしていません。現在はDocumentUserReferenceのみをサポートしています。
+notifications.settings.error.userReferenceAdminForbidden=指定したユーザーに関する管理権限がありません： {0}。
+notifications.settings.error.badCSRF=不正なCSRFトークン。
+notifications.settings.badParameters=無効なリクエストパラメーターです。
+
+## User profile
+notifications.userprofile.following=フォローしています
+notifications.userprofile.notfollowing=フォローしていません
+notifications.userprofile.follow=フォローを開始
+notifications.userprofile.unfollow=フォローを解除
+notifications.userprofile.done=完了
+notifications.userprofile.saving=保存しています…
+notifications.userprofile.error=通知設定を保存する際のエラー
+
+## Macros description
+rendering.macro.notificationsApplicationsPreferences.name=通知アプリケーションの設定
+rendering.macro.notificationsApplicationsPreferences.description=現在のユーザーの通知アプリケーションについての設定を表示。
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=ターゲット
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=マクロのターゲット（現在のユーザーについては"user"、現在のウィキについては"wiki"）
+rendering.macro.notificationsAutoWatchPreferences.name=通知の自動監視の設定
+rendering.macro.notificationsAutoWatchPreferences.description=自動監視に関する現在のユーザーの設定を表示。
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=ターゲット
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=マクロのターゲット（現在のユーザーについては"user"、現在のウィキについては"wiki"）
+
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=ページの通知のみを切り替える
+notifications.filters.preferences.label.space=ページと下位ページの通知を切り替える
+notifications.filters.preferences.label.wiki=ウィキの通知を切り替える
+
+## Notifications switches
+notifications.switches.tooltip.page=このページを監視
+notifications.switches.tooltip.pageAndChildren=このページと下位ページを監視
+notifications.switches.tooltip.space=上位ページと下位ページを監視
+notifications.switches.tooltip.wiki=このウィキを監視
+notifications.switches.changeStatusError=通知の状態を変更できませんでした。
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+notifications.settings.filters.preferences.title=フィルター
+notifications.settings.filters.preferences.hint=フィルターを作成すると、アクティブなイベントが通知を送信するタイミングを設定できます。
+notifications.settings.filters.preferences.forGuest=通知フィルターを設定するにはログインまたは登録が必要です。
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=名称
+notifications.settings.filters.preferences.table.filterType=フィルターの種類
+notifications.settings.filters.preferences.table.eventTypes=イベント
+notifications.settings.filters.preferences.table.notificationFormats=フォーマット
+notifications.settings.filters.preferences.table.isEnabled=有効ですか？
+notifications.settings.filters.preferences.table._actions=アクション
+notifications.filters.preferences.addPreference.filterType.inclusive=含める
+notifications.filters.preferences.addPreference.filterType.exclusive=含めない
+notifications.filters.preferences.addPreference.notificationFormat.label=通知のフォーマット
+notifications.filters.preferences.addPreference.notificationFormat.hint=どの形式でフィルターを適用しますか？
+notifications.filters.preferences.addPreference.eventType.label=イベントの種類
+notifications.filters.preferences.addPreference.eventType.hint=どのイベントの種類をこのフィルターの対象としますか？
+notifications.filters.preferences.addPreference.location.label=フィルターのスコープ
+notifications.filters.preferences.addPreference.location.hint=どのページをこのフィルターの対象としますか？
+
+
+## Filter Types
+notifications.filters.type.inclusive=含める
+notifications.filters.type.exclusive=含めない
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+</xwikidoc>

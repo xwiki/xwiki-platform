@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="ro">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>ro</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Aici poți selecta aplicațiile care sunt afișate în bara de aplicații (în stânga, în mod implicit). Orice aplicație nouă va fi afișată acolo. Dacă dorești să îndepărtezi unele dintre ele, trebuie doar să glisezi pictograma din prima casetă în cealaltă. De asemenea, poți reordona aplicațiile după cum dorești. Nu uitați să salvezi modificările!
+platform.panels.applications.displayedapps=Aplicații în bară
+platform.panels.applications.blacklistedapps=Aplicații care nu sunt în bară
+platform.panels.applications.save=Salvează
+platform.panels.applications.revert=Resetează
+platform.panels.applications.ajax.success=Configurarea a fost salvată.
+platform.panels.applications.ajax.csrf=Validarea CSRF a eșuat. Încearcă să reîncarci pagina.
+platform.panels.applications.ajax.noright=Nu ai dreptul să modifici PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=A eșuat salvarea modificării (modificărilor).
+admin.panels.applications=Panoul de aplicații
+admin.panels.applications.description=Gestionați aplicațiile care sunt afișate în panoul Aplicații.
+admin.panels.navigation=Panoul de navigare
+admin.panels.navigation.description=Gestionați ce pagini sunt afișate în panoul de navigare.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Exclude paginile de extensie de la primul nivel
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Acest filtru dinamic elimină din arborele de navigare paginile din primul nivel care aparțin unei extensii instalate, în cazul în care acestea nu sunt create pentru a fi modificate.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Exclude paginile de aplicație de la primul nivel
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Acest filtru dinamic elimină din arborele de navigare paginile de la primul nivel care aparțin unei aplicații create cu App Within Minutes.
+PanelsCode.NavigationConfigurationClass_exclusions=Excluderi
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Lista de pagini de exclus din arborele de navigare.
+PanelsCode.NavigationConfigurationClass_inclusions=Includeri
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Lista de pagini de inclus in arborele de navigare chiar dacă au fost excluse de un filtru anterior.
+platform.panels.navigation.configuration.excludedPages=Pagini excluse
+platform.panels.navigation.configuration.excludedPages.hint=Folosește funcția de glisare și plasare pentru a muta paginile din arborele de navigare sau pentru a le aduce la locul inițial.
+platform.panels.navigation.configuration.excludedPages.empty=Niciuna
+platform.panels.navigation.configuration.topLevelExtensionPages=Pagini de extensie de la primul nivel
+platform.panels.navigation.configuration.topLevelApplicationPages=Pagini de aplicație de la primul nivel
+platform.panels.navigation.configuration.otherPages=Alte pagini
+platform.panels.navigation.configuration.saveComment=Configurarea panoului de navigare din secțiunea Administrare a fost actualizată
+</content>
+</xwikidoc>

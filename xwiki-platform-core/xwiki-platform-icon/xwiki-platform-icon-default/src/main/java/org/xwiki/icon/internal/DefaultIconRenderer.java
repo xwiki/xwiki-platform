@@ -98,14 +98,14 @@ public class DefaultIconRenderer implements IconRenderer
         contentToParse.write("\")\n");
         contentToParse.write(renderer);
 
-        return velocityRenderer.render(contentToParse.toString());
+        return this.velocityRenderer.render(contentToParse.toString(), iconSet.getSourceDocumentReference());
     }
 
     @Override
     public void use(IconSet iconSet) throws IconException
     {
         if (iconSet == null) {
-            throw new IconException("The icon set is null", null);
+            throw new IconException("The icon set is null");
         }
         if (!StringUtils.isBlank(iconSet.getCss())) {
             activeCSS(iconSet);
@@ -120,19 +120,19 @@ public class DefaultIconRenderer implements IconRenderer
 
     private void activeCSS(IconSet iconSet) throws IconException
     {
-        String url = velocityRenderer.render(iconSet.getCss());
-        Map<String, Object> parameters = new HashMap();
+        String url = this.velocityRenderer.render(iconSet.getCss(), iconSet.getSourceDocumentReference());
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("rel", "stylesheet");
-        linkExtension.use(url, parameters);
+        this.linkExtension.use(url, parameters);
     }
 
     private void activeSSX(IconSet iconSet)
     {
-        skinExtension.use(iconSet.getSsx());
+        this.skinExtension.use(iconSet.getSsx());
     }
 
     private void activeJSX(IconSet iconSet)
     {
-        jsExtension.use(iconSet.getJsx());
+        this.jsExtension.use(iconSet.getJsx());
     }
 }

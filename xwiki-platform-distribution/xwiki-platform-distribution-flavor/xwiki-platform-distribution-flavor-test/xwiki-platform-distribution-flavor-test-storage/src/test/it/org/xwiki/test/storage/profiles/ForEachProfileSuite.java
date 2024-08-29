@@ -143,7 +143,7 @@ public class ForEachProfileSuite extends ClasspathSuite
     /**
      * Tester which will help ClassPathSuite find all Profiles.
      */
-    private static class IsProfileTester implements ClassTester
+    private static final class IsProfileTester implements ClassTester
     {
         public static IsProfileTester INSTANCE = new IsProfileTester();
 

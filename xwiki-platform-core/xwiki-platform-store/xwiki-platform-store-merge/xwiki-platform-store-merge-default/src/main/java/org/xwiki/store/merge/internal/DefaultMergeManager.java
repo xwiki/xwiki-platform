@@ -19,8 +19,8 @@
  */
 package org.xwiki.store.merge.internal;
 
-import java.io.IOException;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +45,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,9 +53,10 @@ import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import org.xwiki.store.merge.MergeManagerResult;
+import com.xpn.xwiki.doc.merge.MergeConfiguration.ConflictFallbackVersion;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -94,6 +96,12 @@ public class DefaultMergeManager implements MergeManager
                 this.mergeConflictDecisionsManager.getConflictDecisionList(concernedDocument, userReference);
             if (conflictDecisionList != null) {
                 return new org.xwiki.diff.MergeConfiguration(conflictDecisionList);
+            } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.CURRENT) {
+                return new org.xwiki.diff.MergeConfiguration(org.xwiki.diff.MergeConfiguration.Version.CURRENT,
+                    Collections.emptyList());
+            } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                return new org.xwiki.diff.MergeConfiguration(org.xwiki.diff.MergeConfiguration.Version.NEXT,
+                    Collections.emptyList());
             }
         }
         return null;
@@ -152,8 +160,13 @@ public class DefaultMergeManager implements MergeManager
             } else if (ObjectUtils.equals(newObject, currentObject)) {
                 mergeResult.setMergeResult(currentObject);
             } else {
-                // the three objects are different, we record a conflict and fallback on the current object.
-                mergeResult.setMergeResult(currentObject);
+                // the three objects are different, we record a conflict and fallback based on the configuration.
+                if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.CURRENT) {
+                    mergeResult.setMergeResult(currentObject);
+                } else if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                    mergeResult.setMergeResult(newObject);
+                    mergeResult.setModified(true);
+                }
                 mergeResult.getLog()
                     .error("Failed to merge objects: previous=[{}] new=[{}] current=[{}]", previousObject,
                         newObject, currentObject);
@@ -178,20 +191,23 @@ public class DefaultMergeManager implements MergeManager
         MergeConfiguration configuration)
     {
         MergeManagerResult<String, Character> mergeResult = new MergeManagerResult<>();
-        try {
-            org.xwiki.diff.MergeResult<Character> result =
-                this.diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr),
-                    getDefaultConfiguration(configuration));
+        if (currentStr == null && newStr == null) {
+            mergeResult.setMergeResult(null);
+        } else {
+            try {
+                org.xwiki.diff.MergeResult<Character> result =
+                    this.diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr),
+                        getDefaultConfiguration(configuration));
 
-            mergeResult.getLog().addAll(result.getLog());
-            mergeResult.addConflicts(result.getConflicts());
-            String resultStr = fromCharacters(result.getMerged());
-            mergeResult.setMergeResult(resultStr);
-            mergeResult.setModified(!resultStr.equals(currentStr));
-        } catch (MergeException e) {
-            mergeResult.getLog().error("Failed to execute merge characters", e);
+                mergeResult.getLog().addAll(result.getLog());
+                mergeResult.addConflicts(result.getConflicts());
+                String resultStr = fromCharacters(result.getMerged());
+                mergeResult.setMergeResult(resultStr);
+                mergeResult.setModified(!resultStr.equals(currentStr));
+            } catch (MergeException e) {
+                mergeResult.getLog().error("Failed to execute merge characters", e);
+            }
         }
-
         return mergeResult;
     }
 
@@ -308,7 +324,7 @@ public class DefaultMergeManager implements MergeManager
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.XOBJECTS, objectMergeManagerResult);
 
             // Class
-            MergeManagerResult<BaseClass, BaseClass> classMergeManagerResult =
+            MergeManagerResult<ElementInterface, Object> classMergeManagerResult =
                 mergeXClass(previousDoc, mergedDocument, newDoc, configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.XCLASS, classMergeManagerResult);
 
@@ -326,20 +342,14 @@ public class DefaultMergeManager implements MergeManager
         return mergeResult;
     }
 
-    private MergeManagerResult<BaseClass, BaseClass> mergeXClass(XWikiDocument previousDoc,
+    private MergeManagerResult<ElementInterface, Object> mergeXClass(XWikiDocument previousDoc,
         XWikiDocument mergedDocument, XWikiDocument newDoc, MergeConfiguration configuration)
     {
         XWikiContext context = this.contextProvider.get();
-        MergeResult classMergeResult = new MergeResult();
         BaseClass classResult = mergedDocument.getXClass();
         BaseClass previousClass = previousDoc.getXClass();
         BaseClass newClass = newDoc.getXClass();
-        classResult.merge(previousClass, newClass, configuration, context, classMergeResult);
-        MergeManagerResult<BaseClass, BaseClass> classMergeManagerResult = new MergeManagerResult<>();
-        classMergeManagerResult.setMergeResult(mergedDocument.getXClass());
-        classMergeManagerResult.getLog().addAll(classMergeResult.getLog());
-        classMergeManagerResult.setModified(classMergeResult.isModified());
-        return classMergeManagerResult;
+        return classResult.merge(previousClass, newClass, configuration, context);
     }
 
     private MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> mergeXObjects(
@@ -347,7 +357,10 @@ public class DefaultMergeManager implements MergeManager
     {
         XWikiContext context = this.contextProvider.get();
 
-        MergeResult objectMergeResult = new MergeResult();
+        MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> objectMergeResult =
+            new MergeManagerResult<>();
+        objectMergeResult.setMergeResult(mergedDocument.getXObjects());
+
         List<List<ObjectDiff>> objectsDiff = mergedDocument.getObjectDiff(previousDoc, newDoc, context);
         if (!objectsDiff.isEmpty()) {
             // Apply diff on result
@@ -372,9 +385,14 @@ public class DefaultMergeManager implements MergeManager
                             if (!objectResult.equals(newObject)) {
                                 // collision between DB and new: object to add but already exists in the DB and not
                                 // the same
+                                // If fallback is next version then we set it.
+                                if (newObject != null &&
+                                    configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT) {
+                                    mergedDocument.setXObject(newObject.getNumber(), newObject.clone());
+                                    objectMergeResult.setModified(true);
+                                }
                                 // TODO: Manage properly the conflicts.
-                                objectMergeResult.getLog()
-                                    .error(ERROR_COLLISION_OBJECT, objectResult.getReference());
+                                objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, objectResult.getReference());
                             } else {
                                 // Already added, lets assume the user is prescient
                                 objectMergeResult.getLog().warn("Object [{}] already added",
@@ -389,6 +407,7 @@ public class DefaultMergeManager implements MergeManager
                             } else {
                                 // collision between DB and new: object to remove but not the same as previous
                                 // version
+                                // We don't remove any xobject as fallback
                                 // TODO: Manage properly the conflicts.
                                 objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT, objectResult.getReference());
                             }
@@ -407,6 +426,12 @@ public class DefaultMergeManager implements MergeManager
                                         // collision between DB and new:
                                         // property to add but already exists in the DB and not the same
                                         // TODO: Manage properly the conflicts.
+                                        // If fallback is next version then we put next version value
+                                        if (configuration.getConflictFallbackVersion() == ConflictFallbackVersion.NEXT)
+                                        {
+                                            objectResult.safeput(diff.getPropName(), newProperty);
+                                            objectMergeResult.setModified(true);
+                                        }
                                         objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT_PROPERTY,
                                             propertyResult.getReference());
                                     } else {
@@ -424,6 +449,7 @@ public class DefaultMergeManager implements MergeManager
                                         // collision between DB and new: supposed to be removed but the DB version
                                         // is not the same as the previous version
                                         // TODO: Manage properly the conflicts.
+                                        // We don't remove any property as fallback
                                         objectMergeResult.getLog().error(ERROR_COLLISION_OBJECT_PROPERTY,
                                             propertyResult.getReference());
                                     }
@@ -439,13 +465,19 @@ public class DefaultMergeManager implements MergeManager
                                         objectMergeResult.setModified(true);
                                     } else {
                                         // Try to apply a 3 ways merge on the property
-                                        propertyResult.merge(previousProperty, newProperty, configuration, context,
-                                            objectMergeResult);
+                                        MergeManagerResult<ElementInterface, Object> propertyManagerResult =
+                                            propertyResult.merge(previousProperty, newProperty, configuration, context);
+                                        objectMergeResult.getLog().addAll(propertyManagerResult.getLog());
+                                        if (propertyManagerResult.isModified()) {
+                                            objectMergeResult.setModified(true);
+                                            objectResult.safeput(diff.getPropName(),
+                                                (PropertyInterface) propertyManagerResult.getMergeResult());
+                                        }
                                     }
                                 } else {
-                                    // collision between DB and new: property to modify but does not exists in DB
+                                    // collision between DB and new: property to modify but does not exist in DB
                                     // Lets assume it's a mistake to fix
-                                    objectMergeResult.getLog().warn("Object [{}] does not exists",
+                                    objectMergeResult.getLog().warn("Object [{}] does not exist",
                                         newProperty.getReference());
 
                                     objectResult.safeput(diff.getPropName(), newProperty);
@@ -460,13 +492,8 @@ public class DefaultMergeManager implements MergeManager
                 }
             }
         }
-        MergeManagerResult<Map<DocumentReference, List<BaseObject>>, BaseObject> objectMergeManagerResult =
-            new MergeManagerResult<>();
-        objectMergeManagerResult.getLog().addAll(objectMergeResult.getLog());
-        objectMergeManagerResult.setMergeResult(mergedDocument.getXObjects());
-        objectMergeManagerResult.setModified(objectMergeResult.isModified());
 
-        return objectMergeManagerResult;
+        return objectMergeResult;
     }
 
     private MergeManagerResult<List<XWikiAttachment>, XWikiAttachment> mergeAttachments(XWikiDocument previousDoc,
@@ -579,7 +606,7 @@ public class DefaultMergeManager implements MergeManager
                 result.add("");
             }
 
-        } catch (IOException e) {
+        } catch (UncheckedIOException e) {
             // Should never happen
             result = null;
         }

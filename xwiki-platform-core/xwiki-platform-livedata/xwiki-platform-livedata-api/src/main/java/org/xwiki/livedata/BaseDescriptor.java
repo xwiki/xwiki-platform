@@ -21,7 +21,7 @@ package org.xwiki.livedata;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Base class for various live data configuration descriptors.
@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.10
  */
-@Unstable
 public class BaseDescriptor extends WithParameters
 {
     private String id;
@@ -71,5 +70,14 @@ public class BaseDescriptor extends WithParameters
         }
 
         return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .appendSuper(super.toString())
+            .append("id", id)
+            .toString();
     }
 }

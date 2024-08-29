@@ -105,7 +105,7 @@ class WebJarsResourceReferenceHandlerTest
     private NamespaceURLClassLoader classLoader;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
     @BeforeEach
     void setUp() throws Exception

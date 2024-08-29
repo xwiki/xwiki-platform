@@ -28,7 +28,7 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
   function setLocalization($t) {
     this.$t = $t;
   }
-  
+
   /**
    * Resolve the url of the document reference in the given mode.
    * @param documentReference the document reference
@@ -48,42 +48,19 @@ define('xwiki-livedata-xObjectPropertyHelper', ['jquery', 'xwiki-meta', 'xwiki-e
     }
   }
 
-  // TODO: fix duplicate.
-  function loadRequiredSkinExtensions(requiredSkinExtensions) {
-    var existingSkinExtensions;
-    var getExistingSkinExtensions = function() {
-      return $('link, script').map(function() {
-        return $(this).attr('href') || $(this).attr('src');
-      }).get();
-    };
-    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
-      if (!existingSkinExtensions) {
-        existingSkinExtensions = getExistingSkinExtensions();
-      }
-      var url = $(this).attr('href') || $(this).attr('src');
-      return existingSkinExtensions.indexOf(url) < 0;
-    }).appendTo('head');
-  }
-  
   function load(mode, documentReference, property, className) {
     const targetUrl = computeTargetURL(documentReference, 'get');
-    return new Promise((resolve, reject) => {
-      $.get(targetUrl, {
-        xpage: 'display',
-        mode: mode,
-        // TODO: handle the object index when provided
-        property: getPropertyReference(property, className),
-        type: property.startsWith('doc.') ? 'document' : 'object',
-        language: xcontext.locale
-      }).done((html, textStatus, jqXHR) => {
-        loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
-        // Update the viewer.
-        resolve(html);
-      }).fail(() => {
-        new XWiki.widgets.Notification(
-          this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
-        reject();
-      })
+    return Promise.resolve($.get(targetUrl, {
+      xpage: 'display',
+      mode: mode,
+      // TODO: handle the object index when provided
+      property: getPropertyReference(property, className),
+      type: property.startsWith('doc.') ? 'document' : 'object',
+      language: xcontext.locale
+    })).catch(() => {
+      new XWiki.widgets.Notification(
+        this.$t('livedata.displayer.xObjectProperty.failedToRetrieveField.errorMessage', [mode]), 'error');
+      return Promise.reject();
     });
   }
 

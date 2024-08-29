@@ -110,8 +110,11 @@ public class DefaultExtendedRenderingConfiguration implements ExtendedRenderingC
         // First, look in the document sources
         List<String> disabledSyntaxesAsStrings = this.renderingConfiguration.getProperty(DISABLED_SYNTAXES_PROPERTY);
 
-        // If not found, look in the xwiki cfg source for a xwiki.rendering.syntaxes property
-        if (disabledSyntaxesAsStrings == null || disabledSyntaxesAsStrings.isEmpty()) {
+        // Second, if there's no RenderingConfigClass xobject (i.e. when disabledSyntaxesAsStrings is null), then
+        // convert the config values from "xwiki.rendering.syntaxes" in xwiki.cfg into disabled syntaxes.
+        // Note: if disabledSyntaxesAsStrings is an empty list, it means that the user has not disabled any syntax and
+        // we'll show all of them.
+        if (disabledSyntaxesAsStrings == null) {
             List<Syntax> configuredSyntaxes =
                 convertList(this.xwikiCfgConfiguration.getProperty("xwiki.rendering.syntaxes", List.class));
             // If there's no such property, then only allow the default syntax. We do this since we don't want users to

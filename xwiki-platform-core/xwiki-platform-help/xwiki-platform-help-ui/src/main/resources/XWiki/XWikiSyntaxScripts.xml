@@ -137,7 +137,7 @@ def var = "whatever"
 
 === 2.0 Scripts ===
 
-{{info}}In XWiki Syntax 1.0 it was possible to enter Velocity scripts anywhere directly in the page. This lead to issues for example when the user was involuntarily entering Velocity content. It was also performance hungry for pages not requiring Velocity content. There were several other technical limitations. Thus in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} Velocity scripts must be entered using the ##velocity## macro. Same goes for entering Groovy scripts.{{/info}}
+{{info}}XWiki [[supports several scripting languages&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
 |Velocity script|((({{{

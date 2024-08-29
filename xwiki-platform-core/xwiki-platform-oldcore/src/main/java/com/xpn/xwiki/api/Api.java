@@ -132,7 +132,7 @@ public class Api
      * Check if the current document has programming rights, meaning that it was last saved by a user with the
      * programming right globally granted.
      *
-     * @return <tt>true</tt> if the current document has the Programming right or <tt>false</tt> otherwise.
+     * @return {@code true} if the current document has the Programming right or {@code false} otherwise.
      */
     public boolean hasProgrammingRights()
     {
@@ -169,7 +169,7 @@ public class Api
      *
      * @param right The name of the right to verify (eg "programming", "admin", "register", etc).
      * @param docname The document for which to verify the right.
-     * @return <tt>true</tt> if the current user has the specified right, <tt>false</tt> otherwise.
+     * @return {@code true} if the current user has the specified right, {@code false} otherwise.
      * @exception XWikiException In case of an error finding the document or accessing groups information.
      */
     public boolean hasAccessLevel(String right, String docname) throws XWikiException

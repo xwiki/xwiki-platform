@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventSearchResult;
-import org.xwiki.stability.Unstable;
 
 /**
  * {@link Iterable} based implementation of {@link EventSearchResult}.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 public class StreamEventSearchResult implements EventSearchResult
 {
     private final long totalHits;

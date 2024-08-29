@@ -40,13 +40,24 @@
     #set ($wikiReference = $doc.documentReference.wikiReference)
   #end
   #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
-  ## TODO: Use the advanced query parameter API:
-  ## query.bindValue('input').anyChars().literal($input).anyChars().query()
-  ## as soon as we fix XWIKI-15362 (An XWQL query that selects from an object property fails when using the advanced
-  ## query parameter API)
-  #set ($query = $query.setLimit(10).bindValue('input', "%$input%"))
+  #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
   #set ($rawResults = $query.execute())
-  #displayResults($rawResults $wikiReference)
+  #set ($results = [])
+  #set ($limit = $numbertool.toNumber($request.limit))
+  #if ("$!limit" == '')
+    #set ($limit = 10)
+  #end
+  ## Iterate over the results and select the first N results (based on the limit request parameter) that are accessible
+  ## to the current user.
+  #foreach ($rawResult in $rawResults)
+    #if ($results.size() >= $limit)
+      #break
+    #end
+    #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))
+      #set ($discard = $results.add($rawResult))
+    #end
+  #end
+  #displayResults($results $wikiReference)
 #end
 ##
 #macro (displayResults $rawResults $wikiReference)
@@ -63,9 +74,15 @@
 ##
 #macro (addResultData $result $results $wikiReference)
   #set ($reference = $services.model.resolveDocument($result, $wikiReference))
+  #set ($hint = $NULL)
   #if ($request.uorg == 'user')
     #set ($label = $xwiki.getPlainUserName($reference))
     #set ($defaultIcon = $services.icon.getMetaData('user'))
+    #set ($userQualifierProperty = $services.user.configuration.userQualifierProperty)
+    #if ("$!userQualifierProperty" != '')
+      #set ($userProperties = $services.user.getProperties("$reference"))
+      #set ($hint = $userProperties.getProperty($userQualifierProperty))
+    #end
   #else
     #set ($label = $xwiki.getDocument($reference).plainTitle)
     #set ($defaultIcon = $services.icon.getMetaData('group'))
@@ -88,7 +105,8 @@
     'value': $value,
     'label': $label,
     'icon': $icon,
-    'url': $xwiki.getURL($reference)
+    'url': $xwiki.getURL($reference),
+    'hint': $hint
   }))
 #end
 ##

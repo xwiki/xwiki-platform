@@ -20,27 +20,22 @@
 package org.xwiki.user.internal.document;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.WikiReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentUserReference}.
  *
  * @version $Id$
  */
-public class DocumentUserReferenceTest
+class DocumentUserReferenceTest
 {
     @Test
-    void identity()
+    void equalsAndHashCode()
     {
         DocumentUserReference reference1 =
             new DocumentUserReference(new DocumentReference("wiki1", "space1", "page1"), true);

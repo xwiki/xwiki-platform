@@ -32,11 +32,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.component.phase.Initializable;
 
 /**
- * Component in charge of communicating with the actual Solr server core. This is direct access and consistency is not
- * enforced at this level.
- * <p>
- * Note: This is also useful for testing since it can be replaced with a mock, this way allowing us to test just our
- * code.
+ * A helper shortcut around the Solr "search" core.
  * 
  * @version $Id$
  * @since 4.3M2

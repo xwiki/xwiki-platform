@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.livedata.LiveData;
 import org.xwiki.livedata.LiveDataConfiguration;
@@ -40,28 +40,20 @@ import org.xwiki.livedata.LiveDataQuery;
 import org.xwiki.livedata.LiveDataQuery.Source;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.template.TemplateManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,37 +66,25 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class LiveTableLiveDataEntryStoreTest
 {
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @InjectMockComponents
     private LiveTableLiveDataEntryStore entryStore;
 
     @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
-
-    @MockComponent
-    private TemplateManager templateManager;
-
-    @MockComponent
-    private ContextualAuthorizationManager authorization;
+    private LiveTableLiveDataResultsRenderer resultsRenderer;
 
     @MockComponent
     @Named("current")
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     @MockComponent
-    private LiveTableRequestHandler liveTableRequestHandler;
-
-    @MockComponent
     private ModelBridge modelBridge;
 
     @MockComponent
-    @Named("liveTable")
+    @Named(LiveTableLiveDataEntryStore.ROLE_HINT)
     private Provider<LiveDataConfiguration> liveDataConfigurationProvider;
-
-    @Mock
-    private XWikiContext xcontext;
-
-    @Mock
-    private XWiki xwiki;
 
     @Mock
     private LiveDataConfiguration liveDataConfiguration;
@@ -117,15 +97,9 @@ class LiveTableLiveDataEntryStoreTest
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void before()
     {
-        when(this.xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
-
-        when(this.liveTableRequestHandler.getLiveTableResults(any(), any()))
-            .thenAnswer(invocation -> ((Supplier<String>) invocation.getArgument(1)).get());
         when(this.liveDataConfigurationProvider.get()).thenReturn(this.liveDataConfiguration);
         when(this.liveDataConfiguration.getMeta()).thenReturn(this.liveDataMeta);
         when(this.liveDataMeta.getEntryDescriptor()).thenReturn(this.entryDescriptor);
@@ -149,7 +123,8 @@ class LiveTableLiveDataEntryStoreTest
         liveTableResults.put("rows", Collections.singletonList(row));
 
         String liveTableResultsJSON = this.objectMapper.writeValueAsString(liveTableResults);
-        when(this.templateManager.render("getdocuments")).thenReturn(liveTableResultsJSON);
+        when(this.resultsRenderer.getLiveTableResultsFromTemplate(eq("getdocuments"), any()))
+            .thenReturn(liveTableResultsJSON);
 
         Map<String, Object> entry = new HashMap<>();
         entry.put("doc.title", "Some title");
@@ -166,26 +141,6 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
-    void getFromResultPageWhenAccessDenied() throws Exception
-    {
-        this.entryStore.getParameters().put("resultPage", "Some.Page");
-
-        DocumentReference documentReference = new DocumentReference("foo", "Some", "Page");
-        when(this.currentDocumentReferenceResolver.resolve("Some.Page")).thenReturn(documentReference);
-
-        DocumentReference userReference = new DocumentReference("xwiki", "Users", "Alice");
-        doThrow(new AccessDeniedException(Right.VIEW, userReference, documentReference)).when(this.authorization)
-            .checkAccess(Right.VIEW, documentReference);
-
-        try {
-            this.entryStore.get(new LiveDataQuery());
-            fail();
-        } catch (LiveDataException e) {
-            assertTrue(e.getCause() instanceof AccessDeniedException, "Expecting AccessDeniedException");
-        }
-    }
-
-    @Test
     void getFromResultPage() throws Exception
     {
         this.entryStore.getParameters().put("resultPage", "test");
@@ -198,9 +153,8 @@ class LiveTableLiveDataEntryStoreTest
         DocumentReference documentReference = new DocumentReference("foo", "Panels", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("Panels.LiveTableResults")).thenReturn(documentReference);
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
-        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("{\"totalrows\":3,\"rows\":[]}");
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("Panels.LiveTableResults"), any()))
+            .thenReturn("{\"totalrows\":3,\"rows\":[]}");
 
         LiveData expectedLiveData = new LiveData();
         expectedLiveData.setCount(3);
@@ -214,9 +168,8 @@ class LiveTableLiveDataEntryStoreTest
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
-        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("{\"totalrows\":7,\"rows\":[]}");
+        when(this.resultsRenderer.getLiveTableResultsFromPage(eq("XWiki.LiveTableResults"), any()))
+            .thenReturn("{\"totalrows\":7,\"rows\":[]}");
 
         LiveData expectedLiveData = new LiveData();
         expectedLiveData.setCount(7);
@@ -230,9 +183,7 @@ class LiveTableLiveDataEntryStoreTest
         DocumentReference documentReference = new DocumentReference("foo", "XWiki", "LiveTableResults");
         when(this.currentDocumentReferenceResolver.resolve("XWiki.LiveTableResults")).thenReturn(documentReference);
 
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument(documentReference, this.xcontext)).thenReturn(document);
-        when(document.getRenderedContent(Syntax.PLAIN_1_0, this.xcontext)).thenReturn("no JSON");
+        when(this.resultsRenderer.getLiveTableResultsFromPage("XWiki.LiveTableResults", null)).thenReturn("no JSON");
 
         try {
             this.entryStore.get(new LiveDataQuery());
@@ -243,13 +194,10 @@ class LiveTableLiveDataEntryStoreTest
     }
 
     @Test
-    void updateUndefinedClassName() throws Exception
+    void updateUndefinedClassName()
     {
-        String entryId = "testEntry";
-        String property = "propName";
-        Object value = "theValue";
         LiveDataException liveDataException =
-            assertThrows(LiveDataException.class, () -> this.entryStore.update(entryId, property, value));
+            assertThrows(LiveDataException.class, () -> this.entryStore.update("testEntry", "propName", "theValue"));
         assertEquals("Can't update object properties if the object type (class name) is undefined.",
             liveDataException.getMessage());
     }

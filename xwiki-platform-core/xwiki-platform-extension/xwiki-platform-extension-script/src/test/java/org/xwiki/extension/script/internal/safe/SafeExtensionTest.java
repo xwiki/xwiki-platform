@@ -21,7 +21,7 @@ package org.xwiki.extension.script.internal.safe;
 
 import org.junit.Test;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.script.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.safe.ScriptSafeProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

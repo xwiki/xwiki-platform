@@ -74,12 +74,12 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // Note: Ideally to improve performance we could imagine loading all XWikiServerClasses at initialization time
         // (in initialize()) and thereafter only use the cache. The problem with this approach is that our Cache will
         // need to be unbounded which is not the case right now. This would mean being able to put all descriptors in
-        // the cache and thus it might not scale if there were a very large number of wikis.
+        // the cache, and thus it might not scale if there were a very large number of wikis.
         // Note that the full list of ids is cached since it takes a lot less memory that descriptors.
 
         Collection<String> wikiIds = getAllIds();
 
-        List<WikiDescriptor> result = new ArrayList<WikiDescriptor>(wikiIds.size());
+        List<WikiDescriptor> result = new ArrayList<>(wikiIds.size());
 
         for (String wikiId : wikiIds) {
             // Get the descriptor
@@ -91,7 +91,19 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             }
         }
 
+        // Sort by wiki pretty name (with a fallback on wiki id).
+        Collections.sort(result, (alice, bob) -> getDisplayName(alice).compareToIgnoreCase(getDisplayName(bob)));
+
         return result;
+    }
+
+    private String getDisplayName(WikiDescriptor descriptor)
+    {
+        String displayName = descriptor.getPrettyName();
+        if (StringUtils.isEmpty(displayName)) {
+            displayName = descriptor.getId();
+        }
+        return displayName;
     }
 
     @Override
@@ -107,7 +119,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 throw new WikiManagerException("Failed to get wiki ids", e);
             }
 
-            wikiIds = new HashSet<String>(documentNames.size());
+            wikiIds = new HashSet<>(documentNames.size());
 
             boolean foundMainWiki = false;
 
@@ -135,7 +147,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public WikiDescriptor getByAlias(String wikiAlias) throws WikiManagerException
     {
-        WikiDescriptor descriptor = cache.getFromAlias(wikiAlias);
+        WikiDescriptor descriptor = this.cache.getFromAlias(wikiAlias);
 
         // If not found in the cache then query the wiki and add to the cache if found.
         //
@@ -145,7 +157,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // Note that In order for performance to be maximum it also means we need to have a cache size at least as
         // large as the max # of wikis being used at once.
         if (descriptor == null) {
-            XWikiDocument document = descriptorDocumentHelperProvider.get().findXWikiServerClassDocument(wikiAlias);
+            XWikiDocument document =
+                this.descriptorDocumentHelperProvider.get().findXWikiServerClassDocument(wikiAlias);
             if (document != null) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
@@ -153,7 +166,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
             if (descriptor == null) {
                 // Cache the fact that no descriptor is available for this alias
-                cache.addFromAlias(wikiAlias, DefaultWikiDescriptor.VOID);
+                this.cache.addFromAlias(wikiAlias, DefaultWikiDescriptor.VOID);
             }
         }
 
@@ -163,11 +176,11 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public WikiDescriptor getById(String wikiId) throws WikiManagerException
     {
-        WikiDescriptor descriptor = cache.getFromId(wikiId);
+        WikiDescriptor descriptor = this.cache.getFromId(wikiId);
 
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
-            XWikiDocument document = descriptorDocumentHelperProvider.get().getDocumentFromWikiId(wikiId);
+            XWikiDocument document = this.descriptorDocumentHelperProvider.get().getDocumentFromWikiId(wikiId);
 
             if (!document.isNew()) {
                 // Build the descriptor
@@ -179,7 +192,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
             if (descriptor == null) {
                 // Cache the fact that no descriptor is available for this alias
-                cache.addFromId(wikiId, DefaultWikiDescriptor.VOID);
+                this.cache.addFromId(wikiId, DefaultWikiDescriptor.VOID);
             }
         }
 
@@ -259,7 +272,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             descriptor = this.wikiDescriptorBuilderProvider.get().buildDescriptorObject(serverClassObjects, document);
             // Add to the cache
             if (descriptor != null) {
-                cache.add(descriptor);
+                this.cache.add(descriptor);
             }
         }
 

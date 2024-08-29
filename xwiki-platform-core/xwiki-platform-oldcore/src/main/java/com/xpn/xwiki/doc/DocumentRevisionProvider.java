@@ -21,6 +21,10 @@ package com.xpn.xwiki.doc;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -56,4 +60,24 @@ public interface DocumentRevisionProvider
      * @throws XWikiException when failing to load the document revision
      */
     XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException;
+
+    /**
+     * Check if access is granted on the given document revision, for the given user and right: if the access is not
+     * granted this method will throw an {@link AccessDeniedException}.
+     * This method allows each revision provider to have their own check depending on the type of revision.
+     *
+     * @param right the right for which to check if access is granted
+     * @param userReference the user for whom to check access
+     * @param documentReference the reference of the document
+     * @param revision the revision of the document
+     * @throws AuthorizationException if the access is denied
+     * @throws XWikiException in case of problem when loading the revision
+     * @since 14.10
+     * @since 14.4.7
+     * @since 13.10.11
+     */
+    default void checkAccess(Right right, UserReference userReference, DocumentReference documentReference,
+        String revision) throws AuthorizationException, XWikiException
+    {
+    }
 }

@@ -58,7 +58,7 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.rendering.wiki.WikiModelException;
 
 import com.steadystate.css.parser.CSSOMParser;
-import com.steadystate.css.parser.SACParserCSS21;
+import com.steadystate.css.parser.SACParserCSS3;
 
 /**
  * Implementation using the Document Access Bridge ({@link DocumentAccessBridge}).
@@ -134,7 +134,7 @@ public class XWikiWikiModel implements WikiModel
      *
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-5625">XWIKI-5625: PDF styling doesn't work anymore</a>
      */
-    private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS21());
+    private final CSSOMParser cssParser = new CSSOMParser(new SACParserCSS3());
 
     /**
      * {@inheritDoc}
@@ -211,7 +211,13 @@ public class XWikiWikiModel implements WikiModel
 
         DocumentReference documentReference = this.documentAccessBridge.getDocumentReference(documentEntityReference);
 
-        return this.documentAccessBridge.exists(documentReference);
+        try {
+            return this.documentAccessBridge.exists(documentReference);
+        } catch (Exception e) {
+            this.logger.error("Failed to check the existence of document with reference [{}]", documentReference, e);
+        }
+
+        return false;
     }
 
     @Override

@@ -42,42 +42,50 @@
 ## Import the documents from the selected XAR.
 ## ---------------------------------------------------------------------------
 #if("$!{request.action}" == 'import')
-<p class="legend">$services.localization.render('import') #if("$!{request.withversions}" == '1')$services.localization.render('export_addhistory')#end</p>
+<p class="legend">$escapetool.xml($services.localization.render('import')) #if("$!{request.withversions}" == '1')
+  $escapetool.xml($services.localization.render('export_addhistory'))#end</p>
 #template("imported.vm")
 ## ---------------------------------------------------------------------------
 ## Browse the XARs and let the user select a XAR and the list of documents
 ## to import from that XAR.
 ## ---------------------------------------------------------------------------
 #else
-  #set($baseQueryString = "editor=$!{request.editor}&amp;section=$!{request.section}")
+  #set($baseQueryString = "editor=$!{escapetool.url($request.editor)}&amp;section=$!{escapetool.url($request.section)}")
   $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##
   $xwiki.ssfx.use('js/xwiki/importer/import.css', true)##
   $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.locale}})##
   $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)##
   <div id="import" class="row">
     <div id="packagelist" class="col-xs-12 col-sm-6 col-md-6">
-      <div class="legend">$services.localization.render('core.importer.uploadPackage')</div>
+      <div class="legend">
+        $escapetool.xml($services.localization.render('core.importer.uploadPackage'))
+      </div>
       ## Let the user upload XAR files.
       <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
         <div>
           ## CSRF prevention
-          <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+          <input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" />
           <input type="hidden" name="xredirect" value="$!{escapetool.xml($redirect)}" />
           <fieldset id="attachform">
             ## Temporarily disabled, until we fix attachment name handling
             ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
             <div><input id="xwikiuploadname" type="hidden" name="filename" value="" /></div>
             <div class="package-upload">
-               <label for="xwikiuploadfile" class="hidden">$services.localization.render('core.viewers.attachments.upload.file')</label>
-               <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput noitems" data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))" />
-               <span class="buttonwrapper">
-                 <input type="submit" value="Upload" class="button" />
-               </span>
+              <label for="xwikiuploadfile" class="sr-only">
+                $escapetool.xml($services.localization.render('core.viewers.attachments.upload.file'))
+              </label>
+              <input id="xwikiuploadfile" type="file" name="filepath" class="uploadFileInput noitems"
+                     data-max-file-size="$!escapetool.xml($xwiki.getSpacePreference('upload_maxsize'))"/>
+              <span class="buttonwrapper">
+                <input type="submit" value="Upload" class="button"/>
+              </span>
             </div>
           </fieldset>
         </div>
       </form>
-    <div class="legend">$services.localization.render('core.importer.availablePackages')</div>
+    <div class="legend">
+      $escapetool.xml($services.localization.render('core.importer.availablePackages'))
+    </div>
     <div id="packagelistcontainer">
       #template('packagelist.vm')
     </div> ## packagelistcontainer
@@ -94,42 +102,54 @@
           #if(!$package)
             #error("There was an error reading the file ${escapetool.xml(${request.file})}. $!xcontext.import_error")
           #else
-          <div class="legend">$services.localization.render('core.importer.availableDocuments')</div>
+          <div class="legend">
+            $escapetool.xml($services.localization.render('core.importer.availableDocuments'))
+          </div>
           <div id="packageDescription">
             <div class="packageinfos">
               <div>
-                <span class="label">$services.localization.render('core.importer.package')</span>
-                <span class="filename">$attach.filename</span>
+                <span class="label">
+                  $escapetool.xml($services.localization.render('core.importer.package'))
+                </span>
+                <span class="filename">$escapetool.xml($attach.filename)</span>
               </div>
               #if("$!package.packageName" != '')
               <div>
-                <span class="label">$services.localization.render('core.importer.package.description')</span>
-                <span class="name">$package.packageName</span>
+                <span class="label">
+                  $escapetool.xml($services.localization.render('core.importer.package.description'))
+                </span>
+                <span class="name">$escapetool.xml($package.packageName)</span>
               </div>
               #end
               #if("$!package.packageVersion" != '')
               <div>
-                <span class="label">$services.localization.render('core.importer.package.version')</span>
-                <span class="version">$package.packageVersion</span>
+                <span class="label">
+                  $escapetool.xml($services.localization.render('core.importer.package.version'))
+                </span>
+                <span class="version">$escapetool.xml($package.packageVersion)</span>
               </div>
               #end
               #if("$!package.packageAuthor" != '')
               <div>
-                <span class="label">$services.localization.render('core.importer.package.author')</span>
-                <span class="author">$package.packageAuthor</span>
+                <span class="label">
+                  $escapetool.xml($services.localization.render('core.importer.package.author'))
+                </span>
+                <span class="author">$escapetool.xml($package.packageAuthor)</span>
               </div>
               #end
               #if("$!package.packageLicense" != '')
               <div>
-                <span class="label">$services.localization.render('core.importer.package.licence')</span>
-                <span class="licence">$package.packageLicense</span>
+                <span class="label">
+                  $escapetool.xml($services.localization.render('core.importer.package.licence'))
+                </span>
+                <span class="licence">$escapetool.xml($package.packageLicense)</span>
               </div>
               #end
             </div>
-            <form action="$!{importaction}" method="post" class="static-importer">
+            <form action="$!escapetool.xml($importaction)" method="post" class="static-importer">
               <div>
                 ## CSRF prevention
-                <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+                <input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" />
                 <input type="hidden" name="action" value="import" />
                 <input type="hidden" name="name" value="$!{escapetool.xml($request.file)}" />
                 <div id="package">
@@ -151,7 +171,7 @@
                           </span>
                           <span class="documentName">
                             <input type="hidden" name="$!{escapetool.xml($services.model.serialize($locale, 'local'))}:$!{escapetool.xml($locale.locale)}" value="$!{escapetool.xml($locale.locale)}" />
-                            $document #if("$!locale.locale" != '') - $locale.locale #end
+                            $escapetool.xml($document) #if("$!locale.locale" != '') - $locale.locale #end
                           </span>
                           <div class="clearfloats"></div>
                         </div>
@@ -163,7 +183,7 @@
                       #set($space = $spaceNode.reference.name)
                       <li class="xitem xunderline">
                         <div class="xitemcontainer">
-                        <div class="spacename">$space</div>
+                        <div class="spacename">$escapetool.xml($space)</div>
                         <div class="clearfloats"></div>
                         <div class="pages">
                         <ul class="xlist pages">
@@ -182,34 +202,38 @@
                         #displaySpaceNode($node)
                       #end                      
                     #end
-                    #foreach($node in $services.model.toTree($package.entries).children)
+                    #set ($tree = $services.model.toTree($package.entries))
+                    #foreach($node in $tree.children)
                       #displayNode($node)
                     #end
                   </ul>
                 <div class="importOption">
-                  <em>$services.localization.render('core.importer.whenDocumentAlreadyExists')</em>
+                  <em>
+                    $escapetool.xml($services.localization.render('core.importer.whenDocumentAlreadyExists'))
+                  </em>
                   <div class="historyStrategyOption">
-                     <input type="radio" name="historyStrategy" value="add" checked="checked" />
-                     $services.localization.render('core.importer.addNewVersion')
+                    <input type="radio" name="historyStrategy" value="add" checked="checked" />
+                    $escapetool.xml($services.localization.render('core.importer.addNewVersion'))
                   </div>
                   <div class="historyStrategyOption">
-                     <input type="radio" name="historyStrategy" value="replace" />
-                     $services.localization.render('core.importer.replaceDocumentHistory')
+                    <input type="radio" name="historyStrategy" value="replace" />
+                    $escapetool.xml($services.localization.render('core.importer.replaceDocumentHistory'))
                   </div>
                   <div class="historyStrategyOption">
-                     <input type="radio" name="historyStrategy" value="reset" />
-                     $services.localization.render('core.importer.resetHistory')
+                    <input type="radio" name="historyStrategy" value="reset" />
+                    $escapetool.xml($services.localization.render('core.importer.resetHistory'))
                   </div>
                 </div>
                 ## TODO: replace with a new API to introduce (impossible to safely test right on a different wiki from velocity without PR)
                 #if($xwiki.package.hasBackupPackImportRights())
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
-                  $services.localization.render('core.importer.importAsBackup')
+                  $escapetool.xml($services.localization.render('core.importer.importAsBackup'))
                 </div>
                 #end
                 <span class="buttonwrapper">
-                  <input class="button" type="submit" value="$services.localization.render('core.importer.import')" />
+                  <input class="button" type="submit" 
+                         value="$escapetool.xml($services.localization.render('core.importer.import'))" />
                 </span>
               </div>
               </div>

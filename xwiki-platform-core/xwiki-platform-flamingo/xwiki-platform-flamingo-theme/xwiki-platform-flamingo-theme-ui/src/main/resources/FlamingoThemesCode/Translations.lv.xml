@@ -42,7 +42,7 @@ platform.flamingo.themes.home.otherthemes=Citas pieejamās tēmas
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Ar šo lietotni varat pārvalīdīt Flamingo tēmas. Flamingo tēma ir pielāgojama Flamingo apdare. Ja vēlaties mainīt krāsas Colibri-bāzētai apdarei, jums ir jāizmanto {0}Colibri krāsu tēmu lietotne{1}.
 platform.flamingo.themes.home.warningCurrentOldColorTheme=Pašreiz tiek izmantota Colibri krāsu tēma, kura nav piemērota izmantošanai ar Flamingo apdari. Mēs esam darījuši visu iespējamo, lai tā nebūtu, tomēr rezultāts var nebūt pietiekami labs.
 platform.flamingo.themes.home.useThisTheme=Lietot šo tēmu
-platform.flamingo.themes.home.newThemeName=Tēmas nosaukums...
+platform.flamingo.themes.home.newThemeName=Tēmas nosaukums…
 platform.flamingo.themes.home.create=Izveidot jaunu tēmu
 platform.flamingo.themes.home.create.invalid=Nepareizs tēmas nosaukums!
 platform.flamingo.themes.home.create.csrf=Drošības nolūkos lūdzam apstiprināt, ka vēlaties izveidot tēmu ar nosaukumu  "{0}".
@@ -76,7 +76,7 @@ platform.flamingo.themes.global=Globāla
 ###############################################################################
 
 ## Used to indicate where deprecated keys start
-@deprecatedstart
+#@deprecatedstart
 
 #######################################
 ## until 7.3M1
@@ -88,5 +88,6 @@ platform.flamingo.themes.lessCode.warning=Diemžēl šī lauka vērtība priekš
 #######################################
 platform.flamingo.themes.incompatiblebrowser=Piedodiet, bet tēmas priešskatīšana nedarbojas ar šo Internet Explorer versiju. Jums ir jāizmanto pārlūkprogrammas modernāka versija.
 
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

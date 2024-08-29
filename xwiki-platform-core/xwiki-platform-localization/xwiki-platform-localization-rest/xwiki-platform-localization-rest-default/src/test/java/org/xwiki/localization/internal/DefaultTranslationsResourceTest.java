@@ -78,7 +78,7 @@ class DefaultTranslationsResourceTest
     private final Locale defaultLocale = Locale.forLanguageTag("es");
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Mock
     private Translation translationKey1;

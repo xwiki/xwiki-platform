@@ -19,9 +19,12 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -33,27 +36,27 @@ import org.openqa.selenium.support.FindBy;
  */
 public class DeletePageOutcomePage extends ViewPage
 {
-    /**
-     * The Deleter is found in the first cell of the first column of the table listing past deletions.
-     * Note that when the user has no profile (as with superadmin for example or if a user's profile has been
-     * removed) then the deleted is not wrapped in an A tag and thus we shouldn't use that as a way to locate
-     * the deleter.
-     */
-    @FindBy(xpath = "//table[@class='centered']/tbody/tr/td")
-    private WebElement deleter;
-
     @FindBy(xpath = "//p[@class='xwikimessage']")
     private WebElement message;
 
-    @FindBy(xpath = "//*[@id = 'mainContentArea']//a[@class = 'action-restore']")
-    private WebElement restoreLink;
+    @FindBy(xpath = "//table[@class='centered']/tbody/tr/td[3]/a")
+    private WebElement batchLink;
 
     /**
+     * Return first page deleted deleter.
      * @since 3.2M3
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
+     *             {@link DeletedPageEntry#getDeleter()}.
      */
+    @Deprecated(since = "14.10")
     public String getPageDeleter()
     {
-        return this.deleter.getText();
+        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
+        if (deletedPagesEntries == null) {
+            return "";
+        } else {
+            return deletedPagesEntries.get(0).getDeleter();
+        }
     }
 
     /**
@@ -64,16 +67,66 @@ public class DeletePageOutcomePage extends ViewPage
         return this.message.getText();
     }
 
+    private List<DeletedPageEntry> getDeletedEntries(WebElement table, boolean isTerminal)
+    {
+        List<DeletedPageEntry> result = new ArrayList<>();
+        List<WebElement> entries = getDriver().findElementsWithoutWaiting(table, By.tagName("tr"));
+        // We ignore the first entry since it's the table header row.
+        if (entries.size() > 1) {
+            for (int i = 1; i < entries.size(); i++) {
+                result.add(new DeletedPageEntry(i, isTerminal, entries.get(i)));
+            }
+        }
+
+        return result;
+    }
+
     /**
-     * Clicks on the link to restore the deleted page from the recycle bin.
+     * @return the list of non-terminal deleted page entries.
+     * @since 14.10
+     */
+    public List<DeletedPageEntry> getDeletedPagesEntries()
+    {
+        try {
+            WebElement table =
+                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.docs table"));
+            return getDeletedEntries(table, false);
+        } catch (NoSuchElementException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * @return the list of terminal deleted page entries.
+     */
+    public List<DeletedPageEntry> getDeletedTerminalPagesEntries()
+    {
+        try {
+            WebElement table =
+                getDriver().findElementWithoutWaiting(By.cssSelector("div.xwikimessage div.terminal-docs table"));
+            return getDeletedEntries(table, true);
+        } catch (NoSuchElementException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Clicks on the first link to restore the deleted page from the recycle bin.
      * 
      * @return the restored view page
      * @since 5.2M2
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
+     *              {@link DeletedPageEntry#clickRestore()}.
      */
+    @Deprecated(since = "14.10")
     public ViewPage clickRestore()
     {
-        this.restoreLink.click();
-        return new ViewPage();
+        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
+        if (deletedPagesEntries == null) {
+            throw new RuntimeException("There's no deleted entries.");
+        } else {
+            return deletedPagesEntries.get(0).clickRestore();
+        }
     }
 
     /**  
@@ -83,31 +136,26 @@ public class DeletePageOutcomePage extends ViewPage
      */
     public boolean hasTerminalPagesInRecycleBin()
     {
-        List<WebElement> messages = getDriver().findElementsByClassName("recyclebin-message");
-        for (WebElement message : messages) {
-            if (StringUtils.equals(message.getText(),
-                    "The following versions of terminal pages are in the recycle bin:")) {
-                return true;
-            }
-        }
-        
-        return false;
+        return !getDeletedTerminalPagesEntries().isEmpty();
     }
 
     /**
-     * Clicks on the link to restore the deleted page from the recycle bin.
+     * Clicks on the link to permanently delete the deleted page from the recycle bin.
      *
-     * @return the restored view page
+     * @return the recycle bin page updated
      * @since 7.2RC1
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
+     *             {@link DeletedPageEntry#clickDelete()}.
      */
+    @Deprecated(since = "14.10")
     public DeletePageOutcomePage clickDeletePage()
     {
-        List<WebElement> elements = getDriver().findElementsByCssSelector(".docs .action-delete");
-        if (!elements.isEmpty()) {
-            getDriver().makeConfirmDialogSilent(true);
-            elements.get(0).click();
+        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
+        if (deletedPagesEntries == null) {
+            throw new RuntimeException("There's no deleted entries.");
+        } else {
+            return deletedPagesEntries.get(0).clickDelete();
         }
-        return new DeletePageOutcomePage();
     }
 
     /**
@@ -115,14 +163,50 @@ public class DeletePageOutcomePage extends ViewPage
      *
      * @return the restored view page
      * @since 7.2RC1
+     * @deprecated Since 14.10 prefer using {@link #getDeletedTerminalPagesEntries()} and
+     *             {@link DeletedPageEntry#clickDelete()}.
      */
+    @Deprecated(since = "14.10")
     public DeletePageOutcomePage clickDeleteTerminalPage()
     {
-        List<WebElement> elements = getDriver().findElementsByCssSelector(".terminal-docs .action-delete");
-        if (!elements.isEmpty()) {
-            getDriver().makeConfirmDialogSilent(true);
-            elements.get(0).click();
+        List<DeletedPageEntry> deletedPagesEntries = getDeletedTerminalPagesEntries();
+        if (deletedPagesEntries == null) {
+            throw new RuntimeException("There's no deleted entries.");
+        } else {
+            return deletedPagesEntries.get(0).clickDelete();
         }
-        return new DeletePageOutcomePage();
-    }   
+    }
+
+    /**
+     * Click on the link to view the deleted page.
+     *
+     * @param row the revision row for which to view the deleted page, starting at 1
+     * @return the view page of the deleted page
+     * @since 13.10.4
+     * @since 14.2RC1
+     * @deprecated Since 14.10 prefer using {@link #getDeletedPagesEntries()} and
+     *            {@link DeletedPageEntry#clickDelete()}.
+     */
+    @Deprecated(since = "14.10")
+    public ViewPage clickViewDocument(int row)
+    {
+        int actualEntryNumber = row - 1;
+        List<DeletedPageEntry> deletedPagesEntries = getDeletedPagesEntries();
+        if (deletedPagesEntries == null || actualEntryNumber >= deletedPagesEntries.size()) {
+            throw new RuntimeException(String.format(
+                "Requested row is [%s] while number of deleted entries is [%s].", row, deletedPagesEntries.size()));
+        } else {
+            return deletedPagesEntries.get(actualEntryNumber).clickView();
+        }
+    }
+
+    /**
+     * Clicks on the batch link. Goes to the undelete action.
+     *
+     * @since 15.8RC1
+     */
+    public void clickBatchLink()
+    {
+        this.batchLink.click();
+    }
 }

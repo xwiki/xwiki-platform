@@ -21,82 +21,86 @@
 ##
 ## Display the drawer
 ##
-<div class="drawer-main drawer-default" id="tmDrawer">
-  <nav class="drawer-nav">
-  
+<dialog class="drawer-nav" id="tmDrawer"
+aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.label'))">
+  <ul class="drawer-menu">
     ##
     ## Drawer header (with elements concerning the current user: profile, login, logout, register, etc...)
     ##
-    <div class="drawer-brand clearfix">
+    <li class="drawer-brand clearfix">
       <a href="$xwiki.getURL($xcontext.user, 'view')">
-      #largeUserAvatar($xcontext.user)
+        #largeUserAvatar($xcontext.user)
       </a>
       <div class="brand-links">
+        #define ($logoutLink)
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
+        #end
         #if ($xcontext.user != 'XWiki.XWikiGuest')
           <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout" rel="nofollow">$services.icon.renderHTML('log-out') $escapetool.xml($services.localization.render('logout'))</a>
+          $logoutLink
+        #elseif($xcontext.user == 'XWiki.XWikiGuest' && $xcontext.inactiveUserReference)
+          <a href="$xwiki.getURL($xcontext.inactiveUserReference, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.inactiveUserReference, false)</a>
+          $logoutLink
         #else
           <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)&loginLink=1")" id="tmLogin" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('login'))</a>
           #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
             <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('register'))</a>
           #end
         #end
-         ##
-         ## UIX
-         ##
-         #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
+        ##
+        ## UIX
+        ##
+        #displayDrawerUIX('org.xwiki.plaftorm.drawer.header')
       </div>
-    </div>
-
+      <button class="btn btn-primary drawer-close" title="$escapetool.xml($services.localization.render('core.menu.drawer.close.title'))">$services.icon.renderHTML('cross')</button>
+    </li>
     ##
     ## Display the content of the drawer
     ##
-    <ul class="drawer-menu">
-      #set ($drawerExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.drawer', {'sortByParameter' : 'order'}))
-      ## Logs to debug problems when displaying UIXes.
-      #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIXes: [{}]', $drawerExtensions))
-      ##
-      ## Local Category
-      ##
-      #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
-      ##
-      ## Display an "Administer wiki" item if the Administration App is not installed.
-      ## The role of the item is to help the user importing content.
-      ##
-      #if ($hasGlobalAdmin)
+    #set ($drawerExtensions = $services.uix.getExtensions('org.xwiki.plaftorm.drawer', {'sortByParameter' : 'order'}))
+    ## Logs to debug problems when displaying UIXes.
+    #set ($discard = $services.logging.getLogger('drawer.vm').debug('Drawer UIXes: [{}]', $drawerExtensions))
+    ##
+    ## Local Category
+    ##
+    #drawerCategoryHeader($services.wiki.currentWikiDescriptor.prettyName)
+    ##
+    ## Display an "Administer wiki" item if the Administration App is not installed.
+    ## The role of the item is to help the user importing content.
+    ##
+    #if ($hasGlobalAdmin)
+      #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
+      #if (!$isAdminAppInstalled)
+        ## If the admin application is not installed, we add a link to import it.
+        ## Otherwise, we let the admin application adds the correct UIX to administrate the wiki.
         #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
-        #if (!$isAdminAppInstalled)
-          ## If the admin application is not installed, we add a link to import it.
-          ## Otherwise, we let the admin application adds the correct UIX to administrate the wiki.
-          #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
-          #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
-          #drawerSeparator()
-        #end
+        #drawerItem($importaction, 'wrench', $escapetool.xml($services.localization.render('core.menu.admin')), 'tmAdminWiki')
+        #drawerSeparator()
       #end
+    #end
+    ##
+    ## UIX: Drawer items for the current wiki
+    ##
+    #displayTheseDrawerUIX($drawerExtensions, 'local')
+    ##
+    ## Global category
+    ##
+    #define ($globalPart)
       ##
-      ## UIX: Drawer items for the current wiki
+      ## Languages
       ##
-      #displayTheseDrawerUIX($drawerExtensions, 'local')
+      #template('menus_language.vm')
       ##
-      ## Global category
+      ## UIX: Drawer items for the global scope
       ##
-      #define ($globalPart)
-        ##
-        ## Languages
-        ##
-        #template('menus_language.vm')
-        ##
-        ## UIX: Drawer items for the global scope
-        ##
-        #displayTheseDrawerUIX($drawerExtensions, 'global')
-      #end
-      #if ($stringtool.isNotBlank($globalPart.toString()))
-        #drawerCategoryHeader($services.localization.render('core.drawer.global'))
-        $globalPart
-      #end
-    </ul>
-  </nav>
-</div>
+      #displayTheseDrawerUIX($drawerExtensions, 'global')
+    #end
+    #if ($stringtool.isNotBlank($globalPart.toString()))
+      #drawerCategoryHeader($services.localization.render('core.drawer.global'))
+      $globalPart
+    #end
+  </ul>
+</dialog>
 #**
  * Display the UI extensions.
  *

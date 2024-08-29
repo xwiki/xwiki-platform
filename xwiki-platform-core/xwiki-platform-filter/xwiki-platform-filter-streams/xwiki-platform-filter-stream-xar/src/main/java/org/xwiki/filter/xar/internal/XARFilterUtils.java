@@ -19,6 +19,8 @@
  */
 package org.xwiki.filter.xar.internal;
 
+import org.xwiki.xar.internal.model.XarDocumentModel;
+
 /**
  * @version $Id$
  * @since 6.2M1
@@ -47,30 +49,37 @@ public final class XARFilterUtils
         }
     }
 
-    /**
-     * @since 7.2M1
-     */
-    public static final String ROLEHINT_11 = "xwiki+xar/1.1";
+    private static final String ROLEHINT_PREFIX = "xwiki+xar/";
 
     /**
      * @since 7.2M1
      */
-    public static final String ROLEHINT_12 = "xwiki+xar/1.2";
+    public static final String ROLEHINT_11 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_11;
+
+    /**
+     * @since 7.2M1
+     */
+    public static final String ROLEHINT_12 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_12;
 
     /**
      * @since 9.0RC1
      */
-    public static final String ROLEHINT_13 = "xwiki+xar/1.3";
+    public static final String ROLEHINT_13 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_13;
 
     /**
      * @since 12.0RC1
      */
-    public static final String ROLEHINT_14 = "xwiki+xar/1.4";
+    public static final String ROLEHINT_14 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_14;
+
+    /**
+     * @since 14.0RC1
+     */
+    public static final String ROLEHINT_15 = ROLEHINT_PREFIX + XarDocumentModel.VERSION_15;
 
     /**
      * @since 7.2M1
      */
-    public static final String ROLEHINT_CURRENT = ROLEHINT_14;
+    public static final String ROLEHINT_CURRENT = ROLEHINT_15;
 
     /**
      * @since 6.2M1

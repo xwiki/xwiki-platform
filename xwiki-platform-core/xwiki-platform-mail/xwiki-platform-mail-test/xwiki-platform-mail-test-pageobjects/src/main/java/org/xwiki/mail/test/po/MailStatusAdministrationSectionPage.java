@@ -19,12 +19,13 @@
  */
 package org.xwiki.mail.test.po;
 
+import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
 import org.xwiki.livedata.test.po.LiveDataElement;
 
 /**
  * Represents the actions possible on the Mail Status Administration Page.
- * 
+ *
  * @version $Id$
  * @since 6.4RC1
  */
@@ -47,5 +48,16 @@ public class MailStatusAdministrationSectionPage extends AdministrationSectionPa
     public LiveDataElement getLiveData()
     {
         return new LiveDataElement("sendmailstatus");
+    }
+
+    /**
+     * Click on a mail action.
+     *
+     * @param rowNumber the row number in which to call the actions (start at 1 for the first row)
+     * @param actionName the name of the action (e.g., {@code mailsendingaction_resend})
+     */
+    public void clickAction(int rowNumber, String actionName)
+    {
+        getLiveData().getTableLayout().clickAction(rowNumber, By.cssSelector(String.format("[name='%s']", actionName)));
     }
 }

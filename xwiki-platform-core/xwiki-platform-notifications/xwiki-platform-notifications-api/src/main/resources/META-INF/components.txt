@@ -1,3 +1,5 @@
+org.xwiki.notifications.internal.ApplicationTypeGroupingStrategy
 org.xwiki.notifications.internal.DefaultCompositeEventStatusManager
+org.xwiki.notifications.internal.DefaultGroupingEventStrategy
 org.xwiki.notifications.internal.DefaultNotificationConfiguration
 org.xwiki.notifications.internal.SimilarityCalculator

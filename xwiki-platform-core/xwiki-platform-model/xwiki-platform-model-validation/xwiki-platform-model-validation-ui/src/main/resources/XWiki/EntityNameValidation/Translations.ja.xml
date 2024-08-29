@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="ja">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>ja</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=現在の命名方針
+entitynamevalidation.currentStrategy.hint=命名方針は、ドキュメントの作成、名称の変更、保存時に使用されます。
+entitynamevalidation.useTransformation.label=名称を自動的に変換
+entitynamevalidation.useTransformation.hint=有効にすると、可能な場合には名称方針を使用して自動的に名称を変更します。
+entitynamevalidation.useValidation.label=保存前に名称を検証
+entitynamevalidation.useValidation.hint=有効にすると、名称方針によって保存前に名称が検証されます。この機能を使用すると既存のドキュメントを保存できない可能性があるため、注意して使用してください。
+entitynamevalidation.replacementCharacter.configuration=文字変更の方針に関する設定
+entitynamevalidation.testStrategy.label=選択した方針をテスト
+entitynamevalidation.testStrategy.hint=選択した命名方針の挙動を確認できます
+entitynamevalidation.testStrategy.placeholder=テストするページ名を入力してください
+entitynamevalidation.testStrategy.validName=この名称は命名方針に正しく従っていますか？
+entitynamevalidation.testStrategy.transformedName=選択した方針で変換を行った後の名称：
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=禁止文字
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=置き換える文字
+entitynamevalidation.replacementCharacter.livetable._actions=アクション
+entitynamevalidation.replacementCharacter.add=新しい文字を追加
+entitynamevalidation.replacementCharacter.addNewCharacter=禁止あるいは置き換える新しい文字を追加
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=新しい禁止文字
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=この文字はページ名で使用できなくなります
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=新しい禁止文字を入力してください
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=置き換える新しい文字
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=この文字でページ名の禁止文字を置き換えます。指定がない場合、禁止文字はページ名から取り除かれます。
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=置き換える文字を入力するか、空のままにしてください
+entitynamevalidation.replacementCharacter.create.inProgress=新しい禁止文字を追加しています…
+entitynamevalidation.replacementCharacter.create.done=新しい禁止文字を正常に追加しました。
+entitynamevalidation.replacementCharacter.create.failed=新しい禁止文字を追加する際のエラー。
+entitynamevalidation.replacementCharacter.removeCharacter=禁止文字の削除
+entitynamevalidation.replacementCharacter.removeCharacter.warning=この禁止文字を削除してよろしいですか？
+entitynamevalidation.replacementCharacter.removeCharacter.remove=削除
+entitynamevalidation.replacementCharacter.remove.inProgress=禁止文字を削除しています…
+entitynamevalidation.replacementCharacter.remove.done=禁止文字を削除しました。
+entitynamevalidation.replacementCharacter.remove.failed=禁止文字を削除する際のエラー。
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=なし
+entitynamevalidation.admin.heading=命名方針
+admin.namestrategies=命名方針
+</content>
+</xwikidoc>

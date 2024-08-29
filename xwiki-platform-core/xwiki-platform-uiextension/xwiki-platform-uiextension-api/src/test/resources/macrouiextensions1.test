@@ -1,0 +1,18 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.1
+.#-----------------------------------------------------
+{{uiextensions extensionPoint="extensionpoint"/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [uiextensions] [extensionPoint=extensionpoint]
+beginParagraph
+onWord [extension1]
+endParagraph
+beginParagraph
+onWord [extension2]
+endParagraph
+endMacroMarkerStandalone [uiextensions] [extensionPoint=extensionpoint]
+endDocument

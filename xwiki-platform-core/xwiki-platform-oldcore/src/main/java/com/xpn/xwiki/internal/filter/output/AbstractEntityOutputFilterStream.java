@@ -42,6 +42,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilter;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterCollection;
@@ -85,6 +87,10 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     @Inject
     @Named("user/current")
     protected DocumentReferenceResolver<String> userStringResolver;
+
+    @Inject
+    @Named("document")
+    protected UserReferenceResolver<DocumentReference> userDocumentResolver;
 
     @Inject
     protected ConverterManager converter;
@@ -264,29 +270,56 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
         return (DocumentReference) reference;
     }
 
-    protected DocumentReference getUserReference(String key, FilterEventParameters parameters, DocumentReference def)
+    protected UserReference getUserReference(String key, FilterEventParameters parameters, UserReference def)
+    {
+        UserReference userReference = def;
+
+        Object reference = get(Object.class, key, parameters, def, false, false);
+
+        if (reference != null && !(reference instanceof UserReference)) {
+            if (reference instanceof DocumentReference) {
+                userReference = this.userDocumentResolver.resolve((DocumentReference) reference);
+            } else {
+                userReference = this.userDocumentResolver.resolve(toUserDocumentReference(reference));
+            }
+        }
+
+        return userReference;
+    }
+
+    protected DocumentReference getUserDocumentReference(String key, FilterEventParameters parameters,
+        DocumentReference def)
     {
         DocumentReference userReference = def;
 
         Object reference = get(Object.class, key, parameters, def, false, false);
 
         if (reference != null && !(reference instanceof DocumentReference)) {
-            if (reference instanceof EntityReference) {
-                userReference =
-                    this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference != null
-                        ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
-            } else {
-                userReference =
-                    this.userStringResolver.resolve(reference.toString(), this.currentEntityReference != null
-                        ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
-            }
-        }
-
-        if (userReference != null && userReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            userReference = null;
+            userReference = toUserDocumentReference(reference);
         }
 
         return userReference;
+    }
+
+    protected DocumentReference toUserDocumentReference(Object reference)
+    {
+        DocumentReference userDocumentReference;
+
+        if (reference instanceof EntityReference) {
+            userDocumentReference =
+                this.userEntityResolver.resolve((EntityReference) reference, this.currentEntityReference != null
+                    ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
+        } else {
+            userDocumentReference =
+                this.userStringResolver.resolve(reference.toString(), this.currentEntityReference != null
+                    ? this.currentEntityReference.extractReference(EntityType.WIKI) : null);
+        }
+
+        if (userDocumentReference != null && userDocumentReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            userDocumentReference = null;
+        }
+
+        return userDocumentReference;
     }
 
     // XWikiDocumentFilter

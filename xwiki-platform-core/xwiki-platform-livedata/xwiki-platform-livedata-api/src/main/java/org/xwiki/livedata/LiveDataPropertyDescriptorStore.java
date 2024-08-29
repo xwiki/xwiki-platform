@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The interface used to store and retrieve the property descriptors.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.10
  */
 @Role
-@Unstable
 public interface LiveDataPropertyDescriptorStore
 {
     /**

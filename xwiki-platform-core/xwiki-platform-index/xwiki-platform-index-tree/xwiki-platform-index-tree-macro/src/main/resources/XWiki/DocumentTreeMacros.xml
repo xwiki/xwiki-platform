@@ -354,10 +354,6 @@
   #if ($canViewDoc &amp;&amp; $docTreeConfig.showDocumentTitle)
     ## Display the translated title.
     #set ($translatedDocument = $xwiki.getDocument($documentReference).translatedDocument)
-    ## Make sure the displayed title is not affected by the sheet request parameter (e.g. when $translatedDocument is
-    ## the current document). By setting the title (even if we don't change it) the internal document instance is cloned
-    ## so it's going to be different than the current document instance (which is the target of the sheet parameter).
-    #set ($discard = $translatedDocument.setTitle($translatedDocument.title))
     #set ($plainTitle = $translatedDocument.plainTitle)
     #if (!$stringtool.isBlank($plainTitle))
       #set ($label = $plainTitle)
@@ -521,7 +517,8 @@
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,
       'canCopy': true,
-      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment')
+      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment'),
+      'mimetype': $attachment.mimeType
     },
     'a_attr': {
       'href': $attachment.document.getAttachmentURL($attachment.filename)
@@ -1163,6 +1160,7 @@
 #macro (searchAttachmentsSolr $text $limit $return)
   #set ($params = [
     'fq=type:ATTACHMENT',
+    'fq=locale:*',
     'qf=filename^4 attcontent',
     'fl=type wiki spaces name filename'
   ])

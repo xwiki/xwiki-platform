@@ -30,8 +30,7 @@ public class LESSCompilerException extends Exception
     /**
      * Construct a new LESSCompilerException object.
      *
-     * @param  message the detail message (which is saved for later retrieval
-     *         by the {@link #getMessage()} method).
+     * @param  message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
      */
     public LESSCompilerException(String message)
     {
@@ -41,12 +40,9 @@ public class LESSCompilerException extends Exception
     /**
      * Construct a new LESSCompilerException object.
      *
-     * @param  message the detail message (which is saved for later retrieval
-     *         by the {@link #getMessage()} method).
-     * @param  source the cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.)
+     * @param  message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
+     * @param  source the cause (which is saved for later retrieval by the {@link #getCause()} method). A {@code null}
+     *            value is permitted, and indicates that the cause is nonexistent or unknown
      */
     public LESSCompilerException(String message, Exception source)
     {

@@ -41,7 +41,7 @@ public class AdministrablePage extends ViewPage
      */
     public AdministrationPage clickAdministerWiki()
     {
-        toggleDrawer();
+        getDrawerMenu().toggle();
         this.administerWikiLink.click();
         return new AdministrationPage();
     }

@@ -1,0 +1,158 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="CKEditor.Translations" locale="hr">
+  <web>CKEditor</web>
+  <name>Translations</name>
+  <language>hr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>CKEditor.ConfigClass_removePlugins=Onemogućeni priključci
+CKEditor.ConfigClass_removePlugins.hint=Lista onemogućenih priključaka.
+CKEditor.ConfigClass_removeButtons=Onemogućene značajke alatne trake
+CKEditor.ConfigClass_removeButtons.hint=Lista onemogućenih značajki alatne trake.
+CKEditor.ConfigClass_linkShowAdvancedTab=Poveznica: Prikaži karticu Napredno
+CKEditor.ConfigClass_linkShowAdvancedTab.hint=Omogućava postavljanje atributa poveznica poput identifikatora, imena, klase ili stila.
+CKEditor.ConfigClass_linkShowTargetTab=Poveznica: Prikaži karticu Odredište
+CKEditor.ConfigClass_linkShowTargetTab.hint=Omogućava postavljanje atributa za odredište poveznice (npr. za otvaranje poveznice u novoj kartici).
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Load JavaScript Skin Extensions
+### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
+CKEditor.ConfigClass_advanced=Napredna konfiguracija
+CKEditor.ConfigClass_advanced.hint=Možete napisati isječak JavaScript kôda za izravnu izmjenu konfiguracijskog objekta. Provjerite {0}CKEditor dokumentaciju{1} za listu dostupnih konfiguracijskih svojstava.
+
+ckeditor.admin.saveComment=CKEditor konfiguracija ažurirana iz Upravljanja
+ckeditor.admin.reset=Ponovo postavi
+ckeditor.admin.reset.hint=Obnovi zadanu konfiguraciju
+ckeditor.admin.reset.confirmation=Jeste li sigurni da želite obnoviti zadanu konfiguraciju? Sve vaše izmjene bit će izgubljene.
+
+ckeditor.plugin.link.options=Opcije
+ckeditor.plugin.link.anchor=Sidro
+ckeditor.plugin.link.queryString=Niz znakova za upit
+ckeditor.plugin.link.defaultLabel=unesite labelu poveznice
+ckeditor.plugin.link.openInNewTab=Otvori poveznicu u novoj kartici
+
+ckeditor.plugin.macro.placeholder=makro:{0}
+ckeditor.plugin.macro.buttonHint=XWiki makro
+ckeditor.plugin.macro.editButtonHint=Uredi makro
+ckeditor.plugin.macro.refreshFailed=Osvježavanje uređenog sadržaja nije uspjelo.
+ckeditor.plugin.macro.dedicatedInsertButtonHint=Umetni makro {0}
+
+### Missing: ckeditor.plugin.office.importer.title=Import Office File
+### Missing: ckeditor.plugin.office.importer.filePath=File Path
+### Missing: ckeditor.plugin.office.importer.filePath.hint=Choose the office file to import. The file will be uploaded and attached to this page and its content inserted in the content of the page.
+### Missing: ckeditor.plugin.office.importer.filterStyles=Filter Styles
+### Missing: ckeditor.plugin.office.importer.filterStyles.hint=Filter text styles like font, color, alignment, margins. Content structure including heading levels, paragraphs, lists and tables are preserved.
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer=Use the Office Viewer
+### Missing: ckeditor.plugin.office.importer.useOfficeViewer.hint=Check this option if you don't plan to edit the content of the office file after the import or if you don't want to mix the content of the office file with the content that you are currently editing.
+### Missing: ckeditor.plugin.office.importer.required=Required
+### Missing: ckeditor.plugin.office.importer.import=Import
+### Missing: ckeditor.plugin.office.importer.inProgress=Importing office file...
+### Missing: ckeditor.plugin.office.importer.done=Office file successfully imported.
+### Missing: ckeditor.plugin.office.importer.fail=Office import failed.
+### Missing: ckeditor.plugin.office.importer.noUploadURL=File upload URL is not configured.
+### Missing: ckeditor.plugin.office.importer.failedToLoadForm=Failed to load the form.
+
+ckeditor.plugin.resource.notSpecified={0} nije naznačeno.
+ckeditor.plugin.save.leaveConfirmationMessage=Ima nespremljenih izmjena. Želite li ih zanemariti?
+### Missing: ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
+ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
+
+### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+### Missing: ckeditor.plugin.toolbar.lists=Lists
+### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+### Missing: ckeditor.plugin.toolbar.numberedlist=Numbered List
+### Missing: ckeditor.plugin.toolbar.insert=Insert
+### Missing: ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
+### Missing: ckeditor.plugin.toolbar.specialchar=Special Character
+### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
+### Missing: ckeditor.plugin.toolbar.successBox=Success Box
+### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
+### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
+### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
+### Missing: ckeditor.plugin.toolbar.include=Include
+### Missing: ckeditor.plugin.toolbar.code=Code Snippet
+### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
+
+### Missing: ckeditor.plugin.syntax.update.inProgress=Updating the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.update.done=WYSIWYG editor updated
+### Missing: ckeditor.plugin.syntax.update.failed=Failed to update the WYSIWYG editor
+### Missing: ckeditor.plugin.syntax.wysiwygModeUnsupported=The WYSIWYG edit mode is not supported by the {0} syntax.
+
+### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+
+modal.ok=OK
+modal.cancel=Otkaži
+modal.close=Zatvori
+
+resource.attach.label=Privitak
+resource.attach.placeholder=Putanja.Prema.Stranici@privitak.png
+resource.data.label=Podatkovni URI
+resource.doc.label=Stranica
+resource.doc.placeholder=Putanja.Prema.Stranici
+resource.icon.label=Ikona
+resource.mailto.label=Adresa e-pošte
+resource.mailto.placeholder=korisnik@primjer.org
+resource.path.label=Putanja
+resource.path.placeholder=/putanja/prema/datoteci
+resource.unc.label=UNC putanja
+resource.unc.placeholder=//poslužitelj/share/putanja/prema/datoteci
+resource.unknown.label=Nepoznato
+resource.url.label=URL
+resource.url.placeholder=http://www.example.org/image.png
+resource.user.label=Korisnik
+resource.user.placeholder=alias
+
+### Missing: resourcePicker.attach.hint=Select an attachment
+### Missing: resourcePicker.doc.hint=Select a page
+
+entityResourceSuggester.doc.placeholder=Pronađi stranicu...
+entityResourceSuggester.attach.placeholder=Pronađi privitak...
+
+entityResourcePicker.select=Odaberi
+entityResourcePicker.doc.title=Odaberite stranicu
+entityResourcePicker.attach.title=Odaberi privitak
+
+macroSelector.title=Odaberi makro
+macroSelector.filter.text.placeholder=Unesi za filtriranje
+macroSelector.filter.category.all=Svi makroi
+macroSelector.filter.category.other=Ostalo
+macroSelector.failedToRetrieveMacros=Dohvat liste dostupnih makroa nije uspio.
+macroSelector.select=Odaberi
+
+macroEditor.title=Uredi makro
+macroEditor.more=Još
+macroEditor.changeMacro=Promijeni makro
+macroEditor.submit=Podnesi
+macroEditor.content=Sadržaj
+macroEditor.noParameters=Ovaj makro nema parametara.
+macroEditor.descriptorRequestFailed=Dohvat macro opisnika {0} nije uspio.</content>
+</xwikidoc>

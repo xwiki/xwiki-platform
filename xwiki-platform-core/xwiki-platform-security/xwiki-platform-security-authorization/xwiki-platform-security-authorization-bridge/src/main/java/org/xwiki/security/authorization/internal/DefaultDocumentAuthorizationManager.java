@@ -60,7 +60,7 @@ public class DefaultDocumentAuthorizationManager implements DocumentAuthorizatio
     public boolean hasAccess(Right right, EntityType level, DocumentReference contextAuthor,
         DocumentReference contextDocument)
     {
-        EntityReference reference = contextDocument.extractReference(level);
+        EntityReference reference = contextDocument != null ? contextDocument.extractReference(level) : null;
 
         try {
             return hasRequiredRight(right, level, contextDocument)

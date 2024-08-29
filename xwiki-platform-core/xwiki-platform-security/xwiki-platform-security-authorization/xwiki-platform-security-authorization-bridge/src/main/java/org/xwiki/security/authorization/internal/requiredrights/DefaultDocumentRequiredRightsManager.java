@@ -54,16 +54,18 @@ public class DefaultDocumentRequiredRightsManager implements DocumentRequiredRig
     public Optional<DocumentRequiredRights> getRequiredRights(DocumentReference documentReference)
         throws AuthorizationException
     {
-        XWikiContext context = this.contextProvider.get();
+        if (documentReference != null) {
+            XWikiContext context = this.contextProvider.get();
 
-        // Load the document.
-        try {
-            XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-            if (!document.isNew()) {
-                return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
+            // Load the document.
+            try {
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                if (!document.isNew()) {
+                    return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
+                }
+            } catch (XWikiException e) {
+                throw new AuthorizationException("Failed to load the document", e);
             }
-        } catch (XWikiException e) {
-            throw new AuthorizationException("Failed to load the document", e);
         }
 
         return Optional.empty();

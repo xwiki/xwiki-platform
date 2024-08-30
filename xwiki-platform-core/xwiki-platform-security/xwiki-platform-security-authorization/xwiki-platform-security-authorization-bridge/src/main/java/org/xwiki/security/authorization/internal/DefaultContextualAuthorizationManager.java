@@ -167,6 +167,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             } catch (AuthorizationException e) {
                 this.logger.error("Failed to load required rights for [{}]",
                     programmingDocument.getDocumentReference(), e);
+                return false;
             }
         }
 

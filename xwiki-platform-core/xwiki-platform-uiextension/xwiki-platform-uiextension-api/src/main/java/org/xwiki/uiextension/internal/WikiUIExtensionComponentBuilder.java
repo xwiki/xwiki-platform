@@ -96,9 +96,9 @@ public class WikiUIExtensionComponentBuilder implements WikiBaseObjectComponentB
             {
                 throw new WikiComponentException("Registering global UI extensions requires programming rights");
             }
-        } else if (scope == WikiComponentScope.WIKI &&
-            !this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, extensionsDoc.getAuthorReference(),
-                extensionsDoc.getDocumentReference()))
+        } else if (scope == WikiComponentScope.WIKI
+            && !this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, extensionsDoc.getAuthorReference(),
+            extensionsDoc.getDocumentReference()))
         {
             throw new WikiComponentException(
                 "Registering UI extensions at wiki level requires wiki administration rights");

@@ -228,7 +228,7 @@
       #set ($togglerTextAlternative = "<span class='sr-only'>$escapetool.xml($services.localization.render('web.hierarchy.toggler.label.parents', [$pathData.get($openToIndex).label])) </span>")
     #end
     #set ($treeToggle = "<button class='dropdown-toggle' data-toggle='dropdown'>" +
-       $togglerTextAlternative +
+      $togglerTextAlternative +
       "$services.icon.renderHTML('caret-down')</button>")
     #set ($treeNavigation = "$treeToggle<div class='dropdown-menu'>#documentTree($treeParams)</div>")
   #end

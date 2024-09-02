@@ -39,7 +39,7 @@ import org.xwiki.tree.test.po.TreeNodeElement;
  */
 public class DocumentTreeElement extends TreeElement
 {
-    private DefaultStringEntityReferenceSerializer entityReferenceSerializer =
+    protected DefaultStringEntityReferenceSerializer entityReferenceSerializer =
         new DefaultStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
@@ -165,6 +165,11 @@ public class DocumentTreeElement extends TreeElement
         return getNode(getSpaceNodeId(path));
     }
 
+    public TreeNodeElement getNode(EntityReference entityReference)
+    {
+        return getNode(getNodeId(entityReference));
+    }
+
     /**
      * @param path the path used to locate the document
      * @return the corresponding document node
@@ -195,7 +200,7 @@ public class DocumentTreeElement extends TreeElement
         return getNode(getNodeId(attachmentReference));
     }
 
-    private String getNodeId(EntityReference reference)
+    protected String getNodeId(EntityReference reference)
     {
         return reference.getType().getLowerCase() + ":" + this.entityReferenceSerializer.serialize(reference);
     }

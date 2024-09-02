@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.index.tree.test.po.DocumentPickerModal;
 
 import static org.openqa.selenium.By.cssSelector;
 
@@ -107,6 +108,23 @@ public class LinkDialog extends CKEditorDialog
             .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s / %s not found", hint, label)))
             .click();
         return this;
+    }
+
+    public LinkDialog createLinkOfNewPage(boolean exactReference)
+    {
+        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create in current space...";
+        getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
+            .filter(element ->
+                Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), resourceLabelName))
+            .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s not found", resourceLabelName)))
+            .click();
+        return this;
+    }
+
+    public LinkPickerModal openDocumentPicker()
+    {
+        getContainer().findElement(By.cssSelector("button.resourceType")).click();
+        return new LinkPickerModal(By.cssSelector(".entity-resource-picker-modal.modal"));
     }
 
     /**

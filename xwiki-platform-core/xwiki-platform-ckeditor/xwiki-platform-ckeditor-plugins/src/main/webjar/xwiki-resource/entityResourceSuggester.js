@@ -37,9 +37,9 @@ define('entityResourceSuggester', [
       input: input,
       nb: 8
     }).done(function(response) {
+      let suggestions = [];
       if (response.documentElement) {
         let results = response.getElementsByTagName('rs');
-        let suggestions = [];
         let containsExactMatch = false;
         for (var i = 0; i < results.length; i++) {
           let result = convertSearchResultToResource(results.item(i), entityType, base);
@@ -52,7 +52,8 @@ define('entityResourceSuggester', [
           deferred.resolve(suggestions);
         }
       } else {
-        deferred.resolve([]);
+        suggestCreateDocument(input, base, suggestions, deferred);
+        deferred.resolve(suggestions);
       }
     }).fail(function() {
       deferred.resolve([]);

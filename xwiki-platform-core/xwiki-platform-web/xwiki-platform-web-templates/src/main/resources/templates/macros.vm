@@ -953,16 +953,28 @@ $html
 ###    message
 ###
 
+#macro(genericMessage $text $classAffix $iconName $prettyNameKey)
+<div class="box ${classAffix}message">
+  <span class="icon-block">$services.icon.renderHTML($iconName)</span>
+  <span class="sr-only">$services.localization.render($prettyNameKey)</span>
+  $text
+</div>
+#end
+
 #macro(warning $text)
-<div class="box warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
+#genericMessage($text 'warning' 'warning' 'warning')
 #end
 
 #macro(error $text)
-<div class="box errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
+#genericMessage($text 'error' 'error' 'error')
 #end
 
 #macro(info $text)
-<div class="box infomessage">$text</div>
+#genericMessage($text 'info' 'info' 'info')
+#end
+
+#macro(success $text)
+#genericMessage($text 'success' 'success' 'success')
 #end
 
 #macro(message $text)

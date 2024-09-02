@@ -130,12 +130,6 @@
       <artifactId>xwiki-platform-wiki-template-default</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Required for having proper DB mapping -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-notifications-filters-default</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

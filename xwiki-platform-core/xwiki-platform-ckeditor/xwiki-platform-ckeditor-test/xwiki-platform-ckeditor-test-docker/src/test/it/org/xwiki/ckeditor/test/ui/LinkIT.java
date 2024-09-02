@@ -45,8 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 15.0RC1
  * @since 14.10.3
  */
-@UITest(extraJARs = {
-    "org.xwiki.platform:xwiki-platform-search-solr-query"
+@UITest(properties = {
+    "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml"
+    }, extraJARs = {
+    "org.xwiki.platform:xwiki-platform-search-solr-query",
+    "org.xwiki.platform:xwiki-platform-notifications-filters-default"
 })
 class LinkIT extends AbstractCKEditorIT
 {
@@ -73,10 +76,12 @@ class LinkIT extends AbstractCKEditorIT
         // Create a sub-page with an attachment, to have something to link to.
         String attachmentName = "image.gif";
         setup.createPage(testReference, "", "");
-        setup.attachFile(testReference, attachmentName,
+        DocumentReference subPage = new DocumentReference("subPage", testReference.getLastSpaceReference());
+        setup.createPage(subPage, "", "");
+        setup.attachFile(subPage, attachmentName,
             getClass().getResourceAsStream("/ResourcePicker/" + attachmentName), false);
 
-        edit(setup, testReference);
+        edit(setup, testReference, false);
 
         String spaceName = testReference.getLastSpaceReference().getParent().getName();
         editor.getToolBar().insertOrEditLink()

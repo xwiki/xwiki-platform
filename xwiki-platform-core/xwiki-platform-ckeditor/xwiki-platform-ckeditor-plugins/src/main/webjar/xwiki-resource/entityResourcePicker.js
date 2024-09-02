@@ -91,24 +91,28 @@ define('entityResourcePicker', [
           if (action === 'create') {
             promise.then(function (promiseData) {
               if (createdNodes[params.id] === undefined) {
-                createdNodes[params.id] = [];
+                createdNodes[params.id] = {};
               }
               if (promiseData instanceof Array) {
-                createdNodes[params.id].push(promiseData[0]);
+                let newNode = promiseData[0];
+                createdNodes[params.id][newNode.id] = newNode;
               }
             });
           }
         }).on('refresh_node.jstree', function (event, data) {
           let parentNodeId = data.node.id;
           let nodesToCreate = createdNodes[parentNodeId];
-          if ((nodesToCreate || []).length > 0) {
+          if (nodesToCreate) {
             let tree = $.jstree.reference(treeElement);
             // jshint camelcase:false
             let parentNode = tree.get_node(parentNodeId);
-            for (let i = 0; i < nodesToCreate.length; i++) {
-              let createdNode = nodesToCreate[i];
-              // jshint camelcase:false
-              tree.create_node(parentNode, createdNode, 'last', null);
+            for (let createdNodeId in nodesToCreate) {
+              // Check that the node is not created already.
+              let createdNode = nodesToCreate[createdNodeId];
+              if (tree.get_node(createdNode.id) === false) {
+                // jshint camelcase:false
+                tree.create_node(parentNode, createdNode, 'last', null);
+              }
             }
           }
         });

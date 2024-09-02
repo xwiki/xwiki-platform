@@ -18,7 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ###
-### Change a user's password
+### Change a user's password from the user preferences.
 ###
 ###
 #template("startpage.vm")
@@ -61,7 +61,7 @@
         #end
       #end
       #if($request.xwikipassword && $isValidPassword)
-        <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
+        #info($services.localization.render('platform.core.profile.passwd.success'))
         <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
       #if(!$isValidPassword)

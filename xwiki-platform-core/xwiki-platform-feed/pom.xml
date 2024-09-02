@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>15.10.12</version>
+    <version>15.10.13-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-feed</artifactId>
   <name>XWiki Platform - Feed - Parent POM</name>

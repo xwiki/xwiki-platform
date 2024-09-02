@@ -39,7 +39,7 @@
   <content>## Translations for the livetables column titles
 ### Missing: extension.repository.emptyvalue=
 extension.repository.name=Название
-extension.repository.summary=Сводка
+extension.repository.summary=Комментарий
 extension.repository.type=Тип
 extension.repository.category=Категория
 extension.repository.authors=Авторы
@@ -49,6 +49,5 @@ extension.repository.rating=Рейтинг
 extension.repository.installedCount=Количество установок
 
 ## Administration UI
-admin.repository=Репозиторий расширений
-</content>
+admin.repository=Репозиторий расширений</content>
 </xwikidoc>

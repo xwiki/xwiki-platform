@@ -35,12 +35,4 @@
     <module>xwiki-platform-messagestream-api</module>
     <module>xwiki-platform-messagestream-ui</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-messagestream-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

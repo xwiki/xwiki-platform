@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.requiredrights;
+package org.xwiki.internal.document;
 
 import java.util.Objects;
 import java.util.Set;

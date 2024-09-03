@@ -27,17 +27,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.internal.requiredrights.DocumentRequiredRightsReader;
-import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
-import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.doc.XWikiDocument;

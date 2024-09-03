@@ -26,6 +26,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;

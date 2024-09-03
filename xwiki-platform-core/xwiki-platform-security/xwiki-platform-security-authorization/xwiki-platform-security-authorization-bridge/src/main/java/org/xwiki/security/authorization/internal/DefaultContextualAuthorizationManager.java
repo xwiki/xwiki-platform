@@ -262,13 +262,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
      */
     private XWikiDocument getProgrammingDocument()
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument document = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
-        if (document == null) {
-            document = xcontext.getDoc();
-        }
-
-        return document;
+        return this.xcontextProvider.get().getSecureDocument();
     }
 }

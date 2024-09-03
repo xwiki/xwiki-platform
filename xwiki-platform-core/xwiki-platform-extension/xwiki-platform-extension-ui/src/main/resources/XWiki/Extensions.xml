@@ -116,13 +116,13 @@
 
     #if ($recommended)
       #if (!$extensions.iterator().hasNext())
-        &lt;div class="box warningmessage"&gt;$services.localization.render('extensions.search.recommended.fallback', ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/div&gt;
+        #warning($services.localization.render('extensions.search.recommended.fallback', ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"]))
         ## Search again with the recommended filter
         #set ($extensions = $repository.search("$!request.search", $paginationParams.firstItem, $paginationParams.itemsPerPage))
         #set ($totalHits = $extensions.totalHits)
         #set ($recommended = false)
       #elseif (!$customExtensionFilter)
-        &lt;div class="box infomessage"&gt;
+        #macro (infoHeaderContent)
           #if ($compatible)
             $services.localization.render('extensions.search.compatiblerecommended.disclaimer')
           #else
@@ -142,12 +142,13 @@
               &lt;input type="submit" value="${escapetool.xml($services.localization.render('extensions.search.all.label'))}" class="btn btn-default"/&gt;
             #end
           &lt;/form&gt;
-        &lt;/div&gt;
+        #end
+        #info("#infoHeaderContent()")
       #end
     #end
 
     #if (!$extensions.iterator().hasNext())
-      &lt;div class="box infomessage"&gt;$services.localization.render($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"])&lt;/div&gt;
+      #info($services.localization.render($noResultsMessageKey, ["&lt;em&gt;$!escapetool.xml($request.search)&lt;/em&gt;"]))
     #else
       #if ($totalHits &amp;&amp; $totalHits &gt; $paginationParams.itemsPerPage)
         #set ($hasPagination = true)
@@ -165,26 +166,7 @@
     #end
 
     #if ($indexed)
-      #set ($indexJobStatus = $repository.getStatus("wiki:${xcontext.database}"))
-      #if ($indexJobStatus)
-        &lt;div class="box infomessage"&gt;
-        #if ($indexJobStatus.state != 'FINISHED')
-          $escapetool.xml($services.localization.render('extensions.search.indexed.started', [$xwiki.formatDate($indexJobStatus.startDate)]))
-          #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
-          #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
-              'xpage': 'job_status_json',
-              'outputSyntax': 'plain',
-              'jobId': $indexJobStatus.request.id
-            })))
-          &lt;div class="xcontent job-status" data-url="$escapetool.xml($jobStatusURL)"&gt;
-            #displayJobProgressBar($indexJobStatus, true)
-          &lt;/div&gt;
-        #else
-          $escapetool.xml($services.localization.render('extensions.search.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
-        #end
-      #else
-        &lt;div class="box warningmessage"&gt;$escapetool.xml($services.localization.render('extensions.search.indexed.nojob'))
-      #end
+      #macro (formContent)
         &lt;form action="${xwiki.relativeRequestURL}"&gt;
           #if ($request.section)
             &lt;input type="hidden" name="section" value="${escapetool.xml($request.section)}" /&gt;
@@ -197,7 +179,33 @@
             &lt;input type="submit" value="${escapetool.xml($services.localization.render('extensions.search.indexed.reindex'))}" name="index_start" class="btn btn-default"/&gt;
           #end
         &lt;/form&gt;
-      &lt;/div&gt;
+      #end
+      #set ($indexJobStatus = $repository.getStatus("wiki:${xcontext.database}"))
+      #if ($indexJobStatus)
+        #if ($indexJobStatus.state != 'FINISHED')
+          #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
+          #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+              'xpage': 'job_status_json',
+              'outputSyntax': 'plain',
+              'jobId': $indexJobStatus.request.id
+            })))
+          #macro (infoFooterContent)
+            $escapetool.xml($services.localization.render('extensions.search.indexed.started', [$xwiki.formatDate($indexJobStatus.startDate)]))
+            &lt;div class="xcontent job-status" data-url="$escapetool.xml($jobStatusURL)"&gt;
+              #displayJobProgressBar($indexJobStatus, true)
+            &lt;/div&gt;
+          #end
+        #else
+          #macro (infoFooterContent)
+            $escapetool.xml($services.localization.render('extensions.search.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
+          #end
+        #end
+        #info("#infoFooterContent()
+          #formContent()")
+      #else
+        #warning("$escapetool.xml($services.localization.render('extensions.search.indexed.nojob'))
+          #formContent()")
+      #end
     #end
   #end
   &lt;/div&gt;

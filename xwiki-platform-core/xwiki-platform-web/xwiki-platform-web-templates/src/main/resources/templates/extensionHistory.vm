@@ -120,7 +120,7 @@
       #set ($message = $services.localization.render('extension.history.currentJobInfo',
         ["<strong>$jobType</strong>", "<strong>$jobId</strong>"]))
     #end
-    <div class="box infomessage">$services.icon.renderHTML('info') $message</div>
+    #info($message)
   #end
 #end
 
@@ -233,10 +233,7 @@
     <div class="extension-history-records-form">
       <ul class="extension-history-records">
         <li class="extension-history-record">
-          <span class="box infomessage">
-            $services.icon.renderHTML('info')
-            $services.localization.render('extension.history.noRecords')
-          </span>
+          #info($services.localization.render('extension.history.noRecords'))
         </li>
       </ul>
     </div>
@@ -465,10 +462,7 @@
         #end
       </ul>
     #else
-      <div class="box infomessage">
-        $services.icon.renderHTML('info')
-        $services.localization.render('extension.history.replayPlan.empty')
-      </div>
+      #info($services.localization.render('extension.history.replayPlan.empty'))
     #end
     <div class="extension-history-actions">
       #if ($hasGlobalAdmin && $records && $records.size() > 0)
@@ -491,10 +485,7 @@
     #displayExtensionHistoryReplayStatus($replayJobStatus)
   #else
     <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
-    <div class="box infomessage">
-      $services.icon.renderHTML('info')
-      $services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])
-    </div>
+    #info($services.localization.render('extension.history.replayStatus.notFound', [$replayJobId]))
   #end
 #end
 
@@ -600,8 +591,8 @@
     #template('xwikivars.vm')
   #end
   #if ($request.extensionId && ($request.extensionVersion || $request.extensionVersionConstraint))
-    #handleExtensionRequest
+    #handleExtensionRequest()
   #else
-    #handleExtensionHistoryRequest
+    #handleExtensionHistoryRequest()
   #end
 #end

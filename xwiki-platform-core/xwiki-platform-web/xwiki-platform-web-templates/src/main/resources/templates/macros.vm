@@ -1527,7 +1527,7 @@ $Msz MB##
             #livetable_filters($collist $colprops $classname)
             <tr class="xwiki-livetable-initial-message">
               <td colspan="${columnCount}">
-                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
+                #warning($services.localization.render('platform.livetable.environmentCannotLoadTableMessage'))
               </td>
             </tr>
           </thead>

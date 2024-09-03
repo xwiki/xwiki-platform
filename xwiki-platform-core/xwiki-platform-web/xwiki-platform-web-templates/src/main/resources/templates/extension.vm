@@ -739,7 +739,7 @@ $namespace##
       'installplan': 'extensions.install.error.alreadyInstalled',
       'uninstallplan': 'extensions.uninstall.error.notInstalled'
     })
-    <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.jobType))</div>
+    #info($services.localization.render($emptyPlanMessageKeys.get($plan.jobType)))
   #else
     <dl>
     #foreach($entry in $extensionsByAction.entrySet())
@@ -1118,15 +1118,15 @@ $namespace##
     #if ($extension)
       #displayExtension($extension, $readOnly)
     #else
-      <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
+      #info($services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
-        "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+        "<strong>$!escapetool.xml($request.extensionVersion)</strong>"]))
 
       ## DEBUG START: Check if there is any job status associated with the specified extension.
       #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
       #if ($jobStatus)
         ## Normally we shouldn't get here.
-        <div class="errormessage">We found an extension job associated with the missing extension:</div>
+        #error("We found an extension job associated with the missing extension:")
         #displayExtensionJobStatus($jobStatus)
       #end
       ## DEBUG STOP
@@ -1290,7 +1290,7 @@ $namespace##
       ## Send error back.
       $response.sendError(400, $errorMessage)
     #else
-      <div class="errormessage">$errorMessage #printThrowable($lastError)</div>
+      #error("$errorMessage #printThrowable($lastError)")
     #end
   #else
     ## Redirect to extension display.
@@ -1621,9 +1621,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     #end
     ##
     #if ($outdated.isEmpty() && $invalid.isEmpty())
-      <div class="successmessage">
-        $services.localization.render('platform.extension.updater.noUpdatesAvailable')
-      </div>
+      #success($services.localization.render('platform.extension.updater.noUpdatesAvailable'))
     #else
       #displayExtensionUpdaterPlanActionByNamespace($invalid 'invalid')
       #displayExtensionUpdaterPlanActionByNamespace($outdated 'outdated')

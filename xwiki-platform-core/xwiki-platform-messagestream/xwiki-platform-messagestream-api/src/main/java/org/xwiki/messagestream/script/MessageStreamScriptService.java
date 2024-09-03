@@ -35,10 +35,12 @@ import org.xwiki.script.service.ScriptService;
  * Service exposing the {@link MessageStream} functionality, allowing to post messages from the current user.
  * 
  * @version $Id$
+ * @deprecated MessageStream should not be used anymore, please check extensions for alternatives.
  */
 @Component
 @Named("messageStream")
 @Singleton
+@Deprecated(since = "16.8.0RC1")
 public class MessageStreamScriptService implements ScriptService
 {
     /**

@@ -32,8 +32,10 @@ import org.xwiki.model.reference.DocumentReference;
  * 
  * @version $Id$
  * @since 3.0M3
+ * @deprecated MessageStream should not be used anymore, please check extensions for alternatives.
  */
 @Role
+@Deprecated(since = "16.8.0RC1")
 public interface MessageStream
 {
     /**

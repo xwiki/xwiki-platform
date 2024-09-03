@@ -31,10 +31,12 @@ import org.xwiki.messagestream.internal.AbstractMessageDescriptor;
  * @version $Id$
  * @since 10.5RC1
  * @since 9.11.6
+ * @deprecated MessageStream should not be used anymore, please check extensions for alternatives.
  */
 @Component
 @Named(DirectMessageDescriptor.EVENT_TYPE)
 @Singleton
+@Deprecated(since = "16.8.0RC1")
 public class DirectMessageDescriptor extends AbstractMessageDescriptor
 {
     /**

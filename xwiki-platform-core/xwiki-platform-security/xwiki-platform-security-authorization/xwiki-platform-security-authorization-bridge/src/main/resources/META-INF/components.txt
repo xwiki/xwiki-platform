@@ -5,7 +5,6 @@ org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator
 org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidatorListener
 org.xwiki.security.authorization.internal.DefaultSecurityEntryReader
 org.xwiki.security.authorization.internal.requiredrights.DefaultDocumentRequiredRightsManager
-org.xwiki.security.authorization.internal.requiredrights.DocumentRequiredRightsReader
 org.xwiki.security.authorization.internal.RightsFilterListener
 org.xwiki.security.internal.DefaultUserBridge
 org.xwiki.security.internal.DefaultXWikiBridge

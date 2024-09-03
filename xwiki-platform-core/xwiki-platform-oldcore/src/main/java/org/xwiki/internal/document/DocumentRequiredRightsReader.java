@@ -17,22 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.requiredrights;
+package org.xwiki.internal.document;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -41,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Read the required rights from a document.
  *
  * @version $Id$
- * @since 16.6.0RC1
+ * @since 16.10.0RC1
  */
 @Component(roles = DocumentRequiredRightsReader.class)
 @Singleton
@@ -51,6 +53,9 @@ public class DocumentRequiredRightsReader
         new LocalDocumentReference("XWiki", "RequiredRightClass");
 
     private static final String PROPERTY_NAME = "level";
+
+    @Inject
+    private Logger logger;
 
     /**
      * Read the required rights from a document.
@@ -65,7 +70,9 @@ public class DocumentRequiredRightsReader
                 .filter(Objects::nonNull)
                 .map(this::readRequiredRight)
                 // Don't allow edit right/edit right implies no extra right.
-                .filter(requiredRight -> !Right.EDIT.equals(requiredRight.right()))
+                // Filter out invalid values.
+                .filter(requiredRight ->
+                    !Right.EDIT.equals(requiredRight.right()) && !Right.ILLEGAL.equals(requiredRight.right()))
                 .collect(Collectors.toUnmodifiableSet()));
     }
 
@@ -78,23 +85,37 @@ public class DocumentRequiredRightsReader
             String[] levelRight = StringUtils.split(value, "_", 2);
             if (levelRight.length == 2) {
                 right = Right.toRight(levelRight[1]);
-                entityType = EntityType.valueOf(levelRight[0].toUpperCase());
+                try {
+                    entityType = EntityType.valueOf(levelRight[0].toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    // Ensure that we return an illegal right even if the right part of the value could be parsed.
+                    right = Right.ILLEGAL;
+                    this.logger.warn("Illegal required right value [{}] in object [{}]", value, object.getReference());
+                }
             }
         }
 
-        // TODO: add some handling for invalid values.
         Set<EntityType> targetedEntityTypes = right.getTargetedEntityType();
         if (targetedEntityTypes == null) {
             // This means the right targets only the farm level, which is null.
             entityType = null;
         } else {
             EntityReference entityReference = object.getDocumentReference().extractReference(entityType);
-            // Try to get the highest level where this right can be assigned. This is done to ensure that, e.g.,
+            // The specified entity type seems to be below the document level. Fall back to document level instead.
+            if (entityReference == null) {
+                entityReference = object.getDocumentReference();
+            }
+            // Try to get the lowest level where this right can be assigned. This is done to ensure that, e.g.,
             // programming right can imply admin right on the wiki level even if programming right is only specified on
             // the document level.
             while (!targetedEntityTypes.contains(entityType) && entityReference != null) {
                 entityType = entityReference.getType();
                 entityReference = entityReference.getParent();
+            }
+
+            // If we couldn't find a targeted entity type, revert to the document level.
+            if (!targetedEntityTypes.contains(entityType)) {
+                entityType = EntityType.DOCUMENT;
             }
         }
 

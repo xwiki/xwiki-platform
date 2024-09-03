@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.requiredrights;
+package org.xwiki.internal.document;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,11 +34,15 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -60,11 +65,18 @@ class DocumentRequiredRightsReaderTest
     @InjectMockComponents
     private DocumentRequiredRightsReader documentRequiredRightsReader;
 
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @ParameterizedTest
     @MethodSource("getArguments")
     void readRequiredRights(boolean enforce, List<String> values, DocumentRequiredRights expected)
     {
         XWikiDocument document = mock();
+        String objectReferenceName = "objectReference";
+        // Object references need other components to be available to compute their name, to avoid these dependencies,
+        // the reference is mocked instead.
+        BaseObjectReference objectReference = mock(objectReferenceName);
         when(document.isEnforceRequiredRights()).thenReturn(enforce);
         List<BaseObject> objects = values.stream()
             .map(value -> {
@@ -74,6 +86,7 @@ class DocumentRequiredRightsReaderTest
                     BaseObject object = mock();
                     when(object.getStringValue("level")).thenReturn(value);
                     when(object.getDocumentReference()).thenReturn(DOCUMENT_REFERENCE);
+                    when(object.getReference()).thenReturn(objectReference);
                     return object;
                 }
             })
@@ -83,6 +96,12 @@ class DocumentRequiredRightsReaderTest
         DocumentRequiredRights actual = this.documentRequiredRightsReader.readRequiredRights(document);
 
         assertEquals(expected, actual);
+
+        List<String> invalidValues = values.stream().filter(v -> StringUtils.startsWith(v, "foo")).toList();
+        for (int i = 0; i < invalidValues.size(); i++) {
+            assertEquals("Illegal required right value [%s] in object [%s]".formatted(invalidValues.get(i),
+                objectReferenceName), this.logCapture.getMessage(i));
+        }
     }
 
     static Stream<Arguments> getArguments()
@@ -122,6 +141,19 @@ class DocumentRequiredRightsReaderTest
                 true,
                 Arrays.asList(null, "admin", null),
                 new DocumentRequiredRights(true, Set.of(new DocumentRequiredRight(Right.ADMIN, EntityType.SPACE)))
+            ),
+            Arguments.of(
+                true,
+                Arrays.asList("illegal", "foo_bar", Right.SCRIPT.getName()),
+                new DocumentRequiredRights(true, Set.of(new DocumentRequiredRight(Right.SCRIPT, EntityType.DOCUMENT)))
+            ),
+            Arguments.of(
+                true,
+                Arrays.asList("block_admin", "wiki_creator", "foo_script", "wiki_illegal"),
+                new DocumentRequiredRights(true, Set.of(
+                    new DocumentRequiredRight(Right.ADMIN, EntityType.SPACE),
+                    new DocumentRequiredRight(Right.CREATOR, EntityType.DOCUMENT)
+                ))
             )
         );
     }

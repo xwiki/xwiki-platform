@@ -183,14 +183,8 @@
 #end
 
 #macro (renameAppModalBody)
-  &lt;div class="box infomessage"&gt;
-    $services.icon.renderHTML('info')
-    $services.localization.render('appWithinMinutes.renameApp.changeAppTitleInfo')
-  &lt;/div&gt;
-  &lt;div class="box warningmessage"&gt;
-    $services.icon.renderHTML('warning')
-    $services.localization.render('appWithinMinutes.renameApp.regenerateAppCodeWarning')
-  &lt;/div&gt;
+  #info($services.localization.render('appWithinMinutes.renameApp.changeAppTitleInfo'))
+  #warning($services.localization.render('appWithinMinutes.renameApp.regenerateAppCodeWarning'))
   &lt;div class="hidden"&gt;
     &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" /&gt;
     &lt;input type="hidden" name="oldAppReference" value="$escapetool.xml(

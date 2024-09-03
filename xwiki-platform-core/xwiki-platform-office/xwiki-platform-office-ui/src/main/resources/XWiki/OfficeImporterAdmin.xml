@@ -91,10 +91,8 @@
       ### Info about the place to modify the configuration
       ###
       &lt;p&gt;
-        &lt;span class="box infomessage"&gt;
-          ## TODO: we do not escape this string because we inject some HTML code. We should improve it.
-          $services.localization.render('admin.ooserver.options.source', ['&lt;span class="monospace"&gt;xwiki.properties&lt;/span&gt;'])
-        &lt;/span&gt;
+        ## TODO: we do not escape this string because we inject some HTML code. We should improve it.
+        #info($services.localization.render('admin.ooserver.options.source', ['&lt;span class="monospace"&gt;xwiki.properties&lt;/span&gt;']))
       &lt;/p&gt;
       &lt;dl&gt;
         ###
@@ -150,7 +148,7 @@
               #if ("$!homePath" != '')
                 $escapetool.html($homePath)
               #else
-                &lt;div class="box errormessage"&gt;$escapetool.html($services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected'))&lt;/div&gt;
+                {{error}}$escapetool.html($services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected')){{/error}}
               #end
           &lt;/dd&gt;
           ###

@@ -295,7 +295,6 @@
                 <!-- Social -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Likes
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Mentions
-                /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=MessageStream
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=Notifications
                 <!-- Wikis -->
                 /xwiki/bin/admin/XWiki/XWikiPreferences?editor=globaladmin&amp;section=wikis.descriptor

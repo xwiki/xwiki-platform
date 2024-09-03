@@ -1754,7 +1754,6 @@
                     <exclude>org.xwiki.platform:xwiki-platform-livetable</exclude>
                     <exclude>flaviusolaru:navigation-menu-wiki-macro</exclude>
                     <exclude>lucaa:navigationmenuconfigapplication</exclude>
-                    <exclude>xwiki-platform-messagestream</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-model</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-filter-instance-oldcore</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-panels</exclude>

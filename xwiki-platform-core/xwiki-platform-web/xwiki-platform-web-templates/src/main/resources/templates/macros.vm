@@ -974,7 +974,7 @@ $html
 #end
 
 #macro(success $text)
-#genericMessage($text 'success' 'success' 'success')
+#genericMessage($text 'success' 'check' 'success')
 #end
 
 #macro(message $text)

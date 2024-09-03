@@ -24,6 +24,8 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -41,6 +43,19 @@ class ThumbnailatorImageProcessorTest
 {
     @InjectMockComponents
     private ThumbnailatorImageProcessor imageProcessor;
+
+    @Test
+    void readImage() throws IOException
+    {
+        // Example image from https://github.com/recurser/exif-orientation-examples,
+        // Copyright (c) 2010 Dave Perrett, http://recursive-design.com/, licensed under the MIT license.
+        // Original photo by John Salvino https://unsplash.com/photos/1PPpwrTNkJI
+        try (InputStream imageInput = getClass().getResourceAsStream("/Portrait_5.jpg")) {
+            Image image = this.imageProcessor.readImage(imageInput);
+            assertEquals(1200, image.getWidth(null));
+            assertEquals(1800, image.getHeight(null));
+        }
+    }
 
     @Test
     void changeAspectRatio()

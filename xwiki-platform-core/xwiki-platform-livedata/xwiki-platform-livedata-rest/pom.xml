@@ -55,6 +55,13 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <!-- Xerces is causing problems with the jaxb plugin -->
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>

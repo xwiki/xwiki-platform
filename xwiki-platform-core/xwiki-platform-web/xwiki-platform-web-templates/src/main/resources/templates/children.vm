@@ -53,9 +53,7 @@
 #######################################################
 #macro(displayChildren)
   #if ($services.parentchild.isParentChildMechanismEnabled())
-    <div class="box warningmessage">
-      $services.localization.render('core.children.warningParentChild')
-    </div>
+    #warning($services.localization.render('core.children.warningParentChild'))
   #end
   
   #if ($doc.documentReference.name != 'WebHome')

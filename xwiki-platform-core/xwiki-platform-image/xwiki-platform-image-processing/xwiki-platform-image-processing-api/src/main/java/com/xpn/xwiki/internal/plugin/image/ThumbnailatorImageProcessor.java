@@ -52,16 +52,12 @@ public class ThumbnailatorImageProcessor extends DefaultImageProcessor
     @Override
     public Image readImage(InputStream inputStream) throws IOException
     {
-        try {
-            // Use Thumbnailator to read the image to correctly interpret the orientation that is set in Exif metadata.
-            return Thumbnails.of(inputStream)
-                .scale(1)
-                // Ensure that nothing is actually resized and there is thus no quality loss.
-                .resizer(Resizers.NULL)
-                .asBufferedImage();
-        } catch (Exception e) {
-            return super.readImage(inputStream);
-        }
+        // Use Thumbnailator to read the image to correctly interpret the orientation that is set in Exif metadata.
+        return Thumbnails.of(inputStream)
+            .scale(1)
+            // Ensure that nothing is actually resized and there is thus no quality loss.
+            .resizer(Resizers.NULL)
+            .asBufferedImage();
     }
 
     @Override

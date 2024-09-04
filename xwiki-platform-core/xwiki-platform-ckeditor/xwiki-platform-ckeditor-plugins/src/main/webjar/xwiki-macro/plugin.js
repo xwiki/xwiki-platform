@@ -675,7 +675,11 @@
           });
         });
       });
-
+      // Ensure that widgets are always properly initialized after a paste.
+      // Fix XWIKI-22391
+      editor.on('afterPaste', function () {
+        this.widgets.checkWidgets();
+      });
     },
 
     insertOrUpdateMacroWidget: async function(editor, data, widget, skipRefresh) {

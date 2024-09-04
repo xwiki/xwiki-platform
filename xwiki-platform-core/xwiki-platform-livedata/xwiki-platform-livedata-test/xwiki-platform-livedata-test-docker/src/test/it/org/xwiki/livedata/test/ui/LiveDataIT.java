@@ -258,6 +258,7 @@ class LiveDataIT
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
         liveDataElement.waitUntilReady();
+        tableLayout.waitUntilRowCountEqualsTo(1);
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 

@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.index.tree.test.po.DocumentPickerModal;
 
 import static org.openqa.selenium.By.cssSelector;
 

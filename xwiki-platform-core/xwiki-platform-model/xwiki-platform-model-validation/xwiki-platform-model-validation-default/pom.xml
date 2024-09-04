@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-model-validation</artifactId>
-    <version>16.4.3-SNAPSHOT</version>
+    <version>16.4.3</version>
   </parent>
   <artifactId>xwiki-platform-model-validation-default</artifactId>
   <name>XWiki Platform - Model - Validation - Default</name>

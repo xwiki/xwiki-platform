@@ -57,7 +57,7 @@
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.0.12</jetty.server.version>
-    <jetty.client.version>10.0.21</jetty.client.version>
+    <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
@@ -81,7 +81,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.6.7</libreoffice.version>
+    <libreoffice.version>7.6.7.2</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -121,7 +121,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.3</pgsql.version>
+    <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
     <oracle.version>21.11.0.0</oracle.version>
@@ -199,7 +199,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
-        <version>2.7.3</version>
+        <version>2.7.4</version>
         <exclusions>
           <!-- Not need in the context of XWiki and cause conflict with other dependencies -->
           <exclusion>
@@ -460,7 +460,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.13.2</version>
+        <version>1.13.3</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -745,7 +745,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.3.1</version>
+        <version>4.4</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -1754,7 +1754,6 @@
                     <exclude>org.xwiki.platform:xwiki-platform-livetable</exclude>
                     <exclude>flaviusolaru:navigation-menu-wiki-macro</exclude>
                     <exclude>lucaa:navigationmenuconfigapplication</exclude>
-                    <exclude>xwiki-platform-messagestream</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-model</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-filter-instance-oldcore</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-panels</exclude>

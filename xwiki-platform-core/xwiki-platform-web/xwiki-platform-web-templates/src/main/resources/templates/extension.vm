@@ -1016,6 +1016,65 @@ $namespace##
   </div>
 #end
 
+#macro(displayExtensionSupportPlanName $extensionSupporterPlan)
+  #set ($isURLSafe = $extensionSupporterPlan.uRL && $services.html.isAttributeSafe('a', 'href', $extensionSupporterPlan.uRL))
+  #if ($isURLSafe)
+  <a target="_blank" rel="noopener noreferrer" class="external wikiexternallink" href="$escapetool.xml($extensionSupporterPlan.uRL)">
+  #end
+    #if ($extensionSupporterPlan.isPaying())
+      $escapetool.xml($services.localization.render('extensions.info.support.supportPlanPaying', [$extensionSupporterPlan.name]))
+    #else
+      $escapetool.xml($extensionSupporterPlan.name)
+    #end
+  #if ($isURLSafe)
+  </a>
+  #end
+#end
+
+#macro (displayExtensionSupportPlans $extensionSupportPlans $supporterList)
+  #set ($extensionSupporters = $extensionSupportPlans.supporters)
+  #if (!$extensionSupporters.isEmpty())
+      <div class="supporter-listing">
+        #if ($supporterList)
+          #set ($supporterElementName = 'div')
+        #else
+          #set ($supporterElementName = 'span')
+        #end
+        #set ($multi-first = false)
+        #foreach ($extensionSupporter in $extensionSupporters)
+          #set ($extensionSupporterPlans = $extensionSupportPlans.getSupportPlans($extensionSupporter))
+          #if ($extensionSupporterPlans.size() == 1)
+            <$supporterElementName class="supporter support-single-plan">
+              #set ($extensionSupporterPlan = $extensionSupporterPlans.get(0))
+              <span class="supporter-name">$extensionSupporter.name: </span>
+              <span class="plan-name infomessage">
+                #displayExtensionSupportPlanName($extensionSupporterPlan)
+              </span>
+            </$supporterElementName>
+          #else
+            <$supporterElementName class="supporter support-multi-plan dropdown">
+              <span class="supporter-name support-multi-name" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                $escapetool.xml($extensionSupporter.name)
+                <span class="caret"></span>
+              </span>
+              <div class="support-dialog dropdown-menu">
+                $escapetool.xml($extensionSupporter.name) <a href="$escapetool.xml($extensionSupporter.uRL)"> $services.icon.renderHTML('link') </a>
+                <h4>$escapetool.xml($services.localization.render('extensions.info.support.supportPlans'))</h4>
+                <div class="support-flex">
+                  #foreach ($extensionSupporterPlan in $extensionSupporterPlans)
+                    <span class="plan-name infomessage">
+                      #displayExtensionSupportPlanName($extensionSupporterPlan)
+                    </span>
+                  #end
+                </div>
+              </div>
+            </$supporterElementName>
+          #end
+        #end
+      </div>
+  #end
+#end
+
 #macro (displayExtension $extension $readOnly)
   ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
   #set ($jobStatus = $NULL)
@@ -1052,9 +1111,17 @@ $namespace##
       #if ("$!extension.summary" != '')
         <div class="extension-summary">$escapetool.xml($extension.summary)</div>
       #end
-      #if ($extension.isRecommended())
-        <div class="extension-recommended">$services.localization.render('extensions.info.recommended')</div>
+      #set ($extensionSupportPlans = $extension.supportPlans)
+      #set ($extensionSupporters = $extensionSupportPlans.supporters)
+      #if (!$extensionSupporters.isEmpty())
+        <div class="supported-by">
+          <h3>$escapetool.xml($services.localization.render('extensions.info.support.supportedBy'))</h3>
+          #displayExtensionSupportPlans($extensionSupportPlans)
+        </div>
+      #elseif ($extension.isRecommended())
+        <div class="extension-recommended">$escapetool.xml($services.localization.render('extensions.info.recommended'))</div>
       #end
+
       #displayProgressBar($extension)
       <div class="clearfloats"></div>
     </div>

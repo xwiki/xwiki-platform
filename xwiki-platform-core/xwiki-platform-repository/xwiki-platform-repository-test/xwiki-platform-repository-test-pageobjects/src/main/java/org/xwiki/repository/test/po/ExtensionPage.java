@@ -19,11 +19,14 @@
  */
 package org.xwiki.repository.test.po;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -35,13 +38,20 @@ public class ExtensionPage extends ViewPage
     @FindBy(xpath = "//a[@title='Update extension']")
     private WebElement update;
 
+    public static ExtensionPage gotoPage(String pageName)
+    {
+        getUtil().gotoPage(new LocalDocumentReference(Arrays.asList("Extension", pageName), "WebHome"));
+
+        return new ExtensionPage();
+    }
+
     /**
      * @since 4.2M1
      */
     public boolean isValidExtension()
     {
-        List<WebElement> elements = getDriver().findElements(
-            By.xpath("//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
+        List<WebElement> elements = getDriver().findElements(By.xpath(
+            "//div[@class = 'box successmessage' and ./p[contains(., 'Installable with the Extension Manager')]]"));
         return !elements.isEmpty();
     }
 
@@ -50,5 +60,11 @@ public class ExtensionPage extends ViewPage
         this.update.click();
 
         return new ExtensionPage();
+    }
+
+    @Override
+    protected ExtensionInlinePage createInlinePage()
+    {
+        return new ExtensionInlinePage();
     }
 }

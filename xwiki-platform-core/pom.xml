@@ -199,7 +199,6 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>

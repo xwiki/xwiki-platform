@@ -44,6 +44,7 @@
     <module>xwiki-platform-legacy-extension-handler-xar</module>
     <module>xwiki-platform-legacy-instance</module>
     <module>xwiki-platform-legacy-mail</module>
+    <module>xwiki-platform-legacy-messagestream</module>
     <module>xwiki-platform-legacy-model-api</module>
     <module>xwiki-platform-legacy-notifications</module>
     <module>xwiki-platform-legacy-observation</module>

@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Editor, Primitive } from "@tiptap/vue-3";
+import { Primitive } from "@tiptap/vue-3";
+import { type Editor } from "@tiptap/core";
 import { EditorState } from "@tiptap/pm/state";
 import { Range } from "@tiptap/core";
 import { Level } from "@tiptap/extension-heading";

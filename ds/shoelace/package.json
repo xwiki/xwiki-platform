@@ -36,7 +36,7 @@
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
-    "vue-tsc": "2.0.22"
+    "vue-tsc": "2.1.6"
   },
   "publishConfig": {
     "exports": {

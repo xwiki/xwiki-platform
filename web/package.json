@@ -58,6 +58,6 @@
     "vite-plugin-dts": "3.9.1",
     "vite-plugin-inspect": "0.8.4",
     "vite-plugin-vuetify": "2.0.3",
-    "vue-tsc": "2.0.22"
+    "vue-tsc": "2.1.6"
   }
 }

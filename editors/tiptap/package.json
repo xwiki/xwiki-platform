@@ -63,7 +63,7 @@
   "devDependencies": {
     "@types/lodash": "4.17.10",
     "@types/markdown-it": "14.1.1",
-    "vue-tsc": "2.0.22"
+    "vue-tsc": "2.1.6"
   },
   "publishConfig": {
     "exports": {

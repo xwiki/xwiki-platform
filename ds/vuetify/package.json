@@ -35,7 +35,7 @@
     "vuetify": "3.6.15"
   },
   "devDependencies": {
-    "vue-tsc": "2.0.22"
+    "vue-tsc": "2.1.6"
   },
   "publishConfig": {
     "exports": {

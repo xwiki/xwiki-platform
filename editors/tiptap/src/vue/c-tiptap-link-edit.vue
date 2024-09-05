@@ -20,7 +20,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { BubbleMenuAction } from "../components/extensions/bubble-menu";
-import { Editor, Range } from "@tiptap/vue-3";
+import { Range } from "@tiptap/vue-3";
+import { type Editor } from "@tiptap/core";
 import { inject, onMounted, onUpdated, Ref, ref, toRefs, watch } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
 import type { CristalApp } from "@xwiki/cristal-api";

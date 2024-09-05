@@ -18,7 +18,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { BubbleMenu, Editor, Range } from "@tiptap/vue-3";
+import { BubbleMenu, Range } from "@tiptap/vue-3";
+import { type Editor } from "@tiptap/core";
 import getMenuActions, {
   BubbleMenuAction,
   getLinkAction,

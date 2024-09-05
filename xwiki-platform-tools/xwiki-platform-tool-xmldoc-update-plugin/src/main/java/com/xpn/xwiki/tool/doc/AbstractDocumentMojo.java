@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -48,20 +47,20 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * An abstract Mojo that knows how to load a XWikiDocument from XML and to write XML from a XWikiDocument
+ * An abstract Mojo that knows how to load a XWikiDocument from XML and to write XML from a XWikiDocument.
  * 
  * @version $Id$
  */
 public abstract class AbstractDocumentMojo extends AbstractMojo
 {
     /**
-     * The document to perform the update on
+     * The document to perform the update on.
      */
     @Parameter(defaultValue = "${basedir}/src/main/resources/XWiki/XWikiPreferences")
     protected File sourceDocument;
 
     /**
-     * The target directory to write the document back to
+     * The target directory to write the document back to.
      */
     @Parameter(defaultValue = "${project.build.outputDirectory}")
     protected File outputDirectory;
@@ -70,9 +69,9 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      * An empty context that will hold the base classes encountered in the passed XML document. This is needed in order
      * not to lose the class definition when writing back to XML.
      */
-    private XWikiContext context;
+    private final XWikiContext context;
 
-    public AbstractDocumentMojo() throws MojoExecutionException
+    AbstractDocumentMojo() throws MojoExecutionException
     {
         this.context = createXWikiContext();
     }
@@ -108,7 +107,7 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
     }
 
     /**
-     * Loads a XWikiDocument from a XML file
+     * Loads a XWikiDocument from a XML file.
      * 
      * @param file the xml file to load
      * @return the XWiki document loaded from XML
@@ -116,30 +115,30 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      */
     protected XWikiDocument loadFromXML(File file) throws MojoExecutionException
     {
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "WebHome"));
-        FileInputStream fis;
         try {
-            // Load the document as a XWikiDocument from XML
-            fis = new FileInputStream(file);
-            doc.fromXML(fis);
+            XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "WebHome"));
+            try (FileInputStream fis = new FileInputStream(file)) {
+                // Load the document as a XWikiDocument from XML
+                doc.fromXML(fis);
+            }
 
             // get XML tree
-            FileReader fr = new FileReader(file);
             // This is not subject to XXE attacks since we control the input files and it's used only at build time.
             SAXReader reader = new SAXReader();
             Document domdoc;
-            domdoc = reader.read(fr);
+            try (FileReader fr = new FileReader(file)) {
+                domdoc = reader.read(fr);
+            }
             Element root = domdoc.getRootElement();
 
             // Lookup all class nodes, and add them to our xwiki context as BaseClass definitions
             List<Node> classNodes = root.selectNodes("//xwikidoc/object/class");
-            for (Iterator<Node> it = classNodes.iterator(); it.hasNext();) {
+            for (Node classNode : classNodes) {
                 BaseClass bClass = new BaseClass();
-                bClass.fromXML((Element) it.next());
-                context.addBaseClass(bClass);
+                bClass.fromXML((Element) classNode);
+                this.context.addBaseClass(bClass);
             }
 
-            fis.close();
             return doc;
         } catch (Exception e) {
             throw new MojoExecutionException("Error loading XWikiDocument [" + file + "]", e);
@@ -155,18 +154,16 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
      */
     protected void writeToXML(XWikiDocument doc, File file) throws MojoExecutionException
     {
-        try {
-            FileWriter fw = new FileWriter(file);
+        try (FileWriter fw = new FileWriter(file)) {
 
-            context.setWiki(new XWiki());
+            this.context.setWiki(new XWiki());
 
             // Write to XML the document and attachments but without rendering and without versions.
             // The passed xwiki context contains the XClass definitions (as BaseClass) all the objects that
             // has been previously loaded from XML, so that the class definition appears again in the XML output.
-            String xml = doc.toXML(true, false, true, false, context);
+            String xml = doc.toXML(true, false, true, false, this.context);
 
             fw.write(xml);
-            fw.close();
         } catch (Exception e) {
             throw new MojoExecutionException("Error writing XML for XWikiDocument [" + file + "]", e);
         }
@@ -174,7 +171,7 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
 
     /**
      * Return the space directory as a File for a given document in a given directory, creating the directories on the
-     * fly if the do not exists
+     * fly if the do not exists.
      * 
      * @param document the document to get space for
      * @param directory the directory in which the space will be written

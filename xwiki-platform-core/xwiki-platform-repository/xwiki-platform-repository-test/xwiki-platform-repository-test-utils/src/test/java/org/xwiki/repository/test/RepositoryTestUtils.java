@@ -39,6 +39,8 @@ import org.xwiki.extension.RemoteExtension;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.RepositoryUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
@@ -62,6 +64,9 @@ public class RepositoryTestUtils
     public final static String PROPERTY_KEY = "repositoryutils";
 
     private final static String SPACENAME_EXTENSION = "Extension";
+
+    private static final LocalStringEntityReferenceSerializer LOCAL_REFERENCE_SERIALIZER =
+        new LocalStringEntityReferenceSerializer(new DefaultSymbolScheme());
 
     /**
      * @since 7.3M1
@@ -87,6 +92,11 @@ public class RepositoryTestUtils
             authors.add(author.getName());
         }
         extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, authors));
+        List<String> supportPlans = new ArrayList<>();
+        for (ExtensionSupportPlan supportPlan : extension.getSupportPlans().getSupportPlans()) {
+            supportPlans.add(LOCAL_REFERENCE_SERIALIZER.serialize(toSupportPlanReference(supportPlan)));
+        }
+        extensionObject.getProperties().add(property(XWikiRepositoryModel.PROP_EXTENSION_SUPPORTPLANS, supportPlans));
         extensionObject.getProperties()
             .add(property(XWikiRepositoryModel.PROP_EXTENSION_WEBSITE, extension.getWebSite()));
         if (extension.getAllowedNamespaces() != null) {

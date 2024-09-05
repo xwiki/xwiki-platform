@@ -75,14 +75,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         // Add the Scheduler plugin used by Mail Resender Scheduler Job
         "xwikiCfgPlugins=com.xpn.xwiki.plugin.scheduler.SchedulerPlugin"
     },
-    resolveExtraJARs = true,
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib. See https://jira.xwiki.org/browse/XWIKI-19932
         "org.xwiki.platform:xwiki-platform-mail-send-storage",
-        // Because of https://jira.xwiki.org/browse/XWIKI-17972 we need to install the jython jar manually in
-        // WEB-INF/lib.
-        "org.python:jython-slim",
         // The Scheduler plugin needs to be in WEB-INF/lib since it's defined in xwiki.properties and plugins are loaded
         // by XWiki at startup, i.e. before extensions are provisioned for the tests
         "org.xwiki.platform:xwiki-platform-scheduler-api"

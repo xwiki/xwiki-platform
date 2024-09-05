@@ -20,6 +20,8 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +37,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.converter.RequestParameterConversionResult;
 import org.xwiki.wysiwyg.converter.RequestParameterConverter;
@@ -80,6 +83,9 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
 
     @Inject
     private HTMLConverter htmlConverter;
+
+    @Inject
+    private URLSecurityManager urlSecurityManager;
 
     @Inject
     private Logger logger;
@@ -172,7 +178,23 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         }
         // Save the output and the caught exceptions on the session.
         queryString += "key=" + save(conversionResult);
-        mutableRequest.sendRedirect(res, redirectURL + '?' + queryString);
+        String unsafeURL = redirectURL + '?' + queryString;
+        if (originalRequest instanceof HttpServletRequest) {
+            HttpServletRequest httpRequest = (HttpServletRequest) originalRequest;
+            try {
+                URI safeURI = this.urlSecurityManager.parseToSafeURI(unsafeURL, httpRequest.getServerName());
+                mutableRequest.sendRedirect(res, safeURI.toString());
+            } catch (URISyntaxException | SecurityException e) {
+                this.logger.warn(
+                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+                        + "If the request was legitimate, please check the URL security configuration. You "
+                        + "might need to add the domain related to this request in the list of trusted domains in "
+                        + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+                    unsafeURL);
+                this.logger.debug("Original error preventing the redirect: ", e);
+                ((HttpServletResponse) res).sendError(400, "The error redirect URI isn't considered safe.");
+            }
+        }
     }
 
     /**

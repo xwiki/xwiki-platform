@@ -17,37 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.livedata;
 
+import org.xwiki.stability.Unstable;
+
 /**
- * Describes the live data selection configuration.
- * 
+ * Helper interface to represents all live data elements that needs initialization.
+ *
  * @version $Id$
- * @since 12.10.1
- * @since 13.0
+ * @since 16.8.0RC1
  */
-public class LiveDataSelectionConfiguration implements InitializableLiveDataElement
+@Unstable
+public interface InitializableLiveDataElement
 {
     /**
-     * Specified whether live data entry selection is enabled.
+     * Prevent {@code null} values where it's possible.
      */
-    private boolean enabled;
-
-    /**
-     * @return {@code true} if live data entry selection is enabled, {@code false} otherwise
-     */
-    public boolean isEnabled()
+    default void initialize()
     {
-        return enabled;
-    }
-
-    /**
-     * Sets whether live data entry selection is enabled.
-     * 
-     * @param enabled {@code true} to enable the live data entry selection, {@code false} to disable it
-     */
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
     }
 }

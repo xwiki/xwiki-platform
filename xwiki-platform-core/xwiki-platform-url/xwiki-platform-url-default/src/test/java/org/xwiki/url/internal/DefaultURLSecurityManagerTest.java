@@ -513,4 +513,19 @@ class DefaultURLSecurityManagerTest
             + "or try to use a different marker.", illegalArgumentException.getMessage());
         assertTrue(illegalArgumentException.getCause() instanceof URISyntaxException);
     }
+
+    @Test
+    void parseToSafeURIWithDomain() throws URISyntaxException
+    {
+        when(this.urlConfiguration.getTrustedSchemes()).thenReturn(List.of("https"));
+
+        String url = "https://www.example.com/path";
+        assertEquals(url, this.urlSecurityManager.parseToSafeURI(url, "www.example.com").toString());
+
+        SecurityException securityException = assertThrows(SecurityException.class,
+            () -> this.urlSecurityManager.parseToSafeURI("https://example.com",
+                "www.example.com"));
+
+        assertEquals("The given URI [https://example.com] is not safe on this server.", securityException.getMessage());
+    }
 }

@@ -26,14 +26,9 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.like.LikeConfiguration;
 import org.xwiki.like.events.LikeEvent;
 import org.xwiki.like.LikeException;
 import org.xwiki.like.events.UnlikeEvent;
@@ -65,6 +60,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -93,12 +89,6 @@ public class DefaultLikeManagerTest
     private ObservationManager observationManager;
 
     @MockComponent
-    private CacheManager cacheManager;
-
-    @MockComponent
-    private LikeConfiguration likeConfiguration;
-
-    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @MockComponent
@@ -107,11 +97,10 @@ public class DefaultLikeManagerTest
     @MockComponent
     private EntityReferenceFactory entityReferenceFactory;
 
+    @MockComponent
+    private LikeManagerCacheHelper cacheHelper;
+
     private RatingsManager ratingsManager;
-
-    private Cache<Long> likedEntityCache;
-
-    private Cache<Pair<EntityReference, Boolean>> likeExistCache;
 
     private Right likeRight;
 
@@ -127,19 +116,6 @@ public class DefaultLikeManagerTest
     {
         this.likeRight = mock(Right.class);
         when(this.authorizationManager.register(LikeRight.INSTANCE)).thenReturn(this.likeRight);
-        when(this.likeConfiguration.getLikeCacheCapacity()).thenReturn(500);
-        this.likedEntityCache = mock(Cache.class);
-        this.likeExistCache = mock(Cache.class);
-        when(this.cacheManager.createNewCache(any())).then(invocationOnMock -> {
-            CacheConfiguration cacheConfiguration = invocationOnMock.getArgument(0);
-            if (cacheConfiguration.getConfigurationId().equals("xwiki.like.count.cache")) {
-                return this.likedEntityCache;
-            } else if (cacheConfiguration.getConfigurationId().equals("xwiki.like.exist.cache")) {
-                return this.likeExistCache;
-            } else {
-                throw new AssertionError("Cache key is wrong.");
-            }
-        });
         this.ratingsManager = mock(RatingsManager.class);
         when(this.ratingsManagerFactory.getRatingsManager(LikeRatingsConfiguration.RATING_MANAGER_HINT))
             .thenReturn(this.ratingsManager);
@@ -164,14 +140,15 @@ public class DefaultLikeManagerTest
 
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
+        when(this.cacheHelper.getCount(target)).thenReturn(null);
         when(this.ratingsManager.countRatings(queryMap)).thenReturn(42L);
 
         assertEquals(42L, this.defaultLikeManager.saveLike(this.userReference, target));
         verify(this.ratingsManager).saveRating(target, this.userReference, 1);
         verify(this.observationManager).notify(any(LikeEvent.class), eq(this.userReference), eq(target));
-        verify(this.likedEntityCache).remove("xwiki:Foo.WebHome");
-        verify(this.likedEntityCache).set("xwiki:Foo.WebHome", 42L);
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, true));
+        verify(this.cacheHelper).removeCount(target);
+        verify(this.cacheHelper).setCount(target, 42L);
+        verify(this.cacheHelper).setExist(this.userReference, target, true);
     }
 
     @Test
@@ -186,9 +163,7 @@ public class DefaultLikeManagerTest
             likeException.getMessage());
         verify(this.ratingsManager, never()).saveRating(target, this.userReference, 1);
         verify(this.observationManager, never()).notify(any(LikeEvent.class), eq(this.userReference), any());
-        verify(this.likedEntityCache, never()).remove(any());
-        verify(this.likedEntityCache, never()).set(any(), any());
-        verify(this.likedEntityCache, never()).get(any());
+        verifyNoInteractions(this.cacheHelper);
     }
 
     @Test
@@ -196,10 +171,11 @@ public class DefaultLikeManagerTest
     {
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
+        when(this.cacheHelper.getCount(target)).thenReturn(null);
         when(this.ratingsManager.countRatings(queryMap)).thenReturn(43L);
 
         assertEquals(43L, this.defaultLikeManager.getEntityLikes(target));
-        verify(this.likedEntityCache).set("xwiki:Foo.WebHome", 43L);
+        verify(this.cacheHelper).setCount(target, 43L);
     }
 
     @Test
@@ -242,11 +218,12 @@ public class DefaultLikeManagerTest
         Map<RatingsManager.RatingQueryField, Object> queryMap = new LinkedHashMap<>();
         queryMap.put(RatingsManager.RatingQueryField.ENTITY_REFERENCE, target);
         queryMap.put(RatingsManager.RatingQueryField.USER_REFERENCE, this.userReference);
+        when(this.cacheHelper.isExist(this.userReference, target)).thenReturn(null);
 
         when(this.ratingsManager.getRatings(queryMap, 0, 1, RatingsManager.RatingQueryField.UPDATED_DATE, false)).
             thenReturn(Collections.singletonList(mock(Rating.class)));
         assertTrue(this.defaultLikeManager.isLiked(this.userReference, target));
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, true));
+        verify(this.cacheHelper).setExist(userReference, target, true);
     }
 
     @Test
@@ -268,8 +245,8 @@ public class DefaultLikeManagerTest
         assertTrue(this.defaultLikeManager.removeLike(this.userReference, target));
         verify(this.ratingsManager).removeRating("grading423");
         verify(this.observationManager).notify(any(UnlikeEvent.class), eq(this.userReference), eq(this.target));
-        verify(this.likeExistCache).set("xwiki:XWiki.User_xwiki:Foo.WebHome", Pair.of(target, false));
-        verify(this.likedEntityCache).remove("xwiki:Foo.WebHome");
+        verify(this.cacheHelper).setExist(userReference, target, false);
+        verify(this.cacheHelper).removeCount(target);
     }
 
     @Test
@@ -324,7 +301,5 @@ public class DefaultLikeManagerTest
     void dispose() throws Exception
     {
         this.defaultLikeManager.dispose();
-        verify(this.likeExistCache).dispose();
-        verify(this.likedEntityCache).dispose();
     }
 }

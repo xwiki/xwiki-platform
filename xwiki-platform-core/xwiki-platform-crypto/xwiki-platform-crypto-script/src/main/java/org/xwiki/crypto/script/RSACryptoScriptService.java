@@ -24,45 +24,28 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.crypto.KeyPairGenerator;
+import org.xwiki.crypto.internal.RSACryptoHelper;
 import org.xwiki.crypto.params.cipher.asymmetric.AsymmetricKeyPair;
 import org.xwiki.crypto.params.cipher.asymmetric.PrivateKeyParameters;
 import org.xwiki.crypto.params.cipher.asymmetric.PublicKeyParameters;
 import org.xwiki.crypto.params.generator.asymmetric.RSAKeyGenerationParameters;
 import org.xwiki.crypto.pkix.CertificateChainBuilder;
-import org.xwiki.crypto.pkix.CertificateGeneratorFactory;
 import org.xwiki.crypto.pkix.CertificateProvider;
-import org.xwiki.crypto.pkix.CertifyingSigner;
-import org.xwiki.crypto.pkix.X509ExtensionBuilder;
 import org.xwiki.crypto.pkix.params.CertifiedKeyPair;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
-import org.xwiki.crypto.pkix.params.x509certificate.DistinguishedName;
-import org.xwiki.crypto.pkix.params.x509certificate.X509CertificateGenerationParameters;
-import org.xwiki.crypto.pkix.params.x509certificate.X509CertificateParameters;
-import org.xwiki.crypto.pkix.params.x509certificate.X509CertifiedPublicKey;
-import org.xwiki.crypto.pkix.params.x509certificate.extension.ExtendedKeyUsages;
-import org.xwiki.crypto.pkix.params.x509certificate.extension.KeyUsage;
-import org.xwiki.crypto.pkix.params.x509certificate.extension.X509DnsName;
 import org.xwiki.crypto.pkix.params.x509certificate.extension.X509GeneralName;
-import org.xwiki.crypto.pkix.params.x509certificate.extension.X509IpAddress;
-import org.xwiki.crypto.pkix.params.x509certificate.extension.X509Rfc822Name;
 import org.xwiki.crypto.signer.CMSSignedDataGenerator;
 import org.xwiki.crypto.signer.CMSSignedDataVerifier;
 import org.xwiki.crypto.signer.SignerFactory;
-import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
-import org.xwiki.crypto.signer.param.CMSSignerInfo;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -90,13 +73,6 @@ public class RSACryptoScriptService implements ScriptService
     private SignerFactory signerFactory;
 
     @Inject
-    private Provider<X509ExtensionBuilder> extensionBuilder;
-
-    @Inject
-    @Named("X509")
-    private CertificateGeneratorFactory certificateGeneratorFactory;
-
-    @Inject
     private CMSSignedDataGenerator cmsSignedDataGenerator;
 
     @Inject
@@ -105,6 +81,9 @@ public class RSACryptoScriptService implements ScriptService
 
     @Inject
     private CMSSignedDataVerifier cmsSignedDataVerifier;
+
+    @Inject
+    private RSACryptoHelper rsaCryptoHelper;
 
     /**
      * Generate a new RSA key pair.
@@ -179,18 +158,7 @@ public class RSACryptoScriptService implements ScriptService
     public CertifiedKeyPair issueRootCACertificate(AsymmetricKeyPair keyPair, String dn, int validity)
         throws IOException, GeneralSecurityException
     {
-        return new CertifiedKeyPair(
-            keyPair.getPrivate(),
-            certificateGeneratorFactory.getInstance(signerFactory.getInstance(true, keyPair.getPrivate()),
-                new X509CertificateGenerationParameters(
-                    validity,
-                    extensionBuilder.get().addBasicConstraints(true)
-                        .addKeyUsage(true, EnumSet.of(KeyUsage.keyCertSign,
-                            KeyUsage.cRLSign))
-                        .build()))
-                .generate(new DistinguishedName(dn), keyPair.getPublic(),
-                    new X509CertificateParameters())
-        );
+        return this.rsaCryptoHelper.issueRootCACertificate(keyPair, dn, validity);
     }
 
     /**
@@ -248,16 +216,7 @@ public class RSACryptoScriptService implements ScriptService
         String dn, int validity)
         throws IOException, GeneralSecurityException
     {
-        return certificateGeneratorFactory.getInstance(
-            CertifyingSigner.getInstance(true, issuer, signerFactory),
-            new X509CertificateGenerationParameters(
-                validity,
-                extensionBuilder.get().addBasicConstraints(0)
-                    .addKeyUsage(EnumSet.of(KeyUsage.keyCertSign,
-                        KeyUsage.cRLSign))
-                    .build()))
-                .generate(new DistinguishedName(dn), publicKey,
-                    new X509CertificateParameters());
+        return this.rsaCryptoHelper.issueIntermediateCertificate(issuer, publicKey, dn, validity);
     }
 
     /**
@@ -319,33 +278,7 @@ public class RSACryptoScriptService implements ScriptService
     public CertifiedPublicKey issueCertificate(CertifiedKeyPair issuer, PublicKeyParameters publicKey,
         String dn, int validity, List<X509GeneralName> subjectAltName) throws IOException, GeneralSecurityException
     {
-        X509CertificateParameters params;
-        X509ExtensionBuilder builder = extensionBuilder.get().addKeyUsage(EnumSet.of(KeyUsage.digitalSignature,
-            KeyUsage.dataEncipherment));
-
-        if (subjectAltName != null) {
-            params = new X509CertificateParameters(
-                extensionBuilder.get().addSubjectAltName(false, subjectAltName.toArray(new X509GeneralName[]{}))
-                    .build());
-            Set<String> extUsage = new HashSet<>();
-            for (X509GeneralName genName : subjectAltName) {
-                if (genName instanceof X509Rfc822Name) {
-                    extUsage.add(ExtendedKeyUsages.EMAIL_PROTECTION);
-                } else if (genName instanceof X509DnsName || genName instanceof X509IpAddress) {
-                    extUsage.add(ExtendedKeyUsages.SERVER_AUTH);
-                    extUsage.add(ExtendedKeyUsages.CLIENT_AUTH);
-                }
-                builder.addExtendedKeyUsage(false, new ExtendedKeyUsages(extUsage));
-            }
-        } else {
-            params = new X509CertificateParameters();
-        }
-
-
-        return certificateGeneratorFactory.getInstance(
-                CertifyingSigner.getInstance(true, issuer, signerFactory),
-                new X509CertificateGenerationParameters(validity, builder.build()))
-            .generate(new DistinguishedName(dn), publicKey, params);
+        return this.rsaCryptoHelper.issueCertificate(issuer, publicKey, dn, validity, subjectAltName);
     }
 
     /**
@@ -398,53 +331,7 @@ public class RSACryptoScriptService implements ScriptService
     public byte[] cmsSign(byte[] data, CertifiedKeyPair keyPair, CertificateProvider certificateProvider,
         CMSSignedDataVerified existingSignature, boolean embedContent) throws GeneralSecurityException
     {
-        CMSSignedDataGeneratorParameters parameters = new CMSSignedDataGeneratorParameters()
-            .addSigner(CertifyingSigner.getInstance(true, keyPair, signerFactory));
-
-        if (existingSignature != null) {
-            for (CMSSignerInfo existingSigner : existingSignature.getSignatures()) {
-                parameters.addSignature(existingSigner);
-            }
-        }
-
-        Set<CertifiedPublicKey> certs = new HashSet<>();
-        if (existingSignature != null && existingSignature.getCertificates() != null) {
-            certs.addAll(existingSignature.getCertificates());
-        }
-
-        if (certificateProvider != null) {
-            if (existingSignature != null) {
-                for (CMSSignerInfo existingSigner : existingSignature.getSignatures()) {
-                    if (existingSigner.getSubjectKeyIdentifier() != null) {
-                        addCertificateChain(
-                            certificateProvider.getCertificate(existingSigner.getSubjectKeyIdentifier()),
-                            certificateProvider, certs);
-                    } else {
-                        addCertificateChain(
-                            certificateProvider.getCertificate(existingSigner.getIssuer(),
-                                existingSigner.getSerialNumber()),
-                            certificateProvider, certs);
-                    }
-                }
-            }
-
-            addCertificateChain(keyPair.getCertificate(), certificateProvider, certs);
-        }
-
-        if (!certs.isEmpty()) {
-            parameters.addCertificates(certs);
-        }
-
-        return cmsSignedDataGenerator.generate(data, parameters, embedContent);
-    }
-
-    private void addCertificateChain(CertifiedPublicKey certificate, CertificateProvider certificateProvider,
-        Collection<CertifiedPublicKey> certs)
-    {
-        Collection<CertifiedPublicKey> chain = certificateChainBuilder.build(certificate, certificateProvider);
-        if (chain != null) {
-            certs.addAll(chain);
-        }
+        return this.rsaCryptoHelper.cmsSign(data, keyPair, certificateProvider, existingSignature, embedContent);
     }
 
     /**
@@ -526,26 +413,6 @@ public class RSACryptoScriptService implements ScriptService
      */
     public boolean checkX509CertificateChainValidity(Collection<CertifiedPublicKey> chain, Date date)
     {
-        if (chain == null || chain.isEmpty()) {
-            return false;
-        }
-
-        Date checkDate = (date != null) ? date : new Date();
-        boolean rootExpected = true;
-        for (CertifiedPublicKey cert : chain) {
-            if (!(cert instanceof X509CertifiedPublicKey)) {
-                return false;
-            }
-            if (rootExpected) {
-                if (!((X509CertifiedPublicKey) cert).isRootCA()) {
-                    return false;
-                }
-                rootExpected = false;
-            }
-            if (!((X509CertifiedPublicKey) cert).isValidOn(checkDate)) {
-                return false;
-            }
-        }
-        return true;
+        return this.rsaCryptoHelper.checkX509CertificateChainValidity(chain, date);
     }
 }

@@ -73,6 +73,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
+        setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
         waitForSolrIndexing(setup, testConfiguration);
 
         createAndLoginStandardUser(setup);

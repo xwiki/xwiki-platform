@@ -70,7 +70,7 @@ import static org.mockito.Mockito.when;
  * @since 12.7RC1
  */
 @ComponentTest
-public class DefaultLikeManagerTest
+class DefaultLikeManagerTest
 {
     @InjectMockComponents
     private DefaultLikeManager defaultLikeManager;
@@ -301,5 +301,6 @@ public class DefaultLikeManagerTest
     void dispose() throws Exception
     {
         this.defaultLikeManager.dispose();
+        verify(this.authorizationManager).unregister(this.likeRight);
     }
 }

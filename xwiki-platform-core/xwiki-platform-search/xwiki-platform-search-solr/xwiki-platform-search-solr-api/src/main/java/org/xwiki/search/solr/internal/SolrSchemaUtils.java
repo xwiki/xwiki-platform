@@ -19,9 +19,10 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Singleton;
@@ -60,11 +61,14 @@ public class SolrSchemaUtils
 
         private Map<String, Map<String, Object>> dynamicFields;
 
+        private Map<String, Set<String>> copyFields;
+
         void reset()
         {
             this.types = null;
             this.fields = null;
             this.dynamicFields = null;
+            this.copyFields = null;
         }
     }
 
@@ -162,6 +166,38 @@ public class SolrSchemaUtils
         }
 
         return schema.dynamicFields;
+    }
+
+    /**
+     * Retrieve all information about existing dynamic fields of the core.
+     *
+     * @param core the core to search in
+     * @param force if {@code true} reloads all information, else gets the information from the cache
+     * @return the map of all dynamic fields
+     * @throws SolrException in case of problem to request fields information
+     */
+    public Map<String, Set<String>> getCopyFields(XWikiSolrCore core, boolean force) throws SolrException
+    {
+        SolrCoreSchema schema = getSchema(core);
+
+        if (schema.copyFields == null || force) {
+            SchemaResponse.CopyFieldsResponse response;
+            try {
+                response = new SchemaRequest.CopyFields().process(core.getClient());
+            } catch (Exception e) {
+                throw new SolrException("Failed to get the list of copy fields", e);
+            }
+
+            Map<String, Set<String>> map = new ConcurrentHashMap<>(response.getCopyFields().size());
+            for (Map<String, Object> fields : response.getCopyFields()) {
+                Set<String> destinations =
+                    map.computeIfAbsent((String) fields.get("source"), k -> ConcurrentHashMap.newKeySet());
+                destinations.add((String) fields.get("dest"));
+            }
+            schema.copyFields = map;
+        }
+
+        return schema.copyFields;
     }
 
     /**
@@ -331,14 +367,31 @@ public class SolrSchemaUtils
      * 
      * @param core the core to update
      * @param source the source field name
-     * @param dest the collection of the destination field names
+     * @param destinations the collection of the destination field names
      * @throws SolrException when failing to add the field
      * @since 16.2.0RC1
      */
-    public void addCopyField(XWikiSolrCore core, String source, String... dest) throws SolrException
+    public void addCopyField(XWikiSolrCore core, String source, String... destinations) throws SolrException
+    {
+        addCopyField(core, source, List.of(destinations));
+    }
+
+    /**
+     * Add a copy field.
+     * 
+     * @param core the core to update
+     * @param source the source field name
+     * @param destinations the collection of the destination field names
+     * @throws SolrException when failing to add the field
+     * @since 16.2.0RC1
+     */
+    public void addCopyField(XWikiSolrCore core, String source, List<String> destinations) throws SolrException
     {
         try {
-            new SchemaRequest.AddCopyField(source, Arrays.asList(dest)).process(core.getClient());
+            new SchemaRequest.AddCopyField(source, destinations).process(core.getClient());
+
+            // Add it to the cache
+            getCopyFields(core, false).computeIfAbsent(source, k -> ConcurrentHashMap.newKeySet()).addAll(destinations);
         } catch (Exception e) {
             throw new SolrException("Failed to add a copy field in the Solr core", e);
         }

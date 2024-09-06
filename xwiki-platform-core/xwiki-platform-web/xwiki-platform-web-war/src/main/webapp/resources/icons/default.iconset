@@ -123,6 +123,7 @@ question = help
 random = arrow_switch
 refresh = arrow_refresh
 remove = cancel
+reposition=reposition
 repeat = arrow_redo
 right = arrow_right
 rotate-left = arrow_rotate_anticlockwise

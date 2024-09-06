@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy</artifactId>
   <name>XWiki Platform - Legacy</name>
@@ -44,6 +44,7 @@
     <module>xwiki-platform-legacy-extension-handler-xar</module>
     <module>xwiki-platform-legacy-instance</module>
     <module>xwiki-platform-legacy-mail</module>
+    <module>xwiki-platform-legacy-messagestream</module>
     <module>xwiki-platform-legacy-model-api</module>
     <module>xwiki-platform-legacy-notifications</module>
     <module>xwiki-platform-legacy-observation</module>

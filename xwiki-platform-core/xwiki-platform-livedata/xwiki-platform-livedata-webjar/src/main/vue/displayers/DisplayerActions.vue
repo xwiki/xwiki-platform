@@ -49,7 +49,8 @@
           :href="sanitizeUrl(entry[action.urlProperty]) || '#'"
           @click="handleClick($event, action)"
         >
-          <XWikiIcon :iconDescriptor="action.icon" /><span class="action-name">{{ action.name }}</span>
+          <XWikiIcon :iconDescriptor="action.icon" class="action-icon"/>
+          <span class="action-name">{{ action.name }}</span>
         </a>
       </div>
     </template>
@@ -146,6 +147,7 @@ export default {
 .displayer-actions .action {
   color: @text-muted;
   white-space: nowrap;
+  text-transform: capitalize;
 }
 
 .displayer-actions .action + .action {

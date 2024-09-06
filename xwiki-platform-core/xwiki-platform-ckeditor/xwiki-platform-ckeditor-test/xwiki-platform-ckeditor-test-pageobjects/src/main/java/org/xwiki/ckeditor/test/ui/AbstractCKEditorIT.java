@@ -28,11 +28,9 @@ import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Base class for CKEditor integration tests.
@@ -98,38 +96,12 @@ public abstract class AbstractCKEditorIT
     protected void maybeLeaveEditMode(TestUtils setup, TestReference testReference)
     {
         if (setup.isInWYSIWYGEditMode() || setup.isInWikiEditMode()) {
-            // Leaving the edit mode with unsaved changes triggers the confirmation alert which stops the navigation.
-            // Selenium doesn't wait for the new web page to be loaded after the alert is handled so we have to do this
-            // ourselves. Adding the page reload marker helps us detect when the new web page is loaded after the
-            // confirmation alert is handled.
-            setup.getDriver().addPageNotYetReloadedMarker();
-
-            // We pass the action because we don't want this call to wait for view mode to be loaded. We do our own wait
-            // (after handling the confirmation alert), as mentioned above.
-            setup.gotoPage(testReference, "view");
-
-            try {
-                // Confirm the page leave (discard unsaved changes) if we are asked for.
-                setup.getDriver().switchTo().alert().accept();
-            } catch (Exception e) {
-                // The page leave confirmation hasn't been shown, probably because there were no unsaved changes.
-            }
-
-            // Wait for the new web page to be loaded.
-            setup.getDriver().waitUntilPageIsReloaded();
-            new ViewPage();
+            new WikiEditPage().clickCancel();
         }
     }
 
     protected void waitForSolrIndexing(TestUtils setup, TestConfiguration testConfiguration) throws Exception
     {
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
-    }
-
-    protected String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
     }
 }

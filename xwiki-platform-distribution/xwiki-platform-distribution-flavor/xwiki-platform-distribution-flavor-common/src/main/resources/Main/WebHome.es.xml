@@ -54,7 +54,7 @@ Utiliza las {{displayIcon name="home"/}} pistas del historial de navegación o "
 Además, puedes acceder a la [[Zona de Pruebas&gt;&gt;Sandbox.WebHome]] para ver ejemplos de uso de la wiki y, en general, como un lugar donde experimentar con sus funcionalidades.
 
 {{box}}
-Aprende más sobre cómo utilizar XWiki con la [[Guía de Introducción&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
+Aprende más sobre cómo utilizar XWiki con la [[Guía de Introducción&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].
 {{/box}}
 
 (% class="row" %)
@@ -65,7 +65,7 @@ Aprende más sobre cómo utilizar XWiki con la [[Guía de Introducción&gt;&gt;h
 
 Para aumentar la potencia y las funciones de tu wiki con las funcionalidades que //tu// necesitas, accede al [[Administrador de Extensiones&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]] donde puedes buscar e instalar extensiones.
 
-Para navegar por las más de 900 extensiones proporcionadas por la comunidad disponibles para XWiki, accede al [[repositorio de extensiones&gt;&gt;http://extensions.xwiki.org]].
+Para navegar por las más de 900 extensiones proporcionadas por la comunidad disponibles para XWiki, accede al [[repositorio de extensiones&gt;&gt;https://extensions.xwiki.org]].
 )))
 
 (% class="col-xs-12 col-sm-6" %)

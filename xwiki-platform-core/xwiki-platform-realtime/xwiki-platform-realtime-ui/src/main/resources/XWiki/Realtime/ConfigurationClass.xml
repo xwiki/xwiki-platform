@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Realtime.ConfigurationClass" locale="">
+<xwikidoc version="1.5" reference="XWiki.Realtime.ConfigurationClass" locale="">
   <web>XWiki.Realtime</web>
   <name>ConfigurationClass</name>
   <language/>
@@ -79,7 +79,7 @@
     <toolbarUserlist>
       <cache>0</cache>
       <customDisplay/>
-      <defaultValue/>
+      <defaultValue>both</defaultValue>
       <disabled>0</disabled>
       <displayType>select</displayType>
       <freeText/>
@@ -117,4 +117,48 @@
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </useGlobalConfig>
   </class>
+  <object>
+    <name>XWiki.Realtime.ConfigurationClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>81df8b09-fe2e-4be5-b938-cfcfa671c12a</guid>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>XWiki.ClassSheet</sheet>
+    </property>
+  </object>
 </xwikidoc>

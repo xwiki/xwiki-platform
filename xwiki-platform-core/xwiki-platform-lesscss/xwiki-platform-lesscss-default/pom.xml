@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-lesscss</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-lesscss-default</artifactId>
   <name>XWiki Platform - LESS CSS - Default</name>
@@ -70,12 +70,6 @@
       <groupId>com.github.sommeri</groupId>
       <artifactId>less4j</artifactId>
       <version>1.17.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.json</groupId>
-          <artifactId>json</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

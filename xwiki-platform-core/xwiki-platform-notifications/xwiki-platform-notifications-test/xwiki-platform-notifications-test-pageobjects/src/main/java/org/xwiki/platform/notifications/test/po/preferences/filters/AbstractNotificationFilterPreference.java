@@ -46,8 +46,6 @@ public abstract class AbstractNotificationFilterPreference
 
     private WebElement row;
 
-    private String filterName;
-
     private List<String> formats = new ArrayList<>();
 
     private BootstrapSwitch enabledSwitch;
@@ -64,7 +62,6 @@ public abstract class AbstractNotificationFilterPreference
     {
         this.parentPage = parentPage;
         this.row = row;
-        this.filterName = getNameElement(row).getText();
         List<WebElement> formatElements = getFormatsElement(row)
             .findElements(By.tagName("li"));
         for (WebElement format : formatElements) {
@@ -73,13 +70,6 @@ public abstract class AbstractNotificationFilterPreference
         this.webDriver = webDriver;
         this.enabledSwitch = new BootstrapSwitch(getBootstrapSwitchElement(row), webDriver);
     }
-
-    /**
-     * @param row the row to get the name from
-     * @return the {@link WebElement} containing the name of the row
-     * @since 16.1.0RC1
-     */
-    protected abstract WebElement getNameElement(WebElement row);
 
     /**
      * @param row the row to get the formats from
@@ -98,14 +88,6 @@ public abstract class AbstractNotificationFilterPreference
     {
         this.webDriver.waitUntilElementIsVisible(row, By.cssSelector(".displayer-toggle .bootstrap-switch"));
         return row.findElement(By.className("displayer-toggle")).findElement(By.className("bootstrap-switch"));
-    }
-
-    /**
-     * @return the filter name.
-     */
-    public String getFilterName()
-    {
-        return filterName;
     }
 
     /**

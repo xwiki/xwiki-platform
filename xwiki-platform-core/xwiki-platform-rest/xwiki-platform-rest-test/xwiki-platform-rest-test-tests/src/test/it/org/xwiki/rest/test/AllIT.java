@@ -20,14 +20,14 @@
 package org.xwiki.rest.test;
 
 import org.junit.runner.RunWith;
-import org.xwiki.test.integration.XWikiExecutorSuite;
+import org.xwiki.test.ui.PageObjectSuite;
 
 /**
  * Runs all functional tests found in the classpath and start/stop XWiki before/after the tests (only once).
  *
  * @version $Id$
  */
-@RunWith(XWikiExecutorSuite.class)
+@RunWith(PageObjectSuite.class)
 public class AllIT
 {
 }

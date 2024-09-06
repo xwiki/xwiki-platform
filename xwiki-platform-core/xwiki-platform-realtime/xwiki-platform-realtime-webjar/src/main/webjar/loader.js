@@ -22,18 +22,17 @@ define('xwiki-realtime-loader', [
   'xwiki-meta',
   'xwiki-realtime-config',
   'xwiki-realtime-document',
-  'xwiki-realtime-interface',
   'xwiki-l10n!xwiki-realtime-messages',
   'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
 ], function(
   /* jshint maxparams:false */
-  $, xm, realtimeConfig, doc, Interface, Messages, ErrorBox
+  $, xm, realtimeConfig, doc, Messages, ErrorBox
 ) {
   'use strict';
 
   if (!realtimeConfig.webSocketURL) {
-    console.log('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
+    console.error('The WebSocket URL is missing. Aborting attempt to configure a realtime session.');
     return;
   }
 
@@ -50,16 +49,12 @@ define('xwiki-realtime-loader', [
   },
 
   getRTEditorURL = module.getEditorURL = function(href, info) {
-    href = href.replace(/\?(.*)$/, function (all, args) {
-      return '?' + args.split('&').filter(
-        arg => ['editor', 'section', 'force', 'realtime'].indexOf(arg.split('=', 1)[0]) < 0
-      ).join('&');
-    });
-    if (href.indexOf('?') < 0) {
-      href += '?';
-    }
-    href = href + info.href;
-    return href;
+    const currentURL = new URL(href);
+    const baseURL = new URL("?", currentURL).toString();
+    const params = new URLSearchParams(currentURL.search);
+    ['editor', 'section', 'force', 'realtime'].forEach(param => params.delete(param));
+    const hash = info.href.includes('#') ? '' : currentURL.hash;
+    return baseURL + params.toString() + info.href + hash;
   },
 
   allRt = {
@@ -213,10 +208,10 @@ define('xwiki-realtime-loader', [
       checkSocket(info.field).then(types => {
         // Determine if it's a realtime session.
         if (types.length) {
-          console.log('Found an active realtime session.');
+          console.debug('Found an active realtime session.');
           displayModal(null, types, null, info);
         } else {
-          console.log("Couldn't find an active realtime session.");
+          console.debug("Couldn't find an active realtime session.");
           module.whenReady(function(rt) {
             if (rt) {
               displayModal(null, null, null, info);
@@ -590,11 +585,11 @@ define('xwiki-realtime-loader', [
     resize();
   },
 
-  tryParse = function(msg) {
+  tryParse = function(message) {
     try {
-      return JSON.parse(msg);
-    } catch (e) {
-      console.error('Cannot parse the message');
+      return JSON.parse(message);
+    } catch (error) {
+      console.error('Cannot parse the message.', {message, error});
     }
   },
 
@@ -715,39 +710,32 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  joinAllUsers = function() {
-    const getChannels = doc.getChannels.bind(doc, {
+  getAllUsersChannel = function() {
+    return doc.getChannels({
       path: doc.language + '/events/all',
       create: true
-    });
-    getChannels().then(channels => {
-      const channelKey = channels[0].key;
-      if (channelKey) {
-        require(['netflux-client', 'xwiki-realtime-errorBox'], function(Netflux, ErrorBox) {
-          const onError = function (error) {
-            allRt.error = true;
-            displayWsWarning();
-            console.error(error);
-          };
-          // Connect to the WebSocket server.
-          Netflux.connect(realtimeConfig.webSocketURL).then(onNetfluxConnect.bind(null, getChannels, channelKey,
-            onError), onError);
-        });
-      }
-    });
+    }).then(channels => channels[0]);
   },
 
-  onNetfluxConnect = function(getChannels, channelKey, onError, network) {
-    allRt.network = network;
-    const onOpen = function(channel) {
-      allRt.userList = channel.members;
-      allRt.wChan = channel;
-      addMessageHandler();
-    };
-    // Join the "all" channel.
-    network.join(channelKey).then(onOpen, onError);
+  joinAllUsers = async function() {
+    const channelInfo = await getAllUsersChannel();
+    if (!channelInfo?.key) {
+      // We can't join the all users (events) channel if we don't know its key.
+      return;
+    }
+    if (!allRt.network) {
+      allRt.network = await connectToNetfluxWebSocket();
+    }
+    await onOpen(channelInfo);
+  },
+
+  connectToNetfluxWebSocket = async function() {
+    const Netflux = await new Promise((resolve, reject) => {
+      require(['netflux-client'], resolve, reject);
+    });
+    const network = await Netflux.connect(realtimeConfig.webSocketURL);
     // Add direct messages handler.
-    network.on('message', function(msg, sender) {
+    network.on('message', msg => {
       const data = tryParse(msg);
       if (data?.cmd === 'displayWarning') {
         // Display the warning message only for the fields that we're still editing.
@@ -755,25 +743,53 @@ define('xwiki-realtime-loader', [
       }
     });
     // On reconnect, join the "all" channel again.
-    network.on('reconnect', function() {
+    network.on('reconnect', () => {
       hideWarning();
       hideWsError();
-      getChannels().then(channels => network.join(channels[0].key)).then(onOpen, onError);
+      module.ready = joinAllUsers();
     });
-    network.on('disconnect', function() {
+    network.on('disconnect', () => {
       if (RealtimeContext.getRealtimeEditedFields().length) {
         displayWsError();
       } else if (Object.keys(RealtimeContext.instances).length) {
         displayWsWarning();
       }
     });
+    return network;
+  },
+
+  onOpen = async channelInfo => {
+    const channel = await allRt.network.join(channelInfo.key);
+    allRt.userList = channel.members;
+    allRt.wChan = channel;
+    allRt.channelInfo = channelInfo;
+    addMessageHandler();
+  },
+
+  maybeRejoinAllUsers = () => {
+    if (allRt.channelInfo && allRt.channelInfo.path[0] !== doc.language) {
+      // The document language has changed since we joined the all users channel (e.g. because the user has switched
+      // from editing the original document translation to editing another translation, without reloading the web page,
+      // from inplace editing). We need to join the all users channel associated with the new document language.
+      // Leave the current channel first.
+      allRt.wChan.leave('Switched to a different document translation');
+      // Then join the new channel.
+      module.ready = joinAllUsers();
+    }
+  },
+
+  onError = error => {
+    allRt.error = true;
+    displayWsWarning();
+    console.error(error);
   },
 
   beforeLaunchRealtime = function(realtimeContext) {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       if (realtimeContext.realtimeEnabled) {
         module.whenReady(function(wsAvailable) {
           realtimeContext.realtimeEnabled = wsAvailable;
+          realtimeContext.network = allRt.network;
           resolve(realtimeContext);
         });
       } else {
@@ -801,21 +817,18 @@ define('xwiki-realtime-loader', [
       }
     },
 
-    whenReady: function(callback) {
+    whenReady: async function(callback) {
       displayConnecting();
-      // We want realtime enabled so we have to wait for the network to be ready.
-      if (allRt.network) {
-        hideConnecting();
+      maybeRejoinAllUsers();
+      try {
+        await module.ready;
         callback(true);
-      } else if (allRt.error) {
-        // Can't connect to network: hide the warning about "not being warned when some wants RT" and display error
-        // about not being able to enable WebSocket.
-        hideConnecting();
+      } catch (error) {
         hideWarning();
-        displayWsWarning(true);
+        onError(error);
         callback(false);
-      } else {
-        setTimeout(module.whenReady.bind(module, callback), 100);
+      } finally {
+        hideConnecting();
       }
     },
 
@@ -825,7 +838,9 @@ define('xwiki-realtime-loader', [
         // Found a lock link. Check active sessions.
         this.checkSessions(info);
         throw new Error('Lock detected');
-      } else if (window.XWiki.editor === info.type) {
+      // We currently support editing in realtime only the content field (using either the Wiki editor, the standalone
+      // WYSIWYG editor or the Inplace editor).
+      } else if (info.field === 'content' && window.XWiki.editor === info.type) {
         // No lock and we are using the right editor. Start realtime.
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
@@ -837,17 +852,19 @@ define('xwiki-realtime-loader', [
         } else if (Object.keys(keys.active).length && !keys[info.type + '_users']) {
           // Let the user choose between joining the existing real-time session (with a different editor) or create
           // a new real-time session with the current editor.
-          console.log('Join the existing realtime session or create a new one.');
+          console.debug('Join the existing realtime session or create a new one.');
           await new Promise(resolve => {
             displayModal(info.type, Object.keys(keys.active), resolve, info);
           });
         }
         return await beforeLaunchRealtime(realtimeContext);
+      } else {
+        throw new Error('Realtime editing is not supported in this context.');
       }
-    }
-  });
+    },
 
-  joinAllUsers();
+    ready: joinAllUsers()
+  });
 
   return module;
 });

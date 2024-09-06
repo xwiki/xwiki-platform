@@ -18,13 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikiEditor', [
-  'xwiki-realtime-config',
   'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
-  'xwiki-realtime-typingTests',
-  'json.sortify',
   'xwiki-realtime-textCursor',
   'xwiki-realtime-interface',
   'xwiki-realtime-saver',
@@ -33,8 +30,7 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  realtimeConfig, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, JSONSortify, TextCursor, Interface, Saver,
-    ChainPad, Crypto, $
+  ErrorBox, Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
 ) {
   'use strict';
 
@@ -232,11 +228,6 @@ define('xwiki-realtime-wikiEditor', [
           getTextValue: function() {
             return editor.getValue();
           },
-          getSaveValue: function() {
-            return {
-              content: editor.getValue()
-            };
-          },
           getTextAtCurrentRevision: function() {
             return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
               return data.content;
@@ -277,12 +268,12 @@ define('xwiki-realtime-wikiEditor', [
           });
         },
 
-        onReady: function(info) {
+        onReady: async function(info) {
           module.chainpad = info.realtime;
           module.leaveChannel = info.leave;
 
           // Update the user list to link the wiki name to the user id.
-          userData = UserData.start(info.network, userdataChannel, {
+          userData = await UserData.start(info.network, userdataChannel, {
             myId: info.myId,
             userName: editorConfig.user.name,
             userAvatar: editorConfig.user.avatarURL,

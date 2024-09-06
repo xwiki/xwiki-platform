@@ -195,7 +195,6 @@ public class NotificationFilterPreferencesMigratorTest
         preference.setEventTypes(eventType);
         preference.setNotificationFormats(formats);
         preference.setFilterType(filterType);
-        preference.setProviderHint("userProfile");
         preference.setFilterName(filterName);
         preference.setEnabled(isEnabled);
         preference.setStartingDate(date);

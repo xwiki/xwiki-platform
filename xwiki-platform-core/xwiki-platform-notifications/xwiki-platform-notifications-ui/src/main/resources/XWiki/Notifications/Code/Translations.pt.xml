@@ -1,0 +1,324 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="XWiki.Notifications.Code.Translations" locale="pt">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>pt</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=Notificações
+notifications.filters.cancel=Cancelar
+notifications.filters.submit=Salvar
+notifications.filters.type.label=Tipo de filtro:
+notifications.filters.type.hint=Como o filtro deve agir em relação a um evento no local especificado
+notifications.filters.location.label=Escopo do filtro:
+notifications.filters.location.hint=Qual parte da wiki deve ser afetada pelo filtro?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Opções avançadas de filtragem
+notifications.filters.advanced.toggles.hint=Esses filtros são ativados por padrão. Você pode desativá-los usando o botão ao lado de cada filtro.
+notifications.filters.advanced.toggles.table.name=Nome do filtro
+notifications.filters.advanced.toggles.table.description=Descrição
+notifications.filters.advanced.toggles.table.toggle=Alternar
+notifications.filters.advanced.modal.close=Fechar
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Filtro do Sistema
+notifications.filters.description.systemUserNotificationFilter=Ocultar notificações do usuário do Sistema, a menos que o evento seja especificamente direcionado a você
+notifications.filters.name.ownEventsNotificationFilter=Filtro de Eventos Próprios
+notifications.filters.description.ownEventsNotificationFilter=Ocultar notificações sobre sua própria atividade, a menos que o evento seja especificamente direcionado a você
+notifications.filters.name.eventReadAlertFilter=Filtro de Eventos Lidos (Alerta)
+notifications.filters.description.eventReadAlertFilter=Ocultar notificações que você marcou como lidas
+notifications.filters.name.eventReadEmailFilter=Filtro de Eventos Lidos (Email)
+notifications.filters.description.eventReadEmailFilter=Ocultar notificações que você marcou como lidas
+notifications.filters.name.minorEventAlertNotificationFilter=Evento Menor (Alerta)
+notifications.filters.description.minorEventAlertNotificationFilter=Ocultar notificações referentes a mudanças menores nas páginas
+notifications.filters.name.minorEventEmailNotificationFilter=Evento Menor (Email)
+notifications.filters.description.minorEventEmailNotificationFilter=Ocultar notificações referentes a mudanças menores nas páginas
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Filtro de Notificação de Escopo
+notifications.filters.preferences.scopeNotificationFilter.page=Apenas a página
+notifications.filters.preferences.scopeNotificationFilter.space=Página e subpáginas
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.user=Usuário
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Você precisa ativar as notificações em suas configurações se deseja acompanhar esses locais
+
+## Notifications formats
+notifications.format.alert=Alerta
+notifications.format.email=Email
+
+## Filter preferences settings
+notifications.filters.preferences.delete.inProgress=Excluindo...
+notifications.filters.preferences.delete.done=Preferência de filtro excluída!
+notifications.filters.preferences.delete.error=Falha ao excluir a preferência de filtro
+notifications.filters.preferences.setEnabled.inProgress=Salvando...
+notifications.filters.preferences.setEnabled.done=Preferência de filtro salva!
+notifications.filters.preferences.setEnabled.error=Falha ao salvar a preferência de filtro
+notifications.filters.preferences.allEvents=Todos os eventos (mesmo desativados)
+
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=Filtros do Sistema
+notifications.settings.filters.preferences.system.hint=Filtros do sistema que você pode alternar para ter um controle mais detalhado das notificações que deseja receber.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.system.table.name=Nome
+notifications.settings.filters.preferences.system.table.filterDescription=Descrição
+notifications.settings.filters.preferences.system.table.filterType=Descrição
+notifications.settings.filters.preferences.system.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.system.table.isEnabled=Está ativado?
+
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=Filtros Personalizados
+notifications.settings.filters.preferences.custom.hint=Crie filtros para controlar as notificações que deseja receber.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identificador
+notifications.settings.filters.preferences.custom.table.scope=Escopo
+notifications.settings.filters.preferences.custom.table.location=Localização
+notifications.settings.filters.preferences.custom.table.filterType=Ação do Filtro
+notifications.settings.filters.preferences.custom.table.eventTypes=Eventos
+notifications.settings.filters.preferences.custom.table.notificationFormats=Formatos
+notifications.settings.filters.preferences.custom.table.isEnabled=Está ativado?
+notifications.settings.filters.preferences.custom.table._actions=Ações
+notifications.filters.type.custom.inclusive=Notificar o evento
+notifications.filters.type.custom.exclusive=Ignorar o evento
+
+
+## Add filter modal
+notifications.settings.addFilter=Adicionar filtro
+notifications.settings.addFilter.hint=Crie um filtro para eventos que ocorrem em locais específicos. O filtro pode disparar o envio de uma notificação ou impedir que ela seja enviada, dependendo do evento e do canal de notificação.
+notifications.filters.preferences.custom.addFilter.location.label=Localização
+notifications.filters.preferences.custom.addFilter.location.hint=Este filtro se aplica aos eventos que ocorrem nas localizações selecionadas aqui. Selecione uma ou mais localizações.
+notifications.filters.preferences.custom.addFilter.type.label=Ação
+notifications.filters.preferences.custom.addFilter.type.hint=Este filtro pode notificar ou ignorar eventos que ocorrem nas localizações selecionadas. Escolha a ação que deseja realizar para os eventos.
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=Notificar o evento
+notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignorar o evento
+notifications.filters.preferences.custom.addFilter.notificationFormat.label=Canal
+notifications.filters.preferences.custom.addFilter.notificationFormat.hint=Este filtro se aplica apenas às notificações enviadas pelos canais de comunicação selecionados abaixo. Escolha um ou mais canais de comunicação.
+notifications.filters.preferences.custom.addFilter.eventType.label=Eventos
+notifications.filters.preferences.custom.addFilter.eventType.hint=Este filtro se aplica aos eventos selecionados aqui, nas localizações selecionadas acima. Escolha um ou mais eventos.
+notifications.menu.header=Notificações
+notifications.menu.header.settings=Configurações
+notifications.menu.clear=Limpar Tudo
+notifications.menu.clearing=Limpando as notificações
+notifications.menu.cleared=As notificações foram limpas
+notifications.settings.title=Preferências de Notificações
+notifications.settings.error.notAdmin=Você precisa ser administrador para ver isto.
+notifications.settings.menu=Menu de Notificações
+notifications.settings.menu.hint=O menu de notificações está localizado no canto superior direito da página, e você pode vê-lo clicando no sino ({0})
+notifications.settings.email=Email
+notifications.settings.email.forGuest=aça login ou registre-se para gerenciar suas configurações de notificação.
+notifications.settings.email.disabled=Os emails de notificações estão desativados. Por favor, contate o administrador.
+notifications.settings.email.hint=Um email é enviado a você regularmente com um resumo do que aconteceu na wiki
+### Missing: notifications.settings.email.title=Email Preferences
+### Missing: notifications.settings.email.frequency=Email Frequency
+### Missing: notifications.settings.email.frequency.hint=Choose how often you want to receive an email with the summary of what happened on the wiki.
+### Missing: notifications.settings.email.diffType.hint=Select the level of detail you want to receive about all the changes in the email.
+### Missing: notifications.settings.saving=Your settings are being saved...
+### Missing: notifications.settings.saved=Saved!
+### Missing: notifications.settings.savingfailed=Failed to save your settings
+### Missing: notifications.settings.filters=Filters ({0})
+### Missing: notifications.settings.errorFilterWiki=Error: you must select a wiki, not a page
+### Missing: notifications.settings.preferences=Preferences
+### Missing: notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
+### Missing: notifications.settings.applications.title=Applications
+### Missing: notifications.settings.applications.hint=This is the list of applications that can send notifications. You can enable or disable any of them.
+### Missing: notifications.settings.applications.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.applications.appName=Name
+### Missing: notifications.settings.applications.table.dropdown.toggle.label=Toggle the details for notifications from the {0} application.
+### Missing: notifications.settings.events=Events
+### Missing: notifications.settings.watch.title=Watched Pages
+### Missing: notifications.settings.watch.autowatchmode=Automatic page watching
+### Missing: notifications.settings.watch.autowatchmode.hint=Decide if you wish to watch a page after you have worked on it
+### Missing: notifications.settings.watch.forGuest=Log in or register to handle your notification settings.
+### Missing: notifications.settings.watch.disabled=The watched entities are disabled. Please contact your administrator.
+### Missing: notifications.events.by=edited by {0}.
+### Missing: notifications.events.lastChange=Last change: {0}.
+### Missing: notifications.events.lastComment=Last comment: {0}.
+### Missing: notifications.preferences.scope.table.scope=Scope
+### Missing: notifications.preferences.scope.table.location=Location
+### Missing: notifications.preferences.scope.table.scopeFilterType=Filter Type
+### Missing: notifications.preferences.scope.table._actions=Actions
+### Missing: notifications.email.title=Event(s) on the wiki:
+### Missing: notifications.email.subject={0} event(s) on the wiki
+### Missing: notifications.email.seeChanges=Changes: {0}
+### Missing: notifications.email.linkDetails=See details
+### Missing: notifications.rss.feedLink=RSS Feed
+### Missing: notifications.rss.feedLinkDescription=Event feed for notifications
+### Missing: notifications.rss.feedTitle=Notifications RSS feed
+### Missing: notifications.rss.feedDescription=This RSS feed can be customized on your profile page.
+### Missing: notifications.rss.seeChanges=Changes: {0}
+### Missing: notifications.rss.defaultTitleWithPage=New event on {0}
+### Missing: notifications.rss.defaultTitle=New event
+### Missing: notifications.globalsettings.email=Notifications Email
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Details of the changes
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Nothing
+### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inclusive
+### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Exclusive
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
+### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+
+## Common notification settings errors
+### Missing: notifications.settings.error.userReferenceNotSupported=The given user reference is not supported, only DocumentUserReference are supported for now.
+### Missing: notifications.settings.error.userReferenceAdminForbidden=You don't have administration right for the given user: {0}.
+### Missing: notifications.settings.error.badCSRF=Bad CSRF token.
+### Missing: notifications.settings.badParameters=Bad request parameters.
+
+## User profile
+### Missing: notifications.userprofile.following=Following
+### Missing: notifications.userprofile.notfollowing=Not following
+### Missing: notifications.userprofile.follow=Start following
+### Missing: notifications.userprofile.unfollow=Stop following
+### Missing: notifications.userprofile.done=Done
+### Missing: notifications.userprofile.saving=Saving...
+### Missing: notifications.userprofile.error=Error saving the notification setting
+
+## Macros description
+### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
+### Missing: rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
+### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
+### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+
+## Toggle notification filters labels
+### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
+### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
+### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+
+## Notifications switches
+### Missing: notifications.switches.tooltip.page=Watch this page
+### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
+### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
+### Missing: notifications.switches.tooltip.wiki=Watch this wiki
+### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.
+
+## Watch button and modal
+
+### Missing: notifications.watch.button.title=Current notification setting for this page: {0} - Click to change it
+### Missing: notifications.watch.button.status.notset=Not set
+### Missing: notifications.watch.button.status.followed=Followed
+### Missing: notifications.watch.button.status.blocked=Blocked
+### Missing: notifications.watch.button.status.custom=Custom
+### Missing: notifications.watch.modal.title=Notification settings for this page
+### Missing: notifications.watch.modal.description.options=You can change the current notification settings with the following options: 
+### Missing: notifications.watch.modal.description.ancestoroption=You can either go to {0} and modify the notification settings there or directly apply settings on the current page with the following options: 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Configurações de notificação da página seguida
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Você está seguindo esta página: você receberá notificações sobre ela.
+### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Followed page by parent watch settings
+### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Followed page and children watch settings
+### Missing: notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are following this page and its children: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.NOT_SET=Not set watch settings
+### Missing: notifications.watch.modal.description.NOT_SET=You haven't configured any settings for watching this page yet and so you are not following this page: you won't receive notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Blocked page watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Blocked page by parent watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Blocked page and children watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
+### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
+### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children
+### Missing: notifications.watch.modal.option.watchspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.watchwiki.title=Follow entire wiki
+### Missing: notifications.watch.modal.option.watchwiki.hint=This option doesn't only impact current page or space: you will receive notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.blockpage.title=Block current page
+### Missing: notifications.watch.modal.option.blockpage.hint=You will block any notifications for that page only.
+### Missing: notifications.watch.modal.option.blockspace.title=Block current page and its children
+### Missing: notifications.watch.modal.option.blockspace.hint=You will block any notifications for that page and all of its children.
+### Missing: notifications.watch.modal.option.unwatchpage.title=Unfollow current page
+### Missing: notifications.watch.modal.option.unwatchpage.hint=You will stop receiving notifications for that page only.
+### Missing: notifications.watch.modal.option.unwatchspace.title=Unfollow current page and its children
+### Missing: notifications.watch.modal.option.unwatchspace.hint=You will stop receiving notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unwatchwiki.title=Unfollow entire wiki
+### Missing: notifications.watch.modal.option.unwatchwiki.hint=This option doesn't only impact current page or space: you will stop receiving notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.unblockpage.title=Unblock current page
+### Missing: notifications.watch.modal.option.unblockpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.unblockspace.title=Unblock current page and its children
+### Missing: notifications.watch.modal.option.unblockspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unblockwiki.title=Unblock entire wiki
+### Missing: notifications.watch.modal.option.unblockwiki.hint=This option doesn't only impact current page or space: you will stop ignoring notifications for any page in the wiki.
+### Missing: notifications.watch.modal.close=Close without saving
+### Missing: notifications.watch.modal.savechanges=Save changes
+### Missing: notifications.watch.modal.gotosettings=Manage all notifications settings
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 13.2RC1
+### Missing: notifications.settings.filters.preferences.title=Filters
+### Missing: notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+### Missing: notifications.settings.filters.preferences.forGuest=Log in or register to handle your notification filters.
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.table.name=Name
+### Missing: notifications.settings.filters.preferences.table.filterType=Filter Type
+### Missing: notifications.settings.filters.preferences.table.eventTypes=Events
+### Missing: notifications.settings.filters.preferences.table.notificationFormats=Formats
+### Missing: notifications.settings.filters.preferences.table.isEnabled=Is enabled?
+### Missing: notifications.settings.filters.preferences.table._actions=Actions
+### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
+### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
+### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
+### Missing: notifications.filters.preferences.addPreference.eventType.label=Event Type
+### Missing: notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
+### Missing: notifications.filters.preferences.addPreference.location.label=Filter Scope
+### Missing: notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
+
+
+## Filter Types
+### Missing: notifications.filters.type.inclusive=Inclusive
+### Missing: notifications.filters.type.exclusive=Exclusive
+
+## until 16.2.0RC1
+### Missing: notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
+### Missing: notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
+### Missing: notifications.settings.filters.preferences.custom.table.name=Location
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
+  </xwikidoc>

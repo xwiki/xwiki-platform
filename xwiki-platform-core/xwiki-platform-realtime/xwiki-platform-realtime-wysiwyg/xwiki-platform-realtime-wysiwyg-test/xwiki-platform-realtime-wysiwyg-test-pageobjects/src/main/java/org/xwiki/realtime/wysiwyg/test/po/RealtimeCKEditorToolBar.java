@@ -125,8 +125,8 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
      */
     public boolean isEditingAlone()
     {
-        return "Editing alone"
-            .equals(getDriver().findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText());
+        return getCoeditors().isEmpty() && !getDriver()
+            .findElementWithoutWaiting(getContainer(), By.className("rt-user-list")).getText().contains(":");
     }
 
     /**
@@ -168,8 +168,8 @@ public class RealtimeCKEditorToolBar extends CKEditorToolBar
     public String waitForAutoSave()
     {
         // Unsaved changes are pushed after 60 seconds, but the check for unsaved changes is done every 20 seconds, so
-        // we need to wait at most 90 seconds (adding an error margin of 10 seconds).
-        int timeout = 90;
+        // we need to wait at most 100 seconds (adding an error margin of 20 seconds).
+        int timeout = 100;
 
         getDriver().waitUntilCondition(driver -> {
             String newMergeStatus =

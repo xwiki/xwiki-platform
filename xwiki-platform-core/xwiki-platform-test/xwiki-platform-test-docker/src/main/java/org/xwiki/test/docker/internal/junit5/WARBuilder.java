@@ -22,15 +22,12 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -129,8 +126,10 @@ public class WARBuilder
 
         // Step: Find the version of the XWiki JARs that we'll resolve to populate the minimal WAR in WEB-INF/lib
         LOGGER.info("Finding version ...");
-        String xwikiVersion = this.mavenResolver.getPlatformVersion();
-        LOGGER.info("Found version = [{}]", xwikiVersion);
+        String commonsVersion = this.mavenResolver.getCommonsVersion();
+        LOGGER.info("Found commons version = [{}]", commonsVersion);
+        String platformVersion = this.mavenResolver.getPlatformVersion();
+        LOGGER.info("Found platform version = [{}]", platformVersion);
 
         File webInfDirectory = new File(this.targetWARDirectory, "WEB-INF");
 
@@ -141,8 +140,8 @@ public class WARBuilder
             List<Artifact> extraArtifacts =this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
                 this.testConfiguration.isResolveExtraJARs());
             this.mavenResolver.addCloverJAR(extraArtifacts);
-            Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
-                extraArtifacts);
+            Collection<ArtifactResult> artifactResults =
+                this.artifactResolver.getDistributionDependencies(commonsVersion, platformVersion, extraArtifacts);
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -184,17 +183,13 @@ public class WARBuilder
             // Step: Unzip the Flamingo skin
             unzipSkin(testConfiguration, skinDependencies, targetWARDirectory);
 
-            // In order to make XWiki work OOB in Jetty 9, we need to replace jetty-web.xml with an overridden
-            // version. TODO: Remove once we drop support for Jetty 9.
-            handleJetty9(webInfDirectory);
-
             // Mark it as having been built successfully
             touchMarkerFile();
         }
 
         // Step: Add XWiki configuration files (depends on the selected DB for the hibernate one)
         LOGGER.info("Generating configuration files for database [{}]...", testConfiguration.getDatabase());
-        this.configurationFilesGenerator.generate(webInfDirectory, xwikiVersion, this.artifactResolver);
+        this.configurationFilesGenerator.generate(webInfDirectory, platformVersion, this.artifactResolver);
     }
 
     private void copyClasses(File webInfClassesDirectory, TestConfiguration testConfiguration) throws Exception
@@ -331,43 +326,5 @@ public class WARBuilder
     private File getMarkerFile()
     {
         return new File(this.targetWARDirectory, "build.marker");
-    }
-
-    private void handleJetty9(File webInfDirectory) throws Exception
-    {
-        ServletEngine engine = this.testConfiguration.getServletEngine();
-        String tag = this.testConfiguration.getServletEngineTag();
-        if (engine == ServletEngine.JETTY && extractJettyVersionFromDockerTag(tag) < 10) {
-            // Override the jetty-web.xml
-            copyJettyWebFile(webInfDirectory);
-        }
-    }
-
-    private void copyJettyWebFile(File webInfDirectory) throws Exception
-    {
-        File outputFile = new File(webInfDirectory, "jetty-web.xml");
-        if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Override jetty-web.xml since Jetty version is < 10");
-        }
-        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("jetty9-web.xml");
-            IOUtils.copy(is, fos);
-        }
-    }
-
-    private int extractJettyVersionFromDockerTag(String tag)
-    {
-        int result = 10;
-        if (tag != null) {
-            Matcher matcher = MAJOR_VERSION.matcher(tag);
-            if (matcher.find()) {
-                try {
-                    result = Integer.valueOf(matcher.group());
-                } catch (NumberFormatException e) {
-                    // On error consider we're on Jetty 10
-                }
-            }
-        }
-        return result;
     }
 }

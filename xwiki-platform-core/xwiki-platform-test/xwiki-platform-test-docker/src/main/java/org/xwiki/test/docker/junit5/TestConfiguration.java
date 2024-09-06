@@ -58,6 +58,8 @@ public class TestConfiguration
 
     private String databaseTag;
 
+    private String browserTag;
+
     private String jdbcDriverVersion;
 
     private boolean vnc;
@@ -90,6 +92,8 @@ public class TestConfiguration
 
     private boolean savePermanentDirectoryData;
 
+    private List<String> servletEngineNetworkAliases;
+
     /**
      * @param testConfiguration the configuration to merge with the current one
      * @throws DockerTestException when a merge error occurs
@@ -105,6 +109,7 @@ public class TestConfiguration
         mergeDatabaseTag(testConfiguration.getDatabaseTag());
         mergeServletEngineTag(testConfiguration.getServletEngineTag());
         mergeJDBCDriverVersion(testConfiguration.getJDBCDriverVersion());
+        mergeBrowserTag(testConfiguration.getBrowserTag());
         mergeVNC(testConfiguration.vnc());
         mergeWCAG(testConfiguration.isWCAG());
         mergeWCAGStopOnError(testConfiguration.shouldWCAGStopOnError());
@@ -119,6 +124,7 @@ public class TestConfiguration
         mergeDatabaseCommands(testConfiguration.getDatabaseCommands());
         mergeSaveDatabaseData(testConfiguration.isDatabaseDataSaved());
         mergeSavePermanentDirectoryData(testConfiguration.isPermanentDirectoryDataSaved());
+        mergeServletEngineNetworkAliases(testConfiguration.getServletEngineNetworkAliases());
     }
 
     private void mergeBrowser(Browser browser) throws DockerTestException
@@ -194,8 +200,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge database tag [%s] since it was already specified as [%s]",
                         databaseTag, getDatabaseTag()));
-            } else {
-                this.databaseTag = getDatabaseTag();
             }
         } else {
             this.databaseTag = databaseTag;
@@ -209,11 +213,22 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge Servlet engine tag [%s] since it was already specified as [%s]",
                         servletEngineTag, getServletEngineTag()));
-            } else {
-                this.servletEngineTag = getServletEngineTag();
             }
         } else {
             this.servletEngineTag = servletEngineTag;
+        }
+    }
+
+    private void mergeBrowserTag(String browserTag) throws DockerTestException
+    {
+        if (getBrowserTag() != null) {
+            if (browserTag != null && !getBrowserTag().equals(browserTag)) {
+                throw new DockerTestException(
+                    String.format("Cannot merge Browser tag [%s] since it was already specified as [%s]",
+                        browserTag, getBrowserTag()));
+            }
+        } else {
+            this.browserTag = browserTag;
         }
     }
 
@@ -224,8 +239,6 @@ public class TestConfiguration
                 throw new DockerTestException(
                     String.format("Cannot merge JDBC driver version [%s] since it was already specified as [%s]",
                         jdbcDriverVersion, getJDBCDriverVersion()));
-            } else {
-                this.jdbcDriverVersion = getJDBCDriverVersion();
             }
         } else {
             this.jdbcDriverVersion = jdbcDriverVersion;
@@ -333,6 +346,15 @@ public class TestConfiguration
         if (!isPermanentDirectoryDataSaved() && savePermanentDirectoryData) {
             this.savePermanentDirectoryData = true;
         }
+    }
+
+    private void mergeServletEngineNetworkAliases(List<String> aliases)
+    {
+        List<String> mergedAliases = getServletEngineNetworkAliases();
+        if (aliases != null) {
+            mergedAliases.addAll(aliases);
+        }
+        this.servletEngineNetworkAliases = mergedAliases;
     }
 
     /**
@@ -466,6 +488,23 @@ public class TestConfiguration
     public void setServletEngineTag(String servletEngineTag)
     {
         this.servletEngineTag = servletEngineTag;
+    }
+
+    /**
+     * @return the docker image tag to use for the browser container (if not specified, uses the "latest" tag)
+     * @since 16.3.0RC1
+     */
+    public String getBrowserTag()
+    {
+        return browserTag;
+    }
+
+    /**
+     * @param browserTag see {@link #getBrowserTag()}
+     */
+    public void setBrowserTag(String browserTag)
+    {
+        this.browserTag = browserTag;
     }
 
     /**
@@ -768,5 +807,27 @@ public class TestConfiguration
     public void setSavePermanentDirectoryData(boolean savePermanentDirectoryData)
     {
         this.savePermanentDirectoryData = savePermanentDirectoryData;
+    }
+
+    /**
+     * @return the list of network aliases to use for the servlet engine Docker container
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public List<String> getServletEngineNetworkAliases()
+    {
+        return this.servletEngineNetworkAliases;
+    }
+
+    /**
+     * @param servletEngineNetworkAliases see {@link #getServletEngineNetworkAliases()}
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setServletEngineNetworkAliases(List<String> servletEngineNetworkAliases)
+    {
+        this.servletEngineNetworkAliases = servletEngineNetworkAliases;
     }
 }

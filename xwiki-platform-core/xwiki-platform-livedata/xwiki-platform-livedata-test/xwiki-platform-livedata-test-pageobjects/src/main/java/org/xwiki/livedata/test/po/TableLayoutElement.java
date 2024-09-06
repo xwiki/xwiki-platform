@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -76,13 +77,16 @@ public class TableLayoutElement extends BaseElement
 
     private final LiveDataElement liveData;
 
+    private static final Pattern PAGINATION_SENTENCE_PATTERN =
+        Pattern.compile("^Entries (?<firstEntry>\\d+) - (?<lastEntry>\\d+) out of (?<totalEntries>\\d+)$");
+
     /**
      * @return the list of rows {@link WebElement}s
      * @since 16.1.0RC1
      */
     public List<WebElement> getRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody > tr"));
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
     }
 
     /**
@@ -562,7 +566,7 @@ public class TableLayoutElement extends BaseElement
         int columnIndex = findColumnIndex(columnLabel);
 
         WebElement element = getRoot().findElement(By.cssSelector(String.format(".column-header-names > th:nth-child"
-            + "(%d) .sort-icon", columnIndex)));
+            + "(%d) .handle", columnIndex)));
         element.click();
 
         waitUntilReady();
@@ -674,8 +678,10 @@ public class TableLayoutElement extends BaseElement
     public WebElement getFilter(String columnLabel)
     {
         int columnIndex = findColumnIndex(columnLabel);
-        return getRoot()
-            .findElement(By.cssSelector(String.format(".column-filters > th:nth-child(%d) input", columnIndex)));
+        By cssSelector = By.cssSelector(String.format(
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
+        return getRoot().findElement(cssSelector);
     }
 
     /**
@@ -688,6 +694,24 @@ public class TableLayoutElement extends BaseElement
             .map(it -> it.getAttribute("value")).collect(Collectors.toSet());
     }
 
+    private String getPaginationEntriesString()
+    {
+        return getRoot().findElement(By.className("pagination-current-entries")).getText().trim();
+    }
+
+    private java.util.regex.Matcher getPaginationMatcher()
+    {
+        return PAGINATION_SENTENCE_PATTERN.matcher(getPaginationEntriesString());
+    }
+
+    public long getTotalEntries()
+    {
+        java.util.regex.Matcher paginationMatcher = getPaginationMatcher();
+        if (!paginationMatcher.matches()) {
+            throw new IllegalStateException("Matcher does not match: " + getPaginationEntriesString());
+        }
+        return Long.parseLong(paginationMatcher.group("totalEntries"));
+    }
 
     /**
      * Clicks on an action button identified by its name, on a given row.
@@ -697,7 +721,18 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, String actionName)
     {
-        clickAction(rowNumber, By.cssSelector(String.format(".actions-container .action.action_%s", actionName)));
+        clickAction(rowNumber, getActionSelector(actionName));
+    }
+
+    /**
+     * @param rowNumber the row number to inspect
+     * @param actionName the expected action
+     * @return {@code true} if the expected action is found on the row, {@code false} otherwise
+     * @since 16.2.0RC1
+     */
+    public boolean hasAction(int rowNumber, String actionName)
+    {
+        return !findElementsInRow(rowNumber, getActionSelector(actionName)).isEmpty();
     }
 
     /**
@@ -708,9 +743,7 @@ public class TableLayoutElement extends BaseElement
      */
     public void clickAction(int rowNumber, By selector)
     {
-        getRowElement(rowNumber)
-            .findElement(selector)
-            .click();
+        findElementInRow(rowNumber, selector).click();
     }
 
     /**
@@ -752,8 +785,20 @@ public class TableLayoutElement extends BaseElement
      */
     public WebElement findElementInRow(int rowNumber, By by)
     {
-        return getRowElement(rowNumber)
-            .findElement(by);
+        return getRowElement(rowNumber).findElement(by);
+    }
+
+    /**
+     * Return a list of elements matching a given selector in a row.
+     *
+     * @param rowNumber the number of the row to search on (starting at index 1)
+     * @param by the selector of the elements to search for
+     * @return the list of matched elements
+     * @since 16.2.0RC1
+     */
+    public List<WebElement> findElementsInRow(int rowNumber, By by)
+    {
+        return getRowElement(rowNumber).findElements(by);
     }
 
     private WebElement getRowElement(int rowNumber)
@@ -956,7 +1001,13 @@ public class TableLayoutElement extends BaseElement
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
-            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
+            // Click close to the left border of the h1 to avoid clicking on a potential date picker that is
+            // hopefully not that close to the left.
+            WebElement h1 = getDriver().findElement(By.tagName("h1"));
+            int width = h1.getRect().getWidth();
+            // Calculate the offset from the center to be close to the left border of the h1.
+            int xOffset = -(width / 2 - 2);
+            new Actions(getDriver().getWrappedDriver()).moveToElement(h1, xOffset, 0).click().perform();
         } else {
             // Press escape to cancel the edition.
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();
@@ -1005,5 +1056,10 @@ public class TableLayoutElement extends BaseElement
             uri = initialUri;
         }
         return uri.toASCIIString();
+    }
+
+    private static By getActionSelector(String actionName)
+    {
+        return By.cssSelector(String.format(".actions-container .action.action_%s", actionName));
     }
 }

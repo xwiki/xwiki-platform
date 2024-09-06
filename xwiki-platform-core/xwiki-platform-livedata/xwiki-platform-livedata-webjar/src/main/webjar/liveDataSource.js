@@ -90,7 +90,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
       var parameters = {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime(),
-        namespace: `wiki:${XWiki.currentWiki}`
+        namespace: `wiki:${encodeURIComponent(XWiki.currentWiki)}`
       };
       addSourceParameters(parameters, source);
       return `${url}?${$.param(parameters, true)}`;
@@ -140,7 +140,7 @@ define('xwiki-livedata-source', ['module', 'jquery'], function(module, $) {
     }
 
     var getTranslations = function(locale, prefix, keys) {
-      const translationsURL = `${module.config().contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`;
+      const translationsURL = `${module.config().contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`;
       return Promise.resolve($.getJSON(translationsURL, $.param({
         locale: locale,
         prefix: prefix,

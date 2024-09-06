@@ -73,8 +73,16 @@ if [ -z "$JETTY_STOP_PORT" ]; then
   JETTY_STOP_PORT=8079
 fi
 
+# Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
+JAVA_TMP="${PRGDIR}/tmp"
+XWIKI_OPTS="$XWIKI_OPTS -Djava.io.tmpdir=${JAVA_TMP}"
+# Make sure the Java tmpdir exist since Jenkins does not create it
+if [ ! -d ${JAVA_TMP} ]; then
+  mkdir ${JAVA_TMP}
+fi
+
 # The location where to store the process id
-XWIKI_LOCK_DIR="/var/tmp"
+XWIKI_LOCK_DIR="${JAVA_TMP}"
 
 # Parse script parameters
 while [[ $# > 0 ]]; do
@@ -148,7 +156,6 @@ JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
 
 # Specify Jetty's home directory to be the directory named jetty inside the jetty base directory.
-# Thus JETTY_HOME/data and JETTY_HOME/webapps are inside the jetty base directory.
 JETTY_HOME=jetty
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 

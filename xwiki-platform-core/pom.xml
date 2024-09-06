@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.2.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -138,130 +138,10 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <justification>Was never meant to be an API.</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.field.removed</code>
-                  <old>field org.xwiki.search.solr.AbstractSolrCoreInitializer.fields</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.field.removed</code>
-                  <old>field org.xwiki.search.solr.AbstractSolrCoreInitializer.types</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.field.visibilityReduced</code>
-                  <old>field org.xwiki.search.solr.AbstractSolrCoreInitializer.solrSchemaUtils</old>
-                  <new>field org.xwiki.search.solr.AbstractSolrCoreInitializer.solrSchemaUtils</new>
-                  <oldVisibility>protected</oldVisibility>
-                  <newVisibility>private</newVisibility>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Should have never been public in the first place and is deprecated since 9.8RC1.</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.rest.Constants</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Not runtime breakages from REST API point of view and not supposed to be called in Java</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::postNotifications() throws java.lang.Exception</old>
-                  <new>method javax.ws.rs.core.Response org.xwiki.notifications.rest.NotificationsResource::postNotifications(java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.returnTypeChanged</code>
-                  <old>method java.util.Map&lt;java.lang.String, java.lang.String&gt; org.xwiki.image.style.rest.ImageStylesResource::getDefaultStyleIdentifier(java.lang.String, java.lang.String) throws org.xwiki.image.style.ImageStyleException</old>
-                  <new>method javax.ws.rs.core.Response org.xwiki.image.style.rest.ImageStylesResource::getDefaultStyleIdentifier(java.lang.String, java.lang.String) throws org.xwiki.image.style.ImageStyleException</new>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, ===javax.mail.Multipart===, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</old>
-                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</new>
-                  <annotation>@javax.ws.rs.DefaultValue("false")</annotation>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.added</code>
-                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, ===javax.mail.Multipart===, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</old>
-                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, ===java.lang.Boolean===, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</new>
-                  <annotation>@javax.ws.rs.QueryParam("prettyNames")</annotation>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.annotation.attributeValueChanged</code>
-                  <old>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart, ===java.lang.Boolean===, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</old>
-                  <new>parameter javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, ===java.lang.Boolean===) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</new>
-                  <annotationType>javax.ws.rs.QueryParam</annotationType>
-                  <attribute>value</attribute>
-                  <oldValue>"prettyNames"</oldValue>
-                  <newValue>"createPage"</newValue>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.numberOfParametersChanged</code>
-                  <old>method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</old>
-                  <new>method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException, org.xwiki.attachment.validation.AttachmentValidationException</new>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Very specific to Restlet and not supposed to be called in Java</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.method.removed</code>
-                  <old>method java.lang.String org.xwiki.rest.XWikiResource::getUriTemplate()</old>
-                </item>
-              </differences>
-            </revapi.differences>
-            <revapi.differences>
-              <justification>Was actually internal classes exposed through public APIs</justification>
-              <criticality>highlight</criticality>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.captcha.script.CaptchaScriptSafeProvider</old>
-                </item>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.removed</code>
-                  <old>class org.xwiki.captcha.script.WrappedScriptCaptcha</old>
-                </item>
-                <item>
-                  <regex>true</regex>
-                  <ignore>true</ignore>
-                  <code>java.field.typeChanged</code>
-                  <old>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</old>
-                  <new>field org.xwiki.extension.script.AbstractExtensionScriptService.scriptProvider.*</new>
-                </item>
-                <item>
-                  <regex>true</regex>
-                  <ignore>true</ignore>
-                  <code>java.field.typeChanged</code>
-                  <old>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</old>
-                  <new>field org.xwiki.filter.script.AbstractFilterScriptService.scriptProvider.*</new>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -319,7 +199,6 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>

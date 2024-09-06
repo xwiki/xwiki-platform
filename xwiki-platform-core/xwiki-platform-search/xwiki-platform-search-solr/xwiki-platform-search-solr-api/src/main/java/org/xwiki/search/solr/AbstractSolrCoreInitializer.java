@@ -19,10 +19,12 @@
  */
 package org.xwiki.search.solr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -49,6 +51,7 @@ import org.apache.solr.schema.IntPointField;
 import org.apache.solr.schema.LongPointField;
 import org.apache.solr.schema.StrField;
 import org.apache.solr.schema.TextField;
+import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.search.solr.internal.DefaultXWikiSolrCore;
@@ -88,6 +91,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_6 = 120600000;
 
     /**
+     * The base schema version for XWiki 12.9.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_12_9 = 120900000;
+
+    /**
      * The base schema version for XWiki 12.10.
      * 
      * @since 12.10
@@ -95,11 +105,60 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_10 = 121000000;
 
     /**
+     * The base schema version for XWiki 13.3.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_13_3 = 130300000;
+
+    /**
+     * The base schema version for XWiki 14.4.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_14_0 = 140000000;
+
+    /**
      * The base schema version for XWiki 14.7.
      * 
      * @since 14.7RC1
      */
     public static final long SCHEMA_VERSION_14_7 = 140700000;
+
+    /**
+     * The base schema version for XWiki 15.5.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_5 = 150500000;
+
+    /**
+     * The base schema version for XWiki 15.6.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_6 = 150600000;
+
+    /**
+     * The base schema version for XWiki 15.9.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_9 = 150900000;
+
+    /**
+     * The base schema version for XWiki 16.6.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_16_6 = 160600000;
+
+    /**
+     * The base schema version for XWiki 16.7.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_16_7 = 160700000;
 
     /**
      * The base schema version.
@@ -151,6 +210,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     @Inject
     protected SolrUtils solrUtils;
+
+    @Inject
+    protected Logger logger;
 
     protected XWikiSolrCore core;
 
@@ -349,6 +411,9 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     @Override
     public void migrate(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        this.logger.info("Starting migrating Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
+
         // Set the current core
         this.core = targetCore;
 
@@ -360,12 +425,19 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
         // Copy the data
         migrateData(sourceCore, targetCore);
+
+        this.logger.info("Finished migrating Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
     }
 
     private void migrateFieldTypes(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
         Map<String, FieldTypeRepresentation> sourceTypes = this.solrSchemaUtils.getFieldTypes(sourceCore, false);
         Map<String, FieldTypeRepresentation> targetTypes = this.solrSchemaUtils.getFieldTypes(targetCore, false);
+
+        this.logger.info("  Migrating [{}] field types from Solr core [{}] to [{}]", sourceTypes.size(),
+            sourceCore.getSolrName(), targetCore.getSolrName());
+
         for (Map.Entry<String, FieldTypeRepresentation> entry : sourceTypes.entrySet()) {
             if (!targetTypes.containsKey(entry.getKey())) {
                 // Add the missing type
@@ -380,6 +452,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     {
         migrateFields(sourceCore, targetCore, true);
         migrateFields(sourceCore, targetCore, false);
+        migrateCopyFields(sourceCore, targetCore);
 
         commit(targetCore);
     }
@@ -387,15 +460,35 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     private void migrateFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore, boolean dynamic) throws SolrException
     {
         Map<String, Map<String, Object>> sourceFields =
-            dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
+            dynamic ? this.solrSchemaUtils.getDynamicFields(sourceCore, false)
                 : this.solrSchemaUtils.getFields(sourceCore, false);
         Map<String, Map<String, Object>> targetFields =
             dynamic ? this.solrSchemaUtils.getDynamicFields(targetCore, false)
                 : this.solrSchemaUtils.getFields(targetCore, false);
+
+        this.logger.info("  Migrating [{}] {} fields from Solr core [{}] to [{}]", sourceFields.size(),
+            dynamic ? " dynamic" : "", sourceCore.getSolrName(), targetCore.getSolrName());
+
         for (Map.Entry<String, Map<String, Object>> entry : sourceFields.entrySet()) {
             if (!targetFields.containsKey(entry.getKey())) {
                 // Add the missing type
                 this.solrSchemaUtils.setField(targetCore, entry.getValue(), dynamic, true);
+            }
+        }
+    }
+
+    private void migrateCopyFields(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
+    {
+        Map<String, Set<String>> sourceFields = this.solrSchemaUtils.getCopyFields(sourceCore, false);
+        Map<String, Set<String>> targetFields = this.solrSchemaUtils.getCopyFields(targetCore, false);
+
+        this.logger.info("Migrating [{}] copy fields from Solr core [{}] to [{}]", sourceFields.size(),
+            sourceCore.getSolrName(), targetCore.getSolrName());
+
+        for (Map.Entry<String, Set<String>> entry : sourceFields.entrySet()) {
+            if (!targetFields.containsKey(entry.getKey())) {
+                // Add the missing type
+                this.solrSchemaUtils.addCopyField(targetCore, entry.getKey(), new ArrayList<>(entry.getValue()));
             }
         }
     }
@@ -412,8 +505,12 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     private void migrateData(XWikiSolrCore sourceCore, XWikiSolrCore targetCore) throws SolrException
     {
+        this.logger.info("  Migrating data from Solr core [{}] to [{}]", sourceCore.getSolrName(),
+            targetCore.getSolrName());
+
         int batchSize = getMigrationBatchRows();
 
+        long total = -1;
         int size = 0;
         do {
             SolrQuery solrQuery = new SolrQuery();
@@ -430,6 +527,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             size = result.size();
 
             if (size > 0) {
+                if (total == -1) {
+                    total = result.getNumFound();
+                }
+                long remaining = result.getNumFound() - size;
+                this.logger.info("    Migrating [{}] documents, [{}] are remaining on a total of [{}] ([{}]% done)",
+                    size, remaining, total, Math.round(((double) (total - remaining) / (double) total) * 100L));
+
                 migrateData(response.getResults(), sourceCore, targetCore);
             }
         } while (size == batchSize);
@@ -1001,7 +1105,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void setField(Map<String, Object> fieldAttributes, boolean dynamic) throws SolrException
     {
-
         this.solrSchemaUtils.setField(this.core, fieldAttributes, dynamic);
     }
 

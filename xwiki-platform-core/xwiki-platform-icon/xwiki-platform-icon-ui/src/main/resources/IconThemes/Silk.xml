@@ -162,6 +162,7 @@ random = arrow_switch
 refresh = arrow_refresh
 remove = cancel
 repeat = arrow_redo
+reposition = reposition
 right = arrow_right
 rotate-left = arrow_rotate_anticlockwise
 rotate-right = arrow_rotate_clockwise

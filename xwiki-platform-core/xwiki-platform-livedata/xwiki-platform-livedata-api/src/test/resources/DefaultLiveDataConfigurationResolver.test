@@ -4,7 +4,8 @@
 {
   "id":"defaultConfigResolverTest",
   "query":{
-    "source":"test"
+    "source":"test",
+    "limit": 17
   },
   "meta":{
     "propertyDescriptors":[
@@ -45,7 +46,7 @@
     "filters":[],
     "sort":[],
     "offset":0,
-    "limit":15
+    "limit":17
   },
   "data":{
     "count":0,
@@ -160,7 +161,7 @@
     "defaultDisplayer":"text",
     "pagination":{
       "maxShownPages":10,
-      "pageSizes":[15,25,50,100],
+      "pageSizes":[15,17,25,50,100],
       "showEntryRange":true,
       "showNextPrevious":true
     },
@@ -170,7 +171,7 @@
     "actions":[
       {"id":"view","name":"view","icon":{"cssClass":"fa fa-eye"}},
       {"id":"edit","name":"Edit","description":"Edit entry","icon":{}},
-      {"id":"delete","name":"delete","icon":{}},
+      {"id":"delete","name":"delete","icon":{"cssClass":"text-danger"}},
       {"id":"copy","name":"copy","icon":{}},
       {"id":"rename","name":"rename","icon":{}},
       {"id":"rights","name":"rights","icon":{}}

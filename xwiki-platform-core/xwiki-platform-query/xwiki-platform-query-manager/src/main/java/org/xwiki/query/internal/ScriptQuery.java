@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +59,12 @@ public class ScriptQuery implements SecureQuery
     /**
      * Used to retrieve {@link org.xwiki.query.QueryFilter} implementations.
      */
-    private ComponentManager componentManager;
+    private final ComponentManager componentManager;
 
     /**
      * The wrapped {@link Query}.
      */
-    private Query query;
+    private final Query query;
 
     private boolean switchAuthor;
 
@@ -175,9 +177,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public Query bindValue(String var, Object val)
+    public Query bindValue(String variable, Object val)
     {
-        this.query.bindValue(var, val);
+        this.query.bindValue(variable, val);
         return this;
     }
 
@@ -203,9 +205,9 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
-    public QueryParameter bindValue(String var)
+    public QueryParameter bindValue(String variable)
     {
-        QueryParameter parameter = this.query.bindValue(var);
+        QueryParameter parameter = this.query.bindValue(variable);
         return new ScriptQueryParameter(this, parameter);
     }
 
@@ -338,5 +340,30 @@ public class ScriptQuery implements SecureQuery
         }
 
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScriptQuery that = (ScriptQuery) o;
+
+        return new EqualsBuilder().append(switchAuthor, that.switchAuthor)
+            .append(componentManager, that.componentManager).append(query, that.query)
+            .append(authorReference, that.authorReference).append(sourceReference, that.sourceReference).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37).append(componentManager).append(query).append(switchAuthor)
+            .append(authorReference).append(sourceReference).toHashCode();
     }
 }

@@ -66,7 +66,7 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
       textAfterRebase
     };
     console.error(error);
-    console.log('Debugging info available at `window.REALTIME_DEBUG.' + errorType + '`');
+    console.debug('Debugging info available at `window.REALTIME_DEBUG.' + errorType + '`');
 
     // Return an empty patch in case we can't do anything else.
     return [];
@@ -96,8 +96,7 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
               rebasedLocalOperation = rebaseOperationSafely(rebasedLocalOperation, remoteOperations[j]);
             } catch (e) {
                 console.error("The pluggable transform function threw an error, " +
-                  "failing operational transformation");
-                console.error(e.stack);
+                  "failing operational transformation", e);
                 return [];
             }
             if (!rebasedLocalOperation) {
@@ -128,8 +127,11 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
       ChainPad.Operation.check(localOperation);
       ChainPad.Operation.check(remoteOperation);
     }
-    const rebasedLocalOperation = rebaseOperation(localOperation, remoteOperation);
-    if (ChainPad.Common.PARANOIA && rebasedLocalOperation) {
+    let rebasedLocalOperation = rebaseOperation(localOperation, remoteOperation);
+    if (!rebasedLocalOperation?.toRemove && !rebasedLocalOperation?.toInsert?.length) {
+      // Discard the rebased local operation because it doesn't do anything.
+      rebasedLocalOperation = null;
+    } else if (ChainPad.Common.PARANOIA) {
       ChainPad.Operation.check(rebasedLocalOperation);
     }
     return rebasedLocalOperation;
@@ -146,14 +148,14 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
   function rebaseOperation(localOperation, remoteOperation) {
     let rebasedLocalOperation;
     if (localOperation.offset > remoteOperation.offset) {
-      if (localOperation.offset > remoteOperation.offset + remoteOperation.toRemove) {
-        // Simple rebase.
+      if (localOperation.offset >= remoteOperation.offset + remoteOperation.toRemove) {
+        // Simple rebase (the local operation inserts or replaces content after the remote operation).
         rebasedLocalOperation = ChainPad.Operation.create(
           localOperation.offset - remoteOperation.toRemove + remoteOperation.toInsert.length,
           localOperation.toRemove,
           localOperation.toInsert
         );
-      } else if (localOperation.offset + localOperation.toRemove < remoteOperation.offset + remoteOperation.toRemove) {
+      } else if (localOperation.offset + localOperation.toRemove <= remoteOperation.offset + remoteOperation.toRemove) {
         // Discard the local operation because it modifies content that has been removed by the remote operation.
         rebasedLocalOperation = null;
       } else {
@@ -165,10 +167,32 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
           localOperation.toInsert
         );
       }
-    } else if (localOperation.offset + localOperation.toRemove < remoteOperation.offset) {
-      // The local operation is not affected by the remote operation.
-      rebasedLocalOperation = localOperation;
-    } else if (localOperation.offset + localOperation.toRemove < remoteOperation.offset + remoteOperation.toRemove) {
+    } else if (localOperation.offset + localOperation.toRemove <= remoteOperation.offset) {
+      if (localOperation.offset === remoteOperation.offset && !remoteOperation.toRemove) {
+        // Both operations insert content at the same position, without removing anything. We can't know the logical
+        // order of the insertions: the local content can be inserted either before or after the remote content. We
+        // choose to insert the local content after the remote content because the local insertion is rebased on top of
+        // the remote insertion.
+        rebasedLocalOperation = ChainPad.Operation.create(
+          remoteOperation.offset + remoteOperation.toInsert.length,
+          0,
+          localOperation.toInsert
+        );
+      } else {
+        // The local operation is not affected by the remote operation.
+        rebasedLocalOperation = localOperation;
+      }
+    } else if (localOperation.offset + localOperation.toRemove > remoteOperation.offset + remoteOperation.toRemove) {
+      // The local operation removes the content inserted by the remote operation.
+      rebasedLocalOperation = ChainPad.Operation.create(
+        localOperation.offset,
+        localOperation.toRemove - remoteOperation.toRemove + remoteOperation.toInsert.length,
+        localOperation.toInsert
+      );
+    } else if (localOperation.offset === remoteOperation.offset) {
+      // Discard the local operation because it modifies content that has been removed by the remote operation.
+      rebasedLocalOperation = null;
+    } else {
       // We have to truncate the content that the local operation removes because some part of it was already removed by
       // the remote operation.
       rebasedLocalOperation = ChainPad.Operation.create(
@@ -176,18 +200,6 @@ define('xwiki-realtime-wysiwyg-transformers', ['chainpad'], function(ChainPad) {
         remoteOperation.offset - localOperation.offset,
         localOperation.toInsert
       );
-    } else {
-      // The local operation removes the content inserted by the remote operation.
-      rebasedLocalOperation = ChainPad.Operation.create(
-        localOperation.offset,
-        localOperation.toRemove - remoteOperation.toRemove + remoteOperation.toInsert.length,
-        localOperation.toInsert
-      );
-    }
-
-    if (!rebasedLocalOperation?.toRemove && !rebasedLocalOperation?.toInsert?.length) {
-      // Discard the rebased local operation because it doesn't do anything.
-      rebasedLocalOperation = null;
     }
 
     return rebasedLocalOperation;

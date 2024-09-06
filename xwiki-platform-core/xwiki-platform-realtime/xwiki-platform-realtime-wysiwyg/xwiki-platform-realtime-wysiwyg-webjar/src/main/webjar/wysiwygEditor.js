@@ -41,9 +41,15 @@ define('xwiki-realtime-wysiwyg', [
   const EDITOR_TYPE = 'wysiwyg';
 
   const ConnectionStatus = {
+    // Before trying to connect to the realtime session, and after leaving it.
     DISCONNECTED: 0,
+    // While trying to connect to the realtime session.
     CONNECTING: 1,
-    CONNECTED: 2
+    // After successfully connecting to the realtime session, as long as the edited content can be patched.
+    CONNECTED: 2,
+    // While connected to the realtime session, when the edited content can't be patched (e.g. because the content is
+    // being refreshed after a macro was inserted, which requires server-side rendering).
+    PAUSED: 3
   };
 
   class RealtimeEditor {
@@ -79,7 +85,7 @@ define('xwiki-realtime-wysiwyg', [
     }
 
     setEditable(editable) {
-      this._editor.getContentWrapper().setAttribute('contenteditable', editable);
+      this._editor.setReadOnly(!editable);
       $('.buttons [name^="action_save"], .buttons [name^="action_preview"]').prop('disabled', !editable);
     }
 
@@ -109,7 +115,7 @@ define('xwiki-realtime-wysiwyg', [
 
       // Notify the others that we're editing in realtime.
       this._realtimeContext.setRealtimeEnabled(true);
-  
+
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
@@ -117,6 +123,15 @@ define('xwiki-realtime-wysiwyg', [
           this._saver.setLocalEditFlag(true);
           this._onLocal();
         }
+      });
+
+      this._editor.onLock(this._onLock.bind(this));
+      this._editor.onUnlock(() => {
+        // The editor is usually unlocked after the content is refreshed (e.g. after a macro is inserted). We execute
+        // our handler on the next tick because our handler can trigger a new refresh (e.g. if we received remote
+        // changes that either add a new macro or modify the parameters of an existing macro), and we want to avoid
+        // executing "nested" refresh (async) commands because CKEditor doesn't handle them well.
+        setTimeout(this._onUnlock.bind(this), 0);
       });
 
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
@@ -127,10 +142,43 @@ define('xwiki-realtime-wysiwyg', [
         this._onAbort();
       });
 
+      this._addNetfluxChannelToSubmittedData();
+
       // Export the typing tests to the window.
       // Call like `test = easyTest()`
       // Terminate the test like `test.cancel()`
       window.easyTest = this._easyTest.bind(this);
+    }
+
+    _addNetfluxChannelToSubmittedData() {
+      // Indicate the Netflux channel used to synchronize the edited content when performing the HTML conversion (e.g.
+      // when refreshing the content after a macro is inserted) in order to render the content using the effective
+      // author associated with this channel (and thus prevent privilege escalation through script injection in the
+      // realtime session).
+      const convertHTMLListener = (event, conversionParams) => {
+        conversionParams.netfluxChannel = this._channel;
+      };
+      $(document).on('xwiki:wysiwyg:convertHTML', convertHTMLListener);
+
+      // Indicate the Netflux channel used to synchronize the edited content when saving the content.
+      const fieldSet = this._editor.getToolBar().closest('form, .form, body')
+        .querySelector('input[name=form_token]').parentNode;
+      let netfluxChannelInput = fieldSet.querySelector(
+        `input[name=netfluxChannel][data-for="${CSS.escape(this._editor.getFormFieldName())}"]`);
+      if (!netfluxChannelInput) {
+        netfluxChannelInput = document.createElement('input');
+        netfluxChannelInput.setAttribute('type', 'hidden');
+        netfluxChannelInput.setAttribute('name', 'netfluxChannel');
+        netfluxChannelInput.setAttribute('data-for', this._editor.getFormFieldName());
+        fieldSet.prepend(netfluxChannelInput);
+      }
+      netfluxChannelInput.value = this._channel;
+
+      // Cleanup when we leave the realtime session.
+      this._removeNetfluxChannelFromSubmittedData = () => {
+        $(document).off('xwiki:wysiwyg:convertHTML', convertHTMLListener);
+        netfluxChannelInput.value = '';
+      };
     }
 
     /**
@@ -153,8 +201,22 @@ define('xwiki-realtime-wysiwyg', [
         const allowRealtimeCheckbox = Interface.createAllowRealtimeCheckbox(Interface.realtimeAllowed());
         const realtimeToggleHandler = () => {
           if (allowRealtimeCheckbox.prop('checked')) {
-            Interface.realtimeAllowed(true);
-            this._startRealtimeSync();
+            // Disable the checkbox while we're fetching the channels.
+            allowRealtimeCheckbox.prop('disabled', true);
+            // We need to fetch the channels before we can connect to the realtime session because:
+            // * the channels might have been closed since we left the realtime session
+            // * the channels might have changed since we last connected to the realtime session
+            // * the channels might not have been created yet because we started editing with realtime disabled.
+            this._updateChannels().then(() => {
+              Interface.realtimeAllowed(true);
+              this._startRealtimeSync();
+            }).catch(() => {
+              // We failed to fetch the channels so we can't connect to the realtime session.
+              allowRealtimeCheckbox.prop('checked', false);
+            }).finally(() => {
+              // Re-enable the checkbox so that the user can try again.
+              allowRealtimeCheckbox.prop('disabled', false);
+            });
           } else {
             this._realtimeContext.displayDisableModal((state) => {
               if (!state) {
@@ -173,7 +235,7 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _createSaver(info, userName) {
+    async _createSaver(info, userName) {
       const saverConfig = {
         editorType: EDITOR_TYPE,
         editorName: 'WYSIWYG',
@@ -194,28 +256,19 @@ define('xwiki-realtime-wysiwyg', [
             return null;
           }
         },
-        getSaveValue: () => {
-          const fieldName = this._editor.getFormFieldName();
-          return {
-            [fieldName]: this._editor.getOutputHTML(),
-            RequiresHTMLConversion: fieldName,
-            [`${fieldName}_syntax`]: 'xwiki/2.1'
-          };
-        },
-        getTextAtCurrentRevision: (revision) => {
+        getTextAtCurrentRevision: () => {
           return $.get(XWiki.currentDocument.getURL('get', $.param({
             xpage:'get',
             outputSyntax:'annotatedhtml',
             outputSyntaxVersion:'5.0',
-            transformations:'macro',
-            rev:revision
+            transformations:'macro'
           })));
         },
         safeCrash: (reason, debugLog) => {
           this._onAbort(null, reason, debugLog);
         }
       };
-      this._saver = new Saver(saverConfig);
+      this._saver = await new Saver(saverConfig).toBeReady();
       this._saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
         this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
       this._saver.setLastSavedContent(this._editor.getOutputHTML());
@@ -241,19 +294,21 @@ define('xwiki-realtime-wysiwyg', [
       // If no new data (someone has just joined or left the channel), get the latest known values.
       const updatedData = newdata || this._connection.userData;
 
-      const ownerDocument = this._editor.getContentWrapper().ownerDocument;
+      const contentWrapper = this._editor.getContentWrapper();
+      const contentWrapperTop = $(contentWrapper).offset().top;
+      const ownerDocument = contentWrapper.ownerDocument;
       $(ownerDocument).find('.rt-user-position').remove();
       const positions = {};
       this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
         const data = updatedData[id];
         const name = RealtimeEditor._getPrettyName(data.name);
         // Set the user position.
-        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], this._editor.getContentWrapper(), null,
+        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (!element) {
           return;
         }
-        const top = $(element).position().top;
+        const top = $(element).offset().top - contentWrapperTop;
         if (!positions[top]) {
           positions[top] = [id];
         } else {
@@ -275,7 +330,7 @@ define('xwiki-realtime-wysiwyg', [
           // element, e.g. the BODY element for the standalone edit mode).
           'top': top > 0 ? top + 'px' : ''
         });
-        $(this._editor.getContentWrapper()).after($indicator);
+        $(contentWrapper).after($indicator);
       });
     }
 
@@ -356,7 +411,7 @@ define('xwiki-realtime-wysiwyg', [
       });
     }
 
-    _onReady(info) {
+    async _onReady(info) {
       if (this._connection.status !== ConnectionStatus.CONNECTING) {
         return;
       }
@@ -374,8 +429,8 @@ define('xwiki-realtime-wysiwyg', [
           crypto: Crypto,
           editor: EDITOR_TYPE,
           getCursor: () => {
-            const selection = this._editor.getSelection();
-            let node = selection?.rangeCount && selection.getRangeAt(0).startContainer;
+            // We take into account only the first selection range when showing the user cursor.
+            let node = this._editor.getSelection()[0]?.startContainer;
             if (!node) {
               return '';
             }
@@ -387,33 +442,35 @@ define('xwiki-realtime-wysiwyg', [
           delete userDataConfig.getCursor;
         }
 
-        this._connection.userData = UserData.start(info.network, this._userDataChannel, userDataConfig);
+        this._connection.userData = await UserData.start(info.network, this._userDataChannel, userDataConfig);
         this._connection.userList.change.push(this._changeUserIcons.bind(this));
       }
 
-      const shjson = this._connection.chainpad.getUserDoc();
-      this._patchedEditor.setHyperJSON(shjson);
+      await this._createSaver(info, this._realtimeContext.user.name);
 
-      console.log('Unlocking editor');
       this._connection.status = ConnectionStatus.CONNECTED;
-      this.setEditable(true);
 
-      this._onLocal();
-      this._createSaver(info, this._realtimeContext.user.name);
+      // Initialize the edited content with the content from the realtime session.
+      await this._onRemote(info);
+
+      console.debug('Unlocking editor');
+      this.setEditable(true);
     }
 
-    _onLocal() {
+    _onLocal(localContent) {
       if (this._connection.status !== ConnectionStatus.CONNECTED) {
         return;
       }
-      // Stringify the JSON and send it into ChainPad.
-      const localContent = this._patchedEditor.getHyperJSON();
-      console.log('Push local content: ' + localContent);
+      if (typeof localContent !== 'string') {
+        // Stringify the JSON and send it into ChainPad.
+        localContent = this._patchedEditor.getHyperJSON();
+      }
+      console.debug('Push local content: ' + localContent);
       this._connection.chainpad.contentUpdate(localContent);
 
       const remoteContent = this._connection.chainpad.getUserDoc();
       if (remoteContent !== localContent) {
-        console.error('Unexpected remote content after synchronization: ', {
+        console.warn('Unexpected remote content after synchronization: ', {
           expected: localContent,
           actual: remoteContent,
           diff: ChainPad.Diff.diff(localContent, remoteContent)
@@ -421,16 +478,17 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _onRemote(info) {
+    async _onRemote(info) {
       if (this._connection.status !== ConnectionStatus.CONNECTED) {
         return;
       }
 
-      const remoteContent = info.realtime.getUserDoc();
-      console.log('Received remote content: ' + remoteContent);
+      let remoteContent = info.realtime.getUserDoc();
+      console.debug('Received remote content: ' + remoteContent);
 
-      // Build a DOM from HyperJSON, diff and patch the editor.
-      this._patchedEditor.setHyperJSON(remoteContent);
+      // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
+      // to be reloaded, e.g. rendering macros have to be rendered server-side).
+      await this._patchedEditor.setHyperJSON(remoteContent);
 
       const localContent = this._patchedEditor.getHyperJSON();
       if (localContent !== remoteContent) {
@@ -446,7 +504,7 @@ define('xwiki-realtime-wysiwyg', [
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         return;
       }
-      console.log('Connection status: ' + info.state);
+      console.debug('Connection status: ' + info.state);
       this._connection.toolbar.failed();
       if (info.state) {
         this._connection.status = ConnectionStatus.CONNECTING;
@@ -466,11 +524,17 @@ define('xwiki-realtime-wysiwyg', [
         } else {
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
-          this.setEditable(false);
           this._onAbort();
           if (!this._saver.getLocalEditFlag()) {
             // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
             // Netflux channel.
+            //
+            // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
+            // the WebSocket connection status changed, see above). The editor takes into account nested calls to
+            // setReadOnly so we need to make sure the previous setEditable(false) has a corresponding call to
+            // setEditable(true). The user won't be able to edit right away because the editor is put back in read-only
+            // mode while we reconnect to the realtime session (in _startRealtimeSync).
+            this.setEditable(true);
             this._startRealtimeSync();
           } else {
             // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
@@ -488,7 +552,7 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
 
-      console.log("Aborting the realtime session!");
+      console.debug("Aborting the realtime session!");
       this._connection.status = ConnectionStatus.DISCONNECTED;
 
       // Stop the realtime content synchronization (leave the WYSIWYG editor Netflux channel associated with the edited
@@ -510,6 +574,9 @@ define('xwiki-realtime-wysiwyg', [
       // And remove the user caret indicators.
       this._changeUserIcons({});
 
+      // Don't include the channel in the submitted data if we're not connected to the realtime session.
+      this._removeNetfluxChannelFromSubmittedData();
+
       // Typing tests require the realtime session to be active.
       delete window.easyTest;
 
@@ -523,17 +590,47 @@ define('xwiki-realtime-wysiwyg', [
       }
     }
 
-    _easyTest() {
-      let container, offset;
-      const selection = this._editor.getSelection();
-      const range = selection?.rangeCount && selection.getRangeAt(0);
-      if (range) {
-        container = range.startContainer;
-        offset = range.startOffset;
+    _onLock() {
+      if (this._connection.status === ConnectionStatus.CONNECTED) {
+        this._connection.status = ConnectionStatus.PAUSED;
+        this._connection.remoteContentBeforeLock = this._connection.chainpad.getUserDoc();
       }
-      const test = TypingTest.testInput(this._editor.getContentWrapper(), container, offset, this._onLocal);
-      this._onLocal();
-      return test;
+    }
+
+    _onUnlock() {
+      if (this._connection.status === ConnectionStatus.PAUSED) {
+        this._connection.status = ConnectionStatus.CONNECTED;
+        const remoteContentAfterLock = this._connection.chainpad.getUserDoc();
+        const localContentAfterLock = this._patchedEditor.getHyperJSON();
+        if (remoteContentAfterLock === this._connection.remoteContentBeforeLock) {
+          // We didn't receive any remote changes while the editor was locked.
+          if (localContentAfterLock !== this._connection.remoteContentBeforeLock) {
+            // The local content has changed while the editor was locked (e.g. because one of the inserted macros is
+            // editable in-place and its rendering added nested editable areas).
+            this._onLocal();
+          }
+        } else if (localContentAfterLock === this._connection.remoteContentBeforeLock) {
+          // The local content didn't change while the editor was locked, but we received remote changes. Let's apply
+          // them.
+          this._onRemote({
+            realtime: this._connection.chainpad
+          });
+        } else {
+          // The local content and the remote content have diverged. We need a 3-way merge.
+          this._onLocal(Patches.merge(this._connection.remoteContentBeforeLock, remoteContentAfterLock,
+            localContentAfterLock));
+          this._onRemote({
+            realtime: this._connection.chainpad
+          });
+        }
+      }
+    }
+
+    _easyTest() {
+      return TypingTest.testInput(
+        () => this._editor.getContentWrapper()?.ownerDocument.defaultView.getSelection(),
+        this._onLocal.bind(this)
+      );
     }
 
     _getXPath(element) {

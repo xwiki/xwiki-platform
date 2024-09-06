@@ -33,6 +33,19 @@
           }, function () {
             console.debug("Failed to resolve image style [" + styleId + "]");
           });
+      } else {
+        // In case of empty imageStyle, check if this is because the default style is forced.
+        // In this case, allow resizing according to the default style configuration.
+        imageStyleClient.loadImageStylesDefault().then((defaultStyle) => {
+          if (defaultStyle.forceDefaultStyle === "true") {
+            imageStyleClient.loadImageStyles().then((values) => {
+              var forcedStyle = values.imageStyles.filter((style) => style.identifier === defaultStyle.defaultStyle)[0];
+              if (forcedStyle.adjustableSize === false) {
+                widget.resizer.addClass('hidden');
+              }
+            });
+          }
+        });
       }
     });
   }
@@ -433,22 +446,39 @@
         widget.on('data', function () {
           widget.resizer[widget.data.alignment === 'end' ? 'addClass' : 'removeClass']('cke_image_resizer_left');
         });
-        
-        if(!widget.wrapper.getChild(0).hasClass('cke_widget_element')) {
-          // Re-wrap the element in a widget element.
-          // This happens when removing the caption of an image. 
-          var widgetElement = editor.document.createElement('span');
-          widgetElement.addClass('cke_widget_element');
+
+        // The image has been wrapped in the image resize wrapper. If the image was the widget element then we need to
+        // create another widget element to hold the image resize wrapper (which includes the image).
+        if (!widget.wrapper.getChild(0).hasClass('cke_widget_element')) {
+          const oldWidgetElement = widget.element;
+          const widgetElementAttrs = [
+            'data-cke-widget-data',
+            'data-cke-widget-upcasted', 
+            'data-cke-widget-keep-attr',
+            'data-widget',
+          ];
+
+          // Create a new widget element (copying some attributes from the old widget element).
+          const newWidgetElement = editor.document.createElement('span');
+          newWidgetElement.addClass('cke_widget_element');
+          newWidgetElement.setAttributes(widgetElementAttrs.reduce((attrs, name) => {
+            attrs[name] = oldWidgetElement.getAttribute(name);
+            return attrs;
+          }, {}));
           if (resizeWrapper) {
-            widgetElement.append(resizeWrapper);
+            newWidgetElement.append(resizeWrapper);
           }
-          widget.wrapper.append(widgetElement, true);
-          widget.element = widgetElement;
-          widget.element.setAttribute('data-widget', widget.name);
-        } else {
-          if (resizeWrapper) {
-            widget.element.append(resizeWrapper, true);
-          }
+
+          // Replace the widget element.
+          widget.wrapper.append(newWidgetElement, true);
+          widget.element = newWidgetElement;
+
+          // Cleanup the old widget element.
+          oldWidgetElement.removeClass('cke_widget_element');
+          oldWidgetElement.removeAttributes(widgetElementAttrs);
+        } else if (resizeWrapper) {
+          // Simply append the image resize wrapper to the widget element.
+          widget.element.append(resizeWrapper, true);
         }
       }
 
@@ -621,49 +651,25 @@
         originalData.call(this);
       };
 
-      var originalUpcast = imageWidget.upcast;
-      // @param {CKEDITOR.htmlParser.element} element
-      // @param {Object} data
-      imageWidget.upcast = function (element, data) {
-        var el = originalUpcast.apply(this, arguments);
-        if (el && element.name === 'img') {
-          // Wrap the image with a span. This span will be used to place the resize span during the init of the image
-          // widget.
-          var span = new CKEDITOR.htmlParser.element( 'span' );
-          el.wrapWith(span);
-          el = span;
-        }
-        return el;
-      };
-
-      var originalDowncast = imageWidget.downcast;
-      imageWidget.downcast = function (element) {
+      const originalDowncast = imageWidget.downcast;
+      imageWidget.downcast = function (...args) {
         const alignment = this.data.alignment;
-        var el = originalDowncast.apply(this, arguments);
-        downcastLegacyCenter(el, alignment);
-        var isNotCaptioned = this.parts.caption === null;
-        if (isNotCaptioned) {
-          let img;
-          if(el.name === 'img') {
-            img = el;
-          } else {
-            img = el.findOne('img', true);
+        const element = originalDowncast.apply(this, args);
+        downcastLegacyCenter(element, alignment);
+        if (!this.parts.caption) {
+          // Image widget without caption.
+          // Remove the wrapping span used for the resize handle.
+          const img = element.name === 'img' ? element : element.findOne('img', true);
+          let imageResizeWrapper = img;
+          while (imageResizeWrapper && imageResizeWrapper.name !== 'span' && imageResizeWrapper !== element) {
+            imageResizeWrapper = imageResizeWrapper.parent;
           }
-          // Cleanup and remove the wrapping span used for the resize caret.
-          delete img.attributes['data-widget'];
-          if(el.children[0]) {
-            var firstChild = el.children[0];
-            if (firstChild.children[0]) {
-              firstChild.replaceWith(firstChild.children[0]);
-            }
+          if (imageResizeWrapper?.name === 'span' && imageResizeWrapper !== element) {
+            imageResizeWrapper.replaceWith(imageResizeWrapper.children[0]);
           }
         }
 
-        // Safety data-widget removal as I noticed an additional data-widget being persisted. I did not identify the
-        // exact reproduction steps though. 
-        delete el.attributes['data-widget'];
-
-        return el;
+        return element;
       };
     }
   });

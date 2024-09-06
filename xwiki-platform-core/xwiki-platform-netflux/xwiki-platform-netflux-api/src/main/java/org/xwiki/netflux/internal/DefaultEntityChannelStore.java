@@ -22,6 +22,7 @@ package org.xwiki.netflux.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -56,15 +57,8 @@ public class DefaultEntityChannelStore implements EntityChannelStore
         List<EntityChannel> channels = this.entityChannels.get(entityReference);
         if (channels != null) {
             this.channelStore.prune();
-            List<EntityChannel> availableChannels = channels.stream().filter(channel -> {
-                Channel rawChannel = this.channelStore.get(channel.getKey());
-                if (rawChannel != null) {
-                    channel.setUserCount(rawChannel.getConnectedUsers().size());
-                    return true;
-                } else {
-                    return false;
-                }
-            }).collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+            List<EntityChannel> availableChannels = channels.stream().filter(this::hasRawChannel)
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
             if (availableChannels.isEmpty()) {
                 this.entityChannels.remove(entityReference);
             } else {
@@ -90,6 +84,27 @@ public class DefaultEntityChannelStore implements EntityChannelStore
             this.entityChannels.computeIfAbsent(entityReference, key -> new CopyOnWriteArrayList<>());
         channels.add(channel);
 
+        // Ask again the bots to join the channel now that we have an entity channel.
+        this.channelStore.askBotsToJoin(this.channelStore.get(channel.getKey()));
+
         return channel;
+    }
+
+    @Override
+    public Optional<EntityChannel> getChannel(String key)
+    {
+        return this.entityChannels.values().stream().flatMap(List::stream)
+            .filter(channel -> Objects.equals(channel.getKey(), key)).filter(this::hasRawChannel).findFirst();
+    }
+
+    private boolean hasRawChannel(EntityChannel channel)
+    {
+        Channel rawChannel = this.channelStore.get(channel.getKey());
+        if (rawChannel != null) {
+            channel.setUserCount(rawChannel.getConnectedUsers().size());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -45,6 +45,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -550,11 +551,13 @@ public class CreateActionRequestHandler
     /**
      * @return the document reference of the new document to be created, {@code null} if a no document can be created
      *         (because the conditions are not met)
+     * @since 16.6.0RC1
+     * @since 16.4.2
+     * @since 15.10.12
      */
-    public DocumentReference getNewDocumentReference()
+    @Unstable
+    public DocumentReference getDocumentReference()
     {
-        DocumentReference result = null;
-
         if (StringUtils.isEmpty(name)) {
             // Can`t do anything without a name.
             return null;
@@ -587,16 +590,30 @@ public class CreateActionRequestHandler
             return null;
         }
 
-        // Check whether there is a template parameter set, be it an empty one. If a page should be created and there is
-        // no template parameter, it means the create action is not supposed to be executed, but only display the
-        // available templates and let the user choose
-        // If there's no passed template, check if there are any available templates. If none available, then the fact
-        // that there is no template is ok.
-        if (hasTemplate() || availableTemplateProviders.isEmpty()) {
-            result = new DocumentReference(newName, newSpaceReference);
-        }
+        return new DocumentReference(newName, newSpaceReference);
+    }
 
-        return result;
+    /**
+     * @return the document reference of the new document to be created, {@code null} if a no document can be created
+     *         (because the conditions are not met)
+     * @deprecated rely on {@link #getDocumentReference()} and on {@link #isTemplateInfoProvided()} for checks.
+     */
+    @Deprecated(since = "15.10.12,16.4.1,16.6.0RC1")
+    public DocumentReference getNewDocumentReference()
+    {
+        return (isTemplateInfoProvided()) ? getDocumentReference() : null;
+    }
+
+    /**
+     * @return if template information is provided and the template providers is not empty.
+     * @since 16.6.0RC1
+     * @since 16.4.1
+     * @since 15.10.12
+     */
+    @Unstable
+    public boolean isTemplateInfoProvided()
+    {
+        return hasTemplate() || availableTemplateProviders.isEmpty();
     }
 
     /**

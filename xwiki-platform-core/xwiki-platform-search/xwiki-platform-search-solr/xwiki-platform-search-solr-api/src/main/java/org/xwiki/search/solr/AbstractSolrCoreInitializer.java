@@ -91,6 +91,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_6 = 120600000;
 
     /**
+     * The base schema version for XWiki 12.9.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_12_9 = 120900000;
+
+    /**
      * The base schema version for XWiki 12.10.
      * 
      * @since 12.10
@@ -98,11 +105,60 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_10 = 121000000;
 
     /**
+     * The base schema version for XWiki 13.3.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_13_3 = 130300000;
+
+    /**
+     * The base schema version for XWiki 14.4.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_14_0 = 140000000;
+
+    /**
      * The base schema version for XWiki 14.7.
      * 
      * @since 14.7RC1
      */
     public static final long SCHEMA_VERSION_14_7 = 140700000;
+
+    /**
+     * The base schema version for XWiki 15.5.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_5 = 150500000;
+
+    /**
+     * The base schema version for XWiki 15.6.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_6 = 150600000;
+
+    /**
+     * The base schema version for XWiki 15.9.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_15_9 = 150900000;
+
+    /**
+     * The base schema version for XWiki 16.6.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_16_6 = 160600000;
+
+    /**
+     * The base schema version for XWiki 16.7.
+     * 
+     * @since 16.8.0RC1
+     */
+    public static final long SCHEMA_VERSION_16_7 = 160700000;
 
     /**
      * The base schema version.
@@ -476,10 +532,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
                 }
                 long remaining = result.getNumFound() - size;
                 this.logger.info("    Migrating [{}] documents, [{}] are remaining on a total of [{}] ([{}]% done)",
-                    size,
-                    remaining,
-                    total,
-                    Math.round(((double) (total - remaining) / (double) total) * 100L));
+                    size, remaining, total, Math.round(((double) (total - remaining) / (double) total) * 100L));
 
                 migrateData(response.getResults(), sourceCore, targetCore);
             }

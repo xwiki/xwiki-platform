@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataPropertyDescriptor
+public class LiveDataPropertyDescriptor implements InitializableLiveDataElement
 {
     private static final String NAME_CONSTANT = "name";
 
@@ -47,7 +47,7 @@ public class LiveDataPropertyDescriptor
      * Holds the filter configuration.
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class FilterDescriptor extends BaseDescriptor
+    public static class FilterDescriptor extends BaseDescriptor implements InitializableLiveDataElement
     {
         private String defaultOperator;
 
@@ -123,9 +123,7 @@ public class LiveDataPropertyDescriptor
             this.defaultOperator = defaultOperator;
         }
 
-        /**
-         * Prevent {@code null} values where it's possible.
-         */
+        @Override
         public void initialize()
         {
             if (this.operators == null) {
@@ -561,9 +559,7 @@ public class LiveDataPropertyDescriptor
         this.editable = editable;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.visible == null) {

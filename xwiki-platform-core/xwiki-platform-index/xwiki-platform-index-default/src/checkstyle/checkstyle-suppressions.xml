@@ -25,6 +25,5 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
-  <suppress checks="MultipleStringLiterals" files="src/main/java/org/xwiki/index/internal/TasksStore\.java"/>
   <suppress checks="ClassFanOutComplexity" files="src/main/java/org/xwiki/index/internal/DefaultTasksManager\.java"/>
 </suppressions>

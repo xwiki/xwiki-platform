@@ -25,5 +25,7 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
+  <!-- FanOut complexity at 22 right now, but it includes Disposable and Initializable: should be removed once those
+  are excluded -->
   <suppress checks="FanOutComplexity" files="DefaultLikeManager.java"/>
 </suppressions>

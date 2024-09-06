@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-legacydependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Legacy Dependencies</name>
@@ -66,6 +66,7 @@
                     <exclude>org.xwiki.platform:xwiki-platform-instance:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-mail-send-storage:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-notifications-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.platform:xwiki-platform-notifications-filters-api:*:jar:*</exclude>
                   </excludes>
                   <message>We should not get both the clean and the legacy JARs</message>
                 </bannedDependencies>
@@ -466,6 +467,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-legacy-notifications-notifiers-api</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -486,6 +493,29 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-filters-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-messagestream-api</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-oldcore</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.commons</groupId>
+          <artifactId>xwiki-commons-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-notifications-filters-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

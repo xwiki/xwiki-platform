@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
@@ -52,7 +53,7 @@ public class DrawerMenu extends BaseElement
 
     public boolean isVisible()
     {
-        return "true".equals(this.activator.getAttribute("aria-expanded"));
+        return this.drawerContainer.isDisplayed();
     }
 
     public boolean show()
@@ -111,10 +112,20 @@ public class DrawerMenu extends BaseElement
 
     private void waitForDrawer(boolean visible)
     {
+        // We always want the transition to be ended in the wait condition.
+        ExpectedCondition<Boolean> transitionEnded = ExpectedConditions.not(
+            ExpectedConditions.attributeContains(this.drawerContainer, "class", "drawer-transitioning")
+        );
         if (visible) {
-            getDriver().waitUntilCondition(ExpectedConditions.visibilityOf(this.drawerContainer));
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                ExpectedConditions.visibilityOf(this.drawerContainer),
+                transitionEnded
+            ));
         } else {
-            getDriver().waitUntilCondition(ExpectedConditions.invisibilityOf(this.drawerContainer));
+            getDriver().waitUntilCondition(ExpectedConditions.and(
+                ExpectedConditions.invisibilityOf(this.drawerContainer),
+                transitionEnded
+            ));
         }
     }
 }

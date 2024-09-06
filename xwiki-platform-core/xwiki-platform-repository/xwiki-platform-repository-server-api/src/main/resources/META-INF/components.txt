@@ -1,4 +1,7 @@
 org.xwiki.repository.internal.DefaultRepositoryConfiguration
+org.xwiki.repository.internal.ExtensionStore
+org.xwiki.repository.internal.ExtensionSupporterProtectionListener
+org.xwiki.repository.internal.ExtensionSupportProtectionListener
 org.xwiki.repository.internal.ExtensionUpdaterListener
 org.xwiki.repository.internal.RepositoryManager
 org.xwiki.repository.internal.reference.ExtensionResourceReferenceTypeParser

@@ -144,6 +144,22 @@ public class LiveDataElement extends BaseElement
         return this;
     }
 
+    /**
+     *
+     * @return the possible pagination sizes.
+     * @since 16.5.0
+     */
+    public List<Integer> getPaginationPageSizes()
+    {
+        WebElement element = getRootElement().findElement(By.cssSelector(".pagination-page-size select"));
+        return new Select(element)
+            .getOptions()
+            .stream()
+            .map(WebElement::getText)
+            .map(Integer::parseInt)
+            .collect(Collectors.toList());
+    }
+
     public void waitUntilReady()
     {
         getDriver().waitUntilCondition(input -> isVueLoaded());

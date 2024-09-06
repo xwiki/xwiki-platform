@@ -434,6 +434,12 @@
                       var insertParam = {
                         name: macro.id.id,
                         parameters: {},
+                        // We consider the macro call to be inline if the macro supports inline mode, as indicated by
+                        // its descriptor, because the caret is placed in an inline context most of the time (e.g.
+                        // inside a paragraph) in order to allow the user to type text. Moreover, the
+                        // 'xwiki-macro-maybe-install-insert' editor command is used mainly by quick actions which are
+                        // triggered by the user typing text, so in an inline context.
+                        inline: descriptor.supportsInlineMode
                       };
 
                       // Set an empty default content when it is mandatory.
@@ -669,7 +675,11 @@
           });
         });
       });
-
+      // Ensure that widgets are always properly initialized after a paste.
+      // Fix XWIKI-22391
+      editor.on('afterPaste', function () {
+        this.widgets.checkWidgets();
+      });
     },
 
     insertOrUpdateMacroWidget: async function(editor, data, widget, skipRefresh) {
@@ -910,36 +920,48 @@
     // The passed element is of type CKEDITOR.htmlParser.element
     isMacroElement: function(element) {
       return (element.name == 'div' || element.name == 'span') &&
-        element.hasClass('macro') && element.attributes['data-macro'];
+        // The passed element doesn't always have the CKEDITOR.htmlParser.element API. This happens for instance when
+        // CKEditor checks which plugins to disable (based on the HTML elements they require). In this case the passed
+        // element only has the data (attributes, children, etc.).
+        element.hasClass?.('macro') && element.attributes['data-macro'];
     },
 
     // The passed element is of type CKEDITOR.htmlParser.element
     isMacroOutput: function(element) {
-      return element.getAscendant && element.getAscendant(function(ancestor) {
-        // The macro marker comments might have been already processed (e.g. in the case of nested editables) so we need
-        // to look for a macro output wrapper also.
-        if (CKEDITOR.plugins.xwikiMacro.isMacroElement(ancestor)) {
-          return true;
-        }
-        // Look for macro marker comments otherwise, taking into account that macro markers can be "nested".
-        var nestingLevel = 0;
-        var previousSibling = ancestor;
-        while (previousSibling.previous && nestingLevel <= 0) {
-          previousSibling = previousSibling.previous;
-          if (previousSibling.type === CKEDITOR.NODE_COMMENT) {
-            if (previousSibling.value === 'stopmacro') {
-              // Macro output end.
-              nestingLevel--;
-            } else if (previousSibling.value.substr(0, 11) === 'startmacro:') {
-              // Macro output start.
-              nestingLevel++;
-            }
-          }
-        }
-        return nestingLevel > 0;
-      });
+      // CKEDITOR.htmlParser.element#getAscendant() doesn't check the element itself, so we have to do it.
+      return isMacroElementOrBetweenMacroMarkers(element) ||
+        element.getAscendant?.(isMacroElementOrBetweenMacroMarkers);
     }
   };
+
+  /**
+   * @param {CKEDITOR.htmlParser.element} element the element to check
+   * @returns {@code true} if the given element is a macro output wrapper or is between macro marker comments,
+   *          {@code false} otherwise
+   */
+  function isMacroElementOrBetweenMacroMarkers(element) {
+    // The macro marker comments might have been already processed (e.g. in the case of nested editables) so we need to
+    // look for a macro output wrapper also.
+    if (CKEDITOR.plugins.xwikiMacro.isMacroElement(element)) {
+      return true;
+    }
+    // Look for macro marker comments otherwise, taking into account that macro markers can be "nested".
+    var nestingLevel = 0;
+    var previousSibling = element;
+    while (previousSibling.previous && nestingLevel <= 0) {
+      previousSibling = previousSibling.previous;
+      if (previousSibling.type === CKEDITOR.NODE_COMMENT) {
+        if (previousSibling.value === 'stopmacro') {
+          // Macro output end.
+          nestingLevel--;
+        } else if (previousSibling.value.substr(0, 11) === 'startmacro:') {
+          // Macro output start.
+          nestingLevel++;
+        }
+      }
+    }
+    return nestingLevel > 0;
+  }
 
   // Overwrite CKEditor's HTML parser in order to prevent it from removing empty elements from generated macro output.
   // It's important to preserve the generated macro output as is, because these empty elements are often used:

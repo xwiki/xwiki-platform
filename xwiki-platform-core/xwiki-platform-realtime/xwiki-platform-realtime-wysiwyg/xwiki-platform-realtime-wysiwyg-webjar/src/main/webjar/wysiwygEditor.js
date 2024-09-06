@@ -115,7 +115,7 @@ define('xwiki-realtime-wysiwyg', [
 
       // Notify the others that we're editing in realtime.
       this._realtimeContext.setRealtimeEnabled(true);
-  
+
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
@@ -142,10 +142,43 @@ define('xwiki-realtime-wysiwyg', [
         this._onAbort();
       });
 
+      this._addNetfluxChannelToSubmittedData();
+
       // Export the typing tests to the window.
       // Call like `test = easyTest()`
       // Terminate the test like `test.cancel()`
       window.easyTest = this._easyTest.bind(this);
+    }
+
+    _addNetfluxChannelToSubmittedData() {
+      // Indicate the Netflux channel used to synchronize the edited content when performing the HTML conversion (e.g.
+      // when refreshing the content after a macro is inserted) in order to render the content using the effective
+      // author associated with this channel (and thus prevent privilege escalation through script injection in the
+      // realtime session).
+      const convertHTMLListener = (event, conversionParams) => {
+        conversionParams.netfluxChannel = this._channel;
+      };
+      $(document).on('xwiki:wysiwyg:convertHTML', convertHTMLListener);
+
+      // Indicate the Netflux channel used to synchronize the edited content when saving the content.
+      const fieldSet = this._editor.getToolBar().closest('form, .form, body')
+        .querySelector('input[name=form_token]').parentNode;
+      let netfluxChannelInput = fieldSet.querySelector(
+        `input[name=netfluxChannel][data-for="${CSS.escape(this._editor.getFormFieldName())}"]`);
+      if (!netfluxChannelInput) {
+        netfluxChannelInput = document.createElement('input');
+        netfluxChannelInput.setAttribute('type', 'hidden');
+        netfluxChannelInput.setAttribute('name', 'netfluxChannel');
+        netfluxChannelInput.setAttribute('data-for', this._editor.getFormFieldName());
+        fieldSet.prepend(netfluxChannelInput);
+      }
+      netfluxChannelInput.value = this._channel;
+
+      // Cleanup when we leave the realtime session.
+      this._removeNetfluxChannelFromSubmittedData = () => {
+        $(document).off('xwiki:wysiwyg:convertHTML', convertHTMLListener);
+        netfluxChannelInput.value = '';
+      };
     }
 
     /**
@@ -223,21 +256,12 @@ define('xwiki-realtime-wysiwyg', [
             return null;
           }
         },
-        getSaveValue: () => {
-          const fieldName = this._editor.getFormFieldName();
-          return {
-            [fieldName]: this._editor.getOutputHTML(),
-            RequiresHTMLConversion: fieldName,
-            [`${fieldName}_syntax`]: 'xwiki/2.1'
-          };
-        },
-        getTextAtCurrentRevision: (revision) => {
+        getTextAtCurrentRevision: () => {
           return $.get(XWiki.currentDocument.getURL('get', $.param({
             xpage:'get',
             outputSyntax:'annotatedhtml',
             outputSyntaxVersion:'5.0',
-            transformations:'macro',
-            rev:revision
+            transformations:'macro'
           })));
         },
         safeCrash: (reason, debugLog) => {
@@ -270,19 +294,21 @@ define('xwiki-realtime-wysiwyg', [
       // If no new data (someone has just joined or left the channel), get the latest known values.
       const updatedData = newdata || this._connection.userData;
 
-      const ownerDocument = this._editor.getContentWrapper().ownerDocument;
+      const contentWrapper = this._editor.getContentWrapper();
+      const contentWrapperTop = $(contentWrapper).offset().top;
+      const ownerDocument = contentWrapper.ownerDocument;
       $(ownerDocument).find('.rt-user-position').remove();
       const positions = {};
       this._connection.userList.users.filter(id => updatedData[id]?.['cursor_' + EDITOR_TYPE]).forEach(id => {
         const data = updatedData[id];
         const name = RealtimeEditor._getPrettyName(data.name);
         // Set the user position.
-        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], this._editor.getContentWrapper(), null,
+        const element = ownerDocument.evaluate(data['cursor_' + EDITOR_TYPE], contentWrapper, null,
           XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         if (!element) {
           return;
         }
-        const top = $(element).position().top;
+        const top = $(element).offset().top - contentWrapperTop;
         if (!positions[top]) {
           positions[top] = [id];
         } else {
@@ -304,7 +330,7 @@ define('xwiki-realtime-wysiwyg', [
           // element, e.g. the BODY element for the standalone edit mode).
           'top': top > 0 ? top + 'px' : ''
         });
-        $(this._editor.getContentWrapper()).after($indicator);
+        $(contentWrapper).after($indicator);
       });
     }
 
@@ -498,11 +524,17 @@ define('xwiki-realtime-wysiwyg', [
         } else {
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
-          this.setEditable(false);
           this._onAbort();
           if (!this._saver.getLocalEditFlag()) {
             // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
             // Netflux channel.
+            //
+            // The editor was previously put in read-only mode when we got disconnected from the WebSocket (i.e. when
+            // the WebSocket connection status changed, see above). The editor takes into account nested calls to
+            // setReadOnly so we need to make sure the previous setEditable(false) has a corresponding call to
+            // setEditable(true). The user won't be able to edit right away because the editor is put back in read-only
+            // mode while we reconnect to the realtime session (in _startRealtimeSync).
+            this.setEditable(true);
             this._startRealtimeSync();
           } else {
             // We can't rejoin the realtime session using the new Netflux channel because we would lose the unsaved
@@ -541,6 +573,9 @@ define('xwiki-realtime-wysiwyg', [
       this._connection.userData.stop?.();
       // And remove the user caret indicators.
       this._changeUserIcons({});
+
+      // Don't include the channel in the submitted data if we're not connected to the realtime session.
+      this._removeNetfluxChannelFromSubmittedData();
 
       // Typing tests require the realtime session to be active.
       delete window.easyTest;

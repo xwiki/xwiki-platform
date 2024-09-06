@@ -33,7 +33,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 
@@ -78,6 +81,10 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
     @Inject
     private ContextualLocalizationManager l10n;
 
+    @Inject
+    @Named("warning")
+    private WarningMessageMacro warningMacro;
+
     /**
      * Default constructor.
      */
@@ -113,18 +120,24 @@ public class AttachmentGalleryPickerMacro extends AbstractMacro<AttachmentGaller
         if (parameters.getTarget() != null) {
             attachmentPickerParameters.put("data-xwiki-attachment-picker-target", parameters.getTarget());
         }
-
-        return List.of(new GroupBlock(List.of(
-            // Search block.
-            new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "attachmentPickerSearch")),
-            // Results block.
-            new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "attachmentPickerResults")),
-            // No results block.
-            new GroupBlock(List.of(this.l10n.getTranslation("attachment.picker.macro.notResult.message").render()),
-                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerNoResults hidden box warningmessage")),
-            new GroupBlock(
-                List.of(this.l10n.getTranslation("attachment.picker.macro.globalSelection.message").render()),
-                Map.of(BLOCK_PARAM_CLASS, "attachmentPickerGlobalSelection hidden box warningmessage"))
-        ), attachmentPickerParameters));
+        BoxMacroParameters warningParams1 = new BoxMacroParameters();
+        warningParams1.setCssClass("attachmentPickerNoResults hidden");
+        BoxMacroParameters warningParams2 = new BoxMacroParameters();
+        warningParams2.setCssClass("attachmentPickerGlobalSelection hidden");
+        try {
+            return List.of(new GroupBlock(List.of(
+                // Search block.
+                new GroupBlock(List.of(), Map.of(BLOCK_PARAM_CLASS, "attachmentPickerSearch")),
+                // Results block.
+                new GroupBlock(Map.of(BLOCK_PARAM_CLASS, "attachmentPickerResults")),
+                // No results block.
+                new GroupBlock(warningMacro.execute(warningParams1, 
+                    this.l10n.getTranslationPlain("attachment.picker.macro.notResult.message"), context)),
+                new GroupBlock(warningMacro.execute(warningParams2,
+                    this.l10n.getTranslationPlain("attachment.picker.macro.globalSelection.message"), context))
+            ), attachmentPickerParameters));
+        } catch (MacroExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

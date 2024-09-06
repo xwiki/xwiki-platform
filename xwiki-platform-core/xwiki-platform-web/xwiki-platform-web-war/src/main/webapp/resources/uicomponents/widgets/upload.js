@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 var XWiki = (function(XWiki) {
-  var l10n = {
+  let l10n = {
     "core.widgets.html5upload.status.icon.inprogress" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.inprogress'))",
     "core.widgets.html5upload.status.icon.done" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.done'))",
     "core.widgets.html5upload.status.icon.canceled" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.status.icon.canceled'))",
@@ -28,7 +28,7 @@ var XWiki = (function(XWiki) {
     "core.widgets.html5upload.cancelAll" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.cancelAll'))",
     "core.widgets.html5upload.hideStatus" : "$!escapetool.javascript($services.localization.render('core.widgets.html5upload.hideStatus'))"
   };
-  var icons = {
+  let icons = {
     'check' : "$!escapetool.javascript($services.icon.renderHTML('check'))",
     'remove' : "$!escapetool.javascript($services.icon.renderHTML('remove'))",
     'error' : "$!escapetool.javascript($services.icon.renderHTML('error'))",

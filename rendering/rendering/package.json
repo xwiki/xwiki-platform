@@ -31,8 +31,8 @@
     "@xwiki/cristal-rendering-wikimodel": "workspace:*",
     "dompurify": "3.1.5",
     "inversify": "6.0.2",
-    "marked": "12.0.2",
-    "marked-base-url": "1.1.3"
+    "marked": "14.1.2",
+    "marked-base-url": "1.1.5"
   },
   "devDependencies": {
     "@types/dompurify": "3.0.5",

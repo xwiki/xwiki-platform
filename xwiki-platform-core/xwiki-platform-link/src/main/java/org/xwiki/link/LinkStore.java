@@ -20,9 +20,11 @@
 package org.xwiki.link;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Allow accessing the links extracted from various entities.
@@ -48,4 +50,32 @@ public interface LinkStore
      * @throws LinkException when failing to load the backlinks
      */
     Set<EntityReference> resolveBackLinkedEntities(EntityReference reference) throws LinkException;
+
+    /**
+     * Get a {@link ReadyIndicator} to wait on for the link store to become ready.
+     *
+     * @since 16.8.0RC1
+     * @since 15.10.13
+     * @since 16.4.4
+     * @return the ready indicator
+     */
+    @Unstable
+    default ReadyIndicator waitReady()
+    {
+        /**
+         * Fake implementation of {@link ReadyIndicator}.
+         */
+        class DummyReadyIndicator extends CompletableFuture<Boolean> implements ReadyIndicator
+        {
+            @Override
+            public int getProgressPercentage()
+            {
+                return 100;
+            }
+        }
+
+        DummyReadyIndicator readyIndicator = new DummyReadyIndicator();
+        readyIndicator.complete(Boolean.TRUE);
+        return readyIndicator;
+    }
 }

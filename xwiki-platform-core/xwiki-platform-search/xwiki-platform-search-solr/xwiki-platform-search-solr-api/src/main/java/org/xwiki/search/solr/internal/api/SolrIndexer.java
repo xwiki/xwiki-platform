@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal.api;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
@@ -68,4 +69,12 @@ public interface SolrIndexer
      * @throws SolrIndexerException when failing to create the job
      */
     IndexerJob startIndex(IndexerRequest request) throws SolrIndexerException;
+
+    /**
+     * @return a ready indicator that indicates if all requests that have been submitted before it have been completed
+     * @since 16.8.0RC1
+     * @since 15.10.13
+     * @since 16.4.4
+     */
+    ReadyIndicator getReadyIndicator();
 }

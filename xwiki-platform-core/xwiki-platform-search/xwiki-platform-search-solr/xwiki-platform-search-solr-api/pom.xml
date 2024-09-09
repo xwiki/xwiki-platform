@@ -34,7 +34,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
 

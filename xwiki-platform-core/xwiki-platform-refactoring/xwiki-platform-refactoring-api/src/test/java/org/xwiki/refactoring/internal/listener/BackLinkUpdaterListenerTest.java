@@ -21,6 +21,8 @@ package org.xwiki.refactoring.internal.listener;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.job.JobContext;
+import org.xwiki.link.LinkStore;
+import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
@@ -47,6 +51,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,11 +80,17 @@ class BackLinkUpdaterListenerTest
     @MockComponent
     private JobContext jobContext;
 
+    @MockComponent
+    private LinkStore linkStore;
+
     @Mock
     private RenameJob renameJob;
 
     @Mock
     private DeleteJob deleteJob;
+
+    @Mock
+    private ReadyIndicator readyIndicator;
 
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
@@ -109,6 +120,10 @@ class BackLinkUpdaterListenerTest
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
         deleteRequest.setNewBacklinkTargets(Collections.singletonMap(aliceReference, bobReference));
+
+        when(this.linkStore.waitReady()).thenReturn(this.readyIndicator);
+        when(this.readyIndicator.getProgressPercentage()).thenReturn(100);
+        when(this.readyIndicator.get(anyLong(), any())).thenReturn(Boolean.TRUE);
     }
 
     @Test
@@ -125,6 +140,8 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index is ready now, starting the update of the back-links.", logCapture.getMessage(2));
     }
 
     @Test
@@ -141,6 +158,8 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index is ready now, starting the update of the back-links.", logCapture.getMessage(2));
     }
 
     @Test
@@ -156,6 +175,8 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index is ready now, starting the update of the back-links.", logCapture.getMessage(2));
     }
 
     @Test
@@ -173,6 +194,7 @@ class BackLinkUpdaterListenerTest
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -187,6 +209,7 @@ class BackLinkUpdaterListenerTest
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(false);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -210,6 +233,8 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index is ready now, starting the update of the back-links.", logCapture.getMessage(2));
     }
 
     @Test
@@ -241,6 +266,8 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index is ready now, starting the update of the back-links.", logCapture.getMessage(2));
     }
 
     @Test
@@ -263,5 +290,50 @@ class BackLinkUpdaterListenerTest
         this.listener.onEvent(documentDeletedEvent, null, null);
 
         verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
+    }
+
+    @Test
+    void onDocumentDeleteWithIndexingWaitingAndFalse() throws ExecutionException, InterruptedException, TimeoutException
+    {
+        deleteRequest.setUpdateLinks(true);
+
+        when(this.readyIndicator.get(anyLong(), any())).thenThrow(new TimeoutException())
+            .thenReturn(Boolean.FALSE);
+
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("The link index didn't become ready, starting the update of the back-links nevertheless"
+            + " as some updates might be better than none.", logCapture.getMessage(2));
+    }
+
+    @Test
+    void onDocumentDeleteWithIndexingWaitingError() throws ExecutionException, InterruptedException, TimeoutException
+    {
+        deleteRequest.setUpdateLinks(true);
+
+        when(this.readyIndicator.get(anyLong(), any())).thenThrow(new ExecutionException(new InterruptedException()));
+
+        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
+        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+
+        this.listener.onEvent(documentDeletedEvent, null, null);
+
+        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference);
+
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
+        assertEquals("Link indexing stopped with an exception while waiting for indexing to complete.",
+            logCapture.getMessage(2));
+        assertEquals("The link index didn't become ready, starting the update of the back-links nevertheless"
+            + " as some updates might be better than none.", logCapture.getMessage(3));
     }
 }

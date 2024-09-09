@@ -17,35 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.link;
+
+import java.util.concurrent.Future;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * The operation to perform on the queued entry.
- * 
+ * An indicator if the link store is ready, i.e., has completed all indexing tasks that have been submitted before
+ * the indicator was requested. It resolves to {@link Boolean#TRUE} when all indexing tasks that were before it in
+ * the queue have been finished and may resolve to {@link Boolean#FALSE} when the queue has been stopped.
+ *
+ * @since 16.8.0RC1
+ * @since 15.10.13
+ * @since 16.4.4
  * @version $Id$
- * @since 5.1M2
  */
-public enum IndexOperation
+@Unstable
+public interface ReadyIndicator extends Future<Boolean>
 {
     /**
-     * Index the entry.
+     *
+     * @return a value between 0 and 100 that expresses the progress towards being ready. Values might jump
+     * non-linearly and might not be fully accurate.
      */
-    INDEX,
-
-    /**
-     * Remove entry from index.
-     */
-    DELETE,
-
-    // General operations
-
-    /**
-     * Stop indexing thread.
-     */
-    STOP,
-
-    /**
-     * Marker for waiting on indexing to finish all previously queued operations.
-     */
-    READY_MARKER
+    int getProgressPercentage();
 }

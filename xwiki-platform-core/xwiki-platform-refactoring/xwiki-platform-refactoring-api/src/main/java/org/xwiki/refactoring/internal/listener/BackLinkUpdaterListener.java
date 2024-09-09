@@ -20,6 +20,8 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -31,6 +33,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkStore;
+import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
@@ -79,6 +83,9 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
 
     @Inject
     private JobContext jobContext;
+
+    @Inject
+    private LinkStore linkStore;
 
     /**
      * Default constructor.
@@ -139,6 +146,12 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     {
         this.logger.info("Updating the back-links for document [{}].", source);
 
+        if (this.jobContext.getCurrentJob() != null) {
+            // We're inside a job, so some waiting should be okay. Wait for the indexing of the link store to finish.
+            // TODO: some jobs might indicate already that they don't want to wait. Add support for that.
+            waitForLinkIndexing();
+        }
+
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
         // document to load and parse) since we have the information in the store
         Set<DocumentReference> backlinkDocumentReferences = this.modelBridge.getBackLinkedDocuments(source);
@@ -156,5 +169,42 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         } finally {
             this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private void waitForLinkIndexing()
+    {
+        this.progressManager.pushLevelProgress(100, this);
+        int percent = 0;
+        this.logger.info("Waiting for the link index to be updated.");
+        ReadyIndicator readyIndicator = this.linkStore.waitReady();
+        Boolean isReady = null;
+        while (isReady == null) {
+            try {
+                isReady = readyIndicator.get(1, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                for (int i = percent; i < readyIndicator.getProgressPercentage(); ++i) {
+                    this.progressManager.startStep(this);
+                }
+
+                // TODO: after some time, ask if the user wants to continue waiting.
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                this.logger.warn("Interrupted while waiting for the link indexing to be updated.");
+                isReady = Boolean.FALSE;
+            } catch (Exception e) {
+                // Catch a generic Exception here and not ExecutionException to not increase class-fanout complexity.
+                this.logger.error("Link indexing stopped with an exception while waiting for indexing to complete.",
+                    e.getCause());
+                isReady = Boolean.FALSE;
+            }
+        }
+
+        if (Boolean.TRUE.equals(isReady)) {
+            this.logger.info("The link index is ready now, starting the update of the back-links.");
+        } else {
+            this.logger.warn("The link index didn't become ready, starting the update of the back-links "
+                + "nevertheless as some updates might be better than none.");
+        }
+        this.progressManager.popLevelProgress(this);
     }
 }

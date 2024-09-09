@@ -790,6 +790,7 @@
     <!-- German -->
     <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
     <dynamicField name="*_de" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_de_DE" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>
@@ -883,6 +884,8 @@
     <!-- French -->
     <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
     <dynamicField name="*_fr" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_FR" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_BE" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fr" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>

@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-dsvuetify",
+  "name": "@xwiki/cristal-navigation-tree-api",
   "version": "0.9.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "ds/vuetify",
+    "directory": "core/navigation-tree/navigation-tree-api",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -18,24 +18,8 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "echo 'no test'"
-  },
-  "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
-    "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "inversify": "6.0.2",
-    "vue": "3.4.31",
-    "vue-i18n": "9.13.1",
-    "vuetify": "3.6.10"
-  },
-  "devDependencies": {
-    "vue-tsc": "2.0.22"
+    "build": "tsc --project tsconfig.json && vite build"
   },
   "publishConfig": {
     "exports": {

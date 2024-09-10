@@ -21,6 +21,7 @@
 import { expect, test } from "@playwright/test";
 import { DesignSystem } from "./DesignSystem";
 import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
+import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -105,6 +106,42 @@ configs.forEach(
       expect(await breadcrumbItems[1].getLink()).toEqual(
         "http://localhost:15680/xwiki/bin/view/Main/",
       );
+    });
+
+    test(`[${name}] has navigation tree`, async ({ page, isMobile }) => {
+      await page.goto(localDefaultPage);
+
+      if (isMobile) {
+        const openSidebar = page.locator(".open-sidebar");
+        await openSidebar.nth(0).click();
+      }
+
+      const navigationTreeNodes = await new NavigationTreePageObject(
+        page,
+        designSystem,
+      ).findItems();
+
+      expect(navigationTreeNodes.length).toEqual(3);
+      await expect(navigationTreeNodes[0].getText()).toContainText("Help");
+      expect(await navigationTreeNodes[0].getLink()).toEqual(
+        "#/Help.WebHome/view",
+      );
+      await expect(navigationTreeNodes[1].getText()).toContainText("Terminal Page");
+      expect(await navigationTreeNodes[1].getLink()).toEqual(
+        "#/Terminal/view",
+      );
+      await expect(navigationTreeNodes[2].getText()).toContainText("Deep Page Root");
+      expect(await navigationTreeNodes[2].getLink()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+
+      await navigationTreeNodes[2].expand();
+      const children = await navigationTreeNodes[2].getChildren();
+      expect(children.length).toEqual(1);
+      await expect(children[0].getText()).toContainText("Deep Page Leaf");
+      expect(await children[0].getLink()).toEqual(
+        "#/Deep1.Deep2/view",
+      )
     });
 
     if (offlineDefaultPage) {

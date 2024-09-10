@@ -420,6 +420,71 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
 
+  core/navigation-tree/navigation-tree-api: {}
+
+  core/navigation-tree/navigation-tree-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../navigation-tree-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/navigation-tree/navigation-tree-filesystem:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-electron-storage':
+        specifier: workspace:*
+        version: link:../../../electron/storage
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../navigation-tree-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/navigation-tree/navigation-tree-github:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../navigation-tree-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/navigation-tree/navigation-tree-nextcloud:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../navigation-tree-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/navigation-tree/navigation-tree-xwiki:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../navigation-tree-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
   dev/config: {}
 
   dev/test-utils:
@@ -469,6 +534,9 @@ importers:
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -494,6 +562,9 @@ importers:
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -699,9 +770,6 @@ importers:
       '@xwiki/cristal-electron-storage':
         specifier: workspace:*
         version: link:../storage
-      '@xwiki/cristal-hierarchy-api':
-        specifier: workspace:*
-        version: link:../../core/hierarchy/hierarchy-api
       '@xwiki/cristal-hierarchy-default':
         specifier: workspace:*
         version: link:../../core/hierarchy/hierarchy-default
@@ -717,6 +785,21 @@ importers:
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../../lib
+      '@xwiki/cristal-navigation-tree-default':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-default
+      '@xwiki/cristal-navigation-tree-filesystem':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-filesystem
+      '@xwiki/cristal-navigation-tree-github':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-github
+      '@xwiki/cristal-navigation-tree-nextcloud':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-nextcloud
+      '@xwiki/cristal-navigation-tree-xwiki':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-xwiki
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -1010,6 +1093,9 @@ importers:
       '@xwiki/cristal-info-actions-ui':
         specifier: workspace:*
         version: link:../core/info-actions/info-actions-ui
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../core/navigation-tree/navigation-tree-api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -1075,6 +1161,18 @@ importers:
       '@xwiki/cristal-link-suggest-xwiki':
         specifier: workspace:*
         version: link:../core/link-suggest/link-suggest-xwiki
+      '@xwiki/cristal-navigation-tree-default':
+        specifier: workspace:*
+        version: link:../core/navigation-tree/navigation-tree-default
+      '@xwiki/cristal-navigation-tree-github':
+        specifier: workspace:*
+        version: link:../core/navigation-tree/navigation-tree-github
+      '@xwiki/cristal-navigation-tree-nextcloud':
+        specifier: workspace:*
+        version: link:../core/navigation-tree/navigation-tree-nextcloud
+      '@xwiki/cristal-navigation-tree-xwiki':
+        specifier: workspace:*
+        version: link:../core/navigation-tree/navigation-tree-xwiki
       express:
         specifier: 4.19.2
         version: 4.19.2
@@ -1111,7 +1209,7 @@ importers:
         version: 0.8.4(rollup@4.18.0)(vite@5.3.2(@types/node@20.14.9))
       vite-plugin-vuetify:
         specifier: 2.0.3
-        version: 2.0.3(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.2))(vuetify@3.6.10)
+        version: 2.0.3(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.2))(vuetify@3.7.0)
       vue-tsc:
         specifier: 2.0.22
         version: 2.0.22(typescript@5.5.2)
@@ -5050,6 +5148,25 @@ packages:
       webpack-plugin-vuetify:
         optional: true
 
+  vuetify@3.7.0:
+    resolution: {integrity: sha512-x+UaU4SPYNcJSE/voCTBFrNn0q9Spzx2EMfDdUj0NYgHGKb59OqnZte+AjaJaoOXy1AHYIGEpm5Ryk2BEfgWuw==}
+    engines: {node: ^12.20 || >=14.13}
+    peerDependencies:
+      typescript: '>=4.7'
+      vite-plugin-vuetify: '>=1.0.0'
+      vue: ^3.3.0
+      vue-i18n: ^9.0.0
+      webpack-plugin-vuetify: '>=2.0.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      vite-plugin-vuetify:
+        optional: true
+      vue-i18n:
+        optional: true
+      webpack-plugin-vuetify:
+        optional: true
+
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
@@ -6593,6 +6710,13 @@ snapshots:
       upath: 2.0.1
       vue: 3.4.31(typescript@5.5.2)
       vuetify: 3.6.10(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2))
+    optional: true
+
+  '@vuetify/loader-shared@2.0.3(vue@3.4.31(typescript@5.5.2))(vuetify@3.7.0(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2)))':
+    dependencies:
+      upath: 2.0.1
+      vue: 3.4.31(typescript@5.5.2)
+      vuetify: 3.7.0(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2))
 
   '@xmldom/xmldom@0.8.10': {}
 
@@ -9425,6 +9549,18 @@ snapshots:
       vuetify: 3.6.10(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2))
     transitivePeerDependencies:
       - supports-color
+    optional: true
+
+  vite-plugin-vuetify@2.0.3(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.2))(vuetify@3.7.0):
+    dependencies:
+      '@vuetify/loader-shared': 2.0.3(vue@3.4.31(typescript@5.5.2))(vuetify@3.7.0(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2)))
+      debug: 4.3.4(supports-color@5.5.0)
+      upath: 2.0.1
+      vite: 5.3.2(@types/node@20.14.9)
+      vue: 3.4.31(typescript@5.5.2)
+      vuetify: 3.7.0(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2))
+    transitivePeerDependencies:
+      - supports-color
 
   vite@5.3.2(@types/node@20.14.9):
     dependencies:
@@ -9541,6 +9677,14 @@ snapshots:
     optionalDependencies:
       typescript: 5.5.2
       vite-plugin-vuetify: 2.0.3(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.2))(vuetify@3.6.10)
+      vue-i18n: 9.13.1(vue@3.4.31(typescript@5.5.2))
+
+  vuetify@3.7.0(typescript@5.5.2)(vite-plugin-vuetify@2.0.3)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.2)))(vue@3.4.31(typescript@5.5.2)):
+    dependencies:
+      vue: 3.4.31(typescript@5.5.2)
+    optionalDependencies:
+      typescript: 5.5.2
+      vite-plugin-vuetify: 2.0.3(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.2))(vuetify@3.7.0)
       vue-i18n: 9.13.1(vue@3.4.31(typescript@5.5.2))
 
   w3c-keyname@2.2.8: {}

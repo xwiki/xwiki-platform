@@ -49,5 +49,8 @@ const api: APITypes = {
   saveAttachment(path: string, file: File): Promise<PageData> {
     return ipcRenderer.invoke("saveAttachment", { path, filePath: file.path });
   },
+  listChildren(page: string): Promise<Array<string>> {
+    return ipcRenderer.invoke("listChildren", { page });
+  },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

@@ -23,6 +23,10 @@ import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-de
 import { ComponentInit as DefaultPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-default";
 import { ComponentInit as GitHubPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-github";
 import { ComponentInit as XWikiPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-xwiki";
+import { ComponentInit as DefaultNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-default";
+import { ComponentInit as GitHubNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-github";
+import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-nextcloud";
+import { ComponentInit as XWikiNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-xwiki";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 import { Container } from "inversify";
 
@@ -47,5 +51,9 @@ CristalAppLoader.init(
     new DefaultPageHierarchyComponentInit(container);
     new GitHubPageHierarchyComponentInit(container);
     new XWikiPageHierarchyComponentInit(container);
+    new DefaultNavigationTreeComponentInit(container);
+    new GitHubNavigationTreeComponentInit(container);
+    new NextcloudNavigationTreeComponentInit(container);
+    new XWikiNavigationTreeComponentInit(container);
   },
 );

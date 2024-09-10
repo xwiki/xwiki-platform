@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-skin",
+  "name": "@xwiki/cristal-navigation-tree-nextcloud",
   "version": "0.9.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "skin",
+    "directory": "core/navigation-tree/navigation-tree-nextcloud",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -18,32 +18,13 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "echo 'no test'"
+    "build": "tsc --project tsconfig.json && vite build"
   },
-  "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-extra-tabs-api": "workspace:*",
-    "@xwiki/cristal-extra-tabs-ui": "workspace:*",
-    "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "@xwiki/cristal-icons": "workspace:*",
-    "@xwiki/cristal-info-actions-api": "workspace:*",
-    "@xwiki/cristal-info-actions-ui": "workspace:*",
-    "inversify": "6.0.2",
-    "marked": "12.0.2",
-    "reflect-metadata": "0.2.2",
-    "vue": "3.4.31",
-    "vue-i18n": "9.13.1",
-    "vue-router": "4.4.0"
-  },
-  "devDependencies": {
-    "vue-tsc": "2.0.22"
+    "inversify": "6.0.2"
   },
   "publishConfig": {
     "exports": {

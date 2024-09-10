@@ -165,6 +165,29 @@ async function saveAttachment(path: string, filePath: string) {
   await fs.promises.copyFile(filePath, path);
 }
 
+/**
+ * Get the ids of the children pages for a given page.
+ *
+ * @param page the id of the page
+ * @returns a list of page ids
+ * @since 0.10
+ */
+async function listChildren(page: string): Promise<Array<string>> {
+  const folderPath = resolvePath(page).replace("/page.json", "");
+
+  const children = [];
+  const files = await fs.promises.readdir(folderPath);
+
+  for (const file of files) {
+    const path = `${folderPath}/${file}`;
+    if (await isDirectory(path)) {
+      children.push(file);
+    }
+  }
+
+  return children;
+}
+
 export default function load(): void {
   ipcMain.handle("resolvePath", (event, { page }) => {
     return resolvePagePath(page);
@@ -186,5 +209,8 @@ export default function load(): void {
   });
   ipcMain.handle("saveAttachment", (event, { path, filePath }) => {
     return saveAttachment(path, filePath);
+  });
+  ipcMain.handle("listChildren", (event, { page }) => {
+    return listChildren(page);
   });
 }

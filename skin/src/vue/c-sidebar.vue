@@ -18,7 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { Ref, onMounted, ref, watch } from "vue";
+import { Ref, inject, onMounted, ref, watch } from "vue";
+import { type CristalApp } from "@xwiki/cristal-api";
+import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
 import CConfigMenu from "./c-config-menu.vue";
 import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
@@ -37,6 +39,8 @@ const { x } = useMouseCoordinates();
 const isSidebarClosed: Ref<boolean> = ref(
   viewportType.value == ViewportType.Mobile,
 );
+
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
 defineEmits(["collapseLeftSidebar"]);
 
@@ -58,7 +62,6 @@ watch(viewportType, (newViewportType: ViewportType) => {
   }
 });
 
-// Store the interval for left sidebar resize operation.
 let sidebarResizeInterval: number = 0;
 
 function updateLeftSidebarWidth(newSidebarWidth: number) {
@@ -150,7 +153,16 @@ function onClickOutsideLeftSidebar() {
       <x-search></x-search>
     </div>
     <div class="panel-container">
-      <c-sidebar-panel name="Wiki Name"></c-sidebar-panel>
+      <c-sidebar-panel name="Wiki Name">
+        <XNavigationTree
+          :tree-resolver="
+            cristal
+              .getContainer()
+              .get<NavigationTreeSourceProvider>('NavigationTreeSourceProvider')
+              .get()
+          "
+        ></XNavigationTree>
+      </c-sidebar-panel>
       <c-sidebar-panel name="Applications"></c-sidebar-panel>
       <UIX uixname="sidebar.after" />
     </div>

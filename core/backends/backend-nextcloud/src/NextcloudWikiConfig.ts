@@ -53,4 +53,8 @@ export class NextcloudWikiConfig extends DefaultWikiConfig {
   override defaultPageName(): string {
     return "home";
   }
+
+  override getType(): string {
+    return "Nextcloud";
+  }
 }

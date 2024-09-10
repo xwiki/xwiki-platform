@@ -120,6 +120,70 @@ app.get(
   },
 );
 
+app.get("/xwiki/bin/get", (req: Request, res: Response) => {
+  res.appendHeader("Access-Control-Allow-Origin", "*");
+
+  if (req.query["sheet"] == "XWiki.DocumentTree") {
+    switch (req.query["id"]) {
+      case "#":
+        res.json([
+          {
+            id: "document:xwiki:Help.WebHome",
+            text: "Help",
+            children: true,
+            data: { type: "document" },
+            a_attr: { href: "/xwiki/bin/view/Help/" },
+          },
+          {
+            id: "document:xwiki:Terminal",
+            text: "Terminal Page",
+            children: false,
+            data: { type: "document" },
+            a_attr: { href: "/xwiki/bin/view/Terminal" },
+          },
+          {
+            id: "document:xwiki:Deep1.WebHome",
+            text: "Deep Page Root",
+            children: true,
+            data: { type: "document" },
+            a_attr: { href: "/xwiki/bin/view/Deep1/" },
+          },
+        ]);
+        break;
+
+      case "document:xwiki:Deep1.WebHome":
+        res.json([
+          {
+            id: "document:xwiki:Deep1.WebHome",
+            text: "Translations",
+            children: true,
+            data: { type: "translations" },
+          },
+          {
+            id: "document:xwiki:Deep1.WebHome",
+            text: "Attachments",
+            children: true,
+            data: { type: "attachments" },
+            a_attr: { href: "/xwiki/bin/view/Deep1/?viewer=attachments" },
+          },
+          {
+            id: "document:xwiki:Deep1.Deep2",
+            text: "Deep Page Leaf",
+            children: false,
+            data: { type: "document" },
+            a_attr: { href: "/xwiki/bin/view/Deep1/Deep2" },
+          },
+        ]);
+        break;
+
+      default:
+        res.json([]);
+    }
+  } else {
+    res.json({});
+  }
+});
+
 app.listen(port, () => {
   console.log(`XWiki mock server listening on http://localhost:${port}`);
 });

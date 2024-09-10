@@ -25,6 +25,7 @@ packages:
   - "core/icons"
   - "core/info-actions/*"
   - "core/link-suggest/*"
+  - "core/navigation-tree/*"
   - "dev/*"
   - "ds/api"
   - "ds/dsfr"

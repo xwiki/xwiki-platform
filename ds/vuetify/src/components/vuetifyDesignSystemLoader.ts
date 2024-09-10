@@ -115,5 +115,10 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
       "XFileInput",
       () => import("../vue/form/x-file-input.vue"),
     );
+    registerAsyncComponent(
+      app,
+      "XNavigationTree",
+      () => import("../vue/x-navigation-tree.vue"),
+    );
   }
 }

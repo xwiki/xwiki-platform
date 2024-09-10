@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -84,8 +85,9 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     @Inject
     private JobContext jobContext;
 
+    // Use a Provider to avoid early initialization of the link store.
     @Inject
-    private LinkStore linkStore;
+    private Provider<LinkStore> linkStore;
 
     /**
      * Default constructor.
@@ -176,7 +178,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         this.progressManager.pushLevelProgress(100, this);
         int percent = 0;
         this.logger.info("Waiting for the link index to be updated.");
-        ReadyIndicator readyIndicator = this.linkStore.waitReady();
+        ReadyIndicator readyIndicator = this.linkStore.get().waitReady();
         Boolean isReady = null;
         while (isReady == null) {
             try {

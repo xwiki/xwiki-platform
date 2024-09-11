@@ -107,6 +107,7 @@ public class DisplayIconMacroParameters
      * @since 16.8.0RC1
      * @return the text alternative picked for the icon
      */
+    @Unstable
     public String getTextAlternative()
     {
         return this.textAlternative;
@@ -118,6 +119,7 @@ public class DisplayIconMacroParameters
      */
     @PropertyName("Text Alternative")
     @PropertyDescription("A text alternative for this icon.")
+    @Unstable
     public void setTextAlternative(String textAlternative)
     {
         this.textAlternative = textAlternative;

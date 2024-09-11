@@ -41,11 +41,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -148,7 +146,7 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
 
         if (parameters.getTextAlternative() != null) {
             // We complete the icon with a text alternative for screen readers.
-            Block textAltBlock = new FormatBlock(List.of(new WordBlock(parameters.getTextAlternative())), Format.NONE);
+            Block textAltBlock = new ParagraphBlock(List.of(new WordBlock(parameters.getTextAlternative())));
             textAltBlock.setParameter("class", "sr-only");
             ArrayList<Block> updatedList = new ArrayList<>(result);
             updatedList.add(textAltBlock);

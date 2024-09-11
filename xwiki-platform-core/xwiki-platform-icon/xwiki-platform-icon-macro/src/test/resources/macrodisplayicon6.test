@@ -16,8 +16,8 @@ onWord [i]
 endFormat [NONE] [[class]=[icon][data-xwiki-icon]=[homeIcon]]
 endParagraph
 endMetaData [[syntax]=[XWiki 2.1]]
-beginFormat [NONE] [[class]=[sr-only]]
+beginParagraph [[class]=[sr-only]]
 onWord [Home]
-endFormat [NONE] [[class]=[sr-only]]
+endParagraph [[class]=[sr-only]]
 endMacroMarkerStandalone [displayIcon] [name=home|textAlternative=Home]
 endDocument

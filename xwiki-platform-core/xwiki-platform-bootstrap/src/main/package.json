@@ -40,7 +40,7 @@
     "load-grunt-tasks": "^4.0.0",
     "markdown-it": "^8.4.2",
     "qunitjs": "^1.23.1",
-    "replace-in-file": "^3.4.3",
+    "replace-in-file": "^7.0.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2",
     "stylelint": "~9.6.0",

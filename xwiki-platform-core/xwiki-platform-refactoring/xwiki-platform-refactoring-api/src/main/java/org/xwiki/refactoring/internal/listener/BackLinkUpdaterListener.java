@@ -205,7 +205,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
                 readyIndicator.get(1, TimeUnit.SECONDS);
                 return;
             } catch (TimeoutException e) {
-                for (int i = percent; i < readyIndicator.getProgressPercentage(); ++i) {
+                for (; percent < readyIndicator.getProgressPercentage(); ++percent) {
                     this.progressManager.startStep(this);
                 }
                 // TODO: after some time, ask if the user wants to continue waiting.

@@ -299,7 +299,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP =
         new IndexQueueEntry((String) null, IndexOperation.STOP);
 
-    private class SolrIndexerReadyIndicator extends CompletableFuture<Boolean> implements ReadyIndicator
+    private class SolrIndexerReadyIndicator extends CompletableFuture<Void> implements ReadyIndicator
     {
         private final long initialResolveQueueCounter;
 
@@ -573,7 +573,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                         break;
                     case READY_MARKER:
                         commit();
-                        batchEntry.readyIndicator.complete(Boolean.TRUE);
+                        batchEntry.readyIndicator.complete(null);
                         length = 0;
                         break;
                     default:
@@ -761,7 +761,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         }
 
         // The indexer has been stopped and won't become ready again.
-        readyIndicator.complete(Boolean.FALSE);
+        readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
         return readyIndicator;
     }
 }

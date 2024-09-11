@@ -65,7 +65,7 @@ public interface LinkStore
         /**
          * Fake implementation of {@link ReadyIndicator}.
          */
-        class DummyReadyIndicator extends CompletableFuture<Boolean> implements ReadyIndicator
+        class DummyReadyIndicator extends CompletableFuture<Void> implements ReadyIndicator
         {
             @Override
             public int getProgressPercentage()
@@ -75,7 +75,7 @@ public interface LinkStore
         }
 
         DummyReadyIndicator readyIndicator = new DummyReadyIndicator();
-        readyIndicator.complete(Boolean.TRUE);
+        readyIndicator.complete(null);
         return readyIndicator;
     }
 }

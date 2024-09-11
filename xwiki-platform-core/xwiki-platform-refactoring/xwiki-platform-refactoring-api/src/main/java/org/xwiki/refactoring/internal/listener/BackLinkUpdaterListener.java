@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
@@ -176,37 +177,39 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     private void waitForLinkIndexing()
     {
         this.progressManager.pushLevelProgress(100, this);
-        int percent = 0;
         this.logger.info("Waiting for the link index to be updated.");
         ReadyIndicator readyIndicator = this.linkStore.get().waitReady();
-        Boolean isReady = null;
-        while (isReady == null) {
+        try {
+            waitOnReadyIndicatorWithProgress(readyIndicator);
+            this.logger.info("The link index is ready now, starting the update of the back-links.");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            this.logger.warn("Interrupted while waiting for the link indexing to be updated, starting the updating of"
+                + " back-links nevertheless.");
+        } catch (ExecutionException e) {
+            this.logger.error("Link indexing stopped with an exception while waiting for indexing to complete, "
+                    + "starting the updating of back-links nevertheless.",
+                e.getCause());
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void waitOnReadyIndicatorWithProgress(ReadyIndicator readyIndicator)
+        throws ExecutionException, InterruptedException
+    {
+        int percent = 0;
+
+        while (true) {
             try {
-                isReady = readyIndicator.get(1, TimeUnit.SECONDS);
+                readyIndicator.get(1, TimeUnit.SECONDS);
+                return;
             } catch (TimeoutException e) {
                 for (int i = percent; i < readyIndicator.getProgressPercentage(); ++i) {
                     this.progressManager.startStep(this);
                 }
-
                 // TODO: after some time, ask if the user wants to continue waiting.
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                this.logger.warn("Interrupted while waiting for the link indexing to be updated.");
-                isReady = Boolean.FALSE;
-            } catch (Exception e) {
-                // Catch a generic Exception here and not ExecutionException to not increase class-fanout complexity.
-                this.logger.error("Link indexing stopped with an exception while waiting for indexing to complete.",
-                    e.getCause());
-                isReady = Boolean.FALSE;
             }
         }
-
-        if (Boolean.TRUE.equals(isReady)) {
-            this.logger.info("The link index is ready now, starting the update of the back-links.");
-        } else {
-            this.logger.warn("The link index didn't become ready, starting the update of the back-links "
-                + "nevertheless as some updates might be better than none.");
-        }
-        this.progressManager.popLevelProgress(this);
     }
 }

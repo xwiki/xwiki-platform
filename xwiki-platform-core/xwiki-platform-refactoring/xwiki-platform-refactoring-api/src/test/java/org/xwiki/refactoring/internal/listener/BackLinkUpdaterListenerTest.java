@@ -123,7 +123,6 @@ class BackLinkUpdaterListenerTest
 
         when(this.linkStore.waitReady()).thenReturn(this.readyIndicator);
         when(this.readyIndicator.getProgressPercentage()).thenReturn(100);
-        when(this.readyIndicator.get(anyLong(), any())).thenReturn(Boolean.TRUE);
     }
 
     @Test
@@ -293,12 +292,13 @@ class BackLinkUpdaterListenerTest
     }
 
     @Test
-    void onDocumentDeleteWithIndexingWaitingAndFalse() throws ExecutionException, InterruptedException, TimeoutException
+    void onDocumentDeleteWithIndexingWaitingAndInterrupt() throws ExecutionException, InterruptedException,
+        TimeoutException
     {
         deleteRequest.setUpdateLinks(true);
 
         when(this.readyIndicator.get(anyLong(), any())).thenThrow(new TimeoutException())
-            .thenReturn(Boolean.FALSE);
+            .thenThrow(new InterruptedException());
 
         when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -310,8 +310,8 @@ class BackLinkUpdaterListenerTest
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
         assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals("The link index didn't become ready, starting the update of the back-links nevertheless"
-            + " as some updates might be better than none.", logCapture.getMessage(2));
+        assertEquals("Interrupted while waiting for the link indexing to be updated, starting the updating of "
+            + "back-links nevertheless.", logCapture.getMessage(2));
     }
 
     @Test
@@ -319,7 +319,7 @@ class BackLinkUpdaterListenerTest
     {
         deleteRequest.setUpdateLinks(true);
 
-        when(this.readyIndicator.get(anyLong(), any())).thenThrow(new ExecutionException(new InterruptedException()));
+        when(this.readyIndicator.get(anyLong(), any())).thenThrow(new ExecutionException(new RuntimeException()));
 
         when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
@@ -331,9 +331,8 @@ class BackLinkUpdaterListenerTest
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
         assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals("Link indexing stopped with an exception while waiting for indexing to complete.",
+        assertEquals("Link indexing stopped with an exception while waiting for indexing to complete, starting "
+                + "the updating of back-links nevertheless.",
             logCapture.getMessage(2));
-        assertEquals("The link index didn't become ready, starting the update of the back-links nevertheless"
-            + " as some updates might be better than none.", logCapture.getMessage(3));
     }
 }

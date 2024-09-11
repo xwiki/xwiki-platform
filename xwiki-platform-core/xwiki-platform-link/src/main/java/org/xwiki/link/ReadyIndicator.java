@@ -25,8 +25,8 @@ import org.xwiki.stability.Unstable;
 
 /**
  * An indicator if the link store is ready, i.e., has completed all indexing tasks that have been submitted before
- * the indicator was requested. It resolves to {@link Boolean#TRUE} when all indexing tasks that were before it in
- * the queue have been finished and may resolve to {@link Boolean#FALSE} when the queue has been stopped.
+ * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
+ * stopped, the {@link Future} is completed with an exception.
  *
  * @since 16.8.0RC1
  * @since 15.10.13
@@ -34,7 +34,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Unstable
-public interface ReadyIndicator extends Future<Boolean>
+public interface ReadyIndicator extends Future<Void>
 {
     /**
      *

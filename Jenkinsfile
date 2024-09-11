@@ -114,27 +114,29 @@ def builds = [
     )
   },
   'Quality' : {
-    // Run the quality checks.
-    // Notes for step 1:
-    // - The build executes jacoco to generate a single jacoco exec file containing the results of the coverage
-    //   for all tests from all modules. This why we need -Pcoverage and -Dxwiki.jacoco.itDestFile.
-    build(
-      name: 'Quality Step 1',
-      goals: 'clean install',
-      profiles: 'repository-snapshots,quality,legacy,coverage',
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
-    )
-    // Notes for step 2:
-    // - We generate the jacoco reports for all modules (all from the single jacoco-it.exec file)
-    // - We then generate the sonar analysis and upload to Sonarcloud with the sonar:sonar goal.
-    // - Sonar uses the jacoco report files and it's thus important that the sonar:sonar goal is executed after
-    //   the jacoco:report one.
-    build(
-      name: 'Quality Step 2',
-      goals: 'jacoco:report sonar:sonar',
-      profiles: 'repository-snapshots,quality,legacy,coverage',
-      properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
-    )
+    node() {
+      // Run the quality checks.
+      // Notes for step 1:
+      // - The build executes jacoco to generate a single jacoco exec file containing the results of the coverage
+      //   for all tests from all modules. This why we need -Pcoverage and -Dxwiki.jacoco.itDestFile.
+      buildInsideNode(
+        name: 'Quality Step 1',
+        goals: 'clean install',
+        profiles: 'repository-snapshots,quality,legacy,coverage',
+        properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
+      )
+      // Notes for step 2:
+      // - We generate the jacoco reports for all modules (all from the single jacoco-it.exec file)
+      // - We then generate the sonar analysis and upload to Sonarcloud with the sonar:sonar goal.
+      // - Sonar uses the jacoco report files and it's thus important that the sonar:sonar goal is executed after
+      //   the jacoco:report one.
+      buildInsideNode(
+        name: 'Quality Step 2',
+        goals: 'jacoco:report sonar:sonar',
+        profiles: 'repository-snapshots,quality,legacy,coverage',
+        properties: '-Dxwiki.jacoco.itDestFile=`pwd`/target/jacoco-it.exec'
+      )
+    }
   }
 ]
 

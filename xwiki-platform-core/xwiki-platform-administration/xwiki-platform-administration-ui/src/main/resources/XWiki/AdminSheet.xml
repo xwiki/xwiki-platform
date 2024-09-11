@@ -894,6 +894,10 @@ require(['jquery'], function($) {
   vertical-align: middle;
 }
 
+#admin-page-content .usersorgroupsnames label &gt; input[type="radio"] {
+  vertical-align: unset;
+}
+
 /**
  * Category Overview
  */
@@ -937,6 +941,19 @@ require(['jquery'], function($) {
   border-color: transparent;
 }
 
+#admin-page-content .usersorgroupsnames {
+  white-space: nowrap;
+  /* Triple of the value for the .right column. This is useful to make sure the columns are somewhat balanced when
+    there is only one right (e.g., extension rights with a default flavor).
+    Keeping them balanced is useful to make sure the filters are displayed properly, which is especially important
+    on a subwiki where we have to find a place to display the scope selector. */
+  width: 27%;
+}
+
+#usersandgroupstable-filters-scope {
+  white-space: nowrap;
+}
+
 #usersandgroupstable-filters #name {
     width: 65%;
 }
@@ -953,6 +970,10 @@ require(['jquery'], function($) {
 
 .rights-settings dt input {
   vertical-align: top;
+}
+
+.xform #usersandgroupstable select {
+  width: unset;
 }
 
 /**

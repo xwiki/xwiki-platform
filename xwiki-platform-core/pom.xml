@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -140,6 +140,8 @@
             -->
             
             
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -154,6 +156,7 @@
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
+    <module>xwiki-platform-bootstrap</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
@@ -197,7 +200,6 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>

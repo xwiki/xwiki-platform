@@ -34,14 +34,14 @@ define('xwiki-realtime-document', [
     }
   };
 
-  const document = {
-    // Initialize the document fields based on the meta information available on page load.
-    documentReference: meta.documentReference,
-    language: meta.locale,
-    version: meta.version,
-    isNew: meta.isNew,
+  class XWikiDocument {
+    constructor() {
+      // Initialize with document fields coming from the real-time configuration.
+      $.extend(this, realtimeConfig.document);
+      this.update();
+    }
 
-    reload: function() {
+    reload() {
       return $.getJSON(meta.restURL, {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
@@ -67,9 +67,18 @@ define('xwiki-realtime-document', [
           return this;
         }
       }).then(this.update.bind(this));
-    },
+    }
 
-    update: function(data) {
+    update(data) {
+      data = data || {
+        documentReference: meta.documentReference,
+        // We need the real locale.
+        language: meta.locale || realtimeConfig.document.language,
+        version: meta.version,
+        // The timestamp of the last modification is needed to be able to properly merge on save.
+        modified: meta.modified || realtimeConfig.document.modified,
+        isNew: meta.isNew
+      };
       $.extend(this, data);
       if (this.documentReference === meta.documentReference && this.version !== meta.version) {
         // Update the meta and the hidden fields used by the edit form in order to ensure proper merge on save.
@@ -78,9 +87,9 @@ define('xwiki-realtime-document', [
         $('#isNew').val(this.isNew);
       }
       return this;
-    },
+    }
 
-    save: function(data) {
+    save(data) {
       return $.post(window.docsaveurl, $.param($.extend({
         /* jshint camelcase:false */
         form_token: meta.form_token,
@@ -95,9 +104,9 @@ define('xwiki-realtime-document', [
         minorEdit: 1,
         ajax: true
       }, data), true)).then(this.reload.bind(this));
-    },
+    }
 
-    getChannels: function(params) {
+    getChannels(params) {
       const url = new XWiki.Document(this.documentReference).getRestURL('channels');
       params = $.extend({
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
@@ -112,8 +121,15 @@ define('xwiki-realtime-document', [
         }
       });
     }
-  };
+  }
 
-  // Extend with document fields coming from the real-time configuration.
-  return $.extend(document, realtimeConfig.document);
+  // Initialize the document fields based on the meta information available on page load.
+  const xwikiDocument = new XWikiDocument();
+
+  // Update the document fields before and after the document is edited inplace (without reloading the web page).
+  $(document).on('xwiki:actions:edit xwiki:actions:view', function(event, data) {
+    xwikiDocument.update();
+  });
+
+  return xwikiDocument;
 });

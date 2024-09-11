@@ -21,7 +21,6 @@ package org.xwiki.localization.script;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -389,15 +388,14 @@ public class LocalizationScriptService implements ScriptService
      */
     public Set<Locale> getAvailableLocales()
     {
-        Set<Locale> locales = new HashSet<>();
-        locales.addAll(Arrays.asList(Locale.getAvailableLocales()));
+        Set<Locale> locales = new HashSet<>(LocaleUtils.availableLocaleSet());
 
         try (InputStream resource = this.environment.getResourceAsStream("/WEB-INF/xwiki-locales.txt")) {
             LineIterator iterator = IOUtils.lineIterator(resource, StandardCharsets.US_ASCII);
             while (iterator.hasNext()) {
                 String line = iterator.nextLine();
                 if (StringUtils.isNotBlank(line)) {
-                    locales.add(new Locale(line));
+                    locales.add(LocaleUtils.toLocale(line));
                 }
             }
             iterator.close();

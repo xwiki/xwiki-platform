@@ -215,7 +215,7 @@ class InvitationIT
             assertMessageValid(messageB);
 
             // Check that the page has the table and the messages.
-            assertTrue(sent.getMessageBoxContent().contains("Your message has been sent."));
+            assertTrue(sent.getMessageBoxContent().contains("Information\nYour message has been sent."));
             TableElement table = sent.getTable();
             assertEquals(3, table.numberOfRows());
             assertEquals(3, table.numberOfColumns());
@@ -299,7 +299,7 @@ class InvitationIT
             getGreenMail().waitForIncomingEmail(2000, 2);
             MimeMessage[] messages = getGreenMail().getReceivedMessages();
             assertEquals(0, messages.length, "Messages were received when they shouldn't have been sent!");
-            assertEquals("Your message could not be sent because there were no valid email addresses to send to.",
+            assertEquals("Error\nYour message could not be sent because there were no valid email addresses to send to.",
                 sent.getMessageBoxContent(),
                 "User was not shown the correct error message.");
             stopGreenMail();
@@ -321,7 +321,7 @@ class InvitationIT
             getGreenMail().waitForIncomingEmail(10000, 2);
             messages = getGreenMail().getReceivedMessages();
             assertEquals(2, messages.length, "Non admins cannot send mail to even with permission");
-            assertEquals("Your message has been sent.", sent.getMessageBoxContent(),
+            assertEquals("Information\nYour message has been sent.", sent.getMessageBoxContent(),
                 "User was not given the message that their mail was sent.");
         } finally {
             stopGreenMail();
@@ -404,7 +404,8 @@ class InvitationIT
                 "The message by the spam reporter is not shown to the admin.");
 
             String memo = "Actually the email lottery is quite legitimate.";
-            String expectedSuccessMessage = "Invitation successfully marked as not spam. Log entry: " + memo;
+            String expectedSuccessMessage =
+                "Information\nInvitation successfully marked as not spam. Log entry: " + memo;
             // Return their sending privilege.
             String successMessage = inspect.notSpam("Actually the email lottery is quite legitimate.");
 
@@ -634,7 +635,7 @@ class InvitationIT
                 confirm.getLabel().toLowerCase());
 
             confirm.setMemo("Sorry, wrong email address.");
-            assertEquals("Invitation successfully rescinded.", confirm.confirm());
+            assertEquals("Information\nInvitation successfully rescinded.", confirm.confirm());
 
             // Now switch to guest.
             setup.forceGuestUser();
@@ -646,13 +647,13 @@ class InvitationIT
             InvitationGuestActionsPage guestPage =
                 InvitationGuestActionsPage.gotoPage(htmlMessage, InvitationGuestActionsPage.Action.ACCEPT);
             assertNotEquals("", guestPage.getMessage(), "Guest was able to accept a message which had been canceled.");
-            assertEquals("We're sorry but this invitation has been rescinded." + commonPart,
+            assertEquals("Error\nWe're sorry but this invitation has been rescinded." + commonPart,
                 guestPage.getMessage());
 
             // Prove that invitation cannot be declined
             guestPage = InvitationGuestActionsPage.gotoPage(htmlMessage, InvitationGuestActionsPage.Action.DECLINE);
             assertNotEquals("", guestPage.getMessage(), "Guest was able to decline a message which had been canceled.");
-            assertEquals("This invitation has been rescinded and thus cannot be declined." + commonPart,
+            assertEquals("Error\nThis invitation has been rescinded and thus cannot be declined." + commonPart,
                 guestPage.getMessage());
 
             // Prove that the message report spam page still shows up.

@@ -86,7 +86,7 @@ public class TableLayoutElement extends BaseElement
      */
     public List<WebElement> getRows()
     {
-        return getRoot().findElements(By.cssSelector("tbody > tr"));
+        return getDriver().findElementsWithoutWaiting(getRoot(), By.cssSelector("tbody > tr"));
     }
 
     /**
@@ -679,8 +679,8 @@ public class TableLayoutElement extends BaseElement
     {
         int columnIndex = findColumnIndex(columnLabel);
         By cssSelector = By.cssSelector(String.format(
-            ".column-filters > th:nth-child(%1$d) input.livedata-filter, "
-            + ".column-filters > th:nth-child(%1$d) select.livedata-filter", columnIndex));
+            ".column-filters > th:nth-child(%1$d) input, "
+            + ".column-filters > th:nth-child(%1$d) select", columnIndex));
         return getRoot().findElement(cssSelector);
     }
 
@@ -1001,7 +1001,13 @@ public class TableLayoutElement extends BaseElement
 
         if (save) {
             // Clicks somewhere outside the edited cell. We use the h1 tag because it is present on all pages.
-            new Actions(getDriver().getWrappedDriver()).click(getDriver().findElement(By.tagName("h1"))).perform();
+            // Click close to the left border of the h1 to avoid clicking on a potential date picker that is
+            // hopefully not that close to the left.
+            WebElement h1 = getDriver().findElement(By.tagName("h1"));
+            int width = h1.getRect().getWidth();
+            // Calculate the offset from the center to be close to the left border of the h1.
+            int xOffset = -(width / 2 - 2);
+            new Actions(getDriver().getWrappedDriver()).moveToElement(h1, xOffset, 0).click().perform();
         } else {
             // Press escape to cancel the edition.
             new Actions(getDriver().getWrappedDriver()).sendKeys(Keys.ESCAPE).build().perform();

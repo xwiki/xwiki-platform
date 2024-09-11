@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration-test</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
   <name>XWiki Platform - Administration - Tests - Page Objects</name>

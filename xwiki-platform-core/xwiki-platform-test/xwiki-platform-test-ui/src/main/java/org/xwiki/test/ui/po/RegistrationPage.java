@@ -67,7 +67,7 @@ public class RegistrationPage extends AbstractRegistrationPage
         for (WebElement info : infos) {
             if (info.getText().contains("Registration successful.") ||
                 info.getText().contains("Welcome ")) {
-                return Optional.of(info.getText());
+                return Optional.of(info.getText().replaceAll("\n", " "));
             }
         }
 

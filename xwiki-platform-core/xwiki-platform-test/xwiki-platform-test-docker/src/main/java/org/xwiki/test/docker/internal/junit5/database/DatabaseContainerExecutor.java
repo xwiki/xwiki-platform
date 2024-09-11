@@ -21,7 +21,6 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -132,14 +131,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         commands.setProperty("character-set-server", "utf8mb4");
         commands.setProperty("collation-server", "utf8mb4_bin");
 
-        if (!isMySQL55x(testConfiguration)) {
-            commands.setProperty("explicit-defaults-for-timestamp", "1");
-        }
-        // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
-        // the native password mechanism.
-        if (isMySQL8xPlus(testConfiguration)) {
-            commands.setProperty("default-authentication-plugin", "mysql_native_password");
-        }
         databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
@@ -182,29 +173,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
                 }
             }
         }
-    }
-
-    private boolean isMySQL55x(TestConfiguration testConfiguration)
-    {
-        return testConfiguration.getDatabaseTag() != null && testConfiguration.getDatabaseTag().startsWith("5.5");
-    }
-
-    private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
-    {
-        boolean isMySQL8xPlus;
-        if (testConfiguration.getDatabaseTag() != null) {
-            isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
-                || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
-        } else {
-            // No tag specific, this means we use "latest" and thus that it's mysql 8+
-            isMySQL8xPlus = true;
-        }
-        return isMySQL8xPlus;
-    }
-
-    private int extractMajor(String version)
-    {
-        return Integer.valueOf(StringUtils.substringBefore(version, "."));
     }
 
     private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception

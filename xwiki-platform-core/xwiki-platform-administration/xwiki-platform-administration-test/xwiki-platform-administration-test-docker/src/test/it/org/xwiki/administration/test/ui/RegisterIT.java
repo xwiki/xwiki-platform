@@ -346,12 +346,12 @@ class RegisterIT
                 AbstractRegistrationPage.JOHN_SMITH_USERNAME, password, password, "wiki@example.com");
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
-            String registrationSuccessMessage = ((RegistrationPage) registrationPage)
-                .getRegistrationSuccessMessage().orElseThrow().replace("\n"," ");
-            assertTrue(registrationSuccessMessage.contains(String.format("%s %s (%s)", firstName, lastName,
-                AbstractRegistrationPage.JOHN_SMITH_USERNAME)),
-                String.format("<%s> should contain <%s>", registrationSuccessMessage,
-                    String.format("%s %s (%s)", firstName, lastName, AbstractRegistrationPage.JOHN_SMITH_USERNAME)));
+            // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
+            String messagePrefix = closedWiki ? "" : "Information ";
+
+            assertEquals(String.format("%s%s %s (%s)", messagePrefix, firstName, lastName,
+                    AbstractRegistrationPage.JOHN_SMITH_USERNAME),
+                ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }
     }
 

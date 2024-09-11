@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -52,8 +52,9 @@
     </dependency>
     <!-- Bootstrap is used for the editor modals (insert / edit link, image, macro) -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bootstrap</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- This is used by the resource tree picker on the link modal. -->
     <dependency>

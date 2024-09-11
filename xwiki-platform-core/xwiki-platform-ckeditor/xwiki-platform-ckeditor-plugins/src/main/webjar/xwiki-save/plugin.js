@@ -28,7 +28,6 @@
 
   CKEDITOR.plugins.add('xwiki-save', {
     requires: 'notification,xwiki-cache,xwiki-localization',
-    editors: [],
 
     init: function(editor) {
       // Make sure we restore the previous editing mode when the page is loaded from cache (back/forward/reload).
@@ -38,14 +37,6 @@
         contentTypeField.prop('disabled', true);
         editor.config.startupMode = 'source';
       }
-
-      this.editors.push(editor);
-      editor.on('destroy', (function(event) {
-        var index = this.editors.indexOf(editor);
-        if (index >= 0) {
-          this.editors.splice(index, 1);
-        }
-      }).bind(this));
 
       // Keyboard shortcuts for the edit form.
       this.addEditFormShortcutKey(editor, 'cancel', CKEDITOR.ALT + 67 /*C*/);
@@ -74,7 +65,7 @@
           // 'xwiki:document:saved' to be sure the document was saved.
           if (!data || !data['continue']) {
             submitInProgress = event.type === 'xwiki:actions:preview' || event.type === 'xwiki:actions:save';
-            this.editors.forEach(function(editor) {
+            this.getEditors().forEach(function(editor) {
               // The editor (its focus manager to be precise) is blurred (loses focus) with a delay (200ms by default).
               // When the editor loses focus its content (HTML) can suffer changes (e.g. some placeholder text is added
               // or removed, the 'cke_widget_focused' and 'cke_widget_editable_focused' CSS classes are removed, etc.).
@@ -82,7 +73,7 @@
               // reset the dirty flag and the moment we leave the edit mode, which will trigger the leave confirmation,
               // unexpectedly. In order to overcome this we have to force the editor to lose focus immediately if the
               // focus manager has a blur timer started (meaning that a blur is scheduled).
-              if (!editor.isDetached() && editor.focusManager?.hasFocus && editor.focusManager?._?.timer) {
+              if (editor.focusManager?.hasFocus && editor.focusManager?._?.timer) {
                 editor.focusManager.blur(true);
               }
               editor.resetDirty();
@@ -109,10 +100,17 @@
       }).bind(this));
     },
 
+    /**
+     * @return the CKEditor instances that use this plugin and are still attached to the DOM
+     */
+    getEditors: function() {
+      return Object.values(CKEDITOR.instances).filter(editor => editor.plugins['xwiki-save'] && !editor.isDetached());
+    },
+
     updateFormFields: function(fullData) {
       var success = true;
       fullData = fullData === true;
-      this.editors.forEach(function(editor) {
+      this.getEditors().forEach(function(editor) {
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE && !this.updateContent(editor, fullData)) {
           success = false;
         }
@@ -160,8 +158,9 @@
     },
 
     checkDirty: function() {
-      for (var i = 0; i < this.editors.length; i++) {
-        var editor = this.editors[i];
+      const editors = this.getEditors();
+      for (var i = 0; i < editors.length; i++) {
+        var editor = editors[i];
         var config = editor.config['xwiki-save'] || {};
         if (config.leaveConfirmation && editor.checkDirty()) {
           return editor;

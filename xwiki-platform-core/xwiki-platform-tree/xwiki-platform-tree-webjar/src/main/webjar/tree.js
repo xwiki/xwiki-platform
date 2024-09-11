@@ -29,11 +29,24 @@ define([
   // jsTree uses the underscore notation for its API, instead of camel case.
   // jshint camelcase:false,maxstatements:false
 
-  // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
-  // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
-  // order to add the following special characters:
-  // * \s (any white space character, such as non breaking space, not just the plain space)
-  $.jstree.idregex = /[\\:&!^|()\[\]<>@*'+~#";.,=\-\s\/${}%?`]/g;
+  // jsTree node identifiers are used without any escaping in HTML id attributes. When finding the DOM node associated
+  // with a jsTree node, the jsTree node identifier needs to be escaped in order to avoid breaking the CSS selector
+  // used. Instead of using CSS.escape(), jsTree performs its own custom CSS escaping, based on a regular expression.
+  // This regular expression doesn't include all the special characters (e.g. doesn't escape all white space characters,
+  // such as non-breaking space) and doesn't handle well new line and line feed characters which need special treatment.
+  // For this reason we overwrite the String.replace() function to perform CSS escaping when the passed arguments are
+  // the jsTree ID regular expression and the escape string.
+  // FIXME: Drop this hack when jsTree replaces its custom CSS escaping code with CSS.escape().
+  if ($.jstree.idregex) {
+    const originalStringReplace = String.prototype.replace;
+    String.prototype.replace = function(...args) {
+      if (args[1] === '\\$&' && args[0] === $?.jstree?.idregex) {
+        return CSS.escape(this);
+      } else {
+        return originalStringReplace.apply(this, args);
+      }
+    };
+  }
 
   var formToken = $('meta[name=form_token]').attr('content');
 
@@ -510,7 +523,7 @@ define([
       }
       params.form_token = formToken;
       var promise = this.jobRunner.run(url, params);
-      this.element.trigger('xtree.runJob', promise);
+      this.element.trigger('xtree.runJob', [promise, action, node, params]);
       return promise;
     }
   };

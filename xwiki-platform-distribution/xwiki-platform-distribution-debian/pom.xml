@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian</artifactId>
   <name>XWiki Platform - Distribution - Debian</name>
@@ -41,7 +41,7 @@
     <module>xwiki-platform-distribution-debian-solr</module>
   </modules>
   <properties>
-    <jdeb.version>1.10</jdeb.version>
+    <jdeb.version>1.11</jdeb.version>
     <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
     <debian.license>LGPL 2.1</debian.license>
     <debian.licenseFilename>LGPL-2.1</debian.licenseFilename>
@@ -70,7 +70,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-resources</artifactId>
-      <version>16.6.0-SNAPSHOT</version>
+      <version>16.8.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>

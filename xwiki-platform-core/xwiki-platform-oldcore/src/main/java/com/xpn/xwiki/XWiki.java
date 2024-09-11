@@ -4237,9 +4237,6 @@ public class XWiki implements EventListener
 
             saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
 
-            // Now let's add the user to XWiki.XWikiAllGroup
-            setUserDefaultGroup(doc.getFullName(), context);
-
             return 1;
         } catch (Exception e) {
             Object[] args = { "XWiki." + userName };
@@ -4259,7 +4256,26 @@ public class XWiki implements EventListener
         return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
     }
 
-    public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
+    /**
+     * @param documentReference the reference of the user document
+     * @param xcontext the XWiki context
+     * @since 16.7.0
+     */
+    @Unstable
+    public void setUserDefaultGroup(DocumentReference documentReference, XWikiContext xcontext)
+    {
+        WikiReference currentWikiReference = xcontext.getWikiReference();
+
+        try {
+            xcontext.setWikiReference(documentReference.getWikiReference());
+
+            setUserDefaultGroup(getLocalStringEntityReferenceSerializer().serialize(documentReference), xcontext);
+        } finally {
+            xcontext.setWikiReference(currentWikiReference);
+        }
+    }
+
+    public void setUserDefaultGroup(String fullwikiname, XWikiContext context)
     {
         String groupsPreference = isAllGroupImplicit() ? getConfiguration().getProperty("xwiki.users.initialGroups")
             : getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
@@ -4268,7 +4284,13 @@ public class XWiki implements EventListener
             String[] groups = groupsPreference.split(",");
             for (String groupName : groups) {
                 if (StringUtils.isNotBlank(groupName)) {
-                    addUserToGroup(fullwikiname, groupName.trim(), context);
+                    String cleanedGroupName = groupName.trim();
+
+                    try {
+                        addUserToGroup(fullwikiname, cleanedGroupName, context);
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to update group [{}] with member [{}]", cleanedGroupName, fullwikiname, e);
+                    }
                 }
             }
         }
@@ -4279,12 +4301,17 @@ public class XWiki implements EventListener
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
-        BaseObject memberObject =
-            groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        memberObject.setStringValue("member", userName);
+        // Make sure the user is not already part of the group
+        if (groupDoc.getXObject(groupClassReference, "member", userName,
+            false) == null) {
+            BaseObject memberObject =
+                groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+            memberObject.setStringValue("member", userName);
+
+            saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+        }
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)

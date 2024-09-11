@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.8.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
-      <version>16.6.0-SNAPSHOT</version>
+      <version>16.8.0-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
@@ -214,7 +214,7 @@
             <data>
               <src>${war.path}/WEB-INF</src>
               <type>directory</type>
-              <excludes>**/lib,**/lib/*,**/classes,**/classes/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties,**/jetty-web.xml</excludes>
+              <excludes>**/lib,**/lib/*,**/classes,**/classes/*,**/hibernate.cfg.xml,**/web.xml,**/xwiki.cfg,**/xwiki.properties</excludes>
               <mapper>
                 <type>perm</type>
                 <prefix>/etc/xwiki</prefix>
@@ -299,6 +299,18 @@
               <symlink>true</symlink>
               <linkName>/usr/lib/xwiki/WEB-INF/sun-web.xml</linkName>
               <linkTarget>/etc/xwiki/sun-web.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/jetty-ee8-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee8-web.xml</linkTarget>
             </data>
             <data>
               <type>link</type>

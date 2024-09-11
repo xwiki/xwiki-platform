@@ -35,7 +35,7 @@
     "karma-browserstack-launcher": "^1.4.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-detect-browsers": "^2.3.3",
-    "karma-firefox-launcher": "^1.1.0",
+    "karma-firefox-launcher": "^2.0.0",
     "karma-qunit": "^1.2.1",
     "load-grunt-tasks": "^4.0.0",
     "markdown-it": "^8.4.2",

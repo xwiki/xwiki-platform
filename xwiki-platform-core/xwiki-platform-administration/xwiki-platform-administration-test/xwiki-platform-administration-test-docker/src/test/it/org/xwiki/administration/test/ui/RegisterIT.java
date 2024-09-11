@@ -349,7 +349,7 @@ class RegisterIT
             // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
             String messagePrefix = closedWiki ? "" : "Information ";
 
-            assertEquals(String.format("%s%s %s (%s)", messagePrefix, firstName, lastName,
+            assertEquals(String.format("%s%s %s (%s): Registration successful.", messagePrefix, firstName, lastName,
                     AbstractRegistrationPage.JOHN_SMITH_USERNAME),
                 ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }

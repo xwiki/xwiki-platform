@@ -22,7 +22,6 @@ package org.xwiki.search.solr.internal;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -298,63 +297,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      */
     private static final IndexQueueEntry INDEX_QUEUE_ENTRY_STOP =
         new IndexQueueEntry((String) null, IndexOperation.STOP);
-
-    private class SolrIndexerReadyIndicator extends CompletableFuture<Void> implements ReadyIndicator
-    {
-        private final long initialResolveQueueCounter;
-
-        private final long initialResolveQueueSize;
-
-        private final AtomicLong initialIndexQueueCounter;
-
-        private final AtomicLong initialIndexQueueSize;
-
-        private final int resolveQueuePercentage;
-
-        SolrIndexerReadyIndicator()
-        {
-            int indexQueueSize = DefaultSolrIndexer.this.indexQueue.size();
-            this.initialResolveQueueCounter = DefaultSolrIndexer.this.resolveQueueRemovalCounter.getAcquire();
-            this.initialResolveQueueSize = Math.max(DefaultSolrIndexer.this.resolveQueue.size(), 1);
-            this.initialIndexQueueCounter = new AtomicLong(-1);
-            this.initialIndexQueueSize = new AtomicLong(-1);
-
-            // If the index queue is almost full or the resolve queue is non-empty, give resolving 50% of the share.
-            if (indexQueueSize >= 0.9 * DefaultSolrIndexer.this.configuration.getIndexerQueueCapacity()
-                || this.initialResolveQueueSize > 1) {
-                this.resolveQueuePercentage = 50;
-            } else {
-                // Resolving should be instant, so give it just 10% of the share.
-                this.resolveQueuePercentage = 10;
-            }
-        }
-
-        void switchToIndexQueue()
-        {
-            this.initialIndexQueueCounter.set(DefaultSolrIndexer.this.indexQueueRemovalCounter.getAcquire());
-            this.initialIndexQueueSize.set(Math.max(DefaultSolrIndexer.this.indexQueue.size(), 1));
-        }
-
-        @Override
-        public int getProgressPercentage()
-        {
-            long initialIndexQueueSizeValue = this.initialIndexQueueSize.get();
-
-            if (initialIndexQueueSizeValue < 0) {
-                long currentResolveQueueCounterValue = DefaultSolrIndexer.this.resolveQueueRemovalCounter.getAcquire();
-                long removedElements = currentResolveQueueCounterValue - this.initialResolveQueueCounter;
-                return Math.min(this.resolveQueuePercentage,
-                    (int) (removedElements * this.resolveQueuePercentage / this.initialResolveQueueSize));
-            } else {
-                long currentIndexQueueCounterValue = DefaultSolrIndexer.this.indexQueueRemovalCounter.getAcquire();
-                long removedElements = currentIndexQueueCounterValue - this.initialIndexQueueCounter.get();
-                // Never report 100%, full completion should only be set when the marker is removed from the queue.
-                return Math.min(99,
-                    this.resolveQueuePercentage + (int) (removedElements * (100 - this.resolveQueuePercentage)
-                        / initialIndexQueueSizeValue));
-            }
-        }
-    }
 
     /**
      * Logging framework.
@@ -749,7 +691,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Override
     public ReadyIndicator getReadyIndicator()
     {
-        SolrIndexerReadyIndicator readyIndicator = new SolrIndexerReadyIndicator();
+        SolrIndexerReadyIndicator readyIndicator = new SolrIndexerReadyIndicator(
+            this.resolveQueueRemovalCounter::getAcquire, this.resolveQueue::size,
+            this.indexQueueRemovalCounter::getAcquire, this.indexQueue::size,
+            this.configuration::getIndexerQueueCapacity
+        );
+
         if (!this.disposed) {
             try {
                 this.resolveQueue.put(new ResolveQueueEntry(readyIndicator));

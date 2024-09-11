@@ -13,7 +13,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "autoprefixer": "^9.4.7",
+    "autoprefixer": "^10.0.0",
     "btoa": "^1.2.1",
     "cross-env": "^7.0.0",
     "grunt": "^1.0.3",

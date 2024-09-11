@@ -104,7 +104,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.5.0RC1
+     * @since 16.8.0RC1
      * @return the text alternative picked for the icon
      */
     public String getTextAlternative()
@@ -113,7 +113,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.5.0RC1
+     * @since 16.8.0RC1
      * @param textAlternative a text alternative for the icon
      */
     @PropertyName("Text Alternative")

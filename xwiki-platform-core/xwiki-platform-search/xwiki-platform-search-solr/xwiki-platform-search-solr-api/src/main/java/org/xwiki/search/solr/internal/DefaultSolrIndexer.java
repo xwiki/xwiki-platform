@@ -49,7 +49,6 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.IndexingUserConfig;
@@ -62,6 +61,7 @@ import org.xwiki.search.solr.internal.job.IndexerRequest;
 import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.store.ReadyIndicator;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

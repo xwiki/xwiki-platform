@@ -25,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * Allow accessing the links extracted from various entities.

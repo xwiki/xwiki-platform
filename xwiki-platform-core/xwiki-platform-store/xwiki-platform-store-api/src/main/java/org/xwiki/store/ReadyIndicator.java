@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.link;
+package org.xwiki.store;
 
 import java.util.concurrent.Future;
 
 import org.xwiki.stability.Unstable;
 
 /**
- * An indicator if the link store is ready, i.e., has completed all indexing tasks that have been submitted before
+ * An indicator if a store is ready, i.e., has completed all writes/indexing tasks that have been submitted before
  * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
  * stopped, the {@link Future} is completed with an exception.
  *

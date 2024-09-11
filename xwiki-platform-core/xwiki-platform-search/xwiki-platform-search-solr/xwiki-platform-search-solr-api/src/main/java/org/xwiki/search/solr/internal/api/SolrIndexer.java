@@ -20,10 +20,10 @@
 package org.xwiki.search.solr.internal.api;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * Component that accepts XWiki {@link EntityReference}s to be indexed or deleted from the index if they exist. The

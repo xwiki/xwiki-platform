@@ -37,4 +37,11 @@
     <!-- Category to display by the Extension Manager -->
     <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-stability</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+  </dependencies>
 </project>

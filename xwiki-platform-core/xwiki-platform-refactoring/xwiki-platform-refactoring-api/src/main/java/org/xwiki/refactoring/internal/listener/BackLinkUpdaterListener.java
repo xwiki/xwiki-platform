@@ -36,7 +36,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.link.LinkStore;
-import org.xwiki.link.ReadyIndicator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
@@ -51,6 +50,7 @@ import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * Updates the back-links after a document has been renamed or deleted.

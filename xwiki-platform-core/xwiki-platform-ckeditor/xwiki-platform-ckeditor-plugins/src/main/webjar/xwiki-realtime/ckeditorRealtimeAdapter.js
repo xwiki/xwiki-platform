@@ -155,10 +155,23 @@ define('xwiki-ckeditor-realtime-adapter', [
 
     /** @inheritdoc */
     getFilters() {
+      /**
+       * Checks if there is a node with a given node name in the given node or its children.
+       */
+      const containsNode = function(node, nodeName) {
+        if (node.nodeName === nodeName) {
+          return true;
+        }
+        if (node.childNodes !== undefined && node.childNodes.some(child => containsNode(child, nodeName))) {
+          return true;
+        }
+        return false;
+      };
       return [
         // Ignore widget id changes.
         change => change.diff.action === 'modifyAttribute' && change.diff.name === 'data-widget-id' &&
-          change.node.classList?.contains('xwiki-widget')
+          change.node.classList?.contains('xwiki-widget'),
+        change => change.diff.action === 'removeElement' && containsNode(change.diff.element, 'XWIKI-WIDGET-UPLOADFILE')
       ];
     }
 

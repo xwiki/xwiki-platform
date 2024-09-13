@@ -46,6 +46,7 @@ import org.xwiki.test.ui.po.LoginPage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
+import static org.apache.commons.lang3.RandomStringUtils.insecure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -101,7 +102,7 @@ public class ResetPasswordIT
     {
         setup.forceGuestUser();
 
-        String userName = "testUser" + RandomStringUtils.randomAlphanumeric(6);
+        String userName = "testUser" + insecure().nextAlphanumeric(6);
         String password = "password";
         String newPassword = "newPasswörd";
 

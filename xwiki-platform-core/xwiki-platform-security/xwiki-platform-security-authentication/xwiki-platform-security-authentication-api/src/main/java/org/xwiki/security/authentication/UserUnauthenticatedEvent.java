@@ -20,7 +20,6 @@
 
 package org.xwiki.security.authentication;
 
-import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
@@ -33,13 +32,8 @@ import org.xwiki.user.UserReference;
  * @since 15.10.13
  */
 @Unstable
-public class UserUnauthenticatedEvent implements Event
+public class UserUnauthenticatedEvent extends AbstractUserAuthenticationEvent
 {
-    /**
-     * The reference related to an authenticated user for whom a {@link UserUnauthenticatedEvent} has been triggered.
-     */
-    private final UserReference userReference;
-
     /**
      * Default constructor without user reference for matching.
      */
@@ -56,20 +50,12 @@ public class UserUnauthenticatedEvent implements Event
      */
     public UserUnauthenticatedEvent(UserReference userReference)
     {
-        this.userReference = userReference;
-    }
-
-    /**
-     * @return the {@link UserReference} of the authenticated user.
-     */
-    public UserReference getUserReference()
-    {
-        return this.userReference;
+        super(userReference);
     }
 
     @Override
     public boolean matches(Object other)
     {
-        return other instanceof UserUnauthenticatedEvent;
+        return other instanceof UserUnauthenticatedEvent && super.matches(other);
     }
 }

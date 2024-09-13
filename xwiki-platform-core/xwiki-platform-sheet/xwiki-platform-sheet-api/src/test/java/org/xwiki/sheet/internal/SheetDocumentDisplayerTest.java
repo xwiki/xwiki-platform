@@ -94,7 +94,7 @@ public class SheetDocumentDisplayerTest
     {
         StringBuilder id = new StringBuilder(documentReference.getLastSpaceReference().getName());
         // Allow different instances of the same document to exist.
-        id.append('.').append(documentReference.getName()).append(RandomStringUtils.insecure().nextAlphanumeric(3));
+        id.append('.').append(documentReference.getName()).append(RandomStringUtils.secure().nextAlphanumeric(3));
         DocumentModelBridge document = mock(DocumentModelBridge.class, id.toString());
 
         when(document.getDocumentReference()).thenReturn(documentReference);

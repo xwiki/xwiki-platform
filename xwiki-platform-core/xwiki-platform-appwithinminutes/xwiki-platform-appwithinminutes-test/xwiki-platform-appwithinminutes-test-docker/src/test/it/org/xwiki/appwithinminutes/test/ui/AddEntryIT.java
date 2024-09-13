@@ -33,7 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 
-import static org.apache.commons.lang3.RandomStringUtils.insecure;
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -77,7 +77,7 @@ class AddEntryIT
 
         // Test
         EntryNamePane entryNamePane = homePage.clickAddNewEntry();
-        String entryName = "A?b=c&d#" + insecure().nextAlphanumeric(3);
+        String entryName = "A?b=c&d#" + secure().nextAlphanumeric(3);
         entryNamePane.setName(entryName);
         EntryEditPage entryEditPage = entryNamePane.clickAdd();
         entryEditPage.setValue("description", "This is a test panel.");

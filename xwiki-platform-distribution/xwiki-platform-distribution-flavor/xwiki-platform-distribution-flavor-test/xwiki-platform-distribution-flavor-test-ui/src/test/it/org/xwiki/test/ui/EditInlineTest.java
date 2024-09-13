@@ -54,7 +54,7 @@ public class EditInlineTest extends AbstractTest
     @Test
     public void testInlineEditCanChangeTitle()
     {
-        String title = insecure().nextAlphanumeric(4);
+        String title = secure().nextAlphanumeric(4);
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit", "editor=inline&title=" + title);
         InlinePage inlinePage = new InlinePage();
         // Check if the title specified on the request is properly displayed.
@@ -88,7 +88,7 @@ public class EditInlineTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     public void testInlineEditPreservesTitle()
     {
-        String title = insecure().nextAlphanumeric(4);
+        String title = secure().nextAlphanumeric(4);
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "save", "title=" + title);
         ViewPage vp = new ViewPage();
         Assert.assertEquals(title, vp.getDocumentTitle());
@@ -134,8 +134,8 @@ public class EditInlineTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     public void testInlineEditPreservesTags()
     {
-        String tag1 = insecure().nextAlphanumeric(4);
-        String tag2 = insecure().nextAlphanumeric(4);
+        String tag1 = secure().nextAlphanumeric(4);
+        String tag2 = secure().nextAlphanumeric(4);
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "save", "tags=" + tag1 + "%7C" + tag2);
         TaggablePage taggablePage = new TaggablePage();
         Assert.assertTrue(taggablePage.hasTag(tag1));

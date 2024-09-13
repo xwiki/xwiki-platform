@@ -30,7 +30,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
-import static org.apache.commons.lang3.RandomStringUtils.insecure;
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -62,7 +62,7 @@ class TagIT
     void addRemoveTag(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String tag = insecure().nextAlphanumeric(4);
+        String tag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(tag));
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(tag);
@@ -80,13 +80,13 @@ class TagIT
     void cancelAddTag(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String firstTag = insecure().nextAlphanumeric(4);
+        String firstTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(firstTag));
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(firstTag);
         addTagsPane.cancel();
 
-        String secondTag = insecure().nextAlphanumeric(4);
+        String secondTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(secondTag));
         addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(secondTag);
@@ -103,9 +103,9 @@ class TagIT
     void addManyRemoveOneTag(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String firstTag = insecure().nextAlphanumeric(4);
+        String firstTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(firstTag));
-        String secondTag = insecure().nextAlphanumeric(4);
+        String secondTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(secondTag));
 
         AddTagsPane addTagsPane = taggablePage.addTags();
@@ -126,7 +126,7 @@ class TagIT
     void addExistingTag(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String tag = insecure().nextAlphanumeric(4);
+        String tag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(tag));
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(tag);
@@ -147,7 +147,7 @@ class TagIT
     void testAddTagContainingPipe(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String tag = insecure().nextAlphanumeric(3) + "|" + insecure().nextAlphanumeric(3);
+        String tag = secure().nextAlphanumeric(3) + "|" + secure().nextAlphanumeric(3);
         assertFalse(taggablePage.hasTag(tag));
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags(tag);
@@ -169,9 +169,9 @@ class TagIT
     void stripLeadingAndTrailingSpacesFromTags(TestUtils setup, TestReference testReference)
     {
         TaggablePage taggablePage = resetTaggablePage(setup, testReference);
-        String firstTag = insecure().nextAlphanumeric(4);
+        String firstTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(firstTag));
-        String secondTag = insecure().nextAlphanumeric(4);
+        String secondTag = secure().nextAlphanumeric(4);
         assertFalse(taggablePage.hasTag(secondTag));
 
         AddTagsPane addTagsPane = taggablePage.addTags();

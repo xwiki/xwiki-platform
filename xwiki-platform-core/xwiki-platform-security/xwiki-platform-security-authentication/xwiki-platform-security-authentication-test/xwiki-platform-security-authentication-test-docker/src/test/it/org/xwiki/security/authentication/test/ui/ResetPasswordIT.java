@@ -30,7 +30,6 @@ import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ import org.xwiki.test.ui.po.LoginPage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.apache.commons.lang3.RandomStringUtils.insecure;
+import static org.apache.commons.lang3.RandomStringUtils.secure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -102,7 +101,7 @@ public class ResetPasswordIT
     {
         setup.forceGuestUser();
 
-        String userName = "testUser" + insecure().nextAlphanumeric(6);
+        String userName = "testUser" + secure().nextAlphanumeric(6);
         String password = "password";
         String newPassword = "newPasswörd";
 

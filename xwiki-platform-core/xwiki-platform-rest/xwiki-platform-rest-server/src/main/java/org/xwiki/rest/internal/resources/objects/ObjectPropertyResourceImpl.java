@@ -69,9 +69,12 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
 
             for (Property property : object.getProperties()) {
                 if (property.getName().equals(propertyName)) {
-                    String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, doc.getWiki(),
-                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                        object.getClassName(), object.getNumber()).toString();
+                    String objectUri =
+                        Utils
+                            .createURI(uriInfo.getBaseUri(), ObjectResource.class, doc.getWiki(),
+                                Utils.getSpacesURLElements(doc.getDocumentReference()),
+                                doc.getDocumentReference().getName(), object.getClassName(), object.getNumber())
+                            .toString();
                     Link objectLink = objectFactory.createLink();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

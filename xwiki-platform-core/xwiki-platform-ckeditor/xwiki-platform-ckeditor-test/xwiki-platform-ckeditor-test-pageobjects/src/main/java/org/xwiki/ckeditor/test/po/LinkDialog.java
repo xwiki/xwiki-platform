@@ -111,7 +111,7 @@ public class LinkDialog extends CKEditorDialog
 
     public LinkDialog createLinkOfNewPage(boolean exactReference)
     {
-        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create in current space...";
+        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create new page...";
         getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
             .filter(element ->
                 Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), resourceLabelName))

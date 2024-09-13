@@ -174,7 +174,7 @@ public final class SavedRequestManager
         // Generate a random key to identify this request
         String key;
         do {
-            key = RandomStringUtils.randomAlphanumeric(8);
+            key = RandomStringUtils.secure().randomAlphanumeric(8);
         } while (savedRequests.containsKey(key));
         // Store the saved request
         savedRequests.put(key, savedRequest);

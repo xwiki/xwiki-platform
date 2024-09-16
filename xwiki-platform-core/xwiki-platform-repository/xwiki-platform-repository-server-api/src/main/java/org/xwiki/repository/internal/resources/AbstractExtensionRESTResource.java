@@ -346,11 +346,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType(StringUtils.stripToNull(
             (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
 
-        License license = this.extensionObjectFactory.createLicense();
-        license.setName(
-            (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
-        extension.getLicenses().add(license);
-
         extension.setRating(getExtensionRating(extensionDocumentReference));
         extension.setSummary(
             (String) this.extensionStore.getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));

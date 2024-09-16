@@ -976,7 +976,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
      * Make sure supported extensions are properly filtered.
      */
     @Test
-    public void testFilterSupportedd() throws Exception
+    public void testFilterSupported() throws Exception
     {
         // Add supported extension
         ExtensionId supportedExtensionId = new ExtensionId("alice-xar-extension", "1.3");

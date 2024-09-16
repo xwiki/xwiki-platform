@@ -31,7 +31,6 @@
   <name>XWiki Platform - Image - Processing - Plugin</name>
   <description>Deprecated Image plugin</description>
   <properties>
-    <checkstyle.suppressions.location>${basedir}/src/main/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-image-plugin</xwiki.extension.features>

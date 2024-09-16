@@ -111,8 +111,8 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.webjars</groupId>
-          <artifactId>bootstrap</artifactId>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-platform-bootstrap</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

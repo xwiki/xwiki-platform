@@ -50,7 +50,6 @@
     <platform.version>${commons.version}</platform.version>
 
     <!-- Dependencies versions -->
-    <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.17</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.2</tika.version>
@@ -63,7 +62,7 @@
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
          version here. -->
     <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
-    <netty.version>4.1.112.Final</netty.version>
+    <netty.version>4.1.113.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
@@ -183,7 +182,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.29.1</version>
+        <version>4.29.2</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -486,17 +485,17 @@
         <artifactId>bootstrap-select</artifactId>
         <version>1.13.18</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>bootstrap-3-typeahead</artifactId>
         <version>4.0.2</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>bootstrap</artifactId>
-        <version>${bootstrap.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -516,12 +515,24 @@
         <artifactId>bootstrap-daterangepicker</artifactId>
         <version>3.1</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>selectize.js</artifactId>
         <version>0.13.3</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- All Batik artifacts should be in sync -->
@@ -701,6 +712,12 @@
         <artifactId>bootstrap-switch</artifactId>
         <version>3.3.4</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!--Used by oldcore + querymanager -->
       <dependency>
@@ -1664,6 +1681,26 @@
                   </message>
                   <excludes>
                     <exclude>org.xwiki.contrib:application-ckeditor*</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure the old bootstrap webjar extension is not used. -->
+          <execution>
+            <id>enforce-bootstrap-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Do not use the official org.webjar:bootstrap extension. Is it now packaged in xwiki platform.
+                  </message>
+                  <excludes>
+                    <exclude>org.webjars:bootstrap</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

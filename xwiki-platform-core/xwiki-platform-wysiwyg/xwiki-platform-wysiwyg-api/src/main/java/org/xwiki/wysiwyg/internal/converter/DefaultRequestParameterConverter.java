@@ -187,7 +187,7 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     private String save(RequestParameterConversionResult conversionResult)
     {
         // Generate a random key to identify the request.
-        String key = RandomStringUtils.randomAlphanumeric(4);
+        String key = RandomStringUtils.secure().nextAlphanumeric(4);
         MutableServletRequest request = conversionResult.getRequest();
 
         // Save the output on the session.

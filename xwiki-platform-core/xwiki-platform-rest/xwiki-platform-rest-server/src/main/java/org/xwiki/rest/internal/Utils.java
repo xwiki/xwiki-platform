@@ -154,11 +154,10 @@ public class Utils
      * @return the spaces
      * @since 16.8.0RC1
      * @since 16.4.4
-     * @since 15.10.13
      */
     public static List<String> getSpaces(EntityReference entityReference)
     {
-        EntityReference spaceReference = entityReference.extractFirstReference(EntityType.SPACE);
+        EntityReference spaceReference = entityReference.extractReference(EntityType.SPACE);
 
         List<String> spaces = new ArrayList<>();
         for(EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE;
@@ -175,7 +174,6 @@ public class Utils
      * @return the value to pass to the URL factory for the space
      * @since 16.8.0RC1
      * @since 16.4.4
-     * @since 15.10.13
      */
     public static List<String> getSpacesURLElements(EntityReference entityReference)
     {
@@ -187,7 +185,6 @@ public class Utils
      * @return the value to pass to the URL factory for the space
      * @since 16.8.0RC1
      * @since 16.4.4
-     * @since 15.10.13
      */
     public static List<String> getSpacesURLElements(List<String> spaces)
     {

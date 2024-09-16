@@ -148,14 +148,17 @@
 #end
 
 #macro (officeImporterForm_overwriteContent)
-  &lt;dt class="box warningmessage"&gt;
-    &lt;label&gt;
-      &lt;input name="overwriteContent" type="checkbox" value="true" checked /&gt;
-      $escapetool.xml($services.localization.render('office.import.overwriteContent'))
-    &lt;/label&gt;
-    &lt;span class="xHint"&gt;
-      $escapetool.xml($services.localization.render('office.import.overwriteContent.hint'))
-    &lt;/span&gt;
+  &lt;dt&gt;
+    #define($warningMessageContent)
+      &lt;label&gt;
+        &lt;input name="overwriteContent" type="checkbox" value="true" checked /&gt;
+        $escapetool.xml($services.localization.render('office.import.overwriteContent'))
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;
+        $escapetool.xml($services.localization.render('office.import.overwriteContent.hint'))
+      &lt;/span&gt;
+    #end
+    #warning($warningMessageContent)
   &lt;/dt&gt;
   &lt;dd&gt;
     #officeImporterForm_confirmationModal({

@@ -966,7 +966,7 @@ $html
 #end
 
 #macro(error $text)
-#genericMessage($text 'error' 'error' 'error')
+#genericMessage($text 'error' 'exclamation' 'error')
 #end
 
 #macro(info $text)

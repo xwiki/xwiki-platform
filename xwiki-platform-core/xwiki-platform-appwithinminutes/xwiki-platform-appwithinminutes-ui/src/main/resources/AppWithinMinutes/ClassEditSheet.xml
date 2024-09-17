@@ -228,9 +228,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           ["#pageLink($sheetReference)"])
       &lt;/span&gt;
     #else
-      &lt;span class="warningmessage"&gt;
-        $services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning')
-      &lt;/span&gt;
+        #warning($services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning'))
     #end
     &lt;/dd&gt;
     &lt;dt&gt;
@@ -705,7 +703,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   #updateAndSaveTranslations
   #if ($action == 'save')
     #if ($errorMessage)
-      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
+      #error($errorMessage)
     #elseif ("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
       #set ($className = $stringtool.removeEnd($doc.fullName, 'Class'))

@@ -337,9 +337,9 @@
   #updateAndSaveIcon()
   #if ($action == 'save')
     #if ($errorMessage)
-      {{html clean="false"}}
-      &lt;div class="box errormessage"&gt;$errorMessage&lt;/div&gt;
-      {{/html}}
+      
+      {{error}}{{html clean="false"}}$errorMessage{{/html}}{/error}}
+      
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

@@ -95,6 +95,7 @@
         </a>
       </div>
     </div>
+    #warning($warningMessageContent)
   #end
 </div>
 #end

@@ -35,90 +35,90 @@ const logo = xlogo;
 const avImg = xavatarImg;
 const viewportType: Ref<ViewportType> = useViewportType();
 const { x } = useMouseCoordinates();
-// By default, left sidebar is closed on mobile only.
+// By default, main sidebar is closed on mobile only.
 const isSidebarClosed: Ref<boolean> = ref(
   viewportType.value == ViewportType.Mobile,
 );
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
-defineEmits(["collapseLeftSidebar"]);
+defineEmits(["collapseMainSidebar"]);
 
 onMounted(() => {
-  // Load and apply left sidebar size from local storage, if available.
-  if (localStorage.leftSidebarWidth) {
-    updateLeftSidebarWidth(localStorage.leftSidebarWidth);
+  // Load and apply main sidebar size from local storage, if available.
+  if (localStorage.mainSidebarWidth) {
+    updateMainSidebarWidth(localStorage.mainSidebarWidth);
   }
-  // If left sidebar is collapsed on desktop, it should also be closed.
+  // If main sidebar is collapsed on desktop, it should also be closed.
   if (viewportType.value == ViewportType.Desktop) {
-    isSidebarClosed.value = localStorage.isLeftSidebarCollapsed === "true";
+    isSidebarClosed.value = localStorage.isMainSidebarCollapsed === "true";
   }
 });
 
 watch(viewportType, (newViewportType: ViewportType) => {
-  // Always close left sidebar when switching to a smaller viewport
+  // Always close main sidebar when switching to a smaller viewport
   if (newViewportType == ViewportType.Mobile) {
     isSidebarClosed.value = true;
   }
 });
 
-let sidebarResizeInterval: number = 0;
+let mainSidebarResizeInterval: number = 0;
 
-function updateLeftSidebarWidth(newSidebarWidth: number) {
+function updateMainSidebarWidth(newSidebarWidth: number) {
   document.documentElement.style.setProperty(
-    "--cr-sizes-left-sidebar-width",
+    "--cr-sizes-main-sidebar-width",
     `${newSidebarWidth}px`,
   );
 }
 
-function startLeftSidebarResize() {
+function startMainSidebarResize() {
   // Check that no other interval exists before scheduling one.
-  if (sidebarResizeInterval == 0) {
-    sidebarResizeInterval = setInterval(() => {
+  if (mainSidebarResizeInterval == 0) {
+    mainSidebarResizeInterval = setInterval(() => {
       let newSidebarWidth = x.value + 8;
-      updateLeftSidebarWidth(newSidebarWidth);
-      localStorage.leftSidebarWidth = newSidebarWidth;
+      updateMainSidebarWidth(newSidebarWidth);
+      localStorage.mainSidebarWidth = newSidebarWidth;
     }, 10);
   }
-  window.addEventListener("mouseup", endLeftSidebarResize);
-  window.addEventListener("touchend", endLeftSidebarResize);
+  window.addEventListener("mouseup", endMainSidebarResize);
+  window.addEventListener("touchend", endMainSidebarResize);
 }
 
-function endLeftSidebarResize() {
-  clearInterval(sidebarResizeInterval);
-  sidebarResizeInterval = 0;
-  window.removeEventListener("mouseup", endLeftSidebarResize);
-  window.removeEventListener("touchend", endLeftSidebarResize);
+function endMainSidebarResize() {
+  clearInterval(mainSidebarResizeInterval);
+  mainSidebarResizeInterval = 0;
+  window.removeEventListener("mouseup", endMainSidebarResize);
+  window.removeEventListener("touchend", endMainSidebarResize);
 }
 
-function onOpenLeftSidebar() {
+function onOpenMainSidebar() {
   isSidebarClosed.value = false;
-  window.addEventListener("click", onClickOutsideLeftSidebar);
+  window.addEventListener("click", onClickOutsideMainSidebar);
 }
 
-function onCloseLeftSidebar() {
+function onCloseMainSidebar() {
   isSidebarClosed.value = true;
-  window.removeEventListener("click", onClickOutsideLeftSidebar);
+  window.removeEventListener("click", onClickOutsideMainSidebar);
 }
 
-function onClickOutsideLeftSidebar() {
-  // We need to get the actual size of the left sidebar at any time
+function onClickOutsideMainSidebar() {
+  // We need to get the actual size of the main sidebar at any time
   // since it may be a relative value in some cases.
   let currentSidebarWidth: number = parseInt(
     window.getComputedStyle(document.getElementById("sidebar")!).width,
   );
   if (x.value > currentSidebarWidth) {
-    onCloseLeftSidebar();
+    onCloseMainSidebar();
   }
 }
 </script>
 <template>
-  <div class="collapsed-sidebar" @click="onOpenLeftSidebar">
+  <div class="collapsed-main-sidebar" @click="onOpenMainSidebar">
     <c-icon name="list" class="open-sidebar"></c-icon>
   </div>
   <c-navigation-drawer
     id="sidebar"
-    class="left-sidebar"
+    class="main-sidebar"
     :class="{ 'is-visible': !isSidebarClosed }"
   >
     <UIX uixname="sidebar.before" />
@@ -126,13 +126,13 @@ function onClickOutsideLeftSidebar() {
       <c-icon
         name="x-lg"
         class="close-sidebar"
-        @click="onCloseLeftSidebar()"
+        @click="onCloseMainSidebar()"
       ></c-icon>
 
       <c-icon
         name="pin"
         class="pin-sidebar"
-        @click="$emit('collapseLeftSidebar')"
+        @click="$emit('collapseMainSidebar')"
       ></c-icon>
     </div>
     <div class="sidebar-header">
@@ -140,8 +140,8 @@ function onClickOutsideLeftSidebar() {
         name="list"
         class="hide-sidebar"
         @click="
-          $emit('collapseLeftSidebar');
-          onCloseLeftSidebar();
+          $emit('collapseMainSidebar');
+          onCloseMainSidebar();
         "
       ></c-icon>
       <x-img class="logo" :src="logo" :width="72" />
@@ -170,8 +170,8 @@ function onClickOutsideLeftSidebar() {
 
     <div
       class="resize-handle"
-      @mousedown="startLeftSidebarResize"
-      @touchstart="startLeftSidebarResize"
+      @mousedown="startMainSidebarResize"
+      @touchstart="startMainSidebarResize"
     ></div>
   </c-navigation-drawer>
 </template>

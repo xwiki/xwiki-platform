@@ -215,43 +215,39 @@ onUpdated(() => loadEditor(currentPage.value!));
     <!-- TODO: provide a better error reporting. -->
     {{ error }}
   </div>
-  <div class="inner-content">
-    <div v-show="!loading && !error" class="content">
-      <div class="content-scroll">
-        <div class="whole-content">
-          <input
-            v-model="title"
-            type="text"
-            :placeholder="titlePlaceholder"
-            class="document-title"
-          />
-          <c-tiptap-bubble-menu
-            v-if="editor"
-            :editor="editor"
-          ></c-tiptap-bubble-menu>
-          <editor-content :editor="editor" class="document-content editor" />
-        </div>
+  <div v-show="!loading && !error" class="content">
+    <input
+      v-model="title"
+      type="text"
+      :placeholder="titlePlaceholder"
+      class="doc-title"
+    />
+    <c-tiptap-bubble-menu v-if="editor" :editor="editor"></c-tiptap-bubble-menu>
+    <editor-content :editor="editor" class="doc-content editor" />
+    <form class="pagemenu" @submit="submit">
+      <div class="pagemenu-status">
+        <c-connection-status
+          v-if="editor"
+          :provider="editor.storage.cristalCollaborationKit.provider"
+        ></c-connection-status>
+        <c-save-status
+          v-if="editor"
+          :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
+        ></c-save-status>
       </div>
-      <form class="pagemenu" @submit="submit">
-        <div class="pagemenu-status">
-          <c-connection-status
-            v-if="editor"
-            :provider="editor.storage.cristalCollaborationKit.provider"
-          ></c-connection-status>
-          <c-save-status
-            v-if="editor"
-            :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
-          ></c-save-status>
-        </div>
-        <div class="pagemenu-actions">
-          <x-btn size="small" variant="primary" @click="submit">Close</x-btn>
-        </div>
-      </form>
-    </div>
+      <div class="pagemenu-actions">
+        <x-btn size="small" variant="primary" @click="submit">Close</x-btn>
+      </div>
+    </form>
   </div>
 </template>
 
 <style scoped>
+.content {
+  display: grid;
+  grid-template-rows: 56px auto auto 1fr;
+  overflow: auto;
+}
 .content-loading {
   display: flex;
   flex-flow: column;
@@ -328,7 +324,7 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   content: attr(data-placeholder);
 }
 
-.document-title {
+.doc-title {
   max-width: var(--cr-sizes-max-page-width);
   width: 100%;
   display: flex;
@@ -338,6 +334,8 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   line-height: var(--cr-font-size-2x-large);
   outline: none;
   border: none;
+  align-self: center;
+  justify-self: center;
 }
 
 /*

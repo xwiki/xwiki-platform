@@ -19,10 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup></script>
 <template>
-  <div class="right-sidebar">
+  <div class="secondary-sidebar">
     <div style="height: 9999px">
       <p>
-        If this element (.right-sidebar) is removed from the page, the layout
+        If this element (.secondary-sidebar) is removed from the page, the layout
         should adapt automatically.
       </p>
       <p>
@@ -32,7 +32,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   </div>
 </template>
 <style scoped>
-.right-sidebar {
+.secondary-sidebar {
   padding: var(--cr-spacing-x-small);
   overflow: auto;
   border-left: 1px solid var(--cr-color-neutral-200);

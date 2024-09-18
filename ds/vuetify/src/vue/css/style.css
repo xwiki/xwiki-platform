@@ -26,9 +26,9 @@
 
 :root {
   --cr-sizes-max-page-width: 960px; /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
-  --cr-sizes-left-sidebar-width: 15%; /*The default width of the sidebar*/
-  --cr-sizes-left-sidebar-min-width: 250px; /*The minimum width of the sidebar*/
-  --cr-sizes-collapsed-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard left sidebar*/
+  --cr-sizes-main-sidebar-width: 15%; /*The default width of the main sidebar*/
+  --cr-sizes-main-sidebar-min-width: 250px; /*The minimum width of the main sidebar*/
+  --cr-sizes-collapsed-main-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard main main sidebar*/
   --cr-base-font-size: 16px;
 
 

@@ -143,90 +143,82 @@ onUpdated(() => {
   </div>
   <article v-else id="content" ref="root" class="content">
     <UIX uixname="content.before" />
-    <div class="inner-content">
-      <div class="content-header">
-        <!-- This div lets us reference an actual HTML element,
+
+    <div class="page-header">
+      <!-- This div lets us reference an actual HTML element,
              to be used in `ContentTools.listenToClicks()`. -->
-        <div id="breadcrumbRoot" ref="breadcrumbRoot">
-          <XBreadcrumb
-            class="breadcrumb"
-            :items="breadcrumbItems"
-          ></XBreadcrumb>
-        </div>
-        <x-btn circle size="small" variant="primary" color="primary">
-          <c-icon
-            class="new-page"
-            name="plus"
-            :label="t('page.actions.create.label')"
-          ></c-icon>
-        </x-btn>
+      <div id="breadcrumbRoot" ref="breadcrumbRoot">
+        <XBreadcrumb class="breadcrumb" :items="breadcrumbItems"></XBreadcrumb>
       </div>
-      <div class="content-scroll">
-        <div class="doc-header">
-          <div class="center-content">
-            <h1 class="document-title">{{ title }}</h1>
-            <div class="doc-info-header">
-              <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
-              <span class="doc-info-user-info">
-                User Name edited on 12/12/2024 at 12:00
-              </span>
-              <!-- TODO: add a way to inject those by extension
+      <x-btn circle size="small" variant="primary" color="primary">
+        <c-icon
+          class="new-page"
+          name="plus"
+          :label="t('page.actions.create.label')"
+        ></c-icon>
+      </x-btn>
+    </div>
+
+    <div class="doc-header">
+      <h1 class="doc-title">{{ title }}</h1>
+      <div class="doc-info">
+        <span class="doc-info-user-info">
+          <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
+          User Name edited on 12/12/2024 at 12:00
+        </span>
+        <!-- TODO: add a way to inject those by extension
                and provide one for the number of attachments.
               It must be reactive whenever the attachment store is updated -->
-              <suspense>
-                <info-actions></info-actions>
-              </suspense>
-              <div class="doc-page-actions">
-                <router-link
-                  :to="{
-                    name: 'edit',
-                    params: { page: currentPageName },
-                  }"
-                >
-                  <x-btn size="small">
-                    <c-icon name="pencil" :size="Size.Small"></c-icon>
-                    Edit
-                  </x-btn>
-                </router-link>
-                <x-btn size="small">
-                  <c-icon
-                    name="three-dots-vertical"
-                    :size="Size.Small"
-                  ></c-icon>
-                </x-btn>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="whole-content">
-          <div class="center-content">
-            <!-- eslint-disable vue/no-v-html -->
-            <div
-              v-if="content"
-              id="xwikicontent"
-              ref="contentRoot"
-              class="document-content"
-              v-html="content"
-            ></div>
-            <div v-else class="unknown-page">
-              The requested page could not be found. You can edit the page to
-              create it.
-            </div>
-            <!-- The footer is not displayed in case of unknown page. -->
-            <div v-if="content" class="doc-info-footer">
-              <!-- Suspense is mandatory here as extra-tabs is asynchronous -->
-              <suspense>
-                <extra-tabs></extra-tabs>
-              </suspense>
-            </div>
+        <div class="doc-info-actions">
+          <suspense>
+            <info-actions></info-actions>
+          </suspense>
+          <div class="doc-page-actions">
+            <router-link
+              :to="{
+                name: 'edit',
+                params: { page: currentPageName },
+              }"
+            >
+              <x-btn size="small">
+                <c-icon name="pencil" :size="Size.Small"></c-icon>
+                Edit
+              </x-btn>
+            </router-link>
+            <x-btn size="small">
+              <c-icon name="three-dots-vertical" :size="Size.Small"></c-icon>
+            </x-btn>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- eslint-disable vue/no-v-html -->
+    <div
+      v-if="content"
+      id="xwikicontent"
+      ref="contentRoot"
+      class="doc-content"
+      v-html="content"
+    ></div>
+    <div v-else class="unknown-page">
+      The requested page could not be found. You can edit the page to create it.
+    </div>
+    <!-- The footer is not displayed in case of unknown page. -->
+    <div v-if="content" class="doc-info-extra">
+      <!-- Suspense is mandatory here as extra-tabs is asynchronous -->
+      <suspense>
+        <extra-tabs></extra-tabs>
+      </suspense>
     </div>
     <UIX uixname="content.after" />
   </article>
 </template>
 <style scoped>
+.content {
+  padding: 0 var(--cr-spacing-2x-large);
+}
+
 .content-loading {
   display: flex;
   flex-flow: column;
@@ -237,8 +229,13 @@ onUpdated(() => {
 
 /*TABLE STYLES*/
 /*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
-
-:global(.document-content table) {
+.content {
+  display: grid;
+  grid-template-rows: 56px auto auto 1fr;
+  overflow: auto;
+  height: 100%;
+}
+:global(.doc-content table) {
   max-width: 100%;
   width: 100%;
   border: none;
@@ -247,28 +244,28 @@ onUpdated(() => {
   margin-bottom: var(--cr-spacing-small);
 }
 
-:global(.document-content table tr) {
+:global(.doc-content table tr) {
   border-bottom: solid 1px var(--cr-input-border-color);
 }
 
-:global(.document-content table th) {
+:global(.doc-content table th) {
   font-weight: var(--cr-font-weight-bold);
   text-align: start;
 }
 
-:global(.document-content table td),
-:global(.document-content table th) {
+:global(.doc-content table td),
+:global(.doc-content table th) {
   line-height: var(--cr-line-height-normal);
   padding: 1rem 1rem;
 }
 
-:global(.document-content table th p:first-child),
-:global(.document-content table td p:first-child) {
+:global(.doc-content table th p:first-child),
+:global(.doc-content table td p:first-child) {
   margin-top: 0;
 }
 
-:global(.document-content table th p:last-child),
-:global(.document-content table td p:last-child) {
+:global(.doc-content table th p:last-child),
+:global(.doc-content table td p:last-child) {
   margin-bottom: 0;
 }
 
@@ -294,23 +291,45 @@ onUpdated(() => {
 }
 
 .doc-header {
-  display: flex;
-  width: 100%;
-  flex-flow: column;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  gap: 0px 0px;
+  grid-template-areas:
+    "title"
+    "info-user";
   gap: var(--cr-spacing-x-small);
-  position: sticky;
-  top: calc(var(--cr-spacing-small) * -1);
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
+  top: 0;
   background: white;
-  align-items: center;
   z-index: 1;
 }
 
-.document-title {
+.doc-title {
+  grid-area: title;
   margin: 0;
   font-size: var(--cr-font-size-2x-large);
   line-height: var(--cr-font-size-2x-large);
 }
 
+.doc-info {
+  grid-area: info-user;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cr-spacing-small);
+  color: var(--cr-color-neutral-500);
+  font-size: var(--cr-font-size-small);
+  justify-content: space-between;
+}
+
+.avatar {
+  --size: 24px;
+}
+
+.doc-info-actions,
 .doc-page-actions {
   display: flex;
   flex-wrap: wrap;
@@ -319,27 +338,28 @@ onUpdated(() => {
   gap: var(--cr-spacing-2x-small);
 }
 
-.doc-info-header,
-.doc-info-footer {
+.doc-info-actions {
+  margin-right: var(--cr-spacing-medium);
+  justify-self: end;
+}
+
+.info-action {
   display: flex;
+  background-color: var(--cr-color-neutral-100);
+  border-radius: 99px;
+  padding: var(--cr-spacing-2x-small) var(--cr-spacing-2x-small);
+  font-size: var(--cr-font-size-medium);
   flex-flow: row;
-  flex-wrap: wrap;
+  gap: var(--cr-spacing-2x-small);
   align-items: center;
-  gap: var(--cr-spacing-small);
 }
 
-.doc-info-user-info {
-  color: var(--cr-color-neutral-500);
-  font-size: var(--cr-font-size-small);
-  margin-right: auto;
+.info-action .cr-icon {
+  line-height: 1.3rem;
 }
 
-.avatar {
-  --size: 24px;
-}
-
-.content-header {
-  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
+.page-header {
+  padding: var(--cr-spacing-x-small) 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--cr-spacing-medium);
@@ -352,5 +372,14 @@ onUpdated(() => {
   flex-flow: column;
   flex-basis: auto;
   overflow: auto;
+}
+
+.doc-info-extra {
+  &.floating {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    box-shadow: var(--cr-shadow-small);
+  }
 }
 </style>

@@ -1113,7 +1113,7 @@ $namespace##
       #end
       #set ($extensionSupportPlans = $extension.supportPlans)
       #set ($extensionSupporters = $extensionSupportPlans.supporters)
-      #if (!$extensionSupporters.isEmpty())
+      #if ($extensionSupportPlans && !$extensionSupporters.isEmpty())
         <div class="supported-by">
           <h3>$escapetool.xml($services.localization.render('extensions.info.support.supportedBy'))</h3>
           #displayExtensionSupportPlans($extensionSupportPlans)

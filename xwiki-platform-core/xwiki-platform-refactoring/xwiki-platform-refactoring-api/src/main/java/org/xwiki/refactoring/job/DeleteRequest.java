@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Job request for deleting a page.
@@ -61,6 +62,11 @@ public class DeleteRequest extends EntityRequest
      * @see #isAutoRedirect()
      */
     public static final String AUTO_REDIRECT = "autoRedirect";
+
+    /**
+     * @see #isWaitForIndexing()
+     */
+    private static final String PROPERTY_WAIT_FOR_INDEXING = "waitForIndexing";
 
     private static final long serialVersionUID = 1L;
 
@@ -139,6 +145,35 @@ public class DeleteRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(UPDATE_LINKS, updateLinks);
+    }
+
+    /**
+     * @return {@code true} if, when {@link #isUpdateLinks()} is {@code true}, the refactoring shall wait for link
+     * indexing to complete. This ensures that accurate information about links is available, this is particularly
+     * relevant when multiple documents with links between them are moved.
+     *
+     * @since 16.8.0
+     * @since 16.4.4
+     * @since 15.10.13
+     */
+    @Unstable
+    public boolean isWaitForIndexing()
+    {
+        return getProperty(PROPERTY_WAIT_FOR_INDEXING, true);
+    }
+
+    /**
+     * Sets whether the refactoring job should wait for links to be indexed before updating them.
+     *
+     * @param waitForIndexing if the refactoring job should wait for links to be indexed before updating them
+     * @since 16.8.0
+     * @since 16.4.4
+     * @since 15.10.13
+     */
+    @Unstable
+    public void setWaitForIndexing(boolean waitForIndexing)
+    {
+        setProperty(PROPERTY_WAIT_FOR_INDEXING, waitForIndexing);
     }
 
     /**

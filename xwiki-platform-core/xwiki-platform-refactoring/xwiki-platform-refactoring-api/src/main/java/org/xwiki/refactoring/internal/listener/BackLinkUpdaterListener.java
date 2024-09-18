@@ -20,9 +20,7 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -30,12 +28,14 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
+import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.link.LinkStore;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.AbstractLocalEventListener;
@@ -46,11 +46,11 @@ import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
+import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.store.ReadyIndicator;
 
 /**
  * Updates the back-links after a document has been renamed or deleted.
@@ -86,9 +86,9 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     @Inject
     private JobContext jobContext;
 
-    // Use a Provider to avoid early initialization of the link store.
+    // Use a Provider to avoid early initialization of dependencies.
     @Inject
-    private Provider<LinkStore> linkStore;
+    private Provider<LinkIndexingWaitingHelper> linkIndexingHelper;
 
     /**
      * Default constructor.
@@ -149,10 +149,24 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     {
         this.logger.info("Updating the back-links for document [{}].", source);
 
-        if (this.jobContext.getCurrentJob() != null) {
+        if (isInsideJobAndShallWaitForIndexing()) {
             // We're inside a job, so some waiting should be okay. Wait for the indexing of the link store to finish.
-            // TODO: some jobs might indicate already that they don't want to wait. Add support for that.
-            waitForLinkIndexing();
+            try {
+                this.logger.info("Waiting for the link index to be updated.");
+                this.linkIndexingHelper.get().waitWithQuestion(10, TimeUnit.SECONDS);
+                this.logger.info("Finished waiting for the link index, starting the update of backlinks.");
+            } catch (InterruptedException e) {
+                this.logger.warn(
+                    "Interrupted while waiting for link indexing: [{}], continuing with the update of the"
+                        + " backlinks nevertheless.", ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full interrupted exception:", e);
+                Thread.currentThread().interrupt();
+            } catch (RefactoringException e) {
+                this.logger.warn(
+                    "Failed to wait for the link index to be updated: [{}], continuing with the update of"
+                        + " the backlinks nevertheless.", ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full exception:", e);
+            }
         }
 
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
@@ -174,42 +188,24 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         }
     }
 
-    private void waitForLinkIndexing()
+    private boolean isInsideJobAndShallWaitForIndexing()
     {
-        this.progressManager.pushLevelProgress(100, this);
-        this.logger.info("Waiting for the link index to be updated.");
-        ReadyIndicator readyIndicator = this.linkStore.get().waitReady();
-        try {
-            waitOnReadyIndicatorWithProgress(readyIndicator);
-            this.logger.info("The link index is ready now, starting the update of the back-links.");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            this.logger.warn("Interrupted while waiting for the link indexing to be updated, starting the updating of"
-                + " back-links nevertheless.");
-        } catch (ExecutionException e) {
-            this.logger.error("Link indexing stopped with an exception while waiting for indexing to complete, "
-                    + "starting the updating of back-links nevertheless.",
-                e.getCause());
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
-    }
+        Job currentJob = this.jobContext.getCurrentJob();
 
-    private void waitOnReadyIndicatorWithProgress(ReadyIndicator readyIndicator)
-        throws ExecutionException, InterruptedException
-    {
-        int percent = 0;
-
-        while (true) {
-            try {
-                readyIndicator.get(1, TimeUnit.SECONDS);
-                return;
-            } catch (TimeoutException e) {
-                for (; percent < readyIndicator.getProgressPercentage(); ++percent) {
-                    this.progressManager.startStep(this);
-                }
-                // TODO: after some time, ask if the user wants to continue waiting.
+        boolean result;
+        if (currentJob != null) {
+            Request request = currentJob.getRequest();
+            if (request instanceof DeleteRequest deleteRequest) {
+                result = deleteRequest.isWaitForIndexing();
+            } else if (request instanceof AbstractCopyOrMoveRequest copyOrMoveRequest) {
+                result = copyOrMoveRequest.isWaitForIndexing();
+            } else {
+                result = true;
             }
+        } else {
+            result = false;
         }
+
+        return result;
     }
 }

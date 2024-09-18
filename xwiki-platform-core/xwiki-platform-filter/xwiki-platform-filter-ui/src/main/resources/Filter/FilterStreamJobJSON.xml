@@ -43,13 +43,9 @@
   #set($finished = $jobStatus.state.name() == 'FINISHED')
   #if ($finished)
     #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
-      &lt;div class="box successmessage"&gt;
-        Done.
-      &lt;/div&gt;
+      #success('Done.')
     #else
-      &lt;div class="box errormessage"&gt;
-        Error has been found during the conversion !
-      &lt;/div&gt;
+      #error('Error has been found during the conversion !')
     #end
   #end
 #end

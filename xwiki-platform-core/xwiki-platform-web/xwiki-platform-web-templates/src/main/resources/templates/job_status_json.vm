@@ -24,11 +24,9 @@
 
 #set($jobStatus = $services.job.getJobStatus($jobId))
 
-#if ($jobStatus)
+#if (!$jobStatus)
   #outputJobStatusJSON($jobStatus, $translationPrefix)
 #else
   $response.setStatus(404)
-  <div class="box errormessage">
-    $services.localization.render("${translationPrefix}.notFound")
-  </div>
+  #error($services.localization.render("${translationPrefix}.notFound"))
 #end

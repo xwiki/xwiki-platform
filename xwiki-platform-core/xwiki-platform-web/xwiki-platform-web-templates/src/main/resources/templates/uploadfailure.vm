@@ -49,7 +49,7 @@ $response.setStatus(500)##
   <p>$services.localization.render('core.action.upload.failure.failedFiles')</p>
   <ul>
   #foreach ($file in $failedFiles.entrySet())
-    <li><strong>$!{escapetool.xml($file.key)}</strong>: <span class="errormessage">$!{escapetool.xml($file.value)}</span></li>
+    <li><strong>$!{escapetool.xml($file.key)}</strong>: #error($!{escapetool.xml($file.value)})</li>
   #end
   </ul>
 #end

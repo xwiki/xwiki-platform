@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
  * stopped, the {@link Future} is completed with an exception.
  *
- * @since 16.8.0RC1
+ * @since 16.8.0
  * @since 15.10.13
  * @since 16.4.4
  * @version $Id$

@@ -29,7 +29,7 @@ import org.xwiki.store.ReadyIndicator;
 /**
  * An implementation of the {@link ReadyIndicator} for the {@link DefaultSolrIndexer}.
  *
- * @since 16.8.0RC1
+ * @since 16.8.0
  * @since 15.10.13
  * @since 16.4.4
  * @version $Id$

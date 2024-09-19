@@ -96,8 +96,7 @@
     #end
   #else
     $response.setStatus(404)
-    <div class="box errormessage">
-      $services.localization.render('core.restore.status.notFound')
+    #error($services.localization.render('core.restore.status.notFound'))
     </div>
   #end
 #end

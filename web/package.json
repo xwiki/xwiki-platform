@@ -49,7 +49,7 @@
     "vue-router": "4.4.0"
   },
   "devDependencies": {
-    "@playwright/test": "1.45.0",
+    "@playwright/test": "1.47.2",
     "@types/node": "20.14.9",
     "@vitejs/plugin-vue": "5.0.5",
     "inversify": "6.0.2",

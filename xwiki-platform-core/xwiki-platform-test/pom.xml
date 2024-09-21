@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Test - Parent POM</description>
   <properties>
-    <selenium.version>4.24.0</selenium.version>
+    <selenium.version>4.25.0</selenium.version>
     <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>

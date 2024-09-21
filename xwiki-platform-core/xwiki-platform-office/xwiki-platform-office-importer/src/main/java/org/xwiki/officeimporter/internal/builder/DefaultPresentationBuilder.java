@@ -19,17 +19,20 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,10 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -163,7 +170,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
             // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
             // artifact displays a screen shot of the first presentation slide.
-            return this.officeServer.getConverter().convertDocument(inputStreams, inputFileName, "img0.html");
+            return this.officeServer.getConverter().convertDocument(inputStreams, inputFileName, "presentation.pdf");
         } catch (OfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
             throw new OfficeImporterException(String.format(message, officeFileName), e);
@@ -185,23 +192,31 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         OfficeConverterResult officeConverterResult, String nameSpace) throws IOException
     {
         Map<String, OfficeDocumentArtifact> artifactFiles = new HashMap<>();
-        // Iterate all the slides.
-        Set<File> conversionOutputFiles = officeConverterResult.getAllFiles();
-        Map<Integer, String> filenames = new HashMap<>();
-        for (File conversionOutputFile : conversionOutputFiles) {
-            Matcher matcher = SLIDE_FORMAT.matcher(conversionOutputFile.getName());
-            if (matcher.matches()) {
-                String number = matcher.group("number");
-                String slideImageName = String.format("%s-slide%s.jpg", nameSpace, number);
-                artifactFiles.put(slideImageName, new FileOfficeDocumentArtifact(slideImageName, conversionOutputFile));
-                // Append slide image to the presentation HTML.
-                String slideImageURL = null;
-                try {
-                    // We need to encode the slide image name in case it contains special URL characters.
-                    slideImageURL = URLEncoder.encode(slideImageName, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // This should never happen.
+
+        // We converted the slides to PDF. Now convert each page of the PDF to an image.
+        List<String> filenames = new ArrayList<>();
+        try (PDDocument document = PDDocument.load(officeConverterResult.getOutputFile())) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            int numberOfPages = document.getPages().getCount();
+            for (int pageCounter = 0; pageCounter < numberOfPages; ++pageCounter) {
+                // note that the page number parameter is zero based
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(pageCounter, 300, ImageType.RGB);
+
+                String slideFileName = String.format("slide%s.png", pageCounter);
+
+                // Store the image in the output directory as this will be cleaned up automatically at the end.
+                File imageFile = new File(officeConverterResult.getOutputDirectory(), slideFileName);
+                try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(imageFile))) {
+                    ImageIOUtil.writeImage(bim, "png", outputStream, 300);
                 }
+
+                String slideImageName = String.format("%s-slide%s.png", nameSpace, pageCounter);
+                artifactFiles.put(slideImageName, new FileOfficeDocumentArtifact(slideImageName, imageFile));
+                // suffix in filename will be used as the file format
+
+                // Append slide image to the presentation HTML.
+                // We need to encode the slide image name in case it contains special URL characters.
+                String slideImageURL = URLEncoder.encode(slideImageName, StandardCharsets.UTF_8);
                 // We do not want to encode the spaces in '+' since '+' will be then reencoded in
                 // ImageFilter to keep it and not consider it as a space when decoding it.
                 // This is link to a bug in libreoffice that does not convert properly the '+', so we cannot distinguish
@@ -209,12 +224,13 @@ public class DefaultPresentationBuilder implements PresentationBuilder
                 // https://github.com/sbraconnier/jodconverter/issues/125 is fixed.
                 slideImageURL = slideImageURL.replace('+', ' ');
 
-                filenames.put(Integer.parseInt(number), slideImageURL);
+                filenames.add(slideImageURL);
             }
         }
+
         // We sort by number so that the filenames are ordered by slide number.
-        String presentationHTML = filenames.entrySet().stream().sorted(Map.Entry.comparingByKey())
-            .map(entry -> String.format("<p><img src=\"%s\"/></p>", XMLUtils.escapeAttributeValue(entry.getValue())))
+        String presentationHTML = filenames.stream()
+            .map(entry -> String.format("<p><img src=\"%s\"/></p>", XMLUtils.escapeAttributeValue(entry)))
             .collect(Collectors.joining());
         return Pair.of(presentationHTML, artifactFiles);
     }

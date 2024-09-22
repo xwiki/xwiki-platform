@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "vue": "2.7.16",
-    "vue-i18n": "8.28.2",
+    "vue-i18n": "10.0.3",
     "lz-string": "1.5.0",
     "u-node": "0.0.2",
     "vuedraggable": "2.24.3",

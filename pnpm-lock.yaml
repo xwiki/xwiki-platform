@@ -679,8 +679,8 @@ importers:
   ds/shoelace:
     dependencies:
       '@shoelace-style/shoelace':
-        specifier: 2.15.1
-        version: 2.15.1(@types/react@18.2.52)
+        specifier: 2.17.1
+        version: 2.17.1(@types/react@18.2.52)
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
@@ -2559,8 +2559,8 @@ packages:
   '@shoelace-style/localize@3.1.2':
     resolution: {integrity: sha512-Hf45HeO+vdQblabpyZOTxJ4ZeZsmIUYXXPmoYrrR4OJ5OKxL+bhMz5mK8JXgl7HsoEowfz7+e248UGi861de9Q==}
 
-  '@shoelace-style/shoelace@2.15.1':
-    resolution: {integrity: sha512-3ecUw8gRwOtcZQ8kWWkjk4FTfObYQ/XIl3aRhxprESoOYV1cYhloYPsmQY38UoL3+pwJiZb5+LzX0l3u3Zl0GA==}
+  '@shoelace-style/shoelace@2.17.1':
+    resolution: {integrity: sha512-fB9+bPHLg5zVwPbBKEqY3ghyttkJq9RuUzFMTZKweKrNKKDMUACtI8DlMYUqNwpdZMJhf7a0xeak6vFVBSxcbQ==}
     engines: {node: '>=14.17.0'}
 
   '@sinclair/typebox@0.27.8':
@@ -5166,9 +5166,6 @@ packages:
   perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
 
-  picocolors@1.0.0:
-    resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
-
   picocolors@1.1.0:
     resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
 
@@ -7325,7 +7322,7 @@ snapshots:
 
   '@shoelace-style/localize@3.1.2': {}
 
-  '@shoelace-style/shoelace@2.15.1(@types/react@18.2.52)':
+  '@shoelace-style/shoelace@2.17.1(@types/react@18.2.52)':
     dependencies:
       '@ctrl/tinycolor': 4.0.3
       '@floating-ui/dom': 1.6.1
@@ -10381,8 +10378,6 @@ snapshots:
   pend@1.2.0: {}
 
   perfect-debounce@1.0.0: {}
-
-  picocolors@1.0.0: {}
 
   picocolors@1.1.0: {}
 

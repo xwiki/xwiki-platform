@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.imageio.ImageIO;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -86,6 +87,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultPresentationBuilderTest
 {
+    private static final int EXPECTED_WIDTH = 1920;
+
     @InjectMockComponents
     private DefaultPresentationBuilder presentationBuilder;
 
@@ -112,6 +115,9 @@ class DefaultPresentationBuilderTest
     @MockComponent
     private OfficeServer officeServer;
 
+    @MockComponent
+    private PresentationBuilderConfiguration configuration;
+
     @XWikiTempDir
     private File outputDirectory;
 
@@ -119,6 +125,10 @@ class DefaultPresentationBuilderTest
     public void configure() throws Exception
     {
         when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
+
+        when(this.configuration.getSlideWidth()).thenReturn(EXPECTED_WIDTH);
+        when(this.configuration.getQuality()).thenReturn(.95f);
+        when(this.configuration.getImageFormat()).thenReturn("jpg");
     }
 
     @Test
@@ -155,7 +165,7 @@ class DefaultPresentationBuilderTest
         Document xhtmlDoc = XMLUtils.createDOMDocument();
         xhtmlDoc.appendChild(xhtmlDoc.createElement("html"));
         String presentationHTML = Stream.of(0).map(slideNumber ->
-            String.format("<p><img src=\"file-slide%d.png\"/></p>", slideNumber)).collect(Collectors.joining());
+            String.format("<p><img src=\"file-slide%d.jpg\"/></p>", slideNumber)).collect(Collectors.joining());
         when(this.officeHTMLCleaner.clean(any(), eq(config)))
             .then(returnMatchingDocument(presentationHTML, xhtmlDoc));
 
@@ -166,10 +176,21 @@ class DefaultPresentationBuilderTest
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
         Map<String, OfficeDocumentArtifact> expectedArtifacts = Stream.of(0)
-            .map(slideNumber -> new FileOfficeDocumentArtifact(String.format("file-slide%d.png", slideNumber),
-                new File(this.outputDirectory, String.format("slide%d.png", slideNumber))))
+            .map(slideNumber -> new FileOfficeDocumentArtifact(String.format("file-slide%d.jpg", slideNumber),
+                new File(this.outputDirectory, String.format("slide%d.jpg", slideNumber))))
             .collect(Collectors.toMap(OfficeDocumentArtifact::getName, Function.identity()));
         assertEquals(expectedArtifacts, result.getArtifactsMap());
+
+        // Check for each output file that it has the expected width.
+        expectedArtifacts.values().forEach(artifact -> {
+            // Read the image from the content input stream.
+            try (InputStream is = artifact.getContentInputStream()) {
+                // Check the image width.
+                assertEquals(EXPECTED_WIDTH, ImageIO.read(is).getWidth());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 

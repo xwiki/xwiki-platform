@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -83,8 +82,6 @@ import org.xwiki.xml.html.HTMLUtils;
 @Singleton
 public class DefaultPresentationBuilder implements PresentationBuilder
 {
-    private static final Pattern SLIDE_FORMAT = Pattern.compile("img(?<number>[0-9]+)\\.jpg");
-
     /**
      * Provides the component manager used by {@link XDOMOfficeDocument}.
      */
@@ -123,6 +120,9 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     @Inject
     @Named("xhtml/1.0")
     private Parser xhtmlParser;
+
+    @Inject
+    private PresentationBuilderConfiguration presentationBuilderConfiguration;
 
     @Override
     public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName,
@@ -192,6 +192,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         OfficeConverterResult officeConverterResult, String nameSpace) throws IOException
     {
         Map<String, OfficeDocumentArtifact> artifactFiles = new HashMap<>();
+        String imageFormat = this.presentationBuilderConfiguration.getImageFormat();
+        float quality = this.presentationBuilderConfiguration.getQuality();
 
         // We converted the slides to PDF. Now convert each page of the PDF to an image.
         List<String> filenames = new ArrayList<>();
@@ -200,17 +202,24 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             int numberOfPages = document.getPages().getCount();
             for (int pageCounter = 0; pageCounter < numberOfPages; ++pageCounter) {
                 // note that the page number parameter is zero based
-                BufferedImage bim = pdfRenderer.renderImageWithDPI(pageCounter, 300, ImageType.RGB);
+                // Compute the DPI based on the slide width.
+                int outputWidth = this.presentationBuilderConfiguration.getSlideWidth();
+                // Get the width of the slide in points.
+                float pageWidth = document.getPage(pageCounter).getMediaBox().getWidth();
+                // Compute the DPI based on the slide width.
+                float dpi = outputWidth / pageWidth * 72;
 
-                String slideFileName = String.format("slide%s.png", pageCounter);
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(pageCounter, dpi, ImageType.RGB);
+
+                String slideFileName = String.format("slide%s.%s", pageCounter, imageFormat);
 
                 // Store the image in the output directory as this will be cleaned up automatically at the end.
                 File imageFile = new File(officeConverterResult.getOutputDirectory(), slideFileName);
                 try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(imageFile))) {
-                    ImageIOUtil.writeImage(bim, "png", outputStream, 300);
+                    ImageIOUtil.writeImage(bim, imageFormat, outputStream, (int) dpi, quality);
                 }
 
-                String slideImageName = String.format("%s-slide%s.png", nameSpace, pageCounter);
+                String slideImageName = String.format("%s-slide%s.%s", nameSpace, pageCounter, imageFormat);
                 artifactFiles.put(slideImageName, new FileOfficeDocumentArtifact(slideImageName, imageFile));
                 // suffix in filename will be used as the file format
 

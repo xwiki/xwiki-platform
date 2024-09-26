@@ -49,7 +49,7 @@
     <dependency>
       <groupId>ua.net.nlp</groupId>
       <artifactId>morfologik-ukrainian-lt</artifactId>
-      <version>6.5.1</version>
+      <version>6.5.2</version>
       <!-- This dependency is packaged so we don't want it to be seen as a transitive dependency by Maven -->
       <!-- We cannot use provided scope because it apparently hide the JAR from maven-assembly-plugin -->
       <optional>true</optional>

@@ -410,9 +410,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
                             // from automatic LTS updates without any maintenance on our side. This is because the
                             // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
-                            // TODO: Use back stable URL when upgrade to LO 24.+
                             .env("LIBREOFFICE_DOWNLOAD_URL",
-                                "https://download.documentfoundation.org/libreoffice/old/"
+                                "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by

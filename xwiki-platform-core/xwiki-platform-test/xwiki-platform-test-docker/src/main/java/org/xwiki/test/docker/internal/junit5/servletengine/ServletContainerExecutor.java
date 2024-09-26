@@ -410,9 +410,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
                             // from automatic LTS updates without any maintenance on our side. This is because the
                             // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
-                            // TODO: Use back stable URL when upgrade to LO 24.+
                             .env("LIBREOFFICE_DOWNLOAD_URL",
-                                "https://downloadarchive.documentfoundation.org/libreoffice/old/"
+                                "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
@@ -420,14 +419,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2 libxslt1-dev && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libxml2 libxslt1-dev")
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

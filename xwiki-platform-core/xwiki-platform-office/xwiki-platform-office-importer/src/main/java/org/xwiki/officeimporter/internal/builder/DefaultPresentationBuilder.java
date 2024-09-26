@@ -166,10 +166,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         Map<String, InputStream> inputStreams = Map.of(inputFileName, officeFileStream);
         try {
             // The office converter uses the output file name extension to determine the output format/syntax.
-            // The returned artifacts are of three types: imgX.jpg (slide screen shot), imgX.html (HTML page that
-            // display the corresponding slide screen shot) and textX.html (HTML page that display the text extracted
-            // from the corresponding slide). We use "img0.html" as the output file name because the corresponding
-            // artifact displays a screen shot of the first presentation slide.
+            // We perform a conversion to PDF to then use a PDF to image conversion.
             return this.officeServer.getConverter().convertDocument(inputStreams, inputFileName, "presentation.pdf");
         } catch (OfficeConverterException e) {
             String message = "Error while converting document [%s] into html.";
@@ -178,10 +175,8 @@ public class DefaultPresentationBuilder implements PresentationBuilder
     }
 
     /**
-     * Builds the presentation HTML from the presentation artifacts. There are two types of presentation artifacts:
-     * slide image and slide text. The returned HTML will display all the slide images. Slide text is currently ignored.
-     * All artifacts except slide images are removed from {@code presentationArtifacts}. Slide images names are prefixed
-     * with the given {@code nameSpace} to avoid name conflicts.
+     * Builds the presentation HTML from the presentation PDF: we convert all PDF page to an image using naming
+     * convention {@code slideX.imageFormatExtension} where X is the slide number.
      * 
      * @param officeConverterResult the map of presentation artifacts; this method removes some of the presentation
      *            artifacts and renames others so be aware of the side effects

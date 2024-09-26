@@ -19,12 +19,16 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -45,19 +49,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Singleton
 public class PresentationBuilderConfiguration implements Initializable
 {
-    protected static final String DEFAULT_IMAGE_FORMAT = "jpg";
+    private static final String DEFAULT_IMAGE_FORMAT = "jpg";
 
     private int slideWidth = 1920;
 
     private float quality = 95;
 
     @Inject
+    @Named("xwikiproperties")
     private ConfigurationSource configurationSource;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
     {
-        try (InputStream configurationInput = getClass().getResourceAsStream("/custom-document-formats.json")) {
+        try {
+            // For backward compatibility reason we check both custom-document-formats and document-formats.
+            if (!extractConfigurationFromJsonRegistry("/custom-document-formats.json")) {
+                extractConfigurationFromJsonRegistry("/document-formats.js");
+            }
+        } catch (Exception e) {
+            this.logger.error("Error when initializing values from document format registry, "
+                + "default values will be used.", e);
+        }
+    }
+
+    private boolean extractConfigurationFromJsonRegistry(String filename) throws IOException
+    {
+        AtomicBoolean result = new AtomicBoolean(false);
+        try (InputStream configurationInput = getClass().getResourceAsStream(filename)) {
             if (configurationInput != null) {
                 // Load the configuration from the JSON file
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -72,6 +94,7 @@ public class PresentationBuilderConfiguration implements Initializable
                         .flatMap(storeProperties -> getJsonNode(storeProperties, "PRESENTATION"))
                         .flatMap(presentationProperties -> getJsonNode(presentationProperties, "FilterData"))
                         .ifPresent(filterData -> {
+                            result.set(true);
                             getJsonNode(filterData, "Quality")
                                 .ifPresent(qualityNode -> this.quality = qualityNode.asInt());
                             getJsonNode(filterData, "Width")
@@ -79,9 +102,8 @@ public class PresentationBuilderConfiguration implements Initializable
                         });
                 }
             }
-        } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the PresentationBuilderConfiguration", e);
         }
+        return result.get();
     }
 
     private Optional<JsonNode> getJsonNode(JsonNode jsonNode, String fieldName)

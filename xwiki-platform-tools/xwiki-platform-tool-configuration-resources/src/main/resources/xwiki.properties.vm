@@ -381,6 +381,26 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Default value is 60 seconds
 # openoffice.taskExecutionTimeout = 60000
 
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# The output image format to use when importing an office presentation in XWiki.
+# officeimporter.presentation.imageFormat = jpg
+
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# Quality of the output image when importing an office presentation: the quality value is between 0 and 100.
+#-# Be aware that this option overrides any filter configuration provided in custom-document-formats.json for html
+#-# presentations. Also this configuration is ignored if the image format is png.
+# officeimporter.presentation.quality = 95
+
+#-# [Since 16.8.0]
+#-# [Since 16.4.4]
+#-# [Since 15.10.13]
+#-# Width of the output image when importing an office presentation: the value is given in pixel.
+# officeimporter.presentation.slideWidth = 1920
+
 #-------------------------------------------------------------------------------------
 # Velocity
 #-------------------------------------------------------------------------------------

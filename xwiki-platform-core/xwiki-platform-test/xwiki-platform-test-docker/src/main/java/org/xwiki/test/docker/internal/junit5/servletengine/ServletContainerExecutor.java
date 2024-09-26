@@ -410,14 +410,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // JODConverter: https://bit.ly/2w8B82Q
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
-                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
+                                + "libxml2 libxslt1-dev")
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

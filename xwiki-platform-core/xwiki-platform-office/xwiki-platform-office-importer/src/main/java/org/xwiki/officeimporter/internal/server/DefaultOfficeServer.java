@@ -137,7 +137,6 @@ public class DefaultOfficeServer implements OfficeServer
             ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
             externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
             externalProcessOfficeManager.connectOnStart(true);
-            //externalProcessOfficeManager.hostName();
             this.jodManager = externalProcessOfficeManager.build();
         } else {
             setState(ServerState.CONF_ERROR);

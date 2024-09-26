@@ -312,7 +312,7 @@ public class XWikiWikiModel implements WikiModel
                 value = sd.getPropertyValue(dimension);
             } catch (Exception e) {
                 // Ignore the style parameter but log a warning to let the user know.
-                this.logger.warn("Failed to parse CSS style [{}]", style);
+                this.logger.warn("Failed to parse CSS style [{}]", style, e);
             }
         }
         if (StringUtils.isBlank(value)) {

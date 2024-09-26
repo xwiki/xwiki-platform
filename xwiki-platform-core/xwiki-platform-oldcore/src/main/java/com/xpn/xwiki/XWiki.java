@@ -1462,7 +1462,7 @@ public class XWiki implements EventListener
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
                 }
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }

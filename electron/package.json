@@ -27,7 +27,7 @@
   "dependencies": {
     "@xwiki/cristal-electron-storage": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
-    "electron-updater": "6.1.8"
+    "electron-updater": "6.3.0"
   },
   "devDependencies": {
     "cross-env": "7.0.3",

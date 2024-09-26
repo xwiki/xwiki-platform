@@ -29,7 +29,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-rendering-wikimodel": "workspace:*",
-    "dompurify": "3.1.5",
+    "dompurify": "3.1.7",
     "inversify": "6.0.2",
     "marked": "14.1.2",
     "marked-base-url": "1.1.5"

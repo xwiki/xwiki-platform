@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
@@ -43,7 +44,6 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -241,8 +241,7 @@ public class EditIT
      * page.
      */
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Alert handling in Firefox currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22282")
+    @Disabled("Alert handling is broken both in Firefox and Chrome, see https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {

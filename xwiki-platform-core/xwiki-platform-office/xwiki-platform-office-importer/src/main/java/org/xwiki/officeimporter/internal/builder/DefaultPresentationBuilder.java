@@ -197,21 +197,23 @@ public class DefaultPresentationBuilder implements PresentationBuilder
             int numberOfPages = document.getPages().getCount();
             for (int pageCounter = 0; pageCounter < numberOfPages; ++pageCounter) {
                 // note that the page number parameter is zero based
-                // Compute the DPI based on the slide width.
+                // Compute the scale based on the slide width.
                 int outputWidth = this.presentationBuilderConfiguration.getSlideWidth();
                 // Get the width of the slide in points.
                 float pageWidth = document.getPage(pageCounter).getMediaBox().getWidth();
-                // Compute the DPI based on the slide width.
-                float dpi = outputWidth / pageWidth * 72;
+                // Compute the scale based on the slide width.
+                // Add 0.5 to the output width to ensure that rounding down does not make the image smaller than
+                // desired.
+                float scale = (outputWidth + 0.5f) / pageWidth;
 
-                BufferedImage bim = pdfRenderer.renderImageWithDPI(pageCounter, dpi, ImageType.RGB);
+                BufferedImage bim = pdfRenderer.renderImage(pageCounter, scale, ImageType.RGB);
 
                 String slideFileName = String.format("slide%s.%s", pageCounter, imageFormat);
 
                 // Store the image in the output directory as this will be cleaned up automatically at the end.
                 File imageFile = new File(officeConverterResult.getOutputDirectory(), slideFileName);
                 try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(imageFile))) {
-                    ImageIOUtil.writeImage(bim, imageFormat, outputStream, (int) dpi, quality);
+                    ImageIOUtil.writeImage(bim, imageFormat, outputStream, (int) (scale * 72f), quality);
                 }
 
                 String slideImageName = String.format("%s-slide%s.%s", nameSpace, pageCounter, imageFormat);

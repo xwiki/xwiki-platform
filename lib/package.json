@@ -52,7 +52,7 @@
     "pinia": "2.1.7",
     "reflect-metadata": "0.2.2",
     "utility-types": "3.11.0",
-    "vue": "3.4.31",
+    "vue": "3.5.10",
     "vue-i18n": "9.13.1",
     "vue-router": "4.4.0"
   },

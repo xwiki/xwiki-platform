@@ -36,7 +36,7 @@
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "comlink": "4.4.1",
     "inversify": "6.0.2",
-    "vue": "3.4.31",
+    "vue": "3.5.10",
     "vue-router": "4.4.0"
   },
   "devDependencies": {

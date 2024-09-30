@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-rendering-macros</artifactId>
-    <version>16.8.0-SNAPSHOT</version>
+    <version>16.8.0</version>
   </parent>
   <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>
   <name>XWiki Platform - Legacy - Rendering - Macros - Include Macro</name>

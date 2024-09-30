@@ -533,17 +533,17 @@
 #set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))
 [[image:registration_success_hero.svg||data-xwiki-image-style-alignment="center" height="50vh"]]
 
-{{html clean="true"}}
+{{html}}
 &lt;div class="registration-success-headline"&gt;
-  &lt;h2&gt;$headline &lt;/h2&gt;
+  &lt;h2&gt;$escapetool.xml($headline) &lt;/h2&gt;
   #if(!$noReadableName)
   &lt;p class="registration-success-subtitle"&gt;
-    ($userName)
+    ($escapetool.xml($userName))
   &lt;/p&gt;
   #end
 &lt;/div&gt;
 &lt;p class="registration-success-hint"&gt;
-  $successAndLogin
+  $escapetool.xml($successAndLogin)
 &lt;/p&gt;
 {{/html}}</registrationSuccessMessage>
     </property>

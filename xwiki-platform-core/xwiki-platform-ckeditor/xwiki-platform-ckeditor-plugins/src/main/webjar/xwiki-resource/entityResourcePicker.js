@@ -24,8 +24,8 @@ define('entityResourcePickerTranslationKeys', [], [
 ]);
 
 define('entityResourcePicker', [
-  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'xwiki-tree'
-], function($, $resource, $modal, translations) {
+  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'xwiki-meta', 'xwiki-tree'
+], function($, $resource, $modal, translations, xm) {
   'use strict';
 
   var createdNodes = {};
@@ -235,7 +235,9 @@ define('entityResourcePicker', [
       showTranslations: false,
       showWikis: true,
       showAddDocument: true,
-      readOnly: false
+      readOnly: false,
+      // jshint camelcase:false
+      form_token: xm.form_token
     })),
     attach: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
       outputSyntax: 'plain',

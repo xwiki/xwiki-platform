@@ -48,9 +48,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -135,8 +133,6 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
-        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals(FINISH_WAITING_MESSAGE, logCapture.getMessage(2));
     }
 
     @Test
@@ -171,8 +167,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
-        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals(FINISH_WAITING_MESSAGE, logCapture.getMessage(2));
+        verify(this.waitingHelper).maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -216,7 +211,7 @@ class BackLinkUpdaterListenerTest
     }
 
     @Test
-    void onDocumentDeletedWithUpdateLinksOnFarm() throws RefactoringException, InterruptedException
+    void onDocumentDeletedWithUpdateLinksOnFarm()
     {
         deleteRequest.setUpdateLinks(true);
 
@@ -229,9 +224,6 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(denisReference, aliceReference, bobReference);
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
-        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals(FINISH_WAITING_MESSAGE, logCapture.getMessage(2));
-        verify(this.waitingHelper).waitWithQuestion(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -286,49 +278,5 @@ class BackLinkUpdaterListenerTest
         this.listener.onEvent(documentDeletedEvent, null, null);
 
         verify(this.updater, never()).update(any(), any(DocumentReference.class), any());
-    }
-
-    @Test
-    void onDocumentDeleteWithIndexingWaitingAndInterrupt() throws InterruptedException, RefactoringException
-    {
-        deleteRequest.setUpdateLinks(true);
-
-        doThrow(new InterruptedException()).when(this.waitingHelper).waitWithQuestion(anyInt(), any());
-
-        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
-        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
-
-        this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
-
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
-        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals("Interrupted while waiting for link indexing: [InterruptedException: ], "
-            + "continuing with the update of the backlinks nevertheless.", logCapture.getMessage(2));
-    }
-
-    @Test
-    void onDocumentDeleteWithIndexingWaitingError() throws InterruptedException, RefactoringException
-    {
-        deleteRequest.setUpdateLinks(true);
-
-        String message = "Waiting for link indexing failed.";
-        doThrow(new RefactoringException(message)).when(this.waitingHelper)
-            .waitWithQuestion(anyInt(), any());
-
-        when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
-        when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
-
-        this.listener.onEvent(documentDeletedEvent, null, null);
-
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
-
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
-        assertEquals("Waiting for the link index to be updated.", logCapture.getMessage(1));
-        assertEquals(("Failed to wait for the link index to be updated: [RefactoringException: %s], continuing with "
-            + "the update of the backlinks nevertheless.").formatted(message), logCapture.getMessage(2));
     }
 }

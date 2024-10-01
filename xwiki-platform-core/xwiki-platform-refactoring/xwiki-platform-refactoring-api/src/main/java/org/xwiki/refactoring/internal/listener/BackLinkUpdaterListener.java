@@ -28,13 +28,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
-import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -46,7 +43,6 @@ import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
-import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.DeleteRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -149,25 +145,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
     {
         this.logger.info("Updating the back-links for document [{}].", source);
 
-        if (isInsideJobAndShallWaitForIndexing()) {
-            // We're inside a job, so some waiting should be okay. Wait for the indexing of the link store to finish.
-            try {
-                this.logger.info("Waiting for the link index to be updated.");
-                this.linkIndexingHelper.get().waitWithQuestion(10, TimeUnit.SECONDS);
-                this.logger.info("Finished waiting for the link index, starting the update of backlinks.");
-            } catch (InterruptedException e) {
-                this.logger.warn(
-                    "Interrupted while waiting for link indexing: [{}], continuing with the update of the"
-                        + " backlinks nevertheless.", ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full interrupted exception:", e);
-                Thread.currentThread().interrupt();
-            } catch (RefactoringException e) {
-                this.logger.warn(
-                    "Failed to wait for the link index to be updated: [{}], continuing with the update of"
-                        + " the backlinks nevertheless.", ExceptionUtils.getRootCauseMessage(e));
-                this.logger.debug("Full exception:", e);
-            }
-        }
+        this.linkIndexingHelper.get().maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
 
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
         // document to load and parse) since we have the information in the store
@@ -186,26 +164,5 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         } finally {
             this.progressManager.popLevelProgress(this);
         }
-    }
-
-    private boolean isInsideJobAndShallWaitForIndexing()
-    {
-        Job currentJob = this.jobContext.getCurrentJob();
-
-        boolean result;
-        if (currentJob != null) {
-            Request request = currentJob.getRequest();
-            if (request instanceof DeleteRequest deleteRequest) {
-                result = deleteRequest.isWaitForIndexing();
-            } else if (request instanceof AbstractCopyOrMoveRequest copyOrMoveRequest) {
-                result = copyOrMoveRequest.isWaitForIndexing();
-            } else {
-                result = true;
-            }
-        } else {
-            result = false;
-        }
-
-        return result;
     }
 }

@@ -21,7 +21,6 @@ package org.xwiki.refactoring.job;
 
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a request used for Copy, Move or Rename (though Move).
@@ -40,11 +39,6 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
      * @see #isUpdateLinks()
      */
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
-
-    /**
-     * @see #isWaitForIndexing()
-     */
-    private static final String PROPERTY_WAIT_FOR_INDEXING = "waitForIndexing";
 
     /**
      * Default constructor.
@@ -100,35 +94,6 @@ public abstract class AbstractCopyOrMoveRequest extends EntityRequest
     public void setUpdateLinks(boolean updateLinks)
     {
         setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
-    }
-
-    /**
-     * @return {@code true} if, when {@link #isUpdateLinks()} is {@code true}, the refactoring shall wait for link
-     * indexing to complete. This ensures that accurate information about links is available, this is particularly
-     * relevant when multiple documents with links between them are moved.
-     *
-     * @since 16.8.0
-     * @since 16.4.4
-     * @since 15.10.13
-     */
-    @Unstable
-    public boolean isWaitForIndexing()
-    {
-        return getProperty(PROPERTY_WAIT_FOR_INDEXING, true);
-    }
-
-    /**
-     * Sets whether the refactoring job should wait for links to be indexed before updating them.
-     *
-     * @param waitForIndexing if the refactoring job should wait for links to be indexed before updating them
-     * @since 16.8.0
-     * @since 16.4.4
-     * @since 15.10.13
-     */
-    @Unstable
-    public void setWaitForIndexing(boolean waitForIndexing)
-    {
-        setProperty(PROPERTY_WAIT_FOR_INDEXING, waitForIndexing);
     }
 
     /**

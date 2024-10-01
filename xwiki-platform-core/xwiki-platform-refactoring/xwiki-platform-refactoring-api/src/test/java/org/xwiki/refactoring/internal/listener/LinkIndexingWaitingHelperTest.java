@@ -26,13 +26,17 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.link.LinkStore;
 import org.xwiki.refactoring.RefactoringException;
+import org.xwiki.refactoring.internal.job.AbstractEntityJob;
+import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.store.ReadyIndicator;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -65,6 +69,8 @@ class LinkIndexingWaitingHelperTest
 {
     protected static final String WAITING_MESSAGE = "Waiting for the link index to be updated.";
 
+    private static final String FINISHED_WAITING_MESSAGE = "Finished waiting for the link index";
+
     @InjectMockComponents
     private LinkIndexingWaitingHelper helper;
 
@@ -81,7 +87,7 @@ class LinkIndexingWaitingHelperTest
     private ReadyIndicator readyIndicator;
 
     @Mock
-    private JobStatus jobStatus;
+    private EntityJobStatus<EntityRequest> jobStatus;
 
     @RegisterExtension
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
@@ -170,5 +176,79 @@ class LinkIndexingWaitingHelperTest
             assertThrows(RefactoringException.class, () -> this.helper.waitWithQuestion(1, TimeUnit.SECONDS));
         assertSame(expectedException, actualException.getCause());
         verify(this.progressManager).popLevelProgress(this.helper);
+    }
+
+    @Test
+    void maybeWaitForLinkIndexingWithLogWithoutJob()
+    {
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
+
+        this.helper.maybeWaitForLinkIndexingWithLog(1, TimeUnit.SECONDS);
+
+        verifyNoInteractions(this.progressManager);
+    }
+
+    @Test
+    void maybeWaitForLinkIndexingWithLogWithGenericJob()
+    {
+        this.helper.maybeWaitForLinkIndexingWithLog(1, TimeUnit.SECONDS);
+
+        verify(this.progressManager).pushLevelProgress(100, this.helper);
+        verify(this.progressManager).popLevelProgress(this.helper);
+
+        assertEquals(WAITING_MESSAGE, this.logCapture.getMessage(0));
+        assertEquals(FINISHED_WAITING_MESSAGE, this.logCapture.getMessage(1));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void maybeWaitForLinkIndexingWithLogWithEntityJob(boolean shallWait)
+    {
+        AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>> entityJob = mock();
+        when(this.jobContext.getCurrentJob()).thenReturn(entityJob);
+        when(entityJob.getStatus()).thenReturn(this.jobStatus);
+        EntityRequest request = mock();
+        when(entityJob.getRequest()).thenReturn(request);
+        when(request.isWaitForIndexing()).thenReturn(shallWait);
+
+        this.helper.maybeWaitForLinkIndexingWithLog(1, TimeUnit.SECONDS);
+
+        if (shallWait) {
+            verify(this.progressManager).pushLevelProgress(100, this.helper);
+            verify(this.progressManager).popLevelProgress(this.helper);
+
+            assertEquals(WAITING_MESSAGE, this.logCapture.getMessage(0));
+            assertEquals(FINISHED_WAITING_MESSAGE, this.logCapture.getMessage(1));
+        } else {
+            verifyNoInteractions(this.progressManager);
+        }
+    }
+
+    @Test
+    void maybeWaitForLinkIndexingWithLogExecutionException() throws Exception
+    {
+        String exceptionMessage = "Test error.";
+        Exception expectedException = new Exception(exceptionMessage);
+        doThrow(new ExecutionException(expectedException)).when(this.readyIndicator).get(anyLong(), any());
+
+        this.helper.maybeWaitForLinkIndexingWithLog(1, TimeUnit.SECONDS);
+
+        assertEquals(WAITING_MESSAGE, this.logCapture.getMessage(0));
+        assertEquals("Failed to wait for the link index to be updated: [Exception: %s], continuing nevertheless."
+            .formatted(exceptionMessage), this.logCapture.getMessage(1));
+    }
+
+    @Test
+    void maybeWaitForLinkIndexingWithLogInterruptedException() throws Exception
+    {
+        String exceptionMessage = "Test interruption.";
+        Exception expectedException = new InterruptedException(exceptionMessage);
+        doThrow(expectedException).when(this.readyIndicator).get(anyLong(), any());
+
+        this.helper.maybeWaitForLinkIndexingWithLog(1, TimeUnit.SECONDS);
+
+        assertEquals(WAITING_MESSAGE, this.logCapture.getMessage(0));
+        assertEquals("Interrupted while waiting for link indexing: [InterruptedException: %s], continuing nevertheless."
+            .formatted(exceptionMessage), this.logCapture.getMessage(1));
     }
 }

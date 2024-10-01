@@ -29,17 +29,20 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.link.LinkStore;
 import org.xwiki.refactoring.RefactoringException;
+import org.xwiki.refactoring.internal.job.AbstractEntityJob;
 import org.xwiki.store.ReadyIndicator;
 
 /**
@@ -76,6 +79,42 @@ public class LinkIndexingWaitingHelper implements Initializable, Disposable
     public void dispose() throws ComponentLifecycleException
     {
         this.executor.shutdown();
+    }
+
+    /**
+     * Wait for link indexing to complete, asking the user after the given timeout if they want to continue waiting.
+     * <p>
+     *     This method only waits inside a job, and, in the case of an entity job, only if the request specifies that
+     *     indexing should be waited for. Exceptions are caught and logged, but not rethrown.
+     * </p>
+     *
+     * @param timeout the maximum time to wait
+     * @param timeUnit the unit of the timeout value
+     */
+    public void maybeWaitForLinkIndexingWithLog(int timeout, TimeUnit timeUnit)
+    {
+        Job currentJob = this.jobContext.getCurrentJob();
+        if (currentJob != null && (!(currentJob instanceof AbstractEntityJob<?, ?> entityJob)
+            || entityJob.getRequest().isWaitForIndexing()))
+        {
+            // We're inside a job, so some waiting should be okay. Wait for the indexing of the link store to finish.
+            try {
+                this.logger.info("Waiting for the link index to be updated.");
+                waitWithQuestion(timeout, timeUnit);
+                this.logger.info("Finished waiting for the link index");
+            } catch (InterruptedException e) {
+                this.logger.warn(
+                    "Interrupted while waiting for link indexing: [{}], continuing nevertheless.",
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full interrupted exception:", e);
+                Thread.currentThread().interrupt();
+            } catch (RefactoringException e) {
+                this.logger.warn(
+                    "Failed to wait for the link index to be updated: [{}], continuing nevertheless.",
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Full exception:", e);
+            }
+        }
     }
 
     /**

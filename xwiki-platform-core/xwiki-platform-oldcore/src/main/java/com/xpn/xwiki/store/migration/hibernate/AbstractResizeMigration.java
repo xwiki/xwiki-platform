@@ -115,16 +115,16 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
         // Check the version of the database server
-        if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+        DatabaseProduct databaseProductName = this.hibernateStore.getDatabaseProductName();
+
+        if (databaseProductName == DatabaseProduct.MYSQL || databaseProductName == DatabaseProduct.MARIADB) {
             DatabaseMetaData databaMetadata = this.hibernateStore.getDatabaseMetaData();
 
             try {
-                String productName = databaMetadata.getDatabaseProductName();
-
                 String versionString = databaMetadata.getDatabaseProductVersion();
                 Version version = new DefaultVersion(versionString);
 
-                if (productName.equalsIgnoreCase("mariadb")) {
+                if (databaseProductName == DatabaseProduct.MARIADB) {
                     // Impossible to apply this migration on MariaDB lower than 10.2
                     if (version.compareTo(MARIADB102) < 0) {
                         warnDatabaTooOld("MariaDB", MARIADB102);
@@ -142,7 +142,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
             } catch (SQLException e) {
                 this.logger.warn("Failed to get database information: {}", ExceptionUtils.getRootCauseMessage(e));
             }
-        } else if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MSSQL) {
+        } else if (databaseProductName == DatabaseProduct.MSSQL) {
             // Impossible to apply this migration on Microsoft SQL Server
             this.logger.warn("The migration cannot run on Microsoft SQL Server");
 
@@ -210,11 +210,11 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
         if (value instanceof Collection) {
             Table collectionTable = ((Collection) value).getCollectionTable();
 
-            for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext();) {
+            for (Iterator<Column> it = collectionTable.getColumnIterator(); it.hasNext(); ) {
                 updateColumn(it.next(), databaseMetaData, dynamicTables, builder);
             }
         } else if (value != null) {
-            for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext();) {
+            for (Iterator<Selectable> it = value.getColumnIterator(); it.hasNext(); ) {
                 Selectable selectable = it.next();
                 if (selectable instanceof Column) {
                     updateColumn((Column) selectable, databaseMetaData, dynamicTables, builder);
@@ -248,7 +248,8 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
                 }
 
                 // Cleanup specific to MySQL/MariaDB
-                if (this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL) {
+                DatabaseProduct databaseProductName = this.hibernateStore.getDatabaseProductName();
+                if (databaseProductName == DatabaseProduct.MYSQL || databaseProductName == DatabaseProduct.MARIADB) {
                     // Make sure all MySQL/MariaDB tables use a DYNAMIC row format (required to support key prefix
                     // length limit up to 3072 bytes)
                     for (PersistentClass entity : existingTables) {
@@ -337,7 +338,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
     {
         for (PersistentClass entity : existingTables) {
             // Find properties to update
-            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext();) {
+            for (Iterator<Property> it = entity.getPropertyIterator(); it.hasNext(); ) {
                 updateProperty(it.next(), databaseMetaData, dynamicTables, builder);
             }
 
@@ -417,7 +418,7 @@ public abstract class AbstractResizeMigration extends AbstractHibernateDataMigra
 
         this.logger.debug("Database product name: {}", productName);
 
-        if (productName == DatabaseProduct.MYSQL) {
+        if (productName == DatabaseProduct.MYSQL || productName == DatabaseProduct.MARIADB) {
             JdbcEnvironment jdbcEnvironment =
                 this.hibernateStore.getConfigurationMetadata().getDatabase().getJdbcEnvironment();
             String tableName = jdbcEnvironment.getQualifiedObjectNameFormatter()

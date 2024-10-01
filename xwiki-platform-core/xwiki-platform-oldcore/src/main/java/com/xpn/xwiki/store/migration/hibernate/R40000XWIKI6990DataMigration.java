@@ -1242,7 +1242,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Detect database products and initialize isMySQLMyISAM and isOracle. isMySQLMyISAM is true if the xwikidoc table
-     * use the MyISAM engine in MySQL, false otherwise or on any failure. isOracle is true if the we access an Oracle
+     * use the MyISAM engine in MySQL or in MariaDB, false otherwise or on any failure. isOracle is true if the we
+     * access an Oracle
      * database.
      *
      * @param store the store to be checked
@@ -1250,7 +1251,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     private void detectDatabaseProducts(XWikiHibernateBaseStore store)
     {
         DatabaseProduct product = store.getDatabaseProductName();
-        if (product != DatabaseProduct.MYSQL) {
+        if (product != DatabaseProduct.MYSQL && product != DatabaseProduct.MARIADB) {
             this.isOracle = (product == DatabaseProduct.ORACLE);
             this.isMSSQL = (product == DatabaseProduct.MSSQL);
             return;
@@ -1283,11 +1284,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             }
             if (this.isMySQL && !this.isMySQLMyISAM) {
                 this.logger
-                    .debug("MySQL innoDB database detected, proceeding to simplified updates with cascaded updates.");
+                    .debug("MySQL or MariaDB innoDB database detected, proceeding to simplified updates with "
+                        + "cascaded updates.");
             }
             if (this.isMySQLMyISAM) {
                 this.logger
-                    .debug("MySQL MyISAM database detected, proceeding to all updates manually without constraints.");
+                    .debug("MySQL or MariaDB MyISAM database detected, proceeding to all updates manually without constraints.");
             }
             if (this.isMSSQL) {
                 this.logger

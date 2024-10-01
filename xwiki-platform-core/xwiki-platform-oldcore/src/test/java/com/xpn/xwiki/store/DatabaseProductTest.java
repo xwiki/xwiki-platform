@@ -50,11 +50,11 @@ class DatabaseProductTest
         assertEquals(DatabaseProduct.MYSQL, product);
         assertSame(DatabaseProduct.MYSQL, product);
         product = DatabaseProduct.toProduct("MariaDB");
-        assertEquals(DatabaseProduct.MYSQL, product);
-        assertSame(DatabaseProduct.MYSQL, product);
+        assertEquals(DatabaseProduct.MARIADB, product);
+        assertSame(DatabaseProduct.MARIADB, product);
         product = DatabaseProduct.toProduct("mariadb");
-        assertEquals(DatabaseProduct.MYSQL, product);
-        assertSame(DatabaseProduct.MYSQL, product);
+        assertEquals(DatabaseProduct.MARIADB, product);
+        assertSame(DatabaseProduct.MARIADB, product);
 
         product = DatabaseProduct.toProduct("Apache Derby");
         assertEquals(DatabaseProduct.DERBY, product);

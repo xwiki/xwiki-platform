@@ -126,8 +126,10 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        // Only really required for MySQL since https://jira.xwiki.org/browse/XWIKI-15215 was only affecting MySQL
-        return this.hibernateStore.getDatabaseProductName() == DatabaseProduct.MYSQL;
+        // Only really required for MySQL and MariaDB since https://jira.xwiki.org/browse/XWIKI-15215 was only
+        // affecting MySQL and MariaDB
+        DatabaseProduct databaseProductName = this.hibernateStore.getDatabaseProductName();
+        return databaseProductName == DatabaseProduct.MYSQL || databaseProductName == DatabaseProduct.MARIADB;
     }
 
     @Override

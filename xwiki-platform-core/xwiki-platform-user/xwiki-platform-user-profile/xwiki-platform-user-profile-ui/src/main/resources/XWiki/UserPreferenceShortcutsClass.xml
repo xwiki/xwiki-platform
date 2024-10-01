@@ -23,6 +23,7 @@
   <web>XWiki</web>
   <name>UserPreferenceShortcutsClass</name>
   <language/>
+  <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>XWiki.XWikiClasses</parent>
@@ -32,7 +33,7 @@
   <title>UserPreferenceShortcuts Class</title>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content/>
   <class>
     <name>XWiki.UserPreferenceShortcutsClass</name>

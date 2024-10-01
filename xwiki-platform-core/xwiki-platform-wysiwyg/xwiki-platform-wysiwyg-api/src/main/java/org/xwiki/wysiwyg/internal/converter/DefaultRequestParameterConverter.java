@@ -146,8 +146,8 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     {
         MutableServletRequest mutableRequest = conversionResult.getRequest();
         ServletRequest originalRequest = mutableRequest.getRequest();
-        if (originalRequest instanceof HttpServletRequest
-            && "XMLHttpRequest".equals(((HttpServletRequest) originalRequest).getHeader("X-Requested-With"))) {
+        if (originalRequest instanceof HttpServletRequest httpServletRequest
+            && "XMLHttpRequest".equals((httpServletRequest).getHeader("X-Requested-With"))) {
             // If this is an AJAX request then we should simply send back the error.
             StringBuilder errorMessage = new StringBuilder();
             // Aggregate all error messages (for all fields that have conversion errors).

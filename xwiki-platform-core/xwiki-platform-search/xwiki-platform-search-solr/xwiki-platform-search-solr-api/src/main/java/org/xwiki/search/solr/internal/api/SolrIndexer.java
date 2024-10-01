@@ -76,5 +76,5 @@ public interface SolrIndexer
      * @since 15.10.13
      * @since 16.4.4
      */
-    ReadyIndicator getReadyIndicator();
+    ReadyIndicator waitReady();
 }

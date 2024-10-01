@@ -689,7 +689,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     }
 
     @Override
-    public ReadyIndicator getReadyIndicator()
+    public ReadyIndicator waitReady()
     {
         SolrIndexerReadyIndicator readyIndicator = new SolrIndexerReadyIndicator(
             this.resolveQueueRemovalCounter::getAcquire, this.resolveQueue::size,
@@ -700,15 +700,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         if (!this.disposed) {
             try {
                 this.resolveQueue.put(new ResolveQueueEntry(readyIndicator));
-                return readyIndicator;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 readyIndicator.completeExceptionally(e);
             }
+        } else {
+            // The indexer has been stopped and won't become ready again.
+            readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
         }
 
-        // The indexer has been stopped and won't become ready again.
-        readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
         return readyIndicator;
     }
 }

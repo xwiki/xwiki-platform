@@ -193,7 +193,7 @@ public class DefaultLinkStore implements LinkStore
     @Override
     public ReadyIndicator waitReady()
     {
-        return this.solrIndexer.getReadyIndicator();
+        return this.solrIndexer.waitReady();
     }
 
     EntityReference toDocumentBasedReference(EntityReference entityReference)

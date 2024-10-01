@@ -472,7 +472,6 @@
   <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      #set ($shortcut_view_edit = $!xwiki.getUserPreference('shortcut_view_edit'))
       shortcut.add("#getShortcutValue('core.shortcuts.view.edit')", function() {
         var editLink = $('tmEdit').down('a');
         // Make sure the shortcut doesn't work when the edit link is disabled.

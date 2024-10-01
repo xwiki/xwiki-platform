@@ -246,6 +246,10 @@ onUpdated(() => loadEditor(currentPage.value!));
 .content {
   display: grid;
   grid-template-rows: 56px auto auto 1fr;
+  overflow: hidden;
+  justify-content: center;
+}
+.doc-content {
   overflow: auto;
 }
 .content-loading {

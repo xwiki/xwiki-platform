@@ -22,8 +22,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   <div class="secondary-sidebar">
     <div style="height: 9999px">
       <p>
-        If this element (.secondary-sidebar) is removed from the page, the layout
-        should adapt automatically.
+        If this element (.secondary-sidebar) is removed from the page, the
+        layout should adapt automatically.
       </p>
       <p>
         The size here is exagerated to test the overflow mechanics (scrolling)

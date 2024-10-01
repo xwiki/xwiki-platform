@@ -62,7 +62,7 @@
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
          version here. -->
     <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
-    <netty.version>4.1.113.Final</netty.version>
+    <netty.version>4.1.114.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>

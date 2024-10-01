@@ -72,7 +72,7 @@
  *        e.g. `shortcut_developer_usertype`
  * @param translationKey  The key of the translation containing the wiki level defined shortcut.
  *        e.g. `core.shortcuts.developer.user.type`
- * @since 16.6.0-rc-1
+ * @since 16.9.0-rc-1
  *#
 #macro(getShortcutValue $translationKey)
 #set ($shortcutPreferenceObject = $xwiki.getDocument($xcontext.getUser()).getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))

@@ -40,6 +40,148 @@
   <object>
     <name>XWiki.XWikiUserPreferencesSheet</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>cbdc7bc6-a49e-41a3-9309-a7d270d217da</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>forbid</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  /**
+   * Handle the shortcut preference modifications
+   */
+  $(document).off('input.shortcutPreference');
+  let updateShortcut = function( shortcutPreferenceDOM) {
+    let shortcutPreference = $(shortcutPreferenceDOM);
+    let translateKey = shortcutPreference.attr("data-translatekey");
+    let newValue = shortcutPreference.val();
+    let url = xm.restURL;
+    let oldItemNumber = shortcutPreference.attr("data-shortcutprefnumber");
+    if (oldItemNumber == null) {
+      // Create the new user preference
+      let creationUrl = url + "/objects";
+      let data = {
+        'className': 'XWiki.UserPreferenceShortcutsClass',
+        'property#translationKey': translateKey,
+        'property#value': newValue
+      };
+      let objectCreationPromise = $.post(creationUrl, data, function(newObject) {
+        shortcutPreference.attr("data-shortcutprefnumber", newObject.firstChild.getElementsByTagName("number")[0].textContent);
+      });
+    } else {
+      if (newValue == shortcutPreference.attr("data-defaultvalue")) {
+        // Remove the existing preference, we don't want to keep it if the user is back to normal.
+        let destructionUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber;
+        $.ajax({url: destructionUrl,
+          type: "DELETE"
+        });
+        shortcutPreference.removeAttr("data-shortcutprefnumber");
+      } else {
+        // Update the existing preference
+        let updateUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber +"/properties/value";
+        let data = {
+          'property#value': newValue
+        };
+        $.ajax({url: updateUrl,
+          type: "PUT",
+          data: data
+        });
+      }
+    }
+  };
+  var timeoutId = 0;
+  $(document).on('input.shortcutPreference', '.shortcutPreference', function () {
+    if (timeoutId != 0){clearTimeout(timeoutId)}
+    timeoutId = setTimeout(updateShortcut, 500, this);
+  });
+});</code>
+    </property>
+    <property>
+      <parse/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiUserPreferencesSheet</name>
+    <number>0</number>
     <className>XWiki.UIExtensionClass</className>
     <guid>d3b30f9d-f441-4a7f-aee6-5eca30094ca2</guid>
     <class>
@@ -270,7 +412,7 @@
       &lt;input type="text" class="shortcutPreference" name="$escapedSelectId" id="$escapedSelectId" size="30"
         data-translatekey="$translationKey"
         data-defaultvalue="$defaultValue"
-        #if ($!shortcutPreference != '')data-shortcutprefnumber='$shortcutPreference.getReference().getObjectNumber()'#end
+        #if ("$!shortcutPreference" != '')data-shortcutprefnumber='$shortcutPreference.getReference().getObjectNumber()'#end
         #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
           #set ($escapedHintId = $escapedSelectId + "_hint")
           aria-describedby="$escapedHintId"

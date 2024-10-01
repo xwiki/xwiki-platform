@@ -155,8 +155,7 @@
         ## Override keyboard shortcut (if any)
         ##
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
-          #set ($userPreferenceName = "shortcut_view_${extraName}")
-          #set ($extraShortcutWithUserPreferences = "#getShortcutValue($userPreferenceName, $extraShortcut)")
+          #set ($extraShortcutWithUserPreferences = "#getShortcutValue($extraShortcut)")
           shortcut.remove("$extraShortcutWithUserPreferences");
           shortcut.add("$extraShortcutWithUserPreferences", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
         #end

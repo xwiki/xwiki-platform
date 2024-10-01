@@ -20,20 +20,51 @@
 package org.xwiki.container.servlet;
 
 import org.xwiki.container.Session;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 public class ServletSession implements Session
 {
     private HttpSession httpSession;
 
+    /**
+     * @param request the servlet request
+     * @deprecated use {@link #ServletSession(HttpServletRequest)} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public ServletSession(javax.servlet.http.HttpServletRequest request)
+    {
+        this(JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * @param request the servlet request
+     * @since 42.0.0
+     */
+    @Unstable
     public ServletSession(HttpServletRequest request)
     {
         this.httpSession = request.getSession(true);
     }
 
-    public HttpSession getHttpSession()
+    /**
+     * @deprecated use {@link #getJakartaHttpSession()} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public javax.servlet.http.HttpSession getHttpSession()
+    {
+        return JakartaServletBridge.toJavax(this.httpSession);
+    }
+
+    /**
+     * @return the current servlet session
+     * @since 42.0.0
+     */
+    @Unstable
+    public HttpSession getJakartaHttpSession()
     {
         return this.httpSession;
     }

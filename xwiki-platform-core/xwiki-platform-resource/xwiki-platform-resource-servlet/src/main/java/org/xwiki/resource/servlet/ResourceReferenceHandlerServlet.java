@@ -23,11 +23,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -42,14 +37,22 @@ import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.url.ExtendedURL;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * Handles any Resource Reference discovered by the Routing Filter and put in the HTTP Request. Any module who wish to
  * add a new Resource Type in the XWiki URL simply needs to register a Handler component (of role
  * {@link org.xwiki.resource.ResourceReferenceHandler}) and any URL matching the corresponding {@link ResourceType} will
  * be handled.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implements a completely
+ * different API from Java point of view.
  *
  * @version $Id$
- * @since 7.1M1
+ * @since 42.0.0
  */
 public class ResourceReferenceHandlerServlet extends HttpServlet
 {
@@ -58,7 +61,7 @@ public class ResourceReferenceHandlerServlet extends HttpServlet
      */
     private static final long serialVersionUID = 1L;
 
-    private ComponentManager rootComponentManager;
+    private transient ComponentManager rootComponentManager;
 
     @Override
     public void init() throws ServletException
@@ -136,9 +139,7 @@ public class ResourceReferenceHandlerServlet extends HttpServlet
             throw new ServletException("Failed to locate a ServletContainerInitializer component", e);
         }
         try {
-            containerInitializer.initializeRequest(httpRequest);
-            containerInitializer.initializeResponse(httpResponse);
-            containerInitializer.initializeSession(httpRequest);
+            containerInitializer.initializeRequest(httpRequest, httpResponse);
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize Request/Response or Session", e);
         }

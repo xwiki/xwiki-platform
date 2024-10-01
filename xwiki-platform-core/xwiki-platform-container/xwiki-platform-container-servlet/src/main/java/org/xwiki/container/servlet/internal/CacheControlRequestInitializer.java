@@ -47,8 +47,8 @@ public class CacheControlRequestInitializer implements RequestInitializer
     public void initialize(Request request) throws RequestInitializerException
     {
         // Indicate if the request explicitly disable getting resources from the cache
-        if (request instanceof ServletRequest
-            && !HttpServletUtils.isCacheReadAllowed(((ServletRequest) request).getHttpServletRequest())) {
+        if (request instanceof ServletRequest servletRequest
+            && !HttpServletUtils.isCacheReadAllowed(servletRequest.getJakartaHttpServletRequest())) {
             this.cacheControl.setCacheReadAllowed(false);
         }
     }

@@ -19,43 +19,6 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Provider;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.xwiki.attachment.validation.AttachmentValidationException;
-import org.xwiki.attachment.validation.AttachmentValidator;
-import org.xwiki.environment.Environment;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.store.TemporaryAttachmentException;
-import org.xwiki.test.junit5.XWikiTempDir;
-import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.test.mockito.MockitoComponentManager;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
-
 import static com.xpn.xwiki.plugin.fileupload.FileUploadPlugin.UPLOAD_MAXSIZE_PARAMETER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,6 +35,44 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Provider;
+import javax.servlet.http.Part;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.xwiki.attachment.validation.AttachmentValidationException;
+import org.xwiki.attachment.validation.AttachmentValidator;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletSession;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.store.TemporaryAttachmentException;
+import org.xwiki.test.TestEnvironment;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+
+import jakarta.servlet.http.HttpSession;
+
 /**
  * Tests for {@link DefaultTemporaryAttachmentSessionsManager}.
  *
@@ -79,6 +80,7 @@ import static org.mockito.Mockito.when;
  * @since 14.3RC1
  */
 @ComponentTest
+@ComponentList(TestEnvironment.class)
 class DefaultTemporaryAttachmentSessionsManagerTest
 {
     private static final String ATTRIBUTE_KEY = "xwikiTemporaryAttachments";
@@ -92,11 +94,11 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     @MockComponent
     private Provider<AttachmentValidator> attachmentValidatorProvider;
 
+    @MockComponent
+    private Container container;
+
     @Mock
     private AttachmentValidator attachmentValidator;
-
-    @XWikiTempDir
-    private File tmpDir;
 
     @Mock
     private XWikiContext context;
@@ -109,13 +111,10 @@ class DefaultTemporaryAttachmentSessionsManagerTest
     {
         when(this.contextProvider.get()).thenReturn(this.context);
 
-        XWikiRequest xWikiRequest = mock(XWikiRequest.class);
-        when(xWikiRequest.getSession()).thenReturn(this.httpSession);
-        when(this.context.getRequest()).thenReturn(xWikiRequest);
+        ServletSession session = mock(ServletSession.class);
+        when(session.getJakartaHttpSession()).thenReturn(this.httpSession);
+        when(this.container.getSession()).thenReturn(session);
         Utils.setComponentManager(mockitoComponentManager);
-
-        Environment environment = mockitoComponentManager.registerMockComponent(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(this.tmpDir);
 
         when(this.attachmentValidatorProvider.get()).thenReturn(this.attachmentValidator);
     }

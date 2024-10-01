@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.url.URLSecurityManager;
 
+@Deprecated(since = "42.0.0")
 public class XWikiServletResponse extends HttpServletResponseWrapper implements XWikiResponse
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);

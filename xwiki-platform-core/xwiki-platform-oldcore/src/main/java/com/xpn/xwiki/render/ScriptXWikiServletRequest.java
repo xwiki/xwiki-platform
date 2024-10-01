@@ -39,7 +39,10 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * @since 12.3RC1
  * @since 12.2.1
  * @since 11.10.5
+ * @deprecated use the container script service instead
  */
+//TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
+//@Deprecated(since = "42.0.0")
 public class ScriptXWikiServletRequest extends WrappingXWikiRequest
 {
     /**

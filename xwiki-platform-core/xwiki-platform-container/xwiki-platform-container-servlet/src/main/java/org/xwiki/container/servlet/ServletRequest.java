@@ -24,21 +24,62 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.container.Request;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * This is the implementation of {@link Request} for {@link HttpServletRequest}.
+ *
+ * @version $Id$
+ */
 public class ServletRequest implements Request
 {
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest jakartaHttpServletRequest;
 
-    public ServletRequest(HttpServletRequest httpServletRequest)
+    private javax.servlet.http.HttpServletRequest javaxHttpServletRequest;
+
+    /**
+     * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
+     * @since 42.0.0
+     */
+    public ServletRequest(HttpServletRequest jakartaHttpServletRequest)
     {
-        this.httpServletRequest = httpServletRequest;
+        this.jakartaHttpServletRequest = jakartaHttpServletRequest;
     }
 
-    public HttpServletRequest getHttpServletRequest()
+    /**
+     * @param javaxHttpServletRequest the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
+     * @deprecated use {@link #ServletRequest(HttpServletRequest)} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public ServletRequest(javax.servlet.http.HttpServletRequest javaxHttpServletRequest)
     {
-        return this.httpServletRequest;
+        this.javaxHttpServletRequest = javaxHttpServletRequest;
+        this.jakartaHttpServletRequest = JakartaServletBridge.toJakarta(javaxHttpServletRequest);
+    }
+
+    /**
+     * @return the standard Jakarta {@link HttpServletRequest} instance
+     * @since 42.0.0
+     */
+    public HttpServletRequest getJakartaHttpServletRequest()
+    {
+        return this.jakartaHttpServletRequest;
+    }
+
+    /**
+     * @return the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
+     * @deprecated use {@link #getJakartaHttpServletRequest()} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public javax.servlet.http.HttpServletRequest getHttpServletRequest()
+    {
+        if (this.javaxHttpServletRequest == null) {
+            this.javaxHttpServletRequest = JakartaServletBridge.toJavax(this.jakartaHttpServletRequest);
+        }
+
+        return this.javaxHttpServletRequest;
     }
 
     @Override
@@ -47,9 +88,9 @@ public class ServletRequest implements Request
         Object result;
 
         // Look first in the Query Parameters and then in the Query Attributes
-        result = this.httpServletRequest.getParameter(key);
+        result = this.jakartaHttpServletRequest.getParameter(key);
         if (result == null) {
-            result = this.httpServletRequest.getAttribute(key);
+            result = this.jakartaHttpServletRequest.getAttribute(key);
         }
 
         return result;
@@ -58,14 +99,14 @@ public class ServletRequest implements Request
     @Override
     public List<Object> getProperties(String key)
     {
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
 
         // Look first in the Query Parameters and then in the Query Attributes
-        Object[] requestParameters = this.httpServletRequest.getParameterValues(key);
+        Object[] requestParameters = this.jakartaHttpServletRequest.getParameterValues(key);
         if (requestParameters != null) {
             result.addAll(Arrays.asList(requestParameters));
         }
-        Object attributeValue = this.httpServletRequest.getAttribute(key);
+        Object attributeValue = this.jakartaHttpServletRequest.getAttribute(key);
         if (attributeValue != null) {
             result.add(attributeValue);
         }
@@ -76,12 +117,12 @@ public class ServletRequest implements Request
     @Override
     public void setProperty(String key, Object value)
     {
-        this.httpServletRequest.setAttribute(key, value);
+        this.jakartaHttpServletRequest.setAttribute(key, value);
     }
 
     @Override
     public void removeProperty(String key)
     {
-        this.httpServletRequest.removeAttribute(key);
+        this.jakartaHttpServletRequest.removeAttribute(key);
     }
 }

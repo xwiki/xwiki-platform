@@ -21,12 +21,12 @@ package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 /**
  * <p>
@@ -51,9 +51,13 @@ import javax.servlet.ServletResponse;
  * characteristics of the incoming request (such as the values of the <code>Accept-Language</code>
  * and <code>User-Agent</code> headers, or a value stashed in the current user's session.
  * </p>
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different API
+ * from Java point of view.
  * 
  * @author Craig McClanahan
  * @version $Id$
+ * @since 42.0.0
  */
 public class SetCharacterEncodingFilter implements Filter
 {

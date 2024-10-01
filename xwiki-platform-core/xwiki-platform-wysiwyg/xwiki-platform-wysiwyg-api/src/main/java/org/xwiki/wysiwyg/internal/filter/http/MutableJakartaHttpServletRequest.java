@@ -25,33 +25,33 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
+import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 import org.xwiki.wysiwyg.filter.MutableServletRequest;
+
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * {@link MutableServletRequest} implementation for the HTTP protocol.
  * 
  * @version $Id$
  */
-public class MutableHttpServletRequest extends HttpServletRequestWrapper implements MutableServletRequest
+public class MutableJakartaHttpServletRequest extends HttpServletRequestWrapper implements MutableJakartaServletRequest
 {
     /**
      * Parameters used instead of those from the wrapped request. This way exiting request parameters can be overwritten
      * and also new parameters can be added.
      */
-    private final Map<String, String[]> params = new HashMap<String, String[]>();
+    private final Map<String, String[]> params = new HashMap<>();
 
     /**
      * Wraps the specified request and copies its parameters to {@link #params} where they can be overwritten later.
      * 
      * @param request The request to be wrapped.
      */
-    @SuppressWarnings("unchecked")
-    public MutableHttpServletRequest(HttpServletRequest request)
+    public MutableJakartaHttpServletRequest(HttpServletRequest request)
     {
         super(request);
 

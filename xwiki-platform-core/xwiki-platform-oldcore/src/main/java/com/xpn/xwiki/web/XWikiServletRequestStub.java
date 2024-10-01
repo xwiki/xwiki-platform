@@ -64,6 +64,7 @@ import org.xwiki.user.UserReference;
  *
  * @version $Id$
  */
+@Deprecated(since = "42.0.0")
 public class XWikiServletRequestStub implements XWikiRequest
 {
     /**

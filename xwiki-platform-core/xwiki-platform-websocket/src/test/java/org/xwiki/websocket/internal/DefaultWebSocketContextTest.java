@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -23,11 +23,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Allows to save a request and restore it later from the stored request identifier (SRID).
@@ -64,20 +66,33 @@ public final class SavedRequestManager
          * Constructor that copies the needed information from a request.
          * 
          * @param request the request that needs to be saved
+         * @deprecated use {@link #SavedRequest(HttpServletRequest)}) instead
          */
-        @SuppressWarnings("unchecked")
+        @Deprecated(since = "42.0.0")
+        public SavedRequest(javax.servlet.http.HttpServletRequest request)
+        {
+            this(JakartaServletBridge.toJakarta(request));
+        }
+
+        /**
+         * Constructor that copies the needed information from a request.
+         * 
+         * @param request the request that needs to be saved
+         * @since 42.0.0
+         */
+        @Unstable
         public SavedRequest(HttpServletRequest request)
         {
-            this.parameters = new HashMap<String, String[]>(request.getParameterMap());
+            this.parameters = new HashMap<>(request.getParameterMap());
             this.requestUrl = request.getRequestURL().toString();
         }
 
         /**
-         * Gets the value for a parameter, just like {@link javax.servlet.ServletRequest#getParameter(String)}.
+         * Gets the value for a parameter, just like {@link jakarta.servlet.ServletRequest#getParameter(String)}.
          * 
          * @param name the name of the parameter
          * @return The first value for this parameter, or <code>null</code> if no value was sent for this parameter.
-         * @see javax.servlet.ServletRequest#getParameter(String)
+         * @see jakarta.servlet.ServletRequest#getParameter(String)
          * @see #getParameterValues(String)
          */
         public String getParameter(String name)
@@ -91,11 +106,11 @@ public final class SavedRequestManager
 
         /**
          * Gets all the values stored for a parameter, just like
-         * {@link javax.servlet.ServletRequest#getParameterValues(String)}.
+         * {@link jakarta.servlet.ServletRequest#getParameterValues(String)}.
          * 
          * @param name the name of the parameter
          * @return All the values for this parameter, or <code>null</code> if no value was sent for this parameter.
-         * @see javax.servlet.ServletRequest#getParameterValues(String)
+         * @see jakarta.servlet.ServletRequest#getParameterValues(String)
          * @see #getParameter(String)
          */
         public String[] getParameterValues(String name)
@@ -104,10 +119,10 @@ public final class SavedRequestManager
         }
 
         /**
-         * Gets all the stored parameters, just like {@link javax.servlet.ServletRequest#getParameterMap()}.
+         * Gets all the stored parameters, just like {@link jakarta.servlet.ServletRequest#getParameterMap()}.
          * 
          * @return A map with all the stored parameters.
-         * @see javax.servlet.ServletRequest#getParameterMap()
+         * @see jakarta.servlet.ServletRequest#getParameterMap()
          */
         public Map<String, String[]> getParameterMap()
         {
@@ -156,7 +171,24 @@ public final class SavedRequestManager
      * 
      * @param request the request to save
      * @return the identifier of the saved request
+     * @deprecated use {@link #saveRequest(HttpServletRequest)} instead
      */
+    @Deprecated(since = "42.0.0")
+    public static String saveRequest(javax.servlet.http.HttpServletRequest request)
+    {
+        return saveRequest(JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * Saves the data from a request and stores it in the current session. This method is not thread safe, and does not
+     * guarantee that saved requests are not overwritten, but given that this should only happen sparingly, and that
+     * each client uses his own session to save this kind of information, this is not a real issue.
+     * 
+     * @param request the request to save
+     * @return the identifier of the saved request
+     * @since 42.0.0
+     */
+    @Unstable
     @SuppressWarnings("unchecked")
     public static String saveRequest(HttpServletRequest request)
     {
@@ -166,7 +198,7 @@ public final class SavedRequestManager
         Map<String, SavedRequest> savedRequests =
             (Map<String, SavedRequest>) session.getAttribute(getSavedRequestKey());
         if (savedRequests == null) {
-            savedRequests = new HashMap<String, SavedRequest>();
+            savedRequests = new HashMap<>();
             session.setAttribute(getSavedRequestKey(), savedRequests);
         }
         // Save the request data
@@ -190,7 +222,25 @@ public final class SavedRequestManager
      * @param request the current request
      * @return the original requested URL that triggered a detour, or <code>null</code> if there isn't any original
      *         request information
+     * @deprecated use {@link #getOriginalUrl(HttpServletRequest)} instead
      */
+    @Deprecated(since = "42.0.0")
+    public static String getOriginalUrl(javax.servlet.http.HttpServletRequest request)
+    {
+        return getOriginalUrl(JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * Retrieves the original URL requested before a detour. This method returns something different from
+     * <code>null</code> only when there's a <em>srid</em> parameter in the current request, indicating that there was
+     * another request which data was saved, related to the current request.
+     * 
+     * @param request the current request
+     * @return the original requested URL that triggered a detour, or <code>null</code> if there isn't any original
+     *         request information
+     * @since 42.0.0
+     */
+    @Unstable
     @SuppressWarnings("unchecked")
     public static String getOriginalUrl(HttpServletRequest request)
     {

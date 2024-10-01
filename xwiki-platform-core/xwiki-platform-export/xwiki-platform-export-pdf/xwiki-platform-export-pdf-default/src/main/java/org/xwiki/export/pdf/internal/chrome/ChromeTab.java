@@ -29,13 +29,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.Cookie;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserTab;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
@@ -49,6 +48,8 @@ import com.github.kklisura.cdt.protocol.types.runtime.Evaluate;
 import com.github.kklisura.cdt.protocol.types.runtime.RemoteObject;
 import com.github.kklisura.cdt.protocol.types.target.TargetInfo;
 import com.github.kklisura.cdt.services.ChromeDevToolsService;
+
+import jakarta.servlet.http.Cookie;
 
 /**
  * Represents a Chrome web browser tab.
@@ -99,6 +100,12 @@ public class ChromeTab implements BrowserTab
         this.tabDevToolsService.close();
         LOGGER.debug("Disposing browser context [{}].", browserContextId);
         this.browserDevToolsService.getTarget().disposeBrowserContext(browserContextId);
+    }
+
+    @Override
+    public boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException
+    {
+        return navigate(url, JakartaServletBridge.toJakarta(cookies), wait, timeout);
     }
 
     @Override

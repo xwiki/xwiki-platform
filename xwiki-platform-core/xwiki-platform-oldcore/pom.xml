@@ -130,6 +130,10 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
 
     <!-- Used by parse groovy from page -->
     <!-- Note: We only depend on the miniumum required to compile oldcore since the distributions will depend on
@@ -164,6 +168,10 @@
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
@@ -633,12 +641,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
-    <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-api</artifactId>
@@ -901,7 +903,7 @@
                 **/web/ViewrevAction.java,
                 **/web/XWikiAction.java,
                 **/web/XWikiConfigurationService.java,
-                **/web/XWikiContextInitializationFilter.java,
+                **/web/XWikiContextInitializer.java,
                 **/web/XWikiDefaultURLFactory.java,
                 **/web/XWikiEngineContext.java,
                 **/web/XWikiForm.java,

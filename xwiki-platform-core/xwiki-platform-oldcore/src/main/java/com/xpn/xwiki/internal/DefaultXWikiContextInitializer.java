@@ -19,11 +19,6 @@
  */
 package com.xpn.xwiki.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -33,6 +28,7 @@ import org.xwiki.container.Request;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
@@ -49,6 +45,11 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletResponse;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Default implementation of {@link XWikiContextInitializer}.
@@ -103,18 +104,11 @@ public class DefaultXWikiContextInitializer implements XWikiContextInitializer
 
         XWikiContext xcontext;
 
-        if (!(request instanceof ServletRequest)) {
-            if (this.fallbackOnStub) {
-                xcontext = this.contextProvider.createStubContext();
-            } else {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
-                    "Unsupported request type [" + request.getClass() + "]");
-            }
-        } else {
+        if (request instanceof ServletRequest servletRequest) {
             try {
-                HttpServletRequest httpServletRequest = ((ServletRequest) request).getHttpServletRequest();
+                HttpServletRequest httpServletRequest = servletRequest.getJakartaHttpServletRequest();
                 HttpServletResponse httpServletReponse =
-                    ((ServletResponse) this.container.getResponse()).getHttpServletResponse();
+                    ((ServletResponse) this.container.getResponse()).getJakartaHttpServletResponse();
 
                 xcontext = initializeXWikiContext(httpServletRequest, httpServletReponse);
 
@@ -134,6 +128,13 @@ public class DefaultXWikiContextInitializer implements XWikiContextInitializer
                         "Failed to initialize XWikiContext", e);
                 }
             }
+        } else {
+            if (this.fallbackOnStub) {
+                xcontext = this.contextProvider.createStubContext();
+            } else {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
+                    "Unsupported request type [" + request.getClass() + "]");
+            }
         }
 
         // Put the XWikiContext in the ExecutionContext
@@ -147,9 +148,10 @@ public class DefaultXWikiContextInitializer implements XWikiContextInitializer
     private static XWikiContext initializeXWikiContext(HttpServletRequest request, HttpServletResponse response)
         throws XWikiException
     {
-        XWikiServletContext xwikiEngine = new XWikiServletContext(request.getServletContext());
-        XWikiServletRequest xwikiRequest = new XWikiServletRequest(request);
-        XWikiServletResponse xwikiResponse = new XWikiServletResponse(response);
+        XWikiServletContext xwikiEngine =
+            new XWikiServletContext(JakartaServletBridge.toJavax(request.getServletContext()));
+        XWikiServletRequest xwikiRequest = new XWikiServletRequest(JakartaServletBridge.toJavax(request));
+        XWikiServletResponse xwikiResponse = new XWikiServletResponse(JakartaServletBridge.toJavax(response));
 
         // Create the XWiki context.
         XWikiContext context = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);

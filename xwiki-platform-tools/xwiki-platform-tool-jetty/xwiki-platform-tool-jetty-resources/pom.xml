@@ -32,114 +32,87 @@
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
   <properties>
-    <!-- Jetty does not work with the Jakarta Annotation API version for some reason (it does not seems to load it without much explanation in the log) -->
-    <xwiki.enforcer.enforce-jakarta.annotation-api.skip>true</xwiki.enforcer.enforce-jakarta.annotation-api.skip>
-
     <!-- Use a different version of Jetty the one used for the Jetty client JARs packaged inside the XWiki WAR.
          The reason is that our dependencies (mainly Solr) are not necessarily compatibles with this version of Jetty.
 
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
     <jetty.version>${jetty.server.version}</jetty.version>
-    <slf4j.version>${jetty.server.slf4j.version}</slf4j.version>
   </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-home</artifactId>
+      <version>${jetty.server.version}</version>
+      <type>zip</type>
+      <exclusions>
+        <!-- jetty-home apparently have all the dependencies it embbeds as transitive dependencies, which does not make any sense... -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
-    <!-- Needed for the org.apache.commons.io.output.TeeOutputStream class used to split the Jetty logs -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-xml</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-deploy</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-start</artifactId>
-      <version>${jetty.version}</version>
-      <classifier>shaded</classifier>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-jmx</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee8</groupId>
-      <artifactId>jetty-ee8-annotations</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-plus</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-jndi</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-slf4j-impl</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-client</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <!-- Note: We don't provide Jetty Websocket API only JSR356 -->
-    <dependency>
-      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
-      <artifactId>jetty-ee8-websocket-javax-server</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
-      <artifactId>jetty-ee8-websocket-javax-client</artifactId>
-      <version>${jetty.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <!-- We need a EL implementation for Hibernate Validator -->
-    <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
-      <optional>true</optional>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <!-- Unpack jetty -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.jetty</groupId>
+                  <artifactId>jetty-home</artifactId>
+                  <version>${jetty.server.version}</version>
+                  <type>zip</type>
+                  <excludes>
+                    <!-- We don't need demo packages -->
+                    **/*demo*,
+                    **/*demo*/,
+                    <!-- Remove any ee8 or ee9 libraries since we want to focus on the latest standard compatible 
+                         with the same minimum Java version XWiki supports -->
+                    **/*ee8*,
+                    **/*ee8*/,
+                    **/*ee9*,
+                    **/*ee9*/,
+                    <!-- We don't need http2 support -->
+                    **/*http2*,
+                    **/*http2*/,
+                    <!-- We don't need http3 support -->
+                    **/*http3*,
+                    **/*http3*/,
+                    <!-- We don't need Jetty injection features -->
+                    **/*cdi*,
+                    **/*cdi*/,
+                    <!-- We don't need JSTL support -->
+                    **/*jstl*,
+                    **/*jstl*/                    
+                  </excludes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Build the final zip -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -149,7 +122,7 @@
             <configuration>
               <appendAssemblyId>false</appendAssemblyId>
               <descriptors>
-                <descriptor>${basedir}/src/main/assembly/distribution.xml</descriptor>
+                <descriptor>src/main/assembly/distribution.xml</descriptor>
               </descriptors>
             </configuration>
             <goals>

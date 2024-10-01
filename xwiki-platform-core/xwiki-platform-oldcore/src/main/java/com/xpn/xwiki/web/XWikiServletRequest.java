@@ -34,6 +34,7 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
+@Deprecated(since = "42.0.0")
 public class XWikiServletRequest extends HttpServletRequestWrapper implements XWikiRequest
 {
     public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = XWikiRequest.class.getName() + "#effectiveAuthor";

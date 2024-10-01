@@ -25,10 +25,10 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;

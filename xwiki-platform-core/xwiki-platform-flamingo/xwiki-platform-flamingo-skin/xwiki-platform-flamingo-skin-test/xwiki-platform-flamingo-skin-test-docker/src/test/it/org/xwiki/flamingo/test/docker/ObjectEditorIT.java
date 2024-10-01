@@ -25,9 +25,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.bidi.browsingcontext.BrowsingContext;
+import org.openqa.selenium.bidi.module.BrowsingContextInspector;
+import org.openqa.selenium.remote.Augmenter;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
@@ -46,7 +48,6 @@ import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Tests for the object editor.
@@ -79,8 +80,8 @@ class ObjectEditorIT
     }
     
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Alert handling in Firefox currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22282")
+    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
+        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(1)
     void preventUsersToLeaveTheEditorWithoutSaving(TestUtils testUtils, TestReference testReference)
     {
@@ -110,15 +111,15 @@ class ObjectEditorIT
         assertTrue(objectEditPane.isDeleteLinkDisplayed());
         assertFalse(objectEditPane.isEditLinkDisplayed());
 
-        try {
-            // should open a confirmation modal for leaving since we didn't save
+        WebDriver driver = new Augmenter().augment(testUtils.getDriver().getWrappedDriver());
+        try (BrowsingContextInspector inspector = new BrowsingContextInspector(driver)) {
+            BrowsingContext context = new BrowsingContext(driver, driver.getWindowHandle());
+            inspector.onUserPromptOpened(userPromptOpened -> {
+                assertEquals(context.getId(), userPromptOpened.getBrowsingContextId());
+                context.handleUserPrompt(false);
+            });
             testUtils.gotoPage(testReference);
-            fail("A confirm alert should be triggered");
-        } catch (UnhandledAlertException e) {
-            Alert alert = testUtils.getDriver().switchTo().alert();
-            alert.dismiss(); // remain on the page
         }
-
         objectEditPage.deleteObject(NUMBER_CLASS, 1);
 
         // State should be same as before adding
@@ -139,14 +140,13 @@ class ObjectEditorIT
 
         // Delete the saved object
         objectEditPage.deleteObject(NUMBER_CLASS, 0);
-
-        try {
-            // should open a confirmation modal for leaving
+        try (BrowsingContextInspector inspector = new BrowsingContextInspector(driver)) {
+            BrowsingContext context = new BrowsingContext(driver, driver.getWindowHandle());
+            inspector.onUserPromptOpened(userPromptOpened -> {
+                assertEquals(context.getId(), userPromptOpened.getBrowsingContextId());
+                context.handleUserPrompt(false);
+            });
             testUtils.gotoPage(testReference);
-            fail("A confirm alert should be triggered");
-        } catch (UnhandledAlertException e) {
-            Alert alert = testUtils.getDriver().switchTo().alert();
-            alert.dismiss();
         }
 
         objectEditPage.clickSaveAndContinue();

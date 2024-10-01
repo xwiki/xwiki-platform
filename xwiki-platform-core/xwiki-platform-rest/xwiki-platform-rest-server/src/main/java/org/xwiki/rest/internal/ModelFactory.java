@@ -304,11 +304,11 @@ public class ModelFactory
         String propertiesUri;
         if (useVersion) {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                 doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
-                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                 xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         }
 
@@ -396,12 +396,12 @@ public class ModelFactory
             if (useVersion) {
                 propertyUri = Utils
                     .createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                        toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                        Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                         doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
                     .toString();
             } else {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
-                    toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                    Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                     xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
             }
             Link propertyLink = this.objectFactory.createLink();
@@ -425,11 +425,11 @@ public class ModelFactory
 
         if (useVersion) {
             objectUri = Utils.createURI(baseUri, ObjectAtPageVersionResource.class, doc.getWiki(),
-                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                 doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             objectUri = Utils.createURI(baseUri, ObjectResource.class, doc.getWiki(),
-                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName(),
+                Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName(),
                 xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         }
         Link objectLink = objectFactory.createLink();
@@ -491,7 +491,7 @@ public class ModelFactory
             space.setXwikiAbsoluteUrl(home.getExternalURL("view"));
         }
 
-        List<String> restSpacesValue = toRestSpaces(spaces);
+        List<String> restSpacesValue = Utils.getSpacesURLElements(spaces);
 
         String pagesUri = Utils.createURI(baseUri, PagesResource.class, wikiName, restSpacesValue).toString();
         Link pagesLink = this.objectFactory.createLink();
@@ -525,14 +525,12 @@ public class ModelFactory
 
         List<Locale> locales = doc.getTranslationLocales();
 
-        List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
+        List<String> restSpacesValue = Utils.getSpacesURLElements(doc.getDocumentReference());
 
         // Add the default (original) page translation, if it makes sense.
         if (!locales.isEmpty() && !Locale.ROOT.equals(defaultLocale)) {
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(translations.getDefault());
-
-            List<String> restSpacesValue = toRestSpaces(spaces);
 
             String pageTranslationUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(), restSpacesValue,
                 doc.getDocumentReference().getName()).toString();
@@ -554,8 +552,6 @@ public class ModelFactory
         for (Locale locale : locales) {
             Translation translation = this.objectFactory.createTranslation();
             translation.setLanguage(locale.toString());
-
-            List<String> restSpacesValue = toRestSpaces(spaces);
 
             String pageTranslationUri = Utils.createURI(baseUri, PageTranslationResource.class, doc.getWiki(),
                 restSpacesValue, doc.getDocumentReference().getName(), locale).toString();
@@ -637,8 +633,7 @@ public class ModelFactory
             pageSummary.setParentId("");
         }
 
-        List<String> spaces = Utils.getSpacesFromSpaceId(doc.getSpace());
-        List<String> restSpacesValue = toRestSpaces(spaces);
+        List<String> restSpacesValue = Utils.getSpacesURLElements(doc.getDocumentReference());
         String spaceUri = Utils.createURI(baseUri, SpaceResource.class, doc.getWiki(), restSpacesValue).toString();
         Link spaceLink = this.objectFactory.createLink();
         spaceLink.setHref(spaceUri);
@@ -654,8 +649,8 @@ public class ModelFactory
             pageSummary.getLinks().add(parentLink);
         }
 
-        String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
+        String historyUri = Utils.createURI(baseUri, PageHistoryResource.class, doc.getWiki(), restSpacesValue,
+            doc.getDocumentReference().getName()).toString();
         Link historyLink = this.objectFactory.createLink();
         historyLink.setHref(historyUri);
         historyLink.setRel(Relations.HISTORY);
@@ -689,10 +684,10 @@ public class ModelFactory
         if (!doc.getAttachmentList().isEmpty()) {
             String attachmentsUri;
             if (useVersion) {
-                attachmentsUri = Utils.createURI(baseUri, AttachmentsAtPageVersionResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName(), doc.getVersion()).toString();
+                attachmentsUri = Utils.createURI(baseUri, AttachmentsAtPageVersionResource.class, doc.getWiki(),
+                    restSpacesValue, doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                attachmentsUri = Utils.createURI(baseUri, AttachmentsResource.class, doc.getWiki(), spaces,
+                attachmentsUri = Utils.createURI(baseUri, AttachmentsResource.class, doc.getWiki(), restSpacesValue,
                     doc.getDocumentReference().getName()).toString();
             }
 
@@ -706,10 +701,10 @@ public class ModelFactory
             String objectsUri;
 
             if (useVersion) {
-                objectsUri = Utils.createURI(baseUri, ObjectsAtPageVersionResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName(), doc.getVersion()).toString();
+                objectsUri = Utils.createURI(baseUri, ObjectsAtPageVersionResource.class, doc.getWiki(),
+                    restSpacesValue, doc.getDocumentReference().getName(), doc.getVersion()).toString();
             } else {
-                objectsUri = Utils.createURI(baseUri, ObjectsResource.class, doc.getWiki(), spaces,
+                objectsUri = Utils.createURI(baseUri, ObjectsResource.class, doc.getWiki(), restSpacesValue,
                     doc.getDocumentReference().getName()).toString();
             }
             Link objectsLink = this.objectFactory.createLink();
@@ -721,7 +716,7 @@ public class ModelFactory
         com.xpn.xwiki.api.Object tagsObject = doc.getObject("XWiki.TagClass", 0);
         if (tagsObject != null) {
             if (tagsObject.getProperty("tags") != null) {
-                String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), spaces,
+                String tagsUri = Utils.createURI(baseUri, PageTagsResource.class, doc.getWiki(), restSpacesValue,
                     doc.getDocumentReference().getName()).toString();
                 Link tagsLink = this.objectFactory.createLink();
                 tagsLink.setHref(tagsUri);
@@ -742,10 +737,11 @@ public class ModelFactory
         PageSummary pageSummary = this.objectFactory.createPageSummary();
         toRestPageSummary(pageSummary, baseUri, doc, false, withPrettyNames);
 
-        String pageUri = Utils
-            .createURI(baseUri, PageResource.class, doc.getWiki(),
-                toRestSpaces(Utils.getSpacesFromSpaceId(doc.getSpace())), doc.getDocumentReference().getName())
-            .toString();
+        String pageUri =
+            Utils
+                .createURI(baseUri, PageResource.class, doc.getWiki(),
+                    Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName())
+                .toString();
         Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
@@ -960,8 +956,7 @@ public class ModelFactory
         attachment.setHierarchy(toRestHierarchy(xwikiAttachment.getReference(), withPrettyNames));
 
         String wiki = documentReference.getWikiReference().getName();
-        List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
-        List<String> restSpacesValue = toRestSpaces(spaces);
+        List<String> restSpacesValue = Utils.getSpacesURLElements(documentReference);
 
         String pageUri =
             Utils.createURI(baseUri, PageResource.class, wiki, restSpacesValue, documentReference.getName()).toString();
@@ -1052,19 +1047,6 @@ public class ModelFactory
         } else {
             return "";
         }
-    }
-
-    private static List<String> toRestSpaces(List<String> spaces)
-    {
-        List<String> restSpaces = new ArrayList<>(spaces.size());
-        spaces.forEach(s -> {
-            if (!restSpaces.isEmpty()) {
-                restSpaces.add("spaces");
-            }
-            restSpaces.add(s);
-        });
-
-        return restSpaces;
     }
 
     /**

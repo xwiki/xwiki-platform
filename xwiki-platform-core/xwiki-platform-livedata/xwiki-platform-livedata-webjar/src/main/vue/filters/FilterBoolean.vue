@@ -22,8 +22,8 @@
 <!-- BooleanFilter is a custom filter that allow to filter boolean values. -->
 <template>
   <span v-if="isReady">
-    <select :value="filterEntry.value" class="xwiki-selectize livedata-selectize filter-boolean" ref="input"
-      :aria-label="$t('livedata.filter.boolean.label')">
+    <select :value="filterEntry.value" class="xwiki-selectize livedata-selectize filter-boolean livedata-filter"
+            ref="input" :aria-label="$t('livedata.filter.boolean.label')">
       <option value=""></option>
       <option :value="trueValue">{{ $t('livedata.displayer.boolean.true') }}</option>
       <option :value="falseValue">{{ $t('livedata.displayer.boolean.false') }}</option>

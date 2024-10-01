@@ -20,13 +20,12 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Named;
 
@@ -122,8 +121,6 @@ public class DefaultNotificationParametersFactoryTest
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
-    private List<NotificationFilter> filterList;
-
     private List<RecordableEventDescriptor> recordableEventDescriptors;
 
     private List<NotificationPreference> mailPreferenceList;
@@ -132,40 +129,53 @@ public class DefaultNotificationParametersFactoryTest
 
     private List<NotificationFilterPreference> filterPreferenceList;
 
+    private OwnEventFilter ownEventFilter;
+    private MinorEventAlertNotificationFilter minorEventFilter;
+    private SystemUserNotificationFilter systemEventFilter;
+    private EventReadAlertFilter readEventFilter;
+    private ScopeNotificationFilter scopeFilter;
+
     @BeforeEach
-    public void setup(MockitoComponentManager componentManager) throws Exception
+    void setup(MockitoComponentManager componentManager) throws Exception
     {
         when(this.stringDocumentReferenceResolver.resolve(USER_SERIALIZED_REFERENCE)).thenReturn(USER_REFERENCE);
 
-        OwnEventFilter ownEventFilter = componentManager.registerMockComponent(OwnEventFilter.class);
+        this.ownEventFilter = componentManager.registerMockComponent(OwnEventFilter.class);
         when(ownEventFilter.getName()).thenReturn(OwnEventFilter.FILTER_NAME);
 
-        MinorEventAlertNotificationFilter minorEventFilter =
+        this.minorEventFilter =
             componentManager.registerMockComponent(MinorEventAlertNotificationFilter.class);
         when(minorEventFilter.getName()).thenReturn(MinorEventAlertNotificationFilter.FILTER_NAME);
 
-        SystemUserNotificationFilter systemEventFilter =
+        this.systemEventFilter =
             componentManager.registerMockComponent(SystemUserNotificationFilter.class);
         when(systemEventFilter.getName()).thenReturn(SystemUserNotificationFilter.FILTER_NAME);
 
-        EventReadAlertFilter readEventFilter = componentManager.registerMockComponent(EventReadAlertFilter.class);
+        this.readEventFilter = componentManager.registerMockComponent(EventReadAlertFilter.class);
         when(readEventFilter.getName()).thenReturn(EventReadAlertFilter.FILTER_NAME);
 
-        this.filterList = Arrays.asList(ownEventFilter, minorEventFilter, systemEventFilter, readEventFilter);
+        this.scopeFilter = componentManager.registerMockComponent(ScopeNotificationFilter.class);
+        when(scopeFilter.getName()).thenReturn(ScopeNotificationFilter.FILTER_NAME);
 
-        this.mailPreferenceList = Arrays.asList(mock(NotificationPreference.class), mock(NotificationPreference.class),
+        this.mailPreferenceList = List.of(mock(NotificationPreference.class), mock(NotificationPreference.class),
             mock(NotificationPreference.class));
-        this.alertPreferenceList = Arrays.asList(mock(NotificationPreference.class), mock(NotificationPreference.class),
+        this.alertPreferenceList = List.of(mock(NotificationPreference.class), mock(NotificationPreference.class),
             mock(NotificationPreference.class));
 
-        this.filterPreferenceList = Arrays.asList(mock(NotificationFilterPreference.class));
+        this.filterPreferenceList = List.of(mock(NotificationFilterPreference.class));
 
         this.recordableEventDescriptors =
-            Arrays.asList(mock(RecordableEventDescriptor.class), mock(RecordableEventDescriptor.class));
-        when(notificationFilterManager.getAllFilters(true)).thenReturn(this.filterList);
+            List.of(mock(RecordableEventDescriptor.class), mock(RecordableEventDescriptor.class));
+        when(notificationFilterManager.getAllFilters(true)).thenReturn(List.of(
+            ownEventFilter,
+            minorEventFilter,
+            systemEventFilter,
+            readEventFilter,
+            scopeFilter
+        ));
         when(notificationFilterManager.getAllFilters(USER_REFERENCE, true,
             NotificationFilter.FilteringPhase.POST_FILTERING))
-            .thenReturn(Collections.singletonList(filterList.get(1)));
+            .thenReturn(List.of(this.minorEventFilter));
 
         when(notificationPreferenceManager.getPreferences(eq(USER_REFERENCE), eq(true), same(NotificationFormat.EMAIL)))
             .thenReturn(this.mailPreferenceList);
@@ -231,9 +241,14 @@ public class DefaultNotificationParametersFactoryTest
     {
         NotificationParameters notificationParameters = new NotificationParameters();
         notificationParameters.format = NotificationFormat.ALERT;
-        notificationParameters.filters = new HashSet<>(this.filterList);
+        notificationParameters.filters = Set.of(
+            ownEventFilter,
+            minorEventFilter,
+            systemEventFilter,
+            readEventFilter
+        );
         notificationParameters.preferences =
-            Arrays.asList(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            List.of(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
                 new InternalNotificationPreference(this.recordableEventDescriptors.get(1)));
         assertEquals(notificationParameters,
             this.parametersFactory.createNotificationParameters(Collections.emptyMap()));
@@ -265,7 +280,7 @@ public class DefaultNotificationParametersFactoryTest
         notificationParameters.onlyUnread = true;
         notificationParameters.user = USER_REFERENCE;
         notificationParameters.expectedCount = 1258;
-        notificationParameters.blackList = Arrays.asList("foo", "bar", "baz");
+        notificationParameters.blackList = List.of("foo", "bar", "baz");
         notificationParameters.preferences = this.mailPreferenceList;
         notificationParameters.filterPreferences = this.filterPreferenceList;
         when(notificationFilterManager.getAllFilters(USER_REFERENCE, true,
@@ -273,9 +288,10 @@ public class DefaultNotificationParametersFactoryTest
 
         notificationParameters.filters =
             Collections.singleton(new ForUserEventFilter(NotificationFormat.EMAIL, null));
-        notificationParameters.preferences =
-            Arrays.asList(new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
-                new InternalNotificationPreference(this.recordableEventDescriptors.get(1)));
+        notificationParameters.preferences = List.of(
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
+            new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
+        );
         notificationParameters.filterPreferences = Collections.emptyList();
 
         assertEquals(notificationParameters, this.parametersFactory.createNotificationParameters(parametersMap));
@@ -289,7 +305,11 @@ public class DefaultNotificationParametersFactoryTest
         parametersMap.put(ParametersKey.USE_USER_PREFERENCES, "false");
 
         // Don't forget that "false" in DISPLAY_XXX_EVENTS means that the filter is applied to discard those events.
-        notificationParameters.filters = new HashSet<>(Arrays.asList(filterList.get(1), filterList.get(2)));
+        notificationParameters.filters = Set.of(
+            this.minorEventFilter,
+            this.systemEventFilter,
+            this.scopeFilter
+        );
 
         List<NotificationFilterPreference> notificationFilterPreferences = new ArrayList<>();
         DefaultNotificationFilterPreference filterPref = getFilterPreference("PAGE", 0);
@@ -352,14 +372,13 @@ public class DefaultNotificationParametersFactoryTest
             new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
             new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
         );
-        expectedNotificationParameters.filters = new HashSet<>(this.filterList);
-
-        DefaultNotificationFilterPreference filterPreference = getFilterPreference("WIKI", 0);
-        filterPreference.setWiki("mywiki");
-        expectedNotificationParameters.filterPreferences = List.of(
-            new ScopeNotificationFilterPreference(filterPreference, this.entityReferenceResolver)
+        expectedNotificationParameters.filters = Set.of(
+            ownEventFilter,
+            minorEventFilter,
+            systemEventFilter,
+            readEventFilter
         );
-        
+
         assertEquals(expectedNotificationParameters, this.parametersFactory.createNotificationParameters(Map.of(
             ParametersKey.USE_USER_PREFERENCES, "false"
         )));
@@ -375,7 +394,13 @@ public class DefaultNotificationParametersFactoryTest
             new InternalNotificationPreference(this.recordableEventDescriptors.get(0)),
             new InternalNotificationPreference(this.recordableEventDescriptors.get(1))
         );
-        expectedNotificationParameters.filters = new HashSet<>(this.filterList);
+        expectedNotificationParameters.filters = Set.of(
+            ownEventFilter,
+            minorEventFilter,
+            systemEventFilter,
+            readEventFilter,
+            scopeFilter
+        );
 
         DefaultNotificationFilterPreference filterPreference0 = getFilterPreference("SPACE", 0);
         filterPreference0.setPage("mywiki@@s1");

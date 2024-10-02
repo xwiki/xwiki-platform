@@ -23,7 +23,7 @@
     "test": "echo 'no test'"
   },
   "devDependencies": {
-    "@types/node": "20.14.9",
+    "@types/node": "20.16.10",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "unplugin-auto-expose": "0.2.4"

@@ -56,7 +56,9 @@
     #set($icon = {})
     #set($discard = $icon.put('name', $xwikiIcon))
     #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
-    #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+    #if($request.metadata == 'true')
+      #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+    #end
     #set($discard = $icons.add($icon))
   #end
   #jsonResponse($icons)

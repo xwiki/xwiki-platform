@@ -1,5 +1,19 @@
 # @xwiki/cristal-editors-tiptap
 
+## 0.10.0
+
+### Minor Changes
+
+- fa7fe9f: Cristal 0.10 Release
+
+### Patch Changes
+
+- Updated dependencies [fa7fe9f]
+  - @xwiki/cristal-api@0.10.0
+  - @xwiki/cristal-icons@0.10.0
+  - @xwiki/cristal-link-suggest-api@0.10.0
+  - @xwiki/cristal-skin@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

@@ -1,5 +1,28 @@
 # @xwiki/cristal-electron-renderer
 
+## 0.10.0
+
+### Minor Changes
+
+- fa7fe9f: Cristal 0.10 Release
+
+### Patch Changes
+
+- Updated dependencies [fa7fe9f]
+  - @xwiki/cristal-hierarchy-default@0.10.0
+  - @xwiki/cristal-hierarchy-filesystem@0.10.0
+  - @xwiki/cristal-hierarchy-github@0.10.0
+  - @xwiki/cristal-hierarchy-nextcloud@0.10.0
+  - @xwiki/cristal-hierarchy-xwiki@0.10.0
+  - @xwiki/cristal-navigation-tree-default@0.10.0
+  - @xwiki/cristal-navigation-tree-filesystem@0.10.0
+  - @xwiki/cristal-navigation-tree-github@0.10.0
+  - @xwiki/cristal-navigation-tree-nextcloud@0.10.0
+  - @xwiki/cristal-navigation-tree-xwiki@0.10.0
+  - @xwiki/cristal-browser-electron@0.10.0
+  - @xwiki/cristal-electron-storage@0.10.0
+  - @xwiki/cristal-lib@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

@@ -170,7 +170,9 @@
   };
   var timeoutId = 0;
   $(document).on('input.shortcutPreference', '.shortcutPreference', function () {
-    if (timeoutId != 0){clearTimeout(timeoutId)}
+    if (timeoutId !== 0) {
+      clearTimeout(timeoutId);
+    }
     timeoutId = setTimeout(updateShortcut, 500, this);
   });
 });</code>

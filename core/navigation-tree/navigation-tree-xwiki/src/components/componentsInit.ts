@@ -19,7 +19,7 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
@@ -78,19 +78,21 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
           a_attr: { href: string };
         }) => {
           if (!["attachments", "translations"].includes(treeNode.data.type)) {
+            const pageId = decodeURIComponent(
+              this.cristalApp
+                .getWikiConfig()
+                .storage.getPageFromViewURL(
+                  `${baseXWikiURL}${treeNode.a_attr.href}`,
+                )!,
+            );
             navigationTree.push({
               id: treeNode.id,
               label: treeNode.text,
+              location: pageId.replace(/\.WebHome$/, ""),
               url: this.cristalApp.getRouter().resolve({
                 name: "view",
                 params: {
-                  page: decodeURIComponent(
-                    this.cristalApp
-                      .getWikiConfig()
-                      .storage.getPageFromViewURL(
-                        `${baseXWikiURL}${treeNode.a_attr.href}`,
-                      )!,
-                  ),
+                  page: pageId,
                 },
               }).href,
               has_children: treeNode.children, //TODO: ignore translations and attachments
@@ -103,6 +105,33 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
       this.logger.debug("Could not load navigation tree.");
     }
     return navigationTree;
+  }
+
+  getParentNodesId(page?: PageData): Array<string> {
+    const result = [];
+    if (page) {
+      const documentId = page.document.getIdentifier();
+      if (!documentId) {
+        this.logger.debug(
+          `No identifier found for page ${page.name}, cannot resolve parents.`,
+        );
+        return [];
+      }
+      // TODO: Use a page resolver instead when CRISTAL-234 is fixed.
+      const parents = documentId
+        .replace(/\.WebHome$/, "")
+        .split(/(?<![^\\](?:\\\\)*\\)\./);
+      let currentParent = "";
+      let i;
+      for (i = 0; i < parents.length - 1; i++) {
+        currentParent += parents[i];
+        // TODO: Support subwikis.
+        result.push(`document:xwiki:${currentParent}.WebHome`);
+        currentParent += ".";
+      }
+      result.push(`document:xwiki:${documentId}`);
+    }
+    return result;
   }
 }
 

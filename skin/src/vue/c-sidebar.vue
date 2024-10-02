@@ -19,9 +19,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import { Ref, inject, onMounted, ref, watch } from "vue";
-import { type CristalApp } from "@xwiki/cristal-api";
+import { useRoute } from "vue-router";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
 import CConfigMenu from "./c-config-menu.vue";
+import CPageCreationMenu from "./c-page-creation-menu.vue";
 import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
@@ -40,6 +42,8 @@ const isSidebarClosed: Ref<boolean> = ref(
   viewportType.value == ViewportType.Mobile,
 );
 
+const route = useRoute();
+const currentPage: Ref<PageData | undefined> = ref(undefined);
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
 defineEmits(["collapseMainSidebar"]);
@@ -55,6 +59,15 @@ onMounted(() => {
   }
 });
 
+watch(
+  () => route.params.page,
+  async () => {
+    // TODO: define a proper abstraction.
+    const pageName = (route.params.page as string) || cristal.getCurrentPage();
+    currentPage.value = await cristal.getPage(pageName);
+  },
+  { immediate: true },
+);
 watch(viewportType, (newViewportType: ViewportType) => {
   // Always close main sidebar when switching to a smaller viewport
   if (newViewportType == ViewportType.Mobile) {
@@ -154,13 +167,17 @@ function onClickOutsideMainSidebar() {
     </div>
     <div class="panel-container">
       <c-sidebar-panel name="Wiki Name">
+        <c-page-creation-menu
+          :current-page="currentPage!"
+        ></c-page-creation-menu>
         <XNavigationTree
-          :tree-resolver="
+          :tree-source="
             cristal
               .getContainer()
               .get<NavigationTreeSourceProvider>('NavigationTreeSourceProvider')
               .get()
           "
+          :current-page="currentPage"
         ></XNavigationTree>
       </c-sidebar-panel>
       <c-sidebar-panel name="Applications"></c-sidebar-panel>

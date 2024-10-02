@@ -19,12 +19,13 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
   type NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
+import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 
 /**
  * Implementation of NavigationTreeSource for the Nextcloud backend.
@@ -57,6 +58,7 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
       navigationTree.push({
         id: d,
         label: currentPageData ? currentPageData.name : d.split("/").pop()!,
+        location: d,
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: {
@@ -110,6 +112,10 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     }
 
     return subdirectories;
+  }
+
+  getParentNodesId(page?: PageData): Array<string> {
+    return getParentNodesIdFromPath(page);
   }
 
   private getBaseHeaders() {

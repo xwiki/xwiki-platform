@@ -18,7 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ComponentInit } from "./components/componentsInit";
-import { getParentNodesIdFromPath } from "./utils";
+import type { PageData } from "@xwiki/cristal-api";
 
-export { ComponentInit, getParentNodesIdFromPath };
+/**
+ * Returns the ids of the parents nodes for a path-like page id.
+ *
+ * @param pageData the data of the page
+ * @returns the parents nodes ids
+ * @since 0.10
+ **/
+export function getParentNodesIdFromPath(page?: PageData): Array<string> {
+  const result: Array<string> = [];
+  if (page) {
+    // TODO: Use a page resolver instead when CRISTAL-234 is fixed.
+    const parents = page.id.split("/");
+    let currentParent = "";
+    let i;
+    for (i = 0; i < parents.length - 1; i++) {
+      currentParent += parents[i];
+      result.push(currentParent);
+      currentParent += "/";
+    }
+    result.push(page.id);
+  }
+  return result;
+}

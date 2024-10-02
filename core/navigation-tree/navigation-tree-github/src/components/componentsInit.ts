@@ -19,12 +19,13 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
   type NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
+import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 
 /**
  * Implementation of NavigationTreeSource for the GitHub backend.
@@ -69,6 +70,7 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
           navigationTree.push({
             id: treeNode.path,
             label: treeNode.name,
+            location: treeNode.path,
             url: this.cristalApp.getRouter().resolve({
               name: "view",
               params: {
@@ -84,6 +86,10 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
       this.logger.debug("Could not load navigation tree.");
     }
     return navigationTree;
+  }
+
+  getParentNodesId(page?: PageData): Array<string> {
+    return getParentNodesIdFromPath(page);
   }
 }
 

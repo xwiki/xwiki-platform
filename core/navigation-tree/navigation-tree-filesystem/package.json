@@ -25,6 +25,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
+    "@xwiki/cristal-navigation-tree-default": "workspace:*",
     "inversify": "6.0.2"
   },
   "publishConfig": {

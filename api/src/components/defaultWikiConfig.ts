@@ -137,4 +137,8 @@ export class DefaultWikiConfig implements WikiConfig {
   getType(): string {
     return "Default";
   }
+
+  getNewPageDefaultName(): string {
+    return "newpage";
+  }
 }

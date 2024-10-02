@@ -3,6 +3,8 @@ import { type TextFieldProps } from "@xwiki/cristal-dsapi";
 import "@shoelace-style/shoelace/dist/components/input/input";
 
 defineProps<TextFieldProps>();
+
+const input = defineModel<string>();
 </script>
 
 <template>
@@ -10,7 +12,9 @@ defineProps<TextFieldProps>();
     :label="label"
     :name="name"
     :required="required"
+    :value="input"
     type="text"
+    @input="input = $event.target.value"
   ></sl-input>
 </template>
 

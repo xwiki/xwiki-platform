@@ -19,21 +19,36 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
-import { ref } from "vue";
 
-defineProps<{ class: string; title: string }>();
-
-const dialog = ref();
+defineProps<{
+  title: string;
+  width: string | number | undefined;
+}>();
 
 function click() {
-  dialog.value.show();
+  open.value = true;
 }
+
+const open = defineModel<boolean>();
 </script>
 <template>
   <span @click="click">
     <slot name="activator" />
   </span>
-  <sl-dialog ref="dialog" :label="title" class="dialog-overview">
+  <sl-dialog
+    :open="open"
+    :label="title"
+    class="dialog-overview"
+    @sl-show="open = true"
+    @sl-hide="open = false"
+  >
     <slot name="default" />
   </sl-dialog>
 </template>
+
+<style scoped>
+sl-dialog {
+  --width: v-bind(width);
+  --body-spacing: 0 1.25rem 1.25rem;
+}
+</style>

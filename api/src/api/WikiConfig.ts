@@ -63,4 +63,12 @@ export interface WikiConfig {
    * @since 0.9
    */
   getType(): string;
+
+  /**
+   * Returns the default name for a newly created page.
+   *
+   * @returns the default name
+   * @since 0.10
+   */
+  getNewPageDefaultName(): string;
 }

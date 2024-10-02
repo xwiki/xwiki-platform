@@ -21,6 +21,9 @@
     "clean": "rimraf dist",
     "build": "tsc --project tsconfig.json && vite build"
   },
+  "dependencies": {
+    "@xwiki/cristal-api": "workspace:*"
+  },
   "publishConfig": {
     "exports": {
       ".": {

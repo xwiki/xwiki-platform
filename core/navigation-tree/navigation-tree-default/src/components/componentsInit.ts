@@ -19,13 +19,14 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
   type NavigationTreeSource,
   type NavigationTreeSourceProvider,
 } from "@xwiki/cristal-navigation-tree-api";
+import { getParentNodesIdFromPath } from "../utils";
 
 /**
  * Default implementation for NavigationTreeSource.
@@ -45,6 +46,10 @@ class DefaultNavigationTreeSource implements NavigationTreeSource {
 
   async getChildNodes(): Promise<Array<NavigationTreeNode>> {
     return [];
+  }
+
+  getParentNodesId(page?: PageData): Array<string> {
+    return getParentNodesIdFromPath(page);
   }
 }
 

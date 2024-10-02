@@ -130,7 +130,7 @@
    * Handle the shortcut preference modifications
    */
   $(document).off('input.shortcutPreference');
-  let updateShortcut = function( shortcutPreferenceDOM) {
+  let updateShortcut = function (shortcutPreferenceDOM) {
     let shortcutPreference = $(shortcutPreferenceDOM);
     let translateKey = shortcutPreference.attr("data-translatekey");
     let newValue = shortcutPreference.val();

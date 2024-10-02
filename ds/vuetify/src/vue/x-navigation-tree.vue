@@ -73,9 +73,7 @@ watch(
 );
 
 async function expandTree() {
-  const newExpandedNodes = props.treeSource.getParentNodesId(
-    props.currentPage,
-  );
+  const newExpandedNodes = props.treeSource.getParentNodesId(props.currentPage);
   let i;
   let currentNodes = rootNodes.value;
   for (i = 0; i < newExpandedNodes.length - 1; i++) {

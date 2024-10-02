@@ -284,10 +284,11 @@
     ## Also, not filled back in if there is an error ('noReturn').
     #set($field =
       {'name' : 'captcha_placeholder',
-        'label' : $services.localization.render('core.captcha.instruction'),
+        'label' : $services.localization.render('core.captcha.label')
         'skipLabelFor' : true,
         'type'  : 'html',
-        'html'  : "$!{services.captcha.default.display()}",
+        'html'  : "&lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('core.captcha.instruction'))
+          &lt;/span&gt; $!{services.captcha.default.display()}",
         'validate' : {
           'programmaticValidation' : {
             'code' : '#if (!$services.captcha.default.isValid())failed#end',

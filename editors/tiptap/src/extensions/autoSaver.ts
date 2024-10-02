@@ -61,7 +61,7 @@ export class AutoSaver extends EventEmitter {
   /**
    * Used to debounce saves.
    */
-  private saveTimer: any;
+  private saveTimer: ReturnType<typeof setTimeout> | undefined;
 
   /**
    * The awareness state used by the auto saver.
@@ -116,7 +116,7 @@ export class AutoSaver extends EventEmitter {
     }
   }
 
-  private onUpdate(update: Uint8Array, origin: any): void {
+  private onUpdate(update: Uint8Array, origin: unknown): void {
     // Cancel the previously scheduled save.
     clearTimeout(this.saveTimer);
 

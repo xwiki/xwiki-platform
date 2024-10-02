@@ -41,7 +41,7 @@ describe("getPageFromViewURL", () => {
       xwikiStorage.getPageFromViewURL(
         "<baseURL>/bin/view/Space1%5C.Space%5C2/Web%2FHome",
       ),
-    ).toStrictEqual("Space1%5C%5C%5C.Space%5C%5C2.Web%2FHome");
+    ).toStrictEqual("Space1\\\\\\.Space\\\\2.Web/Home");
   });
   it("missing terminal page", () => {
     expect(

@@ -28,12 +28,12 @@ import {
 import { getPageHierarchyFromPath } from "@xwiki/cristal-hierarchy-default";
 
 /**
- * Implementation of PageHierarchyResolver for the FileSystem backend.
+ * Implementation of PageHierarchyResolver for Nextcloud backend.
  *
- * @since 0.9
+ * @since 0.10
  **/
 @injectable()
-class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
+class NextcloudPageHierarchyResolver implements PageHierarchyResolver {
   private cristalApp: CristalApp;
   public logger: Logger;
 
@@ -42,9 +42,7 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
     @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
-    this.logger.setModule(
-      "electron.storage.components.FileSystemPageHierarchyResolver",
-    );
+    this.logger.setModule("storage.components.NextcloudPageHierarchyResolver");
     this.cristalApp = cristalApp;
   }
 
@@ -56,7 +54,7 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
         label: "Home",
         url: this.cristalApp.getRouter().resolve({
           name: "view",
-          params: { page: "index" },
+          params: { page: this.cristalApp.getWikiConfig().homePage },
         }).href,
       },
     ];
@@ -73,8 +71,8 @@ export class ComponentInit {
   constructor(container: Container) {
     container
       .bind<PageHierarchyResolver>(name)
-      .to(FileSystemPageHierarchyResolver)
+      .to(NextcloudPageHierarchyResolver)
       .inSingletonScope()
-      .whenTargetNamed("FileSystem");
+      .whenTargetNamed("Nextcloud");
   }
 }

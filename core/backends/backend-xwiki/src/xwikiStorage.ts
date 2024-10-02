@@ -74,7 +74,7 @@ export class XWikiStorage extends AbstractStorage {
       this.wikiConfig.baseURL +
       this.wikiConfig.baseRestURL +
       "&page=" +
-      page +
+      encodeURIComponent(page) +
       "&format=" +
       syntax
     );
@@ -93,6 +93,7 @@ export class XWikiStorage extends AbstractStorage {
       if (page.endsWith(".")) {
         page += "WebHome";
       }
+      page = decodeURIComponent(page);
     } else {
       page = null;
     }

@@ -36,6 +36,7 @@
     "@xwiki/cristal-browser-default": "workspace:*",
     "@xwiki/cristal-hierarchy-default": "workspace:*",
     "@xwiki/cristal-hierarchy-github": "workspace:*",
+    "@xwiki/cristal-hierarchy-nextcloud": "workspace:*",
     "@xwiki/cristal-hierarchy-xwiki": "workspace:*",
     "@xwiki/cristal-navigation-tree-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-github": "workspace:*",

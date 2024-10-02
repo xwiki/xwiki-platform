@@ -124,7 +124,7 @@ export class DefaultCristalApp implements CristalApp {
   setCurrentPage(newPage: string, mode: string = "view"): void {
     this.router.push({
       name: mode,
-      params: { page: decodeURIComponent(newPage) },
+      params: { page: newPage },
     });
   }
 
@@ -140,7 +140,8 @@ export class DefaultCristalApp implements CristalApp {
       }
     } else {
       this.logger?.debug("Could not find state or state in page", event);
-      const page = this.getPageFromHash(location.hash);
+      // TODO: Remove decodeURIComponent once CRISTAL-233 is fixed.
+      const page = decodeURIComponent(this.getPageFromHash(location.hash)!);
       if (page != null) {
         this.page.name = page;
         this.page.source = "";

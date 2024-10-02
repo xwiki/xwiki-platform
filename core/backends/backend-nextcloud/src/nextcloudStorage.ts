@@ -71,6 +71,7 @@ export class NextcloudStorage extends AbstractStorage {
 
         return {
           ...json,
+          id: page,
           headline: json.name,
           headlineRaw: json.name,
         };

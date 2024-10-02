@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ComponentInit } from "./components/componentsInit";
-import { getPageHierarchyFromPath } from "./utils";
+import { generateConfig } from "../../../vite.config";
 
-export { ComponentInit, getPageHierarchyFromPath };
+export default generateConfig(import.meta.url);

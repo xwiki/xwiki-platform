@@ -303,6 +303,9 @@ importers:
       '@xwiki/cristal-hierarchy-api':
         specifier: workspace:*
         version: link:../hierarchy-api
+      '@xwiki/cristal-hierarchy-default':
+        specifier: workspace:*
+        version: link:../hierarchy-default
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -315,6 +318,21 @@ importers:
       '@xwiki/cristal-hierarchy-api':
         specifier: workspace:*
         version: link:../hierarchy-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  core/hierarchy/hierarchy-nextcloud:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../hierarchy-api
+      '@xwiki/cristal-hierarchy-default':
+        specifier: workspace:*
+        version: link:../hierarchy-default
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -792,6 +810,9 @@ importers:
       '@xwiki/cristal-hierarchy-github':
         specifier: workspace:*
         version: link:../../core/hierarchy/hierarchy-github
+      '@xwiki/cristal-hierarchy-nextcloud':
+        specifier: workspace:*
+        version: link:../../core/hierarchy/hierarchy-nextcloud
       '@xwiki/cristal-hierarchy-xwiki':
         specifier: workspace:*
         version: link:../../core/hierarchy/hierarchy-xwiki
@@ -1165,6 +1186,9 @@ importers:
       '@xwiki/cristal-hierarchy-github':
         specifier: workspace:*
         version: link:../core/hierarchy/hierarchy-github
+      '@xwiki/cristal-hierarchy-nextcloud':
+        specifier: workspace:*
+        version: link:../core/hierarchy/hierarchy-nextcloud
       '@xwiki/cristal-hierarchy-xwiki':
         specifier: workspace:*
         version: link:../core/hierarchy/hierarchy-xwiki

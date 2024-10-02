@@ -92,9 +92,6 @@ const title = computed(() => {
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
 async function fetchPage(page: string) {
-  if (page != null) {
-    page = encodeURIComponent(page);
-  }
   loading.value = true;
   try {
     // Provides a reactive variable to be updated if the page content is updated

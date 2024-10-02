@@ -53,7 +53,8 @@ export class GitHubStorage extends AbstractStorage {
   }
 
   getImageURL(page: string, image: string): string {
-    return this.wikiConfig.baseRestURL + decodeURIComponent(image);
+    const directory = page.replace(/[^/]*$/, "");
+    return `${this.wikiConfig.baseRestURL}${directory}${image}`;
   }
 
   hashCode = function (str: string): string {
@@ -73,8 +74,7 @@ export class GitHubStorage extends AbstractStorage {
 
   async getPageContent(page: string, syntax: string): Promise<PageData> {
     this.logger?.debug("GitHub Loading page", page);
-    const decodedPage = decodeURIComponent(page);
-    const url = this.getPageRestURL(decodedPage, syntax);
+    const url = this.getPageRestURL(page, syntax);
     const response = await fetch(url, { cache: "no-store" });
     const text = await response.text();
     let content = "";
@@ -89,8 +89,8 @@ export class GitHubStorage extends AbstractStorage {
     }
 
     const pageContentData = new DefaultPageData();
-    pageContentData.id = decodedPage;
-    pageContentData.name = decodedPage.split("/").pop()!;
+    pageContentData.id = page;
+    pageContentData.name = page.split("/").pop()!;
     pageContentData.source = content;
     pageContentData.syntax = "md";
     pageContentData.css = [];

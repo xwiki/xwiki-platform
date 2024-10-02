@@ -19,6 +19,5 @@
  */
 
 import { ComponentInit } from "./components/componentsInit";
-import { getPageHierarchyFromPath } from "./utils";
 
-export { ComponentInit, getPageHierarchyFromPath };
+export { ComponentInit };

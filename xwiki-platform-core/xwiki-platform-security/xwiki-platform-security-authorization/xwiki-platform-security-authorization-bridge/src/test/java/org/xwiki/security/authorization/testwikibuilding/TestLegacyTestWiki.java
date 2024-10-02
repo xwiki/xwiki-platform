@@ -19,13 +19,12 @@
  */
 package org.xwiki.security.authorization.testwikibuilding;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
+import org.xwiki.security.authorization.internal.XWikiCachingRightService;
 
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
-
-import org.xwiki.security.authorization.internal.XWikiCachingRightService;
-import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 
 public class TestLegacyTestWiki extends AbstractLegacyWikiTestCase
 {
@@ -45,5 +44,13 @@ public class TestLegacyTestWiki extends AbstractLegacyWikiTestCase
 
         Assert.assertTrue(
             cachingImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));
+
+        Assert.assertFalse(
+            cachingImpl.hasAccessLevel("edit", "AllanSvensson", "Main.ScriptDocument", testWiki.getXWikiContext())
+        );
+
+        Assert.assertTrue(
+            cachingImpl.hasAccessLevel("edit", "AllanSvensson", "Main.EditableScriptDocument", testWiki.getXWikiContext())
+        );
     }
 }

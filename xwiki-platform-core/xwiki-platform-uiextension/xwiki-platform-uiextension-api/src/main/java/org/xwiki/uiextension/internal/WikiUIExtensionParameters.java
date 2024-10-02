@@ -41,7 +41,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -113,7 +113,7 @@ public class WikiUIExtensionParameters
 
     private final DocumentReference authorReference;
 
-    private final AuthorizationManager authorizationManager;
+    private final DocumentAuthorizationManager authorizationManager;
 
     /**
      * Default constructor.
@@ -137,7 +137,7 @@ public class WikiUIExtensionParameters
             this.modelContext = cm.getInstance(ModelContext.class);
             this.loggerConfiguration = cm.getInstance(LoggerConfiguration.class);
             this.authorExecutor = cm.getInstance(AuthorExecutor.class);
-            this.authorizationManager = cm.getInstance(AuthorizationManager.class);
+            this.authorizationManager = cm.getInstance(DocumentAuthorizationManager.class);
         } catch (ComponentLookupException e) {
             throw new WikiComponentException(
                 "Failed to get an instance for a component role required by Wiki Components.", e);
@@ -187,7 +187,8 @@ public class WikiUIExtensionParameters
                 .collect(Collectors.toMap(Function.identity(), this.parameters::getProperty));
 
             if (!this.parameters.isEmpty()
-                && this.authorizationManager.hasAccess(Right.SCRIPT, this.authorReference, this.documentReference))
+                && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, this.authorReference,
+                this.documentReference))
             {
                 try {
                     this.authorExecutor.call(() -> {

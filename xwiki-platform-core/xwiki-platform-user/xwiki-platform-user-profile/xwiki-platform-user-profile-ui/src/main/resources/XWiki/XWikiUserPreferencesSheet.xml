@@ -424,7 +424,7 @@
         #end&gt;
     #else
       &lt;span&gt;
-        #if("$!value" != '') $!value##
+        #if("$!shortcutPreference" != '') $!value##
         #else $defaultValue##
           &lt;small&gt;($escapetool.xml($services.localization.render('userprofile.default')))&lt;/small&gt;##
         #end&lt;/span&gt;

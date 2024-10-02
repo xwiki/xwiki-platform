@@ -57,6 +57,7 @@ define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, X
         // Since 12.3RC1
         // Note that the 'data-xwiki-locale' attribute is set since XWiki 10.4RC1 but it hasn't been exposed here.
         self.locale = html.data('xwiki-locale');
+        self.action = html.data('xwiki-action');
       } else {
         // Case 2: meta information are stored in deprecated <meta> tags
         // (in colibri)

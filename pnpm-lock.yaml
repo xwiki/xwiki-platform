@@ -258,8 +258,8 @@ importers:
         version: 4.17.21
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.5
-        version: 4.17.5
+        specifier: 4.17.10
+        version: 4.17.10
 
   core/extra-tabs/extra-tabs-ui:
     dependencies:
@@ -390,8 +390,8 @@ importers:
         version: 4.17.21
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.5
-        version: 4.17.5
+        specifier: 4.17.10
+        version: 4.17.10
 
   core/info-actions/info-actions-ui:
     dependencies:
@@ -713,8 +713,8 @@ importers:
         version: 13.6.18
     devDependencies:
       '@types/lodash':
-        specifier: 4.17.5
-        version: 4.17.5
+        specifier: 4.17.10
+        version: 4.17.10
       '@types/markdown-it':
         specifier: 14.1.1
         version: 14.1.1
@@ -2243,8 +2243,8 @@ packages:
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
 
-  '@types/lodash@4.17.5':
-    resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
+  '@types/lodash@4.17.10':
+    resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
 
   '@types/markdown-it@13.0.8':
     resolution: {integrity: sha512-V+KmpgiipS+zoypeUSS9ojesWtY/0k4XfqcK2fnVrX/qInJhX7rsCxZ/rygiPH2zxlPPrhfuW0I6ddMcWTKLsg==}
@@ -6456,7 +6456,7 @@ snapshots:
 
   '@types/linkify-it@5.0.0': {}
 
-  '@types/lodash@4.17.5': {}
+  '@types/lodash@4.17.10': {}
 
   '@types/markdown-it@13.0.8':
     dependencies:

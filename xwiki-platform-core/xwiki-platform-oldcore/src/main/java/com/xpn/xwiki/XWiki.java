@@ -4102,7 +4102,7 @@ public class XWiki implements EventListener
 
     public String generateRandomString(int size)
     {
-        return RandomStringUtils.randomAlphanumeric(size);
+        return RandomStringUtils.secure().nextAlphanumeric(size);
     }
 
     public String generateValidationKey(int size)

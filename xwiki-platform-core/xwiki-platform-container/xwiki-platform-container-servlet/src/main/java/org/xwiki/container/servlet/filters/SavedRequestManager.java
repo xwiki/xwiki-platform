@@ -68,7 +68,7 @@ public final class SavedRequestManager
         @SuppressWarnings("unchecked")
         public SavedRequest(HttpServletRequest request)
         {
-            this.parameters = new HashMap<String, String[]>(request.getParameterMap());
+            this.parameters = new HashMap<>(request.getParameterMap());
             this.requestUrl = request.getRequestURL().toString();
         }
 
@@ -166,7 +166,7 @@ public final class SavedRequestManager
         Map<String, SavedRequest> savedRequests =
             (Map<String, SavedRequest>) session.getAttribute(getSavedRequestKey());
         if (savedRequests == null) {
-            savedRequests = new HashMap<String, SavedRequest>();
+            savedRequests = new HashMap<>();
             session.setAttribute(getSavedRequestKey(), savedRequests);
         }
         // Save the request data

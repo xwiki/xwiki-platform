@@ -232,24 +232,25 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   /**
    * Display the list of icons
    */
-  var displayList = function(iconTheme) {
+  var displayList = function(iconList, iconTheme) {
     // Filter the icons we display based on the value of the input field.
     let selectedIconName = '';
     if (currentInput.data('xwikiIconPickerSettings') !== '') {
       selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
     }
     // For each icon
-    for (var i=0; i &lt; iconTheme.length; ++i) {
+    for (var i=0; i &lt; iconList.length; ++i) {
+      let icon = iconList[i];
       // Display the icon
-      if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
+      if (selectedIconName === '' || icon.name.includes(selectedIconName)) {
         var displayer = $(document.createElement('div'));
         iconListSection.append(displayer);
         displayer.addClass('xwikiIconPickerIcon');
         var imageDiv = $(document.createElement('div'));
-        imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+        imageDiv.addClass('xwikiIconPickerIconImage').html(icon.render);
         displayer.append(imageDiv);
         var iconNameSpan = $(document.createElement('span'));
-        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        iconNameSpan.addClass('xwikiIconPickerIconName').text(icon.name);
         displayer.append(iconNameSpan);
         // Change the input value when the icon is clicked
         displayer.on('click', function(event) {
@@ -268,7 +269,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Put the result in the icons map
       icons[iconTheme] = dataIcons;
       // Display the list
-      displayList(icons[iconTheme]);
+      displayList(icons[iconTheme], iconTheme);
       // Hide the spinner
       spinner.hide();
     });
@@ -326,7 +327,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         loadIconList(currentIconTheme)
       } else {
         // just display what have been previously loaded
-        displayList(icons[currentIconTheme]);
+        displayList(icons[currentIconTheme], currentIconTheme);
       }
     });
   }
@@ -421,7 +422,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Display icons
       if (icons[currentIconTheme].length &gt; 0) {
         // display the icon theme since it has already be loaded
-        displayList(icons[currentIconTheme]);
+        displayList(icons[currentIconTheme], currentIconTheme);
       } else {
         // load the icon theme
         loadIconList(currentIconTheme);
@@ -432,7 +433,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
       // Display the new ones. We always reload because the filter results are unrelated.
-      displayList(icons[currentIconTheme]);
+      displayList(icons[currentIconTheme], currentIconTheme);
     };
     currentInput.on('keyup', function(event) {
       // Close the picker when the user press 'escape'.

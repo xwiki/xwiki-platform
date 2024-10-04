@@ -27,6 +27,12 @@
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
   "packageRules": [
+    // Wait for releases to be 3 days old before creating a PR.
+    // Avoid having endless suggestions of minor upgrades for fast moving dependencies (e.g., nx).
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "3 days"
+    },
     {
       "groupName": "tiptap",
       "matchDepPatterns": "@tiptap/.+"

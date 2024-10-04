@@ -41,7 +41,8 @@
  This package contains a pre configured Solr core for XWiki ${debian.solr.core} to be used in a standalone Solr setup.
     </debian.description>
 
-    <debian.package>xwiki-solr${solr.major.version}-${debian.xwiki.core}</debian.package>
+    <debian.package.core>${debian.xwiki.core}</debian.package.core>
+    <debian.package>xwiki-solr${solr.major.version}-${debian.package.core}</debian.package>
 
     <debian.solr.package>xwiki-platform-search-solr-server-core-minimal</debian.solr.package>
 

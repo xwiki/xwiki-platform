@@ -32,5 +32,8 @@
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Extension Index</name>
   <properties>
     <debian.xwiki.core>extension_index</debian.xwiki.core>
+
+    <!-- '_'' is forbidden in a Debian package name so we cannot reuse the core name as is -->
+    <debian.package.core>extension-index</debian.package.core>
   </properties>
 </project>

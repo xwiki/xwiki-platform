@@ -616,16 +616,16 @@ importers:
   editors/tiptap:
     dependencies:
       '@hocuspocus/provider':
-        specifier: ^2.13.5
+        specifier: 2.13.5
         version: 2.13.5(y-protocols@1.0.6(yjs@13.6.18))(yjs@13.6.18)
       '@tiptap/core':
         specifier: 2.5.9
         version: 2.5.9(@tiptap/pm@2.5.9)
       '@tiptap/extension-collaboration':
-        specifier: ^2.5.9
+        specifier: 2.5.9
         version: 2.5.9(@tiptap/core@2.5.9(@tiptap/pm@2.5.9))(@tiptap/pm@2.5.9)(y-prosemirror@1.2.11(prosemirror-model@1.22.2)(prosemirror-state@1.4.3)(prosemirror-view@1.33.9)(y-protocols@1.0.6(yjs@13.6.18))(yjs@13.6.18))
       '@tiptap/extension-collaboration-cursor':
-        specifier: ^2.5.9
+        specifier: 2.5.9
         version: 2.5.9(@tiptap/core@2.5.9(@tiptap/pm@2.5.9))(y-prosemirror@1.2.11(prosemirror-model@1.22.2)(prosemirror-state@1.4.3)(prosemirror-view@1.33.9)(y-protocols@1.0.6(yjs@13.6.18))(yjs@13.6.18))
       '@tiptap/extension-heading':
         specifier: 2.5.9
@@ -676,10 +676,10 @@ importers:
         specifier: workspace:*
         version: link:../../skin
       avvvatars-vue:
-        specifier: ^1.1.0
+        specifier: 1.1.0
         version: 1.1.0(patch_hash=usix32k57inq7lu5l5hlwk33gm)(vue@3.5.10(typescript@5.6.2))
       eventemitter3:
-        specifier: ^5.0.1
+        specifier: 5.0.1
         version: 5.0.1
       inversify:
         specifier: 6.0.2
@@ -709,7 +709,7 @@ importers:
         specifier: 4.4.0
         version: 4.4.0(vue@3.5.10(typescript@5.6.2))
       yjs:
-        specifier: ^13.6.18
+        specifier: 13.6.18
         version: 13.6.18
     devDependencies:
       '@types/lodash':
@@ -1175,7 +1175,7 @@ importers:
   web:
     dependencies:
       '@hocuspocus/server':
-        specifier: ^2.13.5
+        specifier: 2.13.5
         version: 2.13.5(y-protocols@1.0.6(yjs@13.6.18))(yjs@13.6.18)
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
@@ -1214,7 +1214,7 @@ importers:
         specifier: 4.19.2
         version: 4.19.2
       express-ws:
-        specifier: ^5.0.2
+        specifier: 5.0.2
         version: 5.0.2(express@4.19.2)
       vue:
         specifier: 3.5.10
@@ -3983,11 +3983,6 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  lib0@0.2.96:
-    resolution: {integrity: sha512-xeV9M34+D4HD1sd6xAarnWYgU7pKau64bvmPySibX85G+hx/KonzISpO409K6OS9IVLORWfQZkKBRZV5sQegFQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-
   lib0@0.2.98:
     resolution: {integrity: sha512-XteTiNO0qEXqqweWx+b21p/fBnNHUA1NwAtJNJek1oPrewEZs2uiT4gWivHKr9GqCjDPAhchz0UQO8NwU3bBNA==}
     engines: {node: '>=16'}
@@ -6156,13 +6151,13 @@ snapshots:
 
   '@hocuspocus/common@2.13.5':
     dependencies:
-      lib0: 0.2.96
+      lib0: 0.2.98
 
   '@hocuspocus/provider@2.13.5(y-protocols@1.0.6(yjs@13.6.18))(yjs@13.6.18)':
     dependencies:
       '@hocuspocus/common': 2.13.5
       '@lifeomic/attempt': 3.1.0
-      lib0: 0.2.96
+      lib0: 0.2.98
       ws: 8.18.0
       y-protocols: 1.0.6(yjs@13.6.18)
       yjs: 13.6.18
@@ -6175,7 +6170,7 @@ snapshots:
       '@hocuspocus/common': 2.13.5
       async-lock: 1.4.1
       kleur: 4.1.5
-      lib0: 0.2.96
+      lib0: 0.2.98
       uuid: 10.0.0
       ws: 8.18.0
       y-protocols: 1.0.6(yjs@13.6.18)
@@ -8871,10 +8866,6 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lib0@0.2.96:
-    dependencies:
-      isomorphic.js: 0.2.5
-
   lib0@0.2.98:
     dependencies:
       isomorphic.js: 0.2.5
@@ -10572,7 +10563,7 @@ snapshots:
 
   yjs@13.6.18:
     dependencies:
-      lib0: 0.2.96
+      lib0: 0.2.98
 
   yn@3.1.1: {}
 

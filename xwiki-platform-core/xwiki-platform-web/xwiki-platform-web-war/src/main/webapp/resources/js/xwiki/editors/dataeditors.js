@@ -764,12 +764,15 @@ editors.XDataEditors = Class.create({
       }.bindAsEventListener());
       // Extend the Sortable items with arrow keys support
       movebutton.observe('keydown', function(event){
+        // We only do something when the key is ArrowUp (keyCode: 38) or ArrowDown (keyCode: 40)
         if (![38, 40].includes(event.keyCode)) { return; }
         var sequence = Sortable.sequence($('xclassContent'));
         var sequenceLength = sequence.length;
         var item = event.target.parentElement.parentElement.parentElement;
         /* We need to recompute the name of the entry similarly to what's done in scriptaculous
-          to make sure it matches the one we get in the sequence. */
+          to make sure it matches the one we get in the sequence. 
+          See https://github.com/madrobby/scriptaculous/blob/b0a8422f7f6f2e2e17f0d5ddfef1d9a6f5428472/src/dragdrop.js#L592 
+          for the source of the format regex. */
         let format = /^[^_\-](?:[A-Za-z0-9\-\_]*)[_](.*)$/;
         let currentElementName = item.id.match(format) ? item.id.match(format)[1] : '';
         let currentElementIndex = sequence.indexOf(currentElementName);

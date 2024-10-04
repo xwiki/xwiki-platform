@@ -30,12 +30,18 @@
     // Wait for releases to be 3 days old before creating a PR.
     // Avoid having endless suggestions of minor upgrades for fast moving dependencies (e.g., nx).
     {
-      "matchDatasources": ["npm"],
+      "matchDatasources": [
+        "npm"
+      ],
       "minimumReleaseAge": "3 days"
     },
     {
       "groupName": "tiptap",
       "matchDepPatterns": "@tiptap/.+"
+    },
+    {
+      "groupName": "hocuspocus",
+      "matchDepPatterns": "@hocuspocus/.+"
     },
     {
       "groupName": "@typescript-eslint",

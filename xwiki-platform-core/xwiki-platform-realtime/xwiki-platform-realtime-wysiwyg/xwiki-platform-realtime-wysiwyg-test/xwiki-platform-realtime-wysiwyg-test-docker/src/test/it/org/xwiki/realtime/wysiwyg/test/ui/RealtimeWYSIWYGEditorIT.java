@@ -1592,6 +1592,36 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         assertEquals("eight", firstTextArea.getText());
     }
 
+    @Test
+    @Order(18)
+    void saveAndContinueDoesNotHideToolbar(TestUtils setup, TestReference testReference)
+    {
+        // Save the page first so that we can edit it inplace.
+        setup.createPage(testReference, "one\n\n{{info}}two{{/info}}");
+
+        // The default edit mode is inplace.
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.edit();
+
+        RealtimeCKEditor editor = new RealtimeCKEditor();
+        RealtimeCKEditorToolBar toolbar = editor.getToolBar();
+        RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
+
+        // Move the focus from the main editable to the nested editable.
+        textArea.sendKeys("1", Keys.ARROW_DOWN, Keys.HOME, "2");
+
+        // Save and continue (using the shortcut so that the editor doesn't lose the focus).
+        textArea.sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+
+        // Verify that the toolbar is still visible.
+        assertTrue(toolbar.canToggleSourceMode());
+
+        // Verify that Save & View doesn't ask for leave confirmation.
+        textArea.sendKeys("3");
+        inplaceEditablePage = inplaceEditablePage.saveAndView();
+        assertEquals("1one\nInformation\n23two", inplaceEditablePage.getContent());
+    }
+
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)
     {
         AdministrationPage adminPage = AdministrationPage.gotoPage();

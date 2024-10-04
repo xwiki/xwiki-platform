@@ -57,7 +57,7 @@
     "vite-plugin-comlink": "4.1.0",
     "vite-plugin-dts": "3.9.1",
     "vite-plugin-inspect": "0.8.4",
-    "vite-plugin-vuetify": "2.0.3",
+    "vite-plugin-vuetify": "2.0.4",
     "vue-tsc": "2.1.6"
   }
 }

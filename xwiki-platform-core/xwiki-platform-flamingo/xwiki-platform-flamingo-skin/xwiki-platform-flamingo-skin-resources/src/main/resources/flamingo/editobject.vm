@@ -46,9 +46,9 @@
         #cleanClassname(${class.name}) <span class="editor-objectNumber">${obj.number}</span>#if ($firstField): $firstFieldSummary#end
       </button>
     </h3>
-    <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.icon.renderHTML('trash')</a>
+    <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$escapetool.xml($services.localization.render('core.editors.object.removeObject.tooltip'))">$services.icon.renderHTML('trash')</a>
     #if (!$hasCustomObject)
-      <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.icon.renderHTML('pencil')</a>
+      <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$escapetool.xml($services.localization.render('core.editors.object.editSingleObject.tooltip'))">$services.icon.renderHTML('pencil')</a>
     #end
   </div>
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_content" class="xobject-content">
@@ -93,7 +93,7 @@
       </dl>
       <div>
         <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
-          title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">
+          title="$escapetool.xml($services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip'))">
           $services.icon.renderHTML('cross')
           $services.localization.render('core.editors.object.removeDeprecatedProperties.link')
         </a>
@@ -208,7 +208,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;form_token=$!{services.csrf.getToken()}&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.icon.renderHTML('add') $services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;form_token=$!{services.csrf.getToken()}&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$escapetool.xml($services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"]))">$services.icon.renderHTML('add') $services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end
@@ -260,7 +260,7 @@
   #if ($mustSync)
     <div class="box warningmessage deprecatedProperties">
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
+      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$escapetool.xml($services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip'))">$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
     </div>
   #end
 #end ## checkPropertyDeprecation
@@ -368,7 +368,7 @@
     #set ($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
     <div class="more-actions">
       $services.icon.renderHTML('pencil')
-      <a href='$fullEditorURL' class='edit-all' title="$services.localization.render('core.editors.object.editAllObjects')">$services.localization.render('core.editors.object.editAllObjects')</a>
+      <a href='$fullEditorURL' class='edit-all' title="$escapetool.xmlI($services.localization.render('core.editors.object.editAllObjects'))">$services.localization.render('core.editors.object.editAllObjects')</a>
     </div>
   #end
   #set ($redirect = $xwiki.relativeRequestURL)

@@ -420,7 +420,7 @@
           aria-describedby="$escapedHintId"
         #end
         #if ($value)
-          value="$value"
+          value="$escapetool.xml($value)"
         #elseif ($defaultValue)
           value="$defaultValue"
         #end&gt;

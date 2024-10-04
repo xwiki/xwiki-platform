@@ -75,7 +75,7 @@ fi
 # Migrate the core files stored at the previous Solr 9 location (XWiki 16.2.0 and 16.3.0)
 if [ -d ${debian.xwiki.var.oldsolr9corecore} ]; then
   # Move the data
-  mv -r ${debian.xwiki.var.oldsolr9corecore}/data ${debian.solr.var.data.core}/
+  mv ${debian.xwiki.var.oldsolr9corecore}/data ${debian.solr.var.data.core}/
   # Replace the default schema with the previous one (so that it matches the data)
   mv -f ${debian.xwiki.var.oldsolr9corecore}/conf/managed-schema ${debian.solr.var.data.core}/conf/managed-schema
   # Delete what remains of the old core location

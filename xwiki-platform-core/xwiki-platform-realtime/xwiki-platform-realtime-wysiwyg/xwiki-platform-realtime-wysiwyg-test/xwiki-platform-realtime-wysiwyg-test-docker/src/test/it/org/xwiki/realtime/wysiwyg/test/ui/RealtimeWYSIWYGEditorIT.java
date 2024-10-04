@@ -751,6 +751,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Some cool title");
+        firstTextArea.waitUntilMacrosAreRendered();
 
         // Edit again the macro an verify that we have the correct parameter value.
         firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
@@ -781,6 +782,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.sendKeys(Keys.END, " first");
 
+        // We plan to edit the same page in another tab outside the realtime session in order to trigger a merge
+        // conflict. We have to save now to prevent the autosave from triggering (it doesn't trigger if there are no
+        // local changes), because we want to control when the merge conflict modal is shown (moreover, we're going to
+        // handle the merge conflict in a second browser tab).
+        firstEditPage.clickSaveAndContinue();
+
         //
         // Second Tab
         //
@@ -791,6 +798,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
+        // Only wait for the synchronization. We're not making any changes yet because we want to save the page outside
+        // the realtime session first in order to trigger a merge conflict.
         secondTextArea.waitUntilTextContains("first");
 
         //
@@ -803,8 +812,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
         thirdTextArea.waitUntilTextContains("first");
 
+        // Make some changes outside the realtime session and save in order to trigger a merge conflict in the realtime
+        // session.
         thirdEditPage.leaveRealtimeEditing();
-
         thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 

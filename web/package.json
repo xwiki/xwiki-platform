@@ -32,7 +32,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@hocuspocus/server": "^2.13.5",
+    "@hocuspocus/server": "2.13.5",
     "@xwiki/cristal-browser-default": "workspace:*",
     "@xwiki/cristal-hierarchy-default": "workspace:*",
     "@xwiki/cristal-hierarchy-github": "workspace:*",
@@ -45,7 +45,7 @@
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
     "express": "4.19.2",
-    "express-ws": "^5.0.2",
+    "express-ws": "5.0.2",
     "vue": "3.5.10",
     "vue-router": "4.4.0"
   },

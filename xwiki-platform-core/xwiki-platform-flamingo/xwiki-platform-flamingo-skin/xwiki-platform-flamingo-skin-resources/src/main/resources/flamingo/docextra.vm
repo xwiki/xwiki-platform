@@ -157,7 +157,7 @@
         #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
           #set ($extraShortcutWithUserPreferences = "#getShortcutValue($extraShortcut)")
           shortcut.remove("$extraShortcutWithUserPreferences");
-          shortcut.add("$extraShortcutWithUserPreferences", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
+          shortcut.add("$escapetool.javascript($extraShortcutWithUserPreferences)", function() { XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'disable_in_input':true });
         #end
       #end
       document.observe("dom:loaded", extraInit, false);

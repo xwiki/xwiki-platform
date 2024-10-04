@@ -472,7 +472,7 @@
   <script>
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("#getShortcutValue('core.shortcuts.view.edit')", function() {
+      shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.edit')")', function() {
         var editLink = $('tmEdit').down('a');
         // Make sure the shortcut doesn't work when the edit link is disabled.
         if (editLink && !editLink.classList.contains('disabled')) {
@@ -482,22 +482,22 @@
         }
       }, {'disable_in_input': true});
       #if($isAdvancedUser)
-        shortcut.add("#getShortcutValue('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
-        shortcut.add("#getShortcutValue('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
-        shortcut.add("#getShortcutValue('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
-        shortcut.add("#getShortcutValue('core.shortcuts.view.rights')",function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
-        shortcut.add("#getShortcutValue('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });
+        shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.wiki')")',function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
+        shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.wysiwyg')")',function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });
+        shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.inline')")',function() { location.href=$('tmEditInline').href; }, { 'disable_in_input':true });
+        shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.rights')")',function() { var editRights = $('tmEditRights'); location.href= editRights ? editRights.href : "$xwiki.getURL($spacePreferencesDocumentReference, 'admin', 'category=1')";}, { 'disable_in_input':true });
+        shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.objects')")',function() { location.href=$('tmEditObject').href; }, { 'disable_in_input':true });
         #if($hasAdmin)
-          shortcut.add("#getShortcutValue('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'disable_in_input':true });
+          shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.class')")',function() { location.href=$('tmEditClass').href; }, { 'disable_in_input':true });
         #end
       #end
     #end
     #if ($canDelete && $displayAdminMenu)
-      shortcut.add("#getShortcutValue('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'disable_in_input':true });
-      shortcut.add("#getShortcutValue('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'disable_in_input':true });
+      shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.delete')")',function() { location.href=$('tmActionDelete').href; }, { 'disable_in_input':true });
+      shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.rename')")',function() { location.href=$('tmActionRename').href; }, { 'disable_in_input':true });
     #end
     #if ($canView && $displayMoreActionsMenu)
-      shortcut.add("#getShortcutValue('core.shortcuts.view.code')", function() { location.href = $('tmViewSource').href; }, { 'disable_in_input': true });
+      shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.view.code')")', function() { location.href = $('tmViewSource').href; }, { 'disable_in_input': true });
     #end
   //]]>
   </script>

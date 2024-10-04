@@ -63,7 +63,7 @@
  * @param class The class to use.
  *#
 #macro(submitButton $name $shortcut $value $class)
-<input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/>
+<input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$escapetool.xml($shortcut)"#end value="$value"/>
 #end
 #**
  * Returns the escaped value of the shortcut. This value can be set in two ways: via user preferences and wiki level translation
@@ -76,8 +76,8 @@
  *#
 #macro(getShortcutValue $translationKey)
 #set ($shortcutPreferenceObject = $xwiki.getDocument($xcontext.getUser()).getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
-#if("$!shortcutPreferenceObject"!='')$escapetool.javascript($escapetool.xml($shortcutPreferenceObject.value))##
-#{else}$escapetool.javascript($escapetool.xml($services.localization.render($translationKey)))##
+#if("$!shortcutPreferenceObject"!='')$shortcutPreferenceObject.value##
+#{else}$services.localization.render($translationKey)##
 #end
 #end
 #**

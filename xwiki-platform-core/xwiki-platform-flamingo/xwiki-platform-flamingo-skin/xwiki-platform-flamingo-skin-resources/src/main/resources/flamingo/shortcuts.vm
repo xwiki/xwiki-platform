@@ -132,12 +132,12 @@
     };
 
     // Append developer shortcuts for toggling userType and hiddenDocuments in the current user profile
-    shortcut.add("#getShortcutValue('core.shortcuts.developer.user.type')", function() {
+    shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.developer.user.type')")', function() {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/usertype/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.type.error'))");
     }, {'type': #if("$!xwiki.getDocument($xcontext.getUser()).getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', 'core.shortcuts.developer.user.type')"!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });
 
-    shortcut.add("#getShortcutValue('core.shortcuts.developer.user.displayHiddenDocs')", function () {
+    shortcut.add('$escapetool.javascript("#getShortcutValue('core.shortcuts.developer.user.displayHiddenDocs')")', function () {
         developerShortcutsRestCall("${request.contextPath}/rest/currentuser/properties/displayHiddenDocuments/next",
                 "$escapetool.javascript($services.localization.render('core.shortcuts.developer.user.displayHiddenDocs.error'))");
     }, {'type': #if("$!xwiki.getDocument($xcontext.getUser()).getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', 'core.shortcuts.developer.user.displayHiddenDocs')"!='')shortcut.type.SIMPLE#{else}shortcut.type.SEQUENCE#end, 'disable_in_input': true });

@@ -304,6 +304,9 @@ public final class HqlQueryUtils
 
     private static String getTableName(Table table, Map<String, String> tables)
     {
+        if (tables.isEmpty()) {
+            return "";
+        }
         String tableName = tables.values().iterator().next();
 
         if (table != null && StringUtils.isNotEmpty(table.getFullyQualifiedName())) {

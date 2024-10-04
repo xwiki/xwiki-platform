@@ -34,7 +34,7 @@
     "eslint-plugin-vue": "9.26.0",
     "nx": "19.8.3",
     "prettier": "3.3.2",
-    "rimraf": "5.0.7",
+    "rimraf": "5.0.10",
     "typescript": "5.6.2",
     "vite": "5.3.6",
     "vite-plugin-css-injected-by-js": "3.5.1",

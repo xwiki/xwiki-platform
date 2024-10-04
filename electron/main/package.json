@@ -28,7 +28,7 @@
     "electron": "31.6.0"
   },
   "devDependencies": {
-    "@types/node": "20.16.10",
+    "@types/node": "22.7.4",
     "cross-env": "7.0.3"
   }
 }

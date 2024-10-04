@@ -117,8 +117,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pinia:
-        specifier: 2.1.7
-        version: 2.1.7(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
+        specifier: 2.2.4
+        version: 2.2.4(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
       vue:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
@@ -819,8 +819,8 @@ importers:
         specifier: 14.1.0
         version: 14.1.0
       pinia:
-        specifier: 2.1.7
-        version: 2.1.7(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
+        specifier: 2.2.4
+        version: 2.2.4(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
       tippy.js:
         specifier: 6.3.7
         version: 6.3.7
@@ -1156,8 +1156,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       pinia:
-        specifier: 2.1.7
-        version: 2.1.7(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
+        specifier: 2.2.4
+        version: 2.2.4(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2))
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3057,6 +3057,9 @@ packages:
 
   '@vue/devtools-api@6.5.1':
     resolution: {integrity: sha512-+KpckaAQyfbvshdDW5xQylLni1asvNSGme1JFs8I1+/H5pHEhqUKMEQD/qn3Nx5+/nycBq11qAEi8lk+LXI2dA==}
+
+  '@vue/devtools-api@6.6.4':
+    resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
   '@vue/language-core@1.8.27':
     resolution: {integrity: sha512-L8Kc27VdQserNaCUNiSFdDl9LWT24ly8Hpwf1ECy3aFb9m6bDhBGQYOujDm21N7EW3moKIOKEanQwe1q5BK+mA==}
@@ -5182,8 +5185,8 @@ packages:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
 
-  pinia@2.1.7:
-    resolution: {integrity: sha512-+C2AHFtcFqjPih0zpYuvof37SFxMQ7OEG2zV9jRI12i9BOy3YQVAHwdKtyyc8pDcDyIc33WCIsZaCFWU7WWxGQ==}
+  pinia@2.2.4:
+    resolution: {integrity: sha512-K7ZhpMY9iJ9ShTC0cR2+PnxdQRuwVIsXDO/WIEV/RnMC/vmSoKDTKW/exNQYPI+4ij10UjXqdNiEHwn47McANQ==}
     peerDependencies:
       '@vue/composition-api': ^1.4.0
       typescript: '>=4.4.4'
@@ -6092,8 +6095,8 @@ packages:
       '@vue/composition-api':
         optional: true
 
-  vue-demi@0.14.7:
-    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
+  vue-demi@0.14.10:
+    resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
     engines: {node: '>=12'}
     hasBin: true
     peerDependencies:
@@ -7939,6 +7942,8 @@ snapshots:
       he: 1.2.0
 
   '@vue/devtools-api@6.5.1': {}
+
+  '@vue/devtools-api@6.6.4': {}
 
   '@vue/language-core@1.8.27(typescript@5.6.2)':
     dependencies:
@@ -10387,11 +10392,11 @@ snapshots:
 
   pify@4.0.1: {}
 
-  pinia@2.1.7(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2)):
+  pinia@2.2.4(typescript@5.6.2)(vue@3.5.10(typescript@5.6.2)):
     dependencies:
-      '@vue/devtools-api': 6.5.1
+      '@vue/devtools-api': 6.6.4
       vue: 3.5.10(typescript@5.6.2)
-      vue-demi: 0.14.7(vue@3.5.10(typescript@5.6.2))
+      vue-demi: 0.14.10(vue@3.5.10(typescript@5.6.2))
     optionalDependencies:
       typescript: 5.6.2
 
@@ -11380,7 +11385,7 @@ snapshots:
     dependencies:
       vue: 3.5.10(typescript@5.6.2)
 
-  vue-demi@0.14.7(vue@3.5.10(typescript@5.6.2)):
+  vue-demi@0.14.10(vue@3.5.10(typescript@5.6.2)):
     dependencies:
       vue: 3.5.10(typescript@5.6.2)
 

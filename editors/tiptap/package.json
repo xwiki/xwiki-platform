@@ -52,7 +52,7 @@
     "inversify": "6.0.2",
     "lodash": "4.17.21",
     "markdown-it": "14.1.0",
-    "pinia": "2.1.7",
+    "pinia": "2.2.4",
     "tippy.js": "6.3.7",
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",

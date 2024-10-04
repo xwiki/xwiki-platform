@@ -25,7 +25,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-api": "workspace:*",
     "inversify": "6.0.2",
-    "pinia": "2.1.7",
+    "pinia": "2.2.4",
     "vue": "3.5.10"
   },
   "publishConfig": {

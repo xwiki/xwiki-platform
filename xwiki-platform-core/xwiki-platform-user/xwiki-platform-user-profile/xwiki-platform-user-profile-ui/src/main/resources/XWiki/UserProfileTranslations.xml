@@ -63,7 +63,7 @@ user.profile.status.saving=Saving...
 user.profile.status.error=Error saving the user status
 
 platform.core.profile.section.shortcutPreferences=Keyboard Shortcut Preferences
-platform.core.profile.section.shortcutPreferences.hint=Configure what keys to press to quickly operate common actions. The preferences defined in this section override the default shortcuts used on the wiki. When leaving the value of this preference empty, the default shortcut will be used.
+platform.core.profile.section.shortcutPreferences.hint=These are the shortcut keys associated with each command. When setting the value of this preference empty, the shortcut will be unbound completely. You can also return them to their default designations.
 platform.core.profile.section.shortcutPreferences.editModes=Edit modes
 platform.core.profile.section.shortcutPreferences.editModes.hint=Shortcuts to edit the current page with a specific editor. Only available as an advanced user.
 platform.core.profile.section.shortcutPreferences.viewInfos=View page informations
@@ -74,6 +74,8 @@ platform.core.profile.section.shortcutPreferences.editorActions=Editor actions
 platform.core.profile.section.shortcutPreferences.editorActions.hint=Shortcuts accessible when editing a page. It's highly recommended to use composite shortcuts like Alt+C to avoid triggering the shortcut while typing in a field.
 platform.core.profile.section.shortcutPreferences.developerShortcuts=Developer shortcuts
 platform.core.profile.section.shortcutPreferences.developerShortcuts.hint=Shortcuts for advanced actions included for developer convenience. Only simple key shortcuts are supported in this parameter, no sequence.
+
+platform.core.profile.shortcut.button.reset=Reset
 
 platform.core.profile.shortcut.view.edit=Default edit mode
 platform.core.profile.shortcut.view.wiki=Wiki edit mode
@@ -101,34 +103,6 @@ platform.core.profile.shortcut.edit.saveandview=Save and view
 
 platform.core.profile.shortcut.dev.usertype=Switch the current user type
 platform.core.profile.shortcut.dev.hiddendocs=Toggle hidden documents
-
-
-XWiki.UserPreferenceShortcutsClass_shortcut_view_edit.hint=Key to switch to the default edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_wiki.hint=Key to switch to the wiki edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_wysiwyg.hint=Key to switch to the WYSIWYG edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_inline.hint=Key to switch to the inline edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_rights.hint=Key to switch to the rights edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_objects.hint=Key to switch to the objects edit mode.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_class.hint=Key to switch to the class edit mode.
-
-XWiki.UserPreferenceShortcutsClass_shortcut_view_comments.hint=Key to open and focus the comments tab.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_annotations.hint=Key to open and focus the annotations tab.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_attachments.hint=Key to open and focus the attachments tab.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_history.hint=Key to open and focus the history tab.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_information.hint=Key to open and focus the information tab.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_code.hint=Key to switch to the code view mode.
-
-XWiki.UserPreferenceShortcutsClass_shortcut_view_delete.hint=Key to delete the page.
-XWiki.UserPreferenceShortcutsClass_shortcut_view_rename.hint=Key to rename the page.
-
-XWiki.UserPreferenceShortcutsClass_shortcut_edit_preview.hint=Key to preview the updated content.
-XWiki.UserPreferenceShortcutsClass_shortcut_edit_backtoedit.hint=Key to go back to edit.
-XWiki.UserPreferenceShortcutsClass_shortcut_edit_cancel.hint=Key to cancel edition.
-XWiki.UserPreferenceShortcutsClass_shortcut_edit_save.hint=Key to save edits.
-XWiki.UserPreferenceShortcutsClass_shortcut_edit_saveandview.hint=Key to save edits and go back to view mode.
-
-XWiki.UserPreferenceShortcutsClass_shortcut_developer_usertype.hint=Key to switch the user type.
-XWiki.UserPreferenceShortcutsClass_shortcut_developer_display_hidden_docs.hint=Key to toggle display of hidden pages.
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

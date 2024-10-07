@@ -168,11 +168,21 @@
       }
     }
   };
+  /**
+   * Handle the reset buttons for shortcut preferences.
+   */
+  $('.reset-shortcut-preference').on('click', function (event) {
+    const shortcutPrefInput = $(this).siblings('input');
+    const defaultValue = shortcutPrefInput.attr('data-defaultvalue');
+    shortcutPrefInput.val(defaultValue).trigger("input");
+  });
   var timeoutId = 0;
+  var lastInput = null;
   $(document).on('input.shortcutPreference', '.shortcutPreference', function () {
-    if (timeoutId !== 0) {
+    if (timeoutId !== 0 && $(this) == lastInput) {
       clearTimeout(timeoutId);
     }
+    lastInput = $(this);
     timeoutId = setTimeout(updateShortcut, 500, this);
   });
 });</code>
@@ -394,19 +404,15 @@
 ##   DISPLAY SHORTCUT PREFERENCE
 ###############################
 #macro (displayShortcut $fieldName $label $translationKey)
-  #set ($hintKey = "XWiki.UserPreferenceShortcutsClass_${fieldName}.hint")
   #set ($escapedSelectId = $escapetool.xml("XWiki.UserPreferenceShortcutsClass_${fieldNumber}"))
   #set ($escapedHintId = $escapedSelectId + "_hint")
   #set ($defaultValue = $escapetool.xml($services.localization.render($translationKey)))
-  &lt;dt&gt;
-    &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))&lt;/label&gt;
-    #if ($services.localization.get($hintKey))
-      &lt;span id="$escapedHintId" class='xHint'&gt;$!escapetool.xml($services.localization.render($hintKey)) ##
+  &lt;li&gt;
+    &lt;label #if($isEdit)for="$escapedSelectId"#end&gt;$!escapetool.xml($services.localization.render($label))
+      &lt;span id="$escapedHintId" class='xHint'&gt;##
       $escapetool.xml($services.localization.render('userprofile.default')): $defaultValue##
       &lt;/span&gt;
-    #end
-  &lt;/dt&gt;
-  &lt;dd data-user-property="$!escapetool.xml($fieldName)"&gt;
+    &lt;/label&gt;
     #set ($shortcutPreference = '')
     #set ($shortcutPreference = $doc.getObject('XWiki.UserPreferenceShortcutsClass', 'translationKey', $translationKey))
     #set ($value = $doc.getValue('value', $shortcutPreference))
@@ -424,6 +430,10 @@
         #elseif ($defaultValue)
           value="$defaultValue"
         #end&gt;
+      <button class="btn btn-default reset-shortcut-preference" type="button">
+        $services.icon.renderHTML('repeat') ##
+        $escapetool.xml($services.localization.render('platform.core.profile.shortcut.button.reset'))##
+      </button>
     #else
       &lt;span&gt;
         #if("$!shortcutPreference" != '') $!value##
@@ -432,7 +442,7 @@
         #end&lt;/span&gt;
     #end
     #set ($fieldNumber = $fieldNumber + 1)##
-  &lt;/dd&gt;
+  &lt;/li&gt;
 #end
 ###############################
 ##      DISPLAY FIELD
@@ -526,7 +536,7 @@
       #if ($isAdvancedUser)
         &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes'))&lt;/h3&gt;
         &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editModes.hint'))&lt;/span&gt;
-        &lt;dl&gt;
+        &lt;ul class="shortcut-list"&gt;
           #displayShortcut('shortcut_view_edit', 'platform.core.profile.shortcut.view.edit', 'core.shortcuts.view.edit')
           #displayShortcut('shortcut_view_wiki', 'platform.core.profile.shortcut.view.wiki', 'core.shortcuts.view.wiki')
           #displayShortcut('shortcut_view_wysiwyg', 'platform.core.profile.shortcut.view.wysiwyg', 'core.shortcuts.view.wysiwyg')
@@ -534,39 +544,39 @@
           #displayShortcut('shortcut_view_rights', 'platform.core.profile.shortcut.view.rights', 'core.shortcuts.view.rights')
           #displayShortcut('shortcut_view_objects', 'platform.core.profile.shortcut.view.objects', 'core.shortcuts.view.objects')
           #displayShortcut('shortcut_view_class', 'platform.core.profile.shortcut.view.class', 'core.shortcuts.view.class')
-        &lt;/dl&gt;
+        &lt;/ul&gt;
         &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos'))&lt;/h3&gt;
         &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.viewInfos.hint'))&lt;/span&gt;
-        &lt;dl&gt;
+        &lt;ul class="shortcut-list"&gt;
           #displayShortcut('shortcut_view_comments', 'platform.core.profile.shortcut.view.comments', 'core.shortcuts.view.comments')
           #displayShortcut('shortcut_view_annotations', 'platform.core.profile.shortcut.view.annotations', 'core.shortcuts.view.annotations')
           #displayShortcut('shortcut_view_attachments', 'platform.core.profile.shortcut.view.attachments', 'core.shortcuts.view.attachments')
           #displayShortcut('shortcut_view_history', 'platform.core.profile.shortcut.view.history', 'core.shortcuts.view.history')
           #displayShortcut('shortcut_view_information', 'platform.core.profile.shortcut.view.information', 'core.shortcuts.view.information')
           #displayShortcut('shortcut_view_code', 'platform.core.profile.shortcut.view.code', 'core.shortcuts.view.code')
-        &lt;/dl&gt;
+        &lt;/ul&gt;
         &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions'))&lt;/h3&gt;
         &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.pageActions.hint'))&lt;/span&gt;
-        &lt;dl&gt;
+        &lt;ul class="shortcut-list"&gt;
           #displayShortcut('shortcut_view_delete', 'platform.core.profile.shortcut.view.delete', 'core.shortcuts.view.delete')
           #displayShortcut('shortcut_view_rename', 'platform.core.profile.shortcut.view.rename', 'core.shortcuts.view.rename')
-        &lt;/dl&gt;
+        &lt;/ul&gt;
       #end
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editorActions'))&lt;/h3&gt;
       &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.editorActions.hint'))&lt;/span&gt;
-      &lt;dl&gt;
+      &lt;ul class="shortcut-list"&gt;
         #displayShortcut('shortcut_edit_preview', 'platform.core.profile.shortcut.edit.preview', 'core.shortcuts.edit.preview')
         #displayShortcut('shortcut_edit_backtoedit', 'platform.core.profile.shortcut.edit.backtoedit', 'core.shortcuts.edit.backtoedit')
         #displayShortcut('shortcut_edit_cancel', 'platform.core.profile.shortcut.edit.cancel', 'core.shortcuts.edit.cancel')
         #displayShortcut('shortcut_edit_save', 'platform.core.profile.shortcut.edit.save', 'core.shortcuts.edit.save')
         #displayShortcut('shortcut_edit_saveandview', 'platform.core.profile.shortcut.edit.saveandview', 'core.shortcuts.edit.saveandview')
-      &lt;/dl&gt;
+      &lt;/ul&gt;
       &lt;h3&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts'))&lt;/h3&gt;
       &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.shortcutPreferences.developerShortcuts.hint'))&lt;/span&gt;
-      &lt;dl&gt;
+      &lt;ul class="shortcut-list"&gt;
         #displayShortcut('shortcut_developer_usertype', 'platform.core.profile.shortcut.dev.usertype', 'core.shortcuts.developer.user.type')
         #displayShortcut('shortcut_developer_display_hidden_docs', 'platform.core.profile.shortcut.dev.hiddendocs', 'core.shortcuts.developer.user.displayHiddenDocs')
-      &lt;/dl&gt;
+      &lt;/ul&gt;
     &lt;/div&gt;
   &lt;/div&gt;
   #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserPreferencesSheet'))##

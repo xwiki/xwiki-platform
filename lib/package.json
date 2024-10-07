@@ -53,7 +53,7 @@
     "reflect-metadata": "0.2.2",
     "utility-types": "3.11.0",
     "vue": "3.5.10",
-    "vue-i18n": "9.13.1",
+    "vue-i18n": "10.0.3",
     "vue-router": "4.4.0"
   },
   "devDependencies": {

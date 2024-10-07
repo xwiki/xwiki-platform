@@ -157,6 +157,10 @@ define('imageSelector', ['jquery', 'modal', 'resource', 'l10n!imageSelector'],
           modal.find('.modal-dialog').addClass('modal-lg');
 
           modal.on('shown.bs.modal', function () {
+            if (modal.data('initialized') == true) {
+              // If the modal was already use, we make sure it's properly reset
+              updateSelectedImageReferences(null);
+            }
             initialize(modal);
           });
           selectButton.on('click', function () {

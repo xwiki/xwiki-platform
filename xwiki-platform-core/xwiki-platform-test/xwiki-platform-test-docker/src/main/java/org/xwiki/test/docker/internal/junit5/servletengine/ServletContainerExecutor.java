@@ -25,6 +25,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.JavaVersion;
@@ -74,6 +76,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String DOCKER_SOCK = "/var/run/docker.sock";
 
     private static final String ROOT_USER = "root";
+
+    private static final Pattern MAJOR_VERSION = Pattern.compile("\\d+");
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -201,15 +205,45 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
-        // Jetty 10.0.3+ has now added a protection in URLs so that encoded characters such as % are
-        // prohibited by default. Since XWiki uses them, we need to configure Jetty to allow for it. See
-        // https://www.eclipse.org/jetty/documentation/jetty-10/operations-guide/index.html#og-module-server-compliance
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance=RFC3986");
+        // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
+        // ambiguous.See https://github.com/jetty/jetty.project/issues/12162#issuecomment-2286747043 for an explanation.
+        // Since XWiki uses them, we need to configure Jetty to allow for it. See also
+        //   https://jetty.org/docs/jetty/10/operations-guide/modules/standard.html#server-compliance
+        // Thus we need to relax the following rules in addition to using RFC3986:
+        //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
+        //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
+        //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
+        // Note: It's important that this command comes before the one below that specifies the module.
+        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance="
+            + "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
+
+        // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
+        // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
+            this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
+                "--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
+        }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
         // socket (otherwise we can't manage the Docker containers from within XWiki, which is a use case for the PDF
         // export application).
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
+    }
+
+    private int extractJettyVersionFromDockerTag(String tag)
+    {
+        int result = 12;
+        if (tag != null) {
+            Matcher matcher = MAJOR_VERSION.matcher(tag);
+            if (matcher.find()) {
+                try {
+                    result = Integer.valueOf(matcher.group());
+                } catch (NumberFormatException e) {
+                    // On error consider we're on Jetty 12
+                }
+            }
+        }
+        return result;
     }
 
     private void configureTomcat(File sourceWARDirectory) throws Exception
@@ -385,14 +419,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2 libxslt1-dev && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libxml2 libxslt1-dev")
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

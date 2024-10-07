@@ -374,7 +374,7 @@ Object.extend(XWiki.constants, {
    * Extracts the file name from the value of the specified file input.
    * @deprecated since 16.6.0RC1
    */
-  extractFileName: function(fileInput) {
+  extractFileName: function (fileInput) {
       warn("XWiki.extractFileName is deprecated since 16.6.0RC1.");
       fileInput = $(fileInput);
       if (fileInput.files && fileInput.files.length > 0) {
@@ -397,99 +397,99 @@ Object.extend(XWiki.constants, {
           // The file input value is just the file name.
           return fileInput.value;
       }
+  }
+});
+
+/**
+ * Watchlist methods.
+ *
+ * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not
+ * break the retro-compatibility but we can consider removing it.
+ */
+XWiki.watchlist = XWiki.watchlist || {};
+Object.extend(XWiki.watchlist, {
+  /**
+   * Mapping between link IDs and associated actions.
+   */
+  actionsMap : {
+      'tmWatchDocument' : 'adddocument',
+      'tmUnwatchDocument' : 'removedocument',
+      'tmWatchSpace' : 'addspace',
+      'tmUnwatchSpace' : 'removespace',
+      'tmWatchWiki' : 'addwiki',
+      'tmUnwatchWiki' : 'removewiki'
   },
 
   /**
-   * Watchlist methods.
-   *
-   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not
-   * break the retro-compatibility but we can consider removing it.
+   * Mapping allowing to know which action to display when a previous action has been executed.
    */
-  watchlist : {
+  flowMap : {
+      'tmWatchDocument' : 'tmUnwatchDocument',
+      'tmUnwatchDocument' : 'tmWatchDocument',
+      'tmWatchSpace' : 'tmUnwatchSpace',
+      'tmUnwatchSpace' : 'tmWatchSpace',
+      'tmWatchWiki' : 'tmUnwatchWiki',
+      'tmUnwatchWiki' : 'tmWatchWiki'
+  },
 
-      /**
-       * Mapping between link IDs and associated actions.
-       */
-      actionsMap : {
-          'tmWatchDocument' : 'adddocument',
-          'tmUnwatchDocument' : 'removedocument',
-          'tmWatchSpace' : 'addspace',
-          'tmUnwatchSpace' : 'removespace',
-          'tmWatchWiki' : 'addwiki',
-          'tmUnwatchWiki' : 'removewiki'
-      },
-
-      /**
-       * Mapping allowing to know which action to display when a previous action has been executed.
-       */
-      flowMap : {
-          'tmWatchDocument' : 'tmUnwatchDocument',
-          'tmUnwatchDocument' : 'tmWatchDocument',
-          'tmWatchSpace' : 'tmUnwatchSpace',
-          'tmUnwatchSpace' : 'tmWatchSpace',
-          'tmWatchWiki' : 'tmUnwatchWiki',
-          'tmUnwatchWiki' : 'tmWatchWiki'
-      },
-
-      /**
-       * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
-       *
-       * @param element the element that fired the action.
-       */
-      executeAction : function(element) {
-          warn("XWiki.watchlist is deprecated since 7.4.");
-          var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
-          new Ajax.Request(
-              surl,
-              {
-                  method: 'get',
-                  onComplete: function() {
-                      if (element.nodeName == 'A') {
-                          element.up().toggleClassName('hidden');
-                          $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
-                      } else {
-                          element.toggleClassName('hidden');
-                          $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
-                      }
+  /**
+   * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
+   *
+   * @param element the element that fired the action.
+   */
+  executeAction : function(element) {
+      warn("XWiki.watchlist is deprecated since 7.4.");
+      var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
+      new Ajax.Request(
+          surl,
+          {
+              method: 'get',
+              onComplete: function() {
+                  if (element.nodeName == 'A') {
+                      element.up().toggleClassName('hidden');
+                      $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
+                  } else {
+                      element.toggleClassName('hidden');
+                      $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
                   }
-              });
-      },
-
-      /**
-       * Initialize watchlist UI.
-       */
-      initialize: function(container) {
-          container = $(container || 'body');
-          for (var button in XWiki.watchlist.actionsMap) {
-              var element = container.down('#' + button);
-              if (element) {
-                  if (element.nodeName != 'A') {
-                      element = $(button).down('A');
-                  }
-
-                  if (!element) {
-                      // This is supposed to happen every time since the watchlist icons are implemented in the
-                     // notifications
-                      // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled
-                     // with a
-                      // custom solution (bootstrap-switch).
-                      // For these reasons, we stop the initialization here.
-                      // We keep this function for old skins (like Colibri), that still have the old-fashioned
-                     // watchlist icons.
-                      return;
-                  }
-
-                  // unregister previously registered handler if any
-                  element.stopObserving('click');
-                  element.observe('click', function(event) {
-                      Event.stop(event);
-                      var element = event.element();
-                      while (element.id == '') {
-                          element = element.up();
-                      }
-                      XWiki.watchlist.executeAction(element);
-                  });
               }
+          });
+  },
+
+  /**
+   * Initialize watchlist UI.
+   */
+  initialize: function(container) {
+      container = $(container || 'body');
+      for (var button in XWiki.watchlist.actionsMap) {
+          var element = container.down('#' + button);
+          if (element) {
+              if (element.nodeName != 'A') {
+                  element = $(button).down('A');
+              }
+
+              if (!element) {
+                  // This is supposed to happen every time since the watchlist icons are implemented in the
+                 // notifications
+                  // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled
+                 // with a
+                  // custom solution (bootstrap-switch).
+                  // For these reasons, we stop the initialization here.
+                  // We keep this function for old skins (like Colibri), that still have the old-fashioned
+                 // watchlist icons.
+                  return;
+              }
+
+              // unregister previously registered handler if any
+              element.stopObserving('click');
+              element.observe('click', function(event) {
+                  Event.stop(event);
+                  var element = event.element();
+                  while (element.id == '') {
+                      element = element.up();
+                  }
+                  XWiki.watchlist.executeAction(element);
+              });
           }
       }
   }

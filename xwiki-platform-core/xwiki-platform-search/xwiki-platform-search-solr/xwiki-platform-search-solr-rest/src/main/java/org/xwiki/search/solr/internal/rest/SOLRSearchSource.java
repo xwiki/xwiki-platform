@@ -168,9 +168,10 @@ public class SOLRSearchSource extends AbstractSearchSource
                 searchResult.setPageName(documentReference.getName());
                 searchResult.setVersion((String) document.get(FieldUtils.VERSION));
 
+                List<String> spaces = Utils.getSpaces(documentReference);
+
                 searchResult.setType("page");
-                searchResult.setId(Utils.getPageId(searchResult.getWiki(),
-                    Utils.getSpacesFromSpaceId(searchResult.getSpace()), searchResult.getPageName()));
+                searchResult.setId(Utils.getPageId(searchResult.getWiki(), spaces, searchResult.getPageName()));
 
                 searchResult.setScore(((Number) document.get(FieldUtils.SCORE)).floatValue());
                 searchResult.setAuthor((String) document.get(FieldUtils.AUTHOR));
@@ -187,8 +188,6 @@ public class SOLRSearchSource extends AbstractSearchSource
 
                 searchResult.setTitle((String) document.getFirstValue(
                     FieldUtils.getFieldName(FieldUtils.TITLE, locale)));
-
-                List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
 
                 String pageUri = null;
                 if (Locale.ROOT == docLocale) {

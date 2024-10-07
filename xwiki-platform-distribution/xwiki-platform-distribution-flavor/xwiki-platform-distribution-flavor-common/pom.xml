@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>16.7.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-common</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Common</name>
@@ -145,12 +145,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-messagestream-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-sandbox</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
@@ -227,7 +221,7 @@
     <dependency>
       <groupId>org.xwiki.contrib.templates</groupId>
       <artifactId>application-templates-ui</artifactId>
-      <version>1.0.10</version>
+      <version>1.0.11</version>
       <type>xar</type>
       <optional>true</optional>
     </dependency>

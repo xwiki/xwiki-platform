@@ -154,6 +154,7 @@ class InplaceTranslateIT
         viewPage.setDocumentTitle("English Title").save();
         // This changes the document locale.
         viewPage.getTranslateButton().click();
+        viewPage.waitForInplaceEditor();
         assertEquals("English Title", viewPage.getDocumentTitle());
 
         viewPage.setDocumentTitle("title IT").saveAndView();

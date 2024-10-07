@@ -43,6 +43,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -64,13 +65,22 @@ class DocumentEventConverterTest
     private MockitoComponentManager componentManager;
 
     @Test
-    void testConvertWithOriginalDocNull() throws Exception
+    void testConvertCreatedDocument() throws Exception
     {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        // Setup of document which just been created and recived by a document event listener
+        XWikiDocument document =
+            this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+        document = document.clone();
+        document.setOriginalDocument(new XWikiDocument(documentReference));
+
         // local -> remote
 
         LocalEventData localEvent = new LocalEventData();
-        localEvent.setEvent(new DocumentUpdatedEvent(new DocumentReference("wiki", "space", "page")));
-        localEvent.setSource(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
+        localEvent.setEvent(new DocumentUpdatedEvent());
+        localEvent.setSource(document);
         localEvent.setData(this.oldcore.getXWikiContext());
 
         RemoteEventData remoteEvent = this.converterManager.createRemoteEventData(localEvent);
@@ -92,9 +102,50 @@ class DocumentEventConverterTest
 
         assertTrue(localEvent2.getSource() instanceof XWikiDocument);
         assertTrue(localEvent2.getData() instanceof XWikiContext);
-        assertEquals("wiki", ((XWikiDocument) localEvent2.getSource()).getWikiName());
+        assertEquals(documentReference, ((XWikiDocument) localEvent2.getSource()).getDocumentReference());
         assertEquals("space", ((XWikiDocument) localEvent2.getSource()).getSpaceName());
         assertEquals("page", ((XWikiDocument) localEvent2.getSource()).getPageName());
         assertTrue(((XWikiDocument) localEvent2.getSource()).getOriginalDocument().isNew());
+        assertNotSame(this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext()),
+            localEvent2.getSource());
+    }
+
+    @Test
+    void testConvertWithOriginalDocNull() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+        // local -> remote
+
+        LocalEventData localEvent = new LocalEventData();
+        localEvent.setEvent(new DocumentUpdatedEvent());
+        localEvent.setSource(new XWikiDocument(documentReference));
+        localEvent.setData(this.oldcore.getXWikiContext());
+
+        RemoteEventData remoteEvent = this.converterManager.createRemoteEventData(localEvent);
+
+        assertFalse(remoteEvent.getSource() instanceof XWikiDocument);
+        assertFalse(remoteEvent.getData() instanceof XWikiContext);
+
+        // serialize/unserialize
+        ByteArrayOutputStream sos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(sos);
+        oos.writeObject(remoteEvent);
+        ByteArrayInputStream sis = new ByteArrayInputStream(sos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(sis);
+        remoteEvent = (RemoteEventData) ois.readObject();
+
+        // remote -> local
+
+        LocalEventData localEvent2 = this.converterManager.createLocalEventData(remoteEvent);
+
+        assertTrue(localEvent2.getSource() instanceof XWikiDocument);
+        assertTrue(localEvent2.getData() instanceof XWikiContext);
+        assertEquals(documentReference, ((XWikiDocument) localEvent2.getSource()).getDocumentReference());
+        assertEquals("space", ((XWikiDocument) localEvent2.getSource()).getSpaceName());
+        assertEquals("page", ((XWikiDocument) localEvent2.getSource()).getPageName());
+        assertTrue(((XWikiDocument) localEvent2.getSource()).getOriginalDocument().isNew());
+        assertNotSame(this.oldcore.getSpyXWiki().getDocument(documentReference, this.oldcore.getXWikiContext()),
+            localEvent2.getSource());
     }
 }

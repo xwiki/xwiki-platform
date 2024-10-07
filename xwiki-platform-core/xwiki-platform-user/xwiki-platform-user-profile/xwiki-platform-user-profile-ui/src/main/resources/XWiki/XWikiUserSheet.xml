@@ -645,26 +645,26 @@ span#avatarUpload {
 ## --------------------------------------
 ## Picker style
 
-.attachment-picker {
+#user-menu-col .attachment-picker {
   position: relative;
   margin: auto;
   width: 100%;
 }
 
-.attachment-picker p {
+#user-menu-col .attachment-picker p {
   padding: 0;
   margin: 0;
 }
 
-.attachment-picker .picture {
+#user-menu-col .attachment-picker .picture {
   z-index: -1;
 }
 
-.attachment-picker .buttonwrapper {
+#user-menu-col .attachment-picker .buttonwrapper {
   margin: 0;
 }
 
-.attachment-picker {
+#user-menu-col .attachment-picker {
   .buttonwrapper {
     .wikilink {
       display: flex;

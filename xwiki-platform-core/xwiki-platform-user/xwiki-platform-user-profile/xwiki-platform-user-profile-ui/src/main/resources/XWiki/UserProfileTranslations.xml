@@ -63,7 +63,7 @@ user.profile.status.saving=Saving...
 user.profile.status.error=Error saving the user status
 
 platform.core.profile.section.shortcutPreferences=Keyboard Shortcut Preferences
-platform.core.profile.section.shortcutPreferences.hint=These are the shortcut keys associated with each command. When setting the value of this preference empty, the shortcut will be unbound completely. You can also return them to their default designations.
+platform.core.profile.section.shortcutPreferences.hint=These are the shortcut keys associated with each command. When setting the value of this preference empty, the shortcut will be unbound completely. Only simple keyboard shortcuts (one key) are supported right now.
 platform.core.profile.section.shortcutPreferences.editModes=Edit modes
 platform.core.profile.section.shortcutPreferences.editModes.hint=Shortcuts to edit the current page with a specific editor. Only available as an advanced user.
 platform.core.profile.section.shortcutPreferences.viewInfos=View page informations
@@ -76,6 +76,7 @@ platform.core.profile.section.shortcutPreferences.developerShortcuts=Developer s
 platform.core.profile.section.shortcutPreferences.developerShortcuts.hint=Shortcuts for advanced actions included for developer convenience. Only simple key shortcuts are supported in this parameter, no sequence.
 
 platform.core.profile.shortcut.button.reset=Reset
+platform.core.profile.shortcut.hint.unbound=Unbound
 
 platform.core.profile.shortcut.view.edit=Default edit mode
 platform.core.profile.shortcut.view.wiki=Wiki edit mode

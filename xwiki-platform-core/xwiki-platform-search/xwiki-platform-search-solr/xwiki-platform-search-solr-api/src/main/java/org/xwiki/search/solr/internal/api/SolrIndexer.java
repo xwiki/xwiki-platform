@@ -72,9 +72,9 @@ public interface SolrIndexer
 
     /**
      * @return a ready indicator that indicates if all requests that have been submitted before it have been completed
-     * @since 16.8.0
+     * @since 16.9.0RC1
      * @since 15.10.13
-     * @since 16.4.4
+     * @since 16.4.5
      */
     ReadyIndicator waitReady();
 }

@@ -55,9 +55,9 @@ public interface LinkStore
     /**
      * Get a {@link ReadyIndicator} to wait on for the link store to become ready.
      *
-     * @since 16.8.0
+     * @since 16.9.0RC1
      * @since 15.10.13
-     * @since 16.4.4
+     * @since 16.4.5
      * @return the ready indicator
      */
     @Unstable

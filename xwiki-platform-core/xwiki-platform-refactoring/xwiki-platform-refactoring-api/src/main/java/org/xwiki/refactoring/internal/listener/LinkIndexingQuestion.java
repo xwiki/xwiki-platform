@@ -25,8 +25,8 @@ import org.xwiki.properties.annotation.PropertyDescription;
  * The question if the job should continue waiting for link indexing to complete.
  *
  * @version $Id$
- * @since 16.8.0
- * @since 16.4.4
+ * @since 16.9.0RC1
+ * @since 16.4.5
  * @since 15.10.13
  */
 public class LinkIndexingQuestion

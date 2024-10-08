@@ -1249,7 +1249,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys("default content");
 
         // Save the page so that we can translate it.
-        firstTextArea.sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+        firstTextArea.sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -1611,7 +1611,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("1", Keys.ARROW_DOWN, Keys.HOME, "2");
 
         // Save and continue (using the shortcut so that the editor doesn't lose the focus).
-        textArea.sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+        textArea.sendSaveShortcutKey();
 
         // Verify that the toolbar is still visible.
         assertTrue(toolbar.canToggleSourceMode());
@@ -1620,6 +1620,105 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         textArea.sendKeys("3");
         inplaceEditablePage = inplaceEditablePage.saveAndView();
         assertEquals("1one\nInformation\n23two", inplaceEditablePage.getContent());
+    }
+
+    @Test
+    @Order(19)
+    void saveAndViewNoMergeConflict(TestUtils setup, TestReference testReference,  MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.sendKeys("second");
+        secondEditPage.clickSaveAndView();
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("second");
+        firstTextArea.sendKeys("first ");
+        // Use the shortcut key so that we don't lose the caret position.
+        firstTextArea.sendSaveShortcutKey();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+
+        // Edit again, this time inplace.
+        InplaceEditablePage secondInplaceEditPage = new InplaceEditablePage().editInplace();
+        secondEditPage = new RealtimeWYSIWYGEditPage();
+        secondEditor = secondEditPage.getContenEditor();
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilTextContains("first second");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.sendKeys("then ");
+        firstEditPage.clickSaveAndView();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("first then second");
+        secondTextArea.sendKeys(Keys.END, " and");
+        // Use the shortcut key so that we don't lose the caret position.
+        secondTextArea.sendSaveShortcutKey();
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        // Edit again, this time inplace.
+        InplaceEditablePage firstInplaceEditPage = new InplaceEditablePage().editInplace();
+        firstEditPage = new RealtimeWYSIWYGEditPage();
+        firstEditor = firstEditPage.getContenEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.waitUntilTextContains("first then second and");
+        firstTextArea.sendKeys(Keys.END, " done");
+        firstInplaceEditPage.saveAndView();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("first then second and done");
+        secondTextArea.sendKeys(" almost");
+        secondInplaceEditPage.saveAndView();
+
+        assertEquals("first then second and almost done", secondInplaceEditPage.getContent());
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

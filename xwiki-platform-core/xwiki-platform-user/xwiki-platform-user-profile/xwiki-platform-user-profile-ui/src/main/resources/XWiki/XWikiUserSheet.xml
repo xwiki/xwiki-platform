@@ -580,23 +580,26 @@ div.editProfileCategory {
 
 /* Preferences */
 /* Shortcut preferences */
+span.xHint:has(+ ul.shortcut-list) {
+  margin-bottom: 10px;
+}
 
 ul.shortcut-list {
   list-style: none;
   padding-left: unset;
-  & > li {
+  &amp; &gt; li {
     display: flex;
     flex-direction: row;
     gap: 1em;
     justify-content: space-between;
     align-items: center;
-    & > label {
+    &amp; &gt; label {
       flex-grow: 1;
       .xHint {
         display: inline;
       }
     }
-    & > input.shortcutPreference, & > span {
+    &amp; &gt; input.shortcutPreference, &amp; &gt; span {
       max-width: 50%;
       width: unset;
     }

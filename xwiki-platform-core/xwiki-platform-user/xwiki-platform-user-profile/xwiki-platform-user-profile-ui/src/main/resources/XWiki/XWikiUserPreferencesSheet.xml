@@ -137,16 +137,18 @@
     let url = xm.restURL;
     let oldItemNumber = shortcutPreference.attr("data-shortcutprefnumber");
     if (oldItemNumber == null) {
-      // Create the new user preference
-      let creationUrl = url + "/objects";
-      let data = {
-        'className': 'XWiki.UserPreferenceShortcutsClass',
-        'property#translationKey': translateKey,
-        'property#value': newValue
-      };
-      let objectCreationPromise = $.post(creationUrl, data, function(newObject) {
-        shortcutPreference.attr("data-shortcutprefnumber", newObject.firstChild.getElementsByTagName("number")[0].textContent);
-      });
+      if (newValue !== shortcutPreference.attr("data-defaultvalue")) {
+        // Create the new user preference
+        let creationUrl = url + "/objects";
+        let data = {
+          'className': 'XWiki.UserPreferenceShortcutsClass',
+          'property#translationKey': translateKey,
+          'property#value': newValue
+        };
+        $.post(creationUrl, data, function(newObject) {
+          shortcutPreference.attr("data-shortcutprefnumber", newObject.firstChild.getElementsByTagName("number")[0].textContent);
+        });
+      }
     } else {
       if (newValue == shortcutPreference.attr("data-defaultvalue")) {
         // Remove the existing preference, we don't want to keep it if the user is back to normal.
@@ -179,10 +181,12 @@
   var timeoutId = 0;
   var lastInput = null;
   $(document).on('input.shortcutPreference', '.shortcutPreference', function () {
-    if (timeoutId !== 0 && $(this) == lastInput) {
+    // If we propose a new update for the same field quickly after it was already updated, 
+    // we cancel the previous update and start the timer for this new one.
+    if (timeoutId !== 0 &amp;&amp; $(this).get(0).id == lastInput) {
       clearTimeout(timeoutId);
     }
-    lastInput = $(this);
+    lastInput = $(this).get(0).id;
     timeoutId = setTimeout(updateShortcut, 500, this);
   });
 });</code>

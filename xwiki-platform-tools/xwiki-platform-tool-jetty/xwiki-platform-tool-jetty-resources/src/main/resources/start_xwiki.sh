@@ -213,7 +213,7 @@ if [ "$JAVA_VERSION" -lt 17 ]; then
   echo This version of XWiki requires Java 17 or greater.
   exit 1
 fi
-if [ "$JAVA_VERSION" -gt 17 ]; then
+if [ "$JAVA_VERSION" -gt 21 ]; then
   if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then

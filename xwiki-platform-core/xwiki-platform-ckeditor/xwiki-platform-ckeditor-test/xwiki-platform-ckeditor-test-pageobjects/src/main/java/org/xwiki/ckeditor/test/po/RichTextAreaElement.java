@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
@@ -256,7 +257,7 @@ public class RichTextAreaElement extends BaseElement
             // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
             // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
             // of it using the arrow keys (as if the editing scope is set to that nested editable).
-            getDriver().executeScript("arguments[0].focus()", rootEditableElement);
+            focus(rootEditableElement);
             return rootEditableElement;
         } else {
             // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
@@ -373,5 +374,47 @@ public class RichTextAreaElement extends BaseElement
                 return false;
             });
         });
+    }
+
+    /**
+     * Sends the save & continue shortcut key to the text area and waits for the success notification message.
+     *
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void sendSaveShortcutKey()
+    {
+        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+
+        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
+        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
+        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
+        // and restore it after the save confirmation.
+        WebElement activeElement;
+        try {
+            activeElement = getActiveElement();
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+
+        // This steals the focus from the rich text area because it clicks on the success notification message in order
+        // to hide it.
+        waitForNotificationSuccessMessage("Saved");
+
+        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
+        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
+        // the image caption).
+        maybeSwitchToEditedContent();
+        try {
+            focus(activeElement);
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
+    private void focus(WebElement element)
+    {
+        getDriver().executeScript("arguments[0].focus()", element);
     }
 }

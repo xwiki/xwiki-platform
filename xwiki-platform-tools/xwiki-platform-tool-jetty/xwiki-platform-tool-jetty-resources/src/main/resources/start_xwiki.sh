@@ -220,8 +220,7 @@ if [ "$JAVA_VERSION" -gt 17 ]; then
       exit 1
     fi
   else
-    echo "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Exiting"
-    exit 1
+    echo "Warning: you're using Java $JAVA_VERSION which XWiki doesn't fully support yet."
   fi
 fi
 

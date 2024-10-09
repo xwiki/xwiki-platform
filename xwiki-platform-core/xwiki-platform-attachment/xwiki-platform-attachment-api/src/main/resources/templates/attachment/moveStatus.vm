@@ -67,7 +67,5 @@
   #end
 #else
   $response.setStatus(404)
-<div class="box errormessage">
-  $escapetool.xml($services.localization.render('attachment.move.status.notFound'))
-</div>
+  #error($escapetool.xml($services.localization.render('attachment.move.status.notFound')))
 #end

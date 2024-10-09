@@ -84,8 +84,8 @@
 #set ($disableModalConfirmation = false)
 ## check if the exception is about the non-allowed spaces for template
 #if("$!exception" != '' && $exception.code == 11016)
-  <div class="box errormessage">
-    #set($allowedSpaces = $createAllowedSpaces)
+  #set($allowedSpaces = $createAllowedSpaces)
+  #define ($errorMessageContent)
     #if ($allowedSpaces.size() == 1)
       $escapetool.xml($services.localization.render('core.create.template.allowedspace.inline', [$templateProvider,
         $allowedSpaces.get(0)]))
@@ -93,7 +93,8 @@
       $escapetool.xml($services.localization.render('core.create.template.allowedspaces.inline', [$templateProvider,
         $allowedSpaces.toString()]))
     #end
-  </div>
+  #end
+  #error($errorMessageContent)
   #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document which already exists

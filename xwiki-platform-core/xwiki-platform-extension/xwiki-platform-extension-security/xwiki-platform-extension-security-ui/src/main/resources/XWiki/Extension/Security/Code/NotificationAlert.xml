@@ -307,9 +307,7 @@
     #set ($parameters = [$count, $htmlLink])
     {{html wiki='false' clean='false'}}
       &lt;li&gt;
-        &lt;div class='box errormessage'&gt;
-          $services.localization.render('extension.security.notification.message', $parameters)
-        &lt;/div&gt;
+        #error($services.localization.render('extension.security.notification.message', $parameters))
       &lt;/li&gt;
     {{/html}}
   #end

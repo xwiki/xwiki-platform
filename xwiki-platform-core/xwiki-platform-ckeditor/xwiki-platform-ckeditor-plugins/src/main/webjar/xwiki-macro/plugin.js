@@ -364,6 +364,7 @@
         contextSensitive: false,
         editorFocus: false,
         readOnly: true,
+        counter: 0,
         exec: function(editor, options) {
           options = Object.assign({
             preserveSelection: true
@@ -397,6 +398,14 @@
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }
+          // Increment the refresh counter and publish its value on the editable element to help functional tests detect
+          // when the edited content has been refreshed. This is especially useful for realtime editing tests that use
+          // multiple browser tabs: changing a macro in the first tab triggers a refresh of the content in the second
+          // tab, but after switching to the second tab we can't rely on the editor loading state to determine if the
+          // content was refreshed or not (the content might have been already refreshed or the changes from the first
+          // tab might not have been applied yet).
+          this.counter++;
+          editor.editable()?.data('xwiki-refresh-counter', this.counter);
           editor.fire('afterCommandExec', {name: this.name, command: this});
         }
       });

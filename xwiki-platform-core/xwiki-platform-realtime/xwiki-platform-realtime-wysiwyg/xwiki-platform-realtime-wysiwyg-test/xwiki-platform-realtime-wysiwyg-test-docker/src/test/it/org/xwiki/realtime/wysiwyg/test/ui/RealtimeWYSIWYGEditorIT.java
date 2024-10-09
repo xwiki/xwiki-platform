@@ -321,7 +321,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -335,7 +335,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Continue typing to verify that the selection is not lost in the second tab. Wait for the inserted macro to be
         // rendered server-side.
         firstTextArea.waitUntilTextContains("my");
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
         firstTextArea.sendKeys(" two");
 
         //
@@ -685,7 +685,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -723,7 +723,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.clickSubmit();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
@@ -738,7 +738,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.clickSubmit();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -751,7 +751,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Some cool title");
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Edit again the macro an verify that we have the correct parameter value.
         firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
@@ -956,7 +956,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -967,7 +967,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/err", "Error Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -1125,31 +1125,33 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
         String text = secondTextArea.getText();
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
 
         // Edit the inserted Velocity macro.
         secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitUntilTextContains("superadmin");
+        secondTextArea.waitForContentRefresh();
         text = secondTextArea.getText();
+        assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
+        String secondRefreshCounter = secondTextArea.getRefreshCounter();
 
         //
         // First Tab
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // The content is re-rendered twice, first time when the Velocity macro is inserted and a second time when the
+        // Velocity macro is edited.
+        firstTextArea.waitForContentRefresh(secondRefreshCounter);
+
         // Even if John didn't make any changes yet, the script macro is executed with the minimum script rights
         // between the current user (John) and the script author associated with the realtime session (superadmin
         // currently).
-        firstTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
-
-        // It's not enough to wait for the Velocity macro error message because the content is re-rendered twice (first
-        // time when the Velocity macro is inserted and a second time when the Velocity macro is edited), but the output
-        // is the same.
-        firstTextArea.waitUntilContentEditable();
+        text = firstTextArea.getText();
+        assertTrue(text.contains("Failed to execute the [velocity] macro."));
 
         // Change the content (without modifying the script macro).
         firstTextArea.sendKeys(Keys.END, " dinner");
@@ -1167,10 +1169,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Edit the macro again.
         secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
+        secondTextArea.waitForContentRefresh();
+        text = secondTextArea.getText();
         // This time the script macro is not executed because John has been associated as script author of the realtime
         // session.
-        secondTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
-        text = secondTextArea.getText();
+        assertTrue(text.contains("Failed to execute the [velocity] macro."));
         assertFalse(text.contains("User: superadmin"), "Unexpected text content: " + text);
 
         secondTextArea.sendKeys(Keys.ARROW_LEFT, Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_LEFT));
@@ -1181,10 +1184,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        firstTextArea.waitUntilTextContains("lunch");
-
         // The second user has modified the Velocity macro, which triggered a re-rendering of the content on this tab.
-        firstTextArea.waitUntilContentEditable();
+        firstTextArea.waitForContentRefresh();
+        firstTextArea.waitUntilTextContains("lunch");
 
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
@@ -1194,14 +1196,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Edit the inserted Velocity macro to add some script.
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
         text = firstTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
+        String firstRefreshCounter = firstTextArea.getRefreshCounter();
 
         // Leave the edit mode to see that the script level associated with the realtime session remains the same.
         firstEditPage.clickCancel();
@@ -1212,17 +1215,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         multiUserSetup.switchToBrowserTab(secondTabHandle);
 
-        secondTextArea.waitUntilTextContains("before\nFailed to execute the [velocity] macro.");
-        text = secondTextArea.getText();
-        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
-
         // The content is re-rendered twice because the first user has inserted and modified the Velocity macro.
-        secondTextArea.waitUntilContentEditable();
+        secondTextArea.waitForContentRefresh(firstRefreshCounter);
+        text = secondTextArea.getText();
+        assertTrue(text.contains("before\nFailed to execute the [velocity] macro."));
+        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
         // Edit again the macro to see that the script level doesn't change.
         secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
         text = secondTextArea.getText();
         assertFalse(text.contains("Current: superadmin"), "Unexpected text content: " + text);
         assertTrue(text.contains("Failed to execute the [velocity] macro."), "Unexpected text content: " + text);
@@ -1281,7 +1283,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Edit the inserted Velocity macro.
         secondTextArea.sendKeys(Keys.ENTER);

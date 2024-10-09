@@ -478,10 +478,9 @@ class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSelected("/toc", "Table of Contents");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        textArea.waitForContentRefresh();
 
-        textArea = editor.getRichTextArea();
-
-        assertSourceEquals("{{toc/}}\n");
+        assertSourceEquals("{{toc/}}\n\n ");
     }
 
     @Test

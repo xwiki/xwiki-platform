@@ -69,7 +69,7 @@ if [ -d ${debian.xwiki.var.oldsolr8core} ]; then
   # Remove the link to the old location
   rm -f ${debian.solr.var.oldsolr8core}
   # And replace it with the actual core
-  mv -r ${debian.xwiki.var.oldsolr8core} ${debian.solr.var.oldsolr8core}
+  mv ${debian.xwiki.var.oldsolr8core} ${debian.solr.var.oldsolr8core}
 fi
 
 # Migrate the core files stored at the previous Solr 9 location (XWiki 16.2.0 and 16.3.0)

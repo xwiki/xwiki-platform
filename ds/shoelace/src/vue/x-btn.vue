@@ -23,7 +23,7 @@ import type { BtnProps } from "@xwiki/cristal-dsapi/dist";
 const { variant } = defineProps<BtnProps>();
 </script>
 <template>
-  <sl-button :variant="variant">
+  <sl-button :variant="variant || 'default'">
     <!-- TODO: We should try to use each the default icon slots to avoid weird alignment issues
       https://shoelace.style/components/button#slots
       -->

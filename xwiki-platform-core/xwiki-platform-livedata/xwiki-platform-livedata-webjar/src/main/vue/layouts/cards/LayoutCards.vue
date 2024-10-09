@@ -35,7 +35,7 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination/>
+        <LivedataPagination v-if="isMoreThanOnePage" />
       </template>
       <template #right>
         <LivedataEntrySelectorAll v-if="isSelectionEnabled"/>
@@ -114,12 +114,14 @@ export default {
   inject: ["logic"],
   
   data: () => ({
-    entriesFetched: false
+    entriesFetched: false,
+    layoutLoaded: false
   }),
 
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
+    isMoreThanOnePage () { return (this.logic.getPageCount() > 1) || this.layoutLoaded },
     isSelectionEnabled () { return this.logic.isSelectionEnabled(); },
     canAddEntry () { return this.logic.canAddEntry(); },
   },
@@ -127,6 +129,9 @@ export default {
   mounted() {
     this.logic.onEvent('afterEntryFetch', () => {
       this.entriesFetched = true;
+    });
+    this.logic.onEvent("layoutLoaded", () => {
+      this.layoutLoaded = true;
     });
   }
 

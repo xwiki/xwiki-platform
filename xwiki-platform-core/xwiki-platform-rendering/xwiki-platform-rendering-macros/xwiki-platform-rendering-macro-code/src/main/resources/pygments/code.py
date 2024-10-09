@@ -24,6 +24,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.styles import get_style_by_name
 from pygments.util import ClassNotFound
 from pygments.formatters.xdom import XDOMFormatter
+from pygments.styles.updated_default import UpdatedDefaultStyle
 
 if language:
   try:
@@ -39,13 +40,16 @@ else:
 if pygmentLexer:
   pygmentStyle = None
   if style:
-    try:
-      pygmentStyle = get_style_by_name(style)
-    except ClassNotFound:
-      ""
+    if style == "updatedDefault":
+      pygmentStyle = UpdatedDefaultStyle
+    else:
+      try:
+        pygmentStyle = get_style_by_name(style)
+      except ClassNotFound:
+        ""
 
   if pygmentStyle:
-    pygmentFormatter = XDOMFormatter(listener, style=style)
+    pygmentFormatter = XDOMFormatter(listener, style=pygmentStyle)
   else:
     pygmentFormatter = XDOMFormatter(listener)
 

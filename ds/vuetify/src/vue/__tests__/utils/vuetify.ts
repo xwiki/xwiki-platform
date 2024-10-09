@@ -18,59 +18,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * Shared types for the x-breadcrumb component implementations.
- * @since 0.8
- */
-type BreadcrumbProps = {
-  items: [{ label: string; url: string }];
-};
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+
+const vuetify = createVuetify({
+  components,
+  directives,
+});
 
 /**
- * Props of the x-tab-panel component.
- *
- * @since 0.9
+ * Provide the required options for testing vuetify, and merge them with existing
+ * @param options the existing options to merge
  */
-type TabPanelProps = {
-  tabId: string;
-};
-
-/**
- * Props of the x-tab component.
- * @since 0.9
- */
-type TabProps = {
-  tabId: string;
-};
-
-type TextFieldProps = {
-  name: string;
-  label: string;
-  required: boolean;
-};
-
-/**
- * Props for the btn component.
- *
- * @since 0.11
- */
-type BtnProps = {
-  variant?:
-    | "default"
-    | "primary"
-    | "success"
-    | "neutral"
-    | "warning"
-    | "danger";
-};
-
-type TextFieldModel = File | File[] | null | undefined;
-
-export type {
-  BreadcrumbProps,
-  BtnProps,
-  TabPanelProps,
-  TabProps,
-  TextFieldProps,
-  TextFieldModel,
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function addVuetifyOptions(options: any) {
+  return {
+    ...options,
+    global: {
+      plugins: [vuetify],
+    },
+  };
+}

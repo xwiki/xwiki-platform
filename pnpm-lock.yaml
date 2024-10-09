@@ -609,6 +609,12 @@ importers:
         specifier: 3.7.2
         version: 3.7.2(typescript@5.6.2)(vite-plugin-vuetify@2.0.4)(vue@3.5.10(typescript@5.6.2))
     devDependencies:
+      '@vue/test-utils':
+        specifier: 2.4.6
+        version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -8784,7 +8790,7 @@ snapshots:
     dependencies:
       config-chain: 1.1.13
       editorconfig: 1.0.4
-      glob: 10.3.10
+      glob: 10.4.5
       nopt: 7.2.0
 
   js-tokens@4.0.0: {}

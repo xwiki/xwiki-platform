@@ -18,59 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * Shared types for the x-breadcrumb component implementations.
- * @since 0.8
- */
-type BreadcrumbProps = {
-  items: [{ label: string; url: string }];
-};
+import { defineConfig, mergeConfig } from "vitest/config";
+import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
+import localConfig from "./vite.config";
 
-/**
- * Props of the x-tab-panel component.
- *
- * @since 0.9
- */
-type TabPanelProps = {
-  tabId: string;
-};
-
-/**
- * Props of the x-tab component.
- * @since 0.9
- */
-type TabProps = {
-  tabId: string;
-};
-
-type TextFieldProps = {
-  name: string;
-  label: string;
-  required: boolean;
-};
-
-/**
- * Props for the btn component.
- *
- * @since 0.11
- */
-type BtnProps = {
-  variant?:
-    | "default"
-    | "primary"
-    | "success"
-    | "neutral"
-    | "warning"
-    | "danger";
-};
-
-type TextFieldModel = File | File[] | null | undefined;
-
-export type {
-  BreadcrumbProps,
-  BtnProps,
-  TabPanelProps,
-  TabProps,
-  TextFieldProps,
-  TextFieldModel,
-};
+export default mergeConfig(
+  mergeConfig(defaultConfig, localConfig),
+  defineConfig({
+    test: {
+      server: {
+        deps: {
+          // see https://github.com/vitest-dev/vitest/discussions/2677#discussioncomment-7035566
+          inline: ["vuetify"],
+        },
+      },
+    },
+  }),
+);

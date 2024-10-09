@@ -17,8 +17,39 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+import { computed } from "vue";
+import { type BtnProps } from "@xwiki/cristal-dsapi";
+
+const { variant } = defineProps<BtnProps>();
+
+// Map the variants to corresponding vuetify colors.
+const color = computed(() => {
+  let color = undefined;
+  switch (variant) {
+    case "default":
+      break;
+    case "primary":
+      color = "primary";
+      break;
+    case "success":
+      color = "success";
+      break;
+    case "neutral":
+      color = "secondary";
+      break;
+    case "warning":
+      color = "warning";
+      break;
+    case "danger":
+      color = "error";
+      break;
+  }
+  return color;
+});
+</script>
 <template>
-  <v-btn>
+  <v-btn :color="color">
     <slot />
   </v-btn>
 </template>

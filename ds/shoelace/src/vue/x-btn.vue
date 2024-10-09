@@ -17,8 +17,13 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script lang="ts" setup>
+import "@shoelace-style/shoelace/dist/components/button/button";
+import type { BtnProps } from "@xwiki/cristal-dsapi/dist";
+const { variant } = defineProps<BtnProps>();
+</script>
 <template>
-  <sl-button variant="default">
+  <sl-button :variant="variant">
     <!-- TODO: We should try to use each the default icon slots to avoid weird alignment issues
       https://shoelace.style/components/button#slots
       -->
@@ -27,10 +32,6 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
     </span>
   </sl-button>
 </template>
-<script lang="ts">
-import "@shoelace-style/shoelace/dist/components/button/button";
-export default {};
-</script>
 <style scoped>
 .align {
   display: flex;

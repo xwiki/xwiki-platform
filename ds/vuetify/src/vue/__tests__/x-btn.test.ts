@@ -17,60 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { describe, expect, it } from "vitest";
+import { mount, VueWrapper } from "@vue/test-utils";
+import XBtn from "../x-btn.vue";
+import { addVuetifyOptions } from "./utils/vuetify";
 
 /**
- * Shared types for the x-breadcrumb component implementations.
- * @since 0.8
+ * Mount a XBtn component with the default configuration.
+ * @param options additional wrapper options, overriding the default ones
  */
-type BreadcrumbProps = {
-  items: [{ label: string; url: string }];
-};
+function mountXBtn(options: unknown): VueWrapper {
+  return mount(XBtn, addVuetifyOptions(options));
+}
 
-/**
- * Props of the x-tab-panel component.
- *
- * @since 0.9
- */
-type TabPanelProps = {
-  tabId: string;
-};
-
-/**
- * Props of the x-tab component.
- * @since 0.9
- */
-type TabProps = {
-  tabId: string;
-};
-
-type TextFieldProps = {
-  name: string;
-  label: string;
-  required: boolean;
-};
-
-/**
- * Props for the btn component.
- *
- * @since 0.11
- */
-type BtnProps = {
-  variant?:
-    | "default"
-    | "primary"
-    | "success"
-    | "neutral"
-    | "warning"
-    | "danger";
-};
-
-type TextFieldModel = File | File[] | null | undefined;
-
-export type {
-  BreadcrumbProps,
-  BtnProps,
-  TabPanelProps,
-  TabProps,
-  TextFieldProps,
-  TextFieldModel,
-};
+describe("x-btn", () => {
+  it("display the slot", () => {
+    const xBtn = mountXBtn({
+      slots: {
+        default: "Content",
+      },
+    });
+    expect(xBtn.text()).eq("Content");
+  });
+  it("uses the variant", () => {
+    const xBtn = mountXBtn({
+      props: {
+        variant: "danger",
+      },
+      slots: {
+        default: "Content",
+      },
+    });
+    expect(xBtn.classes()).toContain("bg-error");
+  });
+});

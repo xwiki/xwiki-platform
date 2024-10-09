@@ -23,7 +23,7 @@
     "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "prepack": "pnpm build",
-    "test": "echo 'no test'"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -35,6 +35,8 @@
     "vuetify": "3.7.2"
   },
   "devDependencies": {
+    "@vue/test-utils": "2.4.6",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "vue-tsc": "2.1.6"
   },
   "publishConfig": {

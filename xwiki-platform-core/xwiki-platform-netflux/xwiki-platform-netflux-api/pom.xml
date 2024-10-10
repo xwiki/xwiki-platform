@@ -35,6 +35,11 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Netflux API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
+    <!-- Replaces the old realtime backend from XWiki Contrib -->
+    <xwiki.extension.features>
+      org.xwiki.contrib:xwiki-contrib-rtbackend,
+      org.xwiki.contrib:xwiki-contrib-netflux
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

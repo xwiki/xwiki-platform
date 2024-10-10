@@ -34,6 +34,10 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Realtime UI</xwiki.extension.name>
+    <!-- Replaces the old realtime frontend from XWiki Contrib -->
+    <xwiki.extension.features>
+      yannflory:realtime-netflux-frontend
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

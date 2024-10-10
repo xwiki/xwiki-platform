@@ -34,6 +34,10 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Realtime Wiki Editor</xwiki.extension.name>
+    <!-- Replaces the old Realtime Wiki Editor from XWiki Contrib -->
+    <xwiki.extension.features>
+      calebjamesdelisle:rtwiki
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

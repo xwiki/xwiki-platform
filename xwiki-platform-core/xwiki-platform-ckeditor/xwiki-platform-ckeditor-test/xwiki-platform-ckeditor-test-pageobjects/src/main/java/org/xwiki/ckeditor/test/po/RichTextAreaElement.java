@@ -416,7 +416,7 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
-     * Sends the save & continue shortcut key to the text area and waits for the success notification message.
+     * Sends the Save &amp; Continue shortcut key to the text area and waits for the success notification message.
      *
      * @since 16.9.0RC1
      * @since 16.4.5

@@ -117,7 +117,7 @@ public class DefaultOldRendering implements OldRendering
         DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
-            oldDocumentReference, newDocumentReference, false);
+            oldDocumentReference, newDocumentReference, false, Set.of());
     }
 
     @Override

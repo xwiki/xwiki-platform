@@ -21,8 +21,11 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -164,5 +167,13 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
             }
         }
         return entitySelection;
+    }
+
+    public Set<EntityReference> getSelectedEntities()
+    {
+        return this.concernedEntities.values().stream()
+            .filter(EntitySelection::isSelected)
+            .map(EntitySelection::getEntityReference)
+            .collect(Collectors.toSet());
     }
 }

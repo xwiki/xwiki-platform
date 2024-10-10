@@ -156,7 +156,6 @@ JETTY_BASE=.
 mkdir -p $JETTY_BASE/logs 2>/dev/null
 
 # Specify Jetty's home directory to be the directory named jetty inside the jetty base directory.
-# Thus JETTY_HOME/data and JETTY_HOME/webapps are inside the jetty base directory.
 JETTY_HOME=jetty
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
@@ -205,20 +204,23 @@ java_version() {
 
 # Check version of Java (when in non-interactive mode)
 JAVA_VERSION="$(java_version)"
-if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
-  if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
-    echo "No Java found. You need Java installed for XWiki to work."
-    exit 0
-  fi
-  if [ "$JAVA_VERSION" -lt 11 ]; then
-    echo This version of XWiki requires Java 11 or greater.
-    exit 0
-  fi
-  if [ "$JAVA_VERSION" -gt 17 ]; then
+
+if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
+  echo "No Java found. You need Java installed for XWiki to work."
+  exit 1
+fi
+if [ "$JAVA_VERSION" -lt 17 ]; then
+  echo This version of XWiki requires Java 17 or greater.
+  exit 1
+fi
+if [ "$JAVA_VERSION" -gt 21 ]; then
+  if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      exit 0
+      exit 1
     fi
+  else
+    echo "Warning: you're using Java $JAVA_VERSION which XWiki doesn't fully support yet."
   fi
 fi
 

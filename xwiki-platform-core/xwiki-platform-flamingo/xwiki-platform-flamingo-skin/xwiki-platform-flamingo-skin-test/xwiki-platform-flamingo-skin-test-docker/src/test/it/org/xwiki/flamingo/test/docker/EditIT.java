@@ -23,9 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -45,6 +43,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -242,13 +241,11 @@ public class EditIT
      * page.
      */
     @Test
+    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
+        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
-        Assumptions.assumeFalse(StringUtils.equalsIgnoreCase("firefox",
-                setup.getDriver().getCapabilities().getBrowserName()),
-            "Alert handling in Firefox currently isn't working, see also https://jira.xwiki.org/browse/XWIKI-22282");
-
         setup.deletePage(reference);
         ViewPage viewPage = setup.gotoPage(reference);
         WikiEditPage editWiki = viewPage.editWiki();

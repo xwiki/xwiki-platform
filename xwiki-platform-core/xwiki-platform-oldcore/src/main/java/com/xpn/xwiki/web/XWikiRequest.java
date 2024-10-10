@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Optional;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 public interface XWikiRequest extends HttpServletRequest
 {
@@ -29,4 +34,19 @@ public interface XWikiRequest extends HttpServletRequest
     HttpServletRequest getHttpServletRequest();
 
     Cookie getCookie(String cookieName);
+
+    /**
+     * @return the user that holds the responsibility, in terms of access rights, for the submitted data and the changes
+     *         triggered by this request. If the request doesn't indicate an effective author then the user that gets
+     *         authenticated with the information provided by this request (or the guest user, if authentication
+     *         information is missing) should be considered the effective author.
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    @Unstable
+    default Optional<UserReference> getEffectiveAuthor()
+    {
+        return Optional.empty();
+    }
 }

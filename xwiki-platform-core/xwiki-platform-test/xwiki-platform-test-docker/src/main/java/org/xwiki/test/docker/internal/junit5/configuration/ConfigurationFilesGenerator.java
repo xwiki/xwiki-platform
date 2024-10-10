@@ -174,8 +174,10 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiCfgPlugins",
             "com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\\"
+                + "        com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin,\\"
                 + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
         props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");

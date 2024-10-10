@@ -103,9 +103,9 @@ import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBloc
 @AllComponents(excludes = {CurrentMacroEntityReferenceResolver.class, DefaultAuthorizationManager.class})
 class IncludeMacroTest
 {
-    private final static DocumentReference INCLUDER_AUHOR = new DocumentReference("wiki", "XWiki", "includer");
+    private final static DocumentReference INCLUDER_AUTHOR = new DocumentReference("wiki", "XWiki", "includer");
 
-    private final static DocumentReference INCLUDED_AUHOR = new DocumentReference("wiki", "XWiki", "included");
+    private final static DocumentReference INCLUDED_AUTHOR = new DocumentReference("wiki", "XWiki", "included");
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -151,7 +151,7 @@ class IncludeMacroTest
         this.includeMacro = this.componentManager.getInstance(Macro.class, "include");
         this.rendererFactory = this.componentManager.getInstance(PrintRendererFactory.class, "event/1.0");
 
-        when(this.dab.getCurrentAuthorReference()).thenReturn(INCLUDER_AUHOR);
+        when(this.dab.getCurrentAuthorReference()).thenReturn(INCLUDER_AUTHOR);
 
         // Put a fake XWiki context on the execution context.
         Execution execution = this.componentManager.getInstance(Execution.class);
@@ -189,7 +189,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
 
         List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false);
 
@@ -329,7 +329,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
         List<Block> blocks = runIncludeMacroWithPreVelocity(Context.CURRENT, "#macro(testmacro)#end",
@@ -407,7 +407,8 @@ class IncludeMacroTest
     {
         // @formatter:off
         String expected = "beginDocument\n"
-            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage][source]="
+                + "[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
             + "beginSection\n"
             + "beginHeader [1, HHeading-1]\n"
             + "onWord [Heading]\n"
@@ -416,7 +417,8 @@ class IncludeMacroTest
             + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true] [Itest.png-1]\n"
             + "endParagraph\n"
             + "endSection\n"
-            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
+            + "endMetaData [[base]=[includedWiki:includedSpace.includedPage][source]="
+                + "[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
         // @formatter:on
 
@@ -631,7 +633,7 @@ class IncludeMacroTest
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
@@ -740,7 +742,7 @@ class IncludeMacroTest
         XDOM xdom = toXDOM(includedContent);
         when(this.includedDocument.getPreparedXDOM()).thenReturn(xdom);
         when(this.includedDocument.getRealLanguage()).thenReturn("");
-        when(this.includedDocument.getContentAuthorReference()).thenReturn(INCLUDED_AUHOR);
+        when(this.includedDocument.getContentAuthorReference()).thenReturn(INCLUDED_AUTHOR);
     }
 
     private XDOM toXDOM(String content) throws Exception
@@ -801,11 +803,11 @@ class IncludeMacroTest
             verify(this.dab).popDocumentFromContext(any(Map.class));
         } else {
             if (parameters.getAuthor() == Author.CURRENT || (parameters.getAuthor() == Author.AUTO
-                && this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUHOR, null))) {
+                && this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null))) {
                 verifyNoInteractions(this.authorExecutor);
             } else {
                 DocumentReference includedReference = this.includedDocument.getDocumentReference();
-                verify(this.authorExecutor).call(any(), eq(INCLUDED_AUHOR), eq(includedReference));
+                verify(this.authorExecutor).call(any(), eq(INCLUDED_AUTHOR), eq(includedReference));
             }
         }
 

@@ -20,6 +20,7 @@
 #template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
+#template("skipnav.vm")
 #if($displayMainMenu)
   <div id="menuview">
     #template("menus_view.vm")

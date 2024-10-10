@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Configuration Resources</name>
@@ -41,8 +41,8 @@
          Following versions of some specific Jetty dependencies should be kept in sync when upgrading Jetty.
     -->
     <jetty.version>${jetty.server.version}</jetty.version>
+    <slf4j.version>${jetty.server.slf4j.version}</slf4j.version>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -61,18 +61,6 @@
       <artifactId>jetty-server</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
-    </dependency>
-    <!-- We need to bundle the Servlet API in the Jetty JARs. This is normally drawn transitively by the jetty-server
-         artifact above. However, since we declare the Servlet API dependency (javax.servlet:javax.servlet-api) with
-         a "provided" scope in our top level POM, the Assembly plugin doesn't include it by default. -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <!-- In addition, we need to specify the version so that it's the one that is required by the version of Jetty
-           used. -->
-      <version>4.0.1</version>
-      <optional>true</optional>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -100,8 +88,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-annotations</artifactId>
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-annotations</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
@@ -131,14 +119,14 @@
     </dependency>
     <!-- Note: We don't provide Jetty Websocket API only JSR356 -->
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-javax-server</artifactId>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-server</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-javax-client</artifactId>
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-javax-client</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
     </dependency>

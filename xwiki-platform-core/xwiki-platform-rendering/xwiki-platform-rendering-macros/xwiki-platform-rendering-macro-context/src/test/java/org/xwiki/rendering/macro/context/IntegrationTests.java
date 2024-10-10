@@ -41,6 +41,8 @@ import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,6 +75,11 @@ public class IntegrationTests implements RenderingTests
         componentManager.registerMockComponent(ReferenceUpdater.class);
         componentManager.registerMockComponent(AuthorizationManager.class);
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+
+        // Used by EffectiveAuthorSetterListener from oldcore.
+        DefaultParameterizedType currentUserReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
+        componentManager.registerMockComponent(currentUserReferenceResolverType);
 
         // Macro Reference Resolver
         DocumentReferenceResolver<String> macroResolver = componentManager.registerMockComponent(

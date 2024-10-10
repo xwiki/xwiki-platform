@@ -92,7 +92,8 @@ class PDFExportIT
                 links.get("XWikiLogo.png"));
 
             // The PDF document should contain the XWikiLogo.png image embedded in the Sandbox home page.
-            assertEquals(1, document.getImages().size());
+            // But it also contains the icons for the different boxes
+            assertEquals(4, document.getImages().size());
         }
     }
 

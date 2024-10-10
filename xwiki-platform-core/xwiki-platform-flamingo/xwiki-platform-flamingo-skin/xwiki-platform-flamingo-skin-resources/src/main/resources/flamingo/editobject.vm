@@ -39,10 +39,11 @@
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
+    <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
     <h3>#cleanClassname(${class.name}) <span class="editor-objectNumber">${obj.number}</span>#if ($firstField): $firstFieldSummary#end
-        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
+        <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.icon.renderHTML('cross')</a>
         #if (!$hasCustomObject)
-          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
+          <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.icon.renderHTML('pencil')</a>
         #end
     </h3>
   </div>
@@ -88,7 +89,10 @@
       </dl>
       <div>
         <a class="syncProperties" href='$doc.getURL("objectsync", "classname=${escapetool.url($class.name)}&amp;object=${obj.number}")'
-           title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.link')</a>
+          title="$services.localization.render('core.editors.object.removeDeprecatedProperties.link.tooltip')">
+          $services.icon.renderHTML('cross')
+          $services.localization.render('core.editors.object.removeDeprecatedProperties.link')
+        </a>
       </div>
     </div>
   #end
@@ -147,7 +151,10 @@
     #if ($hasCustomObject)
       #set ($object = $doc.getObject($class.name, $customObject))
       #if ($object)
-        <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>${escapetool.xml($class.name)}</h2></div>
+        <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
+          <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
+          <h2>${escapetool.xml($class.name)}</h2>
+        </div>
         <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
         #displayObject($object $class $props $titleField)
         </div></div>
@@ -165,7 +172,12 @@
         #set ($isNew = "")
       #end
       #set ($objectCount = $objects.size())
-      <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
+      <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title">
+        <span class="toggle-collapsable" role="presentation">$services.icon.renderHTML('caret-down')</span>
+        <h2>$services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) 
+          <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span>
+        </h2>
+      </div>
       <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
       #foreach ($object in $objects)
         #displayObject($object $class $props $titleField $isNew)
@@ -183,7 +195,7 @@
 #macro(displayAddObject $class)
   <div id="add_xobject_${escapetool.xml($class.name)}" class="add_xobject">
     <div id="add_xobject_${escapetool.xml($class.name)}_title" class="add_xobject-title">
-      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;form_token=$!{services.csrf.getToken()}&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
+      <a href="$doc.getURL('edit', "xpage=editobject&amp;xaction=addObject&amp;form_token=$!{services.csrf.getToken()}&amp;classname=$escapetool.url(${class.name})&amp;xredirect=$escapetool.url(${doc.getURL('edit', 'editor=object')})")" class="xobject-add-control" title="$services.localization.render('core.editors.object.newObjectForClass.tooltip', ["#cleanClassname(${class.name})"])">$services.icon.renderHTML('add') $services.localization.render('core.editors.object.newObjectForClass', ["#cleanClassname(${class.name})"])</a>
     </div>
   </div>
 #end
@@ -342,6 +354,7 @@
   #if ($hasCustomClass || $hasCustomObject || $hasCustomField)
     #set ($fullEditorURL = "$doc.getURL('edit', 'editor=object')")
     <div class="more-actions">
+      $services.icon.renderHTML('pencil')
       <a href='$fullEditorURL' class='edit-all' title="$services.localization.render('core.editors.object.editAllObjects')">$services.localization.render('core.editors.object.editAllObjects')</a>
     </div>
   #end

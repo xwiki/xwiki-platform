@@ -388,11 +388,16 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Extract the last entity of the given type from this one by traversing the current entity to the root.
+     * Extract the entity of the given type which is the closest to this reference when traversing from this reference
+     * to the root.
+     * <p>
+     * For example when passing {@link DocumentReference} {@code wiki:Space1.Space2.Document} it will return the
+     * {@link SpaceReference} {@code wiki:Space1.Space2}.
      * 
      * @param type the type of the entity to be extracted
      * @return the last entity of the given type in the current entity when traversing to the root (the current entity
      *         will be returned if it's of the passed type) or null if no entity of the passed type exist
+     * @see #extractFirstReference(EntityType)
      */
     public EntityReference extractReference(EntityType type)
     {
@@ -406,12 +411,17 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Extract the first entity of the given type from this one by traversing the current entity to the root.
+     * Extract the entity of the given type which is the closest to the root reference when traversing from this
+     * reference to the root.
+     * <p>
+     * For example when passing {@link DocumentReference} {@code wiki:Space1.Space2.Document} it will return the
+     * {@link SpaceReference} {@code wiki:Space1}.
      *
      * @param type the type of the entity to be extracted
      * @return the first entity of the given type in the current entity when traversing to the root or null if no entity
      *         of the passed type exist
      * @since 7.4M1
+     * @see #extractReference(EntityType)
      */
     public EntityReference extractFirstReference(EntityType type)
     {

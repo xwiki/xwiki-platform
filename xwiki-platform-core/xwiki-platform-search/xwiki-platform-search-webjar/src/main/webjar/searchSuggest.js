@@ -129,7 +129,7 @@ var XWiki = (function (XWiki) {
     onSuggestCollapsed: function(event) {
       /* We match the collapse of the input field timing to close the suggest panel.
          As of 16.2.0-RC1, this value is defined in action-menus.less -> #headerglobalsearchinput */
-      this.suggest.resetTimeout(300);
+      this.suggest.resetTimeout($('#headerglobalsearchinput').css('transition-duration'));
     },
 
     /**

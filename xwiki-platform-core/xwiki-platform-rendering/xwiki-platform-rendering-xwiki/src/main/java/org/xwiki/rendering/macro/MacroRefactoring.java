@@ -54,7 +54,8 @@ public interface MacroRefactoring
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
      */
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException;
 
     /**
@@ -74,7 +75,8 @@ public interface MacroRefactoring
      * @since 14.2RC1
      */
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException;
 
     /**

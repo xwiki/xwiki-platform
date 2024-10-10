@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
@@ -1095,11 +1096,11 @@ class XWikiTest
         // Test links
         verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false);
+            targetReference, false, Set.of());
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false);
+            targetReference, false, Set.of());
         verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false);
+            targetReference, false, Set.of());
 
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());

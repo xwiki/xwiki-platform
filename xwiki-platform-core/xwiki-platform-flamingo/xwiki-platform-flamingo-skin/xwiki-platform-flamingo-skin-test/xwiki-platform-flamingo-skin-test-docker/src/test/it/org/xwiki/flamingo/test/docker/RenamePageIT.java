@@ -668,4 +668,24 @@ class RenamePageIT
             setup.rest().delete(otherReference);
         }
     }
+
+    @Order(9)
+    @Test
+    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference)
+    {
+        testUtils.createPage(testReference, "[[Alice]]\n[[Bob]]\n[[Eve]]", "Test relative links");
+        testUtils.createPage(new DocumentReference("Alice", testReference.getLastSpaceReference()), "Alice page",
+            "Alice");
+        testUtils.createPage(new DocumentReference("Bob", testReference.getLastSpaceReference()), "[[Alice]]",
+            "Alice");
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        RenamePage rename = viewPage.rename();
+        rename.getDocumentPicker().setName("Foo");
+        CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+
+        WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
+        assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]", wikiEditPage.getContent());
+    }
 }

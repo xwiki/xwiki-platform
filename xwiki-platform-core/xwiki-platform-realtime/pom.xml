@@ -25,13 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime</artifactId>
   <name>XWiki Platform - Realtime - Parent POM</name>
   <packaging>pom</packaging>
   <description>Adds support for real-time editing in XWiki.</description>
   <modules>
+    <module>xwiki-platform-realtime-api</module>
     <module>xwiki-platform-realtime-ui</module>
     <module>xwiki-platform-realtime-webjar</module>
     <module>xwiki-platform-realtime-wiki</module>

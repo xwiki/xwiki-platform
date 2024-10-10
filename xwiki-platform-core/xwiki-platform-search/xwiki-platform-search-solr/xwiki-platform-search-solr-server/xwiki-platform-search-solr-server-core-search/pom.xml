@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr-server</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server-core-search</artifactId>
   <name>XWiki Platform - Search - SOLR - Server - Search Core</name>
@@ -42,8 +42,16 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
       <version>${project.version}</version>
-      <!-- We use "provided" so that this dep is not used transitively by Maven and thus doesn't find its way into
-           our distribution's WEB-INF/lib directory. -->
+      <!-- This dependency is packaged so we don't want it to be seen as a transitive dependency by Maven -->
+      <!-- We cannot use provided scope because it apparently hide the JAR from maven-assembly-plugin -->
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ua.net.nlp</groupId>
+      <artifactId>morfologik-ukrainian-lt</artifactId>
+      <version>6.5.3</version>
+      <!-- This dependency is packaged so we don't want it to be seen as a transitive dependency by Maven -->
+      <!-- We cannot use provided scope because it apparently hide the JAR from maven-assembly-plugin -->
       <optional>true</optional>
     </dependency>
   </dependencies>

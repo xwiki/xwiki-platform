@@ -23,6 +23,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.environment.Environment;
+import org.xwiki.test.TestEnvironment;
+
+import com.xpn.xwiki.web.Utils;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link MailSenderPlugin mailsender plugin}.
@@ -38,8 +47,13 @@ public class MailSenderPluginTest
     private static MailSenderPlugin plugin;
 
     @BeforeClass
-    public static void setUpPlugin()
+    public static void setUpPlugin() throws ComponentLookupException
     {
+        ComponentManager componentManager = mock(ComponentManager.class);
+        when(componentManager.getInstance(ComponentManager.class, "context")).thenReturn(componentManager);
+        when(componentManager.getInstance(Environment.class)).thenReturn(new TestEnvironment());
+        Utils.setComponentManager(componentManager);
+
         plugin = new MailSenderPlugin("mail", MailSenderPlugin.class.getCanonicalName(), null);
     }
 

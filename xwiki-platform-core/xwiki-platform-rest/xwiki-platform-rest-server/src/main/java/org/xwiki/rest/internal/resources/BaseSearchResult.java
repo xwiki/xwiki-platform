@@ -345,12 +345,12 @@ public class BaseSearchResult extends XWikiResource
 
                 String pageUri;
                 if (StringUtils.isBlank(language)) {
-                    pageUri = Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, pageName)
-                            .toString();
+                    pageUri = Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName,
+                        Utils.getSpacesURLElements(spaces), pageName).toString();
                 } else {
                     searchResult.setLanguage(language);
                     pageUri = Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
-                            spaces, pageName, language).toString();
+                        Utils.getSpacesURLElements(spaces), pageName, language).toString();
                 }
 
                 Link pageLink = new Link();
@@ -413,18 +413,20 @@ public class BaseSearchResult extends XWikiResource
                 searchResult.setSpace(spaceId);
                 searchResult.setTitle(spaceDoc != null ? spaceDoc.getPlainTitle() : spaceReference.getName());
 
+                List<String> restSpacesValue = Utils.getSpacesURLElements(spaces);
+
                 // Add a link to the space information.
                 Link spaceLink = new Link();
                 spaceLink.setRel(Relations.SPACE);
-                spaceLink.setHref(Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaces)
-                    .toString());
+                spaceLink.setHref(
+                    Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, restSpacesValue).toString());
                 searchResult.getLinks().add(spaceLink);
 
                 // Add a link to the home page if it exists and it is viewable.
                 if (spaceDoc != null && !spaceDoc.isNew()) {
                     Link pageLink = new Link();
-                    pageLink.setHref(Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
-                        spaceDoc.getDocumentReference().getName()).toString());
+                    pageLink.setHref(Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName,
+                        restSpacesValue, spaceDoc.getDocumentReference().getName()).toString());
                     pageLink.setRel(Relations.HOME);
                     searchResult.getLinks().add(pageLink);
                 }
@@ -564,17 +566,18 @@ public class BaseSearchResult extends XWikiResource
                         searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthorReference(), componentManager));
                     }
 
+                    List<String> restSpacesValue = Utils.getSpacesURLElements(spaces);
+
                     String pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, pageName)
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, restSpacesValue, pageName)
                             .toString();
                     Link pageLink = new Link();
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
                     searchResult.getLinks().add(pageLink);
 
-                    String objectUri =
-                        Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces, pageName,
-                            className, objectNumber).toString();
+                    String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName,
+                        restSpacesValue, pageName, className, objectNumber).toString();
                     Link objectLink = new Link();
                     objectLink.setHref(objectUri);
                     objectLink.setRel(Relations.OBJECT);

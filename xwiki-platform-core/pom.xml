@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.4.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -138,19 +138,10 @@
 
                  Single justification example:
             -->
-            <revapi.differences>
-              <differences>
-                <item>
-                  <ignore>true</ignore>
-                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
-                  <old>class com.xpn.xwiki.web.XWikiServletResponse</old>
-                  <new>class com.xpn.xwiki.web.XWikiServletResponse</new>
-                  <superClass>javax.servlet.ServletResponseWrapper</superClass>
-                  <justification>Not a breakage since the ServletResponseWrapper class doesn't contain any final method</justification>
-                  <criticality>allowed</criticality>
-                </item>
-              </differences>
-            </revapi.differences>
+            
+            
+            
+            
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -165,6 +156,7 @@
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
+    <module>xwiki-platform-bootstrap</module>
     <module>xwiki-platform-bridge</module>
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
@@ -208,7 +200,6 @@
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
-    <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>
     <module>xwiki-platform-model</module>
     <module>xwiki-platform-netflux</module>
@@ -274,7 +265,7 @@
           <plugin>
             <groupId>org.codehaus.gmavenplus</groupId>
             <artifactId>gmavenplus-plugin</artifactId>
-            <version>3.0.2</version>
+            <version>4.0.1</version>
             <executions>
               <execution>
                 <id>set-system-properties-file</id>

@@ -32,6 +32,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.slf4j.Logger;
+import org.xwiki.search.solr.XWikiSolrCore;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 /**
@@ -46,7 +47,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     /**
      * Solr server instance corresponding, depending on the subclass.
      */
-    protected SolrClient server;
+    protected XWikiSolrCore server;
 
     /**
      * Logging framework.
@@ -59,7 +60,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Add Solr document [{}] to index", solrDocument);
 
-        this.server.add(solrDocument);
+        this.server.getClient().add(solrDocument);
     }
 
     @Override
@@ -67,13 +68,13 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Add Solr documents [{}] to index", solrDocuments);
 
-        this.server.add(solrDocuments);
+        this.server.getClient().add(solrDocuments);
     }
 
     @Override
     public SolrDocument get(String id) throws IOException, SolrServerException
     {
-        return server.getById(id);
+        return server.getClient().getById(id);
     }
 
     @Override
@@ -81,7 +82,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr document [{}] from index", id);
 
-        this.server.deleteById(id);
+        this.server.getClient().deleteById(id);
     }
 
     @Override
@@ -89,7 +90,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr documents [{}] from index", ids);
 
-        this.server.deleteById(ids);
+        this.server.getClient().deleteById(ids);
     }
 
     @Override
@@ -97,7 +98,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Delete Solr documents from index based on query [{}]", query);
 
-        this.server.deleteByQuery(query);
+        this.server.getClient().deleteByQuery(query);
     }
 
     @Override
@@ -105,7 +106,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Commit changes to Solr");
 
-        this.server.commit();
+        this.server.getClient().commit();
     }
 
     @Override
@@ -113,7 +114,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Rollback changes to Solr");
 
-        this.server.rollback();
+        this.server.getClient().rollback();
     }
 
     @Override
@@ -121,7 +122,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Execute Solr query [{}]", solrParams);
 
-        return this.server.query(solrParams);
+        return this.server.getClient().query(solrParams);
     }
 
     @Override
@@ -130,7 +131,7 @@ public abstract class AbstractSolrInstance implements SolrInstance
     {
         this.logger.debug("Execute Solr query and stream response [{}]", params);
 
-        return this.server.queryAndStreamResponse(params, callback);
+        return this.server.getClient().queryAndStreamResponse(params, callback);
     }
 
     /**
@@ -140,6 +141,6 @@ public abstract class AbstractSolrInstance implements SolrInstance
      */
     protected SolrClient getServer()
     {
-        return this.server;
+        return this.server.getClient();
     }
 }

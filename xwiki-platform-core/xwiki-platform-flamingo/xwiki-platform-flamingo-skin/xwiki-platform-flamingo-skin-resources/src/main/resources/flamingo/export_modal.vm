@@ -208,7 +208,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">$services.icon.renderHTML('cross')</button>
           <div class="modal-title" id="exportTreeModalLabel">
             <span class="modal-title-icon">$services.icon.renderHTML('download')</span>
             #set ($title = $escapetool.xml($services.localization.render('core.exporter.exportAs', ['__format__'])))

@@ -10,6 +10,7 @@ org.xwiki.refactoring.internal.job.CopyJob
 org.xwiki.refactoring.internal.job.CopyAsJob
 org.xwiki.refactoring.internal.listener.AutomaticRedirectCreatorListener
 org.xwiki.refactoring.internal.listener.BackLinkUpdaterListener
+org.xwiki.refactoring.internal.listener.LinkIndexingWaitingHelper
 org.xwiki.refactoring.internal.listener.LegacyParentFieldUpdaterListener
 org.xwiki.refactoring.internal.script.DefaultRequestFactory
 org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter

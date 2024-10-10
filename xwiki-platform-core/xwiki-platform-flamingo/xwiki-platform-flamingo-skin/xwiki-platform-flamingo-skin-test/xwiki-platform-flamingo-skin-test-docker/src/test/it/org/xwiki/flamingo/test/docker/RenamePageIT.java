@@ -29,6 +29,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
@@ -592,5 +595,77 @@ class RenamePageIT
         // Make sure the source is back to normal
         vp = setup.gotoPage(sourceReference);
         assertEquals(setup.serializeReference(sourceReference), vp.getMetaDataValue("reference"));
+    }
+
+    @Order(8)
+    @ParameterizedTest
+    @ValueSource(strings = { "true", "false" })
+    @NullSource
+    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // Create two pages that link to each other.
+        SpaceReference spaceReference = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", spaceReference);
+        SpaceReference targetSpace = new SpaceReference("Target", spaceReference);
+        DocumentReference sourceReference = new DocumentReference("WebHome", sourceSpace);
+        DocumentReference targetReference = new DocumentReference("WebHome", targetSpace);
+
+        SpaceReference otherSpace = new SpaceReference("Other", spaceReference);
+        DocumentReference otherReference = new DocumentReference("WebHome", otherSpace);
+
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(targetReference);
+        setup.rest().delete(otherReference);
+
+        // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
+        // won't be updated just because the page is still in the index.
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+
+        // Make the other page slow to index by sleeping when we're in Solr.
+        String slowTitle = "$services.sleep.sleepInSolr(20) Slow Title";
+
+        setup.rest().savePage(sourceReference,
+            "Source, see [[%s]].".formatted(setup.serializeLocalReference(otherReference)), "Source");
+        String otherFormat = "Other, see [[%s]]";
+        String otherContent = otherFormat.formatted(setup.serializeLocalReference(sourceReference));
+        setup.rest().savePage(otherReference, otherContent, slowTitle);
+
+        ViewPage viewPage = setup.gotoPage(sourceReference);
+        RenamePage renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setTitle("Target");
+        CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton();
+
+        int currentTimeout = setup.getDriver().getTimeout();
+        try {
+            // Increase the timeout as the question pane will only appear after 10 seconds and then we need to wait
+            // possibly for another 10 seconds until indexing finished.
+            setup.getDriver().setTimeout(20);
+            JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+            assertEquals("Continue waiting for the link indexing to finish?", jobQuestionPane.getQuestionTitle());
+            if (strategy != null) {
+                jobQuestionPane.clickButton("qproperty_continueWaiting", strategy);
+            }
+            statusPage.waitUntilFinished();
+
+            assertEquals("Done.", statusPage.getInfoMessage());
+            assertTrue(setup.rest().exists(targetReference));
+            assertFalse(setup.rest().exists(sourceReference));
+
+            String updatedOtherContent = setup.gotoPage(otherReference).editWiki().getContent();
+            if ("false".equals(strategy)) {
+                // Make sure the other page hasn't been changed.
+                assertEquals(otherContent, updatedOtherContent);
+            } else {
+                // Both when the question isn't answered and when the continue waiting button is clicked, the other page
+                // should be updated.
+                assertEquals(otherFormat.formatted(setup.serializeLocalReference(targetReference)),
+                    updatedOtherContent);
+            }
+        } finally {
+            setup.getDriver().setTimeout(currentTimeout);
+            // Make sure we delete that strange page again.
+            setup.rest().delete(otherReference);
+        }
     }
 }

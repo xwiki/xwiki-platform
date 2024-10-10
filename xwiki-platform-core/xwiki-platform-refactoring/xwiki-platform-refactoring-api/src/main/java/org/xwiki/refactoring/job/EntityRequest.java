@@ -27,6 +27,7 @@ import java.util.Map;
 import org.xwiki.job.Request;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * A generic job request that targets multiple entities.
@@ -60,6 +61,11 @@ public class EntityRequest extends AbstractCheckRightsRequest
      * @see #isDeep()
      */
     private static final String PROPERTY_DEEP = "deep";
+
+    /**
+     * @see #isWaitForIndexing()
+     */
+    private static final String PROPERTY_WAIT_FOR_INDEXING = "waitForIndexing";
 
     /**
      * Default constructor.
@@ -166,5 +172,34 @@ public class EntityRequest extends AbstractCheckRightsRequest
             setProperty(PROPERTY_ENTITY_PARAMETERS, paramsPerEntity);
         }
         paramsPerEntity.put(entityReference, entityParameters);
+    }
+
+    /**
+     * @return {@code true} if, when links shall be updated, the refactoring shall wait for link indexing to complete.
+     * This ensures that accurate information about links is available, this is particularly relevant when multiple
+     * documents with links between them are moved.
+     *
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    @Unstable
+    public boolean isWaitForIndexing()
+    {
+        return getProperty(PROPERTY_WAIT_FOR_INDEXING, true);
+    }
+
+    /**
+     * Sets whether the refactoring job should wait for links to be indexed before updating them.
+     *
+     * @param waitForIndexing if the refactoring job should wait for links to be indexed before updating them
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    @Unstable
+    public void setWaitForIndexing(boolean waitForIndexing)
+    {
+        setProperty(PROPERTY_WAIT_FOR_INDEXING, waitForIndexing);
     }
 }

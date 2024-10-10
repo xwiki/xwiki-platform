@@ -17,35 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.test;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.script.service.ScriptService;
 
 /**
- * The operation to perform on the queued entry.
- * 
+ * A script service that provides a sleep method for testing purposes.
+ *
  * @version $Id$
- * @since 5.1M2
  */
-public enum IndexOperation
+@Component
+@Singleton
+@Named("sleep")
+public class SleepScriptService implements ScriptService
 {
     /**
-     * Index the entry.
+     * Sleep for a given number of seconds.
+     *
+     * @param seconds the number of seconds to sleep
      */
-    INDEX,
-
-    /**
-     * Remove entry from index.
-     */
-    DELETE,
-
-    // General operations
-
-    /**
-     * Stop indexing thread.
-     */
-    STOP,
-
-    /**
-     * Marker for waiting on indexing to finish all previously queued operations.
-     */
-    READY_MARKER
+    public void sleepInSolr(long seconds)
+    {
+        // Check if we're in the Solr indexing thread.
+        if (Thread.currentThread().getName().equals("XWiki Solr index thread")) {
+            try {
+                Thread.sleep(seconds * 1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

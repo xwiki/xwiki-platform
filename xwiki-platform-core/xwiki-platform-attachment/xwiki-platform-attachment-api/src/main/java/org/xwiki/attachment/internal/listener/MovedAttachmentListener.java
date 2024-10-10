@@ -23,10 +23,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
+import org.xwiki.refactoring.internal.listener.LinkIndexingWaitingHelper;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -74,6 +77,10 @@ public class MovedAttachmentListener implements EventListener
 
     @Inject
     private Logger logger;
+
+    // Use a Provider to avoid early initialization of dependencies.
+    @Inject
+    private Provider<LinkIndexingWaitingHelper> linkIndexingHelper;
 
     @Override
     public String getName()
@@ -110,6 +117,8 @@ public class MovedAttachmentListener implements EventListener
         throws RefactoringException
     {
         this.logger.info("Updating the back-links for attachment [{}].", event.getSourceReference());
+
+        this.linkIndexingHelper.get().maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
 
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
         // document to load and parse) since we have the information in the store

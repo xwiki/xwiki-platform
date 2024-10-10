@@ -26,6 +26,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.observation.event.CancelableEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
@@ -53,8 +56,29 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     @Override
     protected void runInternal() throws Exception
     {
-        if (this.request.getDestination() != null) {
-            super.runInternal();
+        this.progressManager.pushLevelProgress(3, this);
+
+        try {
+            this.progressManager.startStep(this);
+            BeginFoldEvent beginEvent = getBeginEvent();
+            this.observationManager.notify(beginEvent, this, this.getRequest());
+            if (((CancelableEvent) beginEvent).isCanceled()) {
+                return;
+            }
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            if (this.request.getDestination() != null) {
+                super.runInternal();
+            }
+            this.progressManager.endStep(this);
+
+            this.progressManager.startStep(this);
+            EndFoldEvent endEvent = getEndEvent();
+            this.observationManager.notify(endEvent, this, this.getRequest());
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
         }
     }
 
@@ -313,4 +337,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
      * @return {@code true} if the operation worked well.
      */
     protected abstract boolean atomicOperation(DocumentReference source, DocumentReference target);
+    protected abstract <B extends BeginFoldEvent & CancelableEvent> B getBeginEvent();
+
+    protected abstract EndFoldEvent getEndEvent();
 }

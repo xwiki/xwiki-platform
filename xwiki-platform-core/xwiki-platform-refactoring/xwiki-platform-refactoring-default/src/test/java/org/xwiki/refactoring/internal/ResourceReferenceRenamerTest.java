@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Set;
+
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
@@ -81,7 +83,7 @@ class ResourceReferenceRenamerTest
         assertTrue(this.renamer.updateResourceReference(resourceReference,
             oldReference,
             newReference,
-            new DocumentReference("xwiki", "Space", "Page"), true));
+            new DocumentReference("xwiki", "Space", "Page"), true, Set.of()));
 
         verify(this.compactEntityReferenceSerializer).serialize(oldReference, newReference);
     }
@@ -103,7 +105,7 @@ class ResourceReferenceRenamerTest
 
         assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
             currentDocumentReference,
-            false));
+            false, Set.of()));
         assertEquals(new AttachmentResourceReference("xwiki:Space.Page.file2.txt"), resourceReference);
     }
 }

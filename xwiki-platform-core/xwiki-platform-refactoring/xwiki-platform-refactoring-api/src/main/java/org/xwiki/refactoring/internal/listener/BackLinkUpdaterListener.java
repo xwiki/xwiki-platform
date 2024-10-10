@@ -41,9 +41,12 @@ import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
+import org.xwiki.refactoring.internal.job.AbstractEntityJobWithChecks;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
 import org.xwiki.refactoring.job.DeleteRequest;
+import org.xwiki.refactoring.job.EntityJobStatus;
+import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -117,7 +120,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
 
         DocumentReference newTarget = request.getNewBacklinkTargets().get(deletedEvent.getDocumentReference());
         if (request.isUpdateLinks() && newTarget != null) {
-            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit);
+            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit, Set.of());
         }
     }
 
@@ -127,20 +130,24 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         Predicate<EntityReference> canEdit =
             entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
+        Set<DocumentReference> movedDocuments = Set.of();
         if (source instanceof MoveJob) {
             MoveRequest request = (MoveRequest) data;
             updateLinks = request.isUpdateLinks();
             // Check access rights taking into account the move request.
             canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
+            movedDocuments = ((AbstractEntityJobWithChecks) source).getSelectedEntities();
         }
 
         if (updateLinks) {
             DocumentRenamedEvent renameEvent = (DocumentRenamedEvent) event;
-            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit);
+            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit,
+                movedDocuments);
         }
     }
 
-    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit)
+    private void updateBackLinks(DocumentReference source, DocumentReference target,
+        Predicate<EntityReference> canEdit, Set<DocumentReference> movedDocuments)
         throws RefactoringException
     {
         this.logger.info("Updating the back-links for document [{}].", source);
@@ -157,7 +164,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.updater.update(backlinkDocumentReference, source, target);
+                    this.updater.update(backlinkDocumentReference, source, target, movedDocuments);
                 }
                 this.progressManager.endStep(this);
             }

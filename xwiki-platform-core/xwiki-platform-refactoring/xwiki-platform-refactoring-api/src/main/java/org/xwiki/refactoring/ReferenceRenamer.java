@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring;
 
+import java.util.Set;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,7 +46,7 @@ public interface ReferenceRenamer
      * @return {@code true} if the given {@link Block} was modified
      */
     boolean renameReferences(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget, boolean relative);
+        DocumentReference newTarget, boolean relative, Set<DocumentReference> updatedDocuments);
 
     /**
      * Change references of the given block so that the references pointing to the old target points to the new target.
@@ -58,7 +60,8 @@ public interface ReferenceRenamer
      * @since 14.2RC1
      */
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
-        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
+        Set<DocumentReference> updatedDocuments)
     {
         return false;
     }

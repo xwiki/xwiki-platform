@@ -149,22 +149,24 @@ public class DefaultMacroRefactoring implements MacroRefactoring
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException
     {
         return innerReplaceReference(macroBlock,
             xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-            sourceReference, targetReference, relative));
+            sourceReference, targetReference, relative, updatedDocuments));
     }
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException
     {
         return innerReplaceReference(macroBlock,
             xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-            sourceReference, targetReference, relative));
+            sourceReference, targetReference, relative, updatedDocuments));
     }
 
     private Optional<MacroBlock> innerReplaceReference(MacroBlock macroBlock, Predicate<Block> lambda)

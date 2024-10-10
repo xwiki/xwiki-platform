@@ -19,10 +19,15 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Map;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -34,6 +39,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 import static com.xpn.xwiki.XWiki.DEFAULT_SPACE_HOMEPAGE;
 
@@ -60,6 +68,12 @@ public class ResourceReferenceRenamer
     @Inject
     private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private Logger logger;
+
     /**
      * Update the given document reference so that if it targets the old document reference, the new document reference
      * is used instead.
@@ -73,12 +87,13 @@ public class ResourceReferenceRenamer
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative)
+        boolean relative, Set<DocumentReference> movedDocuments)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, movedDocuments)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference);
+            currentDocumentReference, movedDocuments);
     }
 
     /**
@@ -94,16 +109,18 @@ public class ResourceReferenceRenamer
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative)
+        boolean relative, Set<DocumentReference> movedDocuments)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference,
+            currentDocumentReference, movedDocuments)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference);
+            currentDocumentReference, movedDocuments);
     }
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
-        DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference)
+        DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
+        Set<DocumentReference> movedDocuments)
     {
         boolean result = false;
 
@@ -116,8 +133,23 @@ public class ResourceReferenceRenamer
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
 
+        XWikiContext context = contextProvider.get();
+        boolean docExists = false;
+        try {
+            docExists = context.getWiki().exists(linkTargetDocumentReference, context);
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking if [{}] exists for link refactoring.", linkTargetDocumentReference,
+                e);
+        }
+
+        boolean shouldBeUpdated =
+            linkTargetDocumentReference.equals(oldReference)
+                && !(!resourceReference.isTyped() && movedDocuments.contains(linkEntityReference)
+                    && movedDocuments.contains(currentDocumentReference))
+                && docExists;
+
         // If the link targets the old (renamed) document reference, we must update it.
-        if (linkTargetDocumentReference.equals(oldReference)) {
+        if (shouldBeUpdated) {
             // If the link was resolved to a space...
             if (EntityType.SPACE.equals(linkEntityReference.getType())) {
                 if (DEFAULT_SPACE_HOMEPAGE.equals(newReference.getName())) {
@@ -155,7 +187,8 @@ public class ResourceReferenceRenamer
     }
 
     private <T extends EntityReference> boolean updateRelativeResourceReference(ResourceReference resourceReference,
-        T oldReference, T newReference)
+        T oldReference, T newReference, DocumentReference currentDocumentReference,
+        Set<DocumentReference> movedDocuments)
     {
         boolean result = false;
 
@@ -171,8 +204,13 @@ public class ResourceReferenceRenamer
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
 
+        boolean shouldBeUpdated =
+            !linkEntityReference.equals(oldLinkReference)
+                && !(!resourceReference.isTyped() && movedDocuments.contains(oldLinkReference)
+                && movedDocuments.contains(currentDocumentReference));
+
         // If the new and old link references don`t match, then we must update the relative link.
-        if (!linkEntityReference.equals(oldLinkReference)) {
+        if (shouldBeUpdated) {
             // Serialize the old (original) link relative to the new document's location, in compact form.
             String serializedLinkReference =
                 this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
@@ -183,7 +221,8 @@ public class ResourceReferenceRenamer
     }
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
-        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference)
+        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
+        Set<DocumentReference> movedDocuments)
     {
         boolean result = false;
 

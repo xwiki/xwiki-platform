@@ -114,26 +114,28 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
-        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative,
+        Set<DocumentReference> updatedDocuments)
     {
         return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
             SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS,
             (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
-                currentDocumentReference, oldTarget, newTarget, relative),
-            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
-                currentDocumentReference, relative));
+                currentDocumentReference, oldTarget, newTarget, relative, updatedDocuments),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget,
+                newTarget, currentDocumentReference, relative, updatedDocuments));
     }
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
-        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
+        Set<DocumentReference> updatedDocuments)
     {
         return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
             SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS,
             (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
-                currentDocumentReference, oldTarget, newTarget, relative),
-            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
-                currentDocumentReference, relative));
+                currentDocumentReference, oldTarget, newTarget, relative, updatedDocuments),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference,
+                oldTarget, newTarget, currentDocumentReference, relative, updatedDocuments));
     }
 
     private boolean innerRenameReferences(Block block, DocumentReference currentDocumentReference,

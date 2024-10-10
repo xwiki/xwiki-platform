@@ -863,14 +863,23 @@
     </class>
     <property>
       <content>{{velocity}}{{html clean="false"}}
+## If xredirect is not set
+#if (!$request.xredirect)
+  ## Define redirect URL value using current document relative request URL
+  #set($redirectURL = $escapetool.url($xwiki.relativeRequestURL))
+## If xredirect is already set
+#else
+  ## Reuse the current value in the login link
+  #set($redirectURL = $escapetool.url($request.xredirect))
+#end
 #if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference)
 &lt;li&gt;
-  &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)&amp;loginLink=1")" id="tmLogin" rel="nofollow"&gt;$escapetool.xml($services.localization.render('login'))&lt;/a&gt;
+  &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$redirectURL&amp;loginLink=1")" id="tmLogin" rel="nofollow"&gt;$escapetool.xml($services.localization.render('login'))&lt;/a&gt;
 &lt;/li&gt;
 #end
 #if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference &amp;&amp; $xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
 &lt;li&gt;
-&lt;a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister" rel="nofollow"&gt;$escapetool.xml($services.localization.render('register'))&lt;/a&gt;
+&lt;a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$redirectURL")" id="tmRegister" rel="nofollow"&gt;$escapetool.xml($services.localization.render('register'))&lt;/a&gt;
 &lt;/li&gt;
 #end
 {{/html}}{{/velocity}}</content>

@@ -119,9 +119,8 @@ define('xwiki-realtime-wysiwyg', [
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
-          this._saver.destroyDialog();
-          this._saver.setLocalEditFlag(true);
           this._onLocal();
+          this._saver.contentModifiedLocally();
         }
       });
 
@@ -245,6 +244,8 @@ define('xwiki-realtime-wysiwyg', [
         userName,
         network: info.network,
         channel: this._eventsChannel,
+        showNotification: Interface.createMergeMessageElement(
+          this._connection.toolbar.toolbar.find('.rt-toolbar-rightside')),
         setTextValue: (newText) => {
           this._patchedEditor.setHTML(newText, true);
         },
@@ -263,15 +264,9 @@ define('xwiki-realtime-wysiwyg', [
             outputSyntaxVersion:'5.0',
             transformations:'macro'
           })));
-        },
-        safeCrash: (reason, debugLog) => {
-          this._onAbort(null, reason, debugLog);
         }
       };
       this._saver = await new Saver(saverConfig).toBeReady();
-      this._saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
-        this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
-      this._saver.setLastSavedContent(this._editor.getOutputHTML());
     }
 
     static _getFormId() {
@@ -525,7 +520,7 @@ define('xwiki-realtime-wysiwyg', [
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
           this._onAbort();
-          if (!this._saver.getLocalEditFlag()) {
+          if (!this._saver.isDirty()) {
             // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
             // Netflux channel.
             //

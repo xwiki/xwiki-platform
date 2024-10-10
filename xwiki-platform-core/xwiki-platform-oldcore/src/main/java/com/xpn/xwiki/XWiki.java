@@ -1462,7 +1462,7 @@ public class XWiki implements EventListener
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
                 }
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }
@@ -4102,7 +4102,7 @@ public class XWiki implements EventListener
 
     public String generateRandomString(int size)
     {
-        return RandomStringUtils.randomAlphanumeric(size);
+        return RandomStringUtils.secure().nextAlphanumeric(size);
     }
 
     public String generateValidationKey(int size)

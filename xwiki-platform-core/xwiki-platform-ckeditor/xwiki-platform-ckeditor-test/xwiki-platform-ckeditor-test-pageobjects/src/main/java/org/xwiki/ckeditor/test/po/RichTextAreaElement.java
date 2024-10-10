@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.stability.Unstable;
@@ -67,6 +68,11 @@ public class RichTextAreaElement extends BaseElement
     private final boolean isFrame;
 
     private final RichTextAreaContent content = new RichTextAreaContent();
+
+    /**
+     * Holds the last known value of the refresh counter, used to detect when the content is refreshed.
+     */
+    private String cachedRefreshCounter;
 
     /**
      * Creates a new rich text area element.
@@ -256,7 +262,7 @@ public class RichTextAreaElement extends BaseElement
             // Firefox works best if we send the keys to the root editable element, but we need to focus it first,
             // otherwise the keys are ignored. If we send the keys to a nested editable then we can't navigate outside
             // of it using the arrow keys (as if the editing scope is set to that nested editable).
-            getDriver().executeScript("arguments[0].focus()", rootEditableElement);
+            focus(rootEditableElement);
             return rootEditableElement;
         } else {
             // Chrome expects us to send the keys directly to the nested editable where we want to type. If we send the
@@ -305,6 +311,7 @@ public class RichTextAreaElement extends BaseElement
     {
         getDriver().waitUntilCondition(driver -> getFromEditedContent(
             () -> getRootEditableElement(false).getAttribute("contenteditable").equals("true")));
+        this.cachedRefreshCounter = getRefreshCounter();
     }
 
     /**
@@ -355,23 +362,98 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
-     * Wait until the macros present in the rich text area are rendered. Whenever a macro is insered or updated the
-     * entire content is reloaded in order for the macros to be rendered server-side.
+     * Wait for the edited content to be refreshed. Whenever a macro is inserted or updated the entire edited content is
+     * reloaded in order for the macros to be rendered server-side.
      *
-     * @since 16.3.0RC1
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
      */
-    public void waitUntilMacrosAreRendered()
+    public void waitForContentRefresh()
+    {
+        waitForContentRefresh(null);
+    }
+
+    /**
+     * Wait for the edited content to be refreshed. Whenever a macro is inserted or updated the entire edited content is
+     * reloaded in order for the macros to be rendered server-side. This method waits:
+     * <ul>
+     * <li>either until the refresh counter has the expected value (this is useful when the content is refreshed
+     * multiple times, at very short intervals)</li>
+     * <li>or until its value is different from the cached value.</li>
+     * </ul>
+     *
+     * @param expectedRefreshCounter the expected value of the refresh counter, or {@code null} if the refresh counter
+     *            should be checked against the cached value
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void waitForContentRefresh(String expectedRefreshCounter)
     {
         getDriver().waitUntilCondition(driver -> {
-            return getFromEditedContent(() -> {
-                WebElement root = getRootEditableElement(false);
-                if (root.getAttribute("contenteditable").equals("true")) {
-                    return getDriver()
-                        .findElementsWithoutWaiting(root, By.cssSelector(".macro[data-widget='xwiki-macro']")).stream()
-                        .allMatch(macroWidget -> "1".equals(macroWidget.getAttribute("data-cke-widget-upcasted")));
-                }
-                return false;
-            });
+            String refreshCounter = getRefreshCounter();
+            // Either wait until the refresh counter has the expected value...
+            if ((expectedRefreshCounter != null && Objects.equals(expectedRefreshCounter, refreshCounter))
+                // ...or until its value is different from the cached value.
+                || (expectedRefreshCounter == null && !Objects.equals(cachedRefreshCounter, refreshCounter))) {
+                cachedRefreshCounter = refreshCounter;
+                return true;
+            }
+            return false;
         });
+    }
+
+    /**
+     * @return the current value of the refresh counter, read from the edited content.
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public String getRefreshCounter()
+    {
+        return getFromEditedContent(() -> getRootEditableElement(false).getAttribute("data-xwiki-refresh-counter"));
+    }
+
+    /**
+     * Sends the save & continue shortcut key to the text area and waits for the success notification message.
+     *
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void sendSaveShortcutKey()
+    {
+        sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+
+        // The code that waits for the save confirmation clicks on the success notification message to hide it and this
+        // steals the focus from the rich text area. Unfortunately this makes Chrome lose the caret position: the next
+        // sendKeys will insert the text at the end of the edited content. To avoid this, we backup the active element
+        // and restore it after the save confirmation.
+        WebElement activeElement;
+        try {
+            activeElement = getActiveElement();
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+
+        // This steals the focus from the rich text area because it clicks on the success notification message in order
+        // to hide it.
+        waitForNotificationSuccessMessage("Saved");
+
+        // Restore the focus to the previously active element. We cannot simply focus the rich text area because the
+        // previously active element might have been a nested editable area (e.g. from an inline editable macro or from
+        // the image caption).
+        maybeSwitchToEditedContent();
+        try {
+            focus(activeElement);
+        } finally {
+            maybeSwitchToDefaultContent();
+        }
+    }
+
+    private void focus(WebElement element)
+    {
+        getDriver().executeScript("arguments[0].focus()", element);
     }
 }

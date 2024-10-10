@@ -142,6 +142,10 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     restoreSelection(ranges) {
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, ranges);
+
+      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
+      // selection is restored.
+      this._ckeditor.widgets.checkSelection();
     }
 
     /** @inheritdoc */
@@ -390,10 +394,6 @@ define('xwiki-ckeditor-realtime-adapter', [
       if (shouldRefreshContent) {
         await this._refreshContent();
       }
-
-      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
-      // selection is restored.
-      setTimeout(() => this._ckeditor.widgets.checkSelection(), 0);
     }
 
     async _refreshContent() {

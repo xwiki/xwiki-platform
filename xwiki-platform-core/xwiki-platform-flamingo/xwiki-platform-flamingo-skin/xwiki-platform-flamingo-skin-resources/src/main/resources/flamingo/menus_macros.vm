@@ -229,18 +229,12 @@
  *#
 #macro(displaySimpleSecureUIX $name $revert)
   #set ($uixs = $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
-  #set ($numberOfUixs = ${uixs.size()} - 1)
-  #if ($numberOfUixs > 0)
-    #foreach($uixID in [0..$numberOfUixs])
-      #if (!$revert)
-        #set ($uix = $uixs[$uixID])
-      #else
-        #set ($revertedId = $uixs.size() - 1 - $uixID)
-        #set ($uix = $uixs[$revertedId])
-      #end
-      #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
-        $services.rendering.render($uix.execute(), 'html/5.0')
-      #end
+  #if ($revert)
+    #set ($discard = $collectiontool.reverseModifiable($uixs))
+  #end
+  #foreach($uix in $uixs)
+    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+      $services.rendering.render($uix.execute(), 'html/5.0')
     #end
   #end
 #end

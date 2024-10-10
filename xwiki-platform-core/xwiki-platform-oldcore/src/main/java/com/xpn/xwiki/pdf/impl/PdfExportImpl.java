@@ -146,7 +146,7 @@ public class PdfExportImpl implements PdfExport
         // would also need to get the translations and set them too.
 
         File dir = this.environment.getTemporaryDirectory();
-        File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
+        File tempdir = new File(dir, RandomStringUtils.secure().nextAlphanumeric(8));
         try {
             FileUtils.forceMkdir(tempdir);
         } catch (IOException e) {

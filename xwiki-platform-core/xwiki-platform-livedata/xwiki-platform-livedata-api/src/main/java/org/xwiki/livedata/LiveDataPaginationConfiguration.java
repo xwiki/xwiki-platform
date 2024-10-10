@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataPaginationConfiguration
+public class LiveDataPaginationConfiguration implements InitializableLiveDataElement
 {
     private Integer maxShownPages;
 
@@ -157,9 +157,7 @@ public class LiveDataPaginationConfiguration
         this.showPageSizeDropdown = showPageSizeDropdown;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.maxShownPages == null) {

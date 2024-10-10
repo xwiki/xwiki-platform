@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.6.0-SNAPSHOT</version>
+  <version>16.9.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -50,34 +50,37 @@
     <platform.version>${commons.version}</platform.version>
 
     <!-- Dependencies versions -->
-    <bootstrap.version>3.4.1</bootstrap.version>
-    <batik.version>1.17</batik.version>
+    <batik.version>1.18</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.2</tika.version>
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>10.0.21</jetty.server.version>
-    <jetty.client.version>${jetty.server.version}</jetty.client.version>
+    <jetty.server.version>12.0.12</jetty.server.version>
+    <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.111.Final</netty.version>
+    <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
+         version here. -->
+    <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
+    <netty.version>4.1.114.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.3.6</dockerJava.version>
+    <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.42</jersey.version>
+    <jersey.version>2.45</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.2</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.19.8</testcontainers.version>
+    <testcontainers.version>1.20.2</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.6.7</libreoffice.version>
+    <libreoffice.version>24.2.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -108,19 +111,19 @@
     <hsqldb.version>2.7.3</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>8.4.0</mysql.version>
+    <mysql.version>9.0.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.4.0</mariadb.version>
+    <mariadb.version>3.4.1</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.7.3</pgsql.version>
+    <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.11.0.0</oracle.version>
+    <oracle.version>21.15.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
     <node.version>v20.12.0</node.version>
@@ -179,7 +182,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.28.0</version>
+        <version>4.29.2</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -195,7 +198,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
-        <version>2.7.3</version>
+        <version>2.7.4</version>
         <exclusions>
           <!-- Not need in the context of XWiki and cause conflict with other dependencies -->
           <exclusion>
@@ -438,13 +441,13 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.7</version>
+        <version>2.13.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>requirejs</artifactId>
-        <version>2.3.6</version>
+        <version>2.3.7</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -456,7 +459,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.13.2</version>
+        <version>1.13.3</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -482,17 +485,17 @@
         <artifactId>bootstrap-select</artifactId>
         <version>1.13.18</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.webjars.npm</groupId>
         <artifactId>bootstrap-3-typeahead</artifactId>
         <version>4.0.2</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>bootstrap</artifactId>
-        <version>${bootstrap.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -512,12 +515,24 @@
         <artifactId>bootstrap-daterangepicker</artifactId>
         <version>3.1</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>selectize.js</artifactId>
         <version>0.13.3</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- All Batik artifacts should be in sync -->
@@ -595,12 +610,12 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.14.0</version>
+        <version>5.15.0</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna-platform</artifactId>
-        <version>5.14.0</version>
+        <version>5.15.0</version>
       </dependency>
 
       <dependency>
@@ -617,7 +632,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.17.2</version>
+        <version>1.18.1</version>
       </dependency>
 
       <!-- PDF -->
@@ -682,7 +697,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.9</version>
+        <version>2.10</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -697,6 +712,12 @@
         <artifactId>bootstrap-switch</artifactId>
         <version>3.3.4</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!--Used by oldcore + querymanager -->
       <dependency>
@@ -741,7 +762,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.2.2</version>
+        <version>5.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -753,7 +774,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>4.2</version>
+        <version>5.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -761,7 +782,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>xml-dtd</artifactId>
         <!-- Note: has a different release cycle than CSS4J -->
-        <version>4.2.1</version>
+        <version>4.3</version>
       </dependency>
 
       <!-- Used by solr-core and closure-compiler -->
@@ -986,6 +1007,11 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-analysis-extras</artifactId>
+        <version>${solr.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-backward-codecs</artifactId>
         <version>${lucene.version}</version>
@@ -993,7 +1019,7 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.5</version>
+        <version>1.1.10.7</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
@@ -1342,8 +1368,8 @@
               </extensionOverride>
               <extensionOverride>
                 <!-- Open Java is the same as JSON-Java but with a different license -->
-                <id>com.tdunning:json</id>
-                <features>org.json:json/20180130</features>
+                <id>org.json:json</id>
+                <features>com.tdunning:json</features>
               </extensionOverride>
               <extensionOverride>
                 <!-- Embbed javax.el:javax.el-api -->
@@ -1566,7 +1592,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.15.0</version>
+          <version>1.15.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1660,6 +1686,26 @@
               </rules>
             </configuration>
           </execution>
+          <!-- Make sure the old bootstrap webjar extension is not used. -->
+          <execution>
+            <id>enforce-bootstrap-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Do not use the official org.webjar:bootstrap extension. Is it now packaged in xwiki platform.
+                  </message>
+                  <excludes>
+                    <exclude>org.webjars:bootstrap</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
           <!-- Make sure JAR extensions don't trigger runtime dependencies on XAR extensions -->
           <execution>
             <id>enforcer-banneddependencytype-xar</id>
@@ -1745,7 +1791,6 @@
                     <exclude>org.xwiki.platform:xwiki-platform-livetable</exclude>
                     <exclude>flaviusolaru:navigation-menu-wiki-macro</exclude>
                     <exclude>lucaa:navigationmenuconfigapplication</exclude>
-                    <exclude>xwiki-platform-messagestream</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-model</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-filter-instance-oldcore</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-panels</exclude>

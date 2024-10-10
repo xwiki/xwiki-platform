@@ -42,12 +42,13 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,6 +57,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -87,6 +89,9 @@ class NotificationFilterPreferenceStoreTest
 
     @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Mock
     private XWikiContext context;
@@ -127,21 +132,35 @@ class NotificationFilterPreferenceStoreTest
     @Test
     void deleteWikiFilterPreferences() throws Exception
     {
-        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
-
         WikiReference wikiReference = new WikiReference("wikiid");
+        when(this.context.getWikiReference()).thenReturn(CURRENT_WIKI_REFERENCE);
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of(
+            "foo",
+            "bar",
+            CURRENT_WIKI_REFERENCE.getName(),
+            MAIN_WIKI_REFERENCE.getName(),
+            wikiReference.getName()
+        ));
+
         this.notificationFilterPreferenceStore.deleteFilterPreference(wikiReference);
 
+        verify(this.context).setWikiReference(new WikiReference("foo"));
+        verify(this.context).setWikiReference(new WikiReference("bar"));
+        verify(this.context).setWikiReference(MAIN_WIKI_REFERENCE);
         verify(this.context).setWikiReference(wikiReference);
-        verify(this.session).createQuery("delete from DefaultNotificationFilterPreference "
+        // 1 before performing the request and 5 for setting back the current reference
+        verify(this.context, times(6)).setWikiReference(CURRENT_WIKI_REFERENCE);
+        verify(this.session, times(5)).createQuery("delete from DefaultNotificationFilterPreference "
             + "where page like :wikiPrefix "
             + "or pageOnly like :wikiPrefix "
             + "or user like :wikiPrefix "
             + "or wiki = :wikiId");
-        verify(this.query).setParameter("wikiPrefix", "wikiid:%");
-        verify(this.query).setParameter("wikiId", "wikiid");
-        verify(this.query).executeUpdate();
-        verify(this.context).setWikiReference(CURRENT_WIKI_REFERENCE);
+
+        verify(this.query, times(5)).setParameter("wikiPrefix", "wikiid:%");
+        verify(this.query, times(5)).setParameter("wikiId", "wikiid");
+
+        verify(this.query, times(5)).executeUpdate();
+
     }
 
     @Test
@@ -152,6 +171,10 @@ class NotificationFilterPreferenceStoreTest
         when(this.hibernateStore.executeWrite(same(context), any())).thenThrow(XWikiException.class);
 
         WikiReference wikiReference = new WikiReference("wikiid");
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(List.of(
+            wikiReference.getName(),
+            CURRENT_WIKI_REFERENCE.getName()
+        ));
         NotificationException notificationException = assertThrows(NotificationException.class,
             () -> this.notificationFilterPreferenceStore.deleteFilterPreference(
                 wikiReference));

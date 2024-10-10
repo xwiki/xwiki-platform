@@ -38,7 +38,7 @@
   <hidden>false</hidden>
   <content>A sandbox é uma parte do seu wiki que você pode modificar livremente. O objetivo é permitir que você pratique a edição. Você descobrirá como funciona a edição de páginas e criará novas páginas. Basta clicar em **Editar** para começar!
 
-{{informações}}
+{{info}}
 Não se preocupe em substituir ou perder coisas ao editar a página, você sempre pode reverter para a primeira versão da página na guia “Histórico” na parte inferior da página.
 {{/info}}
 
@@ -136,13 +136,13 @@ O XWiki permite que você crie links para outras páginas do seu wiki ou da web:
 
 Você também pode criar links para anexos:
 
-anexar:XWikiLogo.png
+attach:XWikiLogo.png
 
 == Imagens ==
 
 Você pode inserir imagens em suas páginas wiki:
 
-imagem:XWikiLogo.png
+image:XWikiLogo.png
 
 == Macros ==
 
@@ -152,9 +152,9 @@ As macros permitem melhorar a aparência do conteúdo do wiki e adicionar recurs
 
 Esta macro permite chamar a atenção dos usuários para uma informação específica:
 
-{{aviso}}
+{{warning}}
 Olá Mundo
-{{/aviso}}
+{{/warning}}
 
 === Índice ===
 

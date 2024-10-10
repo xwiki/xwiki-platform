@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -42,6 +43,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
+
+import org.xwiki.user.UserReference;
 
 /**
  * A wrapper around {@link XWikiRequest}.
@@ -493,5 +496,11 @@ public class WrappingXWikiRequest implements XWikiRequest
     public Cookie getCookie(String cookieName)
     {
         return this.request.getCookie(cookieName);
+    }
+
+    @Override
+    public Optional<UserReference> getEffectiveAuthor()
+    {
+        return this.request.getEffectiveAuthor();
     }
 }

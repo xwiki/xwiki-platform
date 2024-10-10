@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataMeta
+public class LiveDataMeta implements InitializableLiveDataElement
 {
     private Collection<LiveDataLayoutDescriptor> layouts;
 
@@ -310,53 +310,44 @@ public class LiveDataMeta
         this.description = description;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    private <A extends InitializableLiveDataElement> Collection<A> initializeAndCleanUpCollection(Collection<A>
+        collection)
+    {
+        Collection<A> result;
+        if (collection == null) {
+            result = new ArrayList<>();
+        } else {
+            result = collection;
+            result.stream().filter(Objects::nonNull).forEach(A::initialize);
+        }
+        return result;
+    }
+
+    private <A extends InitializableLiveDataElement> A initialize(A descriptor, A newInstance)
+    {
+        A result = descriptor;
+        if (result == null) {
+            result = newInstance;
+        }
+        result.initialize();
+        return result;
+    }
+
+    @Override
     public void initialize()
     {
-        if (this.layouts == null) {
-            this.layouts = new ArrayList<>();
-        }
-        this.layouts.stream().filter(Objects::nonNull).forEach(LiveDataLayoutDescriptor::initialize);
-
-        if (this.propertyDescriptors == null) {
-            this.propertyDescriptors = new ArrayList<>();
-        }
-        this.propertyDescriptors.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
-
-        if (this.propertyTypes == null) {
-            this.propertyTypes = new ArrayList<>();
-        }
-        this.propertyTypes.stream().filter(Objects::nonNull).forEach(LiveDataPropertyDescriptor::initialize);
-
-        if (this.filters == null) {
-            this.filters = new ArrayList<>();
-        }
-        this.filters.stream().filter(Objects::nonNull).forEach(FilterDescriptor::initialize);
+        this.layouts = initializeAndCleanUpCollection(this.layouts);
+        this.propertyDescriptors = initializeAndCleanUpCollection(this.propertyDescriptors);
+        this.propertyTypes = initializeAndCleanUpCollection(this.propertyTypes);
+        this.filters = initializeAndCleanUpCollection(this.filters);
+        this.actions = initializeAndCleanUpCollection(this.actions);
 
         if (this.displayers == null) {
             this.displayers = new ArrayList<>();
         }
 
-        if (this.pagination == null) {
-            this.pagination = new LiveDataPaginationConfiguration();
-        }
-        this.pagination.initialize();
-
-        if (this.entryDescriptor == null) {
-            this.entryDescriptor = new LiveDataEntryDescriptor();
-        }
-        this.entryDescriptor.initialize();
-
-        if (this.actions == null) {
-            this.actions = new ArrayList<>();
-        }
-        this.actions.stream().filter(Objects::nonNull).forEach(LiveDataActionDescriptor::initialize);
-
-        if (this.selection == null) {
-            this.selection = new LiveDataSelectionConfiguration();
-        }
-        this.selection.initialize();
+        this.pagination = initialize(this.pagination, new LiveDataPaginationConfiguration());
+        this.entryDescriptor = initialize(this.entryDescriptor, new LiveDataEntryDescriptor());
+        this.selection = initialize(this.selection, new LiveDataSelectionConfiguration());
     }
 }

@@ -21,13 +21,13 @@
 
   .navbar-nav {
     float: right;
+
     &.navbar-left > li {
       float: left;
     }
-    // Should be explicitly defined as "&.navbar-right > li", but leaving this implicit (i.e. as it was)
-    // in order to not increase specificity and break any customizations
-    > li {
-      float: right;
+
+    &.navbar-right {
+      display: flex;
     }
   }
   .navbar-form {

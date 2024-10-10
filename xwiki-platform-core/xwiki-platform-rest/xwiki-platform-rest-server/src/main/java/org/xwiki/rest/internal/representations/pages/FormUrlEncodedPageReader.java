@@ -79,7 +79,10 @@ public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiR
 
         page.setTitle(form.getFirst(TITLE_FIELD_NAME));
         page.setParent(form.getFirst(PARENT_FIELD_NAME));
-        page.setHidden(Boolean.valueOf(form.getFirst(HIDDEN_FIELD_NAME)));
+        String hiddenValue = form.getFirst(HIDDEN_FIELD_NAME);
+        if (hiddenValue != null) {
+            page.setHidden(Boolean.valueOf(hiddenValue));
+        }
         page.setContent(form.getFirst(CONTENT_FIELD_NAME));
 
         return page;

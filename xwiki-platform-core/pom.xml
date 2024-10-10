@@ -138,10 +138,44 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>To fix XWIKI-22336 and XWIKI-22337, the type of the hidden field of the
+                REST Page model needs to be changed from boolean to Boolean. This class shouldn't be
+                used directly but through ModelFactory. Users of the REST API aren't affected as
+                ModelFactory always sets the hidden attribute and thus the null value will never be in
+                an API response.</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.field.typeChanged</code>
+                  <old>field org.xwiki.rest.model.jaxb.Page.hidden</old>
+                  <new>field org.xwiki.rest.model.jaxb.Page.hidden</new>
+                </item>
+                <item>
+                  <code>java.annotation.removed</code>
+                  <old>field org.xwiki.rest.model.jaxb.Page.hidden</old>
+                  <new>field org.xwiki.rest.model.jaxb.Page.hidden</new>
+                  <annotation>@javax.xml.bind.annotation.XmlElement(defaultValue = "false")</annotation>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method boolean org.xwiki.rest.model.jaxb.Page::isHidden()</old>
+                  <new>method java.lang.Boolean org.xwiki.rest.model.jaxb.Page::isHidden()</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter void org.xwiki.rest.model.jaxb.Page::setHidden(===boolean===)</old>
+                  <new>parameter void org.xwiki.rest.model.jaxb.Page::setHidden(===java.lang.Boolean===)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter org.xwiki.rest.model.jaxb.Page org.xwiki.rest.model.jaxb.Page::withHidden(===boolean===)</old>
+                  <new>parameter org.xwiki.rest.model.jaxb.Page org.xwiki.rest.model.jaxb.Page::withHidden(===java.lang.Boolean===)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

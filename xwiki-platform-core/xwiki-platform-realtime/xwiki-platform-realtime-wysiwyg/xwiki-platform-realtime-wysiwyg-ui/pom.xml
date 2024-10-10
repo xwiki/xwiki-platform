@@ -34,6 +34,10 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Realtime WYSIWYG Editor</xwiki.extension.name>
+    <!-- Replaces the old Realtime WYSIWYG Editor from XWiki Contrib -->
+    <xwiki.extension.features>
+      calebjamesdelisle:rtwysiwyg
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

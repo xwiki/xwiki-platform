@@ -578,6 +578,33 @@ div.editProfileCategory {
   float: right;
 }
 
+/* Preferences */
+/* Shortcut preferences */
+span.xHint:has(+ ul.shortcut-list) {
+  margin-bottom: 10px;
+}
+
+ul.shortcut-list {
+  list-style: none;
+  padding-left: unset;
+  &amp; &gt; li {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    justify-content: space-between;
+    align-items: center;
+    &amp; &gt; label {
+      flex-grow: 1;
+      .xHint {
+        display: inline;
+      }
+    }
+    &amp; &gt; input.shortcutPreference, &amp; &gt; span {
+      max-width: 50%;
+      width: unset;
+    }
+  }
+}
 
 /* Watchlist */
 

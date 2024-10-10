@@ -81,6 +81,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.cache.CacheControl;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -216,7 +217,7 @@ import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class XWikiDocument implements DocumentModelBridge, Cloneable
+public class XWikiDocument implements DocumentModelBridge, Cloneable, DisposableCacheValue
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
@@ -630,6 +631,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     // Caching
     private boolean fromCache = false;
 
+    private boolean cached;
+
     private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
 
     private List<XWikiAttachmentToRemove> attachmentsToRemove = new ArrayList<XWikiAttachmentToRemove>();
@@ -833,6 +836,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         init(reference);
+    }
+
+    @Override
+    public void dispose() throws Exception
+    {
+        setCached(false);
     }
 
     /**
@@ -4090,11 +4099,42 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return displayForm(resolveClassReference(className), context);
     }
 
+    /**
+     * Indicate if this {@link XWikiDocument} is currently in the document, implying that it's potentially shared with
+     * several threads.
+     * 
+     * @return true if this {@link XWikiDocument} is in the document cache
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public boolean isCached()
+    {
+        return this.cached;
+    }
+
+    /**
+     * @param cached true if this {@link XWikiDocument} is in the document cache
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setCached(boolean cached)
+    {
+        this.cached = cached;
+    }
+
+    /**
+     * @deprecated use {@link #isCached()} instead
+     */
+    @Deprecated(since = "16.10.0RC1")
     public boolean isFromCache()
     {
         return this.fromCache;
     }
 
+    /**
+     * @deprecated use {@link #setCached(boolean)} instead
+     */
+    @Deprecated(since = "16.10.0RC1")
     public void setFromCache(boolean fromCache)
     {
         this.fromCache = fromCache;

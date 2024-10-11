@@ -149,7 +149,7 @@
 
 #macro (officeImporterForm_overwriteContent)
   &lt;dt&gt;
-    #define($warningMessageContent)
+    #define ($warningMessageContent)
       &lt;label&gt;
         &lt;input name="overwriteContent" type="checkbox" value="true" checked /&gt;
         $escapetool.xml($services.localization.render('office.import.overwriteContent'))

@@ -91,7 +91,7 @@
 #if ($indexJobStatus)
   ## We use the velocity macro here instead of the XWiki macro, in order to keep HTML in the content
   ## With the XWiki macro, the progress bar is not properly rendered.
-  #info("
+  #define ($infoMessageContent)
     #if ($indexJobStatus.state != 'FINISHED')
       $escapetool.xml($services.localization.render('extension.security.indexed.started', [$xwiki.formatDate($indexJobStatus.startDate)]))
       #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js'))
@@ -100,13 +100,14 @@
         'outputSyntax': 'plain',
         'jobId': $indexJobStatus.request.id
       })))
-      &lt;div class=""xcontent job-status"" data-url=""$escapetool.xml($jobStatusURL)""&gt;
+      &lt;div class="xcontent job-status" data-url="$escapetool.xml($jobStatusURL)"&gt;
         #displayJobProgressBar($indexJobStatus, true)
       &lt;/div&gt;
     #else
       $escapetool.xml($services.localization.render('extension.security.indexed.on', [$xwiki.formatDate($indexJobStatus.startDate)]))
     #end
-  ")
+  #end
+  #info($infoMessageContent)
   #else
     {{warning}}$escapetool.xml($services.localization.render('extension.security.indexed.nojob')){{/warning}}
   #end

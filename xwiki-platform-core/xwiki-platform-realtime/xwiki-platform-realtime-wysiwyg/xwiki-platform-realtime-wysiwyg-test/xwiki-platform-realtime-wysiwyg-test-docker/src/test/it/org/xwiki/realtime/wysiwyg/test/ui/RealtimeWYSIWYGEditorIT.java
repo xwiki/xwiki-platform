@@ -321,7 +321,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Replace the default message text.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -335,7 +335,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Continue typing to verify that the selection is not lost in the second tab. Wait for the inserted macro to be
         // rendered server-side.
         firstTextArea.waitUntilTextContains("my");
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
         firstTextArea.sendKeys(" two");
 
         //
@@ -685,7 +685,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Replace the default message text.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -723,7 +723,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // overwrite the text typed in the second tab.
         firstTextArea.waitUntilTextContains("two");
         firstMacroEditModal.clickSubmit();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         firstTextArea.sendKeys(Keys.ARROW_UP, Keys.END, " title");
@@ -738,7 +738,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that the remote change (which included a macro parameter update) didn't steal the focus.
         secondMacroEditModal.getMacroParameterInput("cssClass").sendKeys("a");
         secondMacroEditModal.clickSubmit();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Move to the information box title field and type something.
         secondTextArea.sendKeys(Keys.ARROW_UP, Keys.HOME);
@@ -751,6 +751,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.waitUntilTextContains("Some cool title");
+        firstTextArea.waitForContentRefresh();
 
         // Edit again the macro an verify that we have the correct parameter value.
         firstMacroEditModal = firstEditor.getBalloonToolBar().editMacro();
@@ -781,6 +782,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
         firstTextArea.sendKeys(Keys.END, " first");
 
+        // We plan to edit the same page in another tab outside the realtime session in order to trigger a merge
+        // conflict. We have to save now to prevent the autosave from triggering (it doesn't trigger if there are no
+        // local changes), because we want to control when the merge conflict modal is shown (moreover, we're going to
+        // handle the merge conflict in a second browser tab).
+        firstEditPage.clickSaveAndContinue();
+
         //
         // Second Tab
         //
@@ -791,6 +798,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
+        // Only wait for the synchronization. We're not making any changes yet because we want to save the page outside
+        // the realtime session first in order to trigger a merge conflict.
         secondTextArea.waitUntilTextContains("first");
 
         //
@@ -803,8 +812,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeRichTextAreaElement thirdTextArea = thirdEditor.getRichTextArea();
         thirdTextArea.waitUntilTextContains("first");
 
+        // Make some changes outside the realtime session and save in order to trigger a merge conflict in the realtime
+        // session.
         thirdEditPage.leaveRealtimeEditing();
-
         thirdTextArea.sendKeys(Keys.END, " third");
         thirdEditPage.clickSaveAndContinue();
 
@@ -946,7 +956,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/info", "Info Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Select the default information message and delete it.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -957,7 +967,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/err", "Error Box");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Replace the default error message.
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
@@ -1115,31 +1125,33 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
         String text = secondTextArea.getText();
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
 
         // Edit the inserted Velocity macro.
         secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("$xcontext.userReference.name").clickSubmit();
-        secondTextArea.waitUntilTextContains("superadmin");
+        secondTextArea.waitForContentRefresh();
         text = secondTextArea.getText();
+        assertTrue(text.contains("superadmin"));
         assertFalse(text.contains("Failed"), "Unexpected text content: " + text);
+        String secondRefreshCounter = secondTextArea.getRefreshCounter();
 
         //
         // First Tab
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
+        // The content is re-rendered twice, first time when the Velocity macro is inserted and a second time when the
+        // Velocity macro is edited.
+        firstTextArea.waitForContentRefresh(secondRefreshCounter);
+
         // Even if John didn't make any changes yet, the script macro is executed with the minimum script rights
         // between the current user (John) and the script author associated with the realtime session (superadmin
         // currently).
-        firstTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
-
-        // It's not enough to wait for the Velocity macro error message because the content is re-rendered twice (first
-        // time when the Velocity macro is inserted and a second time when the Velocity macro is edited), but the output
-        // is the same.
-        firstTextArea.waitUntilContentEditable();
+        text = firstTextArea.getText();
+        assertTrue(text.contains("Failed to execute the [velocity] macro."));
 
         // Change the content (without modifying the script macro).
         firstTextArea.sendKeys(Keys.END, " dinner");
@@ -1157,10 +1169,11 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Edit the macro again.
         secondTextArea.sendKeys(Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("User: $xcontext.userReference.name").clickSubmit();
+        secondTextArea.waitForContentRefresh();
+        text = secondTextArea.getText();
         // This time the script macro is not executed because John has been associated as script author of the realtime
         // session.
-        secondTextArea.waitUntilTextContains("Failed to execute the [velocity] macro.");
-        text = secondTextArea.getText();
+        assertTrue(text.contains("Failed to execute the [velocity] macro."));
         assertFalse(text.contains("User: superadmin"), "Unexpected text content: " + text);
 
         secondTextArea.sendKeys(Keys.ARROW_LEFT, Keys.chord(Keys.CONTROL, Keys.SHIFT, Keys.ARROW_LEFT));
@@ -1171,10 +1184,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         multiUserSetup.switchToBrowserTab(multiUserSetup.getFirstTabHandle());
-        firstTextArea.waitUntilTextContains("lunch");
-
         // The second user has modified the Velocity macro, which triggered a re-rendering of the content on this tab.
-        firstTextArea.waitUntilContentEditable();
+        firstTextArea.waitForContentRefresh();
+        firstTextArea.waitUntilTextContains("lunch");
 
         // Try to inject a script macro.
         firstTextArea.sendKeys(Keys.HOME);
@@ -1184,14 +1196,15 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         firstTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
 
         // Edit the inserted Velocity macro to add some script.
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("injected").clickSubmit();
-        firstTextArea.waitUntilMacrosAreRendered();
+        firstTextArea.waitForContentRefresh();
         text = firstTextArea.getText();
         assertFalse(text.contains("injected"), "Unexpected text content: " + text);
+        String firstRefreshCounter = firstTextArea.getRefreshCounter();
 
         // Leave the edit mode to see that the script level associated with the realtime session remains the same.
         firstEditPage.clickCancel();
@@ -1202,17 +1215,16 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
 
         multiUserSetup.switchToBrowserTab(secondTabHandle);
 
-        secondTextArea.waitUntilTextContains("before\nFailed to execute the [velocity] macro.");
-        text = secondTextArea.getText();
-        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
-
         // The content is re-rendered twice because the first user has inserted and modified the Velocity macro.
-        secondTextArea.waitUntilContentEditable();
+        secondTextArea.waitForContentRefresh(firstRefreshCounter);
+        text = secondTextArea.getText();
+        assertTrue(text.contains("before\nFailed to execute the [velocity] macro."));
+        assertFalse(text.contains("injected"), "Unexpected text content: " + text);
 
         // Edit again the macro to see that the script level doesn't change.
         secondTextArea.sendKeys(Keys.ARROW_RIGHT, Keys.ENTER);
         new MacroDialogEditModal().waitUntilReady().setMacroContent("Current: $xcontext.userReference").clickSubmit();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
         text = secondTextArea.getText();
         assertFalse(text.contains("Current: superadmin"), "Unexpected text content: " + text);
         assertTrue(text.contains("Failed to execute the [velocity] macro."), "Unexpected text content: " + text);
@@ -1239,7 +1251,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         firstTextArea.sendKeys("default content");
 
         // Save the page so that we can translate it.
-        firstTextArea.sendKeys(Keys.chord(Keys.ALT, Keys.SHIFT, "s"));
+        firstTextArea.sendSaveShortcutKey();
 
         //
         // Second Tab
@@ -1271,7 +1283,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         qa.waitForItemSelected("/velo", "Velocity");
         secondTextArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
-        secondTextArea.waitUntilMacrosAreRendered();
+        secondTextArea.waitForContentRefresh();
 
         // Edit the inserted Velocity macro.
         secondTextArea.sendKeys(Keys.ENTER);
@@ -1585,6 +1597,135 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // We are editing alone, so we should have joined the realtime session after switching back to wysiwyg.
         assertTrue(firstEditPage.isRealtimeEditing());
         assertEquals("eight", firstTextArea.getText());
+    }
+
+    @Test
+    @Order(18)
+    void saveAndContinueDoesNotHideToolbar(TestUtils setup, TestReference testReference)
+    {
+        // Save the page first so that we can edit it inplace.
+        setup.createPage(testReference, "one\n\n{{info}}two{{/info}}");
+
+        // The default edit mode is inplace.
+        InplaceEditablePage inplaceEditablePage = new InplaceEditablePage();
+        inplaceEditablePage.edit();
+
+        RealtimeCKEditor editor = new RealtimeCKEditor();
+        RealtimeCKEditorToolBar toolbar = editor.getToolBar();
+        RealtimeRichTextAreaElement textArea = editor.getRichTextArea();
+
+        // Move the focus from the main editable to the nested editable.
+        textArea.sendKeys("1", Keys.ARROW_DOWN, Keys.HOME, "2");
+
+        // Save and continue (using the shortcut so that the editor doesn't lose the focus).
+        textArea.sendSaveShortcutKey();
+
+        // Verify that the toolbar is still visible.
+        assertTrue(toolbar.canToggleSourceMode());
+
+        // Verify that Save & View doesn't ask for leave confirmation.
+        textArea.sendKeys("3");
+        inplaceEditablePage = inplaceEditablePage.saveAndView();
+        assertEquals("1one\nInformation\n23two", inplaceEditablePage.getContent());
+    }
+
+    @Test
+    @Order(19)
+    void saveAndViewNoMergeConflict(TestUtils setup, TestReference testReference,  MultiUserTestUtils multiUserSetup)
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.sendKeys("second");
+        secondEditPage.clickSaveAndView();
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("second");
+        firstTextArea.sendKeys("first ");
+        // Use the shortcut key so that we don't lose the caret position.
+        firstTextArea.sendSaveShortcutKey();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+
+        // Edit again, this time inplace.
+        InplaceEditablePage secondInplaceEditPage = new InplaceEditablePage().editInplace();
+        secondEditPage = new RealtimeWYSIWYGEditPage();
+        secondEditor = secondEditPage.getContenEditor();
+        secondTextArea = secondEditor.getRichTextArea();
+        secondTextArea.waitUntilTextContains("first second");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.sendKeys("then ");
+        firstEditPage.clickSaveAndView();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("first then second");
+        secondTextArea.sendKeys(Keys.END, " and");
+        // Use the shortcut key so that we don't lose the caret position.
+        secondTextArea.sendSaveShortcutKey();
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+
+        // Edit again, this time inplace.
+        InplaceEditablePage firstInplaceEditPage = new InplaceEditablePage().editInplace();
+        firstEditPage = new RealtimeWYSIWYGEditPage();
+        firstEditor = firstEditPage.getContenEditor();
+        firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.waitUntilTextContains("first then second and");
+        firstTextArea.sendKeys(Keys.END, " done");
+        firstInplaceEditPage.saveAndView();
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("first then second and done");
+        secondTextArea.sendKeys(" almost");
+        secondInplaceEditPage.saveAndView();
+
+        assertEquals("first then second and almost done", secondInplaceEditPage.getContent());
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

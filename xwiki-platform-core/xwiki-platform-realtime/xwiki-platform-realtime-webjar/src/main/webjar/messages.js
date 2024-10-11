@@ -31,7 +31,6 @@ define('xwiki-realtime-messages', {
     'saved',
     'mergeOverwrite',
     'savedRemote',
-    'savedRemoteNoMerge',
     'conflictResolved',
     'mergeDialog.prompt',
     'mergeDialog.keepRealtime',

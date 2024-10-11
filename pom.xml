@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.8.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.8.0-SNAPSHOT</version>
+  <version>16.9.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -50,7 +50,7 @@
     <platform.version>${commons.version}</platform.version>
 
     <!-- Dependencies versions -->
-    <batik.version>1.17</batik.version>
+    <batik.version>1.18</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>2.9.2</tika.version>
     <pdfbox.version>2.0.31</pdfbox.version>
@@ -62,25 +62,25 @@
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
          version here. -->
     <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
-    <netty.version>4.1.113.Final</netty.version>
+    <netty.version>4.1.114.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.42</jersey.version>
+    <jersey.version>2.45</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.2</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.1</testcontainers.version>
+    <testcontainers.version>1.20.2</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>7.6.7.2</libreoffice.version>
+    <libreoffice.version>24.2.6</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -123,7 +123,7 @@
     <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.11.0.0</oracle.version>
+    <oracle.version>21.15.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
     <node.version>v20.12.0</node.version>
@@ -441,7 +441,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.12.7</version>
+        <version>2.13.0</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -610,12 +610,12 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.14.0</version>
+        <version>5.15.0</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna-platform</artifactId>
-        <version>5.14.0</version>
+        <version>5.15.0</version>
       </dependency>
 
       <dependency>
@@ -697,7 +697,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.9</version>
+        <version>2.10</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -762,7 +762,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>4.4</version>
+        <version>5.0</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -774,7 +774,7 @@
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j-dom4j</artifactId>
         <!-- Note: has a different release cycle than CSS4J "core" -->
-        <version>4.2</version>
+        <version>5.0</version>
       </dependency>
 
       <!-- Carte XML DTD -->
@@ -1019,7 +1019,7 @@
       <dependency>
         <groupId>org.xerial.snappy</groupId>
         <artifactId>snappy-java</artifactId>
-        <version>1.1.10.6</version>
+        <version>1.1.10.7</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
@@ -1592,7 +1592,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.15.0</version>
+          <version>1.15.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

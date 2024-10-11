@@ -50,6 +50,7 @@ import org.xwiki.repository.test.po.ExtensionsPage;
 import org.xwiki.repository.test.po.RepositoryAdminPage;
 import org.xwiki.repository.test.po.editor.ExtensionInlinePage;
 import org.xwiki.repository.test.ui.AbstractExtensionAdminAuthenticatedIT;
+import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
@@ -470,15 +471,18 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 
     private void enableProxying(ExtensionPage extensionPage) throws Exception
     {
+        String importedExtensionName = "name";
 
-        String IMPORTED_EXTENSION_NAME = "name";
+        LocalDocumentReference extensionPageReference =
+            new LocalDocumentReference(List.of("Extension", importedExtensionName), "WebHome");
+
         // assert that this test is going to make sense at all
         Assert.assertTrue(getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME) > 1);
         Assert.assertTrue(getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME) > 1);
 
-        // set higher proxy level: "version" - in previously imported extension
-        getUtil().updateObject(Arrays.asList("Extension", IMPORTED_EXTENSION_NAME), "WebHome",
-            XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel", "history");
+        // indicate that the history of the extension should be proxied
+        getUtil().updateObject(extensionPageReference, XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel",
+            "history");
 
         // refresh extension
         extensionPage.updateExtension();
@@ -487,8 +491,16 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         Assert.assertEquals(1, getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME));
         Assert.assertEquals(1, getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME));
 
+        // Remember the page version
+        Page restPage = getUtil().rest().get(extensionPageReference);
+        String extensionPageVersion = restPage.getVersion();
+
         // in rest access nothing should change after enabling proxy
         testRestAccessToImportedExtension();
+
+        // Make sure the REST access does not modify the document
+        restPage = getUtil().rest().get(extensionPageReference);
+        Assert.assertEquals(extensionPageVersion, restPage.getVersion());
     }
 
     private int getNumberOfExtensionVersionsObjects(String extensionName)

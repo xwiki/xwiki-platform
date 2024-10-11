@@ -1219,22 +1219,6 @@ public class RepositoryManager implements Initializable, Disposable
             .anyMatch(version -> version.getValue().equals(extensionVersion));
     }
 
-    /**
-     * Call this method only, when it was check that given extension version xobject is ABSENT
-     */
-    private void addExtensionVersionObjectToDocument(XWikiDocument extensionDocument, String extensionVersion)
-        throws XWikiException, ResolveException
-    {
-        Extension extension = resolveExtensionVersion(extensionDocument, extensionVersion);
-        if (extension == null) {
-            return;
-        }
-        boolean needSave = updateExtensionVersion(extensionDocument, extension);
-        if (needSave) {
-            xcontextProvider.get().getWiki().saveDocument(extensionDocument, xcontextProvider.get());
-        }
-    }
-
     private boolean updateExtensionVersion(XWikiDocument document, Extension extension) throws XWikiException
     {
         boolean needSave = false;
@@ -1392,16 +1376,30 @@ public class RepositoryManager implements Initializable, Disposable
             .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
 
         if (extensionVersionObject == null && allowProxying && isVersionProxyingEnabled(extensionDocument)) {
-            // no ExtensionVersionClass object so we need to create such object temporarily and delete it
+            // No ExtensionVersionClass object for the version, but proxy is enabled, so try to find remotely
+            Extension extension = null;
             try {
-                // FIXME - see XWIKI-14138 - this is nasty hack for obtaining ExtensionVersion XObject, when its
-                // FIXME information should be proxied and not stored permanently behind extension document
-                // FIXME To be substitude by some better solution in the future
+                extension = resolveExtensionVersion(extensionDocument, version);
+            } catch (ExtensionNotFoundException e) {
+                this.logger.debug("No extension could be found remotely with version [{}] for extension page [{}]",
+                    version, extensionDocument.getDocumentReference());
+            } catch (ResolveException e) {
+                throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+            }
+
+            // No extension could be found for the provided version
+            if (extension == null) {
+                return null;
+            }
+
+            // Create a temporary xobject for that extension version
+            // FIXME: find a more elegant solution
+            try {
                 XWikiDocument extensionDocumentClone = extensionDocument.clone();
-                addExtensionVersionObjectToDocument(extensionDocumentClone, version);
+                updateExtensionVersion(extensionDocumentClone, extension);
                 extensionVersionObject = extensionDocumentClone
                     .getXObject(XWikiRepositoryModel.EXTENSIONVERSION_CLASSREFERENCE, "version", version, false);
-            } catch (XWikiException | ResolveException e) {
+            } catch (XWikiException e) {
                 throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         }

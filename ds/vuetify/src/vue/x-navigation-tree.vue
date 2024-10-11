@@ -18,6 +18,17 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+/**
+ * Navigation Tree implemented using Vuetify's VTreeView component.
+ * In order to use the initial component as a proper Navigation Tree for
+ * Cristal, a few changes were made:
+ *   - The only node activated matches the current page, or the clicked link if
+ *     the component has a custom clickAction. We want to use actual links so
+ *     that the user can click them normally (to e.g., open them in a new tab).
+ *     So the default behavior of activating a node by clicking anywhere on the
+ *     item was disabled. Default hover effects, such as darkening or changing
+ *     the cursor on items, were also disabled.
+ */
 import { Ref, onBeforeMount, ref, watch } from "vue";
 import { VTreeview } from "vuetify/labs/VTreeview";
 import { type PageData } from "@xwiki/cristal-api";
@@ -128,32 +139,43 @@ async function lazyLoadChildren(item: unknown) {
     treeItem.children = undefined;
   }
 }
+
+function clearSelection() {
+  // Clicking on a node would activate it and this can't be disabled easily.
+  // With this listener, we ensure that only the first activated node stays
+  // active.
+  if (activatedNodes.value.length > 1) {
+    activatedNodes.value.pop();
+  }
+}
 </script>
 
 <template>
   <v-treeview
     ref="tree"
-    v-model:activated="activatedNodes"
     v-model:opened="expandedNodes"
+    :activated="activatedNodes"
     :items="rootNodes"
     :load-children="lazyLoadChildren"
     activatable
-    active-strategy="single-independent"
+    active-strategy="independent"
     item-value="id"
     open-strategy="multiple"
+    @update:activated="clearSelection"
   >
     <template #title="{ item }: { item: any }">
       <a
         v-if="props.clickAction"
         :href="item.href"
         @click.prevent="
+          activatedNodes = [item.id];
           clickAction!({
             id: item.id,
             label: item.title,
             location: item._location,
             url: item.href,
             has_children: item.children !== undefined,
-          })
+          });
         "
         >{{ item.title }}</a
       >
@@ -162,4 +184,13 @@ async function lazyLoadChildren(item: unknown) {
   </v-treeview>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Disable hover on items. */
+:deep(.v-list-item__overlay) {
+  --v-hover-opacity: 0;
+}
+/* Disable hand cursor on items, since we disable the default click action. */
+:deep(.v-list-item--link) {
+  cursor: default;
+}
+</style>

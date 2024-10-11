@@ -20,12 +20,13 @@
 
 import type {
   MarkedExtension,
-  TokenizerExtension,
   RendererExtension,
-  TokenizerThis,
   RendererThis,
+  TokenizerExtension,
+  TokenizerThis,
   Tokens,
 } from "marked";
+
 type Config = {
   nodeName: string;
   className: string;
@@ -36,19 +37,15 @@ const parametersReg = new RegExp(
   // eslint-disable-next-line no-control-regex
   /(\w*)\s*=\s*((['"])?((\\\3|[^\x03])*?)\3|(\w+))/g,
 );
-const debug = false;
 const config: Config = { nodeName: "pre", className: "wikimodel-macro" };
 
 const macro: TokenizerExtension | RendererExtension = {
   name: "macro",
   level: "block",
   start(this: TokenizerThis, src: string) {
-    const index = src.match(startReg)?.index;
-    debug && console.log("[marked start]", src, index);
-    return index;
+    return src.match(startReg)?.index;
   },
-  tokenizer(src: string, _tokens): Tokens.Generic | undefined {
-    debug && console.log("[marked tokenizer]", src, _tokens);
+  tokenizer(src: string): Tokens.Generic | undefined {
     const lines = src.split(/\n/);
     let endReg = null;
     if (startReg.test(lines[0])) {
@@ -105,7 +102,6 @@ const macro: TokenizerExtension | RendererExtension = {
     }
   },
   renderer(this: RendererThis, token) {
-    debug && console.log("🐉[marked renderer]", this, token);
     const html = `<${config.nodeName} class="${config.className}" macroname="${token.macroName}" title="${token.title}"><!--[CDATA[${token.content}]]--></${config.nodeName}>`;
     console.log("Marked Macro html", html);
     return html;

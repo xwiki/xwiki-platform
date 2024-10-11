@@ -64,7 +64,7 @@ async function isDirectory(path: string) {
 async function pathExists(path: string) {
   try {
     await fs.promises.lstat(path);
-  } catch (e) {
+  } catch {
     return false;
   }
   return true;

@@ -227,7 +227,7 @@ export class DefaultCristalApp implements CristalApp {
     try {
       const renderer = this.container.get<Renderer>("Renderer");
       return renderer.convert(source, sourceSyntax, targetSyntax, wikiConfig);
-    } catch (e) {
+    } catch {
       this.logger.error("Could not find a rendering module");
       return source;
     }
@@ -238,7 +238,7 @@ export class DefaultCristalApp implements CristalApp {
     try {
       const renderer = this.container.get<Renderer>("Renderer");
       await renderer.preloadConverters();
-    } catch (e) {
+    } catch {
       this.logger.error("Could not find a rendering module");
     }
   }

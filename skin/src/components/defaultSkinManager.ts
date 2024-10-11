@@ -88,7 +88,7 @@ export class DefaultSkinManager implements SkinManager {
         "DesignSystemLoader",
         this.designSystem,
       );
-    } catch (e) {
+    } catch {
       console.error(
         "Exception while loading design system ",
         this.designSystem,

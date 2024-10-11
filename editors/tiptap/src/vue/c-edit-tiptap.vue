@@ -158,7 +158,7 @@ async function loadEditor(page: PageData | undefined) {
     let linkSuggest: LinkSuggestService | undefined = undefined;
     try {
       linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
-    } catch (e) {
+    } catch {
       console.debug(`[${name}] service not found`);
     }
 

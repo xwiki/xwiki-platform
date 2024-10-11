@@ -110,7 +110,7 @@ if (import.meta.env.PROD) {
        * @see https://github.com/electron/electron/issues/38829
        * Potentially it may be fixed by this https://github.com/electron/electron/pull/37535
        */
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require("electron-updater").autoUpdater.checkForUpdatesAndNotify(),
     )
     .catch((e) => console.error("Failed check and install updates:", e));

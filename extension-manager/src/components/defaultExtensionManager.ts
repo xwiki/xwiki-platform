@@ -90,7 +90,7 @@ export class DefaultExtensionManager
           assert: { type: "text/css" },
         });
         document.adoptedStyleSheets = [cssModule.default];
-      } catch (e) {
+      } catch {
         // TODO handle exception or comment why can safely be ignored
       }
       // js loading

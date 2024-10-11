@@ -106,7 +106,7 @@ const cristal: CristalApp = inject<CristalApp>("cristal")!;
 let linkSuggest: LinkSuggestService | undefined = undefined;
 try {
   linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
-} catch (e) {
+} catch {
   console.debug(`[${name}] service not found`);
 }
 

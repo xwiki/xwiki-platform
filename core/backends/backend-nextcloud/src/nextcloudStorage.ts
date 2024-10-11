@@ -78,7 +78,7 @@ export class NextcloudStorage extends AbstractStorage {
       } else {
         return undefined;
       }
-    } catch (e) {
+    } catch {
       return undefined;
     }
   }

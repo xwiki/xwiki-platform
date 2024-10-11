@@ -60,7 +60,7 @@ export class DefaultRenderer implements Renderer {
         .getContainer()
         .getNamed<Converter>("Converter", syntaxRenderer);
       return converter.convert(source, wikiConfig);
-    } catch (e) {
+    } catch {
       this.logger.error("Could not find a converter for ", syntaxRenderer);
       return source;
     }

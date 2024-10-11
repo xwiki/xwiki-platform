@@ -150,8 +150,6 @@ export class ContentTools {
     const range = document.createRange();
     range.setStart(document.head, 0);
     const contentToInject = range.createContextualFragment(html);
-    // TODO get rid of any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     contentToInject
       .querySelectorAll("link[href], script[src]")
       // TODO get rid of any
@@ -195,8 +193,6 @@ export class ContentTools {
       };
       new MutationObserver(function (mutations: Array<MutationRecord>) {
         ContentTools.logger?.debug("Called in mutation records");
-        const mutation = mutations[0];
-        mutation.addedNodes.item;
         for (const { addedNodes } of mutations) {
           addedNodes.forEach((addedNode) => {
             if (addedNode.nodeType == 1) {
@@ -246,8 +242,6 @@ export class ContentTools {
 
     new MutationObserver(function (mutations: Array<MutationRecord>) {
       ContentTools.logger?.debug("Called in mutation records");
-      const mutation = mutations[0];
-      mutation.addedNodes.item;
       for (const { addedNodes } of mutations) {
         addedNodes.forEach((addedNode) => {
           if (addedNode.nodeType == 1) {

@@ -54,7 +54,6 @@ export class Worker implements MyWorker {
   public async start(): Promise<void> {
     console.log("Starting worker thread");
     this.initialize();
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       await this.sleep(1000);
       this.checkQueue();

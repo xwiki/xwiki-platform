@@ -129,7 +129,7 @@
   &lt;div class="XWikiColorThemeDisplayer"&gt;
     #set ($colorThemeExists = $xwiki.exists($services.model.resolveDocument($value)))
     #if ("$!value" != '' &amp;&amp; !$colorThemeExists)
-      #error("&lt;p&gt;$services.localization.render('admin.colorthemes.invalidtheme', $escapetool.xml($value))&lt;/p&gt;)
+      #error(&lt;p&gt;$services.localization.render('admin.colorthemes.invalidtheme', $escapetool.xml($value))&lt;/p&gt;)
     #end
 
     #if ($isSubWiki &amp;&amp; (!$flamingoThemesFromMainWiki.isEmpty() || !$colibriThemesFromMainWiki.isEmpty()))

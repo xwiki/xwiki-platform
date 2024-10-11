@@ -25,10 +25,10 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
-    "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "6.0.2"
   },
   "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2"
   },
   "publishConfig": {

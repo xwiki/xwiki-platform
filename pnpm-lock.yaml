@@ -213,13 +213,13 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../../dev/config
       inversify:
         specifier: 6.0.2
         version: 6.0.2
     devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -351,15 +351,16 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../../dev/config
       '@xwiki/cristal-hierarchy-api':
         specifier: workspace:*
         version: link:../hierarchy-api
       inversify:
         specifier: 6.0.2
         version: 6.0.2
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
 
   core/icons:
     dependencies:
@@ -681,9 +682,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-dev-config':
-        specifier: workspace:*
-        version: link:../../dev/config
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
@@ -736,6 +734,9 @@ importers:
       '@types/markdown-it':
         specifier: 14.1.1
         version: 14.1.1
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../dev/config
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)

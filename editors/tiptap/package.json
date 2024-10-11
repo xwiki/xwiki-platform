@@ -44,7 +44,6 @@
     "@tiptap/suggestion": "2.5.9",
     "@tiptap/vue-3": "2.5.9",
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
@@ -64,6 +63,7 @@
   "devDependencies": {
     "@types/lodash": "4.17.10",
     "@types/markdown-it": "14.1.1",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "vue-tsc": "2.1.6"
   },
   "publishConfig": {

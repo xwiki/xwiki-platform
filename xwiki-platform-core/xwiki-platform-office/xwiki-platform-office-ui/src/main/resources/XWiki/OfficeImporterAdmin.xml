@@ -148,7 +148,7 @@
               #if ("$!homePath" != '')
                 $escapetool.html($homePath)
               #else
-                {{error}}$escapetool.html($services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected')){{/error}}
+                #error($escapetool.html($services.localization.render('office.configuration.serverpath.error.notSetNotAutodetected')))
               #end
           &lt;/dd&gt;
           ###

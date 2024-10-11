@@ -1468,8 +1468,8 @@ importers:
         specifier: 3.9.1
         version: 3.9.1(@types/node@22.7.4)(rollup@4.18.0)(typescript@5.6.2)(vite@5.3.6(@types/node@22.7.4))
       vite-plugin-inspect:
-        specifier: 0.8.4
-        version: 0.8.4(rollup@4.18.0)(vite@5.3.6(@types/node@22.7.4))
+        specifier: 0.8.7
+        version: 0.8.7(rollup@4.18.0)(vite@5.3.6(@types/node@22.7.4))
       vite-plugin-vuetify:
         specifier: 2.0.4
         version: 2.0.4(vite@5.3.6(@types/node@22.7.4))(vue@3.5.10(typescript@5.6.2))(vuetify@3.7.2)
@@ -1509,8 +1509,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@antfu/utils@0.7.7':
-    resolution: {integrity: sha512-gFPqTG7otEJ8uP6wrhDv6mqwGWYZKNvAcCq6u9hOj0c+IKCEsY4L1oC9trPq2SaWIzAfHvqfBDxF591JkMf+kg==}
+  '@antfu/utils@0.7.10':
+    resolution: {integrity: sha512-+562v9k4aI80m1+VuMHehNJWLOFjBnXn3tdOitzD0il5b7smkSBal4+a3oKiQTbrwMmN/TBUMDvbdoWDehgOww==}
 
   '@babel/code-frame@7.24.2':
     resolution: {integrity: sha512-y5+tLQyV8pg3fsiln67BVLD1P13Eg4lh5RW9mF0zUuvLrv9uIQ4MCL+CRT+FTsBlBjcIan6PGsLcBN0m3ClUyQ==}
@@ -3869,8 +3869,8 @@ packages:
   err-code@2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
 
-  error-stack-parser-es@0.1.1:
-    resolution: {integrity: sha512-g/9rfnvnagiNf+DRMHEVGuGuIBlCIMDFoTA616HaP2l9PlCjGjVhD98PNbVSJvmK4TttqT5mV5tInMhoFgi+aA==}
+  error-stack-parser-es@0.1.5:
+    resolution: {integrity: sha512-xHku1X40RO+fO8yJ8Wh2f2rZWVjqyhb1zgq1yZ8aZRQkv6OOKhKWRUaht3eSCUbAOBaKIgM+ykwFLE+QUxgGeg==}
 
   es-define-property@1.0.0:
     resolution: {integrity: sha512-jxayLKShrEqqzJ0eumQbVhTYQM27CfT1T35+gCgDFoL82JLsXqTJ76zv6A0YLOgEnLUMvLzsDsGIrl8NFpT2gQ==}
@@ -5995,8 +5995,8 @@ packages:
       vite:
         optional: true
 
-  vite-plugin-inspect@0.8.4:
-    resolution: {integrity: sha512-G0N3rjfw+AiiwnGw50KlObIHYWfulVwaCBUBLh2xTW9G1eM9ocE5olXkEYUbwyTmX+azM8duubi+9w5awdCz+g==}
+  vite-plugin-inspect@0.8.7:
+    resolution: {integrity: sha512-/XXou3MVc13A5O9/2Nd6xczjrUwt7ZyI9h8pTnUMkr5SshLcb0PJUOVq2V+XVkdeU4njsqAtmK87THZuO2coGA==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': '*'
@@ -6320,7 +6320,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@antfu/utils@0.7.7': {}
+  '@antfu/utils@0.7.10': {}
 
   '@babel/code-frame@7.24.2':
     dependencies:
@@ -8940,7 +8940,7 @@ snapshots:
 
   err-code@2.0.3: {}
 
-  error-stack-parser-es@0.1.1: {}
+  error-stack-parser-es@0.1.5: {}
 
   es-define-property@1.0.0:
     dependencies:
@@ -11293,16 +11293,16 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-inspect@0.8.4(rollup@4.18.0)(vite@5.3.6(@types/node@22.7.4)):
+  vite-plugin-inspect@0.8.7(rollup@4.18.0)(vite@5.3.6(@types/node@22.7.4)):
     dependencies:
-      '@antfu/utils': 0.7.7
+      '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
-      debug: 4.3.4(supports-color@5.5.0)
-      error-stack-parser-es: 0.1.1
+      debug: 4.3.7
+      error-stack-parser-es: 0.1.5
       fs-extra: 11.2.0
       open: 10.1.0
       perfect-debounce: 1.0.0
-      picocolors: 1.0.0
+      picocolors: 1.1.0
       sirv: 2.0.4
       vite: 5.3.6(@types/node@22.7.4)
     transitivePeerDependencies:

@@ -166,7 +166,7 @@
     #end
 
     #if ($indexed)
-      #macro (formContent)
+      #define ($formContent)
         &lt;form action="${xwiki.relativeRequestURL}"&gt;
           #if ($request.section)
             &lt;input type="hidden" name="section" value="${escapetool.xml($request.section)}" /&gt;
@@ -201,10 +201,10 @@
           #end
         #end
         #info("$infoFooterContent
-          #formContent()")
+          $formContent")
       #else
         #warning("$escapetool.xml($services.localization.render('extensions.search.indexed.nojob'))
-          #formContent()")
+          $formContent")
       #end
     #end
   #end

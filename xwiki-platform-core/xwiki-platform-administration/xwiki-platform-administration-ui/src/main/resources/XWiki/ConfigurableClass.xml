@@ -428,7 +428,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
       $escapetool.xml($sectionDisplayName)
       &lt;/span&gt;
       #if(!$hasAccess)
-        &lt;br/&gt;&lt;span class="errormessage"&gt;$services.localization.render('xe.admin.configurable.sectionIconNoAccess')&lt;/span&gt;
+        &lt;br/&gt;#inlineError($services.localization.render('xe.admin.configurable.sectionIconNoAccess'))
       #end
       &lt;/a&gt;
     &lt;/li&gt;

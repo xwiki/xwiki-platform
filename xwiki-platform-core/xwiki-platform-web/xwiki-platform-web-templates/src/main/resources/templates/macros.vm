@@ -953,28 +953,44 @@ $html
 ###    message
 ###
 
-#macro(genericMessage $text $classAffix $iconName $prettyNameKey)
-<div class="box ${classAffix}message">
-  <span class="icon-block">$services.icon.renderHTML($iconName)</span>
-  <span class="sr-only">$services.localization.render($prettyNameKey)</span>
-  $text
-</div>
+#macro(genericMessage $text $classAffix $iconName $prettyNameKey $isInline)
+  <#if($isInline)span#{else}div#end class="box ${classAffix}message">
+    <span class="icon-block">$services.icon.renderHTML($iconName)</span>
+    <span class="sr-only">$services.localization.render($prettyNameKey)</span>
+    $text
+  </#if($isInline)span#{else}div#end>
 #end
 
 #macro(warning $text)
 #genericMessage($text 'warning' 'warning' 'warning')
 #end
 
+#macro(inlineWarning $text)
+#genericMessage($text 'warning' 'warning' 'warning' true)
+#end
+
 #macro(error $text)
 #genericMessage($text 'error' 'exclamation' 'error')
+#end
+
+#macro(inlineError $text)
+  #genericMessage($text 'error' 'exclamation' 'error' true)
 #end
 
 #macro(info $text)
 #genericMessage($text 'info' 'info' 'info')
 #end
 
+#macro(inlineInfo $text)
+  #genericMessage($text 'info' 'info' 'info' true)
+#end
+
 #macro(success $text)
 #genericMessage($text 'success' 'check' 'success')
+#end
+
+#macro(inlineSuccess $text)
+  #genericMessage($text 'success' 'check' 'success' true)
 #end
 
 #macro(message $text)

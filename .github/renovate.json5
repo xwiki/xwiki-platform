@@ -26,6 +26,9 @@
   // Distinguish separate all new major versions on separate pull requests.
   "separateMajorMinor": true,
   "separateMultipleMajor": true,
+  assignees: [
+    "manuelleduc"
+  ],
   "packageRules": [
     // Wait for releases to be 3 days old before creating a PR.
     // Avoid having endless suggestions of minor upgrades for fast moving dependencies (e.g., nx).

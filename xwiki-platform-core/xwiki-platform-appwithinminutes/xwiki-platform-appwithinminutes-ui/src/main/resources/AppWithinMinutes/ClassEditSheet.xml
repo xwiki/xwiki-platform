@@ -228,7 +228,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           ["#pageLink($sheetReference)"])
       &lt;/span&gt;
     #else
-        #warning($services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning'))
+        #inlineWarning($services.localization.render('platform.appwithinminutes.classEditorMultipleSheetsWarning'))
     #end
     &lt;/dd&gt;
     &lt;dt&gt;

@@ -1266,8 +1266,8 @@ importers:
         version: 3.5.10(typescript@5.6.2)
     devDependencies:
       vite-plugin-comlink:
-        specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
+        specifier: 5.0.1
+        version: 5.0.1(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -1312,8 +1312,8 @@ importers:
         version: 4.4.0(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       vite-plugin-comlink:
-        specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
+        specifier: 5.0.1
+        version: 5.0.1(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
       vue-tsc:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.2)
@@ -1462,8 +1462,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
       vite-plugin-comlink:
-        specifier: 4.1.0
-        version: 4.1.0(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
+        specifier: 5.0.1
+        version: 5.0.1(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4))
       vite-plugin-dts:
         specifier: 3.9.1
         version: 3.9.1(@types/node@22.7.4)(rollup@4.18.0)(typescript@5.6.2)(vite@5.3.6(@types/node@22.7.4))
@@ -5980,8 +5980,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-comlink@4.1.0:
-    resolution: {integrity: sha512-wsCLCobd7k8X7oB803XzPAvcypcoQj6cTaw6n1qb11jhegssZSwDhI52vLtitVUjYi/1/IqtKpQZeyUsLvuLdg==}
+  vite-plugin-comlink@5.0.1:
+    resolution: {integrity: sha512-4TGw5+bTg5ROd8N2m9O/y0CoS81g8nyce9EI/eV51i54EJ938lFadXEButhaptJs89l5NY9+TkdjI5jXX4cWOw==}
     peerDependencies:
       comlink: ^4.3.1
       vite: '>=2.9.6'
@@ -7044,7 +7044,7 @@ snapshots:
   '@jridgewell/gen-mapping@0.3.5':
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
       '@jridgewell/trace-mapping': 0.3.25
 
   '@jridgewell/resolve-uri@3.1.1': {}
@@ -7058,7 +7058,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
@@ -9922,7 +9922,7 @@ snapshots:
 
   magic-string@0.30.10:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   magic-string@0.30.11:
     dependencies:
@@ -11279,7 +11279,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-comlink@4.1.0(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4)):
+  vite-plugin-comlink@5.0.1(comlink@4.4.1)(vite@5.3.6(@types/node@22.7.4)):
     dependencies:
       comlink: 4.4.1
       json5: 2.2.3

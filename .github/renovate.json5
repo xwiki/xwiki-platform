@@ -51,14 +51,14 @@
     // Automatically assign webjars packages to @mflorea
     {
       "matchDatasources": ["maven"],
-      "matchPackageNames": ["org.webjars"],
+      "matchPackageNames": ["org.webjars*"],
       "assignees": ["mflorea"]
     },
 
     // Automatically assign other Maven dependencies to @tmortagne
     {
       "matchDatasources": ["maven"],
-      "matchPackageNames": [!"org.webjars*"],
+      "matchPackageNames": ["!org.webjars*"],
       "assignees": ["tmortagne"]
     }
   ]

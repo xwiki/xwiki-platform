@@ -57,7 +57,10 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
       const currentPageData = await this.cristalApp.getPage(d);
       navigationTree.push({
         id: d,
-        label: currentPageData ? currentPageData.name : d.split("/").pop()!,
+        label:
+          currentPageData && currentPageData.name
+            ? currentPageData.name
+            : d.split("/").pop()!,
         location: d,
         url: this.cristalApp.getRouter().resolve({
           name: "view",

@@ -63,7 +63,10 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
         const currentPageData = await this.cristalApp.getPage(id);
         navigationTree.push({
           id: id,
-          label: currentPageData ? currentPageData.name : child,
+          label:
+            currentPageData && currentPageData.name
+              ? currentPageData.name
+              : child,
           location: id,
           url: this.cristalApp.getRouter().resolve({
             name: "view",

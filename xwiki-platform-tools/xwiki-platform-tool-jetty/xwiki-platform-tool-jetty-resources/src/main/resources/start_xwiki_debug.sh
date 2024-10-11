@@ -35,4 +35,4 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 # Call the standard start script
-./start_xwiki.sh $@
+./start_xwiki.sh --debug $@

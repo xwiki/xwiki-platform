@@ -25,6 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "inversify": "6.0.2"
   },
   "devDependencies": {

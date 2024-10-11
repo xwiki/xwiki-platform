@@ -24,8 +24,7 @@
     "clean": "rimraf dist",
     "compile": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "echo 'no test'"
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",

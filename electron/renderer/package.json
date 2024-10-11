@@ -20,8 +20,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "linux": "echo 'no task'",
     "prepack": "pnpm build",
-    "package": "echo 'no task'",
-    "test": "echo 'no test'"
+    "package": "echo 'no task'"
   },
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",

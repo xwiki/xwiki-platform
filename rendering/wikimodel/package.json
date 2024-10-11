@@ -22,8 +22,7 @@
     "clean": "rimraf dist",
     "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
-    "prepack": "pnpm build",
-    "test": "echo 'no test'"
+    "prepack": "pnpm build"
   },
   "types": "dist/index.d.ts",
   "devDependencies": {

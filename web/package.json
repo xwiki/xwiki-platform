@@ -27,7 +27,6 @@
     "quickstart": "pnpm run build --scope @xwiki/cristal-app && pnpm prepare && NODE_ENV=production node src/server.js",
     "start": "pnpm run build && pnpm prepare && NODE_ENV=production node src/server.js",
     "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
-    "test": "echo 'no test'",
     "test:e2e": "playwright test"
   },
   "types": "dist/index.d.ts",

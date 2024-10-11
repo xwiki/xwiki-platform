@@ -19,8 +19,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "linux": "echo 'no task'",
     "prepack": "pnpm build",
-    "package": "echo 'no task'",
-    "test": "echo 'no test'"
+    "package": "echo 'no task'"
   },
   "devDependencies": {
     "@types/node": "22.7.4",

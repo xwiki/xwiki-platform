@@ -180,8 +180,6 @@ public class EntityRequest extends AbstractCheckRightsRequest
      * documents with links between them are moved.
      *
      * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
      */
     @Unstable
     public boolean isWaitForIndexing()
@@ -194,8 +192,6 @@ public class EntityRequest extends AbstractCheckRightsRequest
      *
      * @param waitForIndexing if the refactoring job should wait for links to be indexed before updating them
      * @since 16.9.0RC1
-     * @since 16.4.5
-     * @since 15.10.13
      */
     @Unstable
     public void setWaitForIndexing(boolean waitForIndexing)

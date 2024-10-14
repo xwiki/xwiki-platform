@@ -29,8 +29,6 @@ import org.xwiki.stability.Unstable;
  * stopped, the {@link Future} is completed with an exception.
  *
  * @since 16.9.0RC1
- * @since 15.10.13
- * @since 16.4.5
  * @version $Id$
  */
 @Unstable

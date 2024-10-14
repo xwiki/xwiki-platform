@@ -30,8 +30,6 @@ import org.xwiki.store.ReadyIndicator;
  * An implementation of the {@link ReadyIndicator} for the {@link DefaultSolrIndexer}.
  *
  * @since 16.9.0RC1
- * @since 15.10.13
- * @since 16.4.5
  * @version $Id$
  */
 class SolrIndexerReadyIndicator extends CompletableFuture<Void> implements ReadyIndicator

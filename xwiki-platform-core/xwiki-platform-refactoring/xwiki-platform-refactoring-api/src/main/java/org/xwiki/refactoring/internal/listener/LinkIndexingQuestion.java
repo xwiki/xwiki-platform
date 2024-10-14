@@ -17,35 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.refactoring.internal.listener;
+
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
- * The operation to perform on the queued entry.
- * 
+ * The question if the job should continue waiting for link indexing to complete.
+ *
  * @version $Id$
- * @since 5.1M2
+ * @since 16.9.0RC1
  */
-public enum IndexOperation
+public class LinkIndexingQuestion
 {
-    /**
-     * Index the entry.
-     */
-    INDEX,
+    private boolean continueWaiting;
 
     /**
-     * Remove entry from index.
+     * @return if the job should continue waiting for link indexing to complete
      */
-    DELETE,
-
-    // General operations
-
-    /**
-     * Stop indexing thread.
-     */
-    STOP,
+    public boolean isContinueWaiting()
+    {
+        return this.continueWaiting;
+    }
 
     /**
-     * Marker for waiting on indexing to finish all previously queued operations.
+     * @param continueWaiting if the job should continue waiting for link indexing to complete
      */
-    READY_MARKER
+    @PropertyDescription("Continue waiting for link indexing to complete. If not selected, back-links will be "
+        + "refactored with possibly incomplete information.")
+    public void setContinueWaiting(boolean continueWaiting)
+    {
+        this.continueWaiting = continueWaiting;
+    }
 }

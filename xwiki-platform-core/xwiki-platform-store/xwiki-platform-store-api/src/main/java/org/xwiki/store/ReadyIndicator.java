@@ -17,35 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.store;
+
+import java.util.concurrent.Future;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * The operation to perform on the queued entry.
- * 
+ * An indicator if a store is ready, i.e., has completed all writes/indexing tasks that have been submitted before
+ * the indicator was requested. If the indexing tasks cannot be completed, e.g., because the indexer has been
+ * stopped, the {@link Future} is completed with an exception.
+ *
+ * @since 16.9.0RC1
  * @version $Id$
- * @since 5.1M2
  */
-public enum IndexOperation
+@Unstable
+public interface ReadyIndicator extends Future<Void>
 {
     /**
-     * Index the entry.
+     *
+     * @return a value between 0 and 100 that expresses the progress towards being ready. Values might jump
+     * non-linearly and might not be fully accurate.
      */
-    INDEX,
-
-    /**
-     * Remove entry from index.
-     */
-    DELETE,
-
-    // General operations
-
-    /**
-     * Stop indexing thread.
-     */
-    STOP,
-
-    /**
-     * Marker for waiting on indexing to finish all previously queued operations.
-     */
-    READY_MARKER
+    int getProgressPercentage();
 }

@@ -71,6 +71,12 @@ Starting on an arbitrary port (e.g., 9001)
 HTTP_PORT=9001 pnpm run start
 ```
 
+### Starting an electron instance
+
+```shell
+pnpm run start:electron
+```
+
 ### Compile and Minify for Production
 
 ```sh

@@ -24,7 +24,7 @@
 
 #set($jobStatus = $services.job.getJobStatus($jobId))
 
-#if (!$jobStatus)
+#if ($jobStatus)
   #outputJobStatusJSON($jobStatus, $translationPrefix)
 #else
   $response.setStatus(404)

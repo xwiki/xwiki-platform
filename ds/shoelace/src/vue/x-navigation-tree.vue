@@ -97,9 +97,7 @@ function expandTree() {
       // If we have a custom click action, we want to use it on dynamic
       // selection.
       if (props.clickAction) {
-        selection.getSelection()!
-          .getElementsByTagName("a")[0]
-          .click();
+        selection.getSelection()!.getElementsByTagName("a")[0].click();
       }
       expandNodes = false;
     }

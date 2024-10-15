@@ -61,7 +61,7 @@
         #end
       #end
       #if($request.xwikipassword && $isValidPassword)
-        #info($services.localization.render('platform.core.profile.passwd.success'))
+        #inlineInfo($services.localization.render('platform.core.profile.passwd.success'))
         <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
       #if(!$isValidPassword)

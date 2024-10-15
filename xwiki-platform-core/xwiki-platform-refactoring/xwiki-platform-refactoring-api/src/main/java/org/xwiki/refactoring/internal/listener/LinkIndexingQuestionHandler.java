@@ -94,7 +94,10 @@ public class LinkIndexingQuestionHandler
             });
         }
 
-        if (this.questionFuture != null && this.questionFuture.isDone()) {
+        // Technically, if questionFuture isn't null, the question cannot be null as we always set the question before
+        // setting the question future. However, SonarCloud doesn't recognize this and the quality check fails
+        // without the null check.
+        if (this.questionFuture != null && this.questionFuture.isDone() && this.question != null) {
             this.questionFuture.get();
             this.questionFuture = null;
 

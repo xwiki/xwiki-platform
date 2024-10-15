@@ -6,6 +6,7 @@
   position: relative;
   padding: .3em 1em .3em 22px;
   background: $theme.highlightColor none 2px .8em no-repeat;
+  border-radius: 7px; /* Same value as @border-radius-base from Flamingo. */
   margin: .5em 0;
   clear: both;
 }

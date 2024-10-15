@@ -21,21 +21,21 @@ package org.xwiki.platform.security.requiredrights.internal.display;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.rendering.listener.Format;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,9 +43,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Provider for a displayer for an XObject.
@@ -62,10 +59,6 @@ public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<Base
 
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
-    
-    @Inject
-    @Named("warning")
-    private WarningMessageMacro warningMacro;
 
     @Override
     public Supplier<Block> get(BaseObject object, Object... parameters)
@@ -92,8 +85,8 @@ public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<Base
             .map(p -> new PropertyDisplay(p.getName(), null, p.getValue().toString(), false))
             .collect(Collectors.toList());
 
-        String removedPropertiesMessage =
-            this.contextualLocalizationManager.getTranslationPlain("core.editors.object.removeDeprecatedProperties.info",xClass.getPrettyName());
+        Translation removedPropertiesMessage =
+            this.contextualLocalizationManager.getTranslation("core.editors.object.removeDeprecatedProperties.info");
         return () -> {
             // Display the properties
             Block propertiesBlock = renderProperties(propertyNamesHintsValues);
@@ -101,18 +94,11 @@ public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<Base
 
             // Display deprecated properties
             if (!deprecatedPropertyNamesValues.isEmpty()) {
-                BoxMacroParameters warningParams = new BoxMacroParameters();
-                warningParams.setCssClass("deprecatedProperties");
-                Block deprecatedPropertiesBlock = null;
-                try {
-                    deprecatedPropertiesBlock = new GroupBlock(warningMacro.execute(warningParams, 
-                        removedPropertiesMessage, new MacroTransformationContext()));
-                } catch (MacroExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                Block deprecatedPropertiesBlock =
+                    new GroupBlock(Map.of(CLASS_ATTRIBUTE, "box warningmessage deprecatedProperties"));
                 if (removedPropertiesMessage != null) {
                     deprecatedPropertiesBlock.addChild(
-                        new FormatBlock(List.of(), Format.BOLD));
+                        new FormatBlock(List.of(removedPropertiesMessage.render(xClass.getPrettyName())), Format.BOLD));
                 }
                 deprecatedPropertiesBlock.addChild(renderProperties(deprecatedPropertyNamesValues));
                 result.addChild(deprecatedPropertiesBlock);

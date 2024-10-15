@@ -20,7 +20,7 @@
     "build": "pnpm compile",
     "clean": "rimraf dist",
     "compile": "vue-tsc --project tsconfig.json && vite build",
-    "dev": "vite & NODE_ENV=development node src/server.js",
+    "dev": "vite dev",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "prepack": "pnpm build",
     "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",

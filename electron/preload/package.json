@@ -21,6 +21,9 @@
     "prepack": "pnpm build",
     "package": "echo 'no task'"
   },
+  "dependencies": {
+    "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "22.7.4",
     "@xwiki/cristal-browser-electron": "workspace:*",

@@ -18,6 +18,7 @@
 packages:
   - "api"
   - "core/attachments/*"
+  - "core/authentication/*"
   - "core/backends/*"
   - "core/browser/*"
   - "core/extra-tabs/*"
@@ -26,6 +27,7 @@ packages:
   - "core/info-actions/*"
   - "core/link-suggest/*"
   - "core/navigation-tree/*"
+  - "core/uiextension/*"
   - "dev/*"
   - "ds/api"
   - "ds/dsfr"
@@ -33,6 +35,7 @@ packages:
   - "ds/vuetify"
   - "editors/tiptap"
   - "electron"
+  - "electron/authentication/authentication-xwiki/*"
   - "electron/main"
   - "electron/preload"
   - "electron/renderer"

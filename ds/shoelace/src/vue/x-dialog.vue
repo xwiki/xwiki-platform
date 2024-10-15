@@ -36,6 +36,7 @@ const open = defineModel<boolean>();
     <slot name="activator" />
   </span>
   <sl-dialog
+    v-if="open"
     :open="open"
     :label="title"
     class="dialog-overview"

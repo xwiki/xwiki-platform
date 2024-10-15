@@ -22,12 +22,28 @@ import { DefaultLogger, type WikiConfig } from "@xwiki/cristal-api";
 import { describe, expect, it } from "vitest";
 
 import { XWikiStorage } from "../xwikiStorage";
+import type {
+  AuthenticationManager,
+  AuthenticationManagerProvider,
+} from "@xwiki/cristal-authentication-api";
 
 describe("getPageFromViewURL", () => {
   const wikiConfig: WikiConfig = {
     baseURL: "<baseURL>",
   } as WikiConfig;
-  const xwikiStorage: XWikiStorage = new XWikiStorage(new DefaultLogger());
+
+  class MockAuthenticationManagerProvider
+    implements AuthenticationManagerProvider
+  {
+    get(): AuthenticationManager | undefined {
+      return undefined;
+    }
+  }
+
+  const xwikiStorage: XWikiStorage = new XWikiStorage(
+    new DefaultLogger(),
+    new MockAuthenticationManagerProvider(),
+  );
   xwikiStorage.setWikiConfig(wikiConfig);
   it("regular identifier", () => {
     expect(

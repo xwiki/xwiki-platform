@@ -35,4 +35,8 @@ export class BrowserApiElectron implements BrowserApi {
     window.localStorage.setItem("currentApp", wikiConfig.name);
     browserElectron.reloadBrowser();
   }
+
+  reload(): void {
+    browserElectron.reloadBrowser();
+  }
 }

@@ -19,7 +19,8 @@
  */
 
 import { app, BrowserWindow, shell } from "electron";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { loadFile } from "./reload";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -80,9 +81,7 @@ async function createWindow() {
      * @see https://github.com/nodejs/node/issues/12682
      * @see https://github.com/electron/electron/issues/6869
      */
-    await browserWindow.loadFile(
-      resolve(app.getAppPath(), "./renderer/dist/index.html"),
-    );
+    await loadFile(browserWindow);
   }
 
   return browserWindow;

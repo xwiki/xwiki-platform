@@ -32,6 +32,8 @@ import { InformationExtraTab } from "./InformationTab";
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
 import { LikesInfoAction } from "./info-actions/likesInfoAction";
 import { CommentsInfoAction } from "./info-actions/commentsInfoAction";
+import { UIExtension } from "@xwiki/cristal-uiextension-api";
+import { ConfigMenuUIExtension } from "./sidebar-actions/ConfigMenuUIExtension";
 
 export default class ComponentInit {
   logger: Logger;
@@ -67,6 +69,10 @@ export default class ComponentInit {
     container
       .bind<InfoAction>("InfoAction")
       .to(CommentsInfoAction)
+      .inSingletonScope();
+    container
+      .bind<UIExtension>("UIExtension")
+      .to(ConfigMenuUIExtension)
       .inSingletonScope();
     this.logger?.debug("Init Skin components end");
   }

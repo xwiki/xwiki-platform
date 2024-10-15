@@ -27,7 +27,18 @@ import { WikiConfig } from "@xwiki/cristal-api";
  * @since 0.8
  */
 export interface BrowserApi {
+  /**
+   * Change the wiki configuration of the Cristal instance
+   * @param wikiConfig the new wiki config to use
+   */
   switchLocation(wikiConfig: WikiConfig): void;
+
+  /**
+   * Fully reload the current window.
+   *
+   * @since 0.11
+   */
+  reload(): void;
 }
 
 export const name = "BrowserApi";

@@ -1,0 +1,44 @@
+{
+  "name": "@xwiki/cristal-electron-authentication-xwiki-main",
+  "version": "0.10.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "electron/authentication/authentication-xwiki/authentication-xwiki-main",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc --project tsconfig.json && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@xwiki/cristal-authentication-api": "workspace:*",
+    "axios": "1.7.7",
+    "electron-store": "10.0.0"
+  },
+  "peerDependencies": {
+    "electron": "31.6.0"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

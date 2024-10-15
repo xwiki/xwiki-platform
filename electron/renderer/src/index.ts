@@ -31,6 +31,7 @@ import { ComponentInit as FileSystemNavigationTreeComponentInit } from "@xwiki/c
 import { ComponentInit as GitHubNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-github";
 import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-nextcloud";
 import { ComponentInit as XWikiNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-xwiki";
+import { ComponentInit as XWikiAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-xwiki-renderer";
 import { Container } from "inversify";
 
 CristalAppLoader.init(
@@ -61,5 +62,6 @@ CristalAppLoader.init(
     new GitHubNavigationTreeComponentInit(container);
     new NextcloudNavigationTreeComponentInit(container);
     new XWikiNavigationTreeComponentInit(container);
+    new XWikiAuthenticationComponentInit(container);
   },
 );

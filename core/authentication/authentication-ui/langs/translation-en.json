@@ -1,0 +1,8 @@
+{
+  "login": "Log-in",
+  "logout": "Logout",
+  "loggedInUserModal": {
+    "title": "Account"
+  },
+  "userDescription": "You are logged in as {0}"
+}

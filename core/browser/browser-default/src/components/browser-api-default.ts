@@ -31,4 +31,8 @@ export class BrowserApiDefault implements BrowserApi {
   switchLocation(wikiConfig: WikiConfig): void {
     window.location.href = `/${wikiConfig.name}/#/${wikiConfig.homePage}/`;
   }
+
+  reload(): void {
+    window.location.reload();
+  }
 }

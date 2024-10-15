@@ -18,23 +18,21 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { Ref, inject, onMounted, ref, watch } from "vue";
+import { inject, onMounted, Ref, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
-import CConfigMenu from "./c-config-menu.vue";
 import CPageCreationMenu from "./c-page-creation-menu.vue";
 import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
 import xlogo from "../images/xwiki-logo-color.svg";
-import xavatarImg from "../images/no-one.svg";
 import { CIcon } from "@xwiki/cristal-icons";
 import { useMouseCoordinates } from "../composables/mouse";
-import { ViewportType, useViewportType } from "../composables/viewport";
+import { useViewportType, ViewportType } from "../composables/viewport";
+import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 
 const logo = xlogo;
-const avImg = xavatarImg;
 const viewportType: Ref<ViewportType> = useViewportType();
 const { x } = useMouseCoordinates();
 // By default, main sidebar is closed on mobile only.
@@ -158,9 +156,9 @@ function onClickOutsideMainSidebar() {
         "
       ></c-icon>
       <x-img class="logo" :src="logo" :width="72" />
-      <c-icon name="bell"></c-icon>
-      <c-config-menu></c-config-menu>
-      <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
+      <suspense>
+        <u-i-extensions uix-name="sidebar.actions"></u-i-extensions>
+      </suspense>
     </div>
     <div class="search">
       <x-search></x-search>

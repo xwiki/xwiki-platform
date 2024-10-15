@@ -26,6 +26,7 @@ import {
   type PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
 import { getRestSpacesApiUrl } from "../utils";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 /**
  * Implementation of PageHierarchyResolver for the XWiki backend.
@@ -43,6 +44,8 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
     @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
     @inject("PageHierarchyResolver")
     pageHierarchyResolver: PageHierarchyResolver,
+    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    private authenticationManagerProvider: AuthenticationManagerProvider,
   ) {
     this.logger = logger;
     this.logger.setModule("storage.components.XWikiPageHierarchyResolver");
@@ -67,9 +70,17 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
     );
 
     try {
-      const response = await fetch(restApiUrl, {
-        headers: { Accept: "application/json" },
-      });
+      const authorization = await this.authenticationManagerProvider
+        .get()
+        ?.getAuthorizationHeader();
+      const headers: { Accept: string; Authorization?: string } = {
+        Accept: "application/json",
+      };
+
+      if (authorization) {
+        headers.Authorization = authorization;
+      }
+      const response = await fetch(restApiUrl, { headers });
       const jsonResponse = await response.json();
       const hierarchy: Array<PageHierarchyItem> = [];
       jsonResponse.hierarchy.items.forEach(

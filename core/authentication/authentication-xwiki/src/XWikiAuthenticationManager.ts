@@ -68,7 +68,6 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
     window.localStorage.setItem("currentConfigName", config.name);
 
     authorizationUrl.searchParams.set("redirect_uri", redirectUri);
-    // TODO: generalize to have electron support
     window.location.href = authorizationUrl.toString();
   }
 

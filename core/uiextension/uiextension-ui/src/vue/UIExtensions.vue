@@ -49,5 +49,3 @@ for (let uiExtension of await uixManager.list(uixName)) {
     :key="uix.id"
   ></component>
 </template>
-
-<style scoped></style>

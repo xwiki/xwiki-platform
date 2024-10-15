@@ -52,5 +52,3 @@ function login() {
     {{ t("login") }}
   </x-btn>
 </template>
-
-<style scoped></style>

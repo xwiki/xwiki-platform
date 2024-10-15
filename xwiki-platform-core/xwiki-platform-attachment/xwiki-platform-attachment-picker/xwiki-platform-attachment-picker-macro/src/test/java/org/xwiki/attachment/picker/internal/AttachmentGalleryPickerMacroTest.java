@@ -29,11 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.attachment.picker.AttachmentGalleryPickerMacroParameters;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -42,8 +40,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -72,10 +69,6 @@ class AttachmentGalleryPickerMacroTest
 
     @Mock
     private MacroTransformationContext macroTransformationContext;
-    
-    @MockComponent
-    @Named("warning")
-    private WarningMessageMacro warningMacro;
 
     @Mock
     private Block translationRenderBlockNoResult;
@@ -86,20 +79,13 @@ class AttachmentGalleryPickerMacroTest
     @BeforeEach
     void setUp()
     {
-        String translationRenderNoResult = "noresult";
-        String translationRenderGlobalSelection = "globalselection";
-        when(this.l10n.getTranslationPlain("attachment.picker.macro.notResult.message"))
-            .thenReturn(translationRenderNoResult);
-        when(this.l10n.getTranslationPlain("attachment.picker.macro.globalSelection.message"))
-            .thenReturn(translationRenderGlobalSelection);
-        try {
-            when(warningMacro.execute(any(BoxMacroParameters.class), eq(translationRenderNoResult), any(MacroTransformationContext.class)))
-                .thenReturn(List.of(this.translationRenderBlockNoResult));
-            when(warningMacro.execute(any(BoxMacroParameters.class), eq(translationRenderGlobalSelection), any(MacroTransformationContext.class)))
-                .thenReturn(List.of(this.translationRenderBlockGlobalSelection));
-        } catch (MacroExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        Translation translationNoResult = mock(Translation.class);
+        Translation translationGlobalSelection = mock(Translation.class);
+        when(this.l10n.getTranslation("attachment.picker.macro.notResult.message")).thenReturn(translationNoResult);
+        when(this.l10n.getTranslation("attachment.picker.macro.globalSelection.message"))
+            .thenReturn(translationGlobalSelection);
+        when(translationNoResult.render()).thenReturn(this.translationRenderBlockNoResult);
+        when(translationGlobalSelection.render()).thenReturn(this.translationRenderBlockGlobalSelection);
     }
 
     @Test
@@ -111,8 +97,12 @@ class AttachmentGalleryPickerMacroTest
         assertEquals(List.of(new GroupBlock(List.of(
             new GroupBlock(List.of(), Map.of("class", "attachmentPickerSearch")),
             new GroupBlock(Map.of("class", "attachmentPickerResults")),
-            new GroupBlock(List.of(this.translationRenderBlockNoResult)),
-            new GroupBlock(List.of(this.translationRenderBlockGlobalSelection))
+            new GroupBlock(List.of(this.translationRenderBlockNoResult),
+                Map.of("class", "attachmentPickerNoResults hidden box warningmessage")),
+            new GroupBlock(
+                List.of(this.translationRenderBlockGlobalSelection),
+                Map.of("class", "attachmentPickerGlobalSelection hidden box warningmessage"))
+
         ), Map.ofEntries(
             entry("id", "my-id"),
             entry("class", "attachmentGalleryPicker"),

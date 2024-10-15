@@ -57,7 +57,7 @@
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",
     "vue": "3.5.10",
-    "vue-router": "4.4.0",
+    "vue-router": "4.4.5",
     "yjs": "13.6.18"
   },
   "devDependencies": {

@@ -28,7 +28,7 @@
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-info-actions-api": "workspace:*",
     "vue": "3.5.10",
-    "vue-router": "4.4.0"
+    "vue-router": "4.4.5"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

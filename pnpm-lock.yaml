@@ -86,8 +86,8 @@ importers:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -150,8 +150,8 @@ importers:
         specifier: 10.0.3
         version: 10.0.3(vue@3.5.10(typescript@5.6.2))
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       vue-tsc:
         specifier: 2.1.6
@@ -489,8 +489,8 @@ importers:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       '@vue/test-utils':
         specifier: 2.4.6
@@ -655,7 +655,7 @@ importers:
         version: 1.11.2
       '@gouvminint/vue-dsfr':
         specifier: 5.11.0
-        version: 5.11.0(oh-vue-icons@1.0.0-rc3(vue@3.5.10(typescript@5.6.2)))(vue-router@4.4.0(vue@3.5.10(typescript@5.6.2)))(vue@3.5.10(typescript@5.6.2))
+        version: 5.11.0(oh-vue-icons@1.0.0-rc3(vue@3.5.10(typescript@5.6.2)))(vue-router@4.4.5(vue@3.5.10(typescript@5.6.2)))(vue@3.5.10(typescript@5.6.2))
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
@@ -834,8 +834,8 @@ importers:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
       yjs:
         specifier: 13.6.18
         version: 13.6.18
@@ -1171,8 +1171,8 @@ importers:
         specifier: 10.0.3
         version: 10.0.3(vue@3.5.10(typescript@5.6.2))
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       vue-tsc:
         specifier: 2.1.6
@@ -1308,8 +1308,8 @@ importers:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       vite-plugin-comlink:
         specifier: 5.0.1
@@ -1366,8 +1366,8 @@ importers:
         specifier: 10.0.3
         version: 10.0.3(vue@3.5.10(typescript@5.6.2))
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       vue-tsc:
         specifier: 2.1.6
@@ -1437,8 +1437,8 @@ importers:
         specifier: 3.5.10
         version: 3.5.10(typescript@5.6.2)
       vue-router:
-        specifier: 4.4.0
-        version: 4.4.0(vue@3.5.10(typescript@5.6.2))
+        specifier: 4.4.5
+        version: 4.4.5(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       '@eslint/eslintrc':
         specifier: 3.1.0
@@ -6120,6 +6120,11 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
+  vue-router@4.4.5:
+    resolution: {integrity: sha512-4fKZygS8cH1yCyuabAXGUAsyi1b2/o/OKgu/RUb+znIYOxPRxdkytJEx+0wGcpBE1pX6vUgh5jwWOKRGvuA/7Q==}
+    peerDependencies:
+      vue: ^3.2.0
+
   vue-template-compiler@2.7.15:
     resolution: {integrity: sha512-yQxjxMptBL7UAog00O8sANud99C6wJF+7kgbcwqkvA38vCGF7HWE66w0ZFnS/kX5gSoJr/PQ4/oS3Ne2pW37Og==}
 
@@ -6958,14 +6963,14 @@ snapshots:
 
   '@gouvfr/dsfr@1.11.2': {}
 
-  '@gouvminint/vue-dsfr@5.11.0(oh-vue-icons@1.0.0-rc3(vue@3.5.10(typescript@5.6.2)))(vue-router@4.4.0(vue@3.5.10(typescript@5.6.2)))(vue@3.5.10(typescript@5.6.2))':
+  '@gouvminint/vue-dsfr@5.11.0(oh-vue-icons@1.0.0-rc3(vue@3.5.10(typescript@5.6.2)))(vue-router@4.4.5(vue@3.5.10(typescript@5.6.2)))(vue@3.5.10(typescript@5.6.2))':
     dependencies:
       '@gouvfr/dsfr': 1.11.2
       focus-trap: 7.5.4
       focus-trap-vue: 4.0.3(focus-trap@7.5.4)(vue@3.5.10(typescript@5.6.2))
       oh-vue-icons: 1.0.0-rc3(vue@3.5.10(typescript@5.6.2))
       vue: 3.5.10(typescript@5.6.2)
-      vue-router: 4.4.0(vue@3.5.10(typescript@5.6.2))
+      vue-router: 4.4.5(vue@3.5.10(typescript@5.6.2))
 
   '@hocuspocus/common@2.13.5':
     dependencies:
@@ -11409,9 +11414,9 @@ snapshots:
       '@vue/devtools-api': 6.5.1
       vue: 3.4.31(typescript@5.6.2)
 
-  vue-router@4.4.0(vue@3.5.10(typescript@5.6.2)):
+  vue-router@4.4.5(vue@3.5.10(typescript@5.6.2)):
     dependencies:
-      '@vue/devtools-api': 6.5.1
+      '@vue/devtools-api': 6.6.4
       vue: 3.5.10(typescript@5.6.2)
 
   vue-template-compiler@2.7.15:

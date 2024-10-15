@@ -26,6 +26,12 @@ export interface WikiConfig {
   baseURL: string;
   // The rest base url of the backend endpoint
   baseRestURL: string;
+  /**
+   * Realtime endpoint URL.
+   * Defaults to http://localhost:15681/collaboration when undefined.
+   * @since 0.11
+   */
+  realtimeURL?: string;
   homePage: string;
   storage: Storage;
   serverRendering: boolean;

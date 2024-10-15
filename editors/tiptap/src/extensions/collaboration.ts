@@ -39,6 +39,11 @@ interface CollaborationKitOptions {
    * The function that saves the content, called by the auto-saver.
    */
   saveCallback: (authors: User[]) => Promise<void>;
+
+  /**
+   * The URL of the realtime server.
+   */
+  baseUrl: string;
 }
 
 export interface User {
@@ -97,7 +102,7 @@ export const CollaborationKit = Extension.create<CollaborationKitOptions>({
 
     this.storage.provider = new TiptapCollabProvider({
       // See server.js from @xwiki/cristal-web
-      baseUrl: "/collaboration",
+      baseUrl: this.options.baseUrl || "http://localhost:15681/collaboration",
       name: this.options.channel,
       // The Y.Doc that is synchronized between editing users.
       document: ydoc,

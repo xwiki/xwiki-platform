@@ -36,6 +36,12 @@ export class DefaultWikiConfig implements WikiConfig {
   // @ts-expect-error baseRestURL is temporarily undefined during class
   // initialization
   public baseRestURL: string;
+
+  /**
+   * Realtime endpoint URL.
+   * @since 0.11
+   */
+  public realtimeURL?: string;
   // @ts-expect-error homePage is temporarily undefined during class
   // initialization
   public homePage: string;
@@ -71,10 +77,12 @@ export class DefaultWikiConfig implements WikiConfig {
     serverRendering: boolean,
     designSystem: string,
     offline: boolean,
+    optional?: { realtimeURL?: string },
   ): void {
     this.name = name;
     this.baseURL = baseURL;
     this.baseRestURL = baseRestURL;
+    this.realtimeURL = optional?.realtimeURL;
     this.homePage = homePage;
     this.serverRendering = serverRendering;
     this.designSystem = designSystem;
@@ -87,6 +95,7 @@ export class DefaultWikiConfig implements WikiConfig {
     this.name = configObject.name;
     this.baseURL = configObject.baseURL;
     this.baseRestURL = configObject.baseRestURL;
+    this.realtimeURL = configObject.realtimeURL;
     this.homePage = configObject.homePage;
     this.serverRendering = configObject.serverRendering;
     this.offline = configObject.offline;

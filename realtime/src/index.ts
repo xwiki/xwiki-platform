@@ -18,25 +18,36 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
+import express from "express";
+import expressWebsockets from "express-ws";
+import { Server as HocuspocusServer } from "@hocuspocus/server";
 
-const app = express();
-
-app.use("/", express.static(path.resolve(__dirname, "../dist")));
-
-app.get("*", function (req, res) {
-  const pathToHtmlFile = path.resolve(__dirname, "../dist/index.html");
-  const contentFromHtmlFile = fs.readFileSync(pathToHtmlFile, "utf-8");
-  res.send(contentFromHtmlFile);
+const hocuspocusServer = HocuspocusServer.configure({
+  // See https://developer.chrome.com/blog/timer-throttling-in-chrome-88/
+  timeout: 60000,
 });
 
-let port = 9000;
-const env_port = parseInt(process.env.HTTP_PORT);
+const { app }: expressWebsockets.Instance = expressWebsockets(express());
+
+// Add a WebSocket route for Hocuspocus.
+app.ws("/collaboration", (webSocket, request) => {
+  // We can pass contextual information to the Hocuspocus server. For instance, we could authenticate the user here.
+  const context = {
+    //user: {
+    //  id: 'mflorea',
+    //  name: "Marius Florea",
+    //},
+  };
+
+  hocuspocusServer.handleConnection(webSocket, request, context);
+});
+
+let port = 15681;
+const env_port = parseInt(process.env.REALTIME_HTTP_PORT || "");
 if (!isNaN(env_port) && env_port > 0) {
   port = env_port;
 }
-app.listen(port, function () {
+
+app.listen(port, () => {
   console.log(`Application is running on http://localhost:${port}`);
 });

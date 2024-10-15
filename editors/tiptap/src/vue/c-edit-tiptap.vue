@@ -162,6 +162,8 @@ async function loadEditor(page: PageData | undefined) {
       console.debug(`[${name}] service not found`);
     }
 
+    const realtimeURL = cristal.getWikiConfig().realtimeURL;
+
     editor.value = new Editor({
       content: content.value || "",
       extensions: [
@@ -197,6 +199,7 @@ async function loadEditor(page: PageData | undefined) {
           channel: currentPageName.value,
           user: currentUser,
           saveCallback: save,
+          baseUrl: realtimeURL,
         }),
       ],
     });

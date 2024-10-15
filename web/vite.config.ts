@@ -27,12 +27,6 @@ import { comlink } from "vite-plugin-comlink";
 
 import { resolve } from "path";
 
-let port = 9000;
-const env_port = parseInt(process.env.HTTP_PORT);
-if (!isNaN(env_port) && env_port > 0) {
-  port = env_port;
-}
-
 export default defineConfig({
   build: {
     sourcemap: true,
@@ -71,15 +65,6 @@ export default defineConfig({
           // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
           experimentalDecorators: true,
         },
-      },
-    },
-  },
-  server: {
-    proxy: {
-      // Proxy collaboration requests to the WebSocket server.
-      "/collaboration": {
-        target: `ws://localhost:${port}`,
-        ws: true,
       },
     },
   },

@@ -42,6 +42,7 @@ packages:
   - "extensions/menubuttons"
   - "lib"
   - "macros"
+  - "realtime"
   - "rendering/rendering"
   - "rendering/wikimodel"
   - "sharedworker/api"

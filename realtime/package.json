@@ -1,0 +1,33 @@
+{
+  "name": "@xwiki/cristal-realtime",
+  "version": "0.10.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "directory": "realtime",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@hocuspocus/server": "2.13.5",
+    "express": "4.20.0",
+    "express-ws": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "@types/express-ws": "3.0.5",
+    "esbuild": "0.24.0",
+    "tsx": "4.19.1"
+  }
+}

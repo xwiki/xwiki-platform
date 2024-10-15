@@ -15,11 +15,14 @@
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
-    "dev": "nx build @xwiki/cristal-web && nx dev @xwiki/cristal-web",
+    "dev:cristal-web": "nx dev @xwiki/cristal-web",
+    "dev:cristal-realtime": "nx dev @xwiki/cristal-realtime",
+    "dev": "nx build @xwiki/cristal-web && run-p dev:cristal-web dev:cristal-realtime",
     "lint": "nx run-many -t lint",
     "quickstart": "nx run @xwiki/cristal-web:quickstart",
     "start": "nx run @xwiki/cristal-web:start",
-    "start:electron": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
+    "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
+    "start:electron": "run-p start:electron:ui dev:cristal-realtime",
     "test": "nx run-many -t test"
   },
   "devDependencies": {
@@ -34,6 +37,7 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "eslint-plugin-vue": "9.29.0",
+    "npm-run-all2": "6.2.3",
     "nx": "19.8.4",
     "prettier": "3.3.2",
     "rimraf": "6.0.1",

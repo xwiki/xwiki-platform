@@ -1033,11 +1033,14 @@ var XWiki = (function(XWiki){
   /**
    * Reset timeout
    */
-  resetTimeout: function()
+  resetTimeout: function(timeout)
   {
+    if(!timeout) {
+      timeout = 1000;
+    }
     clearTimeout(this.toID);
     var pointer = this;
-    this.toID = setTimeout(function () { pointer.clearSuggestions() }, 1000);
+    this.toID = setTimeout(function () { pointer.clearSuggestions() }, timeout);
   },
 
   /**

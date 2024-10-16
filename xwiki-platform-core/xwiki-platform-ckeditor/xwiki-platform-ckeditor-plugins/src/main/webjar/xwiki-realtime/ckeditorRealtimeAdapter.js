@@ -68,14 +68,22 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     getOutputHTML() {
       const fullPage = this._ckeditor.config.fullPage;
+      const includeUploadWidgetsInOutputHTML = this._ckeditor.config._includeUploadWidgetsInOutputHTML;
       try {
         // We're interested only in the edited content (what's inside the content wrapper). Moreover, the returned HTML
         // should be independent of the editor type (iframe-based on in-place).
         this._ckeditor.config.fullPage = false;
+        // We have to include the upload widgets in the output HTML (that gets synchronized with remote users),
+        // otherwise they are lost when a remote change is applied. We can't simply ignore the diff changes that remove
+        // the upload widgets because it leads to conflicts when applying remote patches (the DOM structure is
+        // different: e.g. instead of <text><uploadWidget><text> we end up having only <text>, i.e. the adjacent text
+        // nodes are merged together).
+        this._ckeditor.config._includeUploadWidgetsInOutputHTML = true;
         return this._ckeditor.getData();
       } finally {
         // Restore the configuration value.
         this._ckeditor.config.fullPage = fullPage;
+        this._ckeditor.config._includeUploadWidgetsInOutputHTML = includeUploadWidgetsInOutputHTML;
       }
     }
 

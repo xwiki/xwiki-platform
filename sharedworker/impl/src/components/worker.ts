@@ -27,6 +27,7 @@ import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backe
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
+import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
 import type { Container } from "inversify";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";
@@ -53,10 +54,10 @@ export class Worker implements MyWorker {
     */
   public async start(): Promise<void> {
     console.log("Starting worker thread");
-    this.initialize();
+    await this.initialize();
     while (true) {
       await this.sleep(1000);
-      this.checkQueue();
+      await this.checkQueue();
     }
   }
 
@@ -217,6 +218,7 @@ export class Worker implements MyWorker {
     new GithubBackendComponentInit(cristalLoader.container);
     new NextcloudBackendComponentInit(cristalLoader.container);
     new XWikiBackendComponentInit(cristalLoader.container);
+    new AuthenticationAPIComponentInit(cristalLoader.container);
     console.log("Loading storage components");
     this.initialized = true;
     console.log("Finished initialize");

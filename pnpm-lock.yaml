@@ -1277,6 +1277,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../core/authentication/authentication-api
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../../core/backends/backend-dexie

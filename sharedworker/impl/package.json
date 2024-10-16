@@ -27,6 +27,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",
     "@xwiki/cristal-backend-github": "workspace:*",
     "@xwiki/cristal-backend-nextcloud": "workspace:*",

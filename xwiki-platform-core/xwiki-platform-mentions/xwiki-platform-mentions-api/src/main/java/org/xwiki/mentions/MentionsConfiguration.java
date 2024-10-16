@@ -20,6 +20,7 @@
 package org.xwiki.mentions;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Gives access to the configuration settings of the mentions.
@@ -53,9 +54,15 @@ public interface MentionsConfiguration
     String getMentionsColor();
 
     /**
-     * @return the color for the mentions to the current user.
+     * @return the background color for the mentions to the current user.
      */
     String getSelfMentionsColor();
+
+    /**
+     * @return the foreground color for the mentions to the current user.
+     */
+    @Unstable
+    String getSelfMentionsForeground();
 
     /**
      * 

@@ -816,6 +816,16 @@ a.search-result-highlightAll:after {
   white-space: nowrap;
 }
 
+/* Override the default style for links in content. */
+body.content.preference-underlining-only-inline-links #xwikicontent .search-facet-body .itemName,
+body.content.preference-underlining-only-inline-links #xwikicontent .search-facet-body .more {
+  text-decoration: none;
+  /* Make sure we don't take over the default behaviour on hover with too much specificity. */
+  &amp;:hover, &amp;:focus {
+    text-decoration: underline;
+  }
+}
+
 .search-facet-body .itemName,
 .search-facet-body .facet-value-toggler,
 .search-facet-body .more {

@@ -19,10 +19,6 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.Network;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.export.pdf.internal.docker.ContainerManager;
 import org.xwiki.export.pdf.test.po.PDFDocument;
 import org.xwiki.export.pdf.test.po.PDFExportAdministrationSectionPage;
@@ -58,6 +55,10 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -1150,9 +1151,9 @@ class PDFExportIT
             // The first image is the presentation (ppt) slide. The second image is from the word document.
             assertEquals(2, images.size());
 
-            // The presenation slide.
-            assertEquals(800, images.get(0).getRawWidth());
-            assertEquals(449, images.get(0).getRawHeight());
+            // The presentation slide.
+            assertEquals(1920, images.get(0).getRawWidth());
+            assertEquals(1080, images.get(0).getRawHeight());
 
             // The image from the word document.
             assertEquals(81, images.get(1).getRawWidth());
@@ -1176,6 +1177,95 @@ class PDFExportIT
             // Verify the text from the content page.
             assertEquals("A&B=C\n2 / 2\nPage with & in title.\n", pdf.getTextFromPage(1));
         }
+    }
+
+    @Test
+    @Order(26)
+    void pageTranslations(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        // Enable multilingual mode and configure the supported languages.
+        setup.loginAsSuperAdmin();
+        setMultiLingual(true, "en", "fr", "de");
+
+        // Get back to the simple user login.
+        setup.login("John", "pass");
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(List.of("PDFExportIT", "PageTranslations"), "WebHome"));
+        // The current locale should be English.
+        assertEquals("Page Translations", viewPage.getDocumentTitle());
+
+        // Include the child page in the export because we want to verify that the selected locale is applied to the
+        // child pages also.
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.PageTranslations.Child").select();
+        exportTreeModal.export();
+
+        // Select a different language than the current one.
+        PDFExportOptionsModal exportOptions = new PDFExportOptionsModal();
+        assertEquals("English (Current language)",
+            exportOptions.getLanguageSelect().getFirstSelectedOption().getText());
+        exportOptions.getLanguageSelect().selectByVisibleText("French");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 4 print pages: cover page, table of contents and two content pages (for the parent and
+            // child wiki pages).
+            assertEquals(4, pdf.getNumberOfPages());
+
+            // Verify the cover page.
+            String text = pdf.getTextFromPage(0);
+            assertTrue(text.startsWith("Traductions de pages"), "Unexpected cover page: " + text);
+
+            // Verify the table of contents.
+            text = pdf.getTextFromPage(1);
+            assertTrue(text.contains("Table des matières\nTraductions de pages\nTitre niveau un\nEnfant"),
+                "Unexpected table of contents: " + text);
+
+            // Verify the parent page.
+            assertEquals("Traductions de pages\n3 / 4\nTraductions de pages\nTitre niveau un\n"
+                + "Ce contenu est traduit en plusieurs langues.\n", pdf.getTextFromPage(2));
+
+            // Verify the child page.
+            assertEquals("Enfant\n4 / 4\nEnfant\nCeci est une page enfant.\n", pdf.getTextFromPage(3));
+        }
+
+        // Verify that the current locale hasn't changed.
+        viewPage = setup.gotoPage(new LocalDocumentReference(List.of("PDFExportIT", "PageTranslations"), "WebHome"));
+        assertEquals("Page Translations", viewPage.getDocumentTitle());
+
+        // Export again, this time using a locale for which we're missing a translation.
+        exportOptions = PDFExportOptionsModal.open(viewPage);
+        exportOptions.getLanguageSelect().selectByVisibleText("German");
+
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 3 pages: cover page, table of contents and one content page.
+            assertEquals(3, pdf.getNumberOfPages());
+
+            // Verify the cover page.
+            String text = pdf.getTextFromPage(0);
+            assertTrue(text.startsWith("Page Translations\nVersion 1.1 verfasst von"),
+                "Unexpected cover page: " + text);
+
+            // Verify the table of contents.
+            text = pdf.getTextFromPage(1);
+            assertTrue(text.contains("Inhaltsverzeichnis\nHeading Level One"),
+                "Unexpected table of contents: " + text);
+
+            // Verify the parent page.
+            assertEquals(
+                "Page Translations\n3 / 3\nHeading Level One\nThis content is translated in multiple languages.\n",
+                pdf.getTextFromPage(2));
+        }
+    }
+
+    private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)
+    {
+        AdministrationPage adminPage = AdministrationPage.gotoPage();
+        LocalizationAdministrationSectionPage sectionPage = adminPage.clickLocalizationSection();
+        sectionPage.setMultiLingual(isMultiLingual);
+        sectionPage.setDefaultLanguage("en");
+        sectionPage.setSupportedLanguages(Arrays.asList(supportedLanguages));
+        sectionPage.clickSave();
     }
 
     private URL getHostURL(TestConfiguration testConfiguration) throws Exception

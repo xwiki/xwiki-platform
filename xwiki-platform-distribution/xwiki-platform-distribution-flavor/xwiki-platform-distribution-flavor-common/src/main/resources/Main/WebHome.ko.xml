@@ -53,7 +53,7 @@ Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니
 
 당신은 또한 [[Sandbox&gt;&gt;Sandbox.WebHome]] 사용하여 더 많은 데모 콘텐츠를 볼 수 있으며 일반적으로 Wiki의 기능을 실험할 수 있습니다.
 
-{{box}}XWiki를 사용하는 방법에 대한 자세한 내용 [[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
+{{box}}XWiki를 사용하는 방법에 대한 자세한 내용 [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
 (% class="row" %)
 (((
@@ -63,7 +63,7 @@ Wiki를 최대한 활용하려면, 로그인하고 다음 작업을 수행합니
 
 //당신이// 필요한 기능을 사용하여 Wiki의 파워와 기능을 확장하려면, 확장기능을 검색하여 설치할 수 있는[[Extension Manager&gt;&gt;XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.Extensions"]]로 이동합니다.
 
-XWiki에서 사용할 수 있는 900 이상의 커뮤니티 기여 확장을 참조하려면, [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]]로 이동합니다.
+XWiki에서 사용할 수 있는 900 이상의 커뮤니티 기여 확장을 참조하려면, [[Extensions Repository&gt;&gt;https://extensions.xwiki.org]]로 이동합니다.
 )))
 
 (% class="col-xs-12 col-sm-6" %)

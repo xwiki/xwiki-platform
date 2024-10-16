@@ -13,7 +13,7 @@ WorkingDirectory=/var/lib/xwiki/
 
 # Lifecycle
 Type=simple
-ExecStart=/bin/bash /usr/lib/xwiki-jetty/start_xwiki.sh
+ExecStart=/bin/bash /usr/lib/xwiki-jetty/start_xwiki.sh --noninteractive
 ExecStop=/bin/bash /usr/lib/xwiki-jetty/stop_xwiki.sh
 Restart=on-abort
 
@@ -28,6 +28,7 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ReadOnlyPaths=/etc/xwiki
 ReadWritePaths=/var/lib/xwiki/data/
+ReadWritePaths=/var/lib/xwiki/tmp/
 ReadWritePaths=/var/log/xwiki/
 
 [Install]

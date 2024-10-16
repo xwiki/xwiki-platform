@@ -33,6 +33,7 @@ import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
 import org.xwiki.test.page.XWikiSyntax21ComponentList;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.feed.FeedPlugin;
@@ -94,7 +95,7 @@ class DatabaseSearchPageTest extends PageTest
         this.context.setResponse(this.response);
 
         String rssFeed = databaseSearchDocument.displayDocument(Syntax.PLAIN_1_0, this.context);
-        assertTrue(rssFeed.isEmpty());
+        assertTrue(StringUtils.isAllBlank(rssFeed));
 
         rssFeed = out.toString();
         assertTrue(rssFeed.contains("<title>search.rss [" + escapedText + "]</title>"));

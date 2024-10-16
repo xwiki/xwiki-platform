@@ -600,7 +600,7 @@
 #end
 
 #macro (displayDocumentChangesHeader $from $to)
-  <div id="changes-info">
+  <div id="changes-info" class="force-underline">
     <div id="changes-info-boxes">
       #if ("$!from.previousLink" != '' || "$!to.nextLink" != '')
         <div id='changes-arrows-box'>
@@ -631,17 +631,20 @@
   #if (!$headingLevel)
     #set ($headingLevel = 2)
   #end
-  #createDocumentDiff($origdoc $newdoc $docDiff)
-  #createDocumentDiffSummary($docDiff $summary)
-  <h$headingLevel>
-    $escapetool.xml($services.localization.render('web.history.changes.summary'))
-  </h$headingLevel>
-  #displayDocumentDiffSummary($summary)
-  #if ($summary.entries.size() > 0)
+  ## If both docs are null we don't display anything
+  #if ("$!origdoc" != "" || "$!newdoc" != "")
+    #createDocumentDiff($origdoc $newdoc $docDiff)
+    #createDocumentDiffSummary($docDiff $summary)
     <h$headingLevel>
-      $escapetool.xml($services.localization.render('web.history.changes.details'))
+      $escapetool.xml($services.localization.render('web.history.changes.summary'))
     </h$headingLevel>
-    #displayDocumentDiff($docDiff $conflictsList)
+    #displayDocumentDiffSummary($summary)
+    #if ($summary.entries.size() > 0)
+      <h$headingLevel>
+        $escapetool.xml($services.localization.render('web.history.changes.details'))
+      </h$headingLevel>
+      #displayDocumentDiff($docDiff $conflictsList)
+    #end
   #end
 #end
 

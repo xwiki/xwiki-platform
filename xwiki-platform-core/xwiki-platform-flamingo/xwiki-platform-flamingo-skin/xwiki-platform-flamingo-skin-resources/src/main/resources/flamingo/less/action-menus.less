@@ -146,6 +146,12 @@
       width: 0;
       padding: 0;
     }
+
+    // Hides the search result when the focus is not on the search field.
+    & ~ .searchSuggest {
+      opacity: 0;
+      max-height: 0;
+    }
   }
 }
 

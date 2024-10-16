@@ -68,7 +68,7 @@
         htmlConverter: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
-          language: $('html').attr('lang') || '',
+          language: editor.getContentLocale(),
           formToken: document.documentElement.dataset.xwikiFormToken || ''
         }))
       }, editor.config['xwiki-source']);

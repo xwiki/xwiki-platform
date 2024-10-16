@@ -25,13 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.3.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Parent POM for the WYSIWYG editor modules</description>
+  <description>WYSIWYG editor modules independent of the underlying WYSIWYG implementation</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-wysiwyg-api</module>
     <module>xwiki-platform-wysiwyg-ui</module>
   </modules>

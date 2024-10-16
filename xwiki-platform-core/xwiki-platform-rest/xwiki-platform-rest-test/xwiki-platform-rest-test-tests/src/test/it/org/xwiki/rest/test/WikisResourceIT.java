@@ -89,6 +89,26 @@ public class WikisResourceIT extends AbstractHttpIT
         this.reference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
     }
 
+    private SearchResults search(int expectedSize, String query)
+    {
+        try {
+            GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
+            assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+
+            SearchResults searchResults =
+                (SearchResults) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+
+            int resultSize = searchResults.getSearchResults().size();
+            if (resultSize == expectedSize) {
+                return searchResults;
+            }
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+
+        return null;
+    }
+
     @Override
     @Test
     public void testRepresentation() throws Exception
@@ -435,16 +455,14 @@ public class WikisResourceIT extends AbstractHttpIT
         this.testUtils.rest().delete(this.reference);
         this.testUtils.rest().savePage(this.reference);
 
+        // Wait for the Solr queue to be empty
         this.solrUtils.waitEmptyQueue();
 
         String query = String.format("%s?q=\"%s\"", buildURI(WikisSearchQueryResource.class, getWiki()), this.pageName);
-        GetMethod getMethod = executeGet(URIUtil.encodeQuery(query));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        // Even if the Solr queue appear to be empty we also make sure to wait for the number of results we expect, in
+        // case there is some race condition on server side
+        SearchResults searchResults = this.testUtils.getDriver().waitUntilCondition(d -> search(1, query));
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
-
-        int resultSize = searchResults.getSearchResults().size();
-        assertEquals(String.format("Query [%s] returned more or less than 1 result", query), 1, resultSize);
         assertEquals(this.fullName, searchResults.getSearchResults().get(0).getPageFullName());
     }
 

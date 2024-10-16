@@ -64,9 +64,6 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     @FindBy(id = "XWiki.PDFExport.ConfigurationClass_0_chromeRemoteDebuggingPort")
     private WebElement chromeRemoteDebuggingPortInput;
 
-    @FindBy(xpath = "//input[@type='submit'][@name='action_saveandcontinue']")
-    private WebElement saveButton;
-
     @FindBy(linkText = "Reset")
     private WebElement resetButton;
 
@@ -86,7 +83,7 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
      */
     public PDFExportAdministrationSectionPage()
     {
-        super(SECTION_ID);
+        super(SECTION_ID, true);
     }
 
     /**
@@ -218,23 +215,6 @@ public class PDFExportAdministrationSectionPage extends AdministrationSectionPag
     public boolean isChromeRemoteDebuggingPortValid()
     {
         return isValid(this.chromeRemoteDebuggingPortInput);
-    }
-
-    @Override
-    public void clickSave()
-    {
-        clickSave(true);
-    }
-
-    @Override
-    public void clickSave(boolean wait)
-    {
-        this.saveButton.click();
-
-        if (wait) {
-            // Wait until the page is really saved.
-            waitForNotificationSuccessMessage("Saved");
-        }
     }
 
     /**

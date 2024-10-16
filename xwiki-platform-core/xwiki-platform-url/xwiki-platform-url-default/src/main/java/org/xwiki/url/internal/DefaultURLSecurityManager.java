@@ -139,11 +139,7 @@ public class DefaultURLSecurityManager implements URLSecurityManager
     public boolean isDomainTrusted(URL urlToCheck)
     {
         if (this.urlConfiguration.isTrustedDomainsEnabled()) {
-            if (this.trustedDomains == null) {
-                computeTrustedDomains();
-            }
-
-            this.trustedDomains.add(this.getCurrentDomain());
+            maybeInitializeWithDomain(this.getCurrentDomain());
             String host = urlToCheck.getHost();
 
             do {
@@ -168,6 +164,23 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             return bypassCheck;
         } else {
             return true;
+        }
+    }
+
+    /**
+     * Initialize the trusted domains with the given domain as additional trusted domains if trusted domains are
+     * enabled.
+     *
+     * @param domain the domain to add to the trusted domains
+     */
+    private void maybeInitializeWithDomain(String domain)
+    {
+        if (this.urlConfiguration.isTrustedDomainsEnabled()) {
+            if (this.trustedDomains == null) {
+                computeTrustedDomains();
+            }
+
+            this.trustedDomains.add(domain);
         }
     }
 
@@ -269,6 +282,14 @@ public class DefaultURLSecurityManager implements URLSecurityManager
             throw new SecurityException(String.format("The given URI [%s] is not safe on this server.",
                 uri));
         }
+    }
+
+    @Override
+    public URI parseToSafeURI(String serializedURI, String requestHost) throws URISyntaxException, SecurityException
+    {
+        maybeInitializeWithDomain(requestHost);
+
+        return parseToSafeURI(serializedURI);
     }
 
     /**

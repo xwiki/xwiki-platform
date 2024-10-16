@@ -594,6 +594,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
     {
         // Start fresh.
         setup.deletePage(testReference);
+        // Create the page with the current user so the current user can delete it when running the test multiple times.
+        setup.createPage(testReference, "");
 
         //
         // First Tab
@@ -1726,6 +1728,98 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         secondInplaceEditPage.saveAndView();
 
         assertEquals("first then second and almost done", secondInplaceEditPage.getContent());
+    }
+
+    @Test
+    @Order(20)
+    void dragAndDropFilesAtTheSameTime(TestUtils setup, TestReference testReference, MultiUserTestUtils multiUserSetup)
+        throws Exception
+    {
+        //
+        // First Tab
+        //
+
+        // Start fresh.
+        setup.deletePage(testReference);
+
+        // Edit the page in the first browser tab.
+        RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
+        RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
+
+        firstTextArea.sendKeys("f");
+
+        //
+        // Second Tab
+        //
+
+        String secondTabHandle = setup.getDriver().switchTo().newWindow(WindowType.TAB).getWindowHandle();
+
+        // Edit the page in the second browser tab.
+        RealtimeWYSIWYGEditPage secondEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
+        RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
+        RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
+
+        secondTextArea.waitUntilTextContains("f");
+        secondTextArea.sendKeys(Keys.END, Keys.ENTER, "second ");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.sendKeys("irst ");
+        // Drop the file without waiting for the upload to finish because we want to simulate two users dropping files
+        // at the same time.
+        firstTextArea.dropFile("/realtimeWysiwygEditor.webm", false);
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.dropFile("/source-button.mp4", false);
+        secondTextArea.sendKeys(Keys.RIGHT, " blue ");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.sendKeys(Keys.RIGHT, " red ");
+        firstTextArea.dropFile("/ckeditor-source.png", false);
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.dropFile("/realtimeWysiwygEditor.png", false);
+        secondTextArea.sendKeys(Keys.RIGHT, " green");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.sendKeys(Keys.RIGHT, " yellow");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.waitUntilTextContains("yellow");
+        secondTextArea.waitForUploadsToFinish();
+
+        // Verify the result.
+        secondEditor.getToolBar().toggleSourceMode();
+        assertEquals(
+            "first [[attach:realtimeWysiwygEditor.webm||target=\"_blank\"]]"
+                + " red\u00A0[[image:ckeditor-source.png]] yellow\n\n"
+                + "second [[attach:source-button.mp4||target=\"_blank\"]]"
+                + " blue\u00A0[[image:realtimeWysiwygEditor.png]] green",
+            secondEditor.getSourceTextArea().getAttribute("value"));
     }
 
     private void setMultiLingual(boolean isMultiLingual, String... supportedLanguages)

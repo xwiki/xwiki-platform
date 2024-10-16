@@ -35,6 +35,10 @@
     <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebSocket Integration</xwiki.extension.name>
+    <!-- Replaces the old WebSocket Integration from XWiki Contrib -->
+    <xwiki.extension.features>
+      org.xwiki.contrib:xwiki-contrib-websocket
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

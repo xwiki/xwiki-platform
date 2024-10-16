@@ -40,6 +40,8 @@ public class DisplayIconMacroParameters
 
     private String iconSet;
 
+    private String textAlternative;
+
     private boolean fallback = true;
 
     /**
@@ -99,5 +101,27 @@ public class DisplayIconMacroParameters
     public void setFallback(boolean fallback)
     {
         this.fallback = fallback;
+    }
+
+    /**
+     * @since 16.8.0RC1
+     * @return the text alternative picked for the icon
+     */
+    @Unstable
+    public String getTextAlternative()
+    {
+        return this.textAlternative;
+    }
+
+    /**
+     * @since 16.8.0RC1
+     * @param textAlternative a text alternative for the icon
+     */
+    @PropertyName("Text Alternative")
+    @PropertyDescription("A text alternative for this icon.")
+    @Unstable
+    public void setTextAlternative(String textAlternative)
+    {
+        this.textAlternative = textAlternative;
     }
 }

@@ -138,7 +138,7 @@ class ImageIT extends AbstractCKEditorIT
         // Verify that the content matches what we did using CKEditor.
         assertEquals("[[image:image.gif]]\n"
             + "\n"
-            + "[[Caption>>image:image.gif]]", savedPage.editWiki().getContent());
+            + "[[Caption>>image:image.gif]]\n\n ", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -268,7 +268,7 @@ class ImageIT extends AbstractCKEditorIT
         ImageDialogEditModal imageDialogEditModal = imageDialogSelectModal.clickSelect();
         imageDialogEditModal.clickInsert();
 
-        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.END, Keys.ENTER, "Some text", Keys.ENTER);
+        editor.getRichTextArea().sendKeys(Keys.RIGHT, Keys.ENTER, "Some text", Keys.ENTER);
 
         imageDialogSelectModal = editor.getToolBar().insertImage();
         imageDialogSelectModal.switchToTreeTab().selectAttachment(attachmentReference);
@@ -321,7 +321,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.
@@ -337,7 +337,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
 
         // Edit again to set the caption a second time.
@@ -353,7 +353,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
     }
 
@@ -456,7 +456,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
         // Test that when re-editing the image, the link, caption and alignment are still set.
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
@@ -486,7 +486,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -634,11 +634,10 @@ class ImageIT extends AbstractCKEditorIT
         createAndLoginStandardUser(setup);
         // Create a child page.
         DocumentReference otherPage = new DocumentReference("attachmentOtherPage",
-                        testReference.getLastSpaceReference());
+            testReference.getLastSpaceReference());
         
         // Attach an image named "otherImage.gif" to the other page.
         String otherAttachmentName = "otherImage.gif";
-        AttachmentReference attachmentReference = new AttachmentReference(otherAttachmentName, otherPage);
         uploadAttachment(setup, otherPage, otherAttachmentName);
         
         String attachmentName = "image.gif";
@@ -817,6 +816,7 @@ class ImageIT extends AbstractCKEditorIT
         CKEditor editor = new CKEditor("content").waitToLoad();
 
         RichTextAreaElement richTextArea = editor.getRichTextArea();
+        richTextArea.clear();
         richTextArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
         richTextArea.verifyContent(content -> {
             content.getImages().get(0).click();
@@ -830,7 +830,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("a [[image:" + imageURL + "||height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
+        assertEquals("a [[image:" + imageURL + "||alt=\"Test alt\" height=\"100\" width=\"100\"]] b", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -862,6 +862,46 @@ class ImageIT extends AbstractCKEditorIT
             + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(20)
+    void editImageWithDataWidgetAttribute(TestUtils setup, TestReference testReference)
+    {
+        setup.loginAsSuperAdmin();
+        ViewPage page = setup.createPage(testReference, "[[image:image.gif||data-widget='uploadimage']]");
+        WYSIWYGEditPage wysiwygEditPage = page.editWYSIWYG();
+        CKEditor editor = new CKEditor("content").waitToLoad();
+        // Make sure the image can be clicked as a proof that the editor did not crash.
+        editor.executeOnEditedContent(() -> setup.getDriver().findElement(By.cssSelector("img")).click());
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+        assertEquals("[[image:image.gif]]", savedPage.editWiki().getContent());
+    }
+
+    @Test
+    @Order(21)
+    void editLegacyCenteredImageWithLink(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Run the tests as a normal user. We make the user advanced only to enable the Edit drop down menu.
+        createAndLoginStandardUser(setup);
+
+        // Upload an attachment to test with.
+        String attachmentName = "image.gif";
+        ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
+
+        WikiEditPage wikiEditPage = newPage.editWiki();
+        wikiEditPage.setContent("(% style='text-align: center' %)\n"
+            + "[[~[~[image:image.gif~]~]>>Target.Page]]");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+
+        // Move to the WYSIWYG edition page.
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+        new CKEditor("content").waitToLoad();
+
+        ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
+
+        assertEquals("[[~[~[image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]>>Target.Page]]",
+            savedPage.editWiki().getContent());
+    }
+
     /**
      * Initialize a page with some content and an image. Then, copy its displayed content in the clipboard.
      *
@@ -875,7 +915,7 @@ class ImageIT extends AbstractCKEditorIT
         wikiEditPage.sendKeys("{{html clean='false'}}\n"
             + "<div contenteditable=\"true\" id=\"copyme\">\n"
             + "  <p>\n"
-            + "    a <img src=\"" + imageURL + "\" > b\n"
+            + "    a <img src=\"" + imageURL + "\" alt=\"Test alt\"> b\n"
             + "  </p>\n"
             + "</div>\n"
             + "{{/html}}");

@@ -161,6 +161,8 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     @Override
+    // The token is generated and not user-controlled
+    @SuppressWarnings("javasecurity:S5145")
     public boolean isTokenValid(String token)
     {
         if (!this.configuration.isEnabled()) {

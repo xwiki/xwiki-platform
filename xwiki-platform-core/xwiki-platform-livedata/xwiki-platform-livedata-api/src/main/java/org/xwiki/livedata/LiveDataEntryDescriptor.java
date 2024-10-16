@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LiveDataEntryDescriptor
+public class LiveDataEntryDescriptor implements InitializableLiveDataElement
 {
     private String idProperty;
 
@@ -48,12 +48,5 @@ public class LiveDataEntryDescriptor
     public void setIdProperty(String idProperty)
     {
         this.idProperty = idProperty;
-    }
-
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
-    public void initialize()
-    {
     }
 }

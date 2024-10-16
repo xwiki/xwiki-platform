@@ -29,23 +29,27 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
 import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.flamingo.skin.test.po.JobQuestionPane;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.DocumentPicker;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.RenamePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -65,13 +69,6 @@ class RenamePageIT
         setup.loginAsSuperAdmin();
     }
 
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
-    }
-
     @Order(1)
     @Test
     void convertNestedPageToTerminalPage(TestUtils setup, TestConfiguration testConfiguration) throws Exception
@@ -88,7 +85,7 @@ class RenamePageIT
         ViewPage vp = setup.createPage(reference, "", "");
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.3.WebHome and check the Terminal checkbox. We also need to uncheck the
         // Auto Redirect checkbox so the page 1.2.3.WebHome will not appear as existing after the Rename operation.
@@ -126,7 +123,7 @@ class RenamePageIT
         ViewPage vp = new ViewPage();
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Go to the Rename page view for 1.2.WebHome.
         RenamePage renamePage = vp.rename();
@@ -397,7 +394,7 @@ class RenamePageIT
             String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 1
         ViewPage viewPage = setup.gotoPage(sourcePageReference1);
@@ -414,7 +411,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 2
         viewPage = setup.gotoPage(sourcePageReference2);
@@ -431,7 +428,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 3
         viewPage = setup.gotoPage(sourcePageReference3);
@@ -448,7 +445,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 4
         viewPage = setup.gotoPage(sourcePageReference4);
@@ -465,7 +462,7 @@ class RenamePageIT
             wikiEditPage.getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // rename link 5
         viewPage = setup.gotoPage(sourcePageReference5);
@@ -501,7 +498,7 @@ class RenamePageIT
         assertEquals("[[OtherPage]]", setup.rest().<Page>get(reference).getContent());
 
         // Wait for the solr indexing to be completed before doing any rename
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Rename the page
         ViewPage vp = setup.gotoPage(reference);
@@ -518,6 +515,157 @@ class RenamePageIT
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
         assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+    }
 
+    @Order(6)
+    @Test
+    void renamePageWithObjectAndAttachmentsPreserveHistory(TestUtils testUtils, TestReference testReference)
+        throws Exception
+    {
+        testUtils.rest().savePage(testReference, "Content 0", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3", "Title");
+        testUtils.rest().savePage(testReference, "Content 0 1 2 3 4", "Title");
+        // add attachment
+        AttachmentReference attachmentReference = new AttachmentReference("file.txt", testReference);
+        testUtils.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        //add object
+        Object styleSheetObject = testUtils.rest().object(testReference, "XWiki.StyleSheetExtension");
+        styleSheetObject.getProperties().add(testUtils.rest().property("title", "a ssx"));
+        testUtils.rest().add(styleSheetObject);
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.1", historyPane.getCurrentVersion());
+
+        RenamePage rename = viewPage.rename();
+        rename.getDocumentPicker().setTitle("Another Title");
+        CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+        viewPage = statusPage.gotoNewPage();
+        historyPane = viewPage.openHistoryDocExtraPane();
+        assertEquals(7, historyPane.getNumberOfVersions());
+        assertEquals("7.2", historyPane.getCurrentVersion());
+        assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
+    }
+
+    @Order(7)
+    @Test
+    void renamePageWithRedirectAndBack(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String sourceName = "Source";
+        String targetName = "Target";
+
+        DocumentReference sourceReference =
+            new DocumentReference("WebHome", new SpaceReference(sourceName, testReference.getLastSpaceReference()));
+        DocumentReference targetReference =
+            new DocumentReference("WebHome", new SpaceReference(targetName, testReference.getLastSpaceReference()));
+
+        // Clean-up: delete the pages that will be used in this test
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(targetReference);
+
+        // Create the needed page
+        setup.rest().savePage(sourceReference, "source", sourceName);
+
+        // Rename source to target with redirect
+        ViewPage vp = setup.gotoPage(sourceReference);
+        RenamePage renamePage = vp.rename();
+        renamePage.setAutoRedirect(true);
+        renamePage.getDocumentPicker().setTitle(targetName);
+        CopyOrRenameOrDeleteStatusPage renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        assertTrue(setup.rest().exists(sourceReference));
+        assertTrue(setup.rest().exists(targetReference));
+
+        // Make sure the redirect is in place
+        vp = setup.gotoPage(sourceReference);
+        assertEquals(setup.serializeReference(targetReference), vp.getMetaDataValue("reference"));
+
+        // Rename back target to source
+        renamePage = vp.rename();
+        renamePage.getDocumentPicker().setTitle(sourceName);
+        renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+        assertTrue(setup.rest().exists(sourceReference));
+        assertFalse(setup.rest().exists(targetReference));
+
+        // Make sure the source is back to normal
+        vp = setup.gotoPage(sourceReference);
+        assertEquals(setup.serializeReference(sourceReference), vp.getMetaDataValue("reference"));
+    }
+
+    @Order(8)
+    @ParameterizedTest
+    @ValueSource(strings = { "true", "false" })
+    @NullSource
+    void renameWithIndexingWaiting(String strategy, TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // Create two pages that link to each other.
+        SpaceReference spaceReference = testReference.getLastSpaceReference();
+        SpaceReference sourceSpace = new SpaceReference("Source", spaceReference);
+        SpaceReference targetSpace = new SpaceReference("Target", spaceReference);
+        DocumentReference sourceReference = new DocumentReference("WebHome", sourceSpace);
+        DocumentReference targetReference = new DocumentReference("WebHome", targetSpace);
+
+        SpaceReference otherSpace = new SpaceReference("Other", spaceReference);
+        DocumentReference otherReference = new DocumentReference("WebHome", otherSpace);
+
+        setup.rest().delete(sourceReference);
+        setup.rest().delete(targetReference);
+        setup.rest().delete(otherReference);
+
+        // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
+        // won't be updated just because the page is still in the index.
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
+
+        // Make the other page slow to index by sleeping when we're in Solr.
+        String slowTitle = "$services.sleep.sleepInSolr(20) Slow Title";
+
+        setup.rest().savePage(sourceReference,
+            "Source, see [[%s]].".formatted(setup.serializeLocalReference(otherReference)), "Source");
+        String otherFormat = "Other, see [[%s]]";
+        String otherContent = otherFormat.formatted(setup.serializeLocalReference(sourceReference));
+        setup.rest().savePage(otherReference, otherContent, slowTitle);
+
+        ViewPage viewPage = setup.gotoPage(sourceReference);
+        RenamePage renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setTitle("Target");
+        CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton();
+
+        int currentTimeout = setup.getDriver().getTimeout();
+        try {
+            // Increase the timeout as the question pane will only appear after 10 seconds and then we need to wait
+            // possibly for another 10 seconds until indexing finished.
+            setup.getDriver().setTimeout(20);
+            JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
+            assertEquals("Continue waiting for the link indexing to finish?", jobQuestionPane.getQuestionTitle());
+            if (strategy != null) {
+                jobQuestionPane.clickButton("qproperty_continueWaiting", strategy);
+            }
+            statusPage.waitUntilFinished();
+
+            assertEquals("Done.", statusPage.getInfoMessage());
+            assertTrue(setup.rest().exists(targetReference));
+            assertFalse(setup.rest().exists(sourceReference));
+
+            String updatedOtherContent = setup.gotoPage(otherReference).editWiki().getContent();
+            if ("false".equals(strategy)) {
+                // Make sure the other page hasn't been changed.
+                assertEquals(otherContent, updatedOtherContent);
+            } else {
+                // Both when the question isn't answered and when the continue waiting button is clicked, the other page
+                // should be updated.
+                assertEquals(otherFormat.formatted(setup.serializeLocalReference(targetReference)),
+                    updatedOtherContent);
+            }
+        } finally {
+            setup.getDriver().setTimeout(currentTimeout);
+            // Make sure we delete that strange page again.
+            setup.rest().delete(otherReference);
+        }
     }
 }

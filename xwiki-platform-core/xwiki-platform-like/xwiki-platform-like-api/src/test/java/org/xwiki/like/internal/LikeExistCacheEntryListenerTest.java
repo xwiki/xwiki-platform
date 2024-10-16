@@ -38,13 +38,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
- * Tests for {@link org.xwiki.like.internal.DefaultLikeManager.LikeExistCacheEntryListener}.
+ * Tests for {@link org.xwiki.like.internal.LikeManagerCacheHelper.LikeExistCacheEntryListener}.
  *
  * @version $Id$
  */
 public class LikeExistCacheEntryListenerTest
 {
-    private DefaultLikeManager.LikeExistCacheEntryListener cacheEntryListener;
+    private LikeManagerCacheHelper.LikeExistCacheEntryListener cacheEntryListener;
 
     class TestCacheEntryEvent<T> implements CacheEntryEvent<T>
     {
@@ -91,7 +91,7 @@ public class LikeExistCacheEntryListenerTest
     @BeforeEach
     void setup()
     {
-        cacheEntryListener = new DefaultLikeManager.LikeExistCacheEntryListener();
+        cacheEntryListener = new LikeManagerCacheHelper.LikeExistCacheEntryListener();
     }
 
     @Test

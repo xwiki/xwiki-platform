@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Enables and configures the Jetty server.
@@ -36,7 +36,6 @@ bytebufferpool
 logging
 
 [lib]
-lib/jetty-servlet-api-4.0.*.jar
 lib/jetty-http-${jetty.version}.jar
 lib/jetty-server-${jetty.version}.jar
 lib/jetty-xml-${jetty.version}.jar
@@ -86,7 +85,7 @@ etc/jetty.xml
 # jetty.httpConfig.maxErrorDispatches=10
 
 ## Relative Redirect Locations allowed
-# jetty.httpConfig.relativeRedirectAllowed=false
+# jetty.httpConfig.relativeRedirectAllowed=true
 
 ## Whether to use direct ByteBuffers for reading or writing
 # jetty.httpConfig.useInputDirectByteBuffers=true
@@ -107,9 +106,6 @@ etc/jetty.xml
 # jetty.httpConfig.responseCookieCompliance=RFC6265
 # end::documentation-server-compliance[]
 
-## multipart/form-data compliance mode of: LEGACY(slow), RFC7578(fast)
-# jetty.httpConfig.multiPartFormDataCompliance=RFC7578
-
 # tag::documentation-server-config[]
 ### Server configuration
 ## Whether ctrl+c on the console gracefully stops the Jetty server
@@ -120,6 +116,9 @@ etc/jetty.xml
 
 ## Dump the state of the Jetty server, components, and webapps after startup
 # jetty.server.dumpAfterStart=false
+
+## The temporary directory used by the Jetty server and as a root for its contexts
+# jetty.server.tempDirectory=
 
 ## Dump the state of the Jetty server, components, and webapps before shutdown
 # jetty.server.dumpBeforeStop=false
@@ -136,3 +135,13 @@ etc/jetty.xml
 ## The number of server scheduler threads.
 # jetty.scheduler.threads=1
 # end::documentation-scheduler-config[]
+
+## Whether the handlers of the ContextHandlerCollection can be updated once the server is started
+## If set to false, then <env>-deploy module jetty.deploy.scanInterval should also be set to 0.
+# jetty.server.contexts.dynamic=true
+
+## Should the DefaultHandler serve the jetty favicon.ico from the root.
+# jetty.server.default.serveFavIcon=true
+
+## Should the DefaultHandler show a list of known contexts in a root 404 response.
+# jetty.server.default.showContexts=true

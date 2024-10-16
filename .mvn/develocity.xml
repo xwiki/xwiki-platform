@@ -40,24 +40,24 @@
   </buildScan>
   <buildCache>
     <!-- Notes:
-     * To disable the local build cache on the command line, pass: -Dgradle.cache.local.enabled=false
+     * To disable the local build cache on the command line, pass: -Ddevelocity.cache.local.enabled=false
      * We disable the local build cache on CI since our agents are transients and isolated, and thus it would cost
        more to save the goal outputs since they're not going to be re-used.
     -->
     <local>
-      <enabled><![CDATA[env['CI'] == null]]></enabled>
+      <enabled>#{env['CI'] == null}</enabled>
     </local>
     <remote>
       <!-- Notes:
-       * To disable the remote build cache on the command line, pass: -Dgradle.cache.remote.enabled=false
+       * To disable the remote build cache on the command line, pass: -Ddevelocity.cache.remote.enabled=false
       -->
       <enabled>true</enabled>
       <!-- Only CI jobs are allowed to store build outputs in the remote cache -->
-      <storeEnabled><![CDATA[isTrue(env['CI']) and isTrue(env['GRADLE_ENTERPRISE_ACCESS_KEY'])]]></storeEnabled>
+      <storeEnabled>#{env['CI'] != null}</storeEnabled>
       <server>
-        <!-- Note: Remote cache authentication is handled in the Maven settings.xml file. The id below is the one
-       found in settings.xml -->
-        <id>gradleEnterpriseCache</id>
+        <!-- Note: Remote cache authentication is handled in the .m2/.develocity/keys.properties file and not
+             anymore in the Maven settings.xml file -->
+        <id>develocityCache</id>
         <!-- We override the default built-in node to use a EU node closer to our CI to reduce the cache lag (and thus
              to make caching more beneficial vs rebuilding) -->
         <url>https://eu-build-cache-ge.xwiki.org/cache/</url>

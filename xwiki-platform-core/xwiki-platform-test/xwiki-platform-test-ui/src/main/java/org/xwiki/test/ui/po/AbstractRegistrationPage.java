@@ -109,7 +109,7 @@ public abstract class AbstractRegistrationPage extends BasePage
       */
     public WebElement getErrorMessage(String message)
     {
-        return getDriver().findElementWithoutWaiting(By.xpath("//div[@class = 'errormessage']"));
+        return getDriver().findElementWithoutWaiting(By.xpath("//div[@class = 'box errormessage']"));
     }
 
     /** @return Is the specified message included in the list of validation failure messages. */
@@ -124,7 +124,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     public boolean errorMessageInclude(String message)
     {
         return !getDriver().findElementsWithoutWaiting(
-                By.xpath("//div[@class = 'errormessage' and . = '" + message + "']"))
+                By.xpath("//div[@class = 'box errormessage' and . = '" + message + "']"))
             .isEmpty();
     }
 

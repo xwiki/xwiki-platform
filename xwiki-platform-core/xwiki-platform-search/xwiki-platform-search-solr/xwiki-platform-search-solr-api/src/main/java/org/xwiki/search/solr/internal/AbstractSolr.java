@@ -162,9 +162,6 @@ public abstract class AbstractSolr implements Solr, Disposable
                 XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion, false);
 
                 if (previousCore != null) {
-                    this.logger.info("Migrating Solr core [{}] to [{}]", previousCore.getSolrName(),
-                        newCore.getSolrName());
-
                     // Copy the previous core
                     initializer.migrate(previousCore, newCore);
 

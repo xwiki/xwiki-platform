@@ -72,6 +72,7 @@ notifications.filters.preferences.scopeNotificationFilter.name=Benachrichtigungs
 notifications.filters.preferences.scopeNotificationFilter.page=Nur Seite
 notifications.filters.preferences.scopeNotificationFilter.space=Seite und Unterseiten
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.user=Benutzer
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einstellungen aktivieren, wenn Sie diese Seiten abonnieren möchten
@@ -92,22 +93,23 @@ notifications.settings.filters.preferences.system.title=Systemfilter
 notifications.settings.filters.preferences.system.hint=Systemfilter, die Sie umschalten können, um eine genauere Kontrolle über die Benachrichtigungen zu haben, die Sie erhalten möchten.
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.system.table.name=Name
+notifications.settings.filters.preferences.system.table.filterDescription=Beschreibung
 notifications.settings.filters.preferences.system.table.filterType=Beschreibung
 notifications.settings.filters.preferences.system.table.notificationFormats=Formate
 notifications.settings.filters.preferences.system.table.isEnabled=Aktiviert?
-notifications.settings.filters.preferences.system.table.description=Hier werden alle Systemfilter dieses Wikis angezeigt.
 
 ## Custom Filter preferences settings
 notifications.settings.filters.preferences.custom.title=Benutzerdefinierte Filter
 notifications.settings.filters.preferences.custom.hint=Erstellen Sie Filter, um die Benachrichtigungen zu steuern, die Sie erhalten möchten.
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.custom.table.name=Ort
+notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+notifications.settings.filters.preferences.custom.table.scope=Geltungsbereich
+notifications.settings.filters.preferences.custom.table.location=Ort
 notifications.settings.filters.preferences.custom.table.filterType=Filteraktion
 notifications.settings.filters.preferences.custom.table.eventTypes=Events
 notifications.settings.filters.preferences.custom.table.notificationFormats=Formate
 notifications.settings.filters.preferences.custom.table.isEnabled=Aktiviert?
 notifications.settings.filters.preferences.custom.table._actions=Aktionen
-notifications.settings.filters.preferences.custom.table.description=Hier werden alle selbst erstellten Filter dieses Nutzenden oder Wikis angezeigt.
 notifications.filters.type.custom.inclusive=Für dieses Event benachrichtigen
 notifications.filters.type.custom.exclusive=Das Event ignorieren
 notifications.settings.addFilter=Filter hinzufügen
@@ -227,9 +229,57 @@ notifications.switches.tooltip.space=Die übergeordnete Seite und deren Untersei
 notifications.switches.tooltip.wiki=Dieses Wiki abonnieren
 notifications.switches.changeStatusError=Fehler beim Ändern des Status der Benachrichtigungen.
 
-## Used to indicate where deprecated keys start
-#@deprecatedstart
+## Watch button and modal
 
+notifications.watch.button.title=Aktuelle Benachrichtigungseinstellung für diese Seite: {0} - Klicke, um sie zu ändern
+notifications.watch.button.status.notset=Nicht eingestellt
+notifications.watch.button.status.followed=Gefolgt
+notifications.watch.button.status.blocked=Blockiert
+notifications.watch.button.status.custom=Benutzerdefiniert
+notifications.watch.modal.title=Benachrichtigungseinstellungen für diese Seite
+notifications.watch.modal.description.options=Du kannst die aktuellen Benachrichtigungseinstellungen mit den folgenden Optionen ändern 
+notifications.watch.modal.description.ancestoroption=Du kannst entweder zu {0} gehen und die Benachrichtigungseinstellungen dort ändern oder die Einstellungen direkt auf der aktuellen Seite mit den folgenden Optionen anwenden: 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Seite gefolgt
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite: Du erhältst dafür Benachrichtigungen.
+notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Seite durch übergeordnete Seite gefolgt
+notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite über eine übergeordnetes Seite in der Hierarchie: Du erhältst Benachrichtigungen für sie.
+notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Seite und untergeordnete Seiten gefolgt
+notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Du folgst dieser Seite und ihren untergeordneten Seiten: Du erhältst dafür Benachrichtigungen.
+notifications.watch.modal.title.NOT_SET=Keine Beobachtung eingestellt
+notifications.watch.modal.description.NOT_SET=Du hast noch keine Einstellungen für die Beobachtung dieser Seite vorgenommen und folgst ihr daher nicht: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Seite blockiert
+notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Seite durch übergeordnete Seite geblockt
+notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite durch eine übergeordnete Seite in der Hierarchie: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Seite und untergeordnete Seiten geblockt
+notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Du ignorierst diese Seite und ihre untergeordneten Seiten: Du erhältst keine Benachrichtigungen für sie.
+notifications.watch.modal.title.CUSTOM=Benutzerdefinierte Einstellungen zur Seitenbeobachtung
+notifications.watch.modal.description.CUSTOM=Du verwendest benutzerdefinierte Benachrichtigungseinstellungen für diese Seite: Möglicherweise folgst Du bestimmten Ereignissen auf der Seite oder blockierst sie, oder Du wählst nur bestimmte Kanäle für die Benachrichtigungen aus. Wir laden Dich ein, Deine Benachrichtigungseinstellungen in Deinem Profil zu überprüfen.
+notifications.watch.modal.option.watchpage.title=Seite folgen
+notifications.watch.modal.option.watchpage.hint=Du wirst nur für diese Seite benachrichtigt.
+notifications.watch.modal.option.watchspace.title=Aktueller Seite und ihren Unterseiten folgen
+notifications.watch.modal.option.watchspace.hint=Du erhältst Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.watchwiki.title=Ganzem Wiki folgen
+notifications.watch.modal.option.watchwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du erhältst Benachrichtigungen für jede Seite des Wikis.
+notifications.watch.modal.option.blockpage.title=Seite blocken
+notifications.watch.modal.option.blockpage.hint=Du blockierst alle Benachrichtigungen ausschließlich für diese Seite.
+notifications.watch.modal.option.blockspace.title=Aktuelle Seite und ihre Unterseiten blockieren
+notifications.watch.modal.option.blockspace.hint=Du blockierst alle Benachrichtigungen für diese Seite und alle ihre Unterseiten.
+notifications.watch.modal.option.unwatchpage.title=Aktueller Seite nicht mehr folgen
+notifications.watch.modal.option.unwatchpage.hint=Du beendest den Erhalt von Benachrichtigungen ausschließlich für diese Seite.
+notifications.watch.modal.option.unwatchspace.title=Aktueller Seite und ihre Unterseiten nicht folgen
+notifications.watch.modal.option.unwatchspace.hint=Du beendest den Empfang von Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.unwatchwiki.title=Gesamtem Wiki nicht folgen
+notifications.watch.modal.option.unwatchwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du erhältst dann keine Benachrichtigungen mehr für jede Seite im Wiki.
+notifications.watch.modal.option.unblockpage.title=Aktuelle Seite entblocken
+notifications.watch.modal.option.unblockpage.hint=Du wirst nur für diese Seite benachrichtigt.
+notifications.watch.modal.option.unblockspace.title=Aktuelle Seite und ihre Unterseiten entblocken
+notifications.watch.modal.option.unblockspace.hint=Du erhältst Benachrichtigungen für diese Seite und ihre Unterseiten.
+notifications.watch.modal.option.unblockwiki.title=Gesamtes Wiki entblocken
+notifications.watch.modal.option.unblockwiki.hint=Diese Option wirkt sich nicht nur auf die aktuelle Seite oder den aktuellen Bereich aus: Du hörst auf, Benachrichtigungen für jede Seite im Wiki zu ignorieren.
+notifications.watch.modal.close=Schließen ohne Speichern
+notifications.watch.modal.savechanges=Änderungen speichern
+notifications.watch.modal.gotosettings=Verwalte alle Einstellungen für Benachrichtigungen
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Filter
@@ -255,6 +305,10 @@ notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) so
 ## Filter Types
 notifications.filters.type.inclusive=Eingeschlossen
 notifications.filters.type.exclusive=Ausgeschlossen
+notifications.settings.filters.preferences.custom.table.description=Hier werden alle selbst erstellten Filter dieses Nutzenden oder Wikis angezeigt.
+notifications.settings.filters.preferences.system.table.description=Hier werden alle Systemfilter dieses Wikis angezeigt.
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.custom.table.name=Ort
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -75,7 +75,7 @@
     }
   ],
   'paths': {
-    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'bootstrap': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-bootstrap', ""js/xwiki-bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
@@ -264,17 +264,8 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
   #set($searchSuggestConfigDocument = $xwiki.getDocument('XWiki.SearchSuggestConfig'))
   #set($searchSuggestConfigObject = $searchSuggestConfigDocument.getObject('XWiki.SearchSuggestConfig'))
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
-    #set($searchSuggestConfigHash = '')
-    #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if($source.getValue('activated') == 1)
-        #set($sourceId = "${source.getValue('name')}:${source.getValue('url')}:${source.getValue('highlight')}:${source.getValue('icon')}}")
-        #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
-      #end
-    #end
-    <script src="${services.webjars.url(
-      'org.xwiki.platform:xwiki-platform-search-webjar',
-      'searchSuggest' + $jsExtension,
-      {'evaluate': true, 'h': $searchSuggestConfigHash.hashCode()})}" defer="defer"></script>##
+    <script src="${services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar',
+      'searchSuggest' + $jsExtension)}" defer="defer"></script>##
     $xwiki.linkx.use(
       $services.webjars.url('org.xwiki.platform:xwiki-platform-search-webjar', 'searchSuggest.min.css', {'evaluate': true}),
       {'type': 'text/css', 'rel': 'stylesheet'})##

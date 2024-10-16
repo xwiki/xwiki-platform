@@ -176,6 +176,9 @@ class EditTranslationIT
         // Make sure three locales are listed for this page in the UI
         assertEquals(new HashSet<>(Arrays.asList(Locale.ROOT, Locale.ENGLISH, Locale.FRENCH)), new HashSet<>(viewPage.getLocales()));
 
+        // Switch to en by switching language in the Drawer to test the feature
+        viewPage.clickLocale(Locale.ENGLISH);
+
         // Verify edit mode informations in edit page
         setup.gotoPage(referenceDEFAULT, "edit", "language=");
         editPage = new WikiEditPage();

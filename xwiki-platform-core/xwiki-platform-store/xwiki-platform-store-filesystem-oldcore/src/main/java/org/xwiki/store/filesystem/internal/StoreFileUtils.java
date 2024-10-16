@@ -19,6 +19,12 @@
  */
 package org.xwiki.store.filesystem.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.FileUtils;
+
 /**
  * Internal class for providing static utilities used by multiple classes in this package.
  *
@@ -62,5 +68,61 @@ public final class StoreFileUtils
         }
 
         return storedFileNameBuilder.toString();
+    }
+
+    /**
+     * A helper which return either the file if it exist or the linked file if there is a link instead.
+     * 
+     * @param targetFile the target file
+     * @param followLinks true if links should be followed
+     * @return the resolved file
+     * @throws IOException when failing to resolve the link
+     * @since 16.4.0RC1
+     */
+    public static File resolve(File targetFile, boolean followLinks) throws IOException
+    {
+        // Return the target file by default
+        File file = targetFile;
+
+        while (!file.exists()) {
+            // If the file does not exist, check if there is a link instead
+            File linkFile = getLinkFile(file);
+
+            if (linkFile.exists()) {
+                if (followLinks) {
+                    // Move the target file to the link's target file
+                    file = new File(linkFile.getParent(), FileUtils.readFileToString(linkFile, StandardCharsets.UTF_8));
+                } else {
+                    // Stop at the link file if we don't follow it
+                    file = linkFile;
+                }
+            } else {
+                // Stop the loop since no file or link could be found
+                break;
+            }
+        }
+
+        return file;
+    }
+
+    /**
+     * @param originalfile the location for which to create a link
+     * @return the File representing the link for the passed location
+     * @since 16.4.0RC1
+     */
+    public static File getLinkFile(File originalfile)
+    {
+        return new File(originalfile.getParent(), originalfile.getName() + ".lnk");
+    }
+
+    /**
+     * @param folder the folder where the link is located
+     * @param targetFile the target file
+     * @return the content of the link file
+     * @since 16.4.0RC1
+     */
+    public static String getLinkContent(File folder, File targetFile)
+    {
+        return folder.toPath().relativize(targetFile.toPath()).toString();
     }
 }

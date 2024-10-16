@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wysiwyg-patches', [
-  'xwiki-realtime-wysiwyg-filters',
   'xwiki-realtime-wysiwyg-transformers',
   'hyper-json',
   'diff-dom',
@@ -26,7 +25,7 @@ define('xwiki-realtime-wysiwyg-patches', [
   'chainpad',
 ], function (
   /* jshint maxparams:false */
-  Filters, Transformers, HyperJSON, DiffDOM, JSONSortify, ChainPad
+  Transformers, HyperJSON, DiffDOM, JSONSortify, ChainPad
 ) {
   'use strict';
 
@@ -41,36 +40,54 @@ define('xwiki-realtime-wysiwyg-patches', [
     constructor(editor) {
       this._editor = editor;
       this._diffDOM = this._createDiffDOM();
-      this._filters = new Filters();
+      this._filters = [
+        change => {
+          // Reject any change made directly to the root node (i.e. the editor content wrapper) because it may break the
+          // editor (e.g. it may remove attributes or listeners required by the editor). Only its descendants are
+          // allowed to be modified.
+          if (change.node === this._editor.getContentWrapper() &&
+              // Allow actions where change.node is actually the parent node where the chaange takes place.
+              !['addElement', 'addTextElement', 'relocateGroup'].includes(change.diff.action)) {
+            return true;
+          }
+        },
+        ...this._editor.getFilters()
+      ];
     }
 
     _createDiffDOM() {
       const diffDOM = new DiffDOM.DiffDOM({
+        // We need fine grained diff (at attribute level) even for large content, in order to be able to properly patch
+        // widgets (images, rendering macro calls).
+        maxChildCount: false,
+
+        // Form fields can appear normally only in the output of a rendering macro, which is ignored when computing the
+        // changes (because macro output can depend on the current user).
+        valueDiffing: false,
+
         preDiffApply: (change) => {
-          // Reject any change made directly to the root node (i.e. the editor content wrapper) because it may break the
-          // editor (e.g. it may remove attributes or listeners required by the editor). Only its descendants are
-          // allowed to be modified. Note that the root node shouldn't have any changes normally because we restore it
-          // in _restoreRootNode() before computing the changes, but we've seen cases where an (aria) attribute is added
-          // just after.
-          if (change.node === this._editor.getContentWrapper()) {
+          if (this._filters.some(filter => filter(change))) {
             return true;
           }
 
-          if (['replaceElement', 'removeElement', 'removeTextElement'].includes(change.diff.action)) {
-            diffDOM._updatedNodes.add(change.node.parentNode);
-          } else if (['addAttribute', 'modifyAttribute', 'removeAttribute', 'modifyTextElement', 'modifyValue',
-              'modifyComment', 'modifyChecked', 'modifySelected', 'relocateGroup'].includes(change.diff.action)) {
+          // addAttribute, modifyAttribute, removeAttribute: node is the owner element
+          // modifyTextElement, modifyComment: node is the modified text or comment node
+          // relocateGroup: node is the parent of the moved nodes
+          // replaceElement, removeElement, removeTextElement: node is going to be removed
+          if (['addAttribute', 'modifyAttribute', 'removeAttribute', 'modifyTextElement', 'modifyComment',
+              'relocateGroup', 'replaceElement', 'removeElement', 'removeTextElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.node);
           }
         },
 
         postDiffApply: (change) => {
-          if (change.diff.action === 'addElement' && !change.newNode) {
-            // Unfortunately DiffDOM doesn't set the new node when an element is added so we have to find it ourselves.
+          if (!change.newNode && ['addElement', 'replaceElement'].includes(change.diff.action)) {
+            // Unfortunately DiffDOM doesn't set the new node when an element is added or replaced so we have to find it
+            // ourselves.
             change.newNode = this._getFromRoute(change.diff.route);
           }
 
-          if (['addTextElement', 'addElement'].includes(change.diff.action)) {
+          if (['addTextElement', 'addElement', 'replaceElement'].includes(change.diff.action)) {
             diffDOM._updatedNodes.add(change.newNode);
           }
         }
@@ -109,83 +126,29 @@ define('xwiki-realtime-wysiwyg-patches', [
     }
 
     /**
-     * @param {Node} node the DOM node to serialize as HyperJSON
-     * @param {boolean} raw whether to filter the editor content or not before serializing it to HyperJSON;
-     *   {@code true} to serialize the raw (unfiltered) content, {@code false} to serialize the filtered (normalized)
-     *   content
-     * @returns {string} the serialization of the given DOM node as HyperJSON
+     * @returns {string} the HyperJSON serialization of the synchronized editor content
      */
-    _stringifyNode(node, raw) {
-      const predicate = !raw && this._filters.shouldSerializeNode.bind(this._filters);
-      const filter = !raw && this._filters.filterHyperJSON.bind(this._filters);
-      const hyperJSON = HyperJSON.fromDOM(node, predicate, filter);
-
-      // The root node depends on the type of editor. For the classical iframe-based editor the root node is the BODY.
-      // For the in-place editor the root node may be a DIV. We have to normalize the root node in order to be able to
-      // synchronize the content between different types of editors. Basically the root node itself is not synchronized,
-      // only its descendants are.
-      hyperJSON[0] = 'xwiki-content';
-      // Ignore all root attributes because they normally store user preferences that shouldn't be shared. Note that
-      // when we apply a remote change we make sure to not overwrite (remove all) the root node attributes.
-      hyperJSON[1] = {};
-
+    getHyperJSON() {
+      const html = this._editor.getOutputHTML();
+      let contentWrapper = this._parseHTML(html);
+      // HyperJSON doesn't support comments, so we have to convert them to custom HTML elements.
+      contentWrapper = this._protectComments(contentWrapper);
+      const hyperJSON = HyperJSON.fromDOM(contentWrapper);
       return JSONSortify(hyperJSON);
-    }
-
-    /**
-     * @param {boolean} raw whether to filter the editor content or not before serializing it to HyperJSON;
-     *   {@code true} to serialize the raw (unfiltered) content, {@code false} to serialize the filtered (normalized)
-     *   content
-     * @returns {string} the serialization of the editor content as HyperJSON
-     */
-    getHyperJSON(raw) {
-      if (raw) {
-        // The raw content is used to determine the local changes that need to be rebased on top of the received remote
-        // changes. Includes dynamic content, such as macro output.
-        return this._stringifyNode(this._editor.getContentWrapper(), true);
-      } else {
-        // The filtered content is synchronized with the other editors. Includes only the content that is normally sent
-        // to the server to be converted to wiki syntax.
-        return this._convertHTMLToHyperJSON(this._editor.getOutputHTML());
-      }
     }
 
     /**
      * Update the editor content without affecting its caret / selection.
      * 
-     * @param {string} remoteFilteredHyperJSON the new normalized (filtered) content (usually the result of a remote
-     *   change), serialized as HyperJSON
-     *
+     * @param {string} remoteHyperJSON the new content (usually the result of a remote change), serialized as HyperJSON
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
-    async setHyperJSON(remoteFilteredHyperJSON, propagate) {
-      let remoteHyperJSON;
-      try {
-        remoteHyperJSON = this._revertHyperJSONFilters(remoteFilteredHyperJSON);
-      } catch (e) {
-        console.warn('Failed to revert the HyperJSON filters.', {
-          filteredHyperJSON: remoteFilteredHyperJSON,
-          error: e
-        });
-        remoteHyperJSON = remoteFilteredHyperJSON;
-      }
-
-      let newContent;
-      try {
-        remoteHyperJSON = JSON.parse(remoteHyperJSON);
-        newContent = HyperJSON.toDOM(this._restoreRootNode(remoteHyperJSON));
-      } catch (e) {
-        console.error('Failed to parse the HyperJSON string.', {
-          filteredHyperJSON: remoteFilteredHyperJSON,
-          rawHyperJSON: remoteHyperJSON,
-          error: e
-        });
-        return;
-      }
-
-      // Content update is asynchronous because it requires server-side rendering sometimes (e.g. when macro parameters
-      // have changed).
-      await this._updateContent(newContent, propagate);
+    async setHyperJSON(remoteHyperJSON, propagate) {
+      let contentWrapper = this._hyperJSONToDOM(remoteHyperJSON);
+      // HyperJSON doesn't support comments, so we had to convert them to custom HTML elements. Let's restore them.
+      contentWrapper = this._restoreComments(contentWrapper);
+      const inputHTML = contentWrapper.innerHTML;
+      await this.setHTML(inputHTML, propagate);
     }
 
     /**
@@ -195,143 +158,179 @@ define('xwiki-realtime-wysiwyg-patches', [
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
     async setHTML(html, propagate) {
-      // We convert to HyperJSON and set the HyperJSON so that we can use the same filters
-      // as when receiving content from coeditors.
-      const hjson = this._convertHTMLToHyperJSON(html);
-      await this.setHyperJSON(hjson, propagate);
+      const contentWrapper = this._editor.parseInputHTML(html);
+      // Content update is asynchronous because it requires server-side rendering sometimes (e.g. when macro parameters
+      // have changed).
+      await this._updateContent(contentWrapper, propagate);
     }
 
     /**
-     * Converts the given HTML (obtained by rendering the wiki syntax) to HyperJSON.
-     *
-     * @param {string} html the HTML content to convert to HyperJSON; we expect this to be the result of rendering the
-     *   wiki syntax to HTML
-     * @returns {string} the HyperJSON that corresponds to the given HTML
+     * @param {string} html the HTML string to parse (we expected this to be the output of the editor)
+     * @returns {Element} the body element of the HTML document created from the given HTML string
      */
-    _convertHTMLToHyperJSON(html) {
-      const contentWrapper = this._editor.parseInputHTML(html);
-      return this._stringifyNode(contentWrapper, false);
+    _parseHTML(html) {
+      return new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html').body;
+    }
+
+    /**
+     * HyperJSON doesn't support comments, so we have to convert them to custom HTML elements.
+     *
+     * @param {Node} root the DOM subtree where to look for comment nodes to protect
+     * @returns {Node} the given root node with the comments protected (replaced by a custom HTML element)
+     */
+    _protectComments(root) {
+      const treeWalker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_COMMENT);
+      const comments = [];
+      while (treeWalker.nextNode()) {
+        comments.push(treeWalker.currentNode);
+      }
+      comments.forEach(comment => {
+        const commentElement = root.ownerDocument.createElement('xwiki-comment');
+        commentElement.setAttribute('value', comment.data);
+        comment.replaceWith(commentElement);
+      });
+      return root;
+    }
+
+    /**
+     * HyperJSON doesn't support comments, so we have to convert the custom HTML elements back to comments.
+     *
+     * @param {Node} root the DOM subtree where to look for protected comments to restore
+     * @returns {Node} the given root node with the protected comments restored (replaced by a actual comment node)
+     */
+    _restoreComments(root) {
+      root.querySelectorAll('xwiki-comment').forEach(commentElement => {
+        const comment = root.ownerDocument.createComment(commentElement.getAttribute('value'));
+        commentElement.replaceWith(comment);
+      });
+      return root;
+    }
+
+    /**
+     * @param {string} hyperJSON the HyperJSON string to convert to a DOM node
+     * @returns {Node} the DOM subtree corresponding to the given HyperJSON string
+     */
+    _hyperJSONToDOM(hyperJSON) {
+      const parsedHyperJSON = JSON.parse(hyperJSON);
+      return HyperJSON.toDOM(parsedHyperJSON);
     }
 
     /**
      * Update the editor content without affecting its caret / selection.
-     * 
+     *
      * @param {Node} newContent the new content to set, as a DOM node
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      */
     async _updateContent(newContent, propagate) {
-      // Remember where the selection is, to be able to restore it in case the content update affects it.
+      const selection = this._saveSelection();
+
+      await this._editor.updateContent(oldContent => {
+        // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
+        const patch = this._diffDOM.diff(DiffDOM.nodeToObj(oldContent), DiffDOM.nodeToObj(newContent));
+        this._diffDOM.apply(oldContent, patch, {
+          // New (added) nodes must be created using the current DOM document, where they will be inserted.
+          document: oldContent.ownerDocument
+        });
+
+        const updatedNodes = this._diffDOM._updatedNodes;
+        this._maybeInvalidateSavedSelection(selection, updatedNodes);
+
+        return updatedNodes;
+      }, propagate);
+
+      this._restoreSelection(selection);
+    }
+
+    /**
+     * Saves the current selection both as a text selection (to be used in case the selected nodes are replaced or
+     * removed) and as an array of relative ranges (to be used in case the selected nodes are only moved around).
+     *
+     * @returns {Array[Object]} an array of objects (relative ranges) that could be used to restore the selection
+     */
+    _saveSelection() {
+      // Save the selection as a text selection.
       this._editor.saveSelection();
-      let selection = this._editor.getSelection();
-      let rangeBefore = selection?.rangeCount && this._copyRangeBoundaryPoints(selection.getRangeAt(0));
-
-      const oldContent = this._editor.getContentWrapper();
-      if (!oldContent.contains(rangeBefore?.startContainer) && !oldContent.contains(rangeBefore?.endContainer)) {
-        rangeBefore = false;
-      }
-
-      // We have to call nodeToObj ourselves because the compared DOM elements are from different documents.
-      const patch = this._diffDOM.diff(DiffDOM.nodeToObj(oldContent), DiffDOM.nodeToObj(newContent));
-      this._diffDOM.apply(oldContent, patch, {
-        document: oldContent.ownerDocument
-      });
-
-      await this._editor.contentUpdated(this._diffDOM._updatedNodes, propagate);
-
-      // Restore the selection if the editor had a selection (i.e. if the selection was inside the editing area) before
-      // the content update and it was affected by the content update. Note that the selection restore focuses the
-      // editor. The editing area might have been reloaded so it's best to retrieve the selection again.
-      selection = this._editor.getSelection();
-      const rangeAfter = selection?.rangeCount && selection.getRangeAt(0);
-      if (rangeBefore && (!rangeBefore.startContainer.isConnected || !rangeBefore.endContainer.isConnected ||
-          !this._isSameRange(rangeBefore, rangeAfter))) {
-        this._editor.restoreSelection();
-      }
-    }
-
-    /**
-     * DOM ranges are updated automatically when the DOM is modified which makes it hard to detect if a range has been
-     * affected by a DOM change. Using {@code Range.cloneRange()} doesn't help either: the cloned range is still
-     * updated automatically. The only option is to copy the range boundary points and check them later after the DOM is
-     * modified.
-     *
-     * @param {Range} range the DOM range whose boundary points we want to copy
-     * @returns an object holding the boundary points of the given range
-     */
-    _copyRangeBoundaryPoints(range) {
-      return {
-        startContainer: range?.startContainer,
-        startOffset: range?.startOffset,
-        endContainer: range?.endContainer,
-        endOffset: range?.endOffset
-      };
-    }
-
-    /**
-     * Checks if two DOM ranges have the same boundary points.
-     *
-     * @param {Range} before the first range
-     * @param {Range} after the second range
-     * @returns {@code true} if the given ranges have the same boundary points, {@code false} otherwise
-     */
-    _isSameRange(before, after) {
-      return before?.startContainer === after?.startContainer &&
-        before?.startOffset === after?.startOffset &&
-        before?.endContainer === after?.endContainer &&
-        before?.endOffset === after?.endOffset;
-    }
-
-    _revertHyperJSONFilters(remoteFilteredHyperJSON) {
-      const localFilteredHyperJSON = this.getHyperJSON();
-      // Use the raw (unfiltered) content to determine the local changes only if the dynamic content (e.g. macro output)
-      // is not affected by the remote change. Otherwise, ignore the local filtered content (e.g. macro output) when
-      // deterining the local changes that need to be rebased on top of the received remote changes. The reason for this
-      // is because we can't merge the macro output when the macro parameters are modified. We need to re-render the
-      // macros (i.e. re-create the dynamic content).
-      const localHyperJSON = this.getHyperJSON(!this._isDynamicContentModified(localFilteredHyperJSON,
-        remoteFilteredHyperJSON));
-      return Patches.merge(localFilteredHyperJSON, remoteFilteredHyperJSON, localHyperJSON);
-    }
-
-    /**
-     * Compares the local content with the remote content in order to determine if the dynamic content needs to be
-     * reloaded because some of its parameters have been modified.
-     *
-     * @param {string} localHyperJSON the local content
-     * @param {string} remoteHyperJSON the remote content
-     * @returns {boolean} {@code true} if the dynamic content needs to be reloaded because some of its parameters have
-     *   been modified, {@code false} otherwise
-     */
-    _isDynamicContentModified(localHyperJSON, remoteHyperJSON) {
-      const localMacroIterator = new MacroHyperJSONIterator(localHyperJSON);
-      const remoteMacroIterator = new MacroHyperJSONIterator(remoteHyperJSON);
-      let localMacro, remoteMacro;
-      do {
-        localMacro = localMacroIterator.next();
-        remoteMacro = remoteMacroIterator.next();
-        if (localMacro.done !== remoteMacro.done || localMacro.value !== remoteMacro.value) {
-          return true;
+      // Save the selection as an array of relative ranges.
+      return this._editor.getSelection().map(range => {
+        // Remember also the selection direction.
+        const savedRange = {reversed: range.reversed};
+        if (!range.startContainer.childNodes.length) {
+          savedRange.startContainer = range.startContainer;
+          savedRange.startOffset = range.startOffset;
+        } else {
+          savedRange.startAfter = range.startContainer.childNodes[range.startOffset - 1];
+          savedRange.startBefore = range.startContainer.childNodes[range.startOffset];
         }
-      } while (!localMacro.done && !remoteMacro.done);
-      return false;
+        if (!range.endContainer.childNodes.length) {
+          savedRange.endContainer = range.endContainer;
+          savedRange.endOffset = range.endOffset;
+        } else {
+          savedRange.endAfter = range.endContainer.childNodes[range.endOffset - 1];
+          savedRange.endBefore = range.endContainer.childNodes[range.endOffset];
+        }
+        return savedRange;
+      });
     }
 
     /**
-     * Make sure the root node of the given HyperJSON matches the editor content wrapper. We have to do this, otherwise
-     * we can't apply the given HyperJSON (the root nodes must match in order to be able to compute the changes and
-     * apply the patch). Moreover, the root node itself is not synchronized, only its descendants are, so we shouldn't
-     * lose or overwrite any of its attributes.
+     * Invalidates the saved selection if it is affected by the updated nodes.
      *
-     * @param {Array} hyperJSON the HyperJSON for which to restore the root node
-     * @returns {Array} the modified HyperJSON, with the root node restored
+     * @param {Array[Object]} selection an array of objects (relative ranges) that can be used to restore the selection
+     * @param {Set[Node]} updatedNodes the set of updated nodes (as a result of applying remote changes to the content)
      */
-    _restoreRootNode(hyperJSON) {
-      // Create a shallow clone of the content wrapper node and compute the corresponding HyperJSON.
-      const rootClone = this._editor.getContentWrapper().cloneNode(false);
-      const rootHyperJSON = HyperJSON.fromDOM(rootClone);
-      // Preserve the descendants from the given HyperJSON.
-      rootHyperJSON[2] = hyperJSON[2];
-      return rootHyperJSON;
+    _maybeInvalidateSavedSelection(selection, updatedNodes) {
+      selection.forEach(range => {
+        // The saved selection is relative if the original selection had its boundaries between DOM nodes. In that case
+        // we remember the DOM node before and after the selection boundaries. This allows us to restore the selection
+        // properly even when DOM nodes are added or removed, as long as either the node before or after remains in the
+        // DOM. The saved selection in not relative if the original selection had its boundaries inside a text node. In
+        // this case, we have to restore the text selection (diff-based) because we need to take into account how many
+        // characters where added or removed before the selection boundary (offset).
+        if (range.startContainer?.nodeType === Node.TEXT_NODE && updatedNodes.has(range.startContainer)) {
+          delete range.startContainer;
+        }
+        if (range.endContainer?.nodeType === Node.TEXT_NODE && updatedNodes.has(range.endContainer)) {
+          delete range.endContainer;
+        }
+      });
+    }
+
+    /**
+     * Tries to restore the selection first using the relative ranges, if the selected nodes are still in the DOM, and
+     * then using the text selection, if the selected nodes have been replaced or removed.
+     *
+     * @param {Array[Object]} selection an array of objects (relative ranges) that can be used to restore the selection
+     */
+    _restoreSelection(selection) {
+      const invalidRange = selection.find(savedRange =>
+        [savedRange.startContainer, savedRange.startAfter, savedRange.startBefore].every(node => !node?.isConnected) ||
+        [savedRange.endContainer, savedRange.endAfter, savedRange.endBefore].every(node => !node?.isConnected));
+      if (invalidRange) {
+        // Some of the selected nodes were removed from the DOM or the selection was in a text node that was modified.
+        // Restore the text selection.
+        this._editor.restoreSelection();
+      } else {
+        // The selected nodes are still in the DOM so we can restore the selection using the relative ranges.
+        this._editor.restoreSelection(selection.map(savedRange => {
+          const range = this._editor.getContentWrapper().ownerDocument.createRange();
+          range.reversed = savedRange.reversed;
+          if (savedRange.startContainer?.isConnected) {
+            range.setStart(savedRange.startContainer, savedRange.startOffset);
+          } else if (savedRange.startBefore?.isConnected) {
+            range.setStartBefore(savedRange.startBefore);
+          } else {
+            range.setStartAfter(savedRange.startAfter);
+          }
+          if (savedRange.endContainer?.isConnected) {
+            range.setEnd(savedRange.endContainer, savedRange.endOffset);
+          } else if (savedRange.endAfter?.isConnected) {
+            range.setEndAfter(savedRange.endAfter);
+          } else {
+            range.setEndBefore(savedRange.endBefore);
+          }
+          return range;
+        }));
+      }
     }
 
     /**
@@ -354,45 +353,6 @@ define('xwiki-realtime-wysiwyg-patches', [
       // Apply the updated operations to the remote content in order to perform the 3-way merge (rebase).
       const merged = ChainPad.Operation.applyMulti(updatedLocalOperations, next);
       return merged;
-    }
-  }
-
-  class MacroHyperJSONIterator {
-    /**
-     * @param {string} hyperJSON the HyperJSON to iterate over
-     */
-    constructor(hyperJSON) {
-      this._path = [{
-        parent: ['', {}, [JSON.parse(hyperJSON)]],
-        index: 0
-      }];
-    }
-
-    next() {
-      while (this._path.length) {
-        const currentItem = this._path[this._path.length - 1];
-        if (currentItem.index < currentItem.parent[2].length) {
-          const nextParent = currentItem.parent[2][currentItem.index++];
-          if (!Array.isArray(nextParent)) {
-            // Skip text nodes.
-            continue;
-          }
-          // Step inside the found element.
-          this._path.push({
-            parent: nextParent,
-            index: 0
-          });
-          if (nextParent[1]['data-macro']) {
-            return {
-              done: false,
-              value: nextParent[1]['data-macro']
-            };
-          }
-        } else {
-          this._path.pop();
-        }
-      }
-      return {done: true};
     }
   }
 

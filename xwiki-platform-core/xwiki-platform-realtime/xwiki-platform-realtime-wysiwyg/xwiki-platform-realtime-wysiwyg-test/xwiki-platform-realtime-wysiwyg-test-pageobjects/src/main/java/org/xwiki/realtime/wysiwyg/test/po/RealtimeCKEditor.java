@@ -60,7 +60,7 @@ public class RealtimeCKEditor extends CKEditor
     @Override
     public RealtimeRichTextAreaElement getRichTextArea(boolean wait)
     {
-        return new RealtimeRichTextAreaElement(getContentContainer(), wait);
+        return new RealtimeRichTextAreaElement(this, wait);
     }
 
     @Override

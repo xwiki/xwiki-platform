@@ -19,6 +19,8 @@
  */
 package org.xwiki.ckeditor.test.po;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -29,7 +31,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.FileDetector;
+import org.openqa.selenium.remote.LocalFileDetector;
 import org.xwiki.stability.Unstable;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -61,6 +66,11 @@ public class RichTextAreaElement extends BaseElement
     }
 
     /**
+     * The CKEditor instance that owns this rich text area.
+     */
+    private CKEditor editor;
+
+    /**
      * The element that defines the rich text area.
      */
     private final WebElement container;
@@ -77,12 +87,13 @@ public class RichTextAreaElement extends BaseElement
     /**
      * Creates a new rich text area element.
      * 
-     * @param container the element that defines the rich text area
+     * @param editor the CKEditor instance that owns this rich text area
      * @param wait whether to wait or not for the content to be editable
      */
-    public RichTextAreaElement(WebElement container, boolean wait)
+    public RichTextAreaElement(CKEditor editor, boolean wait)
     {
-        this.container = container;
+        this.editor = editor;
+        this.container = editor.getContentContainer();
         this.isFrame = "iframe".equals(container.getTagName());
 
         if (wait) {
@@ -455,5 +466,159 @@ public class RichTextAreaElement extends BaseElement
     private void focus(WebElement element)
     {
         getDriver().executeScript("arguments[0].focus()", element);
+    }
+
+    /**
+     * Simulates the user dropping a file on the rich text area.
+     * 
+     * @param filePath the path to the file to be dropped; the file must be located in the test resources directory
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     * @throws URISyntaxException if the specified path is not a valid (relative) URI
+     */
+    public void dropFile(String filePath) throws URISyntaxException
+    {
+        dropFile(filePath, true);
+    }
+
+    /**
+     * Simulates the user dropping a file on the rich text area.
+     * 
+     * @param filePath the path to the file to be dropped; the file must be located in the test resources directory
+     * @param wait {@code true} if the method should wait for the success notification message to be displayed
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     * @throws URISyntaxException if the specified path is not a valid (relative) URI
+     */
+    public void dropFile(String filePath, boolean wait) throws URISyntaxException
+    {
+        dropFile(loadFile(filePath));
+        // Wait for the upload widget to be inserted and selected.
+        waitUntilWidgetSelected();
+        if (wait) {
+            // Wait for the upload to finish.
+            waitForOwnNotificationSuccessMessage("File successfully uploaded.");
+        }
+    }
+
+    private WebElement loadFile(String filePath) throws URISyntaxException
+    {
+        FileDetector originalFileDetector = getDriver().getFileDetector();
+        try {
+            getDriver().setFileDetector(new LocalFileDetector());
+
+            // Create the file input element.
+            StringBuilder script = new StringBuilder();
+            script.append("const fileInput = document.createElement('input');\n");
+            script.append("fileInput.type = 'file';\n");
+            script.append("document.body.append(fileInput);\n");
+            script.append("return fileInput;\n");
+            WebElement fileInput = (WebElement) getDriver().executeScript(script.toString());
+
+            // Set the file input value.
+            String absolutePath = Paths.get(getClass().getResource(filePath).toURI()).toFile().getAbsolutePath();
+            fileInput.sendKeys(absolutePath);
+
+            return fileInput;
+        } finally {
+            getDriver().setFileDetector(originalFileDetector);
+        }
+    }
+
+    private void dropFile(WebElement fileInput)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("const fileInput = arguments[0];\n");
+        script.append("const editorName = arguments[1];\n");
+
+        script.append("const file = fileInput.files[0];\n");
+        script.append("const dataTransfer = new DataTransfer();\n");
+        script.append("dataTransfer.items.add(file);\n");
+        script.append("const dropEvent = new DragEvent('drop', {\n");
+        // For the standalone edit mode the drop listener is added on the inner (iframe) document but we have to trigger
+        // the drop event on a lower level (because CKEditor expects the event target to be an element not the DOM
+        // document) so we need the drop event to bubble up.
+        script.append("  bubbles: true,\n");
+        script.append("  cancelable: true,\n");
+        script.append("  dataTransfer\n");
+        script.append("});\n");
+
+        script.append("const editor = CKEDITOR.instances[editorName];\n");
+        script.append("const dropTarget = CKEDITOR.plugins.clipboard.getDropTarget(editor);\n");
+        // Register a drop event listener on the drop target with high priority in order to intercept the event data and
+        // set the test range. The CKEditor drop handler will then use this test range to insert the dropped content.
+        script.append("const handler = editor.editable().attachListener(dropTarget, 'drop', function(event) {\n");
+        script.append("  handler.removeListener();\n");
+        script.append("  event.data.testRange = editor.getSelection().getRanges()[0];\n");
+        script.append("  return event.data;\n");
+        script.append("}, null, null, 0);\n");
+
+        script.append("editor.editable().$.dispatchEvent(dropEvent);\n");
+
+        getDriver().executeScript(script.toString(), fileInput, this.editor.getName());
+    }
+
+    /**
+     * Waits for a success notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void waitForOwnNotificationSuccessMessage(String message)
+    {
+        waitForOwnNotificationMessage("success", message);
+    }
+
+    private void waitForOwnNotificationMessage(String level, String message)
+    {
+        String notificationMessageLocator =
+            String.format("//div[contains(@class,'cke_notification_%s') and contains(., '%s')]", level, message);
+        getDriver().waitUntilElementIsVisible(By.xpath(notificationMessageLocator));
+        // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
+        // this method always waits for the last notification message of the specified level.
+        try {
+            String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
+            getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
+        } catch (WebDriverException e) {
+            // The notification message may disappear before we get to click on it and thus we ignore in case there's
+            // an error.
+        }
+    }
+
+    /**
+     * Waits until there are no upload widgets in the rich text area (upload widgets are replaced with the actual
+     * content when the upload is finished).
+     *
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void waitForUploadsToFinish()
+    {
+        getDriver().waitUntilCondition(driver -> {
+            try {
+                return !StringUtils.containsAny(getContent(), "cke_widget_uploadfile", "cke_widget_uploadimage");
+            } catch (StaleElementReferenceException e) {
+                // The edited content can be reloaded (which includes the root editable in standalone mode) while we're
+                // waiting, for instance because a macro was inserted or updated as a result of a remote change.
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Wait until the rich text area contains a selected widget.
+     *
+     * @since 16.9.0RC1
+     * @since 16.4.5
+     * @since 15.10.13
+     */
+    public void waitUntilWidgetSelected()
+    {
+        waitUntilContentContains("cke_widget_selected");
     }
 }

@@ -54,13 +54,6 @@
       <scope>runtime</scope>
       <type>xar</type>
     </dependency>
-    <!-- We need this for the WYSIWYG editor administration section where we set the default WYSIWYG editor. -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wysiwyg-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-    </dependency>
     <!-- The JavaScript code needs to display localized messages and for this it needs to fetch them through REST so we
       need an implementation of the localization REST API. -->
     <dependency>

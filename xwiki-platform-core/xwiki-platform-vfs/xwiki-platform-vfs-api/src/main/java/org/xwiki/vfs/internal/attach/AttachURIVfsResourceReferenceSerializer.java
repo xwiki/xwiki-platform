@@ -20,13 +20,13 @@
 package org.xwiki.vfs.internal.attach;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.hc.core5.net.PercentCodec;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -67,14 +67,9 @@ public class AttachURIVfsResourceReferenceSerializer implements ResourceReferenc
             this.attachmentResolver.resolve(reference.getReference());
         String scheme = reference.getScheme();
         String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
-        try {
-            String attachmentName = URIUtil.encodePath(attachmentReference.getName());
-            String referencePath = URIUtil.encodePath(reference.getPath());
-            return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString,
-                attachmentName, referencePath));
-        } catch (URIException e) {
-            throw new SerializeResourceReferenceException(
-                String.format("Error when encoding resource reference [%s]", reference.toString()), e);
-        }
+        String attachmentName = PercentCodec.encode(attachmentReference.getName(), StandardCharsets.UTF_8);
+        String referencePath = PercentCodec.encode(reference.getPath(), StandardCharsets.UTF_8);
+        return URI
+            .create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString, attachmentName, referencePath));
     }
 }

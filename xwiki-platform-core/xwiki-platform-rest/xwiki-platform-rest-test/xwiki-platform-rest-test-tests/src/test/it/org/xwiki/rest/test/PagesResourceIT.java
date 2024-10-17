@@ -19,8 +19,8 @@
  */
 package org.xwiki.rest.test;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.rest.Relations;
@@ -39,30 +39,30 @@ public class PagesResourceIT extends AbstractHttpIT
     @Test
     public void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(getFullUri(WikisResource.class));
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Wikis wikis = (Wikis) unmarshaller.unmarshal(response.getEntity().getContent());
         Assert.assertTrue(wikis.getWikis().size() > 0);
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Spaces spaces = (Spaces) unmarshaller.unmarshal(response.getEntity().getContent());
         Assert.assertTrue(spaces.getSpaces().size() > 0);
 
         Space space = spaces.getSpaces().get(0);
         link = getFirstLinkByRelation(space, Relations.PAGES);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Pages pages = (Pages) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Pages pages = (Pages) unmarshaller.unmarshal(response.getEntity().getContent());
         Assert.assertTrue(pages.getPageSummaries().size() > 0);
 
         checkLinks(pages);

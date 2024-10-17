@@ -28,12 +28,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.http.auth.AuthScope;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -43,6 +38,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionId;
+import org.xwiki.http.internal.XWikiHTTPClient;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
@@ -131,10 +128,8 @@ public class InstallMojo extends AbstractMojo
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Marshaller marshaller = context.createMarshaller();
 
-            HttpClient httpClient = new HttpClient();
-            httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(this.username, this.password));
-            httpClient.getParams().setAuthenticationPreemptive(true);
+            XWikiHTTPClient httpClient = new XWikiHTTPClient();
+            httpClient.setDefaultCredentials(new XWikiCredentials(this.username, this.password));
 
             installExtensions(marshaller, unmarshaller, httpClient);
         } catch (Exception e) {
@@ -142,7 +137,7 @@ public class InstallMojo extends AbstractMojo
         }
     }
 
-    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, HttpClient httpClient)
+    private void installExtensions(Marshaller marshaller, Unmarshaller unmarshaller, XWikiHTTPClient httpClient)
         throws Exception
     {
         InstallRequest installRequest = new InstallRequest();

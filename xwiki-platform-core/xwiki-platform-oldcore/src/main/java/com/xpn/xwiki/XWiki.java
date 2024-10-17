@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -66,13 +67,6 @@ import javax.naming.NamingException;
 import javax.script.ScriptContext;
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -81,6 +75,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.net.PercentCodec;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -114,6 +112,7 @@ import org.xwiki.edit.EditConfiguration;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.CoreExtensionRepository;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.JobException;
@@ -1185,7 +1184,7 @@ public class XWiki implements EventListener
         String proxyUser = System.getProperty("http.proxyUser");
         if ((proxyUser != null) && (!proxyUser.equals(""))) {
             String proxyPassword = System.getProperty("http.proxyPassword");
-            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            Credentials defaultcreds = new HTTPCredentials(proxyUser, proxyPassword);
             client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
         }
 
@@ -5783,11 +5782,7 @@ public class XWiki implements EventListener
     {
         if (!path.startsWith(segment)) {
             // The context path probably contains special characters that are encoded in the URL
-            try {
-                segment = URIUtil.encodePath(segment);
-            } catch (URIException e) {
-                LOGGER.warn("Invalid path: [" + segment + "]");
-            }
+            segment = PercentCodec.encode(segment, StandardCharsets.UTF_8);
         }
         if (!path.startsWith(segment)) {
             // Some clients also encode -, although it's allowed in the path
@@ -6721,19 +6716,15 @@ public class XWiki implements EventListener
 
     public String getURLContent(String surl, int timeout, String userAgent) throws IOException
     {
-        String content;
-        HttpClient client = getHttpClient(timeout, userAgent);
-        GetMethod get = new GetMethod(surl);
+        XWikiHTTPClient client = new XWikiHTTPClient(timeout, userAgent);
 
-        try {
-            client.executeMethod(get);
-            content = get.getResponseBodyAsString();
-        } finally {
-            // Release any connection resources used by the method
-            get.releaseConnection();
-        }
+        return client.executeGet(surl, response -> {
+            if (response.getCode() != HttpStatus.SC_OK) {
+                throw new IOException("Failed to get URL content: " + response.getReasonPhrase());
+            }
 
-        return content;
+            return EntityUtils.toString(response.getEntity());
+        });
     }
 
     public String getURLContent(String surl, String username, String password, XWikiContext context) throws IOException
@@ -6750,7 +6741,7 @@ public class XWiki implements EventListener
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
         client.getState().setCredentials(new AuthScope(null, -1, null),
-            new UsernamePasswordCredentials(username, password));
+            new HTTPCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.
@@ -6815,7 +6806,7 @@ public class XWiki implements EventListener
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
         client.getState().setCredentials(new AuthScope(null, -1, null),
-            new UsernamePasswordCredentials(username, password));
+            new HTTPCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.

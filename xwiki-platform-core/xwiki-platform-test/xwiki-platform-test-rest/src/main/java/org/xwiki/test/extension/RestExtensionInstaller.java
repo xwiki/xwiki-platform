@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -33,6 +32,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
@@ -93,7 +93,7 @@ public class RestExtensionInstaller
      * @throws Exception if there's a failure to install the extensions in the running XWiki instance
      */
     public void installExtensions(String baseUrl, Collection<ExtensionId> extensions,
-        UsernamePasswordCredentials credentials,
+        XWikiCredentials credentials,
         String installUserReference, List<String> namespaces, boolean failOnExist) throws Exception
     {
         String xwikiRESTURL = baseUrl;
@@ -127,7 +127,7 @@ public class RestExtensionInstaller
     }
 
     private void installExtensionsInternal(String xwikiRESTURL, Collection<ExtensionId> extensions,
-        UsernamePasswordCredentials credentials, String installUserReference, List<String> namespaces,
+        XWikiCredentials credentials, String installUserReference, List<String> namespaces,
         boolean failOnExist) throws Exception
     {
         InstallRequest installRequest = new InstallRequest();

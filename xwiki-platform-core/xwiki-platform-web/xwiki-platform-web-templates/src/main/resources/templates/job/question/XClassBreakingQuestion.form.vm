@@ -17,15 +17,19 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+##!source.syntax=xwiki/2.1
+{{velocity}}
 #template('job/question/macros.vm')
 
 #set ($jobStatus = $job.status)
 #set ($question = $jobStatus.question)
 
+{{html clean=false}}
 #questionHeader()
+{{/html}}
 #if ($question.isRefactoringForbidden())
-<div class="errormessage deleteWarningXClass">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle"))</strong></p>
+#define ($errorMessageContent)
+{{html clean=false}}
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenExplanation"))</p>
   <div class="panel panel-default">
     <div class="panel-heading">
@@ -43,10 +47,15 @@
     </div>
     <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render(["job.question.${status.jobType}.cancel", 'job.question.button.cancel']))</button>
   </div>
-</div>
+{{/html}}#end
+
+## We want to use the XWiki macro here because we need its parameters
+{{error cssClass='deleteWarningXClass' title='$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle"))'}}
+  $errorMessageContent
+{{/error}}
 #else
-<div class="warningmessage deleteWarningXClass">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))</strong></p>
+#define ($warningMessageContent)
+{{html clean=false}}
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.explanation"))</p>
   #if ($question.isObjectsPotentiallyHidden())
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.objectsPotentiallyMissingWarning"))</p>
@@ -62,7 +71,15 @@
     </div>
   </div>
   #questionButtons($jobStatus)
-</div>
+{{/html}}#end
+
+## We want to use the XWiki macro here because we need its parameters
+{{warning cssClass='deleteWarningXClass' title='$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))'}}
+  $warningMessageContent
+{{/warning}}
 #end
 
+{{html clean=false}}
 #questionFooter()
+{{/html}}
+{{/velocity}}

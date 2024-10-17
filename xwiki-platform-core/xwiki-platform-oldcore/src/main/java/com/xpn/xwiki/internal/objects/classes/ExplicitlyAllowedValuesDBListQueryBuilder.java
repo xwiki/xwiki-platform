@@ -30,6 +30,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
@@ -37,7 +38,7 @@ import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -59,7 +60,7 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     private Logger logger;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private AuthorExecutor authorExecutor;
@@ -80,7 +81,9 @@ public class ExplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         String statement = dbListClass.getSql();
         DocumentReference authorReference = dbListClass.getOwnerDocument().getAuthorReference();
         DocumentReference documentReference = dbListClass.getOwnerDocument().getDocumentReference();
-        if (this.authorizationManager.hasAccess(Right.SCRIPT, authorReference, documentReference)) {
+        if (this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, authorReference,
+            documentReference))
+        {
             String namespace = this.entityReferenceSerializer.serialize(dbListClass.getReference());
             try {
                 statement = this.authorExecutor.call(() -> evaluateVelocityCode(dbListClass.getSql(), namespace),

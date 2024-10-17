@@ -34,8 +34,14 @@ import org.xwiki.filter.xar.output.XAROutputProperties;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_15, XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {
+    XARFilterUtils.ROLEHINT_16,
+    XARFilterUtils.ROLEHINT_15,
+    XARFilterUtils.ROLEHINT_14,
+    XARFilterUtils.ROLEHINT_13,
+    XARFilterUtils.ROLEHINT_12,
+    XARFilterUtils.ROLEHINT_11
+})
 @Singleton
 public class XAROutputFilterStreamFactory extends AbstractBeanOutputFilterStreamFactory<XAROutputProperties, XARFilter>
 {

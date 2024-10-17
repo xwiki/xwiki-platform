@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -42,6 +43,7 @@ import org.xwiki.security.authorization.testwikis.TestDefinition;
 import org.xwiki.security.authorization.testwikis.TestDefinitionParser;
 import org.xwiki.security.authorization.testwikis.TestDocument;
 import org.xwiki.security.authorization.testwikis.TestGroup;
+import org.xwiki.security.authorization.testwikis.TestRequiredRight;
 import org.xwiki.security.authorization.testwikis.TestSpace;
 import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.test.annotation.ComponentList;
@@ -184,6 +186,8 @@ class TestDefinitionParserTest
         assertThat("Space 1 of main wiki should have a document named 'document1'", document, notNullValue());
         assertThat("'document1' of 'space1' of main wiki should have description 'Document 1'",
             document.getDescription(), equalTo("Document 1"));
+        assertThat("'document1' of 'space1' of main wiki should enforce required rights",
+            document.isEnforceRequiredRights(), equalTo(true));
 
         rules = document.getAccessRules();
 
@@ -210,6 +214,17 @@ class TestDefinitionParserTest
         assertThat("State in access rules of document 1 of space 1 of main wiki mismatch", states, hasItems(
             RuleState.ALLOW
         ));
+
+        List<TestRequiredRight> testRequiredRights = new ArrayList<>(document.getRequiredRights());
+        assertThat("There must be 2 required rights on document 1", testRequiredRights.size(), equalTo(2));
+        assertThat("The first required right on document 1 must have ADMIN right", testRequiredRights.get(0).getRight(),
+            equalTo(Right.ADMIN));
+        assertThat("The first required right on document 1 must have WIKI scope", testRequiredRights.get(0).getScope(),
+            equalTo(EntityType.WIKI));
+        assertThat("The second required right on document 1 must have SCRIPT right",
+            testRequiredRights.get(1).getRight(), equalTo(Right.SCRIPT));
+        assertThat("The second required right on document 1 must have DOCUMENT scope",
+            testRequiredRights.get(1).getScope(), equalTo(EntityType.DOCUMENT));
     }
 }
 

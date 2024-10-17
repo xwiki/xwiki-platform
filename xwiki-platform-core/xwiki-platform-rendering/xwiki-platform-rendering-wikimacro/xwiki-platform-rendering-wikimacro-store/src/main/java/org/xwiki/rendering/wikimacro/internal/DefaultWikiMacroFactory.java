@@ -37,6 +37,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroId;
@@ -50,7 +51,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -81,7 +82,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
     private Execution execution;
 
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     /**
      * The logger to log.
@@ -372,12 +373,13 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         switch (visibility) {
             case GLOBAL:
                 // Verify that the user has programming rights
-                isAllowed = doc != null && this.authorization.hasAccess(Right.PROGRAM, authorReference, null);
+                isAllowed = doc != null && this.authorization.hasAccess(Right.PROGRAM, null, authorReference,
+                    documentReference);
                 break;
             case WIKI:
                 // Verify that the user has admin right on the macro wiki
-                isAllowed = doc != null && this.authorization.hasAccess(Right.ADMIN, authorReference,
-                    doc.getDocumentReference().getWikiReference());
+                isAllowed = doc != null && this.authorization.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference,
+                    documentReference);
                 break;
             default:
                 isAllowed = true;

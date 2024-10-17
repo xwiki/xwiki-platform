@@ -137,7 +137,7 @@ public class Object extends Collection
         getBaseObject().set(fieldname, value, xcontext);
 
         // Temporary set as author of the document the current script author (until the document is saved)
-        getBaseObject().getOwnerDocument().setAuthorReference(xcontext.getAuthorReference());
+        Document.updateAuthor(getBaseObject().getOwnerDocument(), xcontext);
     }
 
     @Override

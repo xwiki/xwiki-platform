@@ -47,8 +47,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents.client5</groupId>
-      <artifactId>httpclient5</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>cpsuite</groupId>

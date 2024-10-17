@@ -37,8 +37,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -24,25 +24,23 @@ XWiki.Gallery = Class.create({
     this.images = this._collectImages(container);
 
     this.container = container.update(
-      '<input type="text" tabindex="-1" class="focusCatcher"/>' +
+      '<button class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></button>' +
+      '<button class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</button>' +
+      '<span class="focusCatcher image-container" role="group" aria-roledescription="slide" tabindex="0">' +
       '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
-      '<div class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</div>' +
-      '<div class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</div>' +
-      '<div class="index">0 / 0</div>' +
-      '<div class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></div>'
+      '</span>' +
+      '<button class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</button>' +
+      '<div class="index">0 / 0</div>'
     );
-    this.container.addClassName('xGallery');
+    this.container.addClassName('xGallery');    
 
     this.focusCatcher = this.container.down('.focusCatcher');
     this.focusCatcher.observe('keydown', this._onKeyDown.bindAsEventListener(this));
-    this.container.observe('click', function() {
-      this.focusCatcher.focus();
-    }.bind(this));
 
     this.container.down('.previous').observe('click', this._onPreviousImage.bind(this));
     this.container.down('.next').observe('click', this._onNextImage.bind(this));
 
-    this.currentImage = this.container.down('.currentImage');
+    this.currentImage = this.focusCatcher.down('.currentImage');
     this.currentImage.observe('load', this._onLoadImage.bind(this));
     this.currentImage.observe('error', this._onErrorImage.bind(this));
     this.currentImage.observe('abort', this._onAbortImage.bind(this));

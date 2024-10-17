@@ -35,7 +35,7 @@
     "electron": "32.2.0"
   },
   "devDependencies": {
-    "@types/node": "22.7.4",
+    "@types/node": "22.7.5",
     "vite-plugin-node": "3.1.0"
   },
   "publishConfig": {

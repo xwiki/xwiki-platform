@@ -65,8 +65,8 @@ importers:
         specifier: 5.3.6
         version: 5.3.6(@types/node@22.7.4)
       vite-plugin-css-injected-by-js:
-        specifier: 3.5.1
-        version: 3.5.1(vite@5.3.6(@types/node@22.7.4))
+        specifier: 3.5.2
+        version: 3.5.2(vite@5.3.6(@types/node@22.7.4))
       vite-plugin-dts:
         specifier: 4.2.4
         version: 4.2.4(@types/node@22.7.4)(rollup@4.18.0)(typescript@5.6.2)(vite@5.3.6(@types/node@22.7.4))
@@ -5972,8 +5972,8 @@ packages:
       comlink: ^4.3.1
       vite: '>=2.9.6'
 
-  vite-plugin-css-injected-by-js@3.5.1:
-    resolution: {integrity: sha512-9ioqwDuEBxW55gNoWFEDhfLTrVKXEEZgl5adhWmmqa88EQGKfTmexy4v1Rh0pAS6RhKQs2bUYQArprB32JpUZQ==}
+  vite-plugin-css-injected-by-js@3.5.2:
+    resolution: {integrity: sha512-2MpU/Y+SCZyWUB6ua3HbJCrgnF0KACAsmzOQt1UvRVJCGF6S8xdA3ZUhWcWdM9ivG4I5az8PnQmwwrkC2CAQrQ==}
     peerDependencies:
       vite: '>2.0.0-0'
 
@@ -11249,7 +11249,7 @@ snapshots:
       source-map: 0.7.4
       vite: 5.3.6(@types/node@22.7.4)
 
-  vite-plugin-css-injected-by-js@3.5.1(vite@5.3.6(@types/node@22.7.4)):
+  vite-plugin-css-injected-by-js@3.5.2(vite@5.3.6(@types/node@22.7.4)):
     dependencies:
       vite: 5.3.6(@types/node@22.7.4)
 

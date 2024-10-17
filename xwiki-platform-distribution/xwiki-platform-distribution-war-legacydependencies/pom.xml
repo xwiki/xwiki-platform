@@ -54,6 +54,7 @@
                     <exclude>org.xwiki.commons:xwiki-commons-component-default:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
+                    <exclude>org.xwiki.commons:xwiki-commons-cache-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-extension-handler-xar:*:jar:*</exclude>

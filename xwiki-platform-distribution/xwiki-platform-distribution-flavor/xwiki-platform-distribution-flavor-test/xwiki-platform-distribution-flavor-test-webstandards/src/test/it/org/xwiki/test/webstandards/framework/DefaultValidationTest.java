@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
@@ -71,10 +71,10 @@ public class DefaultValidationTest extends AbstractValidationTest
     private LogCaptureValidator logCaptureValidator;
     private LogCaptureConfiguration logCaptureConfiguration;
 
-    public DefaultValidationTest(Target target, HttpClient client, Validator validator, String credentials)
+    public DefaultValidationTest(Target target, XWikiHTTPClient client, Validator validator)
         throws Exception
     {
-        super("testDocumentValidity", target, client, credentials);
+        super("testDocumentValidity", target, client);
 
         this.logCaptureValidator = new LogCaptureValidator();
         this.validator = validator;
@@ -152,7 +152,8 @@ public class DefaultValidationTest extends AbstractValidationTest
     {
         return String.format("Validating %s validity for [%s] executed %s",
             this.validator.getName(), getTargetURL(this.target),
-            (credentials == null ? "as guest" : "with credentials " + credentials));
+            (this.client.getDefaultCredentials() == null ? "as guest"
+                : "with credentials " + this.client.getDefaultCredentials()));
     }
 
     public void testDocumentValidity() throws Exception

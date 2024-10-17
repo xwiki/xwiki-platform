@@ -22,7 +22,6 @@ package org.xwiki.localization.test.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -53,10 +52,10 @@ class TranslationsRestIT
     void translationsNoKeyParam(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
-        String body = getMethod.getResponseBodyAsString();
+        String body = testUtils.rest().getString(TranslationsResource.class, queryParams, "xwiki");
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<translations xmlns=\"http://www.xwiki.org/localization\"/>", body);
+            + "<translations xmlns=\"http://www.xwiki.org/localization\"/>"
+            , body);
     }
 
     @Test
@@ -64,15 +63,13 @@ class TranslationsRestIT
     void translationsKeyMissing(TestUtils testUtils) throws Exception
     {
         Map<String, Object[]> queryParams = new HashMap<>();
-        queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
-        String body = getMethod.getResponseBodyAsString();
-        assertEquals(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<translations xmlns=\"http://www.xwiki.org/localization\">"
-                + "<translation><key>key1</key></translation>"
-                + "</translations>",
-            body);
+        queryParams.put("key", new Object[] {"key1"});
+        String body = testUtils.rest().getString(TranslationsResource.class, queryParams, "xwiki");
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+            + "<translations xmlns=\"http://www.xwiki.org/localization\">"
+            + "<translation><key>key1</key></translation>"
+            + "</translations>"
+            , body);
     }
 
     @Test
@@ -88,14 +85,13 @@ class TranslationsRestIT
 
         // Call the REST endpoint and request the translation keys created above.
         Map<String, Object[]> queryParams = new HashMap<>();
-        queryParams.put("key", new Object[] { "key1" });
-        GetMethod getMethod = testUtils.rest().executeGet(TranslationsResource.class, queryParams, "xwiki");
-        String body = getMethod.getResponseBodyAsString();
+        queryParams.put("key", new Object[] {"key1"});
+        String body = testUtils.rest().getString(TranslationsResource.class, queryParams, "xwiki");
         assertEquals(
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                 + "<translations xmlns=\"http://www.xwiki.org/localization\">"
                 + "<translation><key>key1</key><rawSource>value1 {0}</rawSource></translation>"
-                + "</translations>",
-            body);
+                + "</translations>"
+                , body);
     }
 }

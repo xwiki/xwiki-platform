@@ -21,17 +21,15 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.http.internal.XWikiCredentials;
+import org.xwiki.http.internal.XWikiHTTPClient;
 import org.xwiki.platform.wiki.creationjob.WikiCreationRequest;
 import org.xwiki.platform.wiki.creationjob.internal.WikiCreationJob;
 import org.xwiki.rest.internal.ModelFactory;
@@ -72,8 +70,7 @@ public class WikiCreator
      * @return true of the wiki was created, false if it already existed
      * @throws Exception when failing to create the wiki
      */
-    public boolean createWiki(UsernamePasswordCredentials credentials, String wikiId, boolean failOnExist)
-        throws Exception
+    public boolean createWiki(XWikiCredentials credentials, String wikiId, boolean failOnExist) throws Exception
     {
         String xwikiRESTURL = String.format("%s/rest", DockerTestUtils.getXWikiURL(this.context));
 
@@ -102,20 +99,15 @@ public class WikiCreator
         return true;
     }
 
-    private boolean exists(String xwikiRESTURL, UsernamePasswordCredentials credentials, String wikiId)
-        throws IOException
+    private boolean exists(String xwikiRESTURL, XWikiCredentials credentials, String wikiId) throws IOException
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, credentials);
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        XWikiHTTPClient httpClient = new XWikiHTTPClient();
 
         String uri = String.format("%s/wikis/xwiki/spaces/XWiki/pages/XWikiServer%s", xwikiRESTURL,
             StringUtils.capitalize(wikiId));
-        GetMethod getMethod = new GetMethod(uri);
-        httpClient.executeMethod(getMethod);
-        getMethod.releaseConnection();
 
-        return getMethod.getStatusCode() == Status.OK.getStatusCode();
+        return httpClient.execute(new HttpGet(uri), credentials,
+            (response, context) -> response.getCode() == HttpStatus.SC_OK);
     }
 
     private ModelFactory getModelFactory() throws Exception

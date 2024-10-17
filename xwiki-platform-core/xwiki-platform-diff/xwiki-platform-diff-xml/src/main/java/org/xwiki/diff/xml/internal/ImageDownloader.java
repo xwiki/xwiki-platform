@@ -120,7 +120,7 @@ public class ImageDownloader
     {
         HttpClientBuilder httpClientBuilder = this.httpClientBuilderFactory.create();
 
-        HttpGet getMethod = initializeGetMethod(uri);
+        HttpGet response = initializeGetMethod(uri);
 
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
             return httpClient.execute(getMethod, response -> handleResponse(uri, response));
@@ -169,7 +169,7 @@ public class ImageDownloader
 
     private HttpGet initializeGetMethod(URI uri)
     {
-        HttpGet getMethod = new HttpGet(uri);
+        HttpGet response = new HttpGet(uri);
 
         XWikiRequest request = this.xcontextProvider.get().getRequest();
         if (request != null && matchesCookieDomain(uri.getHost(), request)) {

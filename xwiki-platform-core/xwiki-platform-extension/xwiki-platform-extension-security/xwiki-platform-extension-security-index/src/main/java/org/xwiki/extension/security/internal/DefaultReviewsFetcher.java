@@ -72,7 +72,7 @@ public class DefaultReviewsFetcher implements ReviewsFetcher
     public ReviewsMap fetch() throws ExtensionSecurityException
     {
         try (CloseableHttpClient httpClient = this.httpClientFactory.createHttpClientBuilder(Map.of()).build()) {
-            HttpGet getMethod = new HttpGet(buildURI());
+            HttpGet response = new HttpGet(buildURI());
             CloseableHttpResponse execute = httpClient.execute(getMethod);
             StatusLine statusLine = execute.getStatusLine();
             int statusCode = statusLine.getStatusCode();

@@ -148,7 +148,7 @@ public class ExtensionVersionFileRESTResource extends AbstractExtensionRESTResou
                 httpClient.getConnectionManager().getSchemeRegistry(), ProxySelector.getDefault());
             httpClient.setRoutePlanner(routePlanner);
 
-            HttpGet getMethod = new HttpGet(url.toString());
+            HttpGet response = new HttpGet(url.toString());
 
             HttpResponse subResponse;
             try {

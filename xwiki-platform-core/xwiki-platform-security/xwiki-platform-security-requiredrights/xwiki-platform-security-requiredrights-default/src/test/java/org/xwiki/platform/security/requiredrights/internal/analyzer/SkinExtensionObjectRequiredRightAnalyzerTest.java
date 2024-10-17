@@ -40,6 +40,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -89,7 +90,11 @@ class SkinExtensionObjectRequiredRightAnalyzerTest
         assertEquals(1, analysisResult.getRequiredRights().size());
         RequiredRight requiredRightResult = analysisResult.getRequiredRights().get(0);
         assertEquals(requiredRight, requiredRightResult.getRight());
-        assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        if (requiredRight.equals(Right.PROGRAM)) {
+            assertNull(requiredRightResult.getEntityType());
+        } else {
+            assertEquals(EntityType.DOCUMENT, requiredRightResult.getEntityType());
+        }
         assertFalse(requiredRightResult.isManualReviewNeeded());
     }
 }

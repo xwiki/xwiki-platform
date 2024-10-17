@@ -18,6 +18,6 @@
     ".": "./src/index.ts"
   },
   "devDependencies": {
-    "vue": "3.5.10"
+    "vue": "3.5.12"
   }
 }

@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "0.10.0",
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "vue": "3.5.10"
+    "vue": "3.5.12"
   },
   "devDependencies": {
     "vue-tsc": "2.1.6"

@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "inversify": "6.0.2",
-    "vue": "3.5.10",
+    "vue": "3.5.12",
     "vue-i18n": "10.0.3"
   },
   "publishConfig": {

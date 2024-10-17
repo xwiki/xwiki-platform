@@ -31,7 +31,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "6.0.2",
-    "vue": "3.5.10"
+    "vue": "3.5.12"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

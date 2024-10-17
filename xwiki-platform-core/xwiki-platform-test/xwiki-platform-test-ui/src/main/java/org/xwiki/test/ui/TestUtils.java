@@ -53,21 +53,19 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Keys;
@@ -78,6 +76,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.http.internal.XWikiHTTPClient;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.AttachmentReference;
@@ -121,22 +121,20 @@ public class TestUtils
     /**
      * @since 5.0M2
      */
-    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS =
-        new UsernamePasswordCredentials("Admin", "admin");
+    public static final XWikiCredentials ADMIN_CREDENTIALS = new XWikiCredentials("Admin", "admin");
 
     /**
      * @since 5.1M1
      */
-    public static final UsernamePasswordCredentials SUPER_ADMIN_CREDENTIALS =
-        new UsernamePasswordCredentials("superadmin", "pass");
+    public static final XWikiCredentials SUPER_ADMIN_CREDENTIALS = new XWikiCredentials("superadmin", "pass");
 
     /**
      * @since 5.0M2
      * @deprecated since 7.3M1, use {@link #getBaseURL()} instead
      */
     @Deprecated
-    public static final String BASE_URL = XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT
-        + XWikiExecutor.DEFAULT_CONTEXT + "/";
+    public static final String BASE_URL =
+        XWikiExecutor.URL + ":" + XWikiExecutor.DEFAULT_PORT + XWikiExecutor.DEFAULT_CONTEXT + "/";
 
     /**
      * @since 5.0M2
@@ -156,39 +154,39 @@ public class TestUtils
      * @since 7.3M1
      */
     public static final int[] STATUS_OK_NOT_FOUND =
-        new int[] { Status.OK.getStatusCode(), Status.NOT_FOUND.getStatusCode() };
+        new int[] {Status.OK.getStatusCode(), Status.NOT_FOUND.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_OK = new int[] { Status.OK.getStatusCode() };
+    public static final int[] STATUS_OK = new int[] {Status.OK.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_NO_CONTENT = new int[] { Status.NO_CONTENT.getStatusCode() };
+    public static final int[] STATUS_NO_CONTENT = new int[] {Status.NO_CONTENT.getStatusCode()};
 
     /**
      * @since 8.3RC1
      */
     public static final int[] STATUS_NO_CONTENT_NOT_FOUND =
-        new int[] { Status.NO_CONTENT.getStatusCode(), Status.NOT_FOUND.getStatusCode() };
+        new int[] {Status.NO_CONTENT.getStatusCode(), Status.NOT_FOUND.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
     public static final int[] STATUS_CREATED_ACCEPTED =
-        new int[] { Status.CREATED.getStatusCode(), Status.ACCEPTED.getStatusCode() };
+        new int[] {Status.CREATED.getStatusCode(), Status.ACCEPTED.getStatusCode()};
 
     /**
      * @since 7.3M1
      */
-    public static final int[] STATUS_CREATED = new int[] { Status.CREATED.getStatusCode() };
+    public static final int[] STATUS_CREATED = new int[] {Status.CREATED.getStatusCode()};
 
     /**
      * @since 9.5RC1
      */
-    public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+    public static final int[] STATUS_ACCEPTED = new int[] {Status.ACCEPTED.getStatusCode()};
 
     private static final String MAIN_WIKI_NAME = "xwiki";
 
@@ -221,7 +219,7 @@ public class TestUtils
      */
     private String secretToken = null;
 
-    private HttpClient httpClient;
+    private XWikiHTTPClient httpClient;
 
     /**
      * @since 15.2RC1
@@ -247,7 +245,7 @@ public class TestUtils
 
     public TestUtils()
     {
-        this.httpClient = new HttpClient();
+        this.httpClient = new XWikiHTTPClient();
 
         setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
@@ -292,8 +290,8 @@ public class TestUtils
             TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "relative");
         TestUtils.referenceResolver = TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING);
         TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        TestUtils.localReferenceSerializer = TestUtils.componentManager.getInstance(
-            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class), "local");
+        TestUtils.localReferenceSerializer = TestUtils.componentManager
+            .getInstance(new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class), "local");
     }
 
     public XWikiWebDriver getDriver()
@@ -309,6 +307,7 @@ public class TestUtils
     {
         return this.wcagUtils;
     }
+
     public Session getSession()
     {
         return this.new Session(getDriver().manage().getCookies(), getSecretToken());
@@ -320,10 +319,10 @@ public class TestUtils
         options.deleteAllCookies();
         if (session != null) {
             for (Cookie cookie : session.getCookies()) {
-                // Using a cookie for single component domain (i.e., without '.', like 'localhost' or 'xwikiweb') 
+                // Using a cookie for single component domain (i.e., without '.', like 'localhost' or 'xwikiweb')
                 // apparently triggers the following error in firefox:
                 // org.openqa.selenium.UnableToSetCookieException:
-                //[Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE)
+                // [Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE)
                 // [nsICookieManager.add]" nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"
                 // location: "JS frame :: chrome://marionette/content/cookie.js :: cookie.add :: line 177" data: no]
                 //
@@ -332,9 +331,9 @@ public class TestUtils
                 // - https://github.com/mozilla/geckodriver/issues/1579
                 // a working solution is to put null in the cookie domain.
                 // Now we might need to fix this in our real code, but the situation is not quite clear for me.
-                if (cookie.getDomain() !=null && !cookie.getDomain().contains(".")) {
-                    cookie = new Cookie(cookie.getName(), cookie.getValue(), null, cookie.getPath(),
-                        cookie.getExpiry(), cookie.isSecure(), cookie.isHttpOnly());
+                if (cookie.getDomain() != null && !cookie.getDomain().contains(".")) {
+                    cookie = new Cookie(cookie.getName(), cookie.getValue(), null, cookie.getPath(), cookie.getExpiry(),
+                        cookie.isSecure(), cookie.isHttpOnly());
                 }
                 options.addCookie(cookie);
             }
@@ -351,30 +350,24 @@ public class TestUtils
      */
     public void setDefaultCredentials(String username, String password)
     {
-        setDefaultCredentials(new UsernamePasswordCredentials(username, password));
+        setDefaultCredentials(new XWikiCredentials(username, password));
     }
 
     /**
      * @since 7.0RC1
      */
-    public UsernamePasswordCredentials setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
+    public XWikiCredentials setDefaultCredentials(XWikiCredentials defaultCredentials)
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
 
-        if (defaultCredentials != null) {
-            this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
-            this.httpClient.getParams().setAuthenticationPreemptive(true);
-        } else {
-            this.httpClient.getState().clearCredentials();
-            this.httpClient.getParams().setAuthenticationPreemptive(false);
-        }
+        this.httpClient.setDefaultCredentials(defaultCredentials);
 
         return currentCredentials;
     }
 
-    public UsernamePasswordCredentials getDefaultCredentials()
+    public XWikiCredentials getDefaultCredentials()
     {
-        return (UsernamePasswordCredentials) this.httpClient.getState().getCredentials(AuthScope.ANY);
+        return this.httpClient.getDefaultCredentials();
     }
 
     public void loginAsSuperAdmin()
@@ -420,10 +413,10 @@ public class TestUtils
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
             if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
-                throw new RuntimeException(
-                    String.format("Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
-                        + "was on [%s]. Page source is [%s]", username, password, destUrl,
-                        getDriver().getCurrentUrl(), getDriver().getPageSource()));
+                throw new RuntimeException(String.format(
+                    "Login failed with credentials: [%s] / [%s]. Was expecting to be on URL [%s] but "
+                        + "was on [%s]. Page source is [%s]",
+                    username, password, destUrl, getDriver().getCurrentUrl(), getDriver().getPageSource()));
 
             }
             recacheSecretTokenWhenOnRegisterPage();
@@ -453,7 +446,8 @@ public class TestUtils
 
     public String getURLToLoginAsSuperAdmin()
     {
-        return getURLToLoginAs(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
+        return getURLToLoginAs(SUPER_ADMIN_CREDENTIALS.getUserName(),
+            String.valueOf(SUPER_ADMIN_CREDENTIALS.getUserName()));
     }
 
     public String getURLToLoginAs(final String username, final String password)
@@ -467,7 +461,8 @@ public class TestUtils
      */
     public String getURLToLoginAsAdminAndGotoPage(final String pageURL)
     {
-        return getURLToLoginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
+        return getURLToLoginAndGotoPage(ADMIN_CREDENTIALS.getUserName(),
+            String.valueOf(ADMIN_CREDENTIALS.getPassword()), pageURL);
     }
 
     /**
@@ -476,8 +471,8 @@ public class TestUtils
      */
     public String getURLToLoginAsSuperAdminAndGotoPage(final String pageURL)
     {
-        return getURLToLoginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword(),
-            pageURL);
+        return getURLToLoginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(),
+            String.valueOf(SUPER_ADMIN_CREDENTIALS.getPassword()), pageURL);
     }
 
     /**
@@ -488,16 +483,13 @@ public class TestUtils
      */
     public String getURLToLoginAndGotoPage(final String username, final String password, final String pageURL)
     {
-        Map<String, String> parameters = new HashMap<String, String>()
-        {
-            {
-                put("j_username", username);
-                put("j_password", password);
-                if (pageURL != null && pageURL.length() > 0) {
-                    put("xredirect", pageURL);
-                }
-            }
-        };
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("j_username", username);
+        parameters.put("j_password", password);
+        if (pageURL != null && pageURL.length() > 0) {
+            parameters.put("xredirect", pageURL);
+        }
+
         return getURL("XWiki", "XWikiLogin", "loginsubmit", parameters);
     }
 
@@ -558,7 +550,7 @@ public class TestUtils
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
     {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("register", "1");
         parameters.put("xwikiname", username);
         parameters.put("register_password", password);
@@ -576,8 +568,8 @@ public class TestUtils
     }
 
     /**
-     * Creates the Admin user, add it to the XWikiAdminGroup and login.
-     * Note that this method requires to be superadmin to be effective.
+     * Creates the Admin user, add it to the XWikiAdminGroup and login. Note that this method requires to be superadmin
+     * to be effective.
      *
      * @since 12.2
      */
@@ -587,8 +579,8 @@ public class TestUtils
     }
 
     /**
-     * Creates the Admin user, add it to the XWikiAdminGroup and login.
-     * Note that this method requires to be superadmin to be effective.
+     * Creates the Admin user, add it to the XWikiAdminGroup and login. Note that this method requires to be superadmin
+     * to be effective.
      *
      * @param programming true of the user should also be given programming right
      * @since 15.1RC1
@@ -597,7 +589,7 @@ public class TestUtils
     public void createAdminUser(boolean programming)
     {
         String username = ADMIN_CREDENTIALS.getUserName();
-        String password = ADMIN_CREDENTIALS.getPassword();
+        String password = String.valueOf(ADMIN_CREDENTIALS.getPassword());
         LocalDocumentReference userReference = new LocalDocumentReference("XWiki", username);
         Page userPage = rest().page(userReference);
         userPage.setObjects(new org.xwiki.rest.model.jaxb.Objects());
@@ -616,14 +608,16 @@ public class TestUtils
 
         // Add the user to XWikiAllGroup
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAllGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAllGroup group", e);
         }
 
         // Add the user to XWikiAdminGroup group (before we login as the user does not have admin right at first)
         try {
-            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member", serializeReference(userReference));
+            rest().addObject(new LocalDocumentReference("XWiki", "XWikiAdminGroup"), "XWiki.XWikiGroups", "member",
+                serializeReference(userReference));
         } catch (Exception e) {
             fail("Failed to add the user in the XWikiAdminGroup group", e);
         }
@@ -639,9 +633,9 @@ public class TestUtils
      * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPreferences} document.
      *
      * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
-     *               Can be empty or null
-     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
-     *              empty of null
+     *            Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be empty
+     *            of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be disabled
      * @since 12.2
@@ -657,9 +651,9 @@ public class TestUtils
      *
      * @param entityReference the reference to the document for which to set rights for
      * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
-     *               Can be empty or null
-     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
-     *              empty of null
+     *            Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be empty
+     *            of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be denied
      * @since 12.2
@@ -674,9 +668,9 @@ public class TestUtils
      *
      * @param space the reference to the space for which to set rights for
      * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
-     *               Can be empty or null
-     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
-     *              empty of null
+     *            Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be empty
+     *            of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be denied
      * @since 14.10
@@ -696,11 +690,8 @@ public class TestUtils
 
         // Add new rights object
         try {
-            rest().addObject(entityReference, rightClassName,
-                "groups", normalizedGroups,
-                "users", normalizedUsers,
-                "levels", rights,
-                "allow", enabled ? 1 : 0);
+            rest().addObject(entityReference, rightClassName, "groups", normalizedGroups, "users", normalizedUsers,
+                "levels", rights, "allow", enabled ? 1 : 0);
         } catch (Exception e) {
             fail("Failed to add rights object of class [" + rightClassName + "] with groups [" + normalizedGroups
                 + "], users [" + normalizedUsers + "], rights [" + rights + "] and enabled [" + enabled + "]", e);
@@ -974,8 +965,8 @@ public class TestUtils
      * @since 5.1M2
      */
     public ViewPage createPageWithAttachment(String space, String page, String content, String title, String syntaxId,
-        String parentFullPageName, String attachmentName, InputStream attachmentData,
-        UsernamePasswordCredentials credentials) throws Exception
+        String parentFullPageName, String attachmentName, InputStream attachmentData, XWikiCredentials credentials)
+        throws Exception
     {
         return createPageWithAttachment(Collections.singletonList(space), page, content, title, syntaxId,
             parentFullPageName, attachmentName, attachmentData, credentials);
@@ -986,7 +977,7 @@ public class TestUtils
      */
     public ViewPage createPageWithAttachment(List<String> spaces, String page, String content, String title,
         String syntaxId, String parentFullPageName, String attachmentName, InputStream attachmentData,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(spaces, page, content, title, syntaxId, parentFullPageName);
         attachFile(spaces, page, attachmentName, attachmentData, false, credentials);
@@ -1006,7 +997,7 @@ public class TestUtils
      * @since 5.1M2
      */
     public ViewPage createPageWithAttachment(String space, String page, String content, String title,
-        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+        String attachmentName, InputStream attachmentData, XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(space, page, content, title);
         attachFile(space, page, attachmentName, attachmentData, false, credentials);
@@ -1017,7 +1008,7 @@ public class TestUtils
      * @since 12.2
      */
     public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
-        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+        String attachmentName, InputStream attachmentData, XWikiCredentials credentials) throws Exception
     {
         ViewPage vp = createPage(reference, content, title);
         attachFile(reference, attachmentName, attachmentData, false, credentials);
@@ -1156,7 +1147,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(action, new String[] { space, page }, queryString);
+        return getURL(action, new String[] {space, page}, queryString);
     }
 
     /**
@@ -1205,7 +1196,7 @@ public class TestUtils
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
         String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
         return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
-        fragment);
+            fragment);
     }
 
     /**
@@ -1214,7 +1205,7 @@ public class TestUtils
     public String executeAndGetBodyAsString(EntityReference reference, Map<String, ?> queryParameters) throws Exception
     {
         gotoPage(getURL(reference, "get", toQueryString(queryParameters)));
-        
+
         return getDriver().findElementWithoutWaiting(By.tagName("body")).getText();
     }
 
@@ -1245,13 +1236,14 @@ public class TestUtils
      * @since 15.10.11
      * @since 14.10.22
      */
-    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters)
+        throws Exception
     {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
         // Remember the current credentials
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
 
         try {
             // Make sure the page is saved with superadmin author
@@ -1442,7 +1434,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(action, new String[] { space, page, attachment }, queryString);
+        return getURL(action, new String[] {space, page, attachment}, queryString);
     }
 
     /**
@@ -1531,7 +1523,7 @@ public class TestUtils
     }
 
     /**
-     *This class represents all cookies stored in the browser. Use with getSession() and setSession()
+     * This class represents all cookies stored in the browser. Use with getSession() and setSession()
      */
     public class Session
     {
@@ -1635,8 +1627,8 @@ public class TestUtils
     }
 
     /**
-     * Verify if the passed reference corresponds to the current page, independently of the wiki.
-     * Throws an {@link AssertionFailedError} if it's not the case.
+     * Verify if the passed reference corresponds to the current page, independently of the wiki. Throws an
+     * {@link AssertionFailedError} if it's not the case.
      *
      * @param reference the reference to the document to check
      * @since 12.2
@@ -1706,8 +1698,7 @@ public class TestUtils
      * @since 11.5RC1
      * @since 11.3.1
      */
-    public void updateObject(EntityReference entityReference, String className, int objectNumber,
-        Object... properties)
+    public void updateObject(EntityReference entityReference, String className, int objectNumber, Object... properties)
     {
         // TODO: would be even quicker using REST
         Map<String, Object> queryParameters =
@@ -1927,7 +1918,7 @@ public class TestUtils
      * @since 5.1M2
      */
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
         attachFile(Collections.singletonList(space), page, name, is, failIfExists, credentials);
     }
@@ -1936,9 +1927,9 @@ public class TestUtils
      * @since 7.2M2
      */
     public void attachFile(List<String> spaces, String page, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
 
         try {
             if (credentials != null) {
@@ -1991,9 +1982,9 @@ public class TestUtils
      * @since 12.2
      */
     public void attachFile(EntityReference pageReference, String name, InputStream is, boolean failIfExists,
-        UsernamePasswordCredentials credentials) throws Exception
+        XWikiCredentials credentials) throws Exception
     {
-        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        XWikiCredentials currentCredentials = getDefaultCredentials();
         EntityReference reference = new EntityReference(name, EntityType.ATTACHMENT, pageReference);
 
         try {
@@ -2141,20 +2132,17 @@ public class TestUtils
         properties.load(new ByteArrayInputStream(configuration.getBytes()));
         StringBuilder sb = new StringBuilder();
 
-        sb.append("{{velocity}}\n"
-                + "#set($config = $!services.component.getInstance(\"org.xwiki.configuration."
-                + "ConfigurationSource\", \"xwikicfg\"))\n"
-                + "#set($props = $config.getProperties())\n");
+        sb.append("{{velocity}}\n" + "#set($config = $!services.component.getInstance(\"org.xwiki.configuration."
+            + "ConfigurationSource\", \"xwikicfg\"))\n" + "#set($props = $config.getProperties())\n");
 
         // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
         // trick: We create a document, and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
-            sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
-                .append(param.getValue()).append("'))\n");
+            sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '").append(param.getValue())
+                .append("'))\n");
         }
-        sb.append("#set($discard = $config.set($props))\n"
-            + "{{/velocity}}");
+        sb.append("#set($discard = $config.set($props))\n" + "{{/velocity}}");
         createPage("Test", "XWikiConfigurationPageForTest", sb.toString(), "Test page to change xwiki.cfg");
     }
 
@@ -2208,43 +2196,42 @@ public class TestUtils
     public static void assertStatuses(int actualCode, int... expectedCodes)
     {
         if (!ArrayUtils.contains(expectedCodes, actualCode)) {
-            fail(String.format("Unexpected code [%s], was expecting one of [%s]",
-                actualCode, Arrays.toString(expectedCodes)));
+            fail(String.format("Unexpected code [%s], was expecting one of [%s]", actualCode,
+                Arrays.toString(expectedCodes)));
         }
     }
 
     /**
      * @since 7.3M1
      */
-    public static <M extends HttpMethod> M assertStatusCodes(M method, boolean release, int... expectedCodes)
-        throws Exception
+    public static CloseableHttpResponse assertStatusCodes(CloseableHttpResponse response, boolean release,
+        int... expectedCodes) throws Exception
     {
         if (expectedCodes.length > 0) {
-            int actualCode = method.getStatusCode();
+            int actualCode = response.getCode();
 
             if (!ArrayUtils.contains(expectedCodes, actualCode)) {
                 if (actualCode == Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
                     String message;
                     try {
-                        message = method.getResponseBodyAsString();
+                        message = EntityUtils.toString(response.getEntity());
                     } catch (IOException e) {
                         message = "";
                     }
 
-                    fail(String.format("Unexpected internal server error with message [%s] for [%s]",
-                        message, method.getURI()));
+                    fail(String.format("Unexpected internal server error with message [%s]", message));
                 } else {
-                    fail(String.format("Unexpected code [%s], was expecting one of [%s] for [%s]",
-                        actualCode, Arrays.toString(expectedCodes), method.getURI()));
+                    fail(String.format("Unexpected code [%s], was expecting one of [%s]", actualCode,
+                        Arrays.toString(expectedCodes)));
                 }
             }
         }
 
         if (release) {
-            method.releaseConnection();
+            response.close();
         }
 
-        return method;
+        return response;
     }
 
     // HTTP
@@ -2339,19 +2326,17 @@ public class TestUtils
 
         String url = builder.build(elements).toString();
 
-        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
+        return executeGet(url, Status.OK.getStatusCode()).getEntity().getContent();
     }
 
-    protected GetMethod executeGet(String uri) throws Exception
+    protected CloseableHttpResponse executeGet(String uri) throws Exception
     {
-        GetMethod getMethod = new GetMethod(uri);
+        HttpGet getMethod = new HttpGet(uri);
 
-        this.httpClient.executeMethod(getMethod);
-
-        return getMethod;
+        return execute(getMethod);
     }
 
-    protected GetMethod executeGet(String uri, int... expectedCodes) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, int... expectedCodes) throws Exception
     {
         return executeGet(uri, false, expectedCodes);
     }
@@ -2359,7 +2344,7 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected GetMethod executeGet(String uri, boolean release, int... expectedCodes) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, boolean release, int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executeGet(uri), release, expectedCodes);
     }
@@ -2367,18 +2352,15 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected PostMethod executePost(String uri, InputStream content, String mediaType) throws Exception
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType) throws Exception
     {
-        PostMethod postMethod = new PostMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        postMethod.setRequestEntity(entity);
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.setEntity(new InputStreamEntity(content, ContentType.parse(mediaType)));
 
-        this.httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return execute(postMethod);
     }
 
-    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
         throws Exception
     {
         return executePost(uri, content, mediaType, true, expectedCodes);
@@ -2387,7 +2369,7 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected PostMethod executePost(String uri, InputStream content, String mediaType, boolean release,
+    protected CloseableHttpResponse executePost(String uri, InputStream content, String mediaType, boolean release,
         int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executePost(uri, content, mediaType), false, expectedCodes);
@@ -2396,13 +2378,18 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected DeleteMethod executeDelete(String uri) throws Exception
+    protected CloseableHttpResponse executeDelete(String uri) throws IOException
     {
-        DeleteMethod postMethod = new DeleteMethod(uri);
+        HttpDelete postMethod = new HttpDelete(uri);
 
-        this.httpClient.executeMethod(postMethod);
+        return execute(postMethod);
+    }
 
-        return postMethod;
+    @Deprecated
+    public CloseableHttpResponse execute(ClassicHttpRequest request) throws IOException
+    {
+        return this.httpClient.getClient().execute(request,
+            this.httpClient.getHttpClientContext(request, getDefaultCredentials()));
     }
 
     /**
@@ -2416,15 +2403,12 @@ public class TestUtils
     /**
      * @since 7.3M1
      */
-    protected PutMethod executePut(String uri, InputStream content, String mediaType) throws Exception
+    protected CloseableHttpResponse executePut(String uri, InputStream content, String mediaType) throws Exception
     {
-        PutMethod putMethod = new PutMethod(uri);
-        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
-        putMethod.setRequestEntity(entity);
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.setEntity(new InputStreamEntity(content, ContentType.parse(mediaType)));
 
-        this.httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return execute(putMethod);
     }
 
     protected void executePut(String uri, InputStream content, String mediaType, int... expectedCodes) throws Exception
@@ -2432,7 +2416,7 @@ public class TestUtils
         executePut(uri, content, mediaType, true, expectedCodes);
     }
 
-    protected PutMethod executePut(String uri, InputStream content, String mediaType, boolean release,
+    protected CloseableHttpResponse executePut(String uri, InputStream content, String mediaType, boolean release,
         int... expectedCodes) throws Exception
     {
         return assertStatusCodes(executePut(uri, content, mediaType), release, expectedCodes);
@@ -2567,9 +2551,8 @@ public class TestUtils
 
         /**
          * Used when running in a docker container for example and thus when we need a REST URL pointing to a host
-         * different than the TestUTils baseURL which is used inside the Selenium docker container and is thus
-         * different from a REST URL used outside of any container and that needs to call XWiki running inside a
-         * container... ;)
+         * different than the TestUTils baseURL which is used inside the Selenium docker container and is thus different
+         * from a REST URL used outside of any container and that needs to call XWiki running inside a container... ;)
          *
          * @since 10.9
          */
@@ -2617,8 +2600,8 @@ public class TestUtils
             }
 
             // Spaces
-            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
-                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
+            SpaceReference spaceReference = new SpaceReference(
+                relativeReferenceResolver.resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
             // Document
             DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
@@ -2715,7 +2698,7 @@ public class TestUtils
             save(page, true, expectedCodes);
         }
 
-        public EntityEnclosingMethod save(Page page, boolean release, int... expectedCodes) throws Exception
+        public CloseableHttpResponse save(Page page, boolean release, int... expectedCodes) throws Exception
         {
             if (expectedCodes.length == 0) {
                 // Allow create or modify by default
@@ -2855,7 +2838,7 @@ public class TestUtils
         /**
          * Add a new object.
          */
-        public EntityEnclosingMethod add(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
+        public CloseableHttpResponse add(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
         {
             return TestUtils.assertStatusCodes(executePost(ObjectsResource.class, obj, toElements(obj, true)), release,
                 STATUS_CREATED);
@@ -2900,7 +2883,7 @@ public class TestUtils
         /**
          * Fail if the object does not exist.
          */
-        public EntityEnclosingMethod update(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
+        public CloseableHttpResponse update(org.xwiki.rest.model.jaxb.Object obj, boolean release) throws Exception
         {
             return TestUtils.assertStatusCodes(executePut(ObjectResource.class, obj, toElements(obj, false)), release,
                 STATUS_CREATED_ACCEPTED);
@@ -2963,11 +2946,11 @@ public class TestUtils
 
         public boolean exists(EntityReference reference) throws Exception
         {
-            GetMethod getMethod = executeGet(reference);
+            CloseableHttpResponse response = executeGet(reference);
 
-            getMethod.releaseConnection();
+            response.close();
 
-            return getMethod.getStatusCode() == Status.OK.getStatusCode();
+            return response.getCode() == Status.OK.getStatusCode();
         }
 
         /**
@@ -3039,7 +3022,8 @@ public class TestUtils
          * @since 16.2.0RC1
          * @since 15.10.8
          */
-        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
         {
             return get(resourceURI, queryParams, reference, true);
         }
@@ -3061,22 +3045,22 @@ public class TestUtils
         public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
             boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
+            CloseableHttpResponse response = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
-            if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
+            if (response.getCode() == Status.NOT_FOUND.getStatusCode()) {
                 return null;
             }
 
             if (reference != null && reference.getType() == EntityType.ATTACHMENT) {
-                return (T) getMethod.getResponseBodyAsStream();
+                return (T) response.getEntity().getContent();
             } else {
                 try {
-                    try (InputStream stream = getMethod.getResponseBodyAsStream()) {
+                    try (InputStream stream = response.getEntity().getContent()) {
                         return toResource(stream);
                     }
                 } finally {
-                    getMethod.releaseConnection();
+                    response.close();
                 }
             }
         }
@@ -3101,7 +3085,7 @@ public class TestUtils
         public InputStream postInputStream(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
             Object... elements) throws Exception
         {
-            return executePost(resourceUri, restObject, queryParams, elements).getResponseBodyAsStream();
+            return executePost(resourceUri, restObject, queryParams, elements).getEntity().getContent();
         }
 
         public <T> T toResource(InputStream is) throws JAXBException
@@ -3128,7 +3112,7 @@ public class TestUtils
         /**
          * @since 7.3
          */
-        public GetMethod executeGet(EntityReference reference) throws Exception
+        public CloseableHttpResponse executeGet(EntityReference reference) throws Exception
         {
             Class<?> resource = getResourceAPI(reference);
 
@@ -3138,7 +3122,7 @@ public class TestUtils
         /**
          * @since 8.0M1
          */
-        public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
+        public CloseableHttpResponse executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
         }
@@ -3147,19 +3131,19 @@ public class TestUtils
          * @since 16.2.0RC1
          * @since 15.10.8
          */
-        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
-            throws Exception
+        public CloseableHttpResponse executeGet(Object resourceURI, Map<String, Object[]> queryParams,
+            EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
-        public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception
+        public CloseableHttpResponse executeGet(Object resourceUri, Object... elements) throws Exception
         {
             return executeGet(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public GetMethod executeGet(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
-            throws Exception
+        public CloseableHttpResponse executeGet(Object resourceUri, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3167,13 +3151,29 @@ public class TestUtils
             return this.testUtils.executeGet(uri);
         }
 
-        public PostMethod executePost(Object resourceUri, Object restObject, Object... elements) throws Exception
+        public String getString(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
+            throws Exception
+        {
+            try (CloseableHttpResponse response = executeGet(resourceUri, queryParams, elements)) {
+                assertStatusCodes(response, false, STATUS_OK);
+
+                return EntityUtils.toString(response.getEntity());
+            }
+        }
+
+        public String getString(Object resourceUri, Object... elements) throws Exception
+        {
+            return getString(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
+        }
+
+        public CloseableHttpResponse executePost(Object resourceUri, Object restObject, Object... elements)
+            throws Exception
         {
             return executePost(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public PostMethod executePost(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
-            Object... elements) throws Exception
+        public CloseableHttpResponse executePost(Object resourceUri, Object restObject,
+            Map<String, Object[]> queryParams, Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3183,13 +3183,14 @@ public class TestUtils
             }
         }
 
-        public PutMethod executePut(Object resourceUri, Object restObject, Object... elements) throws Exception
+        public CloseableHttpResponse executePut(Object resourceUri, Object restObject, Object... elements)
+            throws Exception
         {
             return executePut(resourceUri, restObject, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public PutMethod executePut(Object resourceUri, Object restObject, Map<String, Object[]> queryParams,
-            Object... elements) throws Exception
+        public CloseableHttpResponse executePut(Object resourceUri, Object restObject,
+            Map<String, Object[]> queryParams, Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();
@@ -3199,13 +3200,13 @@ public class TestUtils
             }
         }
 
-        public DeleteMethod executeDelete(Object resourceUri, Object... elements) throws Exception
+        public CloseableHttpResponse executeDelete(Object resourceUri, Object... elements) throws Exception
         {
             return executeDelete(resourceUri, Collections.<String, Object[]>emptyMap(), elements);
         }
 
-        public DeleteMethod executeDelete(Object resourceUri, Map<String, Object[]> queryParams, Object... elements)
-            throws Exception
+        public CloseableHttpResponse executeDelete(Object resourceUri, Map<String, Object[]> queryParams,
+            Object... elements) throws Exception
         {
             // Build URI
             String uri = createUri(resourceUri, queryParams, elements).toString();

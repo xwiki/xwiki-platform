@@ -19,71 +19,9 @@
  */
 package com.xpn.xwiki;
 
-import java.io.UnsupportedEncodingException;
-import java.io.File;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.net.InetAddress;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.net.smtp.SMTPClient;
-import org.apache.commons.net.smtp.SMTPReply;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.MethodUtils;
-import org.apache.velocity.VelocityContext;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.environment.Environment;
-import org.xwiki.rendering.configuration.ExtendedRenderingConfiguration;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.xml.XMLUtils;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.model.EntityType;
-import org.xwiki.url.XWikiEntityURL;
-import org.xwiki.wiki.manager.WikiManagerException;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
-import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
-import com.xpn.xwiki.cache.api.internal.XWikiInitializedWikiCacheStub;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import com.xpn.xwiki.Credentials;
+import com.xpn.xwiki.HTTPCredentials;
+import com.xpn.xwiki.HttpClient;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -1499,5 +1437,37 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.addTooltip(String html, String message, XWikiContext context)
     {
         return addTooltip(html, message, "this.WIDTH='300'", context);
+    }
+
+    @Deprecated(since = "17.3.0RC1")
+    public static HttpClient getHttpClient(int timeout, String userAgent)
+    {
+        HttpClient client = new HttpClient();
+
+        if (timeout != 0) {
+            client.getParams().setSoTimeout(timeout);
+            client.getParams().setParameter("http.connection.timeout", Integer.valueOf(timeout));
+        }
+
+        client.getParams().setParameter("http.useragent", userAgent);
+
+        String proxyHost = System.getProperty("http.proxyHost");
+        String proxyPort = System.getProperty("http.proxyPort");
+        if ((proxyHost != null) && (!proxyHost.equals(""))) {
+            int port = 3128;
+            if ((proxyPort != null) && (!proxyPort.equals(""))) {
+                port = Integer.parseInt(proxyPort);
+            }
+            client.getHostConfiguration().setProxy(proxyHost, port);
+        }
+
+        String proxyUser = System.getProperty("http.proxyUser");
+        if ((proxyUser != null) && (!proxyUser.equals(""))) {
+            String proxyPassword = System.getProperty("http.proxyPassword");
+            Credentials defaultcreds = new HTTPCredentials(proxyUser, proxyPassword);
+            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+        }
+
+        return client;
     }
 }

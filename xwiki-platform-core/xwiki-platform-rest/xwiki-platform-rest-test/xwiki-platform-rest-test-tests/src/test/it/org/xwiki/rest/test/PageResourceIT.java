@@ -577,6 +577,42 @@ public class PageResourceIT extends AbstractHttpIT
     }
 
     @Test
+    public void testPOSTPageFormURLEncodedHidden() throws Exception
+    {
+        Page originalPage = getFirstPage();
+
+        Link link = getFirstLinkByRelation(originalPage, Relations.SELF);
+        Assert.assertNotNull(link);
+
+        // Mark the page as hidden.
+        NameValuePair[] nameValuePairs = new NameValuePair[1];
+        nameValuePairs[0] = new NameValuePair("hidden", "true");
+
+        PostMethod postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getStatusCode());
+
+        Page modifiedPage = (Page) this.unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+
+        Assert.assertTrue(modifiedPage.isHidden());
+
+        // Set just the title.
+        String title = String.format("Title (%s)", UUID.randomUUID());
+
+        nameValuePairs = new NameValuePair[1];
+        nameValuePairs[0] = new NameValuePair("title", title);
+
+        postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getStatusCode());
+
+        modifiedPage = (Page) this.unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
+
+        Assert.assertEquals(title, modifiedPage.getTitle());
+        Assert.assertTrue(modifiedPage.isHidden());
+    }
+
+    @Test
     public void testPOSTPageFormUrlEncodedNoCSRF() throws Exception
     {
         final String CONTENT = String.format("This is a content (%d)", System.currentTimeMillis());

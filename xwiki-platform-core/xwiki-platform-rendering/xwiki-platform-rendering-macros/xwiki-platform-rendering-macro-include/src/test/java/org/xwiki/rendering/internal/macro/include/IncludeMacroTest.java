@@ -209,7 +209,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.CURRENT, "word", false);
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.CURRENT, "word", false, false);
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -227,7 +227,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.AUTO, "word", false);
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.AUTO, "word", false, false);
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -245,7 +245,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.TARGET, "word", false);
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, Author.TARGET, "word", false, false);
 
         assertBlocks(expected, blocks, this.rendererFactory);
     }
@@ -702,6 +702,26 @@ class IncludeMacroTest
         assertBlocks(expected, blocks, this.rendererFactory);
     }
 
+    @Test
+    void executeWhenIncludedContentStandaloneInInlineContext() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [word]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
+
+        List<Block> blocks = runIncludeMacro(Context.CURRENT, "* item1\n*item2", false);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
     {
         MacroTransformationContext context = new MacroTransformationContext();
@@ -770,11 +790,11 @@ class IncludeMacroTest
     private List<Block> runIncludeMacro(final Context context, String includedContent, boolean restricted)
         throws Exception
     {
-        return runIncludeMacro(context, null, includedContent, restricted);
+        return runIncludeMacro(context, null, includedContent, restricted, false);
     }
 
     private List<Block> runIncludeMacro(final Context context, final Author author, String includedContent,
-        boolean restricted) throws Exception
+        boolean restricted, boolean isInline) throws Exception
     {
         DocumentReference includedDocumentReference = new DocumentReference("wiki", "Space", "IncludedPage");
         String includedDocStringRef = "wiki:space.page";
@@ -790,7 +810,7 @@ class IncludeMacroTest
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
         MacroTransformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
-        MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, false);
+        MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, isInline);
         macroContext.setId("wiki:Space.IncludingPage");
         macroContext.setTransformation(macroTransformation);
         macroContext.getTransformationContext().setRestricted(restricted);

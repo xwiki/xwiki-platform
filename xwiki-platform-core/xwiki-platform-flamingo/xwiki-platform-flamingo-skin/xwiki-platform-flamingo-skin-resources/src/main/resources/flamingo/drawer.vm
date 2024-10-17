@@ -41,21 +41,6 @@ aria-label="$escapetool.xml($services.localization.render('core.menu.drawer.labe
         #elseif($xcontext.user == 'XWiki.XWikiGuest' && $xcontext.inactiveUserReference)
           <a href="$xwiki.getURL($xcontext.inactiveUserReference, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.inactiveUserReference, false)</a>
           $logoutLink
-        #else
-          ## If xredirect is not set
-          #if (!$request.xredirect)
-            ## Define redirect URL value using current document relative request URL
-            #set($redirectURL = $escapetool.url($xwiki.relativeRequestURL))
-          ## If xredirect is already set
-          #else
-            ## Reuse the current value in the login link
-            #set($redirectURL = $escapetool.url($request.xredirect))
-          #end
-
-          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$redirectURL&loginLink=1")" id="tmLogin" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('login'))</a>
-          #if ($xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-            <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$redirectURL")" id="tmRegister" rel="nofollow">$services.icon.renderHTML('log-in') $escapetool.xml($services.localization.render('register'))</a>
-          #end
         #end
         ##
         ## UIX

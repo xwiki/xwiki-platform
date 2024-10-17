@@ -243,7 +243,8 @@ class RegisterIT
     {
         AbstractRegistrationPage registrationPage = setUp(testUtils, isModal, closedWiki, withRegistrationConfig);
         registrationPage.fillInJohnSmithValues();
-        assertTrue(validateAndRegister(testUtils, isModal, registrationPage));
+        assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
+                + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
         tryToLoginAsJohnSmith(testUtils, AbstractRegistrationPage.JOHN_SMITH_PASSWORD, registrationPage);
     }
 
@@ -345,7 +346,6 @@ class RegisterIT
                 AbstractRegistrationPage.JOHN_SMITH_USERNAME, password, password, "wiki@example.com");
             assertTrue(validateAndRegister(testUtils, isModal, registrationPage), String.format("isModal: %s close "
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
-
             // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
             String messagePrefix = closedWiki ? "" : "Information ";
 

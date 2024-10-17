@@ -130,7 +130,7 @@ public class DefaultDocumentAuthorizationManager implements DocumentAuthorizatio
     public void checkAccess(Right right, EntityType level, DocumentReference contextAuthor,
         DocumentReference contextDocument) throws AccessDeniedException
     {
-        EntityReference reference = contextDocument.extractReference(level);
+        EntityReference reference = contextDocument != null ? contextDocument.extractReference(level) : null;
 
         try {
             if (hasRequiredRight(right, level, contextDocument)) {

@@ -5,7 +5,6 @@ org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultMacroRequire
 org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.PDFClassObjectRequiredRightsAnalyzer
-org.xwiki.platform.security.requiredrights.internal.analyzer.RequiredRightObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.ScriptMacroAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.SkinExtensionObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.display.TranslationMessageSupplierProvider

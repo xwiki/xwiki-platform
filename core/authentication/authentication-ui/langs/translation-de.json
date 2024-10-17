@@ -1,1 +1,8 @@
-{}
+{
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "loggedInUserModal": {
+        "title": "Konto"
+    },
+    "userDescription": "Du bist eingeloggt als {0}"
+}

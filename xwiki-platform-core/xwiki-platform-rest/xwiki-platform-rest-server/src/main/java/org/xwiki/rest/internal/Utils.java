@@ -21,17 +21,20 @@ package org.xwiki.rest.internal;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Provider;
+import javax.print.URIException;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.http.URIUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -375,42 +378,55 @@ public class Utils
      * @param pathElements the path elements to insert in the resource path
      * @return an URI that can be used to access the specified resource
      */
-    public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
+    public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, Object... pathElements)
+    {
+        return createURI(baseURI, resourceClass, Arrays.asList(pathElements), null);
+    }
+
+    public static URI createURI(URI baseURI, java.lang.Class<?> resourceClass, List<Object> pathElements,
+        Map<String, Object> queryParameters)
     {
         UriBuilder uriBuilder = UriBuilder.fromUri(baseURI).path(resourceClass);
 
+        if (queryParameters != null) {
+            for (Map.Entry<String, Object> entry : queryParameters.entrySet()) {
+                Object value = entry.getValue();
+                if (value == null) {
+                    uriBuilder.queryParam(entry.getKey());
+                } else if (value instanceof Collection<?> collection) {
+                    uriBuilder.queryParam(entry.getKey(), collection.toArray());
+                } else {
+                    uriBuilder.queryParam(entry.getKey(), value.toString());
+                }
+            }
+        }
+
         List<String> pathVariableNames = null;
-        if (pathElements.length > 0) {
+        if (!pathElements.isEmpty()) {
             pathVariableNames = getVariableNamesFromPathTemplate(uriBuilder.toString());
         }
 
-        Object[] encodedPathElements = new String[pathElements.length];
-        for (int i = 0; i < pathElements.length; i++) {
-            Object pathElement = pathElements[i];
+        Object[] encodedPathElements = new String[pathElements.size()];
+        for (int i = 0; i < pathElements.size(); i++) {
+            Object pathElement = pathElements.get(i);
             if (pathElement != null) {
-                try {
-                    // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
-                    // Note that it would be cleaner to not rely on the variable name and to rely on the instanceof List
-                    // and on generateEncodedListURISegment and to give as argument
-                    // the list of spaces with the intermediate "spaces" segments. We don't go there for now to avoid
-                    // breaking something since this method is heavily used.
-                    if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
-                        if (!(pathElement instanceof List)) {
-                            throw new RuntimeException("The 'spaceName' parameter must be a list!");
-                        }
-                        encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
-                    // see generateEncodedJobIdURISegment to understand why we manually handle the lists
-                    } else if (pathElement instanceof List) {
-                        encodedPathElements[i] = generateEncodedListURISegment((List) pathElements[i]);
-                    } else if (pathElement instanceof EncodedElement) {
-                        encodedPathElements[i] = pathElement.toString();
-                    } else {
-                        // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
-                        // character. So it seems safer here to just encode properly the '/'.
-                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString()).replaceAll("/", "%2F");
+                // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
+                // Note that it would be cleaner to not rely on the variable name and to rely on the instanceof List
+                // and on generateEncodedListURISegment and to give as argument
+                // the list of spaces with the intermediate "spaces" segments. We don't go there for now to avoid
+                // breaking something since this method is heavily used.
+                if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
+                    if (!(pathElement instanceof List)) {
+                        throw new RuntimeException("The 'spaceName' parameter must be a list!");
                     }
-                } catch (URIException e) {
-                    throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
+                    encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElement);
+                    // see generateEncodedJobIdURISegment to understand why we manually handle the lists
+                } else if (pathElement instanceof List pathElementList) {
+                    encodedPathElements[i] = generateEncodedListURISegment(pathElementList);
+                } else if (pathElement instanceof EncodedElement) {
+                    encodedPathElements[i] = pathElement.toString();
+                } else {
+                    encodedPathElements[i] = URIUtils.encodePathSegment(pathElement.toString());
                 }
             } else {
                 encodedPathElements[i] = null;
@@ -463,16 +479,14 @@ public class Utils
      * @return a proper segment
      * @throws URIException in case of problem when performing the encoding.
      */
-    private static String generateEncodedListURISegment(List<Object> listSegment) throws URIException
+    private static String generateEncodedListURISegment(List<Object> listSegment)
     {
         StringBuilder jobIdSegment = new StringBuilder();
         for (Object idElement : listSegment) {
             if (jobIdSegment.length() > 0) {
                 jobIdSegment.append('/');
             }
-            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
-            // character. So it seems safer here to just encode properly the '/'.
-            jobIdSegment.append(URIUtil.encodePath(idElement.toString()).replaceAll("/", "%2F"));
+            jobIdSegment.append(URIUtils.encodePathSegment(idElement.toString()));
         }
         return jobIdSegment.toString();
     }
@@ -489,16 +503,14 @@ public class Utils
      * @return the encoded spaces segment of the URL
      * @throws URIException if problems occur
      */
-    private static String generateEncodedSpacesURISegment(List<Object> spaces) throws URIException
+    private static String generateEncodedSpacesURISegment(List<Object> spaces)
     {
         StringBuilder spaceSegment = new StringBuilder();
         for (Object space : spaces) {
             if (spaceSegment.length() > 0) {
                 spaceSegment.append("/spaces/");
             }
-            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
-            // character. So it seems safer here to just encode properly the '/'.
-            spaceSegment.append(URIUtil.encodePath(space.toString()).replaceAll("/", "%2F"));
+            spaceSegment.append(URIUtils.encodePathSegment(space.toString()));
         }
         return spaceSegment.toString();
     }

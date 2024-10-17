@@ -101,6 +101,12 @@
       <artifactId>commons-net</artifactId>
     </dependency>
 
+    <!-- Some HTTP Client 3 classes are exposed in the API -->
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

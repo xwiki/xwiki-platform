@@ -26,7 +26,7 @@ import java.util.HashMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.JAXBContext;
 
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class IconThemesRestIT
     @BeforeEach
     void setUp(TestUtils testUtils)
     {
-        // Login as superadmin to define the preferences. 
+        // Login as superadmin to define the preferences.
         testUtils.loginAsSuperAdmin();
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "XWikiPreferences");
         testUtils.updateObject(documentReference, "XWiki.XWikiPreferences", 0, "iconTheme", "IconThemes.FontAwesome");
@@ -67,9 +67,7 @@ class IconThemesRestIT
     void iconsNoParamKeys(TestUtils testUtils) throws Exception
     {
         URI rootIconThemeURI = testUtils.rest().createUri(IconThemesResource.class, new HashMap<>(), "xwiki");
-        GetMethod getMethod =
-            testUtils.rest().executeGet(UriBuilder.fromUri(rootIconThemeURI).segment("icons").build());
-        String body = getMethod.getResponseBodyAsString();
+        String body = testUtils.rest().getString(UriBuilder.fromUri(rootIconThemeURI).segment("icons").build());
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<icons xmlns=\"http://www.xwiki.org/icon\"/>", body);
     }
@@ -79,10 +77,11 @@ class IconThemesRestIT
     void iconsUnknownWiki(TestUtils testUtils) throws Exception
     {
         URI rootIconThemeURI = testUtils.rest().createUri(IconThemesResource.class, new HashMap<>(), "nowiki");
-        GetMethod getMethod =
-            testUtils.rest().executeGet(UriBuilder.fromUri(rootIconThemeURI).segment("icons").build());
-        int statusCode = getMethod.getStatusCode();
-        assertEquals(NOT_FOUND.getStatusCode(), statusCode);
+        try (CloseableHttpResponse response =
+            testUtils.rest().executeGet(UriBuilder.fromUri(rootIconThemeURI).segment("icons").build())) {
+            int statusCode = response.getCode();
+            assertEquals(NOT_FOUND.getStatusCode(), statusCode);
+        }
     }
 
     @Test
@@ -91,12 +90,10 @@ class IconThemesRestIT
     {
         URI rootIconThemeURI = testUtils.rest().createUri(IconThemesResource.class, new HashMap<>(), "xwiki");
 
-        URI uri = UriBuilder.fromUri(rootIconThemeURI)
-            .segment("icons")
-            .queryParam("name", "add", "unknown", "arrow_undo")
-            .build();
-        GetMethod getMethod = testUtils.rest().executeGet(uri);
-        String body = getMethod.getResponseBodyAsString();
+        URI uri = UriBuilder.fromUri(rootIconThemeURI).segment("icons")
+            .queryParam("name", "add", "unknown", "arrow_undo").build();
+        String body = testUtils.rest().getString(uri);
+        // @formatter:off
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<icons xmlns=\"http://www.xwiki.org/icon\">"
             + "<icon>"
@@ -111,7 +108,9 @@ class IconThemesRestIT
             + "<iconSetName>Font Awesome</iconSetName>"
             + "<cssClass>fa fa-undo</cssClass>"
             + "</icon>"
-            + "<missingIcons>unknown</missingIcons></icons>", body);
+            + "<missingIcons>unknown</missingIcons></icons>"
+            , body);
+        // @formatter:on
     }
 
     @Test
@@ -120,14 +119,12 @@ class IconThemesRestIT
     {
         URI rootIconThemeURI = testUtils.rest().createUri(IconThemesResource.class, new HashMap<>(), "xwiki");
 
-        URI uri = UriBuilder.fromUri(rootIconThemeURI)
-            .segment("notheme")
-            .segment("icons")
-            .queryParam("name", "add", "unknown", "arrow_undo")
-            .build();
-        GetMethod getMethod = testUtils.rest().executeGet(uri);
-        int statusCode = getMethod.getStatusCode();
-        assertEquals(NOT_FOUND.getStatusCode(), statusCode);
+        URI uri = UriBuilder.fromUri(rootIconThemeURI).segment("notheme").segment("icons")
+            .queryParam("name", "add", "unknown", "arrow_undo").build();
+        try (CloseableHttpResponse response = testUtils.rest().executeGet(uri)) {
+            int statusCode = response.getCode();
+            assertEquals(NOT_FOUND.getStatusCode(), statusCode);
+        }
     }
 
     @Test
@@ -136,16 +133,12 @@ class IconThemesRestIT
     {
         URI rootIconThemeURI = testUtils.rest().createUri(IconThemesResource.class, new HashMap<>(), "xwiki");
 
-        URI uri = UriBuilder.fromUri(rootIconThemeURI)
-            .segment("Silk")
-            .segment("icons")
-            .queryParam("name", "add", "unknown", "arrow_undo")
-            .build();
-        GetMethod getMethod = testUtils.rest().executeGet(uri);
-        String body = getMethod.getResponseBodyAsString();
+        URI uri = UriBuilder.fromUri(rootIconThemeURI).segment("Silk").segment("icons")
+            .queryParam("name", "add", "unknown", "arrow_undo").build();
+        String body = testUtils.rest().getString(uri);
         JAXBContext jaxbContext = JAXBContext.newInstance(Icons.class);
 
-        // We need to parse the  response body to analyse the icons attributes more finely. This is useful in 
+        // We need to parse the response body to analyse the icons attributes more finely. This is useful in
         // particular to assert the icon's url attribute while ignoring the cache-version get parameter value.
         Icons icons = (Icons) jaxbContext.createUnmarshaller().unmarshal(new StringReader(body));
 

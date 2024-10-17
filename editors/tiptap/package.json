@@ -58,7 +58,7 @@
     "utility-types": "3.11.0",
     "vue": "3.5.12",
     "vue-router": "4.4.5",
-    "yjs": "13.6.18"
+    "yjs": "13.6.20"
   },
   "devDependencies": {
     "@types/lodash": "4.17.10",

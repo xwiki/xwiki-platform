@@ -165,6 +165,17 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>Moved to legacy</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method org.apache.commons.httpclient.HttpClient com.xpn.xwiki.XWiki::getHttpClient(int, java.lang.String)</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

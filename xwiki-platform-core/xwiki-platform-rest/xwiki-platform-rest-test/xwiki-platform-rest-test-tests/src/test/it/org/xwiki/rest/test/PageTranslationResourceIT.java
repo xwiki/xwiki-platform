@@ -23,10 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
@@ -80,9 +78,9 @@ public class PageTranslationResourceIT extends AbstractHttpIT
     @Test
     public void testGETNotExistingPage() throws Exception
     {
-        GetMethod getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(),
-            Arrays.asList("NOTEXISTING"), "NOTEXISTING", Locale.FRENCH).toString());
-        assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(PageTranslationResource.class, getWiki(),
+            Arrays.asList("NOTEXISTING"), "NOTEXISTING", Locale.FRENCH));
+        assertEquals(getHttpResponseInfo(response), HttpStatus.SC_NOT_FOUND, response.getCode());
     }
 
     @Test
@@ -95,14 +93,13 @@ public class PageTranslationResourceIT extends AbstractHttpIT
 
         assertFalse(this.testUtils.rest().exists(this.referenceDefault));
 
-        String uri =
-            buildURI(PageTranslationResource.class, getWiki(), this.spaces, this.pageName, Locale.FRENCH).toString();
+        String uri = buildURI(PageTranslationResource.class, getWiki(), this.spaces, this.pageName, Locale.FRENCH);
 
         // PUT
-        PutMethod putMethod = executePutXml(uri, newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        CloseableHttpResponse response = executePutXml(uri, newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
-        Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
+        assertEquals(getHttpResponseInfo(response), HttpStatus.SC_CREATED, response.getCode());
+        Page modifiedPage = (Page) this.unmarshaller.unmarshal(response.getEntity().getContent());
 
         assertEquals("fr titre", modifiedPage.getTitle());
         assertEquals("fr contenue", modifiedPage.getContent());
@@ -112,18 +109,18 @@ public class PageTranslationResourceIT extends AbstractHttpIT
         assertFalse(this.testUtils.rest().exists(this.referenceDefault));
 
         // GET
-        GetMethod getMethod = executeGet(uri);
-        assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
-        modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        response = executeGet(uri);
+        assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
+        modifiedPage = (Page) this.unmarshaller.unmarshal(response.getEntity().getContent());
 
         assertEquals("fr titre", modifiedPage.getTitle());
         assertEquals("fr contenue", modifiedPage.getContent());
         assertEquals(Locale.FRENCH.toString(), modifiedPage.getLanguage());
 
         // DELETE
-        DeleteMethod deleteMethod = executeDelete(uri, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        response = executeDelete(uri, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
+        assertEquals(getHttpResponseInfo(response), HttpStatus.SC_NO_CONTENT, response.getCode());
 
         assertFalse(this.testUtils.rest().exists(this.referenceDefault));
         assertFalse(this.testUtils.rest().exists(this.referenceFR));

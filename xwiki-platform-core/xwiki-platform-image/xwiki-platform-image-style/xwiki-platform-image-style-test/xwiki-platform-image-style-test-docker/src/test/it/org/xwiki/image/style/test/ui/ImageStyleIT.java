@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.xwiki.image.style.rest.ImageStylesResource;
 import org.xwiki.image.style.test.po.ImageStyleAdministrationPage;
@@ -54,10 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ImageStyleIT
 {
     @ParameterizedTest
-    @WikisSource(extensions = {
-        "org.xwiki.platform:xwiki-platform-image-style-ui",
-        "org.xwiki.platform:xwiki-platform-administration-ui"
-    })
+    @WikisSource(extensions = {"org.xwiki.platform:xwiki-platform-image-style-ui",
+        "org.xwiki.platform:xwiki-platform-administration-ui"})
     void imageStyleAdministration(WikiReference wikiReference, TestUtils testUtils) throws Exception
     {
         testUtils.loginAsSuperAdmin();
@@ -69,24 +66,23 @@ class ImageStyleIT
         String defaultPrettyName = String.format("Default-%s", wikiName);
         String type = String.format("default-class-%s", wikiName);
 
-        testUtils.deletePage(
-            new DocumentReference(wikiName, List.of("Image", "Style", "Code", "ImageStyles"), defaultName));
+        testUtils
+            .deletePage(new DocumentReference(wikiName, List.of("Image", "Style", "Code", "ImageStyles"), defaultName));
         testUtils.updateObject(new DocumentReference(wikiName, List.of("Image", "Style", "Code"), "Configuration"),
             "Image.Style.Code.ConfigurationClass", 0, "defaultStyle", "");
 
         assertEquals(Map.of(), getDefaultFromRest(testUtils, wikiReference));
 
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>", getImageStylesFromRest(testUtils, wikiReference));
+        assertEquals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<styles xmlns=\"http://www.xwiki.org/imageStyle\"/>",
+            getImageStylesFromRest(testUtils, wikiReference));
 
         ImageStyleAdministrationPage imageStyleAdministrationPage =
             ImageStyleAdministrationPage.getToAdminPage(wikiReference);
         ImageStyleConfigurationForm imageStyleConfigurationForm =
             imageStyleAdministrationPage.submitNewImageStyleForm(defaultName);
-        imageStyleConfigurationForm
-            .setPrettyName(defaultPrettyName)
-            .setType(type)
-            .clickSaveAndView(true);
+        imageStyleConfigurationForm.setPrettyName(defaultPrettyName).setType(type).clickSaveAndView(true);
         imageStyleAdministrationPage = imageStyleConfigurationForm.clickBackToTheAdministration();
         assertEquals("", imageStyleAdministrationPage.getDefaultStyle());
         imageStyleAdministrationPage.submitDefaultStyleForm(defaultName);
@@ -101,6 +97,7 @@ class ImageStyleIT
         assertEquals(Map.of("forceDefaultStyle", "false", "defaultStyle", defaultName),
             getDefaultFromRest(testUtils, wikiReference));
 
+        // @formatter:off
         assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<styles xmlns=\"http://www.xwiki.org/imageStyle\">"
             + "<imageStyle>"
@@ -118,25 +115,23 @@ class ImageStyleIT
             + "<defaultTextWrap>false</defaultTextWrap>"
             + "</imageStyle>"
             + "</styles>", defaultName, defaultPrettyName, type), getImageStylesFromRest(testUtils, wikiReference));
+        // @formatter:on
     }
 
     private Map<?, ?> getDefaultFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
     {
         URI imageStylesResourceURI =
             testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), wikiReference.getName());
-        GetMethod getMethod = testUtils.rest().executeGet(UriBuilder.fromUri(imageStylesResourceURI)
-            .segment("default")
-            .queryParam("media", "json")
-            .build());
-        return new ObjectMapper().readValue(getMethod.getResponseBodyAsString(), Map.class);
+        String body = testUtils.rest().getString(
+            UriBuilder.fromUri(imageStylesResourceURI).segment("default").queryParam("media", "json").build());
+        return new ObjectMapper().readValue(body, Map.class);
     }
 
     private String getImageStylesFromRest(TestUtils testUtils, WikiReference wikiReference) throws Exception
     {
         URI imageStylesResourceURI =
             testUtils.rest().createUri(ImageStylesResource.class, new HashMap<>(), wikiReference.getName());
-        GetMethod getMethod =
-            testUtils.rest().executeGet(imageStylesResourceURI);
-        return getMethod.getResponseBodyAsString().trim();
+        String body = testUtils.rest().getString(imageStylesResourceURI);
+        return body.trim();
     }
 }

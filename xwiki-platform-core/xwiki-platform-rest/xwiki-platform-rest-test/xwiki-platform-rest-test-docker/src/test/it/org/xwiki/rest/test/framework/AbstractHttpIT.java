@@ -23,8 +23,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
@@ -32,25 +35,28 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.http.internal.XWikiCredentials;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -217,244 +223,197 @@ public abstract class AbstractHttpIT
 
     protected abstract void testRepresentation() throws Exception;
 
-    protected GetMethod executeGet(String uri) throws Exception
+    protected CloseableHttpResponse executeGet(String uri) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-
-        GetMethod getMethod = new GetMethod(uri);
-        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-        httpClient.executeMethod(getMethod);
-
-        return getMethod;
+        return executeGet(uri, (XWikiCredentials) null);
     }
 
-    protected GetMethod executeGet(String uri, String userName, String password) throws Exception
+    protected CloseableHttpResponse executeGet(String uri, String userName, String password) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        GetMethod getMethod = new GetMethod(uri);
-        getMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-        httpClient.executeMethod(getMethod);
-
-        return getMethod;
+        return executeGet(uri, new XWikiCredentials(userName, password));
     }
 
-    protected PostMethod executePostXml(String uri, Object object) throws Exception
+    private CloseableHttpResponse executeGet(String uri, XWikiCredentials credentials) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
+        HttpGet getMethod = new HttpGet(uri);
+        getMethod.addHeader("Accept", MediaType.APPLICATION_XML);
 
-        PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        postMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return execute(getMethod, credentials);
     }
 
-    protected PostMethod executePostXml(String uri, Object object, String userName, String password) throws Exception
+    protected CloseableHttpResponse executePostXml(String uri, Object object) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        postMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return executePostXml(uri, object, (XWikiCredentials) null);
     }
 
-    protected PostMethod executePost(String uri, InputStream is, String userName, String password) throws Exception
+    protected CloseableHttpResponse executePostXml(String uri, Object object, String userName, String password)
+        throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        return executePostXml(uri, object, new XWikiCredentials(userName, password));
+    }
 
-        PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
+    private CloseableHttpResponse executePostXml(String uri, Object object, XWikiCredentials credentials)
+        throws Exception
+    {
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.addHeader("Accept", MediaType.APPLICATION_XML);
+        postMethod.setEntity(toXmlEntity(object));
 
-        RequestEntity entity = new InputStreamRequestEntity(is);
-        postMethod.setRequestEntity(entity);
+        return execute(postMethod, credentials);
+    }
 
-        httpClient.executeMethod(postMethod);
+    protected CloseableHttpResponse executePost(String uri, InputStream is, String userName, String password)
+        throws Exception
+    {
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.addHeader("Accept", MediaType.APPLICATION_XML);
+        postMethod.setEntity(new InputStreamEntity(is, null));
 
-        return postMethod;
+        return execute(postMethod, new XWikiCredentials(userName, password));
     }
 
     protected String getFormToken(String userName, String password) throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(WikisResource.class), userName, password);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
-        return getMethod.getResponseHeader("XWiki-Form-Token").getValue();
+        CloseableHttpResponse response = executeGet(getFullUri(WikisResource.class), userName, password);
+        assertEquals(HttpStatus.SC_OK, response.getCode(), getHttpResponseInfo(response));
+
+        return response.getHeader("XWiki-Form-Token").getValue();
     }
 
-    protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password)
-        throws Exception
+    protected CloseableHttpResponse executePost(String uri, String string, String mediaType, String userName,
+        String password) throws Exception
     {
         return executePost(uri, string, mediaType, userName, password, getFormToken(userName, password));
     }
 
-    protected PostMethod executePost(String uri, String string, String mediaType, String userName, String password,
-        String formToken) throws Exception
+    protected CloseableHttpResponse executePost(String uri, String string, String mediaType, String userName,
+        String password, String formToken) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.addHeader("Accept", MediaType.APPLICATION_XML);
         if (formToken != null) {
-            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+            postMethod.addHeader("XWiki-Form-Token", formToken);
         }
+        postMethod.setEntity(new StringEntity(string, toContentType(mediaType)));
 
-        RequestEntity entity = new StringRequestEntity(string, mediaType, "UTF-8");
-        postMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return execute(postMethod, new XWikiCredentials(userName, password));
     }
 
-    protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password)
-        throws Exception
+    protected CloseableHttpResponse executePostForm(String uri, NameValuePair[] nameValuePairs, String userName,
+        String password) throws Exception
     {
         return executePostForm(uri, nameValuePairs, userName, password, getFormToken(userName, password));
     }
 
-    protected PostMethod executePostForm(String uri, NameValuePair[] nameValuePairs, String userName, String password,
-        String formToken) throws Exception
+    protected CloseableHttpResponse executePostForm(String uri, NameValuePair[] nameValuePairs, String userName,
+        String password, String formToken) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        PostMethod postMethod = new PostMethod(uri);
-        postMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-        postMethod.addRequestHeader("Content-type", MediaType.APPLICATION_FORM_URLENCODED);
+        HttpPost postMethod = new HttpPost(uri);
+        postMethod.addHeader("Accept", MediaType.APPLICATION_XML);
         if (formToken != null) {
-            postMethod.addRequestHeader("XWiki-Form-Token", formToken);
+            postMethod.addHeader("XWiki-Form-Token", formToken);
         }
+        postMethod.setEntity(new UrlEncodedFormEntity(Arrays.asList(nameValuePairs), StandardCharsets.UTF_8));
 
-        postMethod.setRequestBody(nameValuePairs);
-
-        httpClient.executeMethod(postMethod);
-
-        return postMethod;
+        return execute(postMethod, new XWikiCredentials(userName, password));
     }
 
-    protected PutMethod executePutXml(String uri, Object object) throws Exception
+    protected CloseableHttpResponse executePutXml(String uri, Object object) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-
-        PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return executePutXml(uri, object, (XWikiCredentials) null);
     }
 
-    protected PutMethod executePutXml(String uri, Object object, String userName, String password) throws Exception
-    {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        PutMethod putMethod = new PutMethod(uri);
-        putMethod.addRequestHeader("Accept", MediaType.APPLICATION_XML);
-
-        StringWriter writer = new StringWriter();
-        marshaller.marshal(object, writer);
-
-        RequestEntity entity =
-            new StringRequestEntity(writer.toString(), MediaType.APPLICATION_XML, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
-    }
-
-    protected PutMethod executePut(String uri, String string, String mediaType) throws Exception
-    {
-        HttpClient httpClient = new HttpClient();
-
-        PutMethod putMethod = new PutMethod(uri);
-        RequestEntity entity = new StringRequestEntity(string, mediaType, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
-    }
-
-    protected PutMethod executePut(String uri, String string, String mediaType, String userName, String password)
+    protected CloseableHttpResponse executePutXml(String uri, Object object, String userName, String password)
         throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
-
-        PutMethod putMethod = new PutMethod(uri);
-        RequestEntity entity = new StringRequestEntity(string, mediaType, "UTF-8");
-        putMethod.setRequestEntity(entity);
-
-        httpClient.executeMethod(putMethod);
-
-        return putMethod;
+        return executePutXml(uri, object, new XWikiCredentials(userName, password));
     }
 
-    protected DeleteMethod executeDelete(String uri) throws Exception
+    private CloseableHttpResponse executePutXml(String uri, Object object, XWikiCredentials credentials)
+        throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        DeleteMethod deleteMethod = new DeleteMethod(uri);
-        httpClient.executeMethod(deleteMethod);
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.addHeader("Accept", MediaType.APPLICATION_XML);
+        putMethod.setEntity(toXmlEntity(object));
 
-        return deleteMethod;
+        return execute(putMethod, credentials);
     }
 
-    protected DeleteMethod executeDelete(String uri, String userName, String password) throws Exception
+    protected CloseableHttpResponse executePut(String uri, String string, String mediaType) throws Exception
     {
-        HttpClient httpClient = new HttpClient();
-        httpClient.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
-        httpClient.getParams().setAuthenticationPreemptive(true);
+        return executePut(uri, string, mediaType, (XWikiCredentials) null);
+    }
 
-        DeleteMethod deleteMethod = new DeleteMethod(uri);
-        httpClient.executeMethod(deleteMethod);
+    protected CloseableHttpResponse executePut(String uri, String string, String mediaType, String userName,
+        String password) throws Exception
+    {
+        return executePut(uri, string, mediaType, new XWikiCredentials(userName, password));
+    }
 
-        return deleteMethod;
+    private CloseableHttpResponse executePut(String uri, String string, String mediaType,
+        XWikiCredentials credentials) throws Exception
+    {
+        HttpPut putMethod = new HttpPut(uri);
+        putMethod.setEntity(new StringEntity(string, toContentType(mediaType)));
+
+        return execute(putMethod, credentials);
+    }
+
+    protected CloseableHttpResponse executeDelete(String uri) throws Exception
+    {
+        return executeDelete(uri, (XWikiCredentials) null);
+    }
+
+    protected CloseableHttpResponse executeDelete(String uri, String userName, String password) throws Exception
+    {
+        return executeDelete(uri, new XWikiCredentials(userName, password));
+    }
+
+    private CloseableHttpResponse executeDelete(String uri, XWikiCredentials credentials) throws Exception
+    {
+        return execute(new HttpDelete(uri), credentials);
+    }
+
+    protected CloseableHttpResponse execute(ClassicHttpRequest request, String userName, String password)
+        throws Exception
+    {
+        return execute(request, new XWikiCredentials(userName, password));
+    }
+
+    /**
+     * Executes the passed request with the passed credentials, and restores the credentials used by the rest of the
+     * test framework afterwards. Passing null credentials sends the request as guest.
+     */
+    private CloseableHttpResponse execute(ClassicHttpRequest request, XWikiCredentials credentials) throws Exception
+    {
+        XWikiCredentials previousCredentials = getUtil().setDefaultCredentials(credentials);
+
+        try {
+            return getUtil().execute(request);
+        } finally {
+            getUtil().setDefaultCredentials(previousCredentials);
+        }
+    }
+
+    private HttpEntity toXmlEntity(Object object) throws Exception
+    {
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(object, writer);
+
+        return new StringEntity(writer.toString(), toContentType(MediaType.APPLICATION_XML));
+    }
+
+    private ContentType toContentType(String mediaType)
+    {
+        return ContentType.parse(mediaType).withCharset(StandardCharsets.UTF_8);
     }
 
     protected String getWiki() throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(getFullUri(WikisResource.class));
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getEntity().getContent());
         assertTrue(!wikis.getWikis().isEmpty());
 
         return wikis.getWikis().get(0).getName();
@@ -462,19 +421,19 @@ public abstract class AbstractHttpIT
 
     protected String getContentFromURI(String uri) throws Exception
     {
-        GetMethod getMethod = executeGet(uri);
-        assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+        CloseableHttpResponse getMethod = executeGet(uri);
+        assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
-        return getMethod.getResponseBodyAsString();
+        return EntityUtils.toString(getMethod.getEntity());
     }
 
     protected void checkLinks(LinkCollection linkCollection) throws Exception
     {
         if (linkCollection.getLinks() != null) {
             for (Link link : linkCollection.getLinks()) {
-                GetMethod getMethod = executeGet(link.getHref());
-                if (getMethod.getStatusCode() != HttpStatus.SC_UNAUTHORIZED) {
-                    assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+                CloseableHttpResponse getMethod = executeGet(link.getHref());
+                if (getMethod.getCode() != HttpStatus.SC_UNAUTHORIZED) {
+                    assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
                 }
             }
         }
@@ -485,13 +444,22 @@ public abstract class AbstractHttpIT
         return Utils.createURI(new URI(getBaseURL()), resource, pathParameters).toString();
     }
 
+    /**
+     * @since 18.8.0RC1
+     */
+    protected String buildURI(Class<?> resource, List<Object> pathSegments, Map<String, Object> queryParameters)
+        throws Exception
+    {
+        return Utils.createURI(new URI(getBaseURL()), resource, pathSegments, queryParameters).toString();
+    }
+
     private Page getPage(String wikiName, List<String> spaceName, String pageName) throws Exception
     {
         String uri = buildURI(PageResource.class, wikiName, spaceName, pageName).toString();
 
-        GetMethod getMethod = executeGet(uri);
+        CloseableHttpResponse getMethod = executeGet(uri);
 
-        return (Page) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        return (Page) unmarshaller.unmarshal(getMethod.getEntity().getContent());
     }
 
     protected String getPageContent(String wikiName, List<String> spaceName, String pageName) throws Exception
@@ -506,20 +474,19 @@ public abstract class AbstractHttpIT
     {
         String uri = buildURI(PageResource.class, wikiName, spaceName, pageName).toString();
 
-        PutMethod putMethod = executePut(uri, content, javax.ws.rs.core.MediaType.TEXT_PLAIN,
+        CloseableHttpResponse putMethod = executePut(uri, content, javax.ws.rs.core.MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
 
-        int code = putMethod.getStatusCode();
+        int code = putMethod.getCode();
         assertTrue(code == HttpStatus.SC_ACCEPTED || code == HttpStatus.SC_CREATED,
-            String.format("Failed to set page content, %s", getHttpMethodInfo(putMethod)));
+            String.format("Failed to set page content, %s", getHttpResponseInfo(putMethod)));
 
         return code;
     }
 
-    protected String getHttpMethodInfo(HttpMethod method) throws Exception
+    protected String getHttpResponseInfo(ClassicHttpResponse response) throws Exception
     {
-        return String.format("\nName: %s\nURI: %s\nStatus code: %d\nStatus text: %s", method.getName(), method.getURI(),
-            method.getStatusCode(), method.getStatusText());
+        return String.format("\nStatus code: %d\nStatus text: %s", response.getCode(), response.getReasonPhrase());
     }
 
     protected String getAttachmentsInfo(Attachments attachments)
@@ -564,22 +531,22 @@ public abstract class AbstractHttpIT
         Page page = this.objectFactory.createPage();
         page.setContent(content);
 
-        PutMethod putMethod = executePutXml(uri, page, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        CloseableHttpResponse putMethod = executePutXml(uri, page, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertEquals(HttpStatus.SC_CREATED, putMethod.getStatusCode(), getHttpMethodInfo(putMethod));
+        assertEquals(HttpStatus.SC_CREATED, putMethod.getCode(), getHttpResponseInfo(putMethod));
     }
 
     protected boolean createPageIfDoesntExist(List<String> spaces, String pageName, String content) throws Exception
     {
         String uri = buildURI(PageResource.class, getWiki(), toRestSpaces(spaces), pageName);
 
-        GetMethod getMethod = executeGet(uri);
+        CloseableHttpResponse getMethod = executeGet(uri);
 
-        if (getMethod.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+        if (getMethod.getCode() == HttpStatus.SC_NOT_FOUND) {
             createPage(spaces, pageName, content);
 
             getMethod = executeGet(uri);
-            assertEquals(HttpStatus.SC_OK, getMethod.getStatusCode(), getHttpMethodInfo(getMethod));
+            assertEquals(HttpStatus.SC_OK, getMethod.getCode(), getHttpResponseInfo(getMethod));
 
             return true;
         }

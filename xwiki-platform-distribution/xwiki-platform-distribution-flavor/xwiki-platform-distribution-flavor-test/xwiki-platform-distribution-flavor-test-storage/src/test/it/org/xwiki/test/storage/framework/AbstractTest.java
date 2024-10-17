@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.xwiki.http.URIUtils;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.TestUtils;
@@ -75,14 +75,14 @@ public class AbstractTest
         return this.testName.getMethodName();
     }
 
-    protected HttpMethod doPostAsAdmin(final String space, final String page, final String filename,
+    protected StoreTestUtils.Response doPostAsAdmin(final String space, final String page, final String filename,
         final String action, final String query, final Map<String, String> postParameters) throws IOException
     {
         String url = getURL(space, page, filename, action, addBasicauth(query));
         return StoreTestUtils.doPost(url, TestUtils.ADMIN_CREDENTIALS, postParameters);
     }
 
-    public HttpMethod doUploadAsAdmin(final String space, final String page, final Map<String, byte[]> uploads)
+    public StoreTestUtils.Response doUploadAsAdmin(final String space, final String page, final Map<String, byte[]> uploads)
         throws IOException
     {
         String url = getURL(space, page, null, "upload", addBasicauth(null));
@@ -122,12 +122,12 @@ public class AbstractTest
 
         builder.append(action);
         builder.append('/');
-        builder.append(StoreTestUtils.escapeURL(space));
+        builder.append(URIUtils.encodePathSegment(space));
         builder.append('/');
-        builder.append(StoreTestUtils.escapeURL(page));
+        builder.append(URIUtils.encodePathSegment(page));
         if (filename != null && !filename.isEmpty()) {
             builder.append('/');
-            builder.append(StoreTestUtils.escapeURL(filename));
+            builder.append(URIUtils.encodePathSegment(filename));
         }
 
         boolean needToAddSecretToken = !("view".equals(action) || "edit".equals(action));
@@ -159,9 +159,7 @@ public class AbstractTest
         if (this.secretToken == null) {
             String body = null;
             try {
-                body =
-                    new String(doPostAsAdmin("Main", "WebHome", null, "edit", "editor=wiki", null).getResponseBody(),
-                        "UTF-8");
+                body = doPostAsAdmin("Main", "WebHome", null, "edit", "editor=wiki", null).bodyAsString();
                 Matcher matcher = Pattern.compile("<input[^>]+form_token[^>]+value=('|\")([^'\"]+)").matcher(body);
                 if (matcher.find() && matcher.groupCount() == 2) {
                     this.secretToken = matcher.group(2);

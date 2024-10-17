@@ -21,8 +21,9 @@ package org.xwiki.instance.test.ui;
 
 import java.util.UUID;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.instance.rest.InstanceResource;
 import org.xwiki.test.docker.junit5.UITest;
@@ -44,36 +45,36 @@ class InstanceResourceIT
     @Test
     void getInstanceIdReturnsValidUUID(TestUtils setup) throws Exception
     {
-        GetMethod get = setup.rest().executeGet(InstanceResource.class);
+        CloseableHttpResponse get = setup.rest().executeGet(InstanceResource.class);
         try {
-            assertEquals(HttpStatus.SC_OK, get.getStatusCode());
-            String body = get.getResponseBodyAsString().trim();
+            assertEquals(HttpStatus.SC_OK, get.getCode());
+            String body = EntityUtils.toString(get.getEntity()).trim();
             assertDoesNotThrow(() -> UUID.fromString(body));
         } finally {
-            get.releaseConnection();
+            get.close();
         }
     }
 
     @Test
     void getInstanceIdIsIdempotent(TestUtils setup) throws Exception
     {
-        GetMethod get1 = setup.rest().executeGet(InstanceResource.class);
+        CloseableHttpResponse get1 = setup.rest().executeGet(InstanceResource.class);
         String id1;
         try {
-            assertEquals(HttpStatus.SC_OK, get1.getStatusCode());
-            id1 = get1.getResponseBodyAsString().trim();
+            assertEquals(HttpStatus.SC_OK, get1.getCode());
+            id1 = EntityUtils.toString(get1.getEntity()).trim();
         } finally {
-            get1.releaseConnection();
+            get1.close();
         }
         assertNotNull(id1, "Instance id should not be null");
 
-        GetMethod get2 = setup.rest().executeGet(InstanceResource.class);
+        CloseableHttpResponse get2 = setup.rest().executeGet(InstanceResource.class);
         String id2;
         try {
-            assertEquals(HttpStatus.SC_OK, get2.getStatusCode());
-            id2 = get2.getResponseBodyAsString().trim();
+            assertEquals(HttpStatus.SC_OK, get2.getCode());
+            id2 = EntityUtils.toString(get2.getEntity()).trim();
         } finally {
-            get2.releaseConnection();
+            get2.close();
         }
 
         assertEquals(id1, id2);

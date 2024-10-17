@@ -43,7 +43,7 @@
     "@xwiki/cristal-navigation-tree-github": "workspace:*",
     "@xwiki/cristal-navigation-tree-nextcloud": "workspace:*",
     "@xwiki/cristal-navigation-tree-xwiki": "workspace:*",
-    "express": "4.20.0",
+    "express": "4.21.1",
     "vue": "3.5.12",
     "vue-router": "4.4.5"
   },

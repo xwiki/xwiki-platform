@@ -19,8 +19,8 @@
  */
 package org.xwiki.rest.test;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.rest.model.jaxb.Class;
@@ -35,10 +35,10 @@ public class ClassesResourceIT extends AbstractHttpIT
     @Test
     public void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(buildURI(ClassesResource.class, getWiki()));
+        Assert.assertEquals(HttpStatus.SC_OK, response.getCode());
 
-        Classes classes = (Classes) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Classes classes = (Classes) unmarshaller.unmarshal(response.getEntity().getContent());
 
         for (Class clazz : classes.getClazzs()) {
             checkLinks(clazz);

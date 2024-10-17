@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.xwiki.http.URIUtils;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.TestUtils;
@@ -122,12 +122,12 @@ public class AbstractTest
 
         builder.append(action);
         builder.append('/');
-        builder.append(StoreTestUtils.escapeURL(space));
+        builder.append(URIUtils.encodePathSegment(space));
         builder.append('/');
-        builder.append(StoreTestUtils.escapeURL(page));
+        builder.append(URIUtils.encodePathSegment(page));
         if (filename != null && !filename.isEmpty()) {
             builder.append('/');
-            builder.append(StoreTestUtils.escapeURL(filename));
+            builder.append(URIUtils.encodePathSegment(filename));
         }
 
         boolean needToAddSecretToken = !("view".equals(action) || "edit".equals(action));

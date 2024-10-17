@@ -21,7 +21,6 @@ package org.xwiki.test.storage;
 
 import java.util.HashMap;
 
-import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;

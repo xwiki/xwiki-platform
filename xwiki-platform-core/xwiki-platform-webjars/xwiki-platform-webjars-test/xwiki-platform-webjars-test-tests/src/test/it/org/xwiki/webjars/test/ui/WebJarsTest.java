@@ -21,8 +21,8 @@ package org.xwiki.webjars.test.ui;
 
 import java.net.URI;
 
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -31,8 +31,8 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Functional tests for the WebJars integration.
@@ -85,10 +85,8 @@ public class WebJarsTest extends AbstractTest
         URI uri = new URI(StringUtils.removeEnd(getUtil().rest().getBaseURL(), "rest")
             + "webjars/wiki%3Axwiki/..%2F..%2F..%2F..%2F..%2FWEB-INF%2Fxwiki.cfg");
 
-        GetMethod response = getUtil().rest().executeGet(uri);
-
-        assertNotEquals(200, response.getStatusCode());
-
-        response.releaseConnection();
+        try (CloseableHttpResponse response = getUtil().rest().executeGet(uri)) {
+            assertNotEquals(200, response.getCode());
+        }
     }
 }

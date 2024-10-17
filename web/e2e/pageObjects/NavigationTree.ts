@@ -48,8 +48,9 @@ export class NavigationTreePageObject {
 
   private async findItemsShoelace(): Promise<Array<NavigationTreeNode>> {
     return await NavigationTreePageObject.findItemsInternal(
-      this.page.locator("#sidebar sl-tree").nth(1).locator("sl-tree-item"),
-      NavigationTreePageObject.wrapShoelace);
+      this.page.locator("#sidebar sl-tree:visible sl-tree-item"),
+      NavigationTreePageObject.wrapShoelace,
+    );
   }
 
   private static wrapShoelace(element: Locator): NavigationTreeNode {

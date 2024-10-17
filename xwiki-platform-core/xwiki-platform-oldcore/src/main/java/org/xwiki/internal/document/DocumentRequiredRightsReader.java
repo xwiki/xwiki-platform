@@ -49,10 +49,16 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DocumentRequiredRightsReader
 {
-    private static final LocalDocumentReference CLASS_REFERENCE =
+    /**
+     * The (local) class reference of the required right class.
+     */
+    public static final LocalDocumentReference CLASS_REFERENCE =
         new LocalDocumentReference("XWiki", "RequiredRightClass");
 
-    private static final String PROPERTY_NAME = "level";
+    /**
+     * The name of the property that stores the value.
+     */
+    public static final String PROPERTY_NAME = "level";
 
     @Inject
     private Logger logger;

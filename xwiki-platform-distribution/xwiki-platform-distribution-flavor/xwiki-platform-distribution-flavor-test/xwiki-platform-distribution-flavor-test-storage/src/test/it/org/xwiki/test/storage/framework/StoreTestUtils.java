@@ -26,13 +26,14 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.xwiki.test.ui.TestUtils.TestCredentials;
 
 /**
  * Test saving and downloading of attachments.
@@ -49,7 +50,7 @@ public final class StoreTestUtils
     }
 
     /** Method to easily do a post request to the site. */
-    public static HttpMethod doPost(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static HttpMethod doPost(final String address, final TestCredentials userNameAndPassword,
         final Map<String, String> parameters) throws IOException
     {
         final HttpClient client = new HttpClient();
@@ -69,7 +70,7 @@ public final class StoreTestUtils
         return method;
     }
 
-    public static HttpMethod doUpload(final String address, final UsernamePasswordCredentials userNameAndPassword,
+    public static HttpMethod doUpload(final String address, final TestCredentials userNameAndPassword,
         final Map<String, byte[]> uploads) throws IOException
     {
         final HttpClient client = new HttpClient();

@@ -24,7 +24,6 @@ import java.net.URI;
 
 import javax.inject.Provider;
 
-import org.apache.commons.httpclient.util.URIUtil;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;

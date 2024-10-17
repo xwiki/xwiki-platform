@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +55,7 @@ import org.xwiki.repository.test.po.edit.ExtensionSupportPlanInlinePage;
 import org.xwiki.repository.test.po.edit.ExtensionSupporterInlinePage;
 import org.xwiki.repository.test.ui.AbstractExtensionAdminAuthenticatedIT;
 import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.integration.TestCredentials;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 
@@ -71,8 +71,7 @@ import static org.junit.Assert.fail;
  */
 public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
 {
-    public static final UsernamePasswordCredentials USER_CREDENTIALS =
-        new UsernamePasswordCredentials("Author", "password");
+    public static final TestCredentials USER_CREDENTIALS = new TestCredentials("Author", "password");
 
     private static final String IDPREFIX = "prefix-";
 

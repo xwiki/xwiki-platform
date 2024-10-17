@@ -23,10 +23,6 @@ import java.io.IOException;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
@@ -38,6 +34,7 @@ import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.test.docker.junit5.DockerTestException;
 import org.xwiki.test.extension.JobExecutor;
+import org.xwiki.test.integration.TestCredentials;
 
 /**
  * Create a sub wiki.
@@ -72,7 +69,7 @@ public class WikiCreator
      * @return true of the wiki was created, false if it already existed
      * @throws Exception when failing to create the wiki
      */
-    public boolean createWiki(UsernamePasswordCredentials credentials, String wikiId, boolean failOnExist)
+    public boolean createWiki(TestCredentials credentials, String wikiId, boolean failOnExist)
         throws Exception
     {
         String xwikiRESTURL = String.format("%s/rest", DockerTestUtils.getXWikiURL(this.context));
@@ -102,7 +99,7 @@ public class WikiCreator
         return true;
     }
 
-    private boolean exists(String xwikiRESTURL, UsernamePasswordCredentials credentials, String wikiId)
+    private boolean exists(String xwikiRESTURL, TestCredentials credentials, String wikiId)
         throws IOException
     {
         HttpClient httpClient = new HttpClient();

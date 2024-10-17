@@ -25,8 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.hc.client5.http.utils.URIUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -68,7 +67,7 @@ public class AttachURIVfsResourceReferenceSerializer implements ResourceReferenc
         String scheme = reference.getScheme();
         String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
         try {
-            String attachmentName = URIUtil.encodePath(attachmentReference.getName());
+            String attachmentName = URIUtils.encodePath(attachmentReference.getName());
             String referencePath = URIUtil.encodePath(reference.getPath());
             return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString,
                 attachmentName, referencePath));

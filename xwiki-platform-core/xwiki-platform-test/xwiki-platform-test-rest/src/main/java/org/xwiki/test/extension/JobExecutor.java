@@ -26,15 +26,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.xwiki.job.JobException;
 import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.model.jaxb.JobStatus;
+import org.xwiki.test.integration.TestCredentials;
 
 /**
  * Execute a Job to call the XWiki REST endpoint to install extensions.
@@ -53,7 +48,7 @@ public class JobExecutor
      * @throws Exception if an error occured when connecting to the REST endpoint
      */
     public void execute(String jobType, JobRequest request, String xwikiRESTURL,
-        UsernamePasswordCredentials credentials) throws Exception
+        TestCredentials credentials) throws Exception
     {
         JAXBContext context = JAXBContext.newInstance("org.xwiki.rest.model.jaxb");
         Unmarshaller unmarshaller = context.createUnmarshaller();

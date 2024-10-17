@@ -29,7 +29,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
@@ -133,7 +132,7 @@ public class InstallMojo extends AbstractMojo
 
             HttpClient httpClient = new HttpClient();
             httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(this.username, this.password));
+                new TestCredentials(this.username, this.password));
             httpClient.getParams().setAuthenticationPreemptive(true);
 
             installExtensions(marshaller, unmarshaller, httpClient);

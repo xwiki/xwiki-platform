@@ -66,13 +66,7 @@ import javax.naming.NamingException;
 import javax.script.ScriptContext;
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1185,7 +1179,7 @@ public class XWiki implements EventListener
         String proxyUser = System.getProperty("http.proxyUser");
         if ((proxyUser != null) && (!proxyUser.equals(""))) {
             String proxyPassword = System.getProperty("http.proxyPassword");
-            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            Credentials defaultcreds = new TestCredentials(proxyUser, proxyPassword);
             client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
         }
 
@@ -6746,7 +6740,7 @@ public class XWiki implements EventListener
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
         client.getState().setCredentials(new AuthScope(null, -1, null),
-            new UsernamePasswordCredentials(username, password));
+            new TestCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.
@@ -6811,7 +6805,7 @@ public class XWiki implements EventListener
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
         client.getState().setCredentials(new AuthScope(null, -1, null),
-            new UsernamePasswordCredentials(username, password));
+            new TestCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.

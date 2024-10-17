@@ -27,8 +27,6 @@ import java.util.List;
 import javax.inject.Provider;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;

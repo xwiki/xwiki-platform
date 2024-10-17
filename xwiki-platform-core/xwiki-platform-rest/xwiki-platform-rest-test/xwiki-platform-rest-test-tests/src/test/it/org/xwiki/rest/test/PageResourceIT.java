@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,8 +111,8 @@ public class PageResourceIT extends AbstractHttpIT
 
     private Page getFirstPage() throws Exception
     {
-        GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse getMethod = executeGet(getFullUri(WikisResource.class));
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertTrue(wikis.getWikis().size() > 0);
@@ -121,7 +122,7 @@ public class PageResourceIT extends AbstractHttpIT
         Link spacesLink = getFirstLinkByRelation(wiki, Relations.SPACES);
         Assert.assertNotNull(spacesLink);
         getMethod = executeGet(spacesLink.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
         Spaces spaces = (Spaces) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertTrue(spaces.getSpaces().size() > 0);
 
@@ -138,7 +139,7 @@ public class PageResourceIT extends AbstractHttpIT
         Link pagesInSpace = getFirstLinkByRelation(space, Relations.PAGES);
         Assert.assertNotNull(pagesInSpace);
         getMethod = executeGet(pagesInSpace.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
         Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertTrue(pages.getPageSummaries().size() > 0);
 
@@ -153,7 +154,7 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertNotNull(pageLink);
 
         getMethod = executeGet(pageLink.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Page page = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -175,9 +176,9 @@ public class PageResourceIT extends AbstractHttpIT
     @Test
     public void testGETNotExistingPage() throws Exception
     {
-        GetMethod getMethod =
+        CloseableHttpResponse getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), Arrays.asList("NOTEXISTING"), "NOTEXISTING").toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode());
     }
 
     @Test
@@ -198,9 +199,9 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertNotNull(link);
 
         // PUT
-        PutMethod putMethod = executePutXml(link.getHref(), newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        CloseableHttpResponse putMethod = executePutXml(link.getHref(), newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getCode());
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
 
         Assert.assertEquals(title, modifiedPage.getTitle());
@@ -208,8 +209,8 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertEquals(comment, modifiedPage.getComment());
 
         // GET
-        GetMethod getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse getMethod = executeGet(link.getHref());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
         modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         Assert.assertEquals(title, modifiedPage.getTitle());
@@ -243,9 +244,9 @@ public class PageResourceIT extends AbstractHttpIT
         newPage.getObjects().getObjectSummaries().add(object);
 
         // PUT
-        PutMethod putMethod = executePutXml(pageURI, newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+        CloseableHttpResponse putMethod = executePutXml(pageURI, newPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertThat(getHttpMethodInfo(putMethod), putMethod.getStatusCode(),
+        assertThat(getHttpMethodInfo(putMethod), putMethod.getCode(),
             isIn(Arrays.asList(HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED)));
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
@@ -255,8 +256,8 @@ public class PageResourceIT extends AbstractHttpIT
         Assert.assertEquals(comment, modifiedPage.getComment());
 
         // GET
-        GetMethod getMethod = executeGet(pageURI + "?objects=true");
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse getMethod = executeGet(pageURI + "?objects=true");
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
         modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         Assert.assertEquals(title, modifiedPage.getTitle());
@@ -273,7 +274,7 @@ public class PageResourceIT extends AbstractHttpIT
         // PUT
         putMethod = executePutXml(pageURI, modifiedPage, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        assertThat(getHttpMethodInfo(putMethod), putMethod.getStatusCode(),
+        assertThat(getHttpMethodInfo(putMethod), putMethod.getCode(),
             isIn(Arrays.asList(HttpStatus.SC_ACCEPTED)));
 
         modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
@@ -284,7 +285,7 @@ public class PageResourceIT extends AbstractHttpIT
 
         // GET
         getMethod = executeGet(pageURI + "?objects=true");
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
         modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         Assert.assertEquals(title, modifiedPage.getTitle());
@@ -315,9 +316,9 @@ public class PageResourceIT extends AbstractHttpIT
         Link link = getFirstLinkByRelation(originalPage, Relations.SELF);
         Assert.assertNotNull(link);
 
-        PutMethod putMethod = executePut(link.getHref(), CONTENT, MediaType.TEXT_PLAIN,
+        CloseableHttpResponse putMethod = executePut(link.getHref(), CONTENT, MediaType.TEXT_PLAIN,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
 
@@ -333,8 +334,8 @@ public class PageResourceIT extends AbstractHttpIT
         Link link = getFirstLinkByRelation(page, Relations.SELF);
         Assert.assertNotNull(link);
 
-        PutMethod putMethod = executePutXml(link.getHref(), page);
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_UNAUTHORIZED, putMethod.getStatusCode());
+        CloseableHttpResponse putMethod = executePutXml(link.getHref(), page);
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_UNAUTHORIZED, putMethod.getCode());
     }
 
     @Test
@@ -351,9 +352,9 @@ public class PageResourceIT extends AbstractHttpIT
         page.setTitle(TITLE);
         page.setParent(PARENT);
 
-        PutMethod putMethod = executePutXml(buildURI(PageResource.class, getWiki(), SPACE_NAME, PAGE_NAME).toString(),
+        CloseableHttpResponse putMethod = executePutXml(buildURI(PageResource.class, getWiki(), SPACE_NAME, PAGE_NAME).toString(),
             page, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
 
@@ -375,9 +376,9 @@ public class PageResourceIT extends AbstractHttpIT
         Page page = getFirstPage();
         Link link = getFirstLinkByRelation(page, Relations.SELF);
 
-        PutMethod putMethod = executePut(link.getHref(),
+        CloseableHttpResponse putMethod = executePut(link.getHref(),
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><invalidPage><content/></invalidPage>", MediaType.TEXT_XML);
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_BAD_REQUEST, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_BAD_REQUEST, putMethod.getCode());
 
         this.validateConsole.getLogCaptureConfiguration().registerExpected(
             "unexpected element (uri:\"\", local:\"invalidPage\"). Expected elements are"
@@ -396,16 +397,16 @@ public class PageResourceIT extends AbstractHttpIT
         Page page = objectFactory.createPage();
         page.setContent(languageId);
 
-        PutMethod putMethod = executePutXml(
+        CloseableHttpResponse putMethod = executePutXml(
             buildURI(PageTranslationResource.class, getWiki(), TestConstants.TEST_SPACE_NAME,
                 TestConstants.TRANSLATIONS_PAGE_NAME, languageId).toString(),
             page, TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_CREATED, putMethod.getCode());
 
         // GET
-        GetMethod getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(),
+        CloseableHttpResponse getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(),
             TestConstants.TEST_SPACE_NAME, TestConstants.TRANSLATIONS_PAGE_NAME, languageId).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -419,7 +420,7 @@ public class PageResourceIT extends AbstractHttpIT
 
         for (Translation translation : modifiedPage.getTranslations().getTranslations()) {
             getMethod = executeGet(getFirstLinkByRelation(translation, Relations.PAGE).getHref());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
             modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -434,14 +435,14 @@ public class PageResourceIT extends AbstractHttpIT
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, TestConstants.TRANSLATIONS_PAGE_NAME, "Translations");
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, TestConstants.TRANSLATIONS_PAGE_NAME)
                 .toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         getMethod = executeGet(buildURI(PageTranslationResource.class, getWiki(), TestConstants.TEST_SPACE_NAME,
             TestConstants.TRANSLATIONS_PAGE_NAME, "NOT_EXISTING").toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode());
     }
 
     @Test
@@ -449,14 +450,14 @@ public class PageResourceIT extends AbstractHttpIT
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, this.pageName, "Test page");
 
-        DeleteMethod deleteMethod = executeDelete(
+        CloseableHttpResponse deleteMethod = executeDelete(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, this.pageName).toString(),
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_NO_CONTENT, deleteMethod.getCode());
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_NOT_FOUND, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_NOT_FOUND, getMethod.getCode());
     }
 
     @Test
@@ -464,22 +465,22 @@ public class PageResourceIT extends AbstractHttpIT
     {
         createPageIfDoesntExist(TestConstants.TEST_SPACE_NAME, this.pageName, "Test page");
 
-        DeleteMethod deleteMethod = executeDelete(
+        CloseableHttpResponse deleteMethod = executeDelete(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_UNAUTHORIZED, deleteMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(deleteMethod), HttpStatus.SC_UNAUTHORIZED, deleteMethod.getCode());
 
-        GetMethod getMethod = executeGet(
+        CloseableHttpResponse getMethod = executeGet(
             buildURI(PageResource.class, getWiki(), TestConstants.TEST_SPACE_NAME, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
     }
 
     @Test
     public void testPageHistory() throws Exception
     {
-        GetMethod getMethod =
+        CloseableHttpResponse getMethod =
             executeGet(buildURI(PageResource.class, getWiki(), this.spaces, this.pageName).toString());
 
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Page originalPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertEquals(this.spaces.get(0), originalPage.getSpace());
@@ -488,7 +489,7 @@ public class PageResourceIT extends AbstractHttpIT
             buildURI(PageHistoryResource.class, getWiki(), this.spaces, originalPage.getName()).toString();
 
         getMethod = executeGet(pageHistoryUri);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         History history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -499,7 +500,7 @@ public class PageResourceIT extends AbstractHttpIT
             }
 
             getMethod = executeGet(getFirstLinkByRelation(historySummary, Relations.PAGE).getHref());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
             Page page = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -520,14 +521,14 @@ public class PageResourceIT extends AbstractHttpIT
         String pageHistoryUri = buildURI(PageHistoryResource.class, getWiki(), TestConstants.TEST_SPACE_NAME,
             TestConstants.TRANSLATIONS_PAGE_NAME).toString();
 
-        GetMethod getMethod = executeGet(pageHistoryUri);
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse getMethod = executeGet(pageHistoryUri);
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         History history = (History) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
         for (HistorySummary historySummary : history.getHistorySummaries()) {
             getMethod = executeGet(getFirstLinkByRelation(historySummary, Relations.PAGE).getHref());
-            Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+            Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
             Page page = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -539,9 +540,9 @@ public class PageResourceIT extends AbstractHttpIT
     @Test
     public void testGETPageChildren() throws Exception
     {
-        GetMethod getMethod =
+        CloseableHttpResponse getMethod =
             executeGet(buildURI(PageChildrenResource.class, getWiki(), this.spaces, this.pageName).toString());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Pages pages = (Pages) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertTrue(pages.getPageSummaries().size() > 0);
@@ -566,9 +567,9 @@ public class PageResourceIT extends AbstractHttpIT
         nameValuePairs[0] = new NameValuePair("title", TITLE);
         nameValuePairs[1] = new NameValuePair("content", CONTENT);
 
-        PostMethod postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+        CloseableHttpResponse postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_ACCEPTED, postMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(postMethod.getResponseBodyAsStream());
 
@@ -591,14 +592,14 @@ public class PageResourceIT extends AbstractHttpIT
         nameValuePairs[0] = new NameValuePair("title", TITLE);
         nameValuePairs[1] = new NameValuePair("content", CONTENT);
 
-        PostMethod postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
+        CloseableHttpResponse postMethod = executePostForm(String.format("%s?method=PUT", link.getHref()), nameValuePairs,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword(), null);
-        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_FORBIDDEN, postMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(postMethod), HttpStatus.SC_FORBIDDEN, postMethod.getCode());
         Assert.assertEquals("Invalid or missing form token.", postMethod.getResponseBodyAsString());
 
         // Assert that the page hasn't been modified.
-        GetMethod getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse getMethod = executeGet(link.getHref());
+        Assert.assertEquals(HttpStatus.SC_OK, getMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
@@ -619,9 +620,9 @@ public class PageResourceIT extends AbstractHttpIT
         Link link = getFirstLinkByRelation(originalPage, Relations.SELF);
         Assert.assertNotNull(link);
 
-        PutMethod putMethod = executePutXml(link.getHref(), originalPage,
+        CloseableHttpResponse putMethod = executePutXml(link.getHref(), originalPage,
             TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getStatusCode());
+        Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_ACCEPTED, putMethod.getCode());
 
         Page modifiedPage = (Page) this.unmarshaller.unmarshal(putMethod.getResponseBodyAsStream());
 

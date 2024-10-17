@@ -478,8 +478,8 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
             new LocalDocumentReference(List.of("Extension", importedExtensionName), "WebHome");
 
         // assert that this test is going to make sense at all
-        Assert.assertTrue(getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME) > 1);
-        Assert.assertTrue(getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME) > 1);
+        Assert.assertTrue(getNumberOfExtensionVersionsObjects(importedExtensionName) > 1);
+        Assert.assertTrue(getNumberOfExtensionVersionsDependenciesObjects(importedExtensionName) > 1);
 
         // indicate that the history of the extension should be proxied
         getUtil().updateObject(extensionPageReference, XWikiRepositoryModel.EXTENSIONPROXY_CLASSNAME, 0, "proxyLevel",
@@ -489,8 +489,8 @@ public class RepositoryIT extends AbstractExtensionAdminAuthenticatedIT
         extensionPage.updateExtension();
 
         // assert that the object to be proxied are now absent
-        Assert.assertEquals(1, getNumberOfExtensionVersionsObjects(IMPORTED_EXTENSION_NAME));
-        Assert.assertEquals(1, getNumberOfExtensionVersionsDependenciesObjects(IMPORTED_EXTENSION_NAME));
+        Assert.assertEquals(1, getNumberOfExtensionVersionsObjects(importedExtensionName));
+        Assert.assertEquals(1, getNumberOfExtensionVersionsDependenciesObjects(importedExtensionName));
 
         // Remember the page version
         Page restPage = getUtil().rest().get(extensionPageReference);

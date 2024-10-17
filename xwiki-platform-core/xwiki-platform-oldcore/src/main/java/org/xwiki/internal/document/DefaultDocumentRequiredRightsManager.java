@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization.internal.requiredrights;
+package org.xwiki.internal.document;
 
 import java.util.Optional;
 
@@ -26,7 +26,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;

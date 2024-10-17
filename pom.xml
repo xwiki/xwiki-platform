@@ -374,46 +374,6 @@
         <artifactId>tika-parser-image-module</artifactId>
         <version>${tika.version}</version>
       </dependency>
-
-      <!-- Rome 1.x is used only in the feed api module -->
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome</artifactId>
-        <version>1.0</version>
-        <exclusions>
-          <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
-          <exclusion>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-          </exclusion>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome-fetcher</artifactId>
-        <version>1.0</version>
-        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
-        <exclusions>
-          <exclusion>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-          </exclusion>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>

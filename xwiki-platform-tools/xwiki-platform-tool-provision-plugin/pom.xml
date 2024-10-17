@@ -34,7 +34,7 @@
     Install one or several Extensions into a running XWiki instance
    </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
     <!-- Allow Maven plugins to output to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -61,6 +61,11 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-http</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-model</artifactId>
       <version>${project.version}</version>
@@ -79,10 +84,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>

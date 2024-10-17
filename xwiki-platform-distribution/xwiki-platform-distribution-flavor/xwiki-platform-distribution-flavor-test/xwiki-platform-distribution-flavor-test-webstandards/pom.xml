@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-webstandards</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Web Standards</name>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Web Standards</description>
   <dependencyManagement>
     <dependencies>

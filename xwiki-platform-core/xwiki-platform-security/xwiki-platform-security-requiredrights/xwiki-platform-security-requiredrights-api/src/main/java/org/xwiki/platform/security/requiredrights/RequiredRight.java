@@ -19,6 +19,7 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -42,12 +43,12 @@ public class RequiredRight implements Serializable
     /**
      * Programming right required.
      */
-    public static final RequiredRight PROGRAM = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, false);
+    public static final RequiredRight PROGRAM = new RequiredRight(Right.PROGRAM, null, false);
 
     /**
      * Programming right might be required, but a manual review is needed to confirm if the right is required.
      */
-    public static final RequiredRight MAYBE_PROGRAM = new RequiredRight(Right.PROGRAM, EntityType.DOCUMENT, true);
+    public static final RequiredRight MAYBE_PROGRAM = new RequiredRight(Right.PROGRAM, null, true);
 
     /**
      * Script right required.
@@ -70,6 +71,12 @@ public class RequiredRight implements Serializable
      * Script right is required, programming right might be required.
      */
     public static final List<RequiredRight> SCRIPT_AND_MAYBE_PROGRAM = List.of(SCRIPT, MAYBE_PROGRAM);
+
+    /**
+     * The serialization UID. The value is the value of the first version of this class that didn't have this field.
+     */
+    @Serial
+    private static final long serialVersionUID = 4837678565544747071L;
 
     private final Right right;
 

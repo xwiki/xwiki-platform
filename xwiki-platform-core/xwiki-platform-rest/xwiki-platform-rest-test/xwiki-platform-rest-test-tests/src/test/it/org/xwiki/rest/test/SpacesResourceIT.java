@@ -25,9 +25,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
@@ -57,20 +57,20 @@ public class SpacesResourceIT extends AbstractHttpIT
         // Create a subspace
         createPageIfDoesntExist(Arrays.asList("SpaceA", "SpaceB", "SpaceC"), "MyPage", "some content");
 
-        GetMethod getMethod = executeGet(getFullUri(WikisResource.class));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        CloseableHttpResponse response = executeGet(getFullUri(WikisResource.class));
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Wikis wikis = (Wikis) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Wikis wikis = (Wikis) unmarshaller.unmarshal(response.getEntity().getContent());
         Assert.assertTrue(wikis.getWikis().size() > 0);
 
         Wiki wiki = wikis.getWikis().get(0);
         Link link = getFirstLinkByRelation(wiki, Relations.SPACES);
         Assert.assertNotNull(link);
 
-        getMethod = executeGet(link.getHref());
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        response = executeGet(link.getHref());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Spaces spaces = (Spaces) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Spaces spaces = (Spaces) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertTrue(spaces.getSpaces().size() > 0);
 
@@ -106,19 +106,19 @@ public class SpacesResourceIT extends AbstractHttpIT
 
         this.solrUtils.waitEmptyQueue();
 
-        GetMethod getMethod = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
+        CloseableHttpResponse response = executeGet(String.format("%s?q=somethingthatcannotpossiblyexist",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        SearchResults searchResults = (SearchResults) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertEquals(0, searchResults.getSearchResults().size());
 
-        getMethod = executeGet(String.format("%s?q=%s",
+        response = executeGet(String.format("%s?q=%s",
             buildURI(SpaceSearchResource.class, getWiki(), Arrays.asList(getTestClassName())), getTestMethodName()));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        searchResults = (SearchResults) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        searchResults = (SearchResults) unmarshaller.unmarshal(response.getEntity().getContent());
 
         int resultSize = searchResults.getSearchResults().size();
         Assert.assertTrue("Found " + resultSize + " result", resultSize == 1);
@@ -138,11 +138,11 @@ public class SpacesResourceIT extends AbstractHttpIT
             new ReaderInputStream(new StringReader("content"), StandardCharsets.UTF_8), true);
 
         // Matches Sandbox.WebHome@XWikLogo.png
-        GetMethod getMethod = executeGet(String.format("%s",
+        CloseableHttpResponse response = executeGet(String.format("%s",
             buildURI(SpaceAttachmentsResource.class, getWiki(), Arrays.asList(getTestClassName()))));
-        Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
+        Assert.assertEquals(getHttpResponseInfo(response), HttpStatus.SC_OK, response.getCode());
 
-        Attachments attachments = (Attachments) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Attachments attachments = (Attachments) unmarshaller.unmarshal(response.getEntity().getContent());
 
         Assert.assertEquals(getAttachmentsInfo(attachments), 1, attachments.getAttachments().size());
 

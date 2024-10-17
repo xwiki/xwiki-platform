@@ -149,7 +149,7 @@
  *#
 #macro(displayMenu $id $icon $menuContent $titleKey $titleAsLabel $actionUrl $extraAttribute)
   <div class="btn-group" id="$id">
-    <#if ("$!actionUrl" == '')button#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
+    <#if ("$!actionUrl" == '')button type="button"#{else}a#end class="btn btn-default#if ("$!actionUrl" == '') dropdown-toggle#end" title="$services.localization.render($titleKey)"##
     #if ("$!actionUrl" != '')
       href="$actionUrl"
     #else

@@ -84,9 +84,14 @@ public class WebSocketScriptService implements ScriptService
             XWikiContext xcontext = this.xcontextProvider.get();
 
             StringBuilder path = new StringBuilder("/");
-            path.append(xcontext.getWiki().getWebAppPath(xcontext));
-            path.append("websocket").append(path(pathOrRoleHint));
 
+            // Test if installed with ROOT servlet context and avoid double slash.
+            String webAppPath = xcontext.getWiki().getWebAppPath(xcontext);
+            if (!"/".equals(webAppPath)) {
+                path.append(webAppPath);
+            }
+
+            path.append("websocket").append(path(pathOrRoleHint));
             URL serverURL = xcontext.getURLFactory().getServerURL(xcontext);
             String scheme = "https".equals(serverURL.getProtocol()) ? "wss" : "ws";
             // We have to add the path afterwards because the URI constructor double encodes it.

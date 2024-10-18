@@ -37,4 +37,8 @@ const items = computed(() => {
   <v-breadcrumbs :items="items"></v-breadcrumbs>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-breadcrumbs {
+  padding: 0;
+}
+</style>

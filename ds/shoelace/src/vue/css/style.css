@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 .load-spinner {
   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="40" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="100" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="%23B9B9B9" stroke="%23B9B9B9" stroke-width="6" r="15" cx="160" cy="100"><animate attributeName="opacity" calcMode="spline" dur="2" values="1;0;1;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>');
   background-size: cover;
@@ -30,6 +31,7 @@
   --cr-sizes-main-sidebar-min-width: 250px; /*The minimum width of the main sidebar*/
   --cr-sizes-collapsed-main-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard main main sidebar*/
   --cr-base-font-size: 16px;
+  --cr-base-text-color: var(--cr-color-gray-950);
 
   /*
    * Typography
@@ -149,6 +151,18 @@
   --cr-color-neutral-800: var(--sl-color-gray-800);
   --cr-color-neutral-900: var(--sl-color-gray-900);
   --cr-color-neutral-950: var(--sl-color-gray-950);
+
+    /*
+   * Border radii
+   */
+
+   --cr-border-radius-small: 0.1875rem; /* 3px */
+   --cr-border-radius-medium: 0.25rem; /* 4px */
+   --cr-border-radius-large: 0.5rem; /* 8px */
+   --cr-border-radius-x-large: 1rem; /* 16px */
+ 
+   --cr-border-radius-circle: 50%;
+   --cr-border-radius-pill: 9999px;
 
   /*
    * Elevations

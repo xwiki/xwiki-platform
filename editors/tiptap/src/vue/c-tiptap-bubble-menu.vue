@@ -260,9 +260,6 @@ const linkAction = getLinkAction(props.editor);
   display: flex;
   border-radius: var(--cr-tooltip-border-radius);
   background: white; /* TODO: define a global variable for background color */
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.1),
-    0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .items > div {
@@ -272,7 +269,8 @@ const linkAction = getLinkAction(props.editor);
 .item {
   background: transparent;
   border: none;
-  padding: var(--cr-spacing-x-small);
+  padding: var(--cr-spacing-2x-small) var(--cr-spacing-x-small);
+  border-radius: var(--cr-border-radius-medium);
 }
 
 .item:hover {

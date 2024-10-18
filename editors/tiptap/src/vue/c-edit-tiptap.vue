@@ -218,14 +218,21 @@ onUpdated(() => loadEditor(currentPage.value!));
     <!-- TODO: provide a better error reporting. -->
     {{ error }}
   </div>
-  <div v-show="!loading && !error" class="content">
-    <input
-      v-model="title"
-      type="text"
-      :placeholder="titlePlaceholder"
-      class="doc-title"
-    />
-    <c-tiptap-bubble-menu v-if="editor" :editor="editor"></c-tiptap-bubble-menu>
+  <div v-show="!loading && !error" class="edit-wrapper">
+    <div class="doc-header">
+      <div class="doc-header-inner">
+        <input
+          v-model="title"
+          type="text"
+          :placeholder="titlePlaceholder"
+          class="doc-title"
+        />
+        <c-tiptap-bubble-menu
+          v-if="editor"
+          :editor="editor"
+        ></c-tiptap-bubble-menu>
+      </div>
+    </div>
     <editor-content :editor="editor" class="doc-content editor" />
     <form class="pagemenu" @submit="submit">
       <div class="pagemenu-status">
@@ -252,9 +259,6 @@ onUpdated(() => loadEditor(currentPage.value!));
   overflow: hidden;
   justify-content: center;
 }
-.doc-content {
-  overflow: auto;
-}
 .content-loading {
   display: flex;
   flex-flow: column;
@@ -275,6 +279,8 @@ onUpdated(() => loadEditor(currentPage.value!));
 }
 
 .pagemenu {
+  position: sticky;
+  bottom: 0;
   display: flex;
   flex-flow: row;
   gap: var(--cr-spacing-x-small);

@@ -196,12 +196,13 @@ function onClickOutsideMainSidebar() {
   flex-flow: column;
   height: 100%;
   gap: var(--cr-spacing-x-small);
-  padding: 0 var(--cr-spacing-x-small);
-  overflow: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  overflow-x: hidden;
 }
 
 .search {
-  padding: 0 var(--cr-spacing-x-small);
+  padding: 0;
 }
 
 .sidebar-header {
@@ -210,7 +211,6 @@ function onClickOutsideMainSidebar() {
   flex-flow: row;
   align-items: center;
   gap: var(--cr-spacing-x-small);
-  padding: var(--cr-spacing-small) var(--cr-spacing-x-small) 0;
 }
 
 .avatar {

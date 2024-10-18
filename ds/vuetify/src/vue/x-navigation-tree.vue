@@ -154,6 +154,7 @@ function clearSelection() {
   <v-treeview
     ref="tree"
     v-model:opened="expandedNodes"
+    density="compact"
     :activated="activatedNodes"
     :items="rootNodes"
     :load-children="lazyLoadChildren"
@@ -185,6 +186,13 @@ function clearSelection() {
 </template>
 
 <style scoped>
+.v-list {
+  background: none;
+}
+:deep(a) {
+  text-decoration: none;
+  color: var(--cr-base-text-color);
+}
 /* Disable hover on items. */
 :deep(.v-list-item__overlay) {
   --v-hover-opacity: 0;

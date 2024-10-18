@@ -49,7 +49,7 @@ const color = computed(() => {
 });
 </script>
 <template>
-  <v-btn :color="color">
+  <v-btn :color="color" variant="tonal">
     <slot />
   </v-btn>
 </template>

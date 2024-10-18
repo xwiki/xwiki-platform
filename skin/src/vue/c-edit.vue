@@ -65,7 +65,7 @@ export default {
 };
 </script>
 <template>
-  <article id="edit" ref="root">
+  <article id="edit" ref="root" class="content">
     <UIX uixname="edit.before" />
     <component :is="component" />
     <UIX uixname="edit.after" />

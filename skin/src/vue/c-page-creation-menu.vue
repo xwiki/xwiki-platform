@@ -65,43 +65,52 @@ function createPage() {
 <template>
   <x-dialog v-model="dialogOpen" width="auto" title="New Page">
     <template #activator="{ props }">
-      <span id="new-page-button" @click="updateCurrentPage">
+      <x-btn
+        id="new-page-button"
+        size="small"
+        variant="secondary"
+        color="secondary"
+        @click="updateCurrentPage"
+      >
         <c-icon name="plus" v-bind="props"></c-icon>
-        <strong>New Page</strong>
-      </span>
+        New Page
+      </x-btn>
     </template>
     <template #default>
-      <div id="new-page-content">
-        <x-form>
+      <div id="new-page-content" class="grid">
+        <x-form class="subgrid">
           <x-text-field
             v-model="name"
             label="Name"
             name="name"
             required
           ></x-text-field>
-          <x-text-field
-            v-model="location"
-            label="Location"
-            name="location"
-            required
-          ></x-text-field>
+          <div>
+            <label>Parent Location</label>
+            <div id="new-page-navigation-tree" class="location-box">
+              <XNavigationTree
+                :tree-source="
+                  cristal
+                    .getContainer()
+                    .get<NavigationTreeSourceProvider>(
+                      'NavigationTreeSourceProvider',
+                    )
+                    .get()
+                "
+                :click-action="treeNodeClickAction"
+                :current-page="currentPage"
+              ></XNavigationTree>
+              <x-text-field
+                v-model="location"
+                label="Location"
+                name="location"
+                required
+              ></x-text-field>
+            </div>
+          </div>
         </x-form>
-        <div id="new-page-navigation-tree">
-          <XNavigationTree
-            :tree-source="
-              cristal
-                .getContainer()
-                .get<NavigationTreeSourceProvider>(
-                  'NavigationTreeSourceProvider',
-                )
-                .get()
-            "
-            :click-action="treeNodeClickAction"
-            :current-page="currentPage"
-          ></XNavigationTree>
-        </div>
-        <x-btn @click="createPage">Create</x-btn>
       </div>
+      <x-btn slot="footer" @click="createPage">Create</x-btn>
     </template>
   </x-dialog>
 </template>
@@ -114,9 +123,24 @@ function createPage() {
   min-width: 600px;
 }
 #new-page-navigation-tree {
-  height: 400px;
-  border: thin solid var(--cr-color-neutral-200);
-  margin-bottom: 1rem;
   overflow: auto;
+}
+.location-box {
+  border: 1px solid #ddd;
+  border-radius: var(--cr-border-radius-medium);
+  padding: var(--cr-spacing-small);
+}
+
+.grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr;
+}
+.subgrid {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / 1;
+  gap: 0.5rem;
 }
 </style>

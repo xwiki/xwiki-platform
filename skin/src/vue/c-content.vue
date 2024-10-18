@@ -157,34 +157,36 @@ onUpdated(() => {
     </div>
 
     <div class="doc-header">
-      <h1 class="doc-title">{{ title }}</h1>
-      <div class="doc-info">
-        <span class="doc-info-user-info">
-          <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
-          User Name edited on 12/12/2024 at 12:00
-        </span>
-        <!-- TODO: add a way to inject those by extension
+      <div class="doc-header-inner">
+        <h1 class="doc-title">{{ title }}</h1>
+        <div class="doc-info">
+          <span class="doc-info-user-info">
+            <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
+            User Name edited on 12/12/2024 at 12:00
+          </span>
+          <!-- TODO: add a way to inject those by extension
                and provide one for the number of attachments.
               It must be reactive whenever the attachment store is updated -->
-        <div class="doc-info-actions">
-          <suspense>
-            <info-actions></info-actions>
-          </suspense>
-          <div class="doc-page-actions">
-            <router-link
-              :to="{
-                name: 'edit',
-                params: { page: currentPageName },
-              }"
-            >
+          <div class="doc-info-actions">
+            <suspense>
+              <info-actions></info-actions>
+            </suspense>
+            <div class="doc-page-actions">
+              <router-link
+                :to="{
+                  name: 'edit',
+                  params: { page: currentPageName },
+                }"
+              >
+                <x-btn size="small">
+                  <c-icon name="pencil" :size="Size.Small"></c-icon>
+                  Edit
+                </x-btn>
+              </router-link>
               <x-btn size="small">
-                <c-icon name="pencil" :size="Size.Small"></c-icon>
-                Edit
+                <c-icon name="three-dots-vertical" :size="Size.Small"></c-icon>
               </x-btn>
-            </router-link>
-            <x-btn size="small">
-              <c-icon name="three-dots-vertical" :size="Size.Small"></c-icon>
-            </x-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -198,8 +200,11 @@ onUpdated(() => {
       class="doc-content"
       v-html="content"
     ></div>
-    <div v-else class="unknown-page">
-      The requested page could not be found. You can edit the page to create it.
+    <div v-else class="doc-content unknown-page">
+      <p>
+        The requested page could not be found. You can edit the page to create
+        it.
+      </p>
     </div>
     <!-- The footer is not displayed in case of unknown page. -->
     <div v-if="content" class="doc-info-extra">
@@ -213,7 +218,7 @@ onUpdated(() => {
 </template>
 <style scoped>
 .content {
-  padding: 0 var(--cr-spacing-2x-large);
+  padding: 0;
 }
 
 .content-loading {
@@ -226,11 +231,24 @@ onUpdated(() => {
 
 /*TABLE STYLES*/
 /*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
-.content {
+:global(.content),
+:global(.content > .edit-wrapper) {
   display: grid;
-  grid-template-rows: 56px auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
+  gap: var(--cr-spacing-small);
   overflow: auto;
+  scrollbar-gutter: stable;
   height: 100%;
+}
+:global(.content:has(.edit-wrapper)) {
+  grid-template-rows: 1fr;
+}
+:global(.content > .edit-wrapper) {
+  grid-template-rows: auto 1fr;
+}
+:global(.doc-content),
+:global(.doc-header-inner) {
+  padding: 0;
 }
 :global(.doc-content table) {
   max-width: 100%;
@@ -287,7 +305,7 @@ onUpdated(() => {
   display: block;
 }
 
-.doc-header {
+:global(.doc-header) {
   display: grid;
   grid-auto-flow: column;
   grid-template-columns: 1fr;
@@ -297,7 +315,6 @@ onUpdated(() => {
     "title"
     "info-user";
   gap: var(--cr-spacing-x-small);
-  padding: var(--cr-spacing-x-small) var(--cr-spacing-2x-large);
   top: 0;
   background: white;
   z-index: 1;
@@ -336,7 +353,6 @@ onUpdated(() => {
 }
 
 .doc-info-actions {
-  margin-right: var(--cr-spacing-medium);
   justify-self: end;
 }
 
@@ -356,7 +372,7 @@ onUpdated(() => {
 }
 
 .page-header {
-  padding: var(--cr-spacing-x-small) 0;
+  padding: var(--cr-spacing-small) 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--cr-spacing-medium);

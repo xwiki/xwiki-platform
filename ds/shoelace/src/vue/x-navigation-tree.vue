@@ -190,6 +190,10 @@ function onClick(node: NavigationTreeNode) {
 </template>
 
 <style scoped>
+:deep(a) {
+  text-decoration: none;
+  color: var(--cr-base-text-color);
+}
 /* Disable hand cursor on items, since we disable the default click action. */
 :deep(sl-tree-item)::part(base) {
   cursor: default;

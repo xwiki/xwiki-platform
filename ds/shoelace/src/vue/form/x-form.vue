@@ -11,8 +11,4 @@ function submit() {
   </form>
 </template>
 
-<style scoped>
-form {
-  padding: 16px;
-}
-</style>
+<style scoped></style>

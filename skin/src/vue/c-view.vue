@@ -84,6 +84,9 @@ function onCollapseMainSidebar() {
   </div>
 </template>
 <style scoped>
+:global(*) {
+  box-sizing: border-box;
+}
 :global(.xw-cristal) {
   container: xwCristal;
   container-type: size;
@@ -101,16 +104,8 @@ function onCollapseMainSidebar() {
   height: 100%;
 }
 
-:deep(#edit) {
-  display: flex;
-  flex-flow: column;
-  grid-area: content;
-  height: 100%;
-  overflow: auto;
-}
-
 :deep(.doc-content),
-:deep(.doc-header),
+:deep(.doc-header-inner),
 :deep(.doc-info-extra) {
   max-width: var(--cr-sizes-max-page-width);
   width: 100%;
@@ -122,15 +117,23 @@ function onCollapseMainSidebar() {
 }
 .wrapper {
   display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  grid-column-gap: var(--cr-spacing-2x-large);
+  grid-row-gap: 0px;
+  grid-template-areas:
+    "main-sidebar wiki-header"
+    "main-sidebar main-content"
+    "main-sidebar wiki-footer";
+  height: 100%;
+}
+.wrapper:has(.secondary-sidebar) {
   grid-template-columns: auto 1fr auto;
   grid-template-rows: auto 1fr auto;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
   grid-template-areas:
     "main-sidebar wiki-header secondary-sidebar"
     "main-sidebar main-content secondary-sidebar"
     "main-sidebar wiki-footer secondary-sidebar";
-  height: 100%;
 }
 
 main {
@@ -144,10 +147,11 @@ main {
   min-width: var(--cr-sizes-main-sidebar-min-width);
   max-width: 100%;
   position: relative;
-  background-color: var(--cr-color-neutral-100);
+  background-color: var(--cr-color-neutral-50);
   display: flex;
   flex-flow: column;
   gap: var(--cr-spacing-small);
+  padding: var(--cr-spacing-small);
   overflow: hidden;
   border-right: 1px solid var(--cr-color-neutral-200);
   box-shadow: var(--cr-shadow-large);
@@ -204,8 +208,16 @@ TODO: these rules about opening and closing the sidebar should be better organiz
   display: flex;
   flex-flow: row;
   justify-content: space-between;
-  padding: var(--cr-spacing-small) var(--cr-spacing-x-small) 0;
   z-index: 2;
+
+  & span {
+    font-size: 1rem;
+    height: 1rem;
+    line-height: 1rem;
+    display: block;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 :deep(.wrapper.sidebar-is-collapsed .hide-sidebar) {

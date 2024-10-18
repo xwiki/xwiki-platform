@@ -24,6 +24,7 @@ import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
 
 import { createVuetify } from "vuetify";
+import colors from "vuetify/util/colors";
 import { mdi } from "vuetify/iconsets/mdi";
 import * as directives from "vuetify/directives";
 import { injectable } from "inversify";
@@ -54,6 +55,18 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
         defaultSet: "mdi",
         sets: {
           mdi,
+        },
+      },
+      theme: {
+        themes: {
+          light: {
+            dark: false,
+            colors: {
+              background: "#FFFFFF",
+              primary: colors.blue.darken4,
+              secondary: colors.blueGrey.darken4,
+            },
+          },
         },
       },
     });

@@ -45,7 +45,6 @@ const list = await infoActionsService.list();
 
 <style scoped>
 .doc-info-actions {
-  margin-right: var(--cr-spacing-medium);
   display: flex;
   flex-wrap: wrap;
   flex-flow: row;

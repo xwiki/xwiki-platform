@@ -29,8 +29,4 @@ import { CIcon } from "@xwiki/cristal-icons";
   </div>
 </template>
 
-<style scoped>
-.help-button {
-  padding: 0 var(--cr-spacing-x-small) var(--cr-spacing-x-small);
-}
-</style>
+<style scoped></style>

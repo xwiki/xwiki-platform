@@ -695,7 +695,7 @@ public class BasePage extends BaseElement
                 XWikiWebDriver driver = this.getDriver();
                 AxeBuilder axeBuilder = wcagContext.getAxeBuilder();
                 Results axeResult = axeBuilder.analyze(driver);
-                wcagContext.addWCAGResults(driver.getCurrentUrl(), this.getClass().getName(), axeResult);
+                wcagContext.addWCAGResults(this.getPageURL(), this.getClass().getName(), axeResult);
                 long stopTime = System.currentTimeMillis();
                 long deltaTime = stopTime - startTime;
                 LOGGER.debug("[{} : {}] WCAG Validation on this element took [{}] ms.",

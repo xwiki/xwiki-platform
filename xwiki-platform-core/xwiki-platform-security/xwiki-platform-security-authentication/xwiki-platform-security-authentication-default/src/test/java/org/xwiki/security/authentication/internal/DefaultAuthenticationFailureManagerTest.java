@@ -25,8 +25,8 @@ import java.util.Date;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,7 +74,7 @@ import static org.mockito.Mockito.when;
  * @since 11.6RC1
  */
 @ComponentTest
-public class DefaultAuthenticationFailureManagerTest
+class DefaultAuthenticationFailureManagerTest
 {
     @InjectMockComponents
     private DefaultAuthenticationFailureManager defaultAuthenticationFailureManager;
@@ -163,7 +163,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that a AuthenticationFailureEvent is triggered.
      */
     @Test
-    public void authenticationFailureIsTriggered()
+    void authenticationFailureIsTriggered()
     {
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin,
             getRequest("something")));
@@ -234,7 +234,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the time window configuration is taken into account properly.
      */
     @Test
-    public void repeatedAuthenticationFailureOutOfTimeWindow() throws InterruptedException
+    void repeatedAuthenticationFailureOutOfTimeWindow() throws InterruptedException
     {
         HttpServletRequest request = getRequest("anotherId");
         when(configuration.getTimeWindow()).thenReturn(1);
@@ -258,7 +258,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the max attempt configuration is taken into account properly.
      */
     @Test
-    public void repeatedAuthenticationFailureDifferentThreshold()
+    void repeatedAuthenticationFailureDifferentThreshold()
     {
         HttpServletRequest request = getRequest("foobar");
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(5);
@@ -281,7 +281,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the failure record reset is working properly.
      */
     @Test
-    public void resetAuthFailureRecord()
+    void resetAuthFailureRecord()
     {
         HttpServletRequest request = getRequest("reset");
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
@@ -304,7 +304,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the failure record reset is working properly.
      */
     @Test
-    public void resetAuthFailureRecordWithDocumentReference()
+    void resetAuthFailureRecordWithDocumentReference()
     {
         HttpServletRequest request = getRequest("reset2");
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin, request));
@@ -327,7 +327,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the threshold mechanism works properly with different login.
      */
     @Test
-    public void recordAuthFailureDifferentLogin()
+    void recordAuthFailureDifferentLogin()
     {
         HttpServletRequest request = getRequest("multilogin");
         String login1 = this.failingLogin.toLowerCase();
@@ -390,7 +390,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the authentication threshold auth is deactivated if max attempt is set to 0
      */
     @Test
-    public void deactivateThresholdAuthWithMaxAttempt()
+    void deactivateThresholdAuthWithMaxAttempt()
     {
         HttpServletRequest request = getRequest("manyattempt");
         when(this.configuration.getMaxAuthorizedAttempts()).thenReturn(0);
@@ -410,7 +410,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Ensure that the authentication threshold auth is deactivated if time window is set to 0
      */
     @Test
-    public void deactivateThresholdAuthWithTimeWindow()
+    void deactivateThresholdAuthWithTimeWindow()
     {
         HttpServletRequest request = getRequest("manyattempt2");
         when(this.configuration.getTimeWindow()).thenReturn(0);
@@ -430,7 +430,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getForm is working properly.
      */
     @Test
-    public void getForm()
+    void getForm()
     {
         HttpServletRequest request = getRequest("getForm");
         String formStrategy1 = "formStrategy1";
@@ -468,7 +468,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getErrorMessages is working properly.
      */
     @Test
-    public void getErrorMessages()
+    void getErrorMessages()
     {
         HttpServletRequest request = getRequest("errorMsg");
         String errorMessage1 = "errorMessage1";
@@ -489,7 +489,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getForm is working properly.
      */
     @Test
-    public void validateForm()
+    void validateForm()
     {
         HttpServletRequest request = getRequest("validate");
         String login1 = this.failingLogin;
@@ -506,13 +506,13 @@ public class DefaultAuthenticationFailureManagerTest
         this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request);
         this.defaultAuthenticationFailureManager.recordAuthenticationFailure(login2, request);
 
-        when(this.strategy1.validateForm(login1, null)).thenReturn(true);
-        when(this.strategy2.validateForm(login1, null)).thenReturn(true);
-        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login1, null));
+        when(this.strategy1.validateForm(login1, (HttpServletRequest) null)).thenReturn(true);
+        when(this.strategy2.validateForm(login1, (HttpServletRequest) null)).thenReturn(true);
+        assertTrue(this.defaultAuthenticationFailureManager.validateForm(login1, (HttpServletRequest) null));
 
-        when(this.strategy1.validateForm(login2, null)).thenReturn(true);
-        when(this.strategy2.validateForm(login2, null)).thenReturn(false);
-        assertFalse(this.defaultAuthenticationFailureManager.validateForm(login2, null));
+        when(this.strategy1.validateForm(login2, (HttpServletRequest) null)).thenReturn(true);
+        when(this.strategy2.validateForm(login2, (HttpServletRequest) null)).thenReturn(false);
+        assertFalse(this.defaultAuthenticationFailureManager.validateForm(login2, (HttpServletRequest) null));
     }
 
     @Test
@@ -531,7 +531,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getUser is working properly.
      */
     @Test
-    public void getUserNotFound() throws XWikiException
+    void getUserNotFound() throws XWikiException
     {
         when(context.getMainXWiki()).thenReturn("mainwiki");
         when(context.getWikiId()).thenReturn("currentwiki");
@@ -553,7 +553,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getUser is working properly.
      */
     @Test
-    public void getUserGlobalFound() throws XWikiException
+    void getUserGlobalFound() throws XWikiException
     {
         when(context.getMainXWiki()).thenReturn("mainwiki");
         DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
@@ -575,7 +575,7 @@ public class DefaultAuthenticationFailureManagerTest
      * Validate that getUser is working properly.
      */
     @Test
-    public void getUserLocalFound() throws XWikiException
+    void getUserLocalFound() throws XWikiException
     {
         when(context.getMainXWiki()).thenReturn("mainwiki");
         when(context.getWikiId()).thenReturn("currentwiki");
@@ -597,7 +597,7 @@ public class DefaultAuthenticationFailureManagerTest
     }
 
     @Test
-    public void strategiesAreRebuildInCaseOfReset()
+    void strategiesAreRebuildInCaseOfReset()
     {
         HttpServletRequest request = getRequest("reset");
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1" });

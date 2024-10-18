@@ -138,10 +138,93 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <!-- Jakarta -->
+            <revapi.differences>
+              <justification>revapi false positives</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>java.method.addedToInterface</code>
+                  <new>.*@ com.xpn.xwiki.web.XWikiResponse</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>java.method.addedToInterface</code>
+                  <new>.*@ com.xpn.xwiki.web.XWikiRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                  <new>class com.xpn.xwiki.render.ScriptXWikiServletRequest</new>
+                  <superClass>javax.servlet.ServletRequestWrapper</superClass>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.WrappingXWikiRequest</old>
+                  <new>class com.xpn.xwiki.web.WrappingXWikiRequest</new>
+                  <superClass>javax.servlet.ServletRequestWrapper</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Move to Jakarta</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.websocket.AbstractXWikiEndpoint.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.container.servlet.SetThreadNameServletRequestListener.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.resource.servlet.ResourceReferenceHandlerServlet.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.resource.servlet.RoutingFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.wysiwyg.filter.ConversionFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.ActionFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.HomePageRedirectServlet.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.LegacyActionServlet.*</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

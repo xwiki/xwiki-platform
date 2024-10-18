@@ -22,15 +22,17 @@ package org.xwiki.container.servlet;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HeaderElement;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Various helpers around the {@link HttpServletRequest} and {@link HttpServletResponse} API.
@@ -82,8 +84,11 @@ public final class HttpServletUtils
      * 
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
+     * @throws MalformedURLException when an invalid URL was received
+     * @since 42.0.0
      */
-    public static URL getSourceURL(HttpServletRequest servletRequest)
+    @Unstable
+    public static URL getSourceURL(HttpServletRequest servletRequest) throws MalformedURLException
     {
         URL baseURL = getSourceBaseURL(servletRequest);
 
@@ -96,12 +101,7 @@ public final class HttpServletUtils
             path.append(servletRequest.getQueryString());
         }
 
-        try {
-            return new URL(baseURL, path.toString());
-        } catch (MalformedURLException e) {
-            // Not really supposed to happen
-            throw new RuntimeException("XWiki received an invalid URL path or query string", e);
-        }
+        return new URL(baseURL, path.toString());
     }
 
     /**
@@ -113,8 +113,11 @@ public final class HttpServletUtils
      * 
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
+     * @throws MalformedURLException when an invalid URL was received
+     * @since 42.0.0
      */
-    public static URL getSourceBaseURL(HttpServletRequest servletRequest)
+    @Unstable
+    public static URL getSourceBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
     {
         StringBuilder builder = new StringBuilder();
 
@@ -132,14 +135,9 @@ public final class HttpServletUtils
         }
     }
 
-    private static URL getFinalBaseURL(HttpServletRequest servletRequest)
+    private static URL getFinalBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
     {
-        try {
-            return new URL(servletRequest.getScheme(), servletRequest.getRemoteHost(), servletRequest.getRemotePort(),
-                "");
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("XWiki received an invalid URL", e);
-        }
+        return new URL(servletRequest.getScheme(), servletRequest.getRemoteHost(), servletRequest.getRemotePort(), "");
     }
 
     private static void appendScheme(HttpServletRequest request, StringBuilder builder)
@@ -241,8 +239,9 @@ public final class HttpServletUtils
     /**
      * @param request the servlet request input
      * @return true if the request explicitly disable getting resources from the cache
-     * @since 11.8RC1
+     * @since 42.0.0
      */
+    @Unstable
     public static boolean isCacheReadAllowed(HttpServletRequest request)
     {
         String headerValue = request.getHeader(HEADER_CACHE_CONTROL);
@@ -257,5 +256,59 @@ public final class HttpServletUtils
         }
 
         return true;
+    }
+
+    // Deprecated
+
+    /**
+     * Try to extract from various http headers the URL ({@code <protocol>://<host>[:<port>]/<path>[?<querystring>]}) as
+     * close as possible to the one used by the client.
+     * <p>
+     * In theory HttpServletRequest#getRequestURL() is supposed to take care of all that but depending on the
+     * application server and its configuration it's not always reliable. One less thing to configure.
+     * 
+     * @param servletRequest the servlet request input
+     * @return the URL as close as possible from what the client used
+     */
+    @Deprecated(since = "42.0.0")
+    public static URL getSourceURL(javax.servlet.http.HttpServletRequest servletRequest)
+    {
+        try {
+            return getSourceURL(JakartaServletBridge.toJakarta(servletRequest));
+        } catch (MalformedURLException e) {
+            // Not really supposed to happen
+            throw new RuntimeException("XWiki received an invalid URL path or query string", e);
+        }
+    }
+
+    /**
+     * Try to extract from various http headers the base URL ({@code <protocol>://<host>[:<port>]}) as close as possible
+     * to the one used by the client.
+     * <p>
+     * In theory HttpServletRequest#getRequestURL() is supposed to take care of all that but depending on the
+     * application server and its configuration it's not always reliable. One less thing to configure.
+     * 
+     * @param servletRequest the servlet request input
+     * @return the URL as close as possible from what the client used
+     */
+    @Deprecated(since = "42.0.0")
+    public static URL getSourceBaseURL(javax.servlet.http.HttpServletRequest servletRequest)
+    {
+        try {
+            return getSourceBaseURL(JakartaServletBridge.toJakarta(servletRequest));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("XWiki received an invalid URL", e);
+        }
+    }
+
+    /**
+     * @param request the servlet request input
+     * @return true if the request explicitly disable getting resources from the cache
+     * @since 11.8RC1
+     */
+    @Deprecated(since = "42.0.0")
+    public static boolean isCacheReadAllowed(javax.servlet.http.HttpServletRequest request)
+    {
+        return isCacheReadAllowed(JakartaServletBridge.toJakarta(request));
     }
 }

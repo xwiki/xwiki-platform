@@ -64,7 +64,8 @@ public class Context extends Api
      */
     public XWikiRequest getRequest()
     {
-        return new ScriptXWikiServletRequest(getXWikiContext().getRequest(), getContextualAuthorizationManager());
+        XWikiRequest request = getXWikiContext().getRequest();
+        return request != null ? new ScriptXWikiServletRequest(request, getContextualAuthorizationManager()) : request;
     }
 
     /**

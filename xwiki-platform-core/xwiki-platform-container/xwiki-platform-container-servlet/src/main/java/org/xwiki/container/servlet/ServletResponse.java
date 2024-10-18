@@ -22,35 +22,71 @@ package org.xwiki.container.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.xwiki.container.RedirectResponse;
 import org.xwiki.container.Response;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This is the implementation of {@link Response} for {@link HttpServletResponse}.
  *
  * @version $Id$
  */
-public class ServletResponse implements Response, RedirectResponse
+public class ServletResponse implements RedirectResponse
 {
-    private HttpServletResponse httpServletResponse;
+    private final HttpServletResponse jakartaHttpServletResponse;
 
-    public ServletResponse(HttpServletResponse httpServletResponse)
+    private javax.servlet.http.HttpServletResponse javaxHttpServletResponse;
+
+    /**
+     * @param jakartaHttpServletResponse the standard Jakarta {@link HttpServletResponse} instance
+     * @since 42.0.0
+     */
+    public ServletResponse(HttpServletResponse jakartaHttpServletResponse)
     {
-        this.httpServletResponse = httpServletResponse;
+        this.jakartaHttpServletResponse = jakartaHttpServletResponse;
     }
 
-    public HttpServletResponse getHttpServletResponse()
+    /**
+     * @param javaxHttpServletResponse the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
+     * @deprecated use {@link #ServletResponse(HttpServletResponse)} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public ServletResponse(javax.servlet.http.HttpServletResponse javaxHttpServletResponse)
     {
-        return this.httpServletResponse;
+        this.javaxHttpServletResponse = javaxHttpServletResponse;
+        this.jakartaHttpServletResponse = JakartaServletBridge.toJakarta(javaxHttpServletResponse);
+    }
+
+    /**
+     * @return the standard Jakarta {@link HttpServletResponse} instance
+     * @since 42.0.0
+     */
+    public HttpServletResponse getResponse()
+    {
+        return this.jakartaHttpServletResponse;
+    }
+
+    /**
+     * @return the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
+     * @deprecated use {@link #getResponse()} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public javax.servlet.http.HttpServletResponse getHttpServletResponse()
+    {
+        if (this.javaxHttpServletResponse == null) {
+            this.javaxHttpServletResponse = JakartaServletBridge.toJavax(this.jakartaHttpServletResponse);
+        }
+
+        return this.javaxHttpServletResponse;
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException
     {
         try {
-            return this.httpServletResponse.getOutputStream();
+            return this.jakartaHttpServletResponse.getOutputStream();
         } catch (IllegalStateException ex) {
             return null;
         }
@@ -59,18 +95,54 @@ public class ServletResponse implements Response, RedirectResponse
     @Override
     public void setContentLength(int length)
     {
-        this.httpServletResponse.setContentLength(length);
+        this.jakartaHttpServletResponse.setContentLength(length);
     }
 
     @Override
     public void setContentType(String mimeType)
     {
-        this.httpServletResponse.setContentType(mimeType);
+        this.jakartaHttpServletResponse.setContentType(mimeType);
     }
 
     @Override
     public void sendRedirect(String location) throws IOException
     {
-        this.httpServletResponse.sendRedirect(location);
+        this.jakartaHttpServletResponse.sendRedirect(location);
+    }
+
+    @Override
+    public void setStatus(int sc)
+    {
+        this.jakartaHttpServletResponse.setStatus(sc);
+    }
+
+    @Override
+    public void sendError(int sc, String msg) throws IOException
+    {
+        this.jakartaHttpServletResponse.sendError(sc, msg);
+    }
+
+    @Override
+    public void sendError(int sc) throws IOException
+    {
+        this.jakartaHttpServletResponse.sendRedirect(null);
+    }
+
+    @Override
+    public boolean containsHeader(String name)
+    {
+        return this.jakartaHttpServletResponse.containsHeader(name);
+    }
+
+    @Override
+    public void setHeader(String name, String value)
+    {
+        this.jakartaHttpServletResponse.setHeader(name, value);
+    }
+
+    @Override
+    public void addHeader(String name, String value)
+    {
+        this.jakartaHttpServletResponse.addHeader(name, value);
     }
 }

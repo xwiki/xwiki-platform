@@ -22,12 +22,12 @@ package org.xwiki.wysiwyg.filter;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -38,8 +38,12 @@ import com.xpn.xwiki.web.Utils;
 /**
  * This filter is used to convert the values of request parameters that require HTML conversion before being processed.
  * A HTML editor can use this filter to convert its output to a specific syntax before it is saved.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
+ * @since 42.0.0
  */
 public class ConversionFilter implements Filter
 {

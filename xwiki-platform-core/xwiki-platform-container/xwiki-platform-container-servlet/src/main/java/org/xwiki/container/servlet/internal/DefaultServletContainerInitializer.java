@@ -22,8 +22,6 @@ package org.xwiki.container.servlet.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -41,17 +39,13 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @Component
 @Singleton
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
-    // Implementation note: It's important that we don't use @Inject annotations here
-    // for RequestInitializerManager and ExecutionContextManager since we can have
-    // RequestInitializer and ExecutionContextInitializer components which try to access
-    // the Application Context in their initialize() method and we need it to be available
-    // (i.e. initializeApplicationContext() needs to have been called) before they are
-    // looked up (and thus initialized).
-
     @Inject
     private ApplicationContextListenerManager applicationContextListenerManager;
 
@@ -63,6 +57,40 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
 
     @Inject
     private ComponentManager componentManager;
+
+    @Override
+    public void initializeRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletContainerException
+    {
+        // 1) Set the request and the response in the Container. From this point forward request initializers can use
+        // the Container object to get any data they want from the Request.
+        this.container.setRequest(new ServletRequest(request));
+        if (response != null) {
+            this.container.setResponse(new ServletResponse(response));
+        }
+
+        // 2) Create an empty Execution context so that the Container initializers can put things in the
+        // execution context when they execute.
+        this.execution.setContext(new ExecutionContext());
+
+        // 3) Call the request initializers to populate the Request further.
+        try {
+            RequestInitializerManager manager = this.componentManager.getInstance(RequestInitializerManager.class);
+            manager.initializeRequest(this.container.getRequest());
+        } catch (Exception e) {
+            throw new ServletContainerException("Failed to initialize request", e);
+        }
+
+        // 4) Call Execution Context initializers to perform further Execution Context initializations
+        try {
+            ExecutionContextManager manager = this.componentManager.getInstance(ExecutionContextManager.class);
+            manager.initialize(this.execution.getContext());
+        } catch (Exception e) {
+            throw new ServletContainerException("Failed to initialize Execution Context", e);
+        }
+    }
+
+    // Deprecated
 
     /**
      * @deprecated use the notion of Environment instead
@@ -77,7 +105,8 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     }
 
     @Override
-    public void initializeRequest(HttpServletRequest httpServletRequest, Object xwikiContext)
+    @Deprecated(since = "42.0.0")
+    public void initializeRequest(javax.servlet.http.HttpServletRequest httpServletRequest, Object xwikiContext)
         throws ServletContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
@@ -118,19 +147,23 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     }
 
     @Override
-    public void initializeRequest(HttpServletRequest httpServletRequest) throws ServletContainerException
+    @Deprecated(since = "42.0.0")
+    public void initializeRequest(javax.servlet.http.HttpServletRequest httpServletRequest)
+        throws ServletContainerException
     {
         initializeRequest(httpServletRequest, null);
     }
 
     @Override
-    public void initializeResponse(HttpServletResponse httpServletResponse)
+    @Deprecated(since = "42.0.0")
+    public void initializeResponse(javax.servlet.http.HttpServletResponse httpServletResponse)
     {
         this.container.setResponse(new ServletResponse(httpServletResponse));
     }
 
     @Override
-    public void initializeSession(HttpServletRequest httpServletRequest)
+    @Deprecated(since = "42.0.0")
+    public void initializeSession(javax.servlet.http.HttpServletRequest httpServletRequest)
     {
         this.container.setSession(new ServletSession(httpServletRequest));
     }

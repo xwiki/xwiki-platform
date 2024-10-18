@@ -242,6 +242,7 @@ public class Utils
      * @param defaultRedirect the default value to use if no {@code xredirect} parameter is present
      * @return the destination URL, as specified in the {@code xredirect} parameter, or the specified default URL
      */
+    @Deprecated(since = "42.0.0")
     public static String getRedirect(XWikiRequest request, String defaultRedirect)
     {
         String redirect = request.getParameter("xredirect");
@@ -327,6 +328,7 @@ public class Utils
      * @return the name of the requested template, as specified in the {@code xpage} parameter, or the specified default
      *         template
      */
+    @Deprecated(since = "42.0.0")
     public static String getPage(XWikiRequest request, String defaultpage)
     {
         String page = request.getParameter("xpage");
@@ -389,6 +391,7 @@ public class Utils
         return null;
     }
 
+    @Deprecated(since = "42.0.0")
     public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
         XWikiEngineContext engine_context) throws XWikiException
     {

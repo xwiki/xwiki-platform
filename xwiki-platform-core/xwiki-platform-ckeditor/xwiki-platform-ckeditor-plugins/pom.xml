@@ -69,7 +69,7 @@
       <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature.. -->
       <optional>true</optional>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->

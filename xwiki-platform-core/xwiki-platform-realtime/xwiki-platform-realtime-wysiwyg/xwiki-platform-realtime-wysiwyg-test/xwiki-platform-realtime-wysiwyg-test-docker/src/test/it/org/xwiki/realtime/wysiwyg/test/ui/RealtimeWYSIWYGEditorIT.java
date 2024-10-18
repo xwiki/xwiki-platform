@@ -1623,7 +1623,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify that Save & View doesn't ask for leave confirmation.
         textArea.sendKeys("3");
         inplaceEditablePage = inplaceEditablePage.saveAndView();
-        assertEquals("1one\nInformation\n23two", inplaceEditablePage.getContent());
+        assertEquals("1one\n23two", inplaceEditablePage.getContent());
     }
 
     @Test

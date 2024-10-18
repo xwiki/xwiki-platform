@@ -55,7 +55,7 @@ define('xwiki-iconService', [
         return;
       }
 
-      $.getJSON(getResourceURL('data_icons', {iconTheme}), function (dataIcons) {
+      $.getJSON(getResourceURL('data_icons', {iconTheme, 'metadata': 'true'}), function (dataIcons) {
         cachedIcons[iconTheme] = dataIcons;
         resolve(dataIcons);
       }).fail(reject);

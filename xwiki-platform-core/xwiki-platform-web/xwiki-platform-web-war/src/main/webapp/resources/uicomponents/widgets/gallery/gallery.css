@@ -33,9 +33,6 @@
   object-fit: scale-down;
   max-width: 100%;
   max-height: 100%;
-  /* Address an issue with the CSS Grid blowing out with large pictures */
-  height: auto;  
-  width: 100%;
 }
 
 /* Transparent buttons that should fill the space they've been given on the grid*/

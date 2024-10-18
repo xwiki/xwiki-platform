@@ -19,7 +19,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/button/button";
-import type { BtnProps } from "@xwiki/cristal-dsapi/dist";
+import type { BtnProps } from "@xwiki/cristal-dsapi";
 const { variant } = defineProps<BtnProps>();
 </script>
 <template>

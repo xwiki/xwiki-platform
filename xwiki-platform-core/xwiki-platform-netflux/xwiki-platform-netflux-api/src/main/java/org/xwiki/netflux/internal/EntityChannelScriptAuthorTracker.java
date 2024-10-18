@@ -29,13 +29,14 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.netflux.EntityChannel;
 import org.xwiki.netflux.EntityChannelStore;
 import org.xwiki.netflux.internal.EntityChange.ScriptLevel;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -62,7 +63,7 @@ public class EntityChannelScriptAuthorTracker
     private EntityChannelStore entityChannels;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     @Named("document")
@@ -128,10 +129,18 @@ public class EntityChannelScriptAuthorTracker
     private ScriptLevel getUserScriptLevel(UserReference userReference, EntityReference entityReference)
     {
         DocumentReference documentUserReference = this.documentUserReferenceSerializer.serialize(userReference);
-        if (this.authorizationManager.hasAccess(Right.PROGRAM, documentUserReference, entityReference)) {
-            return ScriptLevel.PROGRAMMING;
-        } else if (this.authorizationManager.hasAccess(Right.SCRIPT, documentUserReference, entityReference)) {
-            return ScriptLevel.SCRIPT;
+        EntityReference documentEntityReference = entityReference.extractReference(EntityType.DOCUMENT);
+        if (documentEntityReference != null) {
+            DocumentReference documentReference = new DocumentReference(documentEntityReference);
+            if (this.authorizationManager.hasAccess(Right.PROGRAM, null, documentUserReference, documentReference)) {
+                return ScriptLevel.PROGRAMMING;
+            } else if (this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, documentUserReference,
+                documentReference))
+            {
+                return ScriptLevel.SCRIPT;
+            } else {
+                return ScriptLevel.NO_SCRIPT;
+            }
         } else {
             return ScriptLevel.NO_SCRIPT;
         }

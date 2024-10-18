@@ -54,9 +54,9 @@ import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
@@ -65,7 +65,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -142,7 +142,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     private QueryManager queryManager;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private WikiTranslationConfiguration configuration;
@@ -460,24 +460,26 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     private void checkRegistrationAuthorization(XWikiDocument document, Scope scope) throws AccessDeniedException
     {
-        EntityReference entityReference;
+        DocumentReference documentReference = document.getDocumentReference();
         switch (scope) {
             case GLOBAL:
-                this.authorizationManager.checkAccess(Right.PROGRAM, document.getAuthorReference(), null);
-                this.authorizationManager.checkAccess(Right.PROGRAM, document.getContentAuthorReference(), null);
+                this.authorizationManager.checkAccess(Right.PROGRAM, null, document.getAuthorReference(),
+                    documentReference);
+                this.authorizationManager.checkAccess(Right.PROGRAM, null, document.getContentAuthorReference(),
+                    documentReference);
                 break;
             case WIKI:
-                entityReference = document.getDocumentReference().getWikiReference();
-                this.authorizationManager.checkAccess(Right.ADMIN, document.getAuthorReference(), entityReference);
-                this.authorizationManager.checkAccess(Right.ADMIN, document.getContentAuthorReference(),
-                    entityReference);
+                this.authorizationManager.checkAccess(Right.ADMIN, EntityType.WIKI, document.getAuthorReference(),
+                    documentReference);
+                this.authorizationManager.checkAccess(Right.ADMIN, EntityType.WIKI,
+                    document.getContentAuthorReference(), documentReference);
                 break;
             case USER:
                 if (this.configuration.isRestrictUserTranslations()) {
-                    entityReference = document.getDocumentReference();
-                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getAuthorReference(), entityReference);
-                    this.authorizationManager.checkAccess(Right.SCRIPT, document.getContentAuthorReference(),
-                        entityReference);
+                    this.authorizationManager.checkAccess(Right.SCRIPT, EntityType.DOCUMENT,
+                        document.getAuthorReference(), documentReference);
+                    this.authorizationManager.checkAccess(Right.SCRIPT, EntityType.DOCUMENT,
+                        document.getContentAuthorReference(), documentReference);
                 }
                 break;
             default:

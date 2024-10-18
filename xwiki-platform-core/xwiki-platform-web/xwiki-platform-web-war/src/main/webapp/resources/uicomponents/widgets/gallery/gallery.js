@@ -22,25 +22,31 @@ var XWiki = (function (XWiki) {
 XWiki.Gallery = Class.create({
   initialize : function(container) {
     this.images = this._collectImages(container);
-
     this.container = container.update(
       '<button class="maximize" title="${escapetool.xml($services.localization.render("core.widgets.gallery.maximize"))}"></button>' +
       '<button class="previous" title="${escapetool.xml($services.localization.render("core.widgets.gallery.previousImage"))}">&lt;</button>' +
-      '<span class="focusCatcher image-container" role="group" aria-roledescription="slide" tabindex="0">' +
       '<img class="currentImage" alt="${escapetool.xml($services.localization.render("core.widgets.gallery.currentImage"))}"/>' +
-      '</span>' +
       '<button class="next" title="${escapetool.xml($services.localization.render("core.widgets.gallery.nextImage"))}">&gt;</button>' +
-      '<div class="index">0 / 0</div>'
+      '<div class="index" tabindex="0" title="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}" aria-description="${escapetool.xml($services.localization.render("core.widgets.gallery.index.description"))}">0 / 0</div>'
     );
     this.container.addClassName('xGallery');    
-
-    this.focusCatcher = this.container.down('.focusCatcher');
+    
+    /* Instead of an arbitrary element to catch focus, we use the index.
+    * This index already stores the current image state, might as well be responsible for providing quick controls and
+    * explanations about these quick controls.
+    * Note that wrapping the image in an interactive container to handle this would have been a good solution too.
+    * However, this wrapping caused the image to overflow the CSS grid vertically when in maximized mode. 
+    * Technically I couldn't find a CSS solution to prevent this, so I decided to make do without wrapping. */
+    this.focusCatcher = this.container.down('.index');
     this.focusCatcher.observe('keydown', this._onKeyDown.bindAsEventListener(this));
 
     this.container.down('.previous').observe('click', this._onPreviousImage.bind(this));
     this.container.down('.next').observe('click', this._onNextImage.bind(this));
+    this.container.observe('click', function() {
+      this.focusCatcher.focus();
+    }.bind(this));
 
-    this.currentImage = this.focusCatcher.down('.currentImage');
+    this.currentImage = this.container.down('.currentImage');;
     this.currentImage.observe('load', this._onLoadImage.bind(this));
     this.currentImage.observe('error', this._onErrorImage.bind(this));
     this.currentImage.observe('abort', this._onAbortImage.bind(this));

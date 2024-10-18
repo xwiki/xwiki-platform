@@ -46,7 +46,7 @@ XWiki.Gallery = Class.create({
       this.focusCatcher.focus();
     }.bind(this));
 
-    this.currentImage = this.container.down('.currentImage');;
+    this.currentImage = this.container.down('.currentImage');
     this.currentImage.observe('load', this._onLoadImage.bind(this));
     this.currentImage.observe('error', this._onErrorImage.bind(this));
     this.currentImage.observe('abort', this._onAbortImage.bind(this));

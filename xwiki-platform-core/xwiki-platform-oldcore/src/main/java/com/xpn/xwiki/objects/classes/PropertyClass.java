@@ -230,6 +230,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         }
 
         input.setType("text");
+        /* This is a text alternative fallback to explain what the input is about. 
+         If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
+         */
+        input.addAttribute("aria-label", 
+            localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative", 
+                this.getTranslatedPrettyName(context), object.getPrettyName()));
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setDisabled(isDisabled());

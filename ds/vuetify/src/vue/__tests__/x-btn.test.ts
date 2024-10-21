@@ -48,6 +48,6 @@ describe("x-btn", () => {
         default: "Content",
       },
     });
-    expect(xBtn.classes()).toContain("bg-error");
+    expect(xBtn.classes()).toContain("text-error");
   });
 });

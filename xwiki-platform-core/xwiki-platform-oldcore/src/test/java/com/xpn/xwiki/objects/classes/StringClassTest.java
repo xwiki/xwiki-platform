@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
@@ -50,8 +51,11 @@ class StringClassTest
     private XWikiURLFactory urlFactory;
 
     @Test
-    void displayEdit()
+    void displayEdit() throws Exception
     {
+        // Setup
+        oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+        
         XWikiContext xWikiContext = this.oldCore.getXWikiContext();
         xWikiContext.setURLFactory(this.urlFactory);
         when(this.oldCore.getSpyXWiki()
@@ -68,7 +72,7 @@ class StringClassTest
             new DocumentReference(this.oldCore.getXWikiContext().getWikiId(), spaceName, pageName));
         stringClass.setName(fieldName);
         StringBuffer stringBuffer = new StringBuffer();
-        /**stringClass.displayEdit(stringBuffer, fieldName, spaceName + "." + pageName + "_0_", baseClass,
+        stringClass.displayEdit(stringBuffer, fieldName, spaceName + "." + pageName + "_0_", baseClass,
             xWikiContext);
         assertEquals("<input aria-label='core.model.xclass.editClassProperty.textAlternative' "
             + "onfocus='new ajaxSuggest(this, &#123;script:&#34;\\/a\\/b?xpage=suggest&#38;"
@@ -78,6 +82,6 @@ class StringClassTest
             + "id='&#34; + alert(1) + &#34;.WebHome_0_test' "
             + "name='&#34; + alert(1) + &#34;.WebHome_0_test' "
             + "size='30' "
-            + "type='text'/>", stringBuffer.toString());**/
+            + "type='text'/>", stringBuffer.toString());
     }
 }

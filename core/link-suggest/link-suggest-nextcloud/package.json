@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-link-suggest-api",
+  "name": "@xwiki/cristal-link-suggest-nextcloud",
   "version": "0.10.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/link-suggest/link-suggest-api",
+    "directory": "core/link-suggest/link-suggest-nexcloud",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -24,7 +24,12 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "6.0.2"
+    "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "inversify": "6.0.2",
+    "xml-escape": "1.1.0"
+  },
+  "devDependencies": {
+    "@types/xml-escape": "1.1.3"
   },
   "publishConfig": {
     "exports": {

@@ -17,38 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { type LinkSuggestService } from "./linkSuggestService";
 import { Container } from "inversify";
-import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
-import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
-
-/**
- * @since 0.11
- */
-enum LinkType {
-  PAGE,
-  ATTACHMENT,
-}
-
-/**
- * Minimal data required to describe a link.
- * @since 0.8
- */
-type Link = {
-  id: string;
-  url: string;
-  reference: string;
-  label: string;
-  hint: string;
-  type: LinkType;
-};
-
-/**
- * The component id of LinkSuggestService.
- * @since 0.8
- */
-const name = "LinkSuggestService";
+import { name, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import { NextcloudLinkSuggestService } from "./nextcloudLinkSuggestService";
 
 /**
  * @since 0.11
@@ -56,17 +27,11 @@ const name = "LinkSuggestService";
 class ComponentInit {
   constructor(container: Container) {
     container
-      .bind<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-      .to(DefaultLinkSuggestServiceProvider)
-      .inSingletonScope();
+      .bind<LinkSuggestService>(name)
+      .to(NextcloudLinkSuggestService)
+      .inSingletonScope()
+      .whenTargetNamed("Nextcloud");
   }
 }
 
-export {
-  type LinkSuggestService,
-  name,
-  type Link,
-  LinkType,
-  ComponentInit,
-  type LinkSuggestServiceProvider,
-};
+export { ComponentInit };

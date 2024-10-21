@@ -25,7 +25,11 @@ import { storeToRefs } from "pinia";
 import linkSuggestStore from "../stores/link-suggest-store";
 import { listNavigation } from "./list-navigation-helper";
 import { SuggestionProps } from "@tiptap/suggestion";
-import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
+import {
+  LinkSuggestionActionDescriptor,
+  LinkType,
+} from "../components/extensions/link-suggest";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 
 const container = ref();
 
@@ -145,6 +149,11 @@ defineExpose({
           :class="['item', index - 1 == linkIndex ? 'is-selected' : '']"
           @click="apply(linkIndex + 1)"
         >
+          <c-icon
+            class="icon-type"
+            :size="Size.Small"
+            :name="link.type == LinkType.PAGE ? 'file-earmark' : 'paperclip'"
+          />
           {{ link.title }}
           <XBreadcrumb
             :items="

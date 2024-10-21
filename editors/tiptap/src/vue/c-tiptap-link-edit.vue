@@ -26,7 +26,10 @@ import { inject, onMounted, onUpdated, Ref, ref, toRefs, watch } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
 import type { CristalApp } from "@xwiki/cristal-api";
 import CTiptapLinkSuggest from "./c-tiptap-link-suggest.vue";
-import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
+import {
+  type LinkSuggestService,
+  type LinkSuggestServiceProvider,
+} from "@xwiki/cristal-link-suggest-api";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../stores/link-suggest-store";
@@ -103,12 +106,11 @@ onMounted(listenToLinks);
 onUpdated(listenToLinks);
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
-let linkSuggest: LinkSuggestService | undefined = undefined;
-try {
-  linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
-} catch {
-  console.debug(`[${name}] service not found`);
-}
+const linkSuggestServiceProvider = cristal
+  .getContainer()
+  .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider");
+let linkSuggest: LinkSuggestService | undefined =
+  linkSuggestServiceProvider.get();
 
 const store: LinkSuggestStore = linkSuggestStore();
 
@@ -120,10 +122,7 @@ store.updateProps({
 });
 
 const debouncedWatch = debounce(async (query: string) => {
-  const links = await initSuggestionsService(
-    linkSuggest,
-    cristal.getWikiConfig(),
-  )({ query });
+  const links = await initSuggestionsService(linkSuggest)({ query });
   store.updateText(query);
   store.updateLinks(links);
 }, 400);

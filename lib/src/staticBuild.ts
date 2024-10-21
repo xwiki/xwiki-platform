@@ -38,6 +38,9 @@ import { ComponentInit as AttachmentsDefaultComponentInit } from "@xwiki/cristal
 import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal-uiextension-default";
 import { ComponentInit as AuthenticationUIComponentInit } from "@xwiki/cristal-authentication-ui";
 import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
+import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-api";
+import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
+import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
 import type { Container } from "inversify";
 
 export class StaticBuild {
@@ -70,6 +73,9 @@ export class StaticBuild {
       new UIExtensionDefaultComponentInit(container);
       new AuthenticationUIComponentInit(container);
       new AuthenticationAPIComponentInit(container);
+      new LinkSuggestComponentInit(container);
+      new XWikiLinkSuggestComponentInit(container);
+      new NextcloudLinkSuggestComponentInit(container);
     }
     if (additionalComponents) {
       additionalComponents(container);

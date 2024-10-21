@@ -18,10 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Container, injectable, inject } from "inversify";
+import { Container, inject, injectable } from "inversify";
 import {
   Link,
-  LinkSuggestService,
+  type LinkSuggestService,
+  LinkType,
   name,
 } from "@xwiki/cristal-link-suggest-api";
 import { type CristalApp } from "@xwiki/cristal-api";
@@ -33,7 +34,7 @@ import { type CristalApp } from "@xwiki/cristal-api";
  * @since 0.8
  */
 @injectable()
-class DefaultLinkSuggestService implements LinkSuggestService {
+class XWikiLinkSuggestService implements LinkSuggestService {
   private cristalApp: CristalApp;
 
   constructor(@inject<CristalApp>("CristalApp") cristalApp: CristalApp) {
@@ -57,15 +58,35 @@ class DefaultLinkSuggestService implements LinkSuggestService {
 
     const json = await response.json();
 
-    return json.map(({ id, url, reference, label, hint }: Link) => {
-      return {
+    return json.map(
+      ({
         id,
         url,
         reference,
         label,
         hint,
-      };
-    });
+        type,
+      }: {
+        id: string;
+        url: string;
+        reference: string;
+        label: string;
+        hint: string;
+        type: string;
+      }) => {
+        const xwikiURL =
+          this.cristalApp.getWikiConfig().baseURL + url.replace(/^\/xwiki/, "");
+        const link: Link = {
+          id,
+          url: xwikiURL,
+          reference,
+          label,
+          hint,
+          type: type == "doc" ? LinkType.PAGE : LinkType.ATTACHMENT,
+        };
+        return link;
+      },
+    );
   }
 }
 
@@ -73,7 +94,8 @@ export class ComponentInit {
   constructor(container: Container) {
     container
       .bind<LinkSuggestService>(name)
-      .to(DefaultLinkSuggestService)
-      .inSingletonScope();
+      .to(XWikiLinkSuggestService)
+      .inSingletonScope()
+      .whenTargetNamed("XWiki");
   }
 }

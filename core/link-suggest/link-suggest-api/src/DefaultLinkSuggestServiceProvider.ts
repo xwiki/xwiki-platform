@@ -17,56 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import { type LinkSuggestService } from "./linkSuggestService";
-import { Container } from "inversify";
+import { LinkSuggestService } from "./linkSuggestService";
 import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
-import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
+import { inject, injectable } from "inversify";
+import { type CristalApp } from "@xwiki/cristal-api";
 
 /**
  * @since 0.11
  */
-enum LinkType {
-  PAGE,
-  ATTACHMENT,
-}
+@injectable()
+class DefaultLinkSuggestServiceProvider implements LinkSuggestServiceProvider {
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
-/**
- * Minimal data required to describe a link.
- * @since 0.8
- */
-type Link = {
-  id: string;
-  url: string;
-  reference: string;
-  label: string;
-  hint: string;
-  type: LinkType;
-};
-
-/**
- * The component id of LinkSuggestService.
- * @since 0.8
- */
-const name = "LinkSuggestService";
-
-/**
- * @since 0.11
- */
-class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
-      .to(DefaultLinkSuggestServiceProvider)
-      .inSingletonScope();
+  get(type?: string): LinkSuggestService | undefined {
+    const resolvedType = type || this.cristalApp.getWikiConfig().getType();
+    try {
+      return this.cristalApp
+        .getContainer()
+        .getNamed("LinkSuggestService", resolvedType);
+    } catch (e) {
+      this.cristalApp
+        .getLogger("link.suggest.api")
+        .warn(
+          `Couldn't resolve LinkSuggestService for type=[${resolvedType}]`,
+          e,
+        );
+      return undefined;
+    }
   }
 }
 
-export {
-  type LinkSuggestService,
-  name,
-  type Link,
-  LinkType,
-  ComponentInit,
-  type LinkSuggestServiceProvider,
-};
+export { DefaultLinkSuggestServiceProvider };

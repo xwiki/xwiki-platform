@@ -25,13 +25,21 @@ import { App, createApp } from "vue";
 import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 import { PluginKey } from "@tiptap/pm/state";
 import { Container } from "inversify";
-import { SkinManager, WikiConfig } from "@xwiki/cristal-api";
+import { SkinManager } from "@xwiki/cristal-api";
 import { createPinia } from "pinia";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../../stores/link-suggest-store";
 import { queryEqualityOperator } from "./filter-helper";
-import { Link, LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import { Link, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+
+/**
+ * @since 0.11
+ */
+enum LinkType {
+  PAGE,
+  ATTACHMENT,
+}
 
 /**
  * Describe a link suggestion action (i.e., a search result entry).
@@ -41,6 +49,7 @@ export interface LinkSuggestionActionDescriptor {
   segments: string[];
   reference: string;
   url: string;
+  type: LinkType;
 }
 
 /**
@@ -49,14 +58,12 @@ export interface LinkSuggestionActionDescriptor {
  * retuning the tiptap extension
  * @param skinManager a skin manager component instance
  * @param container a container manager instance
- * @param wikiConfig a wiki configuration component instance
  * @param linkSuggest a link suggest service instance
  * @since 0.8
  */
 function loadLinkSuggest(
   skinManager: SkinManager,
   container: Container,
-  wikiConfig: WikiConfig,
   linkSuggest?: LinkSuggestService,
 ) {
   return Extension.create({
@@ -69,7 +76,7 @@ function loadLinkSuggest(
             // props.command({ editor, range, props });
             // TODO: probably unused?
           },
-          items: getSuggestionItems(wikiConfig, linkSuggest),
+          items: getSuggestionItems(linkSuggest),
           render: renderItems(skinManager, container, linkSuggest),
         },
       };
@@ -91,10 +98,7 @@ function loadLinkSuggest(
  * @param linkSuggest the link suggestion service to use
  * @param wikiConfig the wiki configuration to use
  */
-function initSuggestionsService(
-  linkSuggest: LinkSuggestService | undefined,
-  wikiConfig: WikiConfig,
-) {
+function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
   // Return an array of suggestions from a query
   return async function ({
     query,
@@ -121,9 +125,6 @@ function initSuggestionsService(
     return links
       .filter((link) => equalityOperator(link.label))
       .map((link) => {
-        // FIXME: this is very ugly and we need to architecture link management
-        // better.
-        const url = wikiConfig.baseURL + link.url.replace(/^\/xwiki/, "");
         // FIXME: relate to link management is reference management, here too we
         // need to think me precisely of the architecture we want for this.
         const segments = link.reference.split(/\./);
@@ -131,7 +132,8 @@ function initSuggestionsService(
           title: link.label,
           segments,
           reference: link.reference,
-          url,
+          url: link.url,
+          type: link.type,
         };
       });
   };
@@ -140,14 +142,10 @@ function initSuggestionsService(
 /**
  * Initialize a link suggestion function based on the values provided during the
  * extension initialization of the link-suggest extension
- * @param wikiConfig the wiki configuration to use
  * @param linkSuggest the link suggestion service to use
  */
-function getSuggestionItems(
-  wikiConfig: WikiConfig,
-  linkSuggest?: LinkSuggestService,
-) {
-  return initSuggestionsService(linkSuggest, wikiConfig);
+function getSuggestionItems(linkSuggest?: LinkSuggestService) {
+  return initSuggestionsService(linkSuggest);
 }
 
 function renderItems(
@@ -256,4 +254,4 @@ function renderItems(
   };
 }
 
-export { loadLinkSuggest, initSuggestionsService };
+export { loadLinkSuggest, initSuggestionsService, LinkType };

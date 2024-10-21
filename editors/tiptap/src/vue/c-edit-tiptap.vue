@@ -43,7 +43,10 @@ import { CollaborationKit, User } from "../extensions/collaboration";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import CSaveStatus from "./c-save-status.vue";
 import CConnectionStatus from "./c-connection-status.vue";
-import { LinkSuggestService, name } from "@xwiki/cristal-link-suggest-api";
+import {
+  type LinkSuggestService,
+  type LinkSuggestServiceProvider,
+} from "@xwiki/cristal-link-suggest-api";
 import Link from "../extensions/link";
 import Markdown from "../extensions/markdown";
 
@@ -155,12 +158,12 @@ async function loadEditor(page: PageData | undefined) {
       page?.syntax == "markdown/1.2" ? page?.source : page?.html || "";
     title.value = page?.headlineRaw || "";
     titlePlaceholder.value = page?.name || "";
-    let linkSuggest: LinkSuggestService | undefined = undefined;
-    try {
-      linkSuggest = cristal.getContainer().get<LinkSuggestService>(name);
-    } catch {
-      console.debug(`[${name}] service not found`);
-    }
+
+    const linkSuggestServiceProvider = cristal
+      .getContainer()
+      .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider");
+    const linkSuggest: LinkSuggestService | undefined =
+      linkSuggestServiceProvider.get();
 
     const realtimeURL = cristal.getWikiConfig().realtimeURL;
 
@@ -186,7 +189,6 @@ async function loadEditor(page: PageData | undefined) {
         loadLinkSuggest(
           cristal.getSkinManager(),
           cristal.getContainer(),
-          cristal.getWikiConfig(),
           linkSuggest,
         ),
         Markdown.configure({

@@ -38,7 +38,6 @@
     "@xwiki/cristal-hierarchy-nextcloud": "workspace:*",
     "@xwiki/cristal-hierarchy-xwiki": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
-    "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
     "@xwiki/cristal-navigation-tree-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-github": "workspace:*",
     "@xwiki/cristal-navigation-tree-nextcloud": "workspace:*",

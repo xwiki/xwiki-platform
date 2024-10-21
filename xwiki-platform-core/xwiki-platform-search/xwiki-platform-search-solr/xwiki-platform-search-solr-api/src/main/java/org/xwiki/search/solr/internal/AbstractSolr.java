@@ -162,6 +162,9 @@ public abstract class AbstractSolr implements Solr, Disposable
                 XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion, false);
 
                 if (previousCore != null) {
+                    this.logger.debug("A previous core was found for name [{}] ([{}])", xwikiCoreName,
+                        previousCore.getSolrName());
+
                     // Copy the previous core
                     initializer.migrate(previousCore, newCore);
 
@@ -169,6 +172,8 @@ public abstract class AbstractSolr implements Solr, Disposable
                     previousCore.getClient().close();
 
                     break;
+                } else {
+                    this.logger.debug("Not previous core could be found for name [{}]", xwikiCoreName);
                 }
             }
 

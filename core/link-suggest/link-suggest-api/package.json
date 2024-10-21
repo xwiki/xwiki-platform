@@ -18,8 +18,8 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "clean": "rimraf dist",
     "build": "tsc --project tsconfig.json && vite build",
+    "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "publishConfig": {

@@ -4,7 +4,6 @@
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
-  "type": "module",
   "repository": {
     "type": "git",
     "directory": "realtime",
@@ -13,10 +12,11 @@
   "bugs": {
     "url": "https://jira.xwiki.org/projects/CRISTAL/"
   },
+  "type": "module",
   "scripts": {
-    "dev": "tsx src/index.ts",
     "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node",
     "clean": "rimraf dist",
+    "dev": "tsx src/index.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {

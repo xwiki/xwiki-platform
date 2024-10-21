@@ -18,9 +18,13 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "clean": "rimraf dist",
     "build": "tsc --project tsconfig.json && vite build",
+    "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+  },
+  "dependencies": {
+    "@xwiki/cristal-api": "workspace:*",
+    "inversify": "6.0.2"
   },
   "publishConfig": {
     "exports": {
@@ -32,9 +36,5 @@
     },
     "main": "./dist/index.es.js",
     "types": "./dist/index.d.ts"
-  },
-  "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "inversify": "6.0.2"
   }
 }

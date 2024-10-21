@@ -15,14 +15,14 @@
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
-    "dev:cristal-web": "nx dev @xwiki/cristal-web",
-    "dev:cristal-realtime": "nx dev @xwiki/cristal-realtime",
     "dev": "nx build @xwiki/cristal-web && run-p dev:cristal-web dev:cristal-realtime",
+    "dev:cristal-realtime": "nx dev @xwiki/cristal-realtime",
+    "dev:cristal-web": "nx dev @xwiki/cristal-web",
     "lint": "nx run-many -t lint",
     "quickstart": "nx run @xwiki/cristal-web:quickstart",
     "start": "nx run @xwiki/cristal-web:start",
-    "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
     "start:electron": "run-p start:electron:ui dev:cristal-realtime",
+    "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
     "test": "nx run-many -t test"
   },
   "devDependencies": {

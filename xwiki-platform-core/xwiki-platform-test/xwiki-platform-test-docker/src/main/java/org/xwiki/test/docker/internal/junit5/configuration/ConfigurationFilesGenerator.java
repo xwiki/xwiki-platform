@@ -204,7 +204,7 @@ public class ConfigurationFilesGenerator
         repositories.add(String.format("maven-local:maven:file://%s", localRepo));
 
         if (!this.repositoryResolver.getSession().isOffline()) {
-            repositories.add("maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public");
+            repositories.add("maven-xwiki:maven:https://nexus-snapshots.xwiki.org/repository/public-proxy");
             // Allow snapshot extensions to be resolved too when not offline
             // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
             // WARBuilder when resolving distribution artifacts.

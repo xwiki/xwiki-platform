@@ -297,8 +297,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
              If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
              */
             scontext.setAttribute("aria-label",
-                    localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
-                            this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);
+                localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+                    this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);
             if (prop != null) {

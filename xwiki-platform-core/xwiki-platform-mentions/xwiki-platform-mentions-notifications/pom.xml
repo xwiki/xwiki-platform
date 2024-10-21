@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>15.10.13-SNAPSHOT</version>
+    <version>15.10.13</version>
   </parent>
   <artifactId>xwiki-platform-mentions-notifications</artifactId>
   <name>XWiki Platform - Mentions - Notifications</name>

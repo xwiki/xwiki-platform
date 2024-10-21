@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-web</artifactId>
-    <version>15.10.13-SNAPSHOT</version>
+    <version>15.10.13</version>
   </parent>
   <artifactId>xwiki-platform-web-war</artifactId>
   <name>XWiki Platform - Web - WAR</name>

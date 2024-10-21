@@ -125,7 +125,7 @@
     "serverRendering": false,
     "offline": false,
     "baseURL": "http://localhost:9292/",
-    "baseRestURL": "http://localhost:9292/remote.php/dav/files/admin",
+    "baseRestURL": "http://localhost:9292/remote.php/dav/files",
     "designSystem": "shoelace",
     "homePage": "home"
   }

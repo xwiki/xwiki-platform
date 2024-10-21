@@ -28,6 +28,10 @@ import {
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
+// TODO: To be replaced by an actual authentication with CRISTAL-267
+const USERNAME = "admin";
+const PASSWORD = "admin";
+
 /**
  * Access Nextcloud storage through http.
  * Read and write files to a ~/.cristal directory where all persistent data is
@@ -59,7 +63,7 @@ export class NextcloudStorage extends AbstractStorage {
 
     try {
       const response = await fetch(
-        `${baseRestURL}/.cristal/${page}/page.json`,
+        `${baseRestURL}/${USERNAME}/.cristal/${page}/page.json`,
         {
           method: "GET",
           headers,
@@ -106,7 +110,7 @@ export class NextcloudStorage extends AbstractStorage {
           const mimetype =
             dresponse.getElementsByTagName("d:getcontenttype")[0].textContent!;
           const segments = id.split("/");
-          const href = `${this.getWikiConfig().baseRestURL}/${segments.slice(5).join("/")}`;
+          const href = `${this.getWikiConfig().baseRestURL}/${USERNAME}/${segments.slice(5).join("/")}`;
           const reference = segments[segments.length - 1];
 
           attachments.push({
@@ -125,7 +129,7 @@ export class NextcloudStorage extends AbstractStorage {
   }
 
   private getAttachmentsBasePath(page: string) {
-    return `${this.getWikiConfig().baseRestURL}/.cristal/${page}/${this.ATTACHMENTS}`;
+    return `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal/${page}/${this.ATTACHMENTS}`;
   }
 
   async save(page: string, content: string, title: string): Promise<unknown> {
@@ -135,7 +139,7 @@ export class NextcloudStorage extends AbstractStorage {
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/.cristal`;
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
     await this.createIntermediateDirectories(rootURL, directories);
 
     await fetch(`${rootURL}/${directories.join("/")}/page.json`, {
@@ -174,7 +178,7 @@ export class NextcloudStorage extends AbstractStorage {
     const directories = page.split("/");
 
     // Create the root directory. We also need to create all intermediate directories.
-    const rootURL = `${this.getWikiConfig().baseRestURL}/.cristal`;
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
     await this.createIntermediateDirectories(rootURL, [
       ...directories,
       this.ATTACHMENTS,
@@ -218,7 +222,7 @@ export class NextcloudStorage extends AbstractStorage {
   private getBaseHeaders() {
     // TODO: the authentication is currently hardcoded.
     return {
-      Authorization: `Basic ${btoa("test:test")}`,
+      Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`,
     };
   }
 }

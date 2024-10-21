@@ -27,6 +27,10 @@ import {
 } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 
+// TODO: To be replaced by an actual authentication with CRISTAL-267
+const USERNAME = "test";
+const PASSWORD = "test";
+
 /**
  * Implementation of NavigationTreeSource for the Nextcloud backend.
  *
@@ -79,7 +83,7 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     const subdirectories: Array<string> = [];
     try {
       const response = await fetch(
-        `${this.cristalApp.getWikiConfig().baseRestURL}/.cristal/${directory}`,
+        `${this.cristalApp.getWikiConfig().baseRestURL}/${USERNAME}/.cristal/${directory}`,
         {
           method: "PROPFIND",
           headers: {
@@ -124,7 +128,7 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
   private getBaseHeaders() {
     // TODO: the authentication is currently hardcoded.
     return {
-      Authorization: `Basic ${btoa("test:test")}`,
+      Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`,
     };
   }
 }

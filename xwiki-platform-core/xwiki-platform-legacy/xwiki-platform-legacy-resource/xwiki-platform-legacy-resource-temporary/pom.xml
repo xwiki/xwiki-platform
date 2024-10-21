@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-resource</artifactId>
-    <version>15.10.13</version>
+    <version>15.10.14-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-resource-temporary</artifactId>
   <name>XWiki Platform - Legacy - Resource - Temporary</name>

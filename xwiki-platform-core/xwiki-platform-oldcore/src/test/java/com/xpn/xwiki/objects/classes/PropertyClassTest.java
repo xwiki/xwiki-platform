@@ -25,6 +25,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -77,6 +78,7 @@ public class PropertyClassTest
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         this.oldCore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
     }
 
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */

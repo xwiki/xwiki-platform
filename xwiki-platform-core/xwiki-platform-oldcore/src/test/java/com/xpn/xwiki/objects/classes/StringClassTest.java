@@ -54,7 +54,7 @@ class StringClassTest
     void displayEdit() throws Exception
     {
         // Setup
-        oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
         
         XWikiContext xWikiContext = this.oldCore.getXWikiContext();
         xWikiContext.setURLFactory(this.urlFactory);

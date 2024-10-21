@@ -176,6 +176,7 @@
                 <argument>--no-tar</argument>
                 <!-- Uncomment to leave the JavaScript code as is (merge but not minify). -->
                 <!--<argument>-&#45;leave-js-unminified</argument>-->
+                <argument>--leave-js-unminified</argument>
                 <!-- Uncomment to see all the available configuration options. -->
                 <!--<argument>-&#45;help</argument>-->
               </arguments>

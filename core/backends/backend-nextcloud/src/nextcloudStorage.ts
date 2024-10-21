@@ -29,8 +29,8 @@ import {
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 
 // TODO: To be replaced by an actual authentication with CRISTAL-267
-const USERNAME = "admin";
-const PASSWORD = "admin";
+const USERNAME = "test";
+const PASSWORD = "test";
 
 /**
  * Access Nextcloud storage through http.

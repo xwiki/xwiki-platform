@@ -563,12 +563,16 @@ export class DefaultCristalApp implements CristalApp {
     return uixTemplates;
   }
 
-  async getPage(page: string): Promise<PageData | undefined> {
+  async getPage(
+    page: string,
+    options?: { requeue: boolean },
+  ): Promise<PageData | undefined> {
     const isJsonLD = this.getWikiConfig().isSupported("jsonld");
     const syntax = isJsonLD ? "jsonld" : "html";
     const pageData = await this.getWikiConfig().storage.getPageContent(
       page,
       syntax,
+      options?.requeue,
     );
     if (isJsonLD && pageData) {
       const document = pageData.document;

@@ -325,6 +325,33 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
 
+  core/document/document-api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+
+  core/document/document-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../document-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      pinia:
+        specifier: 2.2.4
+        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+
   core/extra-tabs/extra-tabs-api:
     dependencies:
       inversify:
@@ -841,6 +868,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../core/document/document-api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
@@ -1160,6 +1190,12 @@ importers:
       '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../core/browser/browser-api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../core/document/document-api
+      '@xwiki/cristal-document-default':
+        specifier: workspace:*
+        version: link:../core/document/document-default
       '@xwiki/cristal-dsfr':
         specifier: workspace:*
         version: link:../ds/dsfr
@@ -1348,6 +1384,9 @@ importers:
       '@xwiki/cristal-backend-xwiki':
         specifier: workspace:*
         version: link:../../core/backends/backend-xwiki
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../core/document/document-api
       '@xwiki/cristal-extension-manager':
         specifier: workspace:*
         version: link:../../extension-manager
@@ -1379,6 +1418,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../core/document/document-api
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../core/extra-tabs/extra-tabs-api

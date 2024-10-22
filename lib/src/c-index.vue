@@ -21,6 +21,26 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script lang="ts" setup>
 import { CTemplate } from "@xwiki/cristal-skin";
 import "./index.css";
+import { inject, watch } from "vue";
+import { useRoute } from "vue-router";
+import { CristalApp } from "@xwiki/cristal-api";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
+
+// Observe for route changes and update the current document accordingly.
+// All services using the refs provided by the document service will be updated
+// accordingly.
+const route = useRoute();
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>(documentServiceName);
+function fetchPage(page: string): void {
+  documentService.setCurrentDocument(page);
+}
+watch(() => route.params.page as string, fetchPage, { immediate: true });
 </script>
 <template>
   <CTemplate name="view" />

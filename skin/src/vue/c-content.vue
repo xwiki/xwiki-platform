@@ -41,6 +41,10 @@ import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { useI18n } from "vue-i18n";
 import messages from "../translations";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 
 const { t } = useI18n({
   messages,
@@ -50,16 +54,21 @@ const route = useRoute();
 
 const avImg = xavatarImg;
 
-const loading = ref(false);
-const error: Ref<Error | undefined> = ref(undefined);
-const currentPage: Ref<PageData | undefined> = ref(undefined);
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>(documentServiceName);
+
+const loading = documentService.isLoading();
+const error: Ref<Error | undefined> = documentService.getError();
+const currentPage: Ref<PageData | undefined> =
+  documentService.getCurrentDocument();
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
   return (
     (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
   );
 });
-const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
 
 const breadcrumbRoot = ref(undefined);
 const contentRoot = ref(undefined);
@@ -89,31 +98,23 @@ const title = computed(() => {
   );
 });
 
-const cristal: CristalApp = inject<CristalApp>("cristal")!;
-
-async function fetchPage(page: string) {
-  loading.value = true;
-  try {
-    // Provides a reactive variable to be updated if the page content is updated
-    // in the background.
-    cristal.setContentRef(currentPage);
-    currentPage.value = await cristal.getPage(page || currentPageName.value);
-    breadcrumbItems.value = await cristal
-      .getContainer()
-      .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
-      .get()
-      .getPageHierarchy(currentPage.value!);
-  } catch (e) {
-    console.error(e);
-    if (e instanceof Error) {
-      error.value = e;
+const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
+watch(
+  currentPage,
+  async (p) => {
+    try {
+      breadcrumbItems.value = await cristal
+        .getContainer()
+        .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
+        .get()
+        .getPageHierarchy(p!);
+    } catch (e) {
+      console.error(e);
+      breadcrumbItems.value = [];
     }
-  } finally {
-    loading.value = false;
-  }
-}
-
-watch(() => route.params.page as string, fetchPage, { immediate: true });
+  },
+  { immediate: true },
+);
 
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");

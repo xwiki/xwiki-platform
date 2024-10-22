@@ -19,7 +19,6 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import { inject, onMounted, Ref, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
 import CPageCreationMenu from "./c-page-creation-menu.vue";
@@ -31,6 +30,10 @@ import { CIcon } from "@xwiki/cristal-icons";
 import { useMouseCoordinates } from "../composables/mouse";
 import { useViewportType, ViewportType } from "../composables/viewport";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
+import {
+  DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 
 const logo = xlogo;
 const viewportType: Ref<ViewportType> = useViewportType();
@@ -40,9 +43,12 @@ const isSidebarClosed: Ref<boolean> = ref(
   viewportType.value == ViewportType.Mobile,
 );
 
-const route = useRoute();
-const currentPage: Ref<PageData | undefined> = ref(undefined);
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>(documentServiceName);
+const currentPage: Ref<PageData | undefined> =
+  documentService.getCurrentDocument();
 
 defineEmits(["collapseMainSidebar"]);
 
@@ -57,15 +63,6 @@ onMounted(() => {
   }
 });
 
-watch(
-  () => route.params.page,
-  async () => {
-    // TODO: define a proper abstraction.
-    const pageName = (route.params.page as string) || cristal.getCurrentPage();
-    currentPage.value = await cristal.getPage(pageName);
-  },
-  { immediate: true },
-);
 watch(viewportType, (newViewportType: ViewportType) => {
   // Always close main sidebar when switching to a smaller viewport
   if (newViewportType == ViewportType.Mobile) {

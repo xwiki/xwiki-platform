@@ -25,7 +25,6 @@ import {
   onUpdated,
   type Ref,
   ref,
-  watch,
 } from "vue";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { useRoute } from "vue-router";
@@ -49,12 +48,21 @@ import {
 } from "@xwiki/cristal-link-suggest-api";
 import Link from "../extensions/link";
 import Markdown from "../extensions/markdown";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
-const loading = ref(false);
-const currentPage: Ref<PageData | undefined> = ref(undefined);
-const error: Ref<Error | undefined> = ref(undefined);
+
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>(documentServiceName);
+const loading = documentService.isLoading();
+const error: Ref<Error | undefined> = documentService.getError();
+const currentPage: Ref<PageData | undefined> =
+  documentService.getCurrentDocument();
 
 // TODO: load this content first, then initialize the editor.
 // Make the loading status first.
@@ -68,22 +76,6 @@ const currentPageName: ComputedRef<string> = computed(() => {
     (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
   );
 });
-
-async function fetchPage() {
-  loading.value = true;
-  try {
-    currentPage.value = await cristal.getPage(currentPageName.value);
-  } catch (e) {
-    console.error(e);
-    if (e instanceof Error) {
-      error.value = e;
-    }
-  } finally {
-    loading.value = false;
-  }
-}
-
-watch(() => route.params.page, fetchPage, { immediate: true });
 
 const viewRouterParams = {
   name: "view",

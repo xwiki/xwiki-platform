@@ -23,6 +23,10 @@ import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import * as Comlink from "comlink";
 import Worker from "./worker?sharedworker";
 import { type CristalApp, type Logger } from "@xwiki/cristal-api";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 
 @injectable()
 export default class DefaultQueueWorker implements QueueWorker {
@@ -47,11 +51,13 @@ export default class DefaultQueueWorker implements QueueWorker {
         "Received callback that new document has been loaded",
         page,
       );
-      // When reloading the page for the worker, prevents a requeue to avoid
-      // an endless re-fetch of the current page.
-      this.cristalApp.loadPage({
-        requeue: false,
-      });
+      // We need to access the DocumentService lasily as otherwise the
+      // internal pinia instance is initialized too early.
+      const documentService = this.cristalApp
+        .getContainer()
+        .get<DocumentService>(documentServiceName);
+      documentService.refreshCurrentDocument();
+
       this.logger.debug(
         "Done callback that new document has been loaded",
         page,

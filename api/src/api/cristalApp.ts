@@ -70,6 +70,10 @@ export interface CristalApp {
 
   setCurrentPage(page: string, mode: string): void;
 
+  /**
+   * @deprecated use the document-api instead
+   * @param ref the reactive reference holding the reference to a page data.
+   */
   setContentRef(ref: Ref): void;
 
   loadPageFromURL(url: string): Promise<void>;
@@ -84,7 +88,10 @@ export interface CristalApp {
    *
    * @since 0.7
    */
-  getPage(page: string): Promise<PageData | undefined>;
+  getPage(
+    page: string,
+    options?: { requeue: boolean },
+  ): Promise<PageData | undefined>;
 
   getLogger(module: string): Logger;
 

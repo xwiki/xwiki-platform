@@ -21,6 +21,7 @@ packages:
   - "core/authentication/*"
   - "core/backends/*"
   - "core/browser/*"
+  - "core/document/*"
   - "core/extra-tabs/*"
   - "core/hierarchy/*"
   - "core/icons"

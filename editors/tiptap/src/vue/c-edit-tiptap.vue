@@ -18,14 +18,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import {
-  computed,
-  type ComputedRef,
-  inject,
-  onUpdated,
-  type Ref,
-  ref,
-} from "vue";
+import { computed, type ComputedRef, inject, type Ref, ref, watch } from "vue";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { useRoute } from "vue-router";
 import { Editor, EditorContent } from "@tiptap/vue-3";
@@ -200,7 +193,7 @@ async function loadEditor(page: PageData | undefined) {
   }
 }
 
-onUpdated(() => loadEditor(currentPage.value!));
+watch(currentPage, (page) => loadEditor(page), { immediate: true });
 </script>
 
 <template>

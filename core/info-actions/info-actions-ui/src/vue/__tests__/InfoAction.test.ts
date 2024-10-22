@@ -61,7 +61,6 @@ describe("info-action", () => {
     // Wait for all the asynchronous operations to be terminated before starting
     // to assert the rendered content.
     await flushPromises();
-    console.log(infoAction.html());
     expect(infoAction.classes()).to.contain("testId");
     expect(infoAction.find("c-icon-stub").attributes("name")).toBe("testName");
     expect(infoAction.find(".counter").text()).toBe("10");

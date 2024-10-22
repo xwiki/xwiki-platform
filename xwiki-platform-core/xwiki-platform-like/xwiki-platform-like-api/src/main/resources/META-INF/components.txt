@@ -1,4 +1,5 @@
 org.xwiki.like.script.LikeScriptService
+org.xwiki.like.internal.LikeManagerCacheHelper
 org.xwiki.like.internal.DefaultLikeManager
 org.xwiki.like.internal.DefaultLikeConfiguration
 org.xwiki.like.internal.LikeConfigurationSource

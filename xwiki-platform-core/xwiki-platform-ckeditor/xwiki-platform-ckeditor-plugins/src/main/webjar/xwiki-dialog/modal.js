@@ -25,26 +25,53 @@ define('modalTranslationKeys', [], [
 
 define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations) {
   'use strict';
-  var modalTemplate = 
-    '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
-      '<div class="modal-dialog" role="document">' +
-        '<div class="modal-content">' +
-          '<div class="modal-header">' +
-            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-              '<span aria-hidden="true">&times;</span>' +
-            '</button>' +
-            '<h4 class="modal-title"></h4>' +
-          '</div>' +
-          '<div class="modal-body"></div>' +
-          '<div class="modal-footer">' +
-            '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
-            '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
-          '</div>' +
+  // Fetch the cross icon from the icon theme to fill up the modal template.
+  let iconURL = `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/iconThemes/icons?name=cross`;
+  // Default value taken until the fetch is fulfilled
+  var closeIconTemplate = `<span aria-hidden="true">&times;</span>`;
+  $.get(iconURL, function(response) {
+    // We override the close button content template if the request is successful
+    let iconMetadata = response.getElementsByTagName('icon')[0];
+    console.log(iconMetadata);
+    if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'IMAGE') {
+      closeIconTemplate = '<img src="' + iconMetadata.getElementsByTagName('url')[0].textContent +
+          '" alt="" />';
+    } else if (iconMetadata.getElementsByTagName('iconSetType')[0].textContent === 'FONT') {
+      closeIconTemplate = '<span class="' +
+          iconMetadata.getElementsByTagName('cssClass')[0].textContent +
+          '" aria-hidden="true"></span>';
+    }
+    // Once we retrieve the icon value, we
+    // 1. Replace all the uses of the icon in the DOM already generated
+    const closeButtons = document.querySelectorAll(
+      '.modal > .modal-dialog > .modal-content > .modal-header > button.close');
+    closeButtons.forEach((button)=> {
+      button.innerHTML = closeIconTemplate;
+    });
+    // 2. replace the modal template used to create new modals
+    closeButtonTemplate = closeIconTemplate;
+  });
+  let closeButtonTemplate = '<span aria-hidden="true">&times;</span>';
+  let modalTemplate = '<div class="modal" tabindex="-1" role="dialog" data-backdrop="static">' +
+    '<div class="modal-dialog" role="document">' +
+      '<div class="modal-content">' +
+        '<div class="modal-header">' +
+          '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+            closeButtonTemplate +
+          '</button>' +
+          '<h4 class="modal-title"></h4>' +
+        '</div>' +
+        '<div class="modal-body"></div>' +
+        '<div class="modal-footer">' +
+          '<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>' +
+          '<button type="button" class="btn btn-primary" disabled="disabled">OK</button>' +
         '</div>' +
       '</div>' +
-    '</div>',
+    '</div>' +
+  '</div>',
+  
 
-  createModal = function(definition) {
+  createModal = function (definition) {
     // form(Boolean): Whether the modal is a form. Some basic form semantics and behaviour will be added if this is true
     definition = $.extend({
       title: '',
@@ -53,7 +80,7 @@ define('modal', ['jquery', 'l10n!modal', 'bootstrap'], function($, translations)
       dismissLabel: translations.get('cancel'),
       form: false
     }, definition);
-    var modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
+    let modal = $(modalTemplate).addClass(definition['class']).appendTo(document.body);
     modal.find('.close').attr({
       title: translations.get('close'),
       'aria-label': translations.get('close')

@@ -196,7 +196,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         #set ($deleteURL = $xwiki.getURL($doc.fullName, 'objectremove', $queryString, "xwikicomment_${comment.number}"))
         <a class="delete btn btn-default btn-xs " data-toggle="modal" data-target="#deleteModal" rel="nofollow"
           href="$deleteURL" title="$services.localization.render('core.viewers.comments.delete')">
-          $services.icon.renderHTML('cross')
+          $services.icon.renderHTML('trash')
         </a>
        #end
       </div>## btn-group
@@ -258,12 +258,6 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       $services.localization.render('core.viewers.comments.add.commentAsGuest.label')
     #end
   </button>
-  #if($isGuest)
-    <a id='loginAndComment' class='btn btn-primary'
-      href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($doc.getURL('view', 'viewer=comments'))")'>
-      $services.localization.render('core.viewers.comments.add.loginAndComment.label')
-    </a>
-  #end
 #end
 ##
 ##
@@ -336,7 +330,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.permalink')</div>
         </div>
         <div class="modal-body">
@@ -363,7 +357,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.comments.delete')</div>
         </div>
         <div class="modal-body">

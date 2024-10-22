@@ -159,68 +159,86 @@ require.config({
   paths: paths.js
 });
 
-define('xwiki-document-api', ['jquery'], function($) {
-  var getOldAPI = function(xwikiDocument) {
+define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
+  function getOldAPI(xwikiDocument) {
     return (xwikiDocument.documentReference &amp;&amp; new XWiki.Document(xwikiDocument.documentReference)) ||
       XWiki.currentDocument;
-  };
+  }
 
-  return {
+  class XWikiDocument {
+    constructor() {
+      // Initialize based on the current document.
+      this.documentReference = xcontext.documentReference;
+      this.language = xcontext.locale;
+      this.version = xcontext.version;
+      this.isNew = xcontext.isNew;
+      this.renderedTitle = $('#document-title h1').html();
+      this.renderedContent = $('#xwikicontent').html();
+
+      if (!this.language) {
+        // We know this is the original document translation, but we don't know it's actual (real) locale (which may be
+        // different from the current UI locale if this document doesn't have a translation for the current UI locale).
+        const docVariant = new URLSearchParams(XWiki.docvariant);
+        this.translations = this.translations || {};
+        this.translations['default'] = docVariant.get('language');
+      }
+    }
+
     /**
      * @return this document's plain title
      */
     getPlainTitle() {
       return $('&lt;div/&gt;').html(this.renderedTitle || this.title).text();
-    },
+    }
 
     /**
      * @return this document's real locale
      */
-    getRealLocale: function() {
+    getRealLocale() {
       var realLocale = this.language;
       if (typeof realLocale !== 'string' || realLocale === '') {
         realLocale = this.getDefaultLocale();
       }
       return realLocale;
-    },
+    }
 
     /**
      * @return this document's default locale
      */
-    getDefaultLocale: function() {
+    getDefaultLocale() {
       if (this.translations &amp;&amp; typeof this.translations['default'] === 'string') {
         return this.translations['default'];
       } else {
         // The default locale is not specified. Use the UI locale.
         return $('html').attr('lang');
       }
-    },
+    }
 
     /**
      * @return the URL that can be used to perform the specified action on this document
      */
-    getURL: function(action, queryString, fragment) {
+    getURL(action, queryString, fragment) {
       if (queryString &amp;&amp; typeof queryString === 'object') {
         queryString = $.param(queryString, true);
       }
       // Forward the call to the old API.
       var oldAPI = getOldAPI(this);
       return oldAPI.getURL.call(oldAPI, action, queryString, fragment);
-    },
+    }
 
     /**
      * @param queryString the query string to add to the URL; it can be a string or a plain JavaScript object
      * @return the URL that can be used to retrieve this document's (JSON) data, taking into account whether this is the
      *         original document or a translation
      */
-    getRestURL: function(queryString) {
+    getRestURL(queryString) {
       var oldAPI = getOldAPI(this);
       if (queryString &amp;&amp; typeof queryString === 'object') {
         queryString = $.param(queryString, true);
       }
       var entity = this.language &amp;&amp; ('translations/' + encodeURIComponent(this.language));
       return oldAPI.getRestURL(entity, queryString);
-    },
+    }
 
     /**
      * Render the title and the content of this document.
@@ -229,11 +247,15 @@ define('xwiki-document-api', ['jquery'], function($) {
      *          rendering annotations); when rendering for edit some transformations might not be executed
      * @return a promise that resolves to this document instance if the render request succeeds
      */
-    render: function(forView) {
+    render(forView) {
       var queryString = {
         xpage: 'get',
         outputTitle: true,
-        language: this.getRealLocale(),
+        // Render the default translation if this is a new document:
+        // * if it's a new document then we need to create the default translation first
+        // * if it's a new translation then we want to initialize the translation with the title and content from the
+        //   default translation
+        language: (this.isNew ? '' : this.getRealLocale()),
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       };
@@ -257,14 +279,14 @@ define('xwiki-document-api', ['jquery'], function($) {
         new XWiki.widgets.Notification(l10n['edit.inplace.page.renderFailed'], 'error');
         return Promise.reject(this);
       });
-    },
+    }
 
     /**
      * Reload this document's (JSON) data.
      *
      * @return a promise that resolves to this document instance if the reload request succeeds
      */
-    reload: function() {
+    reload() {
       return Promise.resolve($.getJSON(this.getRestURL(), {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
@@ -275,11 +297,40 @@ define('xwiki-document-api', ['jquery'], function($) {
         // We were able to load the document so it's not new.
         this.isNew = false;
         return $.extend(this, newXWikiDocument);
-      }).catch(() =&gt; {
-        // Reload failed.
-        return Promise.reject(this);
+      }).catch(response =&gt; {
+        if (response.status === 404) {
+          // This document doesn't exist.
+          if (this.language === '') {
+            // The default document translation doesn't exist. It needs to be created before the other translations.
+            this.markAsNew();
+            return this;
+          } else {
+            // This document translation doesn't exist. Initialize it with the values from the default translation.
+            const language = this.language;
+            // Reload the default translation and then restore the language.
+            this.language = '';
+            return this.reload().then(() =&gt; {
+              // If the default translation exists then use it to initialize the current translation. Otherwise, we have
+              // to create the default translation first.
+              if (!this.isNew) {
+                this.translate(language);
+              }
+              return this;
+            });
+          }
+        } else {
+          // Reload failed.
+          return Promise.reject(this);
+        }
       });
-    },
+    }
+
+    markAsNew() {
+      this.isNew = true;
+      delete this.version;
+      delete this.majorVersion;
+      delete this.minorVersion;
+    }
 
     /**
      * Lock this document for the specified action. The request fails if the document is already locked, unless the lock
@@ -287,7 +338,7 @@ define('xwiki-document-api', ['jquery'], function($) {
      *
      * @return a promise that resolves to this document instance if the lock request succeeds
      */
-    lock: function(action, force) {
+    lock(action, force) {
       action = action || 'edit';
       return Promise.resolve($.getJSON(this.getURL('get'), {
         sheet: 'XWiki.InplaceEditing',
@@ -313,13 +364,13 @@ define('xwiki-document-api', ['jquery'], function($) {
         }
         return Promise.reject(this);
       });
-    },
+    }
 
     /**
      * Unlock this document for the specified action, by sending a beacon, if the browser supports it, or by making a
      * synchronous HTTP request, because this function can be called just before the window is unloaded.
      */
-    unlock: function(action) {
+    unlock(action) {
       action = action || 'edit';
       this.locked = false;
       var url = this.getURL('cancel', $.param({
@@ -334,27 +385,41 @@ define('xwiki-document-api', ['jquery'], function($) {
         // See https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Synchronous_and_Asynchronous_Requests
         $.ajax({type: 'GET', url: url, async: false});
       }
-    },
+    }
 
     /**
      * Makes sure this document matches the current UI locale.
+     *
+     * @param language the language for which to create the translation; if not specified then the current UI language
+     *                 is used
      */
-    translate: function() {
+    translate(language) {
       const realLocale = this.getRealLocale();
-      const uiLocale = $('html').attr('lang');
-      if (realLocale &amp;&amp; realLocale !== uiLocale) {
-        this.language = uiLocale;
+      language = language || $('html').attr('lang');
+      if (realLocale &amp;&amp; realLocale !== language) {
+        // Backup the default translation.
+        this.backup('defaultTranslation');
+        this.language = language;
         // Set the original document locale.
         this.translations = this.translations || {};
         this.translations['default'] = realLocale;
         // Update the document fields that are not 'shared' with the original document.
-        this.isNew = true;
-        delete this.version;
-        delete this.majorVersion;
-        delete this.minorVersion;
+        this.markAsNew();
       }
     }
-  };
+
+    /**
+     * Back up the current state of this document instance in a special field named {@code originalDocument}, that can
+     * be used to restore the current state later.
+     */
+    backup(backupName) {
+      backupName = backupName || 'originalDocument';
+      delete this[backupName];
+      this[backupName] = $.extend(true, new XWikiDocument(), this);
+    }
+  }
+
+  return XWikiDocument;
 });
 
 define('editInPlace', [
@@ -367,7 +432,7 @@ define('editInPlace', [
   'bootstrap',
   // We need this in order to catch events triggered by actionButtons.js using Prototype.js
   'xwiki-events-bridge'
-], function($, xcontext, xwikiDocumentAPI) {
+], function($, xcontext, XWikiDocument) {
   var preload = function() {
     paths.css.forEach(loadCSS);
     return initActionButtons();
@@ -381,6 +446,34 @@ define('editInPlace', [
     }).appendTo('head');
   };
 
+  // We preserve the document data between edits in order to be able to know which document translation should be edited
+  // (e.g. when the document translation is missing and we create it, the next edit session should target the created
+  // translation).
+  let currentXWikiDocument;
+
+  function getCurrentXWikiDocument() {
+    if (!currentXWikiDocument) {
+      // We initialize the current document late, based on the metadata and HTML available right before edit.
+      currentXWikiDocument = new XWikiDocument();
+    }
+    return currentXWikiDocument;
+  }
+
+  function setCurrentXWikiDocument(xwikiDocument) {
+    currentXWikiDocument = xwikiDocument;
+    return Promise.resolve(xwikiDocument);
+  }
+
+  // The version of the edited document can change even if the in-place editor doesn't save the document (e.g. because a
+  // remote user has saved the document in a realtime editing session or because the document was updated outside the
+  // in-place editor by uploading an attachment). We need to update the version of the edited document in order to avoid
+  // merge conflicts on save (this version is passed to the server on save, see updateFormDataBeforeSave).
+  $(document).on('xwiki:document:changeVersion', (event, data) =&gt; {
+    if (data.documentReference.equals(currentXWikiDocument?.documentReference)) {
+      currentXWikiDocument.version = data.version;
+    }
+  });
+
   var editPage = function() {
     return editInPlace({
       afterEdit: function() {
@@ -390,7 +483,14 @@ define('editInPlace', [
   };
 
   var translatePage = function() {
+    // We have to change the locale of the current document before we start editing in order to lock the translation
+    // that is going to be created, not the default translation. Moreover, some editors may rely on the locale. For
+    // instance the realtime editor needs to fetch the Netflux channel keys associated with the new document translation
+    // (not the default one).
+    getCurrentXWikiDocument().translate();
     return editInPlace({
+      // This is called after the title and content editors have been loaded. It shows a popover message indicating to
+      // the user that they are creating a new translation for the current UI locale.
       afterEdit: createTranslation
     });
   };
@@ -414,18 +514,6 @@ define('editInPlace', [
     });
   };
 
-  // We preserve the document data between edits in order to be able to know which document translation should be edited
-  // (e.g. when the document translation is missing and we create it, the next edit session should target the created
-  // translation).
-  var currentXWikiDocument = $.extend({
-    language: xcontext.locale
-  }, xwikiDocumentAPI);
-
-  var setCurrentXWikiDocument = function(xwikiDocument) {
-    currentXWikiDocument = xwikiDocument;
-    return Promise.resolve(xwikiDocument);
-  };
-
   var editInPlace = function(options) {
     options = $.extend({
       afterEdit: function() {},
@@ -433,7 +521,7 @@ define('editInPlace', [
     }, options);
     $('#xwikicontent').addClass('loading');
     // Lock the document first.
-    return lock(currentXWikiDocument)
+    return lock(getCurrentXWikiDocument())
       // Then load the document only if we managed to lock it.
       .then(load, xwikiDocument =&gt; {
         options.lockFailed(xwikiDocument);
@@ -445,7 +533,7 @@ define('editInPlace', [
       }).finally(() =&gt; {
         // Remove the aria-expanded attribute which is incorrect for role=textbox
         $('#xwikicontent').removeClass('loading').removeAttr('aria-expanded');
-      // Then wait for an action (save, cancel, reload) only if the editors were loaded successfuly.
+      // Then wait for an action (save, cancel, reload) only if the editors were loaded successfully.
       }).then(maybeSave)
       // Then unlock the document both when the edit ended with success and with a failure.
       .then(unlock, unlock)
@@ -542,10 +630,7 @@ define('editInPlace', [
   var load = function(xwikiDocument) {
     return xwikiDocument.reload().then(xwikiDocument =&gt; {
       // Clone the current document version and keep a reference to it in order to be able to restore it on cancel.
-      xwikiDocument.originalDocument = $.extend(true, {
-        renderedTitle: $('#document-title h1').html(),
-        renderedContent: $('#xwikicontent').html()
-      }, xwikiDocument);
+      xwikiDocument.backup();
       return xwikiDocument;
     }).catch(xwikiDocument =&gt; {
       new XWiki.widgets.Notification(l10n['edit.inplace.page.loadFailed'], 'error');
@@ -584,11 +669,18 @@ define('editInPlace', [
       // deferred object (promise) cannot change once it was resolved. So the first event that fires will resolve the
       // promise and the remaining events won't be able to change that. The remaining event listeners could be called
       // later but they won't have any effect on the deferred object.
+      //
+      // Enable the action buttons to receive action events, because they might have been disabled when the previous
+      // action was handled, see below.
+      const actionButtons = $('.inplace-editing-buttons').prop('disabled', false);
       $(document).one([
         'xwiki:actions:save',
         'xwiki:actions:reload',
         'xwiki:actions:cancel',
       ].join(' '), '.xcontent.form', function(event, data) {
+        // Disable the action buttons while we handle the current action. They will be re-enabled once waitForAction is
+        // called again to wait for the next action. This way we avoid handling multiple actions at the same time.
+        actionButtons.prop('disabled', true);
         resolve({
           name: event.type.substring('xwiki:actions:'.length),
           document: xwikiDocument,
@@ -603,8 +695,8 @@ define('editInPlace', [
     return push(data.document).then(xwikiDocument =&gt; {
       // Save succeeded.
       return shouldReload(xwikiDocument).then(
-        // The document was saved with merge and thus if we want to continue eding we need to reload the editor (because
-        // its content doesn't match the saved content).
+        // The document was saved with merge and thus if we want to continue editing we need to reload the editor
+        // (because its content doesn't match the saved content).
         reload,
         // No need to reload the editor because either the action was Save &amp; View or there was no merge on save.
         maybeContinueEditing.bind(null, data['continue'])
@@ -631,8 +723,7 @@ define('editInPlace', [
       if (continueEditing) {
         if (success) {
           // Update the original version in order to be able to restore it on cancel.
-          delete xwikiDocument.originalDocument;
-          xwikiDocument.originalDocument = $.extend(true, {}, xwikiDocument);
+          xwikiDocument.backup();
         }
         // Continue editing.
         return maybeSave(xwikiDocument);
@@ -665,7 +756,9 @@ define('editInPlace', [
   };
 
   // Make sure we unlock the document when the user navigates to another page.
-  $(window).on('unload pagehide', unlock.bind(null, currentXWikiDocument));
+  $(window).on('unload pagehide', () =&gt; {
+    unlock(getCurrentXWikiDocument());
+  });
 
   var shouldReload = function(xwikiDocument) {
     var reloadEventFired = false;
@@ -692,12 +785,18 @@ define('editInPlace', [
   };
 
   var view = function(xwikiDocument, reload) {
+    if (xwikiDocument.isNew &amp;&amp; xwikiDocument.language &amp;&amp; xwikiDocument.defaultTranslation) {
+      // The user tried to translate the current document in the UI locale and either canceled the edit without saving
+      // or there was an error. Display the default translation to the user.
+      xwikiDocument = xwikiDocument.defaultTranslation;
+    }
+
     var viewContent = $('#xwikicontent');
     // Destroy the editors before returning to view.
     viewContent.trigger('xwiki:actions:view', {document: xwikiDocument});
     $('#document-title h1').html(xwikiDocument.renderedTitle);
     viewContent.html(xwikiDocument.renderedContent);
-    // Reset the editor to let others know that we're no editing anymore.
+    // Reset the editor to let others know that we're not editing anymore.
     XWiki.editor = '';
     if (!reload) {
       // If the user has canceled the edit then the restored page content may include the section edit links. Show them
@@ -723,8 +822,7 @@ define('editInPlace', [
     $('#xwikicontent').closest('.xcontent').addClass('form');
     // Let others know which editor is used for the page content.
     XWiki.editor = config.editMode;
-    return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor)
-      .then(startRealTimeEditingSession);
+    return initActionButtons(xwikiDocument).then(initTitleEditor).then(initContentEditor);
   };
 
   var initActionButtons = function(xwikiDocument) {
@@ -733,7 +831,7 @@ define('editInPlace', [
     }
     var editContent = $('#xwikicontent');
     // We need the wrapper because #xwikicontent uses Bootstrap grid (col-xs-12) which is implemented with CSS float.
-    // Thus we need to use the grid for the sticky buttons also otherwise the postion is badly computed when scrolling
+    // Thus we need to use the grid for the sticky buttons also otherwise the position is badly computed when scrolling
     // (because of the float on the previous element). This wouldn't be needed if we were using position:sticky, which
     // we can't use yet because it's not implemented on IE11 which we still have to support.
     let inplaceEditingForm = editContent.nextAll('form#inplace-editing');
@@ -777,7 +875,6 @@ define('editInPlace', [
   };
 
   var createTranslation = function(xwikiDocument) {
-    xwikiDocument.translate();
     $('#document-title-input').focus().select();
     // Let the user know that they are now editing the translation of this page in the current locale.
     $('#document-title-input').popover({
@@ -793,13 +890,9 @@ define('editInPlace', [
   var initTranslateButton = function(xwikiDocument) {
     // Initialize the translate button only if it's visible.
     const translateButton = $(config.translateButtonSelector).filter('[data-toggle="popover"]').filter(':visible');
-    translateButton.off('click.translate').on('click.translate', function(event) {
-      event.preventDefault();
-      translateButton.parent().addClass('hidden');
-      createTranslation(xwikiDocument);
     // Let the user know that they are editing the original version of the page and not the translation corresponding
     // to the current locale because there isn't one created yet.
-    }).attr({
+    translateButton.attr({
       // Backup the initial popover message to be able to restore it on view.
       'data-content-view': translateButton.attr('data-content'),
       // Use a custom popover message dedicated to the edit action.
@@ -836,8 +929,7 @@ define('editInPlace', [
       var uiLocale = $('html').attr('lang');
       if (xwikiDocumentLocale &amp;&amp; xwikiDocumentLocale !== uiLocale) {
         const translateButton = $(config.translateButtonSelector).filter('[data-toggle="popover"]');
-        // Restore the translation button behavior for view action.
-        translateButton.off('click.translate')
+        translateButton
           // Restore the popover text for view action.
           .attr('data-content', translateButton.attr('data-content-view') || translateButton.attr('data-content'))
           // Restore the visibility.
@@ -985,11 +1077,6 @@ define('editInPlace', [
     });
   };
 
-  var startRealTimeEditingSession = function(xwikiDocument) {
-    // TODO
-    return xwikiDocument;
-  };
-
   var selectText = function(node) {
     if (window.getSelection) {
       var selection = window.getSelection();
@@ -1032,36 +1119,63 @@ require(['jquery'], function($) {
     });
   }
 
+  function enableEditing(enable) {
+    if (enable) {
+      // Restore only the edit button at the end because:
+      // * the translate button is restored (if needed) by the editInPlace module
+      // * the section edit links are restored when the document is rendered for view
+      editButton.removeClass('disabled');
+      editButton.removeAttr('aria-disabled');
+      editButton.removeAttr('role');
+      editButton.attr('href', editButton.attr('data-saved-href'));
+      editButton.removeAttr('data-saved-href');
+    } else {
+      // Disable the edit buttons and hide the section edit links.
+      editButton.add(translateButton).addClass('disabled');
+      editButton.attr('aria-disabled', 'true');
+      editButton.each(function() {
+        $(this).attr('data-saved-href', $(this).attr('href'));
+      });
+      editButton.removeAttr('href');
+      editButton.attr('role', 'link');
+      $('#xwikicontent').children(':header').children('.edit_section').addClass('hidden');
+    }
+  }
+
+  // We keep a reference to the promise that resolves when the current editing session ends.
+  let currentlyEditing;
+
   var onInPlaceEditing = function(event) {
-    // Make sure the user doesn't try to re-activate the edit mode while we are in edit mode.
-    if (editButton.hasClass('disabled')) {
+    event.preventDefault();
+    enableEditing(false);
+    if (currentlyEditing) {
+      // Continue after the current editing session ends.
+      currentlyEditing.finally(() =&gt; {
+        onInPlaceEditing(event);
+      });
+      // Cancel the current editing session. This is especially important if the document we want to edit is different
+      // from the one currently being edited. For instance, the user may start editing the default translation of a
+      // document and then chose to create a new translation. We have to unlock the default translation before locking
+      // the new translation.
+      $('.xcontent.form').trigger('xwiki:actions:cancel');
       return;
     }
-    // Disable the edit buttons and hide the section edit links.
-    editButton.add(translateButton).addClass('disabled');
-    editButton.attr('aria-disabled', 'true');
-    var reference = editButton.attr('href');
-    editButton.removeAttr('href');
-    editButton.attr('role', 'link');
-    $('#xwikicontent').children(':header').children('.edit_section').addClass('hidden');
-    event.preventDefault();
     const handler = event.data;
     const data = handler.beforeEdit?.(event);
     // Load the code needed to edit in place only when the edit button is clicked.
-    require(['editInPlace', wysiwygEditorModule], function(editInPlace) {
-      // Re-enable the translate button because it can be used while editing to create the missing translation.
-      translateButton.removeClass('disabled');
-      handler.edit(editInPlace, data).finally(function() {
-        // Restore only the edit button at the end because:
-        // * the translate button is restored (if needed) by the editInPlace module
-        // * the section edit links are restored when the document is rendered for view
-        editButton.removeClass('disabled');
-        editButton.removeAttr('aria-disabled');
-        editButton.removeAttr('role');
-        editButton.attr('href', reference);
-      });
-    // Fallback on the standalone edit mode if we fail to load the required modules.
-    }, disableInPlaceEditing.bind(event.target));
+    currentlyEditing = new Promise((resolve, reject) =&gt; {
+      require(['editInPlace', wysiwygEditorModule], (editInPlace) =&gt; {
+        // Re-enable the translate button because it can be used while editing to create the missing translation.
+        translateButton.removeClass('disabled');
+        handler.edit(editInPlace, data).finally(() =&gt; {
+          enableEditing(true);
+          resolve();
+        });
+      // Fallback on the standalone edit mode if we fail to load the required modules.
+      }, disableInPlaceEditing.bind(event.target));
+    }).finally(() =&gt; {
+      currentlyEditing = false;
+    });
   };
 
   var disableInPlaceEditing = function() {
@@ -1113,16 +1227,25 @@ require(['jquery'], function($) {
   }
 });
 
-require(['jquery'], function($) {
+require(['jquery', 'xwiki-meta'], function($, meta) {
   // Backup the document title before each editing session in order to catch changes.
   var previousPlainTitle;
   $('#xwikicontent').on('xwiki:actions:edit', function(event, data) {
-    previousPlainTitle = data.document.getPlainTitle();
+    var xwikiDocument = data.document;
+    // Make sure the metadata is up-to-date before editing starts because some editors may rely on this (e.g. when
+    // creating a new translation the meta shouldn't point to the default translation).
+    updateMeta(xwikiDocument);
+    previousPlainTitle = xwikiDocument.getPlainTitle();
   });
 
   // Update the UI after each editing session.
   $(document).on('xwiki:actions:view', function(event, data) {
     var xwikiDocument = data.document;
+    // Make sure the metadata matches the viewed document (e.g. after a translation is created the metadata should match
+    // it, even if initially it was pointing to the default translation; same, if we cancel the creation of a
+    // translation then the metadata should point to the default translation even if it was modified to point to the new
+    // translation before edit).
+    updateMeta(xwikiDocument);
     updateDocAuthorAndDate(xwikiDocument);
     updateDocExtraTabs(xwikiDocument);
     updateDrawer(xwikiDocument);
@@ -1133,8 +1256,34 @@ require(['jquery'], function($) {
     }
   });
 
+  function updateMeta(xwikiDocument) {
+    $('html').attr({
+      'data-xwiki-isnew': xwikiDocument.isNew,
+      'data-xwiki-version': xwikiDocument.version || '',
+      'data-xwiki-modified': xwikiDocument.modified,
+      'data-xwiki-locale': xwikiDocument.language,
+      'data-xwiki-rest-url': xwikiDocument.getRestURL()
+    }).data({
+      'xwiki-isnew': xwikiDocument.isNew,
+      'xwiki-version': xwikiDocument.version || '',
+      'xwiki-modified': xwikiDocument.modified,
+      'xwiki-locale': xwikiDocument.language,
+      'xwiki-rest-url': xwikiDocument.getRestURL()
+    });
+
+    // Reinitialize the meta.
+    meta.init();
+
+    // Indicate the timestamp of the last modification, which may be needed to properly merge on save.
+    meta.modified = xwikiDocument.modified;
+  }
+
   var updateDocAuthorAndDate = function(xwikiDocument) {
-    var urlWithSelector = xwikiDocument.getURL('get', 'xpage=contentheader') + ' .xdocLastModification';
+    var urlWithSelector = xwikiDocument.getURL('get', $.param({
+      xpage: 'contentheader',
+      // Preserve the current UI locale.
+      language: $('html').attr('lang')
+    })) + ' .xdocLastModification';
     $('.xdocLastModification').load(urlWithSelector, function() {
       // load() replaces the content of the specified container but we want to replace the container itself. We can't do
       // this from the selector, e.g. by using '.xdocLastModification &gt; *' because we lose the text nodes.
@@ -1165,8 +1314,8 @@ require(['jquery'], function($) {
 
   // Update the links that target the edited document and whose label matches the document title. Note that this can
   // update links whose label was not generated dynamically (e.g. with server side scripting) based on the document
-  // title. For instance there could be links with hard-coded labels or with labels generated using a translatin key
-  // (like in the Applications panel). For simplicity we assume that if the link matches the document URL and its
+  // title. For instance there could be links with hard-coded labels or with labels generated using a translation key
+  // (like in the Applications panel). For simplicity, we assume that if the link matches the document URL and its
   // previous title then it needs to be updated, but this happens only at the UI level.
   var updateLinks = function(xwikiDocument) {
     var docURL = xwikiDocument.getURL();
@@ -1188,7 +1337,7 @@ require(['jquery'], function($) {
     var localeSelector = 'a[href*="language=' + locale + '&amp;"], a[href$="language=' + locale + '"]';
     // Check if the language menu is present (multilingual is on) and the document locale is not listed.
     if (languageMenu.length &amp;&amp; !languageMenu.find(localeSelector).length) {
-      // If we get here then it means a new document translation was created and it needs to be listed in the drawer.
+      // If we get here then it means a new document translation was created, and it needs to be listed in the drawer.
       $('&lt;div/&gt;').load(xwikiDocument.getURL('get', $.param({
         'xpage': 'xpart',
         'vm': 'drawer.vm',

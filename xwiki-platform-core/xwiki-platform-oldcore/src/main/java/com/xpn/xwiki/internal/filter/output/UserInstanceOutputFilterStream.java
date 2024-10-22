@@ -270,13 +270,6 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         } catch (XWikiException e) {
             throw new FilterException("Failed to save user document", e);
         }
-
-        // Add the user to default groups
-        try {
-            xcontext.getWiki().setUserDefaultGroup(userDocument.getFullName(), xcontext);
-        } catch (XWikiException e) {
-            throw new FilterException("Failed to add user to default groups", e);
-        }
     }
 
     @Override

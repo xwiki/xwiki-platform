@@ -59,6 +59,7 @@ import org.xwiki.rendering.internal.macro.DefaultMacroManager;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.internal.macro.html.HTMLMacroXHTMLRendererFactory;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
+import org.xwiki.rendering.internal.macro.message.MacroIconPrettyNameProvider;
 import org.xwiki.rendering.internal.macro.velocity.DefaultVelocityMacroConfiguration;
 import org.xwiki.rendering.internal.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.internal.macro.velocity.filter.IndentVelocityMacroFilter;
@@ -79,6 +80,7 @@ import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityRefer
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.internal.transformation.macro.RawBlockFilterUtils;
 import org.xwiki.rendering.internal.util.DefaultErrorBlockGenerator;
+import org.xwiki.rendering.internal.util.DefaultIconProvider;
 import org.xwiki.rendering.internal.wiki.WikiModelProvider;
 import org.xwiki.resource.internal.DefaultResourceReferenceManager;
 import org.xwiki.script.internal.DefaultScriptContextManager;
@@ -165,6 +167,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultMacroContentParser.class,
     DefaultSyntaxRegistry.class,
     WikiModelProvider.class,
+    DefaultIconProvider.class,
+    MacroIconPrettyNameProvider.class,
 
     // Resource
     DefaultResourceReferenceManager.class,

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>16.6.0-SNAPSHOT</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-server</artifactId>
   <name>XWiki Platform - Search - SOLR - Server</name>

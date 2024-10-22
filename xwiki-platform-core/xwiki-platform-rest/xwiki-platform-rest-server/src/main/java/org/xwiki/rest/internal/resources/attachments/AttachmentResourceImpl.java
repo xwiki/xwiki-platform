@@ -22,7 +22,6 @@ package org.xwiki.rest.internal.resources.attachments;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -34,7 +33,6 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
@@ -49,9 +47,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl")
 public class AttachmentResourceImpl extends BaseAttachmentsResource implements AttachmentResource
 {
-    @Inject
-    private ContextualAuthorizationManager authorization;
-
     @Override
     public Response getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
         throws XWikiRestException

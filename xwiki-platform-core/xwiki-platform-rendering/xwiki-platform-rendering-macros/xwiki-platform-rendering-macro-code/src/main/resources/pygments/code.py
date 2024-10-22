@@ -24,7 +24,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.styles import get_style_by_name
 from pygments.util import ClassNotFound
 from pygments.formatters.xdom import XDOMFormatter
-from pygments.styles.updated_default import UpdatedDefaultStyle
+from pygments.styles.xwiki_default import XWikiStyle
 
 if language:
   try:
@@ -40,8 +40,8 @@ else:
 if pygmentLexer:
   pygmentStyle = None
   if style:
-    if style == "updatedDefault":
-      pygmentStyle = UpdatedDefaultStyle
+    if style == "xwiki":
+      pygmentStyle = XWikiStyle
     else:
       try:
         pygmentStyle = get_style_by_name(style)

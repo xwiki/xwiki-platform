@@ -44,6 +44,7 @@ administration.sectionTitle=管理：{0}
 administration.sectionTitle.page=管理此页面：{0}
 administration.sectionTitle.wiki=管理此维基：{0}
 administration.sectionTitle.global=全域管理：{0}
+administration.menu.label=管理部分
 administration.menu.search.hint=查找…
 administration.menu.search.noResults=尚无结果。
 
@@ -54,8 +55,6 @@ XWiki.XWikiPreferences_use_email_verification.hint=向新注册的用户发送�
 ### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
 ### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
 ### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
 ### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
 ### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
 ### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
@@ -139,26 +138,53 @@ XWiki.XWikiPreferences_use_email_verification.hint=向新注册的用户发送�
 ### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
 ### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
 ### Missing: administration.section.users.deleteUser.newAuthor.script=script
+admin.usersgroups.extensionrights=扩展权限
+
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=从组中删除成员
+administration.section.groups.deleteUserFromGroup.success=已成功从组中删除成员
+administration.section.groups.deleteUserFromGroup.failure=无法从组中删除成员
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=Various configurations for extensions.
-### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+admin.other=其他的
+admin.other.description=各种扩展配置。
+administration.section.analytics.status=状态
+administration.section.analytics.status.hint=确定 Google Analytics™ 中的跟踪是否有效
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=社会
+admin.social.description=社交功能的配置。
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=在部分中显示
+XWiki.ConfigurableClass_heading=标题
+XWiki.ConfigurableClass_configurationClass=配置类
+XWiki.ConfigurableClass_linkPrefix=链接前缀
+XWiki.ConfigurableClass_propertiesToShow=要显示的属性
+XWiki.ConfigurableClass_codeToExecute=要执行的代码
+XWiki.ConfigurableClass_iconAttachment=图标附件
+XWiki.ConfigurableClass_displayInCategory=按类别显示
+XWiki.ConfigurableClass_displayBeforeCategory=在类别之前显示
+XWiki.ConfigurableClass_categoryIcon=类别图标
+XWiki.ConfigurableClass_scope=范围
+### Missing: XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=当前空间
+XWiki.ConfigurableClass_scope_ALL_SPACES=所有空间
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki 和所有空间
+XWiki.ConfigurableClass_sectionOrder=分段顺序
+
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.XWikiPreferences_auth_active_check.hint=如果设置为 “Yes”，它将阻止用户在不输入之前通过电子邮件发送的令牌的情况下登录。
+administration.section.users.deleteUser.markInactiveMessage=您可以将用户的个人资料标记为非活动状态，而不是删除用户。这将阻止他们登录，并保留与他们编写的脚本相关的访问权限。
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=您可以将用户的个人资料标记为已禁用，而不是删除用户。这将阻止他们登录，并保留与他们编写的脚本相关的访问权限。
+XWiki.Registration_liveValidation_enabled.hint=将此项设置为 false 可禁用实时验证 JavaScript 代码（字段仍将在服务器端进行验证）。
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=实时验证 显示一条消息，向用户指示他们已令人满意地填写了该字段。这是如果特定字段未覆盖该消息，他们将收到该消息。可以使用 Velocity 代码。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

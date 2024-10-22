@@ -84,7 +84,7 @@ public class EditIT
     @AfterEach
     public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
         // Ensure remaining tabs are properly closed.
         if (setup.getDriver().getWindowHandles().size() > 1) {

@@ -28,7 +28,7 @@
     "electron-store": "10.0.0"
   },
   "peerDependencies": {
-    "electron": "32.2.0"
+    "electron": "31.7.1"
   },
   "publishConfig": {
     "exports": {

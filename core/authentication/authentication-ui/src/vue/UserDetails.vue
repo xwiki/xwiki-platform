@@ -21,9 +21,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { inject } from "vue";
 import { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
-import { useI18n, I18nT } from "vue-i18n";
-import { name as browserApiName, BrowserApi } from "@xwiki/cristal-browser-api";
+import { I18nT, useI18n } from "vue-i18n";
+import { BrowserApi, name as browserApiName } from "@xwiki/cristal-browser-api";
 import messages from "../translations";
+import { getUserProfile } from "./utils/getUserProfile";
 
 const { t } = useI18n({
   messages,
@@ -38,7 +39,7 @@ const authenticationManager = cristal
 
 const browserApi = cristal.getContainer().get<BrowserApi>(browserApiName);
 
-const { profile, name } = await authenticationManager.getUserDetails();
+const { profile, name, error } = await getUserProfile(authenticationManager);
 
 function logout() {
   authenticationManager.logout().then(() => browserApi.reload());
@@ -46,10 +47,13 @@ function logout() {
 </script>
 
 <template>
-  <i18n-t keypath="userDescription" tag="span">
-    <a :href="profile">{{ name }}</a>
-  </i18n-t>
-  <br />
-  <br />
-  <x-btn variant="danger" @click.prevent="logout">{{ t("logout") }}</x-btn>
+  <template v-if="!error">
+    <i18n-t keypath="userDescription" tag="span">
+      <a :href="profile">{{ name }}</a>
+    </i18n-t>
+    <br />
+    <br />
+    <x-btn variant="danger" @click.prevent="logout">{{ t("logout") }}</x-btn>
+  </template>
+  <span v-else>{{ t("userDetails.error") }}</span>
 </template>

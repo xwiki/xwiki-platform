@@ -20,7 +20,8 @@
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -33,6 +34,11 @@
     "vue-i18n": "10.0.4"
   },
   "devDependencies": {
+    "@vue/test-utils": "2.4.6",
+    "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dev-test-utils": "workspace:*",
+    "reflect-metadata": "0.2.2",
+    "vitest": "2.1.2",
     "vue-tsc": "2.1.6"
   },
   "publishConfig": {

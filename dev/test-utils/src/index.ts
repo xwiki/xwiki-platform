@@ -18,6 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { defineComponent, h, Suspense } from "vue";
+import { decorate, injectable } from "inversify";
+import { useI18n } from "vue-i18n";
 
 /**
  * Wraps a component with an async setup in a suspense component and pass it
@@ -40,4 +42,19 @@ function wrapInSuspense(
   });
 }
 
-export { wrapInSuspense };
+/**
+ * @param clazz the class to decorate with an injectable
+ * @since 0.11
+ */
+function makeInjectable(clazz: object): object {
+  decorate(injectable(), clazz);
+  return clazz;
+}
+
+function mockI18n() {
+  useI18n.mockReturnValue({
+    t: (tKey) => tKey,
+  });
+}
+
+export { wrapInSuspense, makeInjectable, mockI18n };

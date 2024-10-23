@@ -74,7 +74,7 @@
     <zookeeper.version>3.9.2</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.2</testcontainers.version>
+    <testcontainers.version>1.20.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots

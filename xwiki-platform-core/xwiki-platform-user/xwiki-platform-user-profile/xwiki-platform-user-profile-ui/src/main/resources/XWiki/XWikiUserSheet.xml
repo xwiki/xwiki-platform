@@ -520,6 +520,9 @@ return XWiki;
 }
 
 .column h3 {
+  /* This font weight is more than the standard @headings-font-weight value.
+    This title level should have at least as much visibility as `.xform dl dt label` */
+  font-weight: bold;
   font-size: 110%;
 }
 
@@ -593,6 +596,13 @@ ul.shortcut-list {
     gap: 1em;
     justify-content: space-between;
     align-items: center;
+    /* Keep the line large enough to fit an input in both view and edit mode. */
+    height: 38px;
+    border-top: 1px dashed $theme.textPrimaryColor;
+    &amp;:first-child {
+      border-top: none;
+    }
+    
     &amp; &gt; label {
       flex-grow: 1;
       .xHint {
@@ -601,7 +611,7 @@ ul.shortcut-list {
     }
     &amp; &gt; input.shortcutPreference, &amp; &gt; span {
       max-width: 50%;
-      width: unset;
+      width: 10em;
     }
   }
 }

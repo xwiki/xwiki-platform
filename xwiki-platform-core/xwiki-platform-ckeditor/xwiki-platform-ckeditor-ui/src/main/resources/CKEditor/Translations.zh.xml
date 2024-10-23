@@ -314,18 +314,18 @@ imageEditor.modal.initialization.fail=检索图像选择表单失败。
 imageEditor.modal.outscaleWarning=其中一个尺寸大于原始图像 ({0}) 。可能导致显示图像质量的降低。
 imageSelector.modal.title=选择图片
 imageSelector.modal.selectButton=选择
-### Missing: imageSelector.modal.loadFail.message=Failed to retrieve the image selection form.
-### Missing: imageSelector.modal.fileUpload.success=File upload succeeded.
-### Missing: imageSelector.modal.fileUpload.fail=File upload failed.
-### Missing: imageSelector.modal.fileUpload.abort=File upload aborted.
-### Missing: imageSelector.modal.initialization.fail=Failed to retrieve the image selection form.
+imageSelector.modal.loadFail.message=检索图像选择表单失败。
+imageSelector.modal.fileUpload.success=文件上传成功。
+imageSelector.modal.fileUpload.fail=文件上传失败。
+imageSelector.modal.fileUpload.abort=上传文件中止。
+imageSelector.modal.initialization.fail=检索图像选择表单失败。
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
 ## Deprecated since 14.10
-### Missing: imageEditor.modal.backToEditor.button=Back
-### Missing: ckeditor.plugin.image.imageSelector.documentTreeTab.title=Document Tree
+imageEditor.modal.backToEditor.button=返回
+ckeditor.plugin.image.imageSelector.documentTreeTab.title=文档树
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

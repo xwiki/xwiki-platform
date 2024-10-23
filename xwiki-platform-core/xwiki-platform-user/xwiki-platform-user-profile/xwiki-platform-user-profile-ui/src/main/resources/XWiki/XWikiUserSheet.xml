@@ -520,9 +520,6 @@ return XWiki;
 }
 
 .column h3 {
-  /* This font weight is more than the standard @headings-font-weight value.
-    This title level should have at least as much visibility as `.xform dl dt label` */
-  font-weight: bold;
   font-size: 110%;
 }
 

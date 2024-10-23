@@ -366,18 +366,15 @@ class RenamePageIT
 
         setup.rest().delete(testReference);
 
-        ViewPage standardLinkPage = setup.createPage(sourcePageReference1, "Some content to be linked. number 1");
-        ViewPage standardMacroLinkPage =
-            setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
-        ViewPage nestedMacroLinkPage =
-            setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
+        setup.createPage(sourcePageReference1, "Some content to be linked. number 1");
+        setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
+        setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
         setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");
-
-        ViewPage includeLinkPage = setup.createPage(sourcePageReference5, "A page to be included. number 5");
+        setup.createPage(sourcePageReference5, "A page to be included. number 5");
 
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n" + "\n" + "{{warning}}\n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n" + "\n" + "{{error}}\n"
@@ -511,10 +508,10 @@ class RenamePageIT
 
         // Make sure the link was refactored in both the page and its translation
         Page newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName));
-        assertEquals("[[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+        assertEquals("[[OtherPage]]", newPage.getContent());
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
-        assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+        assertEquals("fr [[OtherPage]]", newPage.getContent());
     }
 
     @Order(6)
@@ -671,21 +668,35 @@ class RenamePageIT
 
     @Order(9)
     @Test
-    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference)
+    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         testUtils.createPage(testReference, "[[Alice]]\n[[Bob]]\n[[Eve]]", "Test relative links");
-        testUtils.createPage(new DocumentReference("Alice", testReference.getLastSpaceReference()), "Alice page",
+        SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
+        SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
+        testUtils.createPage(new DocumentReference("WebHome", aliceSpace), "Alice page",
             "Alice");
-        testUtils.createPage(new DocumentReference("Bob", testReference.getLastSpaceReference()), "[[Alice]]",
+        SpaceReference bobSpace = new SpaceReference("Bob", rootSpaceReference);
+        testUtils.createPage(new DocumentReference("WebHome", bobSpace), "[[Alice]]",
             "Alice");
+
+        // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
+        // won't be updated just because the page is still in the index.
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
         RenamePage rename = viewPage.rename();
-        rename.getDocumentPicker().setName("Foo");
+        rename.getDocumentPicker().setName(rootSpaceReference.getName() + "Foo");
         CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
         assertEquals("Done.", statusPage.getInfoMessage());
 
         WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
         assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]", wikiEditPage.getContent());
+
+        SpaceReference newRootSpace =
+            new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
+        SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
+        wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
+        assertEquals("[[Alice]]", wikiEditPage.getContent());
     }
 }

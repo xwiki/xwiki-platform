@@ -59,7 +59,7 @@
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
-        <version>1.10.0</version>
+        <version>1.11.0</version>
         <executions>
           <!-- Download the CKEditor sources for the version (tag) we want to use. -->
           <execution>

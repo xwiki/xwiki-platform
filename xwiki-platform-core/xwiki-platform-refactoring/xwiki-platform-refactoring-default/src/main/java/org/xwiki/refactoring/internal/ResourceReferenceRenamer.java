@@ -146,7 +146,7 @@ public class ResourceReferenceRenamer
             linkTargetDocumentReference.equals(oldReference)
                 && !(!resourceReference.isTyped() && movedDocuments.contains(linkEntityReference)
                     && movedDocuments.contains(currentDocumentReference))
-                && docExists;
+                && (docExists || movedDocuments.contains(linkEntityReference));
 
         // If the link targets the old (renamed) document reference, we must update it.
         if (shouldBeUpdated) {
@@ -195,7 +195,9 @@ public class ResourceReferenceRenamer
         EntityReference linkEntityReference = this.entityReferenceResolver.resolve(resourceReference, null,
             newReference);
 
-        if (newReference.equals(linkEntityReference.extractReference(EntityType.DOCUMENT))) {
+        DocumentReference documentReference =
+            (DocumentReference) linkEntityReference.extractReference(EntityType.DOCUMENT);
+        if (newReference.equals(documentReference)) {
             // If the link is relative to the containing document we don't modify it
             return false;
         }
@@ -204,10 +206,19 @@ public class ResourceReferenceRenamer
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
 
+        XWikiContext context = contextProvider.get();
+        boolean docExists = false;
+        try {
+            docExists = context.getWiki().exists(documentReference, context);
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
+                e);
+        }
+
         boolean shouldBeUpdated =
             !linkEntityReference.equals(oldLinkReference)
-                && !(!resourceReference.isTyped() && movedDocuments.contains(oldLinkReference)
-                && movedDocuments.contains(currentDocumentReference));
+                && !(!resourceReference.isTyped() && movedDocuments.contains(documentReference))
+                && (docExists || movedDocuments.contains(documentReference));
 
         // If the new and old link references don`t match, then we must update the relative link.
         if (shouldBeUpdated) {

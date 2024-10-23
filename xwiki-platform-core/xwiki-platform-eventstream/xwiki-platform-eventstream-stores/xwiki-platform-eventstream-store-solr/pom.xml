@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-eventstream-stores</artifactId>
-    <version>16.9.0-rc-1</version>
+    <version>16.9.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
   <name>XWiki Platform - Event Stream - Store - Solr</name>

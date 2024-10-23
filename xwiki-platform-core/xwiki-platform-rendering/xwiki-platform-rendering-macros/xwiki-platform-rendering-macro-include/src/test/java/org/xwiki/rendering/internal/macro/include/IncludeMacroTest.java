@@ -443,6 +443,29 @@ class IncludeMacroTest
     }
 
     @Test
+    void adaptInlineContent() throws Exception
+    {
+        String expected = """
+            beginDocument
+            beginMetaData [[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]
+            onWord [content]
+            endMetaData [[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
+
+        String documentContent = "content";
+
+        DocumentReference includedDocumentReference = new DocumentReference("includedWiki", "includedSpace", "includedPage");
+        setupDocumentMocks("includedWiki:includedSpace.includedPage", includedDocumentReference, documentContent);
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("includedWiki:includedSpace.includedPage");
+        MacroTransformationContext context = createMacroTransformationContext("whatever", true);
+        List<Block> blocks = this.includeMacro.execute(parameters, null, context);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
     void executeWithRecursiveIncludeContextCurrent() throws Exception
     {
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
@@ -703,6 +726,7 @@ class IncludeMacroTest
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
     {
         MacroTransformationContext context = new MacroTransformationContext();
+        context.setInline(isInline);
         MacroBlock includeMacro =
             new MacroBlock("include", Collections.singletonMap("reference", documentName), isInline);
         XDOM xdom = new XDOM(List.of(includeMacro));

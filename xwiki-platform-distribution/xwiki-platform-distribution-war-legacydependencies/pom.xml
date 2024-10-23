@@ -54,7 +54,6 @@
                     <exclude>org.xwiki.commons:xwiki-commons-component-default:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-platform-distribution-war-dependencies:*:jar:*</exclude>
                     <exclude>org.xwiki.commons:xwiki-commons-component-api:*:jar:*</exclude>
-                    <exclude>org.xwiki.commons:xwiki-commons-cache-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-api:*:jar:*</exclude>
                     <exclude>org.xwiki.rendering:xwiki-rendering-transformation-macro:*:jar:*</exclude>
                     <exclude>org.xwiki.platform:xwiki-platform-extension-handler-xar:*:jar:*</exclude>
@@ -87,10 +86,6 @@
       <type>pom</type>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
-        <exclusion>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-cache-api</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>
@@ -170,11 +165,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-legacy-cache-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-legacy-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
@@ -204,10 +194,6 @@
       <version>${project.version}</version>
       <!-- Exclude transitive dependencies which are conflicting with legacy dependencies -->
       <exclusions>
-        <exclusion>
-          <groupId>org.xwiki.commons</groupId>
-          <artifactId>xwiki-commons-cache-api</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-component-api</artifactId>

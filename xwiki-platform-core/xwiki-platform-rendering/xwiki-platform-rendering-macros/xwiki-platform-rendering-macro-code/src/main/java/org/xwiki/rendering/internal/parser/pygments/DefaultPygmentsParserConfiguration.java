@@ -42,7 +42,7 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
 
     /**
      * Default style name to use.
-     * @since 16.9.0RC1
+     * @since 16.10.0RC1
      */
     private static final String DEFAULT_STYLE = "xwiki";
 

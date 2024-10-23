@@ -58,6 +58,10 @@ import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
 import type { Renderer } from "@xwiki/cristal-rendering";
 import { createPinia } from "pinia";
 import { createI18n } from "vue-i18n";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {
@@ -128,27 +132,12 @@ export class DefaultCristalApp implements CristalApp {
     });
   }
 
-  handlePopState(event: PopStateEvent): void {
-    this.logger?.debug("In handlePopState ", event);
-    if (event.state && event.state.page) {
-      const pageName = event.state.page;
-      if (pageName) {
-        this.page.name = pageName;
-        this.page.source = "";
-        this.page.html = "";
-        this.loadPage();
-      }
-    } else {
-      this.logger?.debug("Could not find state or state in page", event);
-      // TODO: Remove decodeURIComponent once CRISTAL-233 is fixed.
-      const page = decodeURIComponent(this.getPageFromHash(location.hash)!);
-      if (page != null) {
-        this.page.name = page;
-        this.page.source = "";
-        this.page.html = "";
-        this.loadPage();
-      }
-    }
+  handlePopState(name: string): void {
+    this.logger?.debug("In handlePopState ", name);
+    this.page.name = name;
+    this.page.source = "";
+    this.page.html = "";
+    this.loadPage();
   }
 
   setWikiConfig(wikiConfig: WikiConfig): void {
@@ -259,6 +248,11 @@ export class DefaultCristalApp implements CristalApp {
           "jsonld",
           options?.requeue,
         );
+
+        const documentService =
+          this.getContainer().get<DocumentService>(documentServiceName);
+        documentService.setCurrentDocument(this.page.name);
+
         if (!pageData) {
           this.logger.error(
             "Could not find page data",
@@ -502,7 +496,9 @@ export class DefaultCristalApp implements CristalApp {
 
     this.app.mount("#xwCristalApp");
 
-    window.addEventListener("popstate", this.handlePopState.bind(this));
+    this.router.beforeEach((to) => {
+      this.handlePopState(to.params.page as string);
+    });
 
     this.logger?.debug("After vue");
     this.logger?.debug("Replacing state in history " + this.getCurrentPage());

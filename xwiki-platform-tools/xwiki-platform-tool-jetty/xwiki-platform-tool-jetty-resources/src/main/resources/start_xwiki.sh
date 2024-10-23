@@ -70,12 +70,6 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx1024m"
 fi
 
-# Enable debug
-if [ -n "$DEBUG" ]; then
-  XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-  XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
-fi
-
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
   JETTY_PORT=8080
@@ -84,6 +78,11 @@ fi
 # The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if [ -z "$JETTY_STOP_PORT" ]; then
   JETTY_STOP_PORT=8079
+fi
+
+# The port on which to listen for debugging operations.
+if [ -z "$JETTY_DEBUG_PORT" ]; then
+  JETTY_DEBUG_PORT=5005
 fi
 
 # Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
@@ -96,6 +95,9 @@ fi
 
 # The location where to store the process id
 XWIKI_LOCK_DIR="${JAVA_TMP}"
+
+# By default suspend is false for debug
+SUSPEND="n"
 
 # Parse script parameters
 while [[ $# > 0 ]]; do
@@ -116,19 +118,15 @@ while [[ $# > 0 ]]; do
       ;;
     -j|--jmx)
       JETTY_OPTS="$JETTY_OPTS --module=jmx"
-      shift
       ;;
     -ni|--noninteractive)
       XWIKI_NONINTERACTIVE=true
-      shift
       ;;
     -d|--debug)
       DEBUG=true
-      shift
       ;;
     --suspend)
       SUSPEND="y"
-      shift
       ;;
     -dp|--debugPort)
       JETTY_DEBUG_PORT="$1"
@@ -144,11 +142,18 @@ while [[ $# > 0 ]]; do
       ;;
     *)
       # unknown option
+      echo "Unknown option: $key"
       usage
       exit 1
       ;;
   esac
 done
+
+# Enable debug
+if [ "$DEBUG" = true ] ; then
+  XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
+  XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
+fi
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"

@@ -102,15 +102,17 @@ const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
 watch(
   currentPage,
   async (p) => {
-    try {
-      breadcrumbItems.value = await cristal
-        .getContainer()
-        .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
-        .get()
-        .getPageHierarchy(p!);
-    } catch (e) {
-      console.error(e);
-      breadcrumbItems.value = [];
+    if (p) {
+      try {
+        breadcrumbItems.value = await cristal
+          .getContainer()
+          .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
+          .get()
+          .getPageHierarchy(p);
+      } catch (e) {
+        console.error(e);
+        breadcrumbItems.value = [];
+      }
     }
   },
   { immediate: true },

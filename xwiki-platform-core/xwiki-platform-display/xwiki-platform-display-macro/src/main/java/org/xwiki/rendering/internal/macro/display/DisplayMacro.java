@@ -39,6 +39,7 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.display.DisplayMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -137,6 +138,11 @@ public class DisplayMacro extends AbstractIncludeMacro<DisplayMacroParameters>
         // a Section block with a Heading block inside.
         if (parameters.isExcludeFirstHeading()) {
             excludeFirstHeading(result);
+        }
+
+        // Step 5a: if the macro is in an inline context, try converting the included content to inline.
+        if (context.isInline()) {
+            result = (XDOM) (new ParserUtils()).convertToInline(result, true);
         }
 
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the

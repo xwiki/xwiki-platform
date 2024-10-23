@@ -85,22 +85,27 @@ public class IncludeMacroRefactoring implements MacroRefactoring
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            updatedDocuments);
     }
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
-        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException
     {
-        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+        return getMacroBlock(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            updatedDocuments);
     }
 
     private <T extends EntityReference> Optional<MacroBlock> getMacroBlock(MacroBlock macroBlock,
-        DocumentReference currentDocumentReference, T sourceReference, T targetReference, boolean relative)
+        DocumentReference currentDocumentReference, T sourceReference, T targetReference, boolean relative,
+        Set<DocumentReference> updatedDocuments)
         throws MacroRefactoringException
     {
         Optional<MacroBlock> result;

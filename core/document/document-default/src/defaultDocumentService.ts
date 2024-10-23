@@ -20,6 +20,16 @@ type WrappedRefs<Type> = {
 type StateRefs = WrappedRefs<State>;
 type Getters = Record<string, never>;
 type Actions = {
+  /**
+   * Switch the loading state to true;
+   */
+  setLoading(): void;
+
+  /**
+   * Update the page data for the provided document reference
+   * @param documentReference the reference o the document to update
+   * @param requeue true in case of offline refresh required
+   */
   update(documentReference: string, requeue: boolean): Promise<void>;
 };
 type DocumentStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
@@ -36,9 +46,14 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
       };
     },
     actions: {
+      // Loading must be in its own separate action because action changes are
+      // only applied to the store at the end of an action.
+      setLoading() {
+        this.loading = true;
+      },
       async update(documentReference: string, requeue: boolean) {
         this.lastDocumentReference = documentReference;
-        this.loading = true;
+        this.setLoading();
         try {
           const doc = await cristal.getPage(documentReference, {
             requeue,
@@ -87,12 +102,14 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   setCurrentDocument(documentReference: string): void {
+    // this.store.setLoading();
     this.store.update(documentReference, true);
   }
 
   refreshCurrentDocument(): void {
     const documentReference = this.store.lastDocumentReference;
     if (documentReference) {
+      // this.store.setLoading();
       this.store.update(documentReference, false);
     }
   }

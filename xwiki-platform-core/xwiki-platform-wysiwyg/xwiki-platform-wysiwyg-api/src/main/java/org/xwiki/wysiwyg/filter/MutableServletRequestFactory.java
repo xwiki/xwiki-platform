@@ -19,9 +19,13 @@
  */
 package org.xwiki.wysiwyg.filter;
 
-import javax.servlet.ServletRequest;
-
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wysiwyg.internal.filter.http.JakartaToJavaxMutableHttpServletRequest;
+import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRequest;
+
+import jakarta.servlet.ServletRequest;
 
 /**
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
@@ -38,6 +42,24 @@ public interface MutableServletRequestFactory
      * 
      * @param request The original servlet request to wrap.
      * @return a new mutable servlet request.
+     * @deprecated use {@link #newInstance(ServletRequest)} instead
      */
-    MutableServletRequest newInstance(ServletRequest request);
+    @Deprecated(since = "42.0.0")
+    default MutableServletRequest newInstance(javax.servlet.ServletRequest request)
+    {
+        return new JavaxToJakartaMutableHttpServletRequest(newInstance(JakartaServletBridge.toJakarta(request)));
+    }
+
+    /**
+     * Creates a new mutable servlet request.
+     * 
+     * @param request The original servlet request to wrap.
+     * @return a new mutable servlet request.
+     * @since 42.0.0
+     */
+    @Unstable
+    default MutableJakartaServletRequest newInstance(ServletRequest request)
+    {
+        return new JakartaToJavaxMutableHttpServletRequest(newInstance(JakartaServletBridge.toJavax(request)));
+    }
 }

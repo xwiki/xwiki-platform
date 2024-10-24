@@ -27,15 +27,15 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.attachment.validation.AttachmentValidator;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.internal.attachment.XWikiAttachmentAccessWrapper;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.store.TemporaryAttachmentException;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
@@ -43,6 +43,9 @@ import org.xwiki.store.TemporaryAttachmentSessionsManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 /**
  * Default implementation of {@link TemporaryAttachmentSessionsManager}.
@@ -63,12 +66,11 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     private Provider<AttachmentValidator> attachmentValidator;
 
     @Inject
-    private Logger logger;
+    private Provider<Container> container;
 
     private HttpSession getSession()
     {
-        XWikiContext context = this.contextProvider.get();
-        return context.getRequest().getSession();
+        return ((ServletSession) this.container.get().getSession()).getJakartaHttpSession();
     }
 
     private TemporaryAttachmentSession getOrCreateSession()
@@ -91,6 +93,14 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
     }
 
     @Override
+    @Deprecated
+    public XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part,
+        String filename) throws TemporaryAttachmentException, AttachmentValidationException
+    {
+        return uploadAttachment(documentReference, JakartaServletBridge.toJakarta(part), filename);
+    }
+
+    @Override
     public XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
@@ -107,7 +117,7 @@ public class DefaultTemporaryAttachmentSessionsManager implements TemporaryAttac
             xWikiAttachment.setFilename(actualFilename);
             xWikiAttachment.setContent(part.getInputStream());
             xWikiAttachment.setAuthorReference(context.getUserReference());
-            // Initialize an empty document with the right document reference and locale. We don't set the actual 
+            // Initialize an empty document with the right document reference and locale. We don't set the actual
             // document since it's a temporary attachment, but it is still useful to have a minimal knowledge of the
             // document it is stored for.
             xWikiAttachment.setDoc(new XWikiDocument(documentReference, documentReference.getLocale()), false);

@@ -19,13 +19,12 @@
  */
 package org.xwiki.wysiwyg.internal.filter.http;
 
-import javax.inject.Singleton;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wysiwyg.filter.MutableServletRequest;
+import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
+
+import jakarta.inject.Singleton;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link MutableServletRequestFactory} implementation for the HTTP protocol.
@@ -37,10 +36,10 @@ import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
     @Override
-    public synchronized MutableServletRequest newInstance(ServletRequest request)
+    public synchronized MutableJakartaServletRequest newInstance(jakarta.servlet.ServletRequest request)
     {
-        if (request instanceof HttpServletRequest) {
-            return new MutableHttpServletRequest((HttpServletRequest) request);
+        if (request instanceof HttpServletRequest httpRequest) {
+            return new MutableJakartaHttpServletRequest(httpRequest);
         } else {
             throw new IllegalArgumentException(String.format("Expecting HttpServletRequest, got [%s]!", request));
         }

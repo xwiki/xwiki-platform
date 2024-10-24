@@ -19,69 +19,113 @@
  */
 package org.xwiki.container.servlet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Enumeration;
 
 import org.xwiki.container.Request;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.user.UserReference;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * This is the implementation of {@link Request} for {@link HttpServletRequest}.
+ *
+ * @version $Id$
+ */
 public class ServletRequest implements Request
 {
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest jakartaHttpServletRequest;
 
-    public ServletRequest(HttpServletRequest httpServletRequest)
+    private javax.servlet.http.HttpServletRequest javaxHttpServletRequest;
+
+    /**
+     * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
+     * @since 42.0.0
+     */
+    public ServletRequest(HttpServletRequest jakartaHttpServletRequest)
     {
-        this.httpServletRequest = httpServletRequest;
+        this.jakartaHttpServletRequest = jakartaHttpServletRequest;
     }
 
-    public HttpServletRequest getHttpServletRequest()
+    /**
+     * @param javaxHttpServletRequest the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
+     * @deprecated use {@link #ServletRequest(HttpServletRequest)} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public ServletRequest(javax.servlet.http.HttpServletRequest javaxHttpServletRequest)
     {
-        return this.httpServletRequest;
+        this.javaxHttpServletRequest = javaxHttpServletRequest;
+        this.jakartaHttpServletRequest = JakartaServletBridge.toJakarta(javaxHttpServletRequest);
     }
 
-    @Override
-    public Object getProperty(String key)
+    /**
+     * @return the standard Jakarta {@link HttpServletRequest} instance
+     * @since 42.0.0
+     */
+    public HttpServletRequest getRequest()
     {
-        Object result;
+        return this.jakartaHttpServletRequest;
+    }
 
-        // Look first in the Query Parameters and then in the Query Attributes
-        result = this.httpServletRequest.getParameter(key);
-        if (result == null) {
-            result = this.httpServletRequest.getAttribute(key);
+    /**
+     * @return the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
+     * @deprecated use {@link #getRequest()} instead
+     */
+    @Deprecated(since = "42.0.0")
+    public javax.servlet.http.HttpServletRequest getHttpServletRequest()
+    {
+        if (this.javaxHttpServletRequest == null) {
+            this.javaxHttpServletRequest = JakartaServletBridge.toJavax(this.jakartaHttpServletRequest);
         }
 
-        return result;
+        return this.javaxHttpServletRequest;
     }
 
     @Override
-    public List<Object> getProperties(String key)
+    public Object getParameter(String key)
     {
-        List<Object> result = new ArrayList<Object>();
-
-        // Look first in the Query Parameters and then in the Query Attributes
-        Object[] requestParameters = this.httpServletRequest.getParameterValues(key);
-        if (requestParameters != null) {
-            result.addAll(Arrays.asList(requestParameters));
-        }
-        Object attributeValue = this.httpServletRequest.getAttribute(key);
-        if (attributeValue != null) {
-            result.add(attributeValue);
-        }
-
-        return result;
+        return this.jakartaHttpServletRequest.getParameter(key);
     }
 
     @Override
-    public void setProperty(String key, Object value)
+    public String[] getParameterValues(String name)
     {
-        this.httpServletRequest.setAttribute(key, value);
+        return this.jakartaHttpServletRequest.getParameterValues(name);
     }
 
     @Override
-    public void removeProperty(String key)
+    public Enumeration<String> getParameterNames()
     {
-        this.httpServletRequest.removeAttribute(key);
+        return this.jakartaHttpServletRequest.getParameterNames();
+    }
+
+    @Override
+    public Object getAttribute(String name)
+    {
+        return this.jakartaHttpServletRequest.getAttribute(name);
+    }
+
+    @Override
+    public Enumeration<String> getAttributeNames()
+    {
+        return this.jakartaHttpServletRequest.getAttributeNames();
+    }
+
+    @Override
+    public void setAttribute(String name, Object o)
+    {
+        this.jakartaHttpServletRequest.setAttribute(name, o);
+    }
+
+    @Override
+    public void removeAttribute(String name)
+    {
+        this.jakartaHttpServletRequest.removeAttribute(name);
+    }
+
+    @Override
+    public UserReference getEffectiveAuthor()
+    {
+        return (UserReference) getAttribute(ATTRIBUTE_EFFECTIVE_AUTHOR);
     }
 }

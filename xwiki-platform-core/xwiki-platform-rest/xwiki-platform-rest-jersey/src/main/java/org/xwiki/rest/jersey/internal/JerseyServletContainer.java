@@ -24,28 +24,32 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.rest.XWikiRestComponent;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
 
 /**
  * Encapsulate the Jersey {@link ServletContainer} to control it's initialization and reload (when a REST component is
  * registered/unregistered).
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
- * @since 16.2.0RC1
+ * @since 42.0.0
  */
 @Component(roles = JerseyServletContainer.class)
 @Singleton
@@ -66,7 +70,11 @@ public class JerseyServletContainer extends HttpServlet
     {
         // Create and initialize the Jersey servlet
         ServletContainer newContainer = new ServletContainer(createResourceConfig());
-        newContainer.init(getServletConfig());
+        try {
+            newContainer.init(JakartaServletBridge.toJavax(getServletConfig()));
+        } catch (javax.servlet.ServletException e) {
+            throw new ServletException(e);
+        }
 
         // Remember the previous container
         ServletContainer previousContainer = this.container;
@@ -128,7 +136,9 @@ public class JerseyServletContainer extends HttpServlet
 
         try {
             // Execute the request
-            this.container.service(req, res);
+            this.container.service(JakartaServletBridge.toJavax(req), JakartaServletBridge.toJavax(res));
+        } catch (javax.servlet.ServletException e) {
+            throw new ServletException(e);
         } finally {
             // Decrement the counter
             counter.decrementAndGet();
@@ -159,6 +169,6 @@ public class JerseyServletContainer extends HttpServlet
     @Override
     public ServletContext getServletContext()
     {
-        return this.container.getServletContext();
+        return JakartaServletBridge.toJakarta(this.container.getServletContext());
     }
 }

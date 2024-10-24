@@ -19,9 +19,6 @@
  */
 package org.xwiki.container.servlet;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
@@ -33,14 +30,22 @@ import org.xwiki.container.servlet.internal.HttpSessionManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.extension.handler.ExtensionInitializer;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+
 /**
  * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
+ * @since 42.0.0
  */
 public class XWikiServletContextListener implements ServletContextListener
 {
@@ -97,7 +102,8 @@ public class XWikiServletContextListener implements ServletContextListener
         try {
             ServletContainerInitializer containerInitializer =
                 this.componentManager.getInstance(ServletContainerInitializer.class);
-            containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
+            containerInitializer
+                .initializeApplicationContext(JakartaServletBridge.toJavax(servletContextEvent.getServletContext()));
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
         }
@@ -118,7 +124,7 @@ public class XWikiServletContextListener implements ServletContextListener
             throw new RuntimeException("Failed to initialize installed extensions", e);
         }
 
-        // Register the  HttpSessionManager as a listener.
+        // Register the HttpSessionManager as a listener.
         try {
             HttpSessionManager httpSessionManager = this.componentManager.getInstance(HttpSessionManager.class);
             servletContextEvent.getServletContext().addListener(httpSessionManager);

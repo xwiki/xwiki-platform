@@ -68,8 +68,8 @@
     <!-- Test dependencies -->
     <!-- For some tests we need to have the Servlet API JAR available -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

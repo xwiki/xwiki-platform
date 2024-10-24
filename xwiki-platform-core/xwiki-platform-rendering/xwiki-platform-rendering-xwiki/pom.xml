@@ -119,11 +119,6 @@
       <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency-->
   </dependencies>
   <build>
     <plugins>

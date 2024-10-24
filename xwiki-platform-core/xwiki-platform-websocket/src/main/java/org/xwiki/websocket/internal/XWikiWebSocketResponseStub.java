@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
-import javax.websocket.HandshakeResponse;
+import jakarta.websocket.HandshakeResponse;
 
 import org.apache.commons.lang3.StringUtils;
 

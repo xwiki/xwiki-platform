@@ -450,7 +450,9 @@
         #end
         <dd>
           <ul>
-            #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #if ($canView)
+              #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #end
             $viewersContent
             ## Display Viewers menu UIX..
             #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])

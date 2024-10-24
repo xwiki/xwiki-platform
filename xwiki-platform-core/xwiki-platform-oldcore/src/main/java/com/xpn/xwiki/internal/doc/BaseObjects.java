@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -61,6 +62,38 @@ public class BaseObjects extends AbstractList<BaseObject>
         collection.forEach(this::add);
     }
 
+    /**
+     * @param document the document when the current {@link BaseObjects} is stored
+     * @param otherObjects the objects to copy
+     * @param keepsIdentity if true it does an exact copy (same guid), otherwise it create a new object with the same
+     *            values
+     * @since 16.10.0RC1
+     * @since 16.4.5
+     * @since 15.10.14
+     */
+    public BaseObjects(XWikiDocument document, BaseObjects otherObjects, boolean keepsIdentity)
+    {
+        // Make sure to keep the same size if keepsIdentity is true
+        this.size = keepsIdentity ? otherObjects.size() : 0;
+
+        for (Map.Entry<Integer, BaseObject> entry : otherObjects.map.entrySet()) {
+            BaseObject otherObject = entry.getValue();
+            BaseObject clonedObject =
+                keepsIdentity ? otherObject.clone() : otherObject.duplicate(document.getDocumentReference());
+
+            // Make sure the cloned object has the right document (in case was is cloned in the document)
+            clonedObject.setOwnerDocument(document);
+
+            // Make sure to maintain the same position in the list since it's part of the object reference
+            put(entry.getKey(), clonedObject);
+
+            // Update the size
+            if (this.size <= otherObject.getNumber()) {
+                this.size = otherObject.getNumber() + 1;
+            }
+        }
+    }
+
     @Override
     public BaseObject get(int index)
     {
@@ -73,27 +106,6 @@ public class BaseObjects extends AbstractList<BaseObject>
     public int size()
     {
         return this.size;
-    }
-
-    private BaseObject put(int index, BaseObject element)
-    {
-        BaseObject old;
-        if (element == null) {
-            // We don't want to keep null values in memory
-            old = this.map.remove(index);
-        } else {
-            // Make sure the object number is right
-            element.setNumber(index);
-
-            old = this.map.put(index, element);
-        }
-
-        // Increment size if needed
-        if (this.size <= index) {
-            this.size = index + 1;
-        }
-
-        return old;
     }
 
     @Override
@@ -121,6 +133,32 @@ public class BaseObjects extends AbstractList<BaseObject>
 
         // Set the value and remember the old one
         return put(index, element);
+    }
+
+    /**
+     * @param index the index of the object in the list
+     * @param object the object
+     * @return the object previously at the specified position
+     */
+    public BaseObject put(int index, BaseObject object)
+    {
+        BaseObject old;
+        if (object == null) {
+            // We don't want to keep null values in memory
+            old = this.map.remove(index);
+        } else {
+            // Make sure the object number is right
+            object.setNumber(index);
+
+            old = this.map.put(index, object);
+        }
+
+        // Increment size if needed
+        if (this.size <= index) {
+            this.size = index + 1;
+        }
+
+        return old;
     }
 
     @Override

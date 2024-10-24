@@ -42,6 +42,9 @@ import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-s
 import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
 import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
+import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
+import { ComponentInit as ActionsPagesComponentInit } from "@xwiki/cristal-page-actions-default";
+import { ComponentInit as ActionsPagesUIComponentInit } from "@xwiki/cristal-page-actions-ui";
 import type { Container } from "inversify";
 
 export class StaticBuild {
@@ -78,6 +81,9 @@ export class StaticBuild {
       new XWikiLinkSuggestComponentInit(container);
       new NextcloudLinkSuggestComponentInit(container);
       new DocumentComponentInit(container);
+      new AlertsDefaultComponentInit(container);
+      new ActionsPagesComponentInit(container);
+      new ActionsPagesUIComponentInit(container);
     }
     if (additionalComponents) {
       additionalComponents(container);

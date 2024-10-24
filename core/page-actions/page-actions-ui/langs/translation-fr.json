@@ -1,0 +1,8 @@
+{
+  "page.action.category.page.management.title": "Gérer",
+  "page.action.action.delete.page.title": "Supprimer",
+  "page.action.action.delete.page.dialog.title": "Supprimer la page",
+  "page.action.action.delete.page.success": "La page \"{page}\" a été supprimée.",
+  "page.action.action.delete.page.error": "La suppression de la page \"{page}\" a échoué. Raison: [{reason}]",
+  "page.action.action.delete.page.confirm": "Cette opération supprimera la page \"{page}\". Voulez-vous continuer ?"
+}

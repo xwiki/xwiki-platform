@@ -36,4 +36,6 @@ export interface APITypes {
   saveAttachment(path: string, file: File): Promise<PageData>;
 
   listChildren(page: string): Promise<Array<string>>;
+
+  deletePage(path: string): Promise<void>;
 }

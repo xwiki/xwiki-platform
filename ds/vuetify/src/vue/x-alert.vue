@@ -17,23 +17,20 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
+<script setup lang="ts">
+import type { AlertProps } from "@xwiki/cristal-dsapi";
+
+defineProps<AlertProps>();
+</script>
 <template>
-  <v-alert :title="title" :type="type">
-    <slot />
+  <v-alert closable :title="title" :type="type" :text="description">
+    <x-btn
+      v-for="action of actions"
+      :key="action.name"
+      size="small"
+      variant="text"
+      @click="action.callback"
+      >{{ action.name }}</x-btn
+    >
   </v-alert>
 </template>
-<script lang="ts">
-import type { PropType } from "vue";
-import type { VAlert } from "vuetify/lib/components/VAlert/index.mjs";
-
-export default {
-  components: {},
-  props: {
-    title: { type: String, required: true },
-    type: {
-      type: Object as PropType<VAlert["type"] | undefined>,
-      required: true,
-    },
-  },
-};
-</script>

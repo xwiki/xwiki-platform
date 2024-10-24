@@ -51,6 +51,7 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
     const hierarchy: Array<PageHierarchyItem> = [
       {
         label: "Home",
+        pageId: this.cristalApp.getWikiConfig().homePage,
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: { page: this.cristalApp.getWikiConfig().homePage },
@@ -65,6 +66,7 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
         currentFile += `${i == 0 ? "" : "/"}${file}`;
         hierarchy.push({
           label: file,
+          pageId: currentFile,
           url: this.cristalApp.getRouter().resolve({
             name: "view",
             params: { page: currentFile },

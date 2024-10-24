@@ -19,7 +19,7 @@
  */
 
 import { dirname, join, relative } from "node:path";
-import { app, ipcMain } from "electron";
+import { app, ipcMain, shell } from "electron";
 import fs from "node:fs";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
 
@@ -173,7 +173,7 @@ async function saveAttachment(path: string, filePath: string) {
  * @since 0.10
  */
 async function listChildren(page: string): Promise<Array<string>> {
-  const folderPath = resolvePath(page).replace("/page.json", "");
+  const folderPath = resolvePath(page).replace(/\/page.json$/, "");
 
   const children = [];
   const files = await fs.promises.readdir(folderPath);
@@ -186,6 +186,16 @@ async function listChildren(page: string): Promise<Array<string>> {
   }
 
   return children;
+}
+
+/**
+ * Delete a page.
+ *
+ * @param path the path to the page to delete
+ * @since 0.11
+ */
+async function deletePage(path: string): Promise<void> {
+  await shell.trashItem(path.replace(/\/page.json$/, ""));
 }
 
 export default function load(): void {
@@ -212,5 +222,8 @@ export default function load(): void {
   });
   ipcMain.handle("listChildren", (event, { page }) => {
     return listChildren(page);
+  });
+  ipcMain.handle("deletePage", (event, { path }) => {
+    return deletePage(path);
   });
 }

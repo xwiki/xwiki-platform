@@ -208,6 +208,21 @@ export class NextcloudStorage extends AbstractStorage {
     return new DefaultPageData();
   }
 
+  async delete(page: string): Promise<{ success: boolean; error?: string }> {
+    const rootURL = `${this.getWikiConfig().baseRestURL}/${USERNAME}/.cristal`;
+    const success = await fetch(`${rootURL}/${page}`, {
+      method: "DELETE",
+      headers: this.getBaseHeaders(),
+    }).then(async (response) => {
+      if (response.ok) {
+        return { success: true };
+      } else {
+        return { success: false, error: await response.text() };
+      }
+    });
+    return success;
+  }
+
   async isStorageReady(): Promise<boolean> {
     return true;
   }

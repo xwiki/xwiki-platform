@@ -99,6 +99,49 @@ importers:
         specifier: 2.1.6
         version: 2.1.6(typescript@5.6.3)
 
+  core/alerts/alerts-api:
+    dependencies:
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+
+  core/alerts/alerts-default:
+    dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../alerts-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      pinia:
+        specifier: 2.2.4
+        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+
+  core/alerts/alerts-ui:
+    dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../alerts-api
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+    devDependencies:
+      vue-tsc:
+        specifier: 2.1.6
+        version: 2.1.6(typescript@5.6.3)
+
   core/attachments/attachments-api:
     dependencies:
       vue:
@@ -668,6 +711,65 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
 
+  core/page-actions/page-actions-api:
+    dependencies:
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+      vue-i18n:
+        specifier: 10.0.4
+        version: 10.0.4(vue@3.5.12(typescript@5.6.3))
+
+  core/page-actions/page-actions-default:
+    dependencies:
+      '@xwiki/cristal-page-actions-api':
+        specifier: workspace:*
+        version: link:../page-actions-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+    devDependencies:
+      '@types/lodash':
+        specifier: 4.17.10
+        version: 4.17.10
+
+  core/page-actions/page-actions-ui:
+    dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../../alerts/alerts-api
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-hierarchy-api':
+        specifier: workspace:*
+        version: link:../../hierarchy/hierarchy-api
+      '@xwiki/cristal-icons':
+        specifier: workspace:*
+        version: link:../../icons
+      '@xwiki/cristal-page-actions-api':
+        specifier: workspace:*
+        version: link:../page-actions-api
+      inversify:
+        specifier: 6.0.2
+        version: 6.0.2
+      vue:
+        specifier: 3.5.12
+        version: 3.5.12(typescript@5.6.3)
+      vue-i18n:
+        specifier: 10.0.4
+        version: 10.0.4(vue@3.5.12(typescript@5.6.3))
+    devDependencies:
+      vue-tsc:
+        specifier: 2.1.6
+        version: 2.1.6(typescript@5.6.3)
+
   core/uiextension/uiextension-api:
     dependencies:
       vue:
@@ -761,6 +863,9 @@ importers:
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-icons':
+        specifier: workspace:*
+        version: link:../../core/icons
       '@xwiki/cristal-navigation-tree-api':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
@@ -950,7 +1055,7 @@ importers:
         version: 31.7.1
       electron-builder:
         specifier: 25.1.7
-        version: 25.1.7(electron-builder-squirrel-windows@24.13.3)
+        version: 25.1.7(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7))
 
   electron/authentication/authentication-xwiki/authentication-xwiki-main:
     dependencies:
@@ -1160,6 +1265,9 @@ importers:
       '@mdi/font':
         specifier: 7.4.47
         version: 7.4.47
+      '@xwiki/cristal-alerts-default':
+        specifier: workspace:*
+        version: link:../core/alerts/alerts-default
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
@@ -1232,6 +1340,12 @@ importers:
       '@xwiki/cristal-macros':
         specifier: workspace:*
         version: link:../macros
+      '@xwiki/cristal-page-actions-default':
+        specifier: workspace:*
+        version: link:../core/page-actions/page-actions-default
+      '@xwiki/cristal-page-actions-ui':
+        specifier: workspace:*
+        version: link:../core/page-actions/page-actions-ui
       '@xwiki/cristal-rendering':
         specifier: workspace:*
         version: link:../rendering/rendering
@@ -1415,6 +1529,12 @@ importers:
 
   skin:
     dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../core/alerts/alerts-api
+      '@xwiki/cristal-alerts-ui':
+        specifier: workspace:*
+        version: link:../core/alerts/alerts-ui
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
@@ -1442,6 +1562,9 @@ importers:
       '@xwiki/cristal-navigation-tree-api':
         specifier: workspace:*
         version: link:../core/navigation-tree/navigation-tree-api
+      '@xwiki/cristal-page-actions-ui':
+        specifier: workspace:*
+        version: link:../core/page-actions/page-actions-ui
       '@xwiki/cristal-uiextension-api':
         specifier: workspace:*
         version: link:../core/uiextension/uiextension-api
@@ -8057,7 +8180,7 @@ snapshots:
       js-beautify: 1.14.11
       vue-component-type-helpers: 2.0.7
 
-  '@vuetify/loader-shared@2.0.3(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.2)':
+  '@vuetify/loader-shared@2.0.3(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.2(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.12(typescript@5.6.3)))':
     dependencies:
       upath: 2.0.1
       vue: 3.5.12(typescript@5.6.3)
@@ -8201,7 +8324,7 @@ snapshots:
 
   app-builder-bin@5.0.0-alpha.10: {}
 
-  app-builder-lib@24.13.3(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3):
+  app-builder-lib@24.13.3(dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7)):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.2.1
@@ -8235,7 +8358,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  app-builder-lib@25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3):
+  app-builder-lib@25.1.7(dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7)):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.5.0
@@ -8834,7 +8957,7 @@ snapshots:
 
   dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3):
     dependencies:
-      app-builder-lib: 25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 25.1.7(dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7))
       builder-util: 25.1.7
       builder-util-runtime: 9.2.10
       fs-extra: 10.1.0
@@ -8892,7 +9015,7 @@ snapshots:
 
   electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7):
     dependencies:
-      app-builder-lib: 24.13.3(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 24.13.3(dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7))
       archiver: 5.3.2
       builder-util: 24.13.1
       fs-extra: 10.1.0
@@ -8900,9 +9023,9 @@ snapshots:
       - dmg-builder
       - supports-color
 
-  electron-builder@25.1.7(electron-builder-squirrel-windows@24.13.3):
+  electron-builder@25.1.7(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7)):
     dependencies:
-      app-builder-lib: 25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 25.1.7(dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3))(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7))
       builder-util: 25.1.7
       builder-util-runtime: 9.2.10
       chalk: 4.1.2
@@ -11335,7 +11458,7 @@ snapshots:
 
   vite-plugin-vuetify@2.0.4(vite@5.4.9(@types/node@22.7.7))(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.2):
     dependencies:
-      '@vuetify/loader-shared': 2.0.3(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.2)
+      '@vuetify/loader-shared': 2.0.3(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.2(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.12(typescript@5.6.3)))
       debug: 4.3.4(supports-color@5.5.0)
       upath: 2.0.1
       vite: 5.4.9(@types/node@22.7.7)

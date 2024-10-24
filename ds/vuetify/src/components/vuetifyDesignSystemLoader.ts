@@ -98,6 +98,11 @@ export class VuetifyDesignSystemLoader implements DesignSystemLoader {
     );
     registerAsyncComponent(
       app,
+      "XMenuLabel",
+      () => import("../vue/x-menu-label.vue"),
+    );
+    registerAsyncComponent(
+      app,
       "XBreadcrumb",
       () => import("../vue/x-breadcrumb.vue"),
     );

@@ -1,0 +1,72 @@
+<!--
+See the LICENSE file distributed with this work for additional
+information regarding copyright ownership.
+
+This is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 2.1 of
+the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this software; if not, write to the Free
+Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+<script setup lang="ts">
+import { inject, type Ref } from "vue";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { Alert, AlertsService } from "@xwiki/cristal-alerts-api";
+
+const cristal = inject<CristalApp>("cristal")!;
+const alertsService = cristal
+  .getContainer()
+  .get<AlertsService>("AlertsService")!;
+
+const alerts: Ref<Alert[]> = alertsService.list();
+</script>
+
+<template>
+  <div class="wrapper">
+    <XAlert
+      v-for="alert of alerts"
+      :key="alert.id"
+      :type="alert.type"
+      :description="alert.message"
+      :actions="alert.actions"
+      @update:model-value="
+        (open: boolean) => {
+          if (!open) {
+            alertsService.dismiss(alert.id);
+          }
+        }
+      "
+    ></XAlert>
+  </div>
+</template>
+
+<style scoped>
+.wrapper {
+  width: 400px;
+  z-index: var(--cr-z-index-toast);
+  position: fixed;
+  top: var(--cr-spacing-x-large);
+  right: var(--cr-spacing-2x-large);
+  display: grid;
+  gap: var(--cr-spacing-x-small);
+}
+
+/* We want to display alerts on the bottom on small viewports. */
+@container xwCristal (max-width: 600px) {
+  .wrapper {
+    width: 90%;
+    left: 5%;
+    top: auto;
+    bottom: var(--cr-spacing-x-large);
+  }
+}
+</style>

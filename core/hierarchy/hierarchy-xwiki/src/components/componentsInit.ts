@@ -87,6 +87,9 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
         (hierarchyItem: { label: string; url: string }) => {
           hierarchy.push({
             label: hierarchyItem.label,
+            pageId: this.cristalApp
+              .getWikiConfig()
+              .storage.getPageFromViewURL(hierarchyItem.url)!,
             url: hierarchyItem.url,
           });
         },

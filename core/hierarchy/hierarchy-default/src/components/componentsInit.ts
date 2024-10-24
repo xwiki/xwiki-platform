@@ -53,6 +53,7 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
     const hierarchy: Array<PageHierarchyItem> = [
       {
         label: "Home",
+        pageId: this.cristalApp.getWikiConfig().homePage,
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: { page: this.cristalApp.getWikiConfig().homePage },
@@ -62,6 +63,7 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
     if (pageData != null) {
       hierarchy.push({
         label: pageData.name,
+        pageId: this.cristalApp.getCurrentPage(),
         url: window.location.href,
       });
     }

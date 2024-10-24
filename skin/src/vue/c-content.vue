@@ -45,6 +45,8 @@ import {
   type DocumentService,
   name as documentServiceName,
 } from "@xwiki/cristal-document-api";
+import { PageActions } from "@xwiki/cristal-page-actions-ui";
+import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
 
 const { t } = useI18n({
   messages,
@@ -144,6 +146,8 @@ onUpdated(() => {
   <article v-else id="content" ref="root" class="content">
     <UIX uixname="content.before" />
 
+    <alerts-toasts></alerts-toasts>
+
     <div class="page-header">
       <!-- This div lets us reference an actual HTML element,
              to be used in `ContentTools.listenToClicks()`. -->
@@ -186,9 +190,10 @@ onUpdated(() => {
                   Edit
                 </x-btn>
               </router-link>
-              <x-btn size="small">
-                <c-icon name="three-dots-vertical" :size="Size.Small"></c-icon>
-              </x-btn>
+              <page-actions
+                :current-page="currentPage"
+                :current-page-name="currentPageName"
+              ></page-actions>
             </div>
           </div>
         </div>

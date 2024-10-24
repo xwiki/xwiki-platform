@@ -17,6 +17,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 packages:
   - "api"
+  - "core/alerts/*"
   - "core/attachments/*"
   - "core/authentication/*"
   - "core/backends/*"
@@ -28,6 +29,7 @@ packages:
   - "core/info-actions/*"
   - "core/link-suggest/*"
   - "core/navigation-tree/*"
+  - "core/page-actions/*"
   - "core/uiextension/*"
   - "dev/*"
   - "ds/api"

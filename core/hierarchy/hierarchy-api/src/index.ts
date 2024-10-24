@@ -26,6 +26,7 @@ import type { PageData } from "@xwiki/cristal-api";
  */
 type PageHierarchyItem = {
   label: string;
+  pageId: string;
   url: string;
 };
 

@@ -52,6 +52,7 @@ class NextcloudPageHierarchyResolver implements PageHierarchyResolver {
     let hierarchy: Array<PageHierarchyItem> = [
       {
         label: "Home",
+        pageId: this.cristalApp.getWikiConfig().homePage,
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: { page: this.cristalApp.getWikiConfig().homePage },

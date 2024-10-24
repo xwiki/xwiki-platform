@@ -1,0 +1,8 @@
+{
+  "page.action.category.page.management.title": "Manage",
+  "page.action.action.delete.page.title": "Delete",
+  "page.action.action.delete.page.dialog.title": "Delete Page",
+  "page.action.action.delete.page.success": "The page \"{page}\" has been deleted.",
+  "page.action.action.delete.page.error": "Failed to delete the page \"{page}\". Reason: [{reason}]",
+  "page.action.action.delete.page.confirm": "This operation will delete the page \"{page}\". Are you sure?"
+}

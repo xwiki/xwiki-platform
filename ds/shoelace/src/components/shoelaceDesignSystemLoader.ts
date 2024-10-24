@@ -55,7 +55,12 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
     registerAsyncComponent(
       app,
       "XMenuItem",
-      () => import("../vue/x-menuitem.vue"),
+      () => import("../vue/x-menu-item.vue"),
+    );
+    registerAsyncComponent(
+      app,
+      "XMenuLabel",
+      () => import("../vue/x-menu-label.vue"),
     );
     registerAsyncComponent(
       app,

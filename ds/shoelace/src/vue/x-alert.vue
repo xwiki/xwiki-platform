@@ -17,49 +17,62 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts" setup>
+<script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/alert/alert";
-import { computed, type PropType } from "vue";
+import "@shoelace-style/shoelace/dist/components/icon/icon";
+import type { AlertProps } from "@xwiki/cristal-dsapi";
+import { CIcon } from "@xwiki/cristal-icons";
+import { computed } from "vue";
 
-type Types = "" | "success" | "warning" | "error" | "info";
-
-const { type } = defineProps({
-  title: { type: String, required: true },
-  type: {
-    type: String as PropType<Types>,
-    required: true,
-  },
-  description: { type: String, required: true },
-});
+const { type } = defineProps<AlertProps>();
 
 const variant = computed(() => {
   let variant: string;
+  let icon: string;
   switch (type) {
-    case "":
-      variant = "primary";
-      break;
     case "success":
       variant = "success";
+      icon = "check2-circle";
       break;
     case "warning":
       variant = "warning";
+      icon = "exclamation-triangle";
       break;
     case "error":
       variant = "danger";
+      icon = "exclamation-octagon";
       break;
     case "info":
       variant = "primary";
-      break;
-    default:
-      variant = "primary";
+      icon = "info-circle";
       break;
   }
-  return variant;
+  return { variant, icon };
 });
+
+const open = defineModel<boolean>();
+open.value = true;
 </script>
 
 <template>
-  <sl-alert open :title="title" :variant="variant">
+  <sl-alert
+    closable
+    :variant="variant.variant"
+    :open="open"
+    @sl-show="open = true"
+    @sl-hide="open = false"
+  >
+    <c-icon slot="icon" :name="variant.icon"></c-icon>
+    <strong v-if="title">{{ title }}</strong>
+    <br v-if="title" />
     {{ description }}
+    <x-btn
+      v-for="action of actions"
+      :key="action.name"
+      size="small"
+      variant="text"
+      @click="action.callback"
+      >{{ action.name }}</x-btn
+    >
   </sl-alert>
 </template>

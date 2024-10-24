@@ -61,12 +61,26 @@ type BtnProps = {
     | "success"
     | "neutral"
     | "warning"
-    | "danger";
+    | "danger"
+    | "text";
 };
 
 type TextFieldModel = File | File[] | null | undefined;
 
+/**
+ * Props for the alert component.
+ *
+ * @since 0.11
+ */
+type AlertProps = {
+  title?: string;
+  type: "success" | "warning" | "error" | "info";
+  description: string;
+  actions?: [{ name: string; callback: () => void }];
+};
+
 export type {
+  AlertProps,
   BreadcrumbProps,
   BtnProps,
   TabPanelProps,

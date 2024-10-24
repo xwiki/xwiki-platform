@@ -29,6 +29,7 @@
     "@shoelace-style/shoelace": "2.17.1",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
+    "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "6.0.2",
     "vue": "3.5.12"

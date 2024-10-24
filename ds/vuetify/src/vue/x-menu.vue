@@ -17,13 +17,15 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts" setup>
-defineProps<{
-  title: string;
-}>();
-</script>
+<script lang="ts" setup></script>
 <template>
-  <v-menu open-on-hover>
+  <!-- v-menu needs to be attached inside Cristal DOM to fix its z-index.
+       We also reset the default z-index to set it in the style section. -->
+  <v-menu
+    :close-on-content-click="false"
+    attach="#xwCristalApp"
+    z-index="initial"
+  >
     <template #activator="{ props }">
       <span v-bind="props">
         <slot name="activator" />
@@ -34,3 +36,8 @@ defineProps<{
     </v-list>
   </v-menu>
 </template>
+<style scoped>
+.v-overlay {
+  z-index: var(--cr-z-index-dropdown);
+}
+</style>

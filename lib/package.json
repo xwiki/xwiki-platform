@@ -27,6 +27,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@mdi/font": "7.4.47",
+    "@xwiki/cristal-alerts-default": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-default": "workspace:*",
     "@xwiki/cristal-attachments-ui": "workspace:*",
@@ -51,6 +52,8 @@
     "@xwiki/cristal-link-suggest-nextcloud": "workspace:*",
     "@xwiki/cristal-link-suggest-xwiki": "workspace:*",
     "@xwiki/cristal-macros": "workspace:*",
+    "@xwiki/cristal-page-actions-default": "workspace:*",
+    "@xwiki/cristal-page-actions-ui": "workspace:*",
     "@xwiki/cristal-rendering": "workspace:*",
     "@xwiki/cristal-sharedworker-impl": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",

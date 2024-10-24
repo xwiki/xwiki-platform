@@ -54,6 +54,7 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
     let hierarchy: Array<PageHierarchyItem> = [
       {
         label: "Home",
+        pageId: this.cristalApp.getWikiConfig().homePage,
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: { page: "index" },

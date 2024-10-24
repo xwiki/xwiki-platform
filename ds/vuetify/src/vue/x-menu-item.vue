@@ -19,11 +19,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 defineProps<{
-  title: string;
+  value: string;
 }>();
 </script>
 <template>
-  <v-list-item>
+  <v-list-item :value="value">
     <slot name="default" />
   </v-list-item>
 </template>

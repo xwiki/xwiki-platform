@@ -26,6 +26,8 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@xwiki/cristal-alerts-api": "workspace:*",
+    "@xwiki/cristal-alerts-ui": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
@@ -35,6 +37,7 @@
     "@xwiki/cristal-info-actions-api": "workspace:*",
     "@xwiki/cristal-info-actions-ui": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
+    "@xwiki/cristal-page-actions-ui": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-uiextension-ui": "workspace:*",
     "inversify": "6.0.2",

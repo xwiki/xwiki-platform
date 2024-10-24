@@ -54,5 +54,8 @@ const api: APITypes = {
   listChildren(page: string): Promise<Array<string>> {
     return ipcRenderer.invoke("listChildren", { page });
   },
+  deletePage(path: string): Promise<void> {
+    return ipcRenderer.invoke("deletePage", { path });
+  },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

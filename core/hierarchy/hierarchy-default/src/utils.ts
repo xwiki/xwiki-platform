@@ -49,6 +49,7 @@ export async function getPageHierarchyFromPath(
     }
     hierarchy.push({
       label: currentPageData?.name ? currentPageData.name : file,
+      pageId: currentFile,
       url: cristalApp.getRouter().resolve({
         name: "view",
         params: { page: currentFile },

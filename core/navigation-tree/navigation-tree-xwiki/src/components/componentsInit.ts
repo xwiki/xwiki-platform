@@ -54,20 +54,7 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
     const currentId = id ? id : "#";
     const navigationTree: Array<NavigationTreeNode> = [];
 
-    const navigationTreeRequestUrl = new URL(
-      `${this.cristalApp.getWikiConfig().baseURL}/bin/get`,
-    );
-    navigationTreeRequestUrl.search = new URLSearchParams([
-      ["id", currentId],
-      ["outputSyntax", "plain"],
-      ["sheet", "XWiki.DocumentTree"],
-      ["data", "children"],
-      ["compact", "true"],
-    ]).toString();
     try {
-      const baseXWikiURL = this.cristalApp
-        .getWikiConfig()
-        .baseURL.replace(/\/[^/]*$/, "");
       const authorization = await this.authenticationManagerProvider
         .get()
         ?.getAuthorizationHeader();
@@ -78,39 +65,8 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
       if (authorization) {
         headers.Authorization = authorization;
       }
-      const response = await fetch(navigationTreeRequestUrl, { headers });
-      const jsonResponse = await response.json();
-      jsonResponse.forEach(
-        (treeNode: {
-          id: string;
-          text: string;
-          children: boolean;
-          data: { type: string };
-          a_attr: { href: string };
-        }) => {
-          if (!["attachments", "translations"].includes(treeNode.data.type)) {
-            const pageId = decodeURIComponent(
-              this.cristalApp
-                .getWikiConfig()
-                .storage.getPageFromViewURL(
-                  `${baseXWikiURL}${treeNode.a_attr.href}`,
-                )!,
-            );
-            navigationTree.push({
-              id: treeNode.id,
-              label: treeNode.text,
-              location: pageId.replace(/\.WebHome$/, ""),
-              url: this.cristalApp.getRouter().resolve({
-                name: "view",
-                params: {
-                  page: pageId,
-                },
-              }).href,
-              has_children: treeNode.children, //TODO: ignore translations and attachments
-            });
-          }
-        },
-      );
+
+      navigationTree.push(...(await this.fetchNodes(currentId, headers, 0)));
     } catch (error) {
       this.logger.error(error);
       this.logger.debug("Could not load navigation tree.");
@@ -143,6 +99,72 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
       result.push(`document:xwiki:${documentId}`);
     }
     return result;
+  }
+
+  private async fetchNodes(
+    currentId: string,
+    headers: { Accept: string; Authorization?: string },
+    offset: number,
+  ): Promise<Array<NavigationTreeNode>> {
+    const nodes: Array<NavigationTreeNode> = [];
+    const baseXWikiURL = this.cristalApp
+      .getWikiConfig()
+      .baseURL.replace(/\/[^/]*$/, "");
+
+    const navigationTreeRequestUrl = new URL(
+      `${this.cristalApp.getWikiConfig().baseURL}/bin/get`,
+    );
+    navigationTreeRequestUrl.search = new URLSearchParams([
+      ["id", currentId],
+      ["outputSyntax", "plain"],
+      ["sheet", "XWiki.DocumentTree"],
+      ["data", "children"],
+      ["compact", "true"],
+      ["offset", offset.toString()],
+    ]).toString();
+
+    const response = await fetch(navigationTreeRequestUrl, { headers });
+    const jsonResponse: [
+      {
+        id: string;
+        text: string;
+        children: boolean;
+        data: { type: string; offset: number };
+        a_attr?: { href: string };
+      },
+    ] = await response.json();
+    for (const treeNode of jsonResponse) {
+      if (treeNode.id == "pagination:wiki:xwiki") {
+        nodes.push(
+          ...(await this.fetchNodes(currentId, headers, treeNode.data.offset)),
+        );
+      } else if (
+        !["attachments", "translations"].includes(treeNode.data.type) &&
+        treeNode.a_attr
+      ) {
+        const pageId = decodeURIComponent(
+          this.cristalApp
+            .getWikiConfig()
+            .storage.getPageFromViewURL(
+              `${baseXWikiURL}${treeNode.a_attr.href}`,
+            )!,
+        );
+        nodes.push({
+          id: treeNode.id,
+          label: treeNode.text,
+          location: pageId.replace(/\.WebHome$/, ""),
+          url: this.cristalApp.getRouter().resolve({
+            name: "view",
+            params: {
+              page: pageId,
+            },
+          }).href,
+          has_children: treeNode.children, //TODO: ignore translations and attachments
+        });
+      }
+    }
+
+    return nodes;
   }
 }
 

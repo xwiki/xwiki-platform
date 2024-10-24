@@ -39,7 +39,7 @@ interface PageHierarchyResolver {
   /**
    * Returns the page hierarchy for a given page.
    *
-   * @param pageData the page for which to compute the hierarchy
+   * @param pageData - the page for which to compute the hierarchy
    * @returns the page hierarchy
    */
   getPageHierarchy(pageData: PageData): Promise<Array<PageHierarchyItem>>;

@@ -29,9 +29,18 @@ describe("x-alert", () => {
         title: "My Title",
         type: "warning",
         description: "My description",
+        actions: [{ name: "My Action", callback: () => {} }],
       },
     });
-    expect(xAlert.attributes("title")).eq("My Title");
-    expect(xAlert.text()).eq("My description");
+    expect(xAlert.text()).match(/^My Title.*My description.*My Action$/);
+    const xTitle = xAlert.find("strong");
+    expect(xTitle.text()).eq("My Title");
+    const xIcon = xAlert.find("c-icon-stub");
+    expect(xIcon.attributes("name")).eq("exclamation-triangle");
+    expect(xIcon.attributes("slot")).eq("icon");
+    const xBtn = xAlert.find("x-btn");
+    expect(xBtn.attributes("variant")).eq("text");
+    expect(xBtn.attributes("size")).eq("small");
+    expect(xBtn.text()).eq("My Action");
   });
 });

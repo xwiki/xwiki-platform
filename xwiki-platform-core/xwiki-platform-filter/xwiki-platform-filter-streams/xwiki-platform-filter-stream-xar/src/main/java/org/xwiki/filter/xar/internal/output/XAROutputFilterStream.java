@@ -69,8 +69,14 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_15, XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13,
-    XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {
+    XARFilterUtils.ROLEHINT_16,
+    XARFilterUtils.ROLEHINT_15,
+    XARFilterUtils.ROLEHINT_14,
+    XARFilterUtils.ROLEHINT_13,
+    XARFilterUtils.ROLEHINT_12,
+    XARFilterUtils.ROLEHINT_11
+})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter
 {
@@ -381,6 +387,10 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
             if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)) {
                 this.writer.writeElement(XarDocumentModel.ELEMENT_HIDDEN,
                     toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
+            }
+            if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS)) {
+                this.writer.writeElement(XarDocumentModel.ELEMENT_ENFORCE_REQUIRED_RIGHTS,
+                    toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS)));
             }
             if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT)) {
                 this.writer.writeElement(XarDocumentModel.ELEMENT_CONTENT,

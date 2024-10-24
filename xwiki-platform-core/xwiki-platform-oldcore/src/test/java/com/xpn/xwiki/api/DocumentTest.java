@@ -20,13 +20,16 @@
 package com.xpn.xwiki.api;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,8 +38,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
@@ -60,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
@@ -71,6 +78,7 @@ import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(DocumentRequiredRightsReader.class)
 class DocumentTest
 {
     @InjectMockitoOldcore
@@ -82,8 +90,28 @@ class DocumentTest
     @MockComponent
     private ObservationManager observationManager;
 
+    @MockComponent
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
+    @InjectMockComponents
+    private DocumentRequiredRightsReader documentRequiredRightsReader;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
+    @BeforeEach
+    void setUp() throws AuthorizationException
+    {
+        when(this.documentRequiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
+        {
+            DocumentReference reference = invocationOnMock.getArgument(0);
+            XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(reference, this.oldcore.getXWikiContext());
+            if (document.isNew()) {
+                return Optional.empty();
+            }
+            return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
+        });
+    }
 
     @Test
     void toStringReturnsFullName()

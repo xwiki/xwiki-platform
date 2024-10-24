@@ -38,5 +38,15 @@ public interface HasDocuments extends HasAcl
      */
     HasAcl addDocument(String name, String creator, String alt);
 
+    /**
+     * @param name The name of the document to add.
+     * @param creator The name of the creator. May be {\code null}.
+     * @param enforceRequiredRights whether to enforce required rights on the document.
+     * @param alt The pretty name of the document. (optional)
+     * @return an entity representing the document that holds the acl of the document.
+     */
+    HasAcl addDocument(String name, String creator, boolean enforceRequiredRights, String alt);
+
+
     XWikiDocument removeDocument(String name);
 }

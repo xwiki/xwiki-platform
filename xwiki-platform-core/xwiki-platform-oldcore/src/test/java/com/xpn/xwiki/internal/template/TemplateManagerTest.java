@@ -34,13 +34,14 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
 import org.xwiki.test.annotation.AfterComponent;
@@ -78,7 +79,7 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class TemplateManagerTest
 {
-    private AuthorizationManager authorizationMock;
+    private DocumentAuthorizationManager authorizationMock;
 
     private Environment environmentMock;
 
@@ -104,7 +105,7 @@ class TemplateManagerTest
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
         this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
-        this.authorizationMock = this.componentManager.registerMockComponent(AuthorizationManager.class);
+        this.authorizationMock = this.componentManager.registerMockComponent(DocumentAuthorizationManager.class);
         this.environmentMock = this.componentManager.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.componentManager.registerMockComponent(VelocityManager.class);
 
@@ -172,7 +173,8 @@ class TemplateManagerTest
     {
         DocumentReference author = new DocumentReference("wiki", "space", "user");
 
-        doThrow(AccessDeniedException.class).when(this.authorizationMock).checkAccess(Right.SCRIPT, author, null);
+        doThrow(AccessDeniedException.class).when(this.authorizationMock).checkAccess(Right.SCRIPT,
+            EntityType.DOCUMENT, author, null);
 
         Template template = this.templateManager.createStringTemplate("", author);
 

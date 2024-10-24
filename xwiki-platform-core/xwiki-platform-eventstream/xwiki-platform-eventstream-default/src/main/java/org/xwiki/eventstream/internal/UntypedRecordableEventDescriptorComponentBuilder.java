@@ -34,10 +34,11 @@ import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiBaseObjectComponentBuilder;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -61,7 +62,7 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
     public static final String BOUNDED_XOBJECT_CLASS = "XWiki.EventStream.Code.EventClass";
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private ContextualLocalizationManager contextualLocalizationManager;
@@ -106,8 +107,7 @@ public class UntypedRecordableEventDescriptorComponentBuilder implements WikiBas
     private void checkRights(DocumentReference documentReference, DocumentReference authorReference)
             throws EventStreamException
     {
-        if (!this.authorizationManager.hasAccess(Right.ADMIN, authorReference, documentReference.getWikiReference()))
-        {
+        if (!this.authorizationManager.hasAccess(Right.ADMIN, EntityType.WIKI, authorReference, documentReference)) {
             throw new EventStreamException("Registering Untyped Events requires wiki administration rights.");
         }
     }

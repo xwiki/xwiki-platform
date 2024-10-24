@@ -108,7 +108,7 @@
     </class>
     <property>
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content of #submenuitem()
-#if ($hasSpaceAdmin &amp;&amp; $isAdminAppInstalled)
+#if ($hasSpaceAdmin &amp;&amp; $isAdminAppInstalled &amp;&amp; !$doc.isNew())
   #template('menus_macros.vm')
   #set ($adminspaceaction = $xwiki.getURL($spacePreferencesDocumentReference, 'admin'))
   #if ($doc.documentReference.name == 'WebHome')

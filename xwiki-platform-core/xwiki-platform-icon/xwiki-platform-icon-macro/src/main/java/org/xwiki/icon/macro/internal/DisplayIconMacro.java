@@ -19,6 +19,7 @@
  */
 package org.xwiki.icon.macro.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.async.internal.AbstractExecutedContentMacro;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -140,6 +142,15 @@ public class DisplayIconMacro extends AbstractExecutedContentMacro<DisplayIconMa
             throw e;
         } catch (Exception e) {
             throw new MacroExecutionException("Failed parsing and executing the icon.", e);
+        }
+
+        if (parameters.getTextAlternative() != null) {
+            // We complete the icon with a text alternative for screen readers.
+            Block textAltBlock = new ParagraphBlock(List.of(new WordBlock(parameters.getTextAlternative())));
+            textAltBlock.setParameter("class", "sr-only");
+            ArrayList<Block> updatedList = new ArrayList<>(result);
+            updatedList.add(textAltBlock);
+            result = List.copyOf(updatedList);
         }
 
         return result;

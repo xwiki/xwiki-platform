@@ -209,7 +209,8 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration);
 
         databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
-        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
+        databaseContainer.addEnv("POSTGRES_INITDB_ARGS",
+            "--encoding=UTF8 --locale-provider=builtin --builtin-locale=C.UTF-8");
 
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
     }

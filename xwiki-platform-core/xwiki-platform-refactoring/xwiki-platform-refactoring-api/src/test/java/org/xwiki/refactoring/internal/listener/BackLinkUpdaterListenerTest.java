@@ -129,8 +129,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
+        verify(this.updater).update(denisReference, aliceReference, bobReference, Set.of());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
@@ -147,7 +147,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
@@ -163,7 +163,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, renameJob, renameRequest);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
@@ -189,8 +189,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
+        verify(this.updater).update(denisReference, aliceReference, bobReference, Set.of());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
@@ -205,7 +205,7 @@ class BackLinkUpdaterListenerTest
         this.listener.onEvent(documentRenamedEvent, null, null);
 
         verify(this.updater, never()).update(eq(carolReference), any(DocumentReference.class), any());
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(denisReference, aliceReference, bobReference, Set.of());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
@@ -220,8 +220,8 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
-        verify(this.updater).update(denisReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
+        verify(this.updater).update(denisReference, aliceReference, bobReference, Set.of());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
     }
@@ -252,7 +252,7 @@ class BackLinkUpdaterListenerTest
 
         this.listener.onEvent(documentDeletedEvent, null, null);
 
-        verify(this.updater).update(carolReference, aliceReference, bobReference);
+        verify(this.updater).update(carolReference, aliceReference, bobReference, Set.of());
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));

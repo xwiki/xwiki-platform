@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -189,6 +190,7 @@ class DefaultReferenceUpdaterTest
     {
         XWiki xwiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(xwiki);
+        when(xwiki.exists(any(DocumentReference.class), eq(this.xcontext))).thenReturn(true);
 
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
@@ -254,7 +256,7 @@ class DefaultReferenceUpdaterTest
         LinkBlock xobjectSpaceLinkBlock =
             new LinkBlock(Collections.emptyList(), xobjectSpaceLinkReference, false);
         ResourceReference xobjectImageReference = new AttachmentResourceReference("attachment.txt");
-        ImageBlock xobjectImageBlock = new ImageBlock(imageReference, false);
+        ImageBlock xobjectImageBlock = new ImageBlock(xobjectImageReference, false);
         setTextarea(newDocument,
             new XDOM(Arrays.asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
 
@@ -617,17 +619,18 @@ class DefaultReferenceUpdaterTest
             componentManager.registerMockComponent(MacroRefactoring.class, "include");
         MacroRefactoring displayMacroRefactoring =
             componentManager.registerMockComponent(MacroRefactoring.class, "display");
-        when(displayMacroRefactoring.replaceReference(any(), any(), any(DocumentReference.class), any(), anyBoolean()))
+        when(displayMacroRefactoring.replaceReference(any(), any(), any(DocumentReference.class), any(), anyBoolean()
+            , any()))
             .thenReturn(Optional.of(displayMacroBlock));
         when(this.documentAccessBridge.getDocumentInstance(documentReference)).thenReturn(document);
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         verify(includeMacroRefactoring).replaceReference(includeMacroBlock1, documentReference, oldLinkTarget,
-            newLinkTarget, false);
+            newLinkTarget, false, Set.of());
         verify(includeMacroRefactoring).replaceReference(includeMacroBlock2, documentReference, oldLinkTarget,
-            newLinkTarget, false);
+            newLinkTarget, false, Set.of());
         verify(displayMacroRefactoring).replaceReference(displayMacroBlock, documentReference, oldLinkTarget,
-            newLinkTarget, false);
+            newLinkTarget, false, Set.of());
         verify(this.mutableRenderingContext, times(3)).push(any(), any(), eq(Syntax.XWIKI_2_1), any(), anyBoolean(),
             any());
         verify(this.mutableRenderingContext, times(3)).pop();
@@ -711,7 +714,7 @@ class DefaultReferenceUpdaterTest
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         verify(includeMacroRefactoring).replaceReference(includeMacroBlock, documentReference, oldLinkTarget,
-            newLinkTarget, false);
+            newLinkTarget, false, Set.of());
         assertEquals("X.Y", documentLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, documentLinkBlock.getReference().getType());
         verifyDocumentSave(document, "Renamed back-links.", false, false);

@@ -41,7 +41,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -51,12 +50,15 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authentication.UserUnauthenticatedEvent;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -142,6 +144,10 @@ public class XWikiHibernateStoreTest
     @MockComponent
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
@@ -240,14 +246,17 @@ public class XWikiHibernateStoreTest
 
         Query query = mock(Query.class);
         when(session.createQuery("delete from XWikiLock as lock where lock.userName=:userName")).thenReturn(query);
-        when(xcontext.getUserReference()).thenReturn(new DocumentReference("xwiki", "XWiki", "LoggerOutter"));
-        when(xcontext.getUser()).thenReturn("XWiki.LoggerOutter");
+        UserReference userReference = mock(UserReference.class);
+        String username = "XWiki.LoggerOutter";
+        DocumentReference userDoc = new DocumentReference("xwiki", "XWiki", "LoggerOutter");
+        when(this.userReferenceSerializer.serialize(userReference)).thenReturn(userDoc);
+        when(this.compactWikiEntityReferenceSerializer.serialize(userDoc)).thenReturn(username);
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
 
         // Fire the logout event.
-        eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, xcontext);
+        eventListenerCaptor.getValue().onEvent(new UserUnauthenticatedEvent(userReference), null, xcontext);
 
-        verify(query).setParameter("userName", "XWiki.LoggerOutter");
+        verify(query).setParameter("userName", username);
         verify(query).executeUpdate();
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(true);

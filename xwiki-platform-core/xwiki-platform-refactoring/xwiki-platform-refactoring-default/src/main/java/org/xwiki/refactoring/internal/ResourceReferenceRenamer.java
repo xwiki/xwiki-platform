@@ -19,7 +19,6 @@
  */
 package org.xwiki.refactoring.internal;
 
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -87,13 +86,12 @@ public class ResourceReferenceRenamer
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative, Set<DocumentReference> movedDocuments)
+        boolean relative, Set<? extends EntityReference> movedReferences)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference, movedDocuments)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference, movedReferences)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference, movedDocuments);
+            currentDocumentReference, movedReferences);
     }
 
     /**
@@ -109,18 +107,17 @@ public class ResourceReferenceRenamer
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative, Set<DocumentReference> movedDocuments)
+        boolean relative, Set<? extends EntityReference> movedReferences)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference, movedDocuments)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference, movedReferences)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference, movedDocuments);
+            currentDocumentReference, movedReferences);
     }
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        Set<DocumentReference> movedDocuments)
+        Set<? extends EntityReference> movedDocuments)
     {
         boolean result = false;
 
@@ -189,8 +186,7 @@ public class ResourceReferenceRenamer
     }
 
     private <T extends EntityReference> boolean updateRelativeResourceReference(ResourceReference resourceReference,
-        T oldReference, T newReference, DocumentReference currentDocumentReference,
-        Set<DocumentReference> movedDocuments)
+        T oldReference, T newReference, Set<? extends EntityReference> movedReferences)
     {
         boolean result = false;
 
@@ -200,27 +196,33 @@ public class ResourceReferenceRenamer
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
 
-        DocumentReference documentReference =
-            (DocumentReference) oldLinkReference.extractReference(EntityType.DOCUMENT);
-        if (newReference.equals(documentReference)
-            || (newReference.hasParent(documentReference) && movedDocuments.contains(documentReference))) {
-            // If the link is relative to the containing document we don't modify it
+        boolean anyMatchInMovedReferences = oldLinkReference.hasParent(oldReference)
+            || movedReferences.contains(oldLinkReference)
+            // TODO: check if that oracle is good in case of holes in the hierarchy
+            || movedReferences.stream().anyMatch(oldLinkReference::hasParent);
+
+        if (anyMatchInMovedReferences) {
             return false;
         }
 
-        XWikiContext context = contextProvider.get();
         boolean docExists = false;
-        try {
-            docExists = context.getWiki().exists(documentReference, context);
-        } catch (XWikiException e) {
-            this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
-                e);
+        EntityType entityType = linkEntityReference.getType();
+        if (entityType == EntityType.DOCUMENT || entityType.getAllowedParents().contains(EntityType.DOCUMENT)) {
+            DocumentReference documentReference =
+                (DocumentReference) oldLinkReference.extractReference(EntityType.DOCUMENT);
+            XWikiContext context = contextProvider.get();
+            try {
+                docExists = context.getWiki().exists(documentReference, context);
+            } catch (XWikiException e) {
+                this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
+                    e);
+            }
+        } else {
+            docExists = true;
         }
 
         boolean shouldBeUpdated =
-            !linkEntityReference.equals(oldLinkReference)
-                && !(!resourceReference.isTyped() && movedDocuments.contains(documentReference))
-                && (docExists || movedDocuments.contains(documentReference));
+            !linkEntityReference.equals(oldLinkReference) && docExists;
 
         // If the new and old link references don`t match, then we must update the relative link.
         if (shouldBeUpdated) {
@@ -235,7 +237,7 @@ public class ResourceReferenceRenamer
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
         AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
-        Set<DocumentReference> movedDocuments)
+        Set<? extends EntityReference> movedReferences)
     {
         boolean result = false;
 

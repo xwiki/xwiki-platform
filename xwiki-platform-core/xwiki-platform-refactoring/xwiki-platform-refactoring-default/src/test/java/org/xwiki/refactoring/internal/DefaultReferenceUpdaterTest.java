@@ -190,6 +190,7 @@ class DefaultReferenceUpdaterTest
     {
         XWiki xwiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(xwiki);
+        when(xwiki.exists(any(DocumentReference.class), eq(this.xcontext))).thenReturn(true);
 
         when(this.xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.componentManagerProvider.get()).thenReturn(this.componentManager);
@@ -255,7 +256,7 @@ class DefaultReferenceUpdaterTest
         LinkBlock xobjectSpaceLinkBlock =
             new LinkBlock(Collections.emptyList(), xobjectSpaceLinkReference, false);
         ResourceReference xobjectImageReference = new AttachmentResourceReference("attachment.txt");
-        ImageBlock xobjectImageBlock = new ImageBlock(imageReference, false);
+        ImageBlock xobjectImageBlock = new ImageBlock(xobjectImageReference, false);
         setTextarea(newDocument,
             new XDOM(Arrays.asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
 

@@ -127,6 +127,8 @@ public class ResourceReferenceRenamer
         // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
             this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
+        DocumentReference documentReference =
+            (DocumentReference) linkEntityReference.extractReference(EntityType.DOCUMENT);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
@@ -144,9 +146,9 @@ public class ResourceReferenceRenamer
 
         boolean shouldBeUpdated =
             linkTargetDocumentReference.equals(oldReference)
-                && !(!resourceReference.isTyped() && movedDocuments.contains(linkEntityReference)
+                && !(!resourceReference.isTyped() && movedDocuments.contains(documentReference)
                     && movedDocuments.contains(currentDocumentReference))
-                && (docExists || movedDocuments.contains(linkEntityReference));
+                && (docExists || movedDocuments.contains(documentReference));
 
         // If the link targets the old (renamed) document reference, we must update it.
         if (shouldBeUpdated) {
@@ -194,17 +196,17 @@ public class ResourceReferenceRenamer
 
         EntityReference linkEntityReference = this.entityReferenceResolver.resolve(resourceReference, null,
             newReference);
-
-        DocumentReference documentReference =
-            (DocumentReference) linkEntityReference.extractReference(EntityType.DOCUMENT);
-        if (newReference.equals(documentReference)) {
-            // If the link is relative to the containing document we don't modify it
-            return false;
-        }
-
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
+
+        DocumentReference documentReference =
+            (DocumentReference) oldLinkReference.extractReference(EntityType.DOCUMENT);
+        if (newReference.equals(documentReference)
+            || (newReference.hasParent(documentReference) && movedDocuments.contains(documentReference))) {
+            // If the link is relative to the containing document we don't modify it
+            return false;
+        }
 
         XWikiContext context = contextProvider.get();
         boolean docExists = false;

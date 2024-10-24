@@ -889,11 +889,14 @@ require(['jquery'], function($) {
   margin-top: 0;
 }
 
-#admin-page-content label &gt; input[type="checkbox"],
-#admin-page-content label &gt; input[type="radio"] {
+#admin-page-content label &gt; input[type="checkbox"] {
   vertical-align: middle;
 }
 
+#admin-page-content label &gt; input[type="radio"] {
+  vertical-align: baseline;
+}
+                  
 #admin-page-content .usersorgroupsnames label &gt; input[type="radio"] {
   vertical-align: unset;
 }

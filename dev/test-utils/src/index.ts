@@ -24,8 +24,8 @@ import { useI18n } from "vue-i18n";
 /**
  * Wraps a component with an async setup in a suspense component and pass it
  * the provided props
- * @param component the component with an async setup to wrap in a suspense
- * @param props the props of the wrapped component
+ * @param component - the component with an async setup to wrap in a suspense
+ * @param props - the props of the wrapped component
  */
 function wrapInSuspense(
   component: ReturnType<typeof defineComponent>,
@@ -43,7 +43,7 @@ function wrapInSuspense(
 }
 
 /**
- * @param clazz the class to decorate with an injectable
+ * @param clazz - the class to decorate with an injectable
  * @since 0.11
  */
 function makeInjectable(clazz: object): object {

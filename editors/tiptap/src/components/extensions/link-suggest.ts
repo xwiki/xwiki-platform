@@ -56,9 +56,9 @@ export interface LinkSuggestionActionDescriptor {
  * Initialize a link suggest tiptap extension with the provided components.
  * TODO: This should be migrate to a component with proper injects and a method
  * retuning the tiptap extension
- * @param skinManager a skin manager component instance
- * @param container a container manager instance
- * @param linkSuggest a link suggest service instance
+ * @param skinManager - a skin manager component instance
+ * @param container - a container manager instance
+ * @param linkSuggest - a link suggest service instance
  * @since 0.8
  */
 function loadLinkSuggest(
@@ -95,8 +95,8 @@ function loadLinkSuggest(
 
 /**
  * Build a function returning an array of link suggestions from a string.
- * @param linkSuggest the link suggestion service to use
- * @param wikiConfig the wiki configuration to use
+ * @param linkSuggest - the link suggestion service to use
+ * @param wikiConfig - the wiki configuration to use
  */
 function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
   // Return an array of suggestions from a query
@@ -142,7 +142,7 @@ function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
 /**
  * Initialize a link suggestion function based on the values provided during the
  * extension initialization of the link-suggest extension
- * @param linkSuggest the link suggestion service to use
+ * @param linkSuggest - the link suggestion service to use
  */
 function getSuggestionItems(linkSuggest?: LinkSuggestService) {
   return initSuggestionsService(linkSuggest);

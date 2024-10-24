@@ -26,7 +26,7 @@ import { Link } from "./index";
 interface LinkSuggestService {
   /**
    * Returns a list of page links from a text query.
-   * @param query a textual search value (e.g., PageName)
+   * @param query - a textual search value (e.g., PageName)
    */
   getLinks(query: string): Promise<Link[]>;
 }

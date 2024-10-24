@@ -27,7 +27,7 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
 
 /**
  *
- * @param input
+ * @param input - the input string
  * @since 0.8
  */
 export function loadConfig(input: string) {

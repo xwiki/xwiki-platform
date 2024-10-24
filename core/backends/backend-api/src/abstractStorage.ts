@@ -77,10 +77,10 @@ export abstract class AbstractStorage implements Storage {
   /**
    * Save a page and its content to the give syntax.
    *
-   * @param page the page to save
-   * @param title the raw page title
-   * @param content the content of the page
-   * @param syntax the syntax of the content
+   * @param page - the page to save
+   * @param title - the raw page title
+   * @param content - the content of the page
+   * @param syntax - the syntax of the content
    *
    * @since 0.8
    */
@@ -99,8 +99,8 @@ export abstract class AbstractStorage implements Storage {
   /**
    * Delete a page.
    *
-   * @param page the page to delete
-   * @return true if the delete was successful, false with the reason otherwise
+   * @param page - the page to delete
+   * @returns true if the delete was successful, false with the reason otherwise
    *
    * @since 0.11
    */

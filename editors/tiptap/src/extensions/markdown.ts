@@ -28,10 +28,10 @@ type InternalLink = { text?: string; reference: string };
 /**
  * Takes the substring of content between start and end (and from start until the end if end is empty).
  * Add the extracted substring to the tokens if the string is not empty.
- * @param content
- * @param tokens
- * @param start
- * @param end
+ * @param content - the content to update
+ * @param tokens - the tokens to append
+ * @param start - the start index
+ * @param end - the end index
  */
 function appendIfNotEmpty(
   content: string,
@@ -48,7 +48,7 @@ function appendIfNotEmpty(
 
 /**
  * Parse a string in look for internal links. Returns a array of string or InternalLink types.
- * @param content a string to parse
+ * @param content - a string to parse
  */
 function parseStringForInternalLinks(
   content: string,
@@ -75,7 +75,7 @@ function parseStringForInternalLinks(
 
 /**
  * Returns true if at least an internal link was found, false otherwise.
- * @param internalTokens an array of tokens
+ * @param internalTokens - an array of tokens
  */
 function hasLink(internalTokens: (string | InternalLink)[]) {
   return (

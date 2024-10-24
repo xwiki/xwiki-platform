@@ -72,7 +72,7 @@ export interface CristalApp {
 
   /**
    * @deprecated use the document-api instead
-   * @param ref the reactive reference holding the reference to a page data.
+   * @param ref - the reactive reference holding the reference to a page data.
    */
   setContentRef(ref: Ref): void;
 
@@ -82,9 +82,9 @@ export interface CristalApp {
 
   /**
    * Return the requested page
-   * @param page a page identifier (e.g., a document reference for the XWiki
+   * @param page - a page identifier (e.g., a document reference for the XWiki
    *  backend, or a filename for the filesystem backend)
-   * @return the page data, or undefined if the page is not found
+   * @returns the page data, or undefined if the page is not found
    *
    * @since 0.7
    */

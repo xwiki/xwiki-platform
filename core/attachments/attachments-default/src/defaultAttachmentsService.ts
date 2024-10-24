@@ -48,8 +48,8 @@ type Actions = {
   setLoading(): void;
   /**
    * Update the attachments of the store
-   * @param attachments the list of attachments to store
-   * @param count an optional count, used for the count status if available,
+   * @param attachments - the list of attachments to store
+   * @param count - an optional count, used for the count status if available,
    *  otherwise the size of the attachment list is used
    */
   updateAttachments(

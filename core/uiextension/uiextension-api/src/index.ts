@@ -63,8 +63,8 @@ interface UIExtension {
 interface UIExtensionsManager {
   /**
    *
-   * @param name the name of the UIXP
-   * @return a list of UIExtension components, sorted by ascending order. disabled UIExtensions are excluded
+   * @param name - the name of the UIXP
+   * @returns a list of UIExtension components, sorted by ascending order. disabled UIExtensions are excluded
    */
   list(name: string): Promise<UIExtension[]>;
 }

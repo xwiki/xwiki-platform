@@ -24,7 +24,7 @@ import { addVuetifyOptions } from "./utils/vuetify";
 
 /**
  * Mount a XBtn component with the default configuration.
- * @param options additional wrapper options, overriding the default ones
+ * @param options - additional wrapper options, overriding the default ones
  */
 function mountXBtn(options: unknown): VueWrapper {
   return mount(XBtn, addVuetifyOptions(options));

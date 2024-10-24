@@ -28,23 +28,23 @@ import type { Ref } from "vue";
  */
 interface DocumentService {
   /**
-   * @return the reference to the current document, the current document changes when setCurrentDocument is called
+   * @returns the reference to the current document, the current document changes when setCurrentDocument is called
    */
   getCurrentDocument(): Ref<PageData | undefined>;
 
   /**
-   * @return a ref to the loading state. true when the page is loading, false otherwise
+   * @returns a ref to the loading state. true when the page is loading, false otherwise
    */
   isLoading(): Ref<boolean>;
 
   /**
-   * @return a ref to the error for the loading of the current document. undefined if no error happened
+   * @returns a ref to the error for the loading of the current document. undefined if no error happened
    */
   getError(): Ref<Error | undefined>;
 
   /**
    * Update the reference of the latest document.
-   * @param documentReference the current document reference
+   * @param documentReference - the current document reference
    */
   setCurrentDocument(documentReference: string): void;
 

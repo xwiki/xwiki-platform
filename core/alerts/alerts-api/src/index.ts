@@ -41,41 +41,41 @@ interface Alert {
 interface AlertsService {
   /**
    * List created and not dismissed alerts.
-   * @return the current alerts
+   * @returns the current alerts
    */
   list(): Ref<Alert[]>;
 
   /**
    * Create an "info" alert.
-   * @param message the content of the alert
-   * @param actions possible actions to include in the alert
+   * @param message - the content of the alert
+   * @param actions - possible actions to include in the alert
    */
   info(message: string, actions?: Action[]): void;
 
   /**
    * Create a "success" alert.
-   * @param message the content of the alert
-   * @param actions possible actions to include in the alert
+   * @param message - the content of the alert
+   * @param actions - possible actions to include in the alert
    */
   success(message: string, actions?: Action[]): void;
 
   /**
    * Create a "warning" alert.
-   * @param message the content of the alert
-   * @param actions possible actions to include in the alert
+   * @param message - the content of the alert
+   * @param actions - possible actions to include in the alert
    */
   warning(message: string, actions?: Action[]): void;
 
   /**
    * Create an "error" alert.
-   * @param message the content of the alert
-   * @param actions possible actions to include in the alert
+   * @param message - the content of the alert
+   * @param actions - possible actions to include in the alert
    */
   error(message: string, actions?: Action[]): void;
 
   /**
    * Dismiss an alert.
-   * @param id the id of the alert to dismiss
+   * @param id - the id of the alert to dismiss
    */
   dismiss(id: number): void;
 }

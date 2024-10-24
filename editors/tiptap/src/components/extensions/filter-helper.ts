@@ -23,8 +23,8 @@
  * The equality operation currently returns true of the query is a sub-string
  * of the provided value, without taking into account the case.
  *
- * @param query the query to apply on the provided value
- * @return a lamba taking a string and returning a true when the value matches
+ * @param query - the query to apply on the provided value
+ * @returns a lamba taking a string and returning a true when the value matches
  * the query filter, and false otherwise
  * @since 0.8
  */

@@ -234,7 +234,7 @@ export class DefaultCristalApp implements CristalApp {
 
   /**
    * Load the current page content.
-   * @param options an optional set of parameters. When a requeue key is
+   * @param options - an optional set of parameters. When a requeue key is
    * provided, it is used to determine if an asynchronous update of the page
    * content is allowed. When undefinied, default to true.
    * @since 0.8

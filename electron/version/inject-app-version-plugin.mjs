@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {getVersion} from './getVersion.mjs';
+import { getVersion } from "./getVersion.mjs";
 
 /**
  * Somehow inject app version to vite build context
- * @return {import('vite').Plugin}
+ * @returns {import('vite').Plugin}
  */
 export const injectAppVersion = () => ({
-  name: 'inject-version',
+  name: "inject-version",
   config: () => {
     // TODO: Find better way to inject app version
     process.env.VITE_APP_VERSION = getVersion();

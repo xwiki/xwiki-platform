@@ -24,7 +24,7 @@ import { resolve } from "node:path";
 
 /**
  * Reload the browser by reloading the index file.
- * @param window
+ * @param window - the window instance in which the default index page is loaded
  */
 function reloadBrowser(window: BrowserWindow) {
   window.loadFile(resolve(app.getAppPath(), "./renderer/dist/index.html"));

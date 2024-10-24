@@ -73,7 +73,7 @@ const simpleCursorInLink = computed(() => {
 /**
  * Find link at position, return the corresponding mark when found, undefined
  * otherwise.
- * @param pos the provided position (e.g., the start of end of a selection)
+ * @param pos - the provided position (e.g., the start of end of a selection)
  */
 function findLinkPosition(pos: ResolvedPos) {
   return pos.marks().find((m) => m.type.name == "link");

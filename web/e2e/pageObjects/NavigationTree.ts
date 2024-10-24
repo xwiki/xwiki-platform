@@ -6,17 +6,17 @@ import { DesignSystem } from "../DesignSystem";
  */
 export interface NavigationTreeNode {
   /**
-   * @return the text element of the node
+   * @returns the text element of the node
    */
   getText(): Locator;
 
   /**
-   * @return the href value of the node link
+   * @returns the href value of the node link
    */
   getLink(): Promise<string>;
 
   /**
-   * @return the children of the node
+   * @returns the children of the node
    */
   getChildren(): Promise<Array<NavigationTreeNode>>;
 
@@ -24,7 +24,6 @@ export interface NavigationTreeNode {
    * Expands the node's children.
    */
   expand(): Promise<void>;
-
 }
 
 /**
@@ -70,7 +69,7 @@ export class NavigationTreePageObject {
       },
       async expand() {
         await element.locator("div[part='expand-button']").nth(0).click();
-      }
+      },
     };
   }
 
@@ -91,7 +90,7 @@ export class NavigationTreePageObject {
       },
       async expand() {
         await element.locator("button").nth(0).click();
-      }
+      },
     };
   }
 

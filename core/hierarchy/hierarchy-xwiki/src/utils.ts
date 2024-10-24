@@ -23,8 +23,8 @@ import type { WikiConfig } from "@xwiki/cristal-api";
 /**
  * Returns URL to XWiki spaces rest API for a given document.
  *
- * @param wikiConfig the current wiki configuration
- * @param documentId the id of the document
+ * @param wikiConfig - the current wiki configuration
+ * @param documentId - the id of the document
  * @returns the crafted URL
  * @since 0.9
  */

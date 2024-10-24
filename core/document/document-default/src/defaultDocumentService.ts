@@ -27,8 +27,8 @@ type Actions = {
 
   /**
    * Update the page data for the provided document reference
-   * @param documentReference the reference o the document to update
-   * @param requeue true in case of offline refresh required
+   * @param documentReference - the reference o the document to update
+   * @param requeue - true in case of offline refresh required
    */
   update(documentReference: string, requeue: boolean): Promise<void>;
 };

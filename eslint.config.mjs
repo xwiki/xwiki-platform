@@ -6,6 +6,7 @@ import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
 import pluginVue from "eslint-plugin-vue";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintPluginTsdoc from "eslint-plugin-tsdoc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,14 @@ export default [
   ),
   ...pluginVue.configs["flat/recommended"],
   eslintPluginPrettierRecommended,
+  {
+    plugins: {
+      tsdoc: eslintPluginTsdoc,
+    },
+    rules: {
+      "tsdoc/syntax": "error",
+    },
+  },
   {
     plugins: {
       "@typescript-eslint": typescriptEslint,

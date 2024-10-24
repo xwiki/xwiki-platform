@@ -44,7 +44,7 @@ interface NavigationTreeSource {
    * Returns the direct child nodes for a given page id in the navigation tree.
    * If the page id is omitted, returns the root nodes instead.
    *
-   * @param id the page id
+   * @param id - the page id
    * @returns the descendants in the navigation tree
    */
   getChildNodes(id?: string): Promise<Array<NavigationTreeNode>>;
@@ -52,7 +52,7 @@ interface NavigationTreeSource {
   /**
    * Returns the ids of the parents nodes for a given page.
    *
-   * @param page the data of the page
+   * @param page - the data of the page
    * @returns the parents nodes ids
    **/
   getParentNodesId(page?: PageData): Array<string>;

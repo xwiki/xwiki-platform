@@ -23,7 +23,7 @@ import { type AuthenticationManager } from "@xwiki/cristal-authentication-api";
 /**
  * Access to user profile.
  *
- * @return the name and profile url, and an error status
+ * @returns the name and profile url, and an error status
  * @since 0.11
  */
 export async function getUserProfile(

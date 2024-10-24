@@ -29,7 +29,7 @@ const vuetify = createVuetify({
 
 /**
  * Provide the required options for testing vuetify, and merge them with existing
- * @param options the existing options to merge
+ * @param options - the existing options to merge
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function addVuetifyOptions(options: any) {

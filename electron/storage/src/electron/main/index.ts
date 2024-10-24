@@ -112,9 +112,9 @@ async function isWithin(root: string, path: string) {
  * Note: currently this is more a method to update the content of a page than
  * an actual page save.
  *
- * @param path the path of the page on the file system
- * @param content the content of the page
- * @param title the title of the page
+ * @param path - the path of the page on the file system
+ * @param content - the content of the page
+ * @param title - the title of the page
  * @since 0.8
  */
 async function savePage(
@@ -168,7 +168,7 @@ async function saveAttachment(path: string, filePath: string) {
 /**
  * Get the ids of the children pages for a given page.
  *
- * @param page the id of the page
+ * @param page - the id of the page
  * @returns a list of page ids
  * @since 0.10
  */
@@ -191,7 +191,7 @@ async function listChildren(page: string): Promise<Array<string>> {
 /**
  * Delete a page.
  *
- * @param path the path to the page to delete
+ * @param path - the path to the page to delete
  * @since 0.11
  */
 async function deletePage(path: string): Promise<void> {

@@ -42,7 +42,7 @@ interface AuthenticationManager {
   getAuthorizationHeader(): Promise<string | undefined>;
 
   /**
-   * @return true of the current user is authenticated
+   * @returns true of the current user is authenticated
    */
   isAuthenticated(): Promise<boolean>;
 

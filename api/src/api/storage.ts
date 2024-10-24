@@ -35,11 +35,11 @@ export interface Storage {
 
   /**
    *
-   * @param page the id of the request page
-   * @param syntax the syntax of the request page
-   * @param requeue optional param informing whether an asynchronous update of
+   * @param page - the id of the request page
+   * @param syntax - the syntax of the request page
+   * @param requeue - optional param informing whether an asynchronous update of
    *  the page content is allowed (default is true)
-   * @return a promise wrapping a page data, or undefined in case of page not
+   * @returns a promise wrapping a page data, or undefined in case of page not
    *  found
    *  @since 0.8
    */
@@ -50,8 +50,8 @@ export interface Storage {
   ): Promise<PageData | undefined>;
 
   /**
-   * @param page the page to get the attachments from
-   * @return a promise wrapping an array of attachments and an optional count, or undefined if the
+   * @param page - the page to get the attachments from
+   * @returns a promise wrapping an array of attachments and an optional count, or undefined if the
    *  requested page is not found
    *
    * @since 0.9
@@ -71,11 +71,11 @@ export interface Storage {
   /**
    * Update the content of a given page with the provided content.
    *
-   * @param page the page to save
-   * @param content the content of the page
-   * @param title the page title
-   * @param syntax the syntax of the page
-   * @return a promise when the save is done
+   * @param page - the page to save
+   * @param content - the content of the page
+   * @param title - the page title
+   * @param syntax - the syntax of the page
+   * @returns a promise when the save is done
    *
    * @since 0.8
    */
@@ -88,8 +88,8 @@ export interface Storage {
 
   /**
    *
-   * @param page the page where to save attachments at
-   * @param files the files to save
+   * @param page - the page where to save attachments at
+   * @param files - the files to save
    *
    * @since 0.9
    */
@@ -98,8 +98,8 @@ export interface Storage {
   /**
    * Delete a page.
    *
-   * @param page the page to delete
-   * @return true if the delete was successful, false with the reason otherwise
+   * @param page - the page to delete
+   * @returns true if the delete was successful, false with the reason otherwise
    *
    * @since 0.11
    */

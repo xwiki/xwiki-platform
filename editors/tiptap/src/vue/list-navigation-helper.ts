@@ -23,10 +23,10 @@ import { nextTick, readonly, Ref, ref, watch } from "vue";
 /**
  * Build the Vue operations to easily bind the up/down/enter events to a Vue
  * component template.
- * @param apply an apply operation trigger when a element is called on enter
- * @param length the full length of the list of displayed elements
- * @param container the container of the listed elements
- * @return an object with:
+ * @param apply - - an apply operation trigger when a element is called on enter
+ * @param length - - the full length of the list of displayed elements
+ * @param container - - the container of the listed elements
+ * @returns an object with:
  *  * up: a method to bind to the arrow up event in the template
  *  * down: a method to bind to the arrow down event in the template
  *  * enter: a method to bind to the enter event in the template

@@ -29,7 +29,7 @@ import { WikiConfig } from "@xwiki/cristal-api";
 export interface BrowserApi {
   /**
    * Change the wiki configuration of the Cristal instance
-   * @param wikiConfig the new wiki config to use
+   * @param wikiConfig - the new wiki config to use
    */
   switchLocation(wikiConfig: WikiConfig): void;
 

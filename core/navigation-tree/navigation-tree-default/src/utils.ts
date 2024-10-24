@@ -23,7 +23,7 @@ import type { PageData } from "@xwiki/cristal-api";
 /**
  * Returns the ids of the parents nodes for a path-like page id.
  *
- * @param pageData the data of the page
+ * @param pageData - the data of the page
  * @returns the parents nodes ids
  * @since 0.10
  **/

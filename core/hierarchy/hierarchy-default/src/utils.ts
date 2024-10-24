@@ -25,8 +25,8 @@ import type { PageHierarchyItem } from "@xwiki/cristal-hierarchy-api";
  * Returns the page hierarchy for a path-like page id.
  * This does not include a Home segment.
  *
- * @param pageData the data of the page
- * @param cristalApp the current app
+ * @param pageData - the data of the page
+ * @param cristalApp - the current app
  * @returns the page hierarchy
  * @since 0.10
  **/

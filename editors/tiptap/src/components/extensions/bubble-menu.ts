@@ -31,7 +31,7 @@ import CTiptapLinkEdit from "../../vue/c-tiptap-link-edit.vue";
 /**
  * Bubble menu action descriptor.
  *
- * @sincer 0.8
+ * @since 0.8
  */
 export interface BubbleMenuAction {
   title: string;

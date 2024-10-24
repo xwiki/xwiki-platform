@@ -27,7 +27,7 @@ interface MouseState {
 /**
  * Returns a reactive state that contains the current position of either
  * the mouse cursor or a touch event.
- * @return a reactive state with:
+ * @returns a reactive state with:
  *  * x: x position of mouse cursor or touch event
  *  * y: y position of mouse cursor or touch event
  *

@@ -33,7 +33,7 @@ interface InfoAction {
   /**
    * And optional refresh action. Otherwise, we assume asking for the counter
    * is enough.
-   * @param page an option page reference, otherwise the current page is used
+   * @param page - an option page reference, otherwise the current page is used
    * @since 0.10
    */
   refresh?(page?: string): Promise<void>;

@@ -95,7 +95,7 @@ interface PageActionService {
   /**
    * Returns the list of available actions for a given category.
    *
-   * @param categoryId the id of the category
+   * @param categoryId - the id of the category
    */
   list(categoryId: string): PageAction[];
 }

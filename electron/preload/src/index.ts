@@ -18,10 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * @module preload
- */
-
 export { sha256sum } from "./nodeCrypto";
 export { versions } from "./versions";
 import "@xwiki/cristal-electron-storage/preload";

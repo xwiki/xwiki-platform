@@ -6,12 +6,12 @@ import { DesignSystem } from "../DesignSystem";
  */
 export interface BreadcrumbSegmentElement {
   /**
-   * @return the text element of the segment
+   * @returns the text element of the segment
    */
   getText(): Locator;
 
   /**
-   * @return the href value of the segment link
+   * @returns the href value of the segment link
    */
   getLink(): Promise<string>;
 }

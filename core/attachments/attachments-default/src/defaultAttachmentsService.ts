@@ -151,7 +151,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
       if (attachmentData) {
         const { attachments, count } = attachmentData;
         this.store.updateAttachments(
-          attachments.map(({ id, reference, mimetype, href }) => {
+          attachments?.map(({ id, reference, mimetype, href }) => {
             return { id, name: reference, mimetype, href };
           }),
           count,

@@ -4,5 +4,8 @@
     "loggedInUserModal": {
         "title": "Konto"
     },
-    "userDescription": "Du bist eingeloggt als {0}"
+    "userDescription": "Du bist eingeloggt als {0}",
+    "userDetails": {
+        "error": "Auf das Benutzerprofil kann nicht zugegriffen werden."
+    }
 }

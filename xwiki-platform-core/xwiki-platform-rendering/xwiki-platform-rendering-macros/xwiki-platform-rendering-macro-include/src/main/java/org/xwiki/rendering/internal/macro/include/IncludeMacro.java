@@ -47,7 +47,6 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Author;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -169,9 +168,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         }
 
         // Step 5a: if the macro is in an inline context, try converting the included content to inline.
-        if (context.isInline()) {
-            result = (XDOM) (new ParserUtils()).convertToInline(result, true);
-        }
+        maybeConvertToInline(result, context);
 
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved

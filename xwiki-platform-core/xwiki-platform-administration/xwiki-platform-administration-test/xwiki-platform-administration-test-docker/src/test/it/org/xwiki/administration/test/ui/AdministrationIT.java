@@ -24,6 +24,7 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 
@@ -43,12 +44,12 @@ class AdministrationIT
      * Validate presence of default sections for Administration UIs (Global, Page).
      */
     @Test
-    void verifyAdministrationSections(TestUtils setup)
+    void verifyAdministrationSections(TestUtils setup, TestReference testReference)
     {
         setup.loginAsSuperAdmin();
 
-        // Navigate to a (non existent for test performance reasons) page in view mode.
-        setup.gotoPage("NonExistentSpace", "NonExistentPage");
+        // Navigate to a page in view mode.
+        setup.createPage(testReference, "");
 
         // Verify that pages have an Admin menu and navigate to the wiki admin UI (which happens to be the global
         // admin UI too since we're on the main wiki).
@@ -71,11 +72,11 @@ class AdministrationIT
         assertTrue(wikiAdministrationPage.hasNotSection("PageRights"));
 
         // Select XWiki page administration.
-        setup.gotoPage("NonExistentSpace", "WebHome");
+        setup.gotoPage(testReference);
         page = new AdministrablePage();
         AdministrationPage pageAdministrationPage = page.clickAdministerPage();
 
-        assertEquals("Page Administration: NonExistentSpace", pageAdministrationPage.getDocumentTitle());
+        assertEquals("Page Administration: AdministrationIT.verifyAdministrationSections", pageAdministrationPage.getDocumentTitle());
         assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
         assertTrue(pageAdministrationPage.hasSection("Themes"));

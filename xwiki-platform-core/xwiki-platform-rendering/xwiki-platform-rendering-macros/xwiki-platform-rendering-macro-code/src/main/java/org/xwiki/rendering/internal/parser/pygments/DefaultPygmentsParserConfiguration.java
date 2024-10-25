@@ -41,10 +41,10 @@ public class DefaultPygmentsParserConfiguration implements PygmentsParserConfigu
     private static final String PREFIX = "rendering.macro.code.pygments.";
 
     /**
-     * Default style name to use.
+     * Default value of style provided to code.py
      * @since 16.10.0RC1
      */
-    private static final String DEFAULT_STYLE = "xwiki";
+    private static final String DEFAULT_STYLE = "default";
 
     /**
      * Defines from where to read the Pygments configuration data.

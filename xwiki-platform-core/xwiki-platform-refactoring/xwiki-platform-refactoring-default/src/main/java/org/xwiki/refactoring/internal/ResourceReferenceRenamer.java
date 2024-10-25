@@ -82,6 +82,8 @@ public class ResourceReferenceRenamer
      * @param newReference the new document reference target
      * @param currentDocumentReference the current document where the resource reference is located
      * @param relative {@code true} if the reference should be kept relative to the current document
+     * @param movedReferences the list of references that have been moved in the same job: this list contains the old
+     * references before the move.
      * @return {@code true} if the resource reference has been updated
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
@@ -94,6 +96,19 @@ public class ResourceReferenceRenamer
             currentDocumentReference, movedReferences);
     }
 
+    private boolean checkIfDocExists(DocumentReference documentReference)
+    {
+        XWikiContext context = contextProvider.get();
+        boolean docExists = false;
+        try {
+            docExists = context.getWiki().exists(documentReference, context);
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
+                e);
+        }
+        return docExists;
+    }
+
     /**
      * Update the given document reference so that if it targets the old attachment reference, the new attachment
      * reference is used instead.
@@ -103,6 +118,8 @@ public class ResourceReferenceRenamer
      * @param newReference the new attachment reference target
      * @param currentDocumentReference the current document where the resource reference is located
      * @param relative {@code true} if the reference should be kept relative to the current document
+     * @param movedReferences the list of references that have been moved in the same job: this list contains the old
+     * references before the move.
      * @return {@code true} if the attachment reference has been updated
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
@@ -124,30 +141,18 @@ public class ResourceReferenceRenamer
         // FIXME: the root cause of XWIKI-18634 is related to this call.
         EntityReference linkEntityReference =
             this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference);
-        DocumentReference documentReference =
-            (DocumentReference) linkEntityReference.extractReference(EntityType.DOCUMENT);
 
         DocumentReference linkTargetDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
 
-        XWikiContext context = contextProvider.get();
-        boolean docExists = false;
-        try {
-            docExists = context.getWiki().exists(linkTargetDocumentReference, context);
-        } catch (XWikiException e) {
-            this.logger.error("Error while checking if [{}] exists for link refactoring.", linkTargetDocumentReference,
-                e);
-        }
+        // If the link targets the old (renamed) document reference we must update it,
+        // except if the target link document is also part of the moved documents, in which case the hierarchy is moved.
+        boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
+            // FIXME: this oracle is not good, it currently works with test mostly by luck
+            && !movedDocuments.contains(currentDocumentReference);
 
-        boolean shouldBeUpdated =
-            linkTargetDocumentReference.equals(oldReference)
-                && !(!resourceReference.isTyped() && movedDocuments.contains(documentReference)
-                    && movedDocuments.contains(currentDocumentReference))
-                && (docExists || movedDocuments.contains(documentReference));
-
-        // If the link targets the old (renamed) document reference, we must update it.
         if (shouldBeUpdated) {
             // If the link was resolved to a space...
             if (EntityType.SPACE.equals(linkEntityReference.getType())) {
@@ -210,13 +215,7 @@ public class ResourceReferenceRenamer
         if (entityType == EntityType.DOCUMENT || entityType.getAllowedParents().contains(EntityType.DOCUMENT)) {
             DocumentReference documentReference =
                 (DocumentReference) oldLinkReference.extractReference(EntityType.DOCUMENT);
-            XWikiContext context = contextProvider.get();
-            try {
-                docExists = context.getWiki().exists(documentReference, context);
-            } catch (XWikiException e) {
-                this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
-                    e);
-            }
+            docExists = checkIfDocExists(documentReference);
         } else {
             docExists = true;
         }

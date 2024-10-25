@@ -28,6 +28,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component dedicated to perform refactoring of existing macros.
@@ -54,9 +55,36 @@ public interface MacroRefactoring
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
      */
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        throws MacroRefactoringException;
+
+    /**
+     * Replace the given source reference by the given entity reference in the macro block. The method returns an
+     * optional containing a modified macro block if it needs to be updated, else it returns an empty optional.
+     * Depending on the macro implementation, this method might lead to parsing the macro content for finding the
+     * reference, or might just modify the macro parameters.
+     *
+     * @param macroBlock the macro block in which to replace the reference.
+     * @param currentDocumentReference the reference of the document in which the block is located
+     * @param sourceReference the reference to replace.
+     * @param targetReference the reference to use as replacement.
+     * @param relative if {@code true} indicate that the reference should be resolved relatively to the current
+     *     document
+     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
+     *                         old references before the rename
+     * @return an optional containing the new macro block with proper information if it needs to be updated, else an
+     *     empty optional.
+     * @throws MacroRefactoringException in case of problem to parse or render the macro content.
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
         Set<DocumentReference> updatedDocuments)
-        throws MacroRefactoringException;
+        throws MacroRefactoringException
+    {
+        return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+    }
 
     /**
      * Replace the given source reference by the given entity reference in the macro block. The method returns an
@@ -75,9 +103,36 @@ public interface MacroRefactoring
      * @since 14.2RC1
      */
     Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        throws MacroRefactoringException;
+
+    /**
+     * Replace the given source reference by the given entity reference in the macro block. The method returns an
+     * optional containing a modified macro block if it needs to be updated, else it returns an empty optional.
+     * Depending on the macro implementation, this method might lead to parsing the macro content for finding the
+     * reference, or might just modify the macro parameters.
+     *
+     * @param macroBlock the macro block in which to replace the reference.
+     * @param currentDocumentReference the reference of the document in which the block is located
+     * @param sourceReference the reference to replace.
+     * @param targetReference the reference to use as replacement
+     * @param relative if {@code true} indicate that the reference should be resolved relatively to the current
+     *     document
+     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
+     *                         old references before the rename
+     * @return an optional containing the new macro block with proper information if it needs to be updated, else an
+     *     empty optional.
+     * @throws MacroRefactoringException in case of problem to parse or render the macro content.
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
         Set<DocumentReference> updatedDocuments)
-        throws MacroRefactoringException;
+        throws MacroRefactoringException
+    {
+        return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
+    }
 
     /**
      * Extract references used in the macro so that they can be used for example for creating backlinks.

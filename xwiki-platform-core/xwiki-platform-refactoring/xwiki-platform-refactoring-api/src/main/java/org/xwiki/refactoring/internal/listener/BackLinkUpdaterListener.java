@@ -45,8 +45,6 @@ import org.xwiki.refactoring.internal.job.AbstractEntityJobWithChecks;
 import org.xwiki.refactoring.internal.job.DeleteJob;
 import org.xwiki.refactoring.internal.job.MoveJob;
 import org.xwiki.refactoring.job.DeleteRequest;
-import org.xwiki.refactoring.job.EntityJobStatus;
-import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;

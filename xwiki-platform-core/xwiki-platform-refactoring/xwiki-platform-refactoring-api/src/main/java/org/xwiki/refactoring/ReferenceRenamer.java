@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Allow to replace references during rename/move refactoring operations.
@@ -46,7 +47,28 @@ public interface ReferenceRenamer
      * @return {@code true} if the given {@link Block} was modified
      */
     boolean renameReferences(Block block, DocumentReference currentDocumentReference, DocumentReference oldTarget,
-        DocumentReference newTarget, boolean relative, Set<DocumentReference> updatedDocuments);
+        DocumentReference newTarget, boolean relative);
+
+    /**
+     * Change references of the given block so that the references pointing to the old target points to the new target.
+     *
+     * @param block the {@link Block} to modify
+     * @param currentDocumentReference the current document reference
+     * @param oldTarget the previous reference of the renamed entity (attachment or document)
+     * @param newTarget the new reference of the renamed entity (attachment or document)
+     * @param relative {@code true} if the link should be serialized relatively to the current document
+     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
+     *                          old references before the rename
+     * @return {@code true} if the given {@link Block} was modified
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        DocumentReference oldTarget,
+        DocumentReference newTarget, boolean relative, Set<DocumentReference> updatedDocuments)
+    {
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative);
+    }
 
     /**
      * Change references of the given block so that the references pointing to the old target points to the new target.
@@ -60,10 +82,30 @@ public interface ReferenceRenamer
      * @since 14.2RC1
      */
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+    {
+        return false;
+    }
+
+    /**
+     * Change references of the given block so that the references pointing to the old target points to the new target.
+     *
+     * @param block the {@link Block} to modify
+     * @param currentDocumentReference the current document reference
+     * @param oldTarget the previous reference of the renamed entity (attachment or document)
+     * @param newTarget the new reference of the renamed entity (attachment or document)
+     * @param relative {@code true} if the link should be serialized relatively to the current document
+     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
+     *     old references before the rename
+     * @return {@code true} if the given {@link Block} was modified
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
         Set<DocumentReference> updatedDocuments)
     {
-        return false;
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative);
     }
 
 }

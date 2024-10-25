@@ -75,8 +75,9 @@ class AdministrationIT
         setup.gotoPage(testReference);
         page = new AdministrablePage();
         AdministrationPage pageAdministrationPage = page.clickAdministerPage();
-
-        assertEquals("Page Administration: AdministrationIT.verifyAdministrationSections", pageAdministrationPage.getDocumentTitle());
+        String fullName = setup.serializeReference(testReference.getParent()).split(":")[1];
+        assertEquals("Page Administration: " + fullName, 
+            pageAdministrationPage.getDocumentTitle());
         assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
         assertTrue(pageAdministrationPage.hasSection("Themes"));

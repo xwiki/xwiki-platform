@@ -8,7 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --no-fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "vue": "2.7.16"
+    "vue": "3.0.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "1.10.2",

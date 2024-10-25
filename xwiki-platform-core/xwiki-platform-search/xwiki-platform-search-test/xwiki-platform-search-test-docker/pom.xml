@@ -83,6 +83,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- We use the Groovy macro for testing purposes. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

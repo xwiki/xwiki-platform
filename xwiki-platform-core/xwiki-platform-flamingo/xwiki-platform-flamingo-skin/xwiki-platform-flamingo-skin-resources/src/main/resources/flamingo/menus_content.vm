@@ -27,7 +27,9 @@
 ## copy menu action. Checking if the user (or guest) doesn't have edit
 ## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
 ## only check for view permissions.
-#set ($canCopy = $canView)
+## When the wiki server is in readonly mode, edit permissions are OFF everywhere. We can safely assume that the copy
+## action is not allowed.
+#set ($canCopy = $canView && !$xwiki.isReadOnly())
 
 #set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
 #set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))

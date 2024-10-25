@@ -34,4 +34,9 @@ class AllIT
     class NestedSolrSearchIT extends SolrSearchIT
     {
     }
+
+    @Nested
+    class NestedSolrIndexerIT extends SolrIndexerIT
+    {
+    }
 }

@@ -169,6 +169,24 @@ public class DefaultMacroRefactoring implements MacroRefactoring
             sourceReference, targetReference, relative, updatedDocuments));
     }
 
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        DocumentReference sourceReference, DocumentReference targetReference, boolean relative)
+        throws MacroRefactoringException
+    {
+        return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            Set.of(sourceReference));
+    }
+
+    @Override
+    public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
+        AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative)
+        throws MacroRefactoringException
+    {
+        return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
+            Set.of());
+    }
+
     private Optional<MacroBlock> innerReplaceReference(MacroBlock macroBlock, Predicate<Block> lambda)
         throws MacroRefactoringException
     {

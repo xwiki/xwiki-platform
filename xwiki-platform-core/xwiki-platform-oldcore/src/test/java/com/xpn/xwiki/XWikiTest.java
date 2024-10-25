@@ -1094,7 +1094,7 @@ class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference, Set.of());
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
             targetReference, false, Set.of());
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,

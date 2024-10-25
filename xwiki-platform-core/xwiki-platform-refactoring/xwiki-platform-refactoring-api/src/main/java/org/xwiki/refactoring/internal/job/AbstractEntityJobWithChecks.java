@@ -21,7 +21,6 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -169,6 +168,10 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         return entitySelection;
     }
 
+    /**
+     * @return the list of references that have been selected to be refactored.
+     * @since 16.10.0RC1
+     */
     public Set<EntityReference> getSelectedEntities()
     {
         return this.concernedEntities.values().stream()

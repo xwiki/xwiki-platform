@@ -39,6 +39,7 @@ public interface ReferenceUpdater
      * @param oldTargetReference the previous reference of the renamed entity
      * @param newTargetReference the new reference of the renamed entity
      * @param updatedEntities the set of entities that might have been updated.
+     * @since 16.10.0RC1
      */
     default void update(DocumentReference documentReference, EntityReference oldTargetReference,
         EntityReference newTargetReference, Set<DocumentReference> updatedEntities)
@@ -46,6 +47,11 @@ public interface ReferenceUpdater
         update(documentReference, oldTargetReference, newTargetReference);
     }
 
+    /**
+     * @param documentReference the reference of the document in which to update the references
+     * @param oldTargetReference the previous reference of the renamed entity
+     * @param newTargetReference the new reference of the renamed entity
+     */
     void update(DocumentReference documentReference, EntityReference oldTargetReference,
         EntityReference newTargetReference);
 }

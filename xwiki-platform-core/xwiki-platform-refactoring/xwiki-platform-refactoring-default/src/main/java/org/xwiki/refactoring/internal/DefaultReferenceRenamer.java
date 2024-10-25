@@ -127,6 +127,13 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+    {
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative, Set.of(oldTarget));
+    }
+
+    @Override
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
         Set<DocumentReference> updatedDocuments)
     {
@@ -136,6 +143,13 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
                 currentDocumentReference, oldTarget, newTarget, relative, updatedDocuments),
             reference -> this.resourceReferenceRenamer.updateResourceReference(reference,
                 oldTarget, newTarget, currentDocumentReference, relative, updatedDocuments));
+    }
+
+    @Override
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
+    {
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative, Set.of());
     }
 
     private boolean innerRenameReferences(Block block, DocumentReference currentDocumentReference,

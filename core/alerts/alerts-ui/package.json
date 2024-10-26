@@ -25,7 +25,7 @@
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12"
   },
   "devDependencies": {

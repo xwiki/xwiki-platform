@@ -53,7 +53,7 @@
     "@types/node": "22.8.7",
     "@vitejs/plugin-vue": "5.1.4",
     "globals": "15.11.0",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vite-plugin-comlink": "5.0.1",
     "vite-plugin-dts": "4.2.4",
     "vite-plugin-inspect": "0.8.7",

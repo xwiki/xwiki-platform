@@ -36,7 +36,7 @@
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "comlink": "4.4.1",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12",
     "vue-router": "4.4.5"
   },

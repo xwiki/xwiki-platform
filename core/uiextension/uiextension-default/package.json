@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "lodash": "4.17.21"
   },
   "devDependencies": {

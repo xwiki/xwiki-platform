@@ -40,7 +40,7 @@
     "@xwiki/cristal-page-actions-ui": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-uiextension-ui": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "marked": "14.1.2",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.12",

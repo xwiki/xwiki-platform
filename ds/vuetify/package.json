@@ -29,7 +29,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12",
     "vue-i18n": "10.0.4",
     "vuetify": "3.7.2"

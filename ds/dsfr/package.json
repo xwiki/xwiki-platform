@@ -29,7 +29,7 @@
     "@gouvfr/dsfr": "1.11.2",
     "@gouvminint/vue-dsfr": "5.11.0",
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12"
   },
   "devDependencies": {

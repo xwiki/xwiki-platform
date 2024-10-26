@@ -24,7 +24,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "inversify": "6.0.2"
+    "inversify": "6.0.3"
   },
   "publishConfig": {
     "exports": {

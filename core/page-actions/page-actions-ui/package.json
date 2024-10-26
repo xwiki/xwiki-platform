@@ -27,7 +27,7 @@
     "@xwiki/cristal-hierarchy-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-page-actions-api": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12",
     "vue-i18n": "10.0.4"
   },

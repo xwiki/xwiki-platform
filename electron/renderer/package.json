@@ -37,7 +37,7 @@
     "@xwiki/cristal-navigation-tree-github": "workspace:*",
     "@xwiki/cristal-navigation-tree-nextcloud": "workspace:*",
     "@xwiki/cristal-navigation-tree-xwiki": "workspace:*",
-    "inversify": "6.0.2",
+    "inversify": "6.0.3",
     "vue": "3.5.12"
   },
   "devDependencies": {

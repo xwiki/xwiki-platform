@@ -864,8 +864,8 @@ importers:
   ds/shoelace:
     dependencies:
       '@shoelace-style/shoelace':
-        specifier: 2.17.1
-        version: 2.17.1(@types/react@18.2.52)
+        specifier: 2.18.0
+        version: 2.18.0(@types/react@18.2.52)
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
@@ -2782,8 +2782,8 @@ packages:
   '@shoelace-style/localize@3.1.2':
     resolution: {integrity: sha512-Hf45HeO+vdQblabpyZOTxJ4ZeZsmIUYXXPmoYrrR4OJ5OKxL+bhMz5mK8JXgl7HsoEowfz7+e248UGi861de9Q==}
 
-  '@shoelace-style/shoelace@2.17.1':
-    resolution: {integrity: sha512-fB9+bPHLg5zVwPbBKEqY3ghyttkJq9RuUzFMTZKweKrNKKDMUACtI8DlMYUqNwpdZMJhf7a0xeak6vFVBSxcbQ==}
+  '@shoelace-style/shoelace@2.18.0':
+    resolution: {integrity: sha512-uzpL0+8Qm8aE2ArcXBcKHkaPc6l7ymuVaN6xJM0yd2o3talcoXpuP+gRBsgggSZKuuJEa+JkEuLDdzzFnE/+jw==}
     engines: {node: '>=14.17.0'}
 
   '@sinclair/typebox@0.27.8':
@@ -7518,7 +7518,7 @@ snapshots:
 
   '@shoelace-style/localize@3.1.2': {}
 
-  '@shoelace-style/shoelace@2.17.1(@types/react@18.2.52)':
+  '@shoelace-style/shoelace@2.18.0(@types/react@18.2.52)':
     dependencies:
       '@ctrl/tinycolor': 4.0.3
       '@floating-ui/dom': 1.6.1

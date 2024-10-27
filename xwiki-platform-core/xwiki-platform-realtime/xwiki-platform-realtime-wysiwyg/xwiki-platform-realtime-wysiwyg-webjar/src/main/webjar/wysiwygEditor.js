@@ -133,9 +133,24 @@ define('xwiki-realtime-wysiwyg', [
         setTimeout(this._onUnlock.bind(this), 0);
       });
 
+      // Flush the uncommitted work back to the server on actions that might cause the editor to be destroyed without
+      // the beforeDestroy event being called.
+      const flushUncommittedWork = () => {
+        if (this._connection.status === ConnectionStatus.CONNECTED) {
+          this._connection.chainpad.sync();
+        }
+      };
+      const form = document.getElementById(RealtimeEditor._getFormId());
+      $(form).on('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
       // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
       this._editor.onBeforeDestroy(() => {
+        // Flush the uncommitted work back to the server. There is no guarantee that the work is actually committed but
+        // at least we try.
+        flushUncommittedWork();
+        $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+
         // Notify the others that we're not editing anymore.
         this._realtimeContext.destroy();
         this._onAbort();

@@ -1768,7 +1768,8 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys("irst ");
+        firstTextArea.sendKeys("irst end");
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT));
         // Drop the file without waiting for the upload to finish because we want to simulate two users dropping files
         // at the same time.
         firstTextArea.dropFile("/realtimeWysiwygEditor.webm", false);
@@ -1802,7 +1803,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        firstTextArea.sendKeys(Keys.RIGHT, " yellow");
+        firstTextArea.sendKeys(Keys.RIGHT, " yellow ");
 
         //
         // Second Tab
@@ -1815,9 +1816,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         // Verify the result.
         secondEditor.getToolBar().toggleSourceMode();
         assertEquals(
-            "first [[attach:realtimeWysiwygEditor.webm||target=\"_blank\"]]"
-                + " red\u00A0[[image:ckeditor-source.png]] yellow\n\n"
-                + "second [[attach:source-button.mp4||target=\"_blank\"]]"
+            "first [[attach:realtimeWysiwygEditor.webm||target=\"_blank\"]]"
+                + " red [[image:ckeditor-source.png]] yellow end\n\n"
+                + "second\u00A0[[attach:source-button.mp4||target=\"_blank\"]]"
                 + " blue\u00A0[[image:realtimeWysiwygEditor.png]] green",
             secondEditor.getSourceTextArea().getAttribute("value"));
     }

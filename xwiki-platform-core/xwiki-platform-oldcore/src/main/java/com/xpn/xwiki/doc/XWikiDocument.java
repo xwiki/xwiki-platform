@@ -59,6 +59,7 @@ import java.util.zip.ZipOutputStream;
 import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -3267,7 +3268,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         object.setOwnerDocument(this);
 
-        List<BaseObject> vobj = this.xObjects.get(object.getXClassReference());
+        BaseObjects vobj = this.xObjects.get(object.getXClassReference());
         if (vobj == null) {
             setXObject(0, object);
         } else {
@@ -3296,15 +3297,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             object.setNumber(nb);
         }
 
-        BaseObjects objects = this.xObjects.get(classReference);
-        if (objects == null) {
-            objects = new BaseObjects();
-            this.xObjects.put(classReference, objects);
-        }
-        while (nb >= objects.size()) {
-            objects.add(null);
-        }
-        objects.set(nb, object);
+        BaseObjects objects = this.xObjects.computeIfAbsent(classReference, k -> new BaseObjects());
+        objects.put(nb, object);
+
         setMetaDataDirty(true);
     }
 
@@ -3322,15 +3317,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         object.setOwnerDocument(this);
         object.setNumber(nb);
 
-        BaseObjects objects = this.xObjects.get(object.getXClassReference());
-        if (objects == null) {
-            objects = new BaseObjects();
-            this.xObjects.put(object.getXClassReference(), objects);
-        }
-        while (nb >= objects.size()) {
-            objects.add(null);
-        }
-        objects.set(nb, object);
+        BaseObjects objects = this.xObjects.computeIfAbsent(object.getXClassReference(), k -> new BaseObjects());
+        objects.put(nb, object);
+
         setMetaDataDirty(true);
     }
 
@@ -3434,31 +3423,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Copy specified document objects into current document.
      *
-     * @param templatedoc the document to copy
-     * @param keepsIdentity if true it does an exact java copy, otherwise it duplicate objects with the new document
-     *            name (and new class names)
+     * @param templateDocument the document to copy
+     * @param keepsIdentity if true it does an exact copy (same guid), otherwise it create a new object with the same
+     *            values
      */
-    private void cloneXObjects(XWikiDocument templatedoc, boolean keepsIdentity)
+    private void cloneXObjects(XWikiDocument templateDocument, boolean keepsIdentity)
     {
         // clean map
         this.xObjects.clear();
 
         // fill map
-        for (Map.Entry<DocumentReference, List<BaseObject>> entry : templatedoc.getXObjects().entrySet()) {
-            List<BaseObject> tobjects = entry.getValue();
+        for (Map.Entry<DocumentReference, BaseObjects> entry : templateDocument.xObjects.entrySet()) {
+            BaseObjects tobjects = entry.getValue();
 
-            // clone and insert xobjects
-            for (BaseObject otherObject : tobjects) {
-                if (otherObject != null) {
-                    if (keepsIdentity) {
-                        addXObject(otherObject.clone());
-                    } else {
-                        BaseObject newObject = otherObject.duplicate(getDocumentReference());
-                        setXObject(newObject.getNumber(), newObject);
+            if (CollectionUtils.isNotEmpty(tobjects)) {
+                BaseObjects objects = new BaseObjects(this, tobjects, keepsIdentity);
+
+                if (!objects.isEmpty()) {
+                    DocumentReference xclassReference = entry.getKey();
+                    WikiReference wikiReference = getDocumentReference().getWikiReference();
+                    if (!wikiReference.equals(xclassReference.getWikiReference())) {
+                        // Make sure the class reference is in the same wiki as the document in which the object is
+                        // stored
+                        xclassReference = xclassReference.setWikiReference(wikiReference);
                     }
-                } else if (keepsIdentity) {
-                    // set null object to make sure to have exactly the same thing when cloning a document
-                    addXObject(entry.getKey(), null);
+
+                    this.xObjects.put(xclassReference, objects);
                 }
             }
         }
@@ -4593,13 +4583,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             if (keepsIdentity) {
                 doc.setXClassXML(getXClassXML());
-                doc.cloneXObjects(this);
                 doc.cloneAttachments(this);
             } else {
                 doc.getXClass().setCustomMapping(null);
-                doc.duplicateXObjects(this);
                 doc.copyAttachments(this);
             }
+            doc.cloneXObjects(this, keepsIdentity);
 
             doc.setContentDirty(isContentDirty());
             doc.setMetaDataDirty(isMetaDataDirty());

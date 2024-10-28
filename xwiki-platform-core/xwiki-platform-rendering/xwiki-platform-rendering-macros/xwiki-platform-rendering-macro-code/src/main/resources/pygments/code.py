@@ -40,7 +40,7 @@ else:
 if pygmentLexer:
   pygmentStyle = None
   if style:
-    if style == "xwiki":
+    if style == "default":
       pygmentStyle = XWikiStyle
     else:
       try:

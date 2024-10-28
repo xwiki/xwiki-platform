@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>16.9.0</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons

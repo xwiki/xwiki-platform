@@ -134,7 +134,7 @@ public class ResourceReferenceRenamer
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        Set<? extends EntityReference> movedDocuments)
+        Set<? extends EntityReference> movedReferences)
     {
         boolean result = false;
 
@@ -146,12 +146,14 @@ public class ResourceReferenceRenamer
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
+        // TODO: test in subwiki
+        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
-        // If the link targets the old (renamed) document reference we must update it,
-        // except if the target link document is also part of the moved documents, in which case the hierarchy is moved.
-        boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
-            // FIXME: this oracle is not good, it currently works with test mostly by luck
-            && !movedDocuments.contains(currentDocumentReference);
+        // If the link targets the old (renamed) document reference and it's an absolute reference
+        // (i.e. its resolution without any given parameter gives same result than its resolution with the
+        // currentDocument) then we must update it
+        boolean shouldBeUpdated =
+            linkTargetDocumentReference.equals(oldReference) && absoluteResolvedReference.equals(linkEntityReference);
 
         if (shouldBeUpdated) {
             // If the link was resolved to a space...
@@ -200,15 +202,7 @@ public class ResourceReferenceRenamer
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
-
-        boolean anyMatchInMovedReferences = oldLinkReference.hasParent(oldReference)
-            || movedReferences.contains(oldLinkReference)
-            // TODO: check if that oracle is good in case of holes in the hierarchy
-            || movedReferences.stream().anyMatch(oldLinkReference::hasParent);
-
-        if (anyMatchInMovedReferences) {
-            return false;
-        }
+        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
         boolean docExists = false;
         EntityType entityType = linkEntityReference.getType();
@@ -220,10 +214,23 @@ public class ResourceReferenceRenamer
             docExists = true;
         }
 
-        boolean shouldBeUpdated =
-            !linkEntityReference.equals(oldLinkReference) && docExists;
+        boolean anyMatchInMovedReferences =
+            (oldLinkReference.hasParent(oldReference)
+                || movedReferences.contains(oldLinkReference)
+                // TODO: check if that oracle is good in case of holes in the hierarchy
+                || movedReferences.stream().anyMatch(oldLinkReference::hasParent));
 
-        // If the new and old link references don`t match, then we must update the relative link.
+        // We should update the reference if:
+        //  - it's relative: the resolution of the reference without any parameter, and the resolution of the reference
+        //                   with the new reference should give different results
+        //  - it doesn't match any reference moved in the same job, i.e. in the same hierarchy
+        //  - the new and old link references don`t match
+        //  - the link refers to a doc that exists
+        boolean shouldBeUpdated = !absoluteResolvedReference.equals(linkEntityReference)
+            && !anyMatchInMovedReferences
+            && !linkEntityReference.equals(oldLinkReference)
+            && docExists;
+
         if (shouldBeUpdated) {
             // Serialize the old (original) link relative to the new document's location, in compact form.
             String serializedLinkReference =

@@ -92,8 +92,9 @@ pnpm run test
 ## Run Functional Tests with [Playwright](https://playwright.dev/)
 
 ```sh
-## Make sure to have the system dependencies and browsers up to date. By filtering on the web module we make sure the
-## version of playwright that gets installed is the one specified in package.json
+## Make sure to have the system dependencies and browsers up to date. By filtering
+## on the web module we make sure the version of playwright that gets installed is
+## the one specified in package.json
 pnpm --filter ./web exec playwright install --with-deps
 
 ## Run the tests from the web module.

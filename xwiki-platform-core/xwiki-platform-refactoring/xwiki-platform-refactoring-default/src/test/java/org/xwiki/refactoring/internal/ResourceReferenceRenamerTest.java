@@ -99,6 +99,7 @@ class ResourceReferenceRenamerTest
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
         when(this.compactEntityReferenceSerializer.serialize(oldReference, newReference)).thenReturn("file2.txt");
@@ -119,8 +120,12 @@ class ResourceReferenceRenamerTest
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
+        AttachmentReference absoluteReference =
+            new AttachmentReference("image.png", new DocumentReference("xwiki", "Main", "WebHome"));
         DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Space", "Page");
 
+        when(this.entityReferenceResolver.resolve(resourceReference, null))
+            .thenReturn(absoluteReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
             .thenReturn(oldReference);
         when(this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference))

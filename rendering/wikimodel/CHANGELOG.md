@@ -1,5 +1,11 @@
 # @xwiki/cristal-rendering-wikimodel
 
+## 0.11.0
+
+### Minor Changes
+
+- d54422d: Cristal 0.11 Release
+
 ## 0.10.0
 
 ### Minor Changes

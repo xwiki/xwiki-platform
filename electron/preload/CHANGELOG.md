@@ -1,5 +1,16 @@
 # @xwiki/cristal-electron-preload
 
+## 0.11.0
+
+### Minor Changes
+
+- d54422d: Cristal 0.11 Release
+
+### Patch Changes
+
+- Updated dependencies [d54422d]
+  - @xwiki/cristal-electron-authentication-xwiki-preload@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes

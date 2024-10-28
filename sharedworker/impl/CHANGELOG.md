@@ -1,5 +1,24 @@
 # @xwiki/cristal-sharedworker-impl
 
+## 0.11.0
+
+### Minor Changes
+
+- d54422d: Cristal 0.11 Release
+
+### Patch Changes
+
+- Updated dependencies [d54422d]
+  - @xwiki/cristal-api@0.11.0
+  - @xwiki/cristal-authentication-api@0.11.0
+  - @xwiki/cristal-backend-dexie@0.11.0
+  - @xwiki/cristal-backend-github@0.11.0
+  - @xwiki/cristal-backend-nextcloud@0.11.0
+  - @xwiki/cristal-backend-xwiki@0.11.0
+  - @xwiki/cristal-document-api@0.11.0
+  - @xwiki/cristal-extension-manager@0.11.0
+  - @xwiki/cristal-sharedworker-api@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @xwiki/cristal-info-actions-default
 
+## 0.11.0
+
+### Minor Changes
+
+- d54422d: Cristal 0.11 Release
+
+### Patch Changes
+
+- Updated dependencies [d54422d]
+  - @xwiki/cristal-info-actions-api@0.11.0
+
 ## 0.10.0
 
 ### Minor Changes

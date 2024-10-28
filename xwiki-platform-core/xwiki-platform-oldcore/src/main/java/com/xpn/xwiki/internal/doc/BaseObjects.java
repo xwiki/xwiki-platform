@@ -139,6 +139,9 @@ public class BaseObjects extends AbstractList<BaseObject>
      * @param index the index of the object in the list
      * @param object the object
      * @return the object previously at the specified position
+     * @since 16.10.0RC1
+     * @since 16.4.5
+     * @since 15.10.14
      */
     public BaseObject put(int index, BaseObject object)
     {

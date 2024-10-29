@@ -66,7 +66,7 @@
 <input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$escapetool.xml($shortcut)"#end value="$value"/>
 #end
 #**
- * Returns the escaped value of the shortcut. This value can be set in two ways: via user preferences and wiki level translation
+ * Returns the unescaped value of the shortcut as a String. This value can be set in two ways: via user preferences and wiki level translation
  * keys. If there are both, the user preference will take priority.
  * @param translationKey  The key of the translation containing the wiki level defined shortcut.
  *        e.g. `core.shortcuts.developer.user.type`

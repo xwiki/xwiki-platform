@@ -804,8 +804,8 @@ importers:
   core/uiextension/uiextension-ui:
     dependencies:
       '@xwiki/cristal-api':
-        specifier: 0.10.0
-        version: 0.10.0(typescript@5.6.3)
+        specifier: workspace:*
+        version: link:../../../api
       '@xwiki/cristal-uiextension-api':
         specifier: workspace:*
         version: link:../uiextension-api
@@ -1063,8 +1063,8 @@ importers:
         specifier: 31.7.1
         version: 31.7.1
       electron-builder:
-        specifier: 25.1.7
-        version: 25.1.7(electron-builder-squirrel-windows@24.13.3)
+        specifier: 25.1.8
+        version: 25.1.8(electron-builder-squirrel-windows@24.13.3)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-main:
     dependencies:
@@ -3251,26 +3251,14 @@ packages:
   '@volar/typescript@2.4.5':
     resolution: {integrity: sha512-mcT1mHvLljAEtHviVcBuOyAwwMKz1ibXTi5uYtP/pf4XxoAzpdkQ+Br2IC0NPCvLCbjPZmbf3I0udndkfB1CDg==}
 
-  '@vue/compiler-core@3.4.31':
-    resolution: {integrity: sha512-skOiodXWTV3DxfDhB4rOf3OGalpITLlgCeOwb+Y9GJpfQ8ErigdBUHomBzvG78JoVE8MJoQsb+qhZiHfKeNeEg==}
-
   '@vue/compiler-core@3.5.12':
     resolution: {integrity: sha512-ISyBTRMmMYagUxhcpyEH0hpXRd/KqDU4ymofPgl2XAkY9ZhQ+h0ovEZJIiPop13UmR/54oA2cgMDjgroRelaEw==}
-
-  '@vue/compiler-dom@3.4.31':
-    resolution: {integrity: sha512-wK424WMXsG1IGMyDGyLqB+TbmEBFM78hIsOJ9QwUVLGrcSk0ak6zYty7Pj8ftm7nEtdU/DGQxAXp0/lM/2cEpQ==}
 
   '@vue/compiler-dom@3.5.12':
     resolution: {integrity: sha512-9G6PbJ03uwxLHKQ3P42cMTi85lDRvGLB2rSGOiQqtXELat6uI4n8cNz9yjfVHRPIu+MsK6TE418Giruvgptckg==}
 
-  '@vue/compiler-sfc@3.4.31':
-    resolution: {integrity: sha512-einJxqEw8IIJxzmnxmJBuK2usI+lJonl53foq+9etB2HAzlPjAS/wa7r0uUpXw5ByX3/0uswVSrjNb17vJm1kQ==}
-
   '@vue/compiler-sfc@3.5.12':
     resolution: {integrity: sha512-2k973OGo2JuAa5+ZlekuQJtitI5CgLMOwgl94BzMCsKZCX/xiqzJYzapl4opFogKHqwJk34vfsaKpfEhd1k5nw==}
-
-  '@vue/compiler-ssr@3.4.31':
-    resolution: {integrity: sha512-RtefmITAje3fJ8FSg1gwgDhdKhZVntIVbwupdyZDSifZTRMiWxWehAOTCc8/KZDnBOcYQ4/9VWxsTbd3wT0hAA==}
 
   '@vue/compiler-ssr@3.5.12':
     resolution: {integrity: sha512-eLwc7v6bfGBSM7wZOGPmRavSWzNFF6+PdRhE+VFJhNCgHiF8AM7ccoqcv5kBXA2eWUfigD7byekvf/JsOfKvPA==}
@@ -3289,36 +3277,19 @@ packages:
       typescript:
         optional: true
 
-  '@vue/reactivity@3.4.31':
-    resolution: {integrity: sha512-VGkTani8SOoVkZNds1PfJ/T1SlAIOf8E58PGAhIOUDYPC4GAmFA2u/E14TDAFcf3vVDKunc4QqCe/SHr8xC65Q==}
-
   '@vue/reactivity@3.5.12':
     resolution: {integrity: sha512-UzaN3Da7xnJXdz4Okb/BGbAaomRHc3RdoWqTzlvd9+WBR5m3J39J1fGcHes7U3za0ruYn/iYy/a1euhMEHvTAg==}
-
-  '@vue/runtime-core@3.4.31':
-    resolution: {integrity: sha512-LDkztxeUPazxG/p8c5JDDKPfkCDBkkiNLVNf7XZIUnJ+66GVGkP+TIh34+8LtPisZ+HMWl2zqhIw0xN5MwU1cw==}
 
   '@vue/runtime-core@3.5.12':
     resolution: {integrity: sha512-hrMUYV6tpocr3TL3Ad8DqxOdpDe4zuQY4HPY3X/VRh+L2myQO8MFXPAMarIOSGNu0bFAjh1yBkMPXZBqCk62Uw==}
 
-  '@vue/runtime-dom@3.4.31':
-    resolution: {integrity: sha512-2Auws3mB7+lHhTFCg8E9ZWopA6Q6L455EcU7bzcQ4x6Dn4cCPuqj6S2oBZgN2a8vJRS/LSYYxwFFq2Hlx3Fsaw==}
-
   '@vue/runtime-dom@3.5.12':
     resolution: {integrity: sha512-q8VFxR9A2MRfBr6/55Q3umyoN7ya836FzRXajPB6/Vvuv0zOPL+qltd9rIMzG/DbRLAIlREmnLsplEF/kotXKA==}
-
-  '@vue/server-renderer@3.4.31':
-    resolution: {integrity: sha512-D5BLbdvrlR9PE3by9GaUp1gQXlCNadIZytMIb8H2h3FMWJd4oUfkUTEH2wAr3qxoRz25uxbTcbqd3WKlm9EHQA==}
-    peerDependencies:
-      vue: 3.4.31
 
   '@vue/server-renderer@3.5.12':
     resolution: {integrity: sha512-I3QoeDDeEPZm8yR28JtY+rk880Oqmj43hreIBVTicisFTx/Dl7JpG72g/X7YF8hnQD3IFhkky5i2bPonwrTVPg==}
     peerDependencies:
       vue: 3.5.12
-
-  '@vue/shared@3.4.31':
-    resolution: {integrity: sha512-Yp3wtJk//8cO4NItOPpi3QkLExAr/aLBGZMmTtW9WpdwBCJpRM6zj9WgWktXAl8IDIozwNMByT45JP3tO3ACWA==}
 
   '@vue/shared@3.5.12':
     resolution: {integrity: sha512-L2RPSAwUFbgZH20etwrXyVyCBu9OxRSi8T/38QsvnkJyvq2LufW2lDCOzm7t/U9C1mkhJGWYfCuFBCmIuNivrg==}
@@ -3335,9 +3306,6 @@ packages:
   '@xmldom/xmldom@0.8.10':
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
     engines: {node: '>=10.0.0'}
-
-  '@xwiki/cristal-api@0.10.0':
-    resolution: {integrity: sha512-SJoHZnDZZ7qJ4jsb8ur3segwyAcSUwpSJiYDKZ+jtoZuNDE5tRTHVqseJVrO5t33eqsJ0tDpqLNOLObXoHc1nQ==}
 
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
@@ -3479,12 +3447,12 @@ packages:
       dmg-builder: 24.13.3
       electron-builder-squirrel-windows: 24.13.3
 
-  app-builder-lib@25.1.7:
-    resolution: {integrity: sha512-JxmN+D/Dn7BLQoN+cTFO+zbMHcpI10v/xjyjFO1FKpHbApOG+OQt/xUyVjKWp4FYplIfuHdpxqTXo1PN/Wzm/A==}
+  app-builder-lib@25.1.8:
+    resolution: {integrity: sha512-pCqe7dfsQFBABC1jeKZXQWhGcCPF3rPCXDdfqVKjIeWBcXzyC1iOWZdfFhGl+S9MyE/k//DFmC6FzuGAUudNDg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      dmg-builder: 25.1.7
-      electron-builder-squirrel-windows: 25.1.7
+      dmg-builder: 25.1.8
+      electron-builder-squirrel-windows: 25.1.8
 
   aproba@2.0.0:
     resolution: {integrity: sha512-lYe4Gx7QT+MKGbDsA+Z+he/Wtef0BiwDOlK/XkBrdfsh9J/jPPXbX0tE9x9cl27Tmu5gg3QUbUrQYa/y+KOHPQ==}
@@ -3983,8 +3951,8 @@ packages:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
 
-  dmg-builder@25.1.7:
-    resolution: {integrity: sha512-Hac0AfXQrAV62JT99Had6bvUJb/f7vjJTaLOsmA/gAQcrc/cLmNAqCJ0ZZDqwKy2+LKXnxx45TvMXvovKd4iMg==}
+  dmg-builder@25.1.8:
+    resolution: {integrity: sha512-NoXo6Liy2heSklTI5OIZbCgXC1RzrDQsZkeEwXhdOro3FT1VBOvbubvscdPnjVuQ4AMwwv61oaH96AbiYg9EnQ==}
 
   dmg-license@1.0.11:
     resolution: {integrity: sha512-ZdzmqwKmECOWJpqefloC5OJy1+WZBBse5+MR88z9g9Zn4VY+WYUkAyojmhzJckH5YbbZGcYIuGAkY5/Ys5OM2Q==}
@@ -4033,8 +4001,8 @@ packages:
   electron-builder-squirrel-windows@24.13.3:
     resolution: {integrity: sha512-oHkV0iogWfyK+ah9ZIvMDpei1m9ZRpdXcvde1wTpra2U8AFDNNpqJdnin5z+PM1GbQ5BoaKCWas2HSjtR0HwMg==}
 
-  electron-builder@25.1.7:
-    resolution: {integrity: sha512-lsKtX93GSHWnmuteNRvBzgJIjRiiYB0qrJVRjShwBi75Ns+mRdWeOGZiXItqOWj+3g5UyY722kgoq2WlqCB87A==}
+  electron-builder@25.1.8:
+    resolution: {integrity: sha512-poRgAtUHHOnlzZnc9PK4nzG53xh74wj2Jy7jkTrqZ0MWPoHGh1M2+C//hGeYdA+4K8w4yiVCNYoLXF7ySj2Wig==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -6315,11 +6283,6 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  vue-router@4.4.0:
-    resolution: {integrity: sha512-HB+t2p611aIZraV2aPSRNXf0Z/oLZFrlygJm+sZbdJaW6lcFqEDQwnzUBXn+DApw+/QzDU/I9TeWx9izEjTmsA==}
-    peerDependencies:
-      vue: ^3.2.0
-
   vue-router@4.4.5:
     resolution: {integrity: sha512-4fKZygS8cH1yCyuabAXGUAsyi1b2/o/OKgu/RUb+znIYOxPRxdkytJEx+0wGcpBE1pX6vUgh5jwWOKRGvuA/7Q==}
     peerDependencies:
@@ -6330,14 +6293,6 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
-
-  vue@3.4.31:
-    resolution: {integrity: sha512-njqRrOy7W3YLAlVqSKpBebtZpDVg21FPoaq1I7f/+qqBThK9ChAIjkRWgeP6Eat+8C+iia4P3OYqpATP21BCoQ==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   vue@3.5.12:
     resolution: {integrity: sha512-CLVZtXtn2ItBIi/zHZ0Sg1Xkb7+PU32bJJ8Bmy7ts3jxXTcbfsEfBivFYYWz1Hur+lalqGAh65Coin0r+HRUfg==}
@@ -8059,14 +8014,6 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
-  '@vue/compiler-core@3.4.31':
-    dependencies:
-      '@babel/parser': 7.25.7
-      '@vue/shared': 3.4.31
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
-
   '@vue/compiler-core@3.5.12':
     dependencies:
       '@babel/parser': 7.25.7
@@ -8075,27 +8022,10 @@ snapshots:
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
-  '@vue/compiler-dom@3.4.31':
-    dependencies:
-      '@vue/compiler-core': 3.4.31
-      '@vue/shared': 3.4.31
-
   '@vue/compiler-dom@3.5.12':
     dependencies:
       '@vue/compiler-core': 3.5.12
       '@vue/shared': 3.5.12
-
-  '@vue/compiler-sfc@3.4.31':
-    dependencies:
-      '@babel/parser': 7.25.7
-      '@vue/compiler-core': 3.4.31
-      '@vue/compiler-dom': 3.4.31
-      '@vue/compiler-ssr': 3.4.31
-      '@vue/shared': 3.4.31
-      estree-walker: 2.0.2
-      magic-string: 0.30.11
-      postcss: 8.4.47
-      source-map-js: 1.2.1
 
   '@vue/compiler-sfc@3.5.12':
     dependencies:
@@ -8108,11 +8038,6 @@ snapshots:
       magic-string: 0.30.11
       postcss: 8.4.47
       source-map-js: 1.2.1
-
-  '@vue/compiler-ssr@3.4.31':
-    dependencies:
-      '@vue/compiler-dom': 3.4.31
-      '@vue/shared': 3.4.31
 
   '@vue/compiler-ssr@3.5.12':
     dependencies:
@@ -8139,30 +8064,14 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.3
 
-  '@vue/reactivity@3.4.31':
-    dependencies:
-      '@vue/shared': 3.4.31
-
   '@vue/reactivity@3.5.12':
     dependencies:
       '@vue/shared': 3.5.12
-
-  '@vue/runtime-core@3.4.31':
-    dependencies:
-      '@vue/reactivity': 3.4.31
-      '@vue/shared': 3.4.31
 
   '@vue/runtime-core@3.5.12':
     dependencies:
       '@vue/reactivity': 3.5.12
       '@vue/shared': 3.5.12
-
-  '@vue/runtime-dom@3.4.31':
-    dependencies:
-      '@vue/reactivity': 3.4.31
-      '@vue/runtime-core': 3.4.31
-      '@vue/shared': 3.4.31
-      csstype: 3.1.3
 
   '@vue/runtime-dom@3.5.12':
     dependencies:
@@ -8171,19 +8080,11 @@ snapshots:
       '@vue/shared': 3.5.12
       csstype: 3.1.3
 
-  '@vue/server-renderer@3.4.31(vue@3.4.31(typescript@5.6.3))':
-    dependencies:
-      '@vue/compiler-ssr': 3.4.31
-      '@vue/shared': 3.4.31
-      vue: 3.4.31(typescript@5.6.3)
-
   '@vue/server-renderer@3.5.12(vue@3.5.12(typescript@5.6.3))':
     dependencies:
       '@vue/compiler-ssr': 3.5.12
       '@vue/shared': 3.5.12
       vue: 3.5.12(typescript@5.6.3)
-
-  '@vue/shared@3.4.31': {}
 
   '@vue/shared@3.5.12': {}
 
@@ -8199,14 +8100,6 @@ snapshots:
       vuetify: 3.7.2(typescript@5.6.3)(vite-plugin-vuetify@2.0.4)(vue@3.5.12(typescript@5.6.3))
 
   '@xmldom/xmldom@0.8.10': {}
-
-  '@xwiki/cristal-api@0.10.0(typescript@5.6.3)':
-    dependencies:
-      inversify: 6.0.2
-      vue: 3.4.31(typescript@5.6.3)
-      vue-router: 4.4.0(vue@3.4.31(typescript@5.6.3))
-    transitivePeerDependencies:
-      - typescript
 
   '@yarnpkg/lockfile@1.1.0': {}
 
@@ -8336,7 +8229,7 @@ snapshots:
 
   app-builder-bin@5.0.0-alpha.10: {}
 
-  app-builder-lib@24.13.3(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3):
+  app-builder-lib@24.13.3(dmg-builder@25.1.8)(electron-builder-squirrel-windows@24.13.3):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.2.1
@@ -8350,9 +8243,9 @@ snapshots:
       builder-util-runtime: 9.2.4
       chromium-pickle-js: 0.2.0
       debug: 4.3.7
-      dmg-builder: 25.1.7(electron-builder-squirrel-windows@24.13.3)
+      dmg-builder: 25.1.8(electron-builder-squirrel-windows@24.13.3)
       ejs: 3.1.9
-      electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.1.7)
+      electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.1.8)
       electron-publish: 24.13.1
       form-data: 4.0.0
       fs-extra: 10.1.0
@@ -8370,7 +8263,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  app-builder-lib@25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3):
+  app-builder-lib@25.1.8(dmg-builder@25.1.8)(electron-builder-squirrel-windows@24.13.3):
     dependencies:
       '@develar/schema-utils': 2.6.5
       '@electron/notarize': 2.5.0
@@ -8386,11 +8279,11 @@ snapshots:
       chromium-pickle-js: 0.2.0
       config-file-ts: 0.2.8-rc1
       debug: 4.3.7
-      dmg-builder: 25.1.7(electron-builder-squirrel-windows@24.13.3)
+      dmg-builder: 25.1.8(electron-builder-squirrel-windows@24.13.3)
       dotenv: 16.4.5
       dotenv-expand: 11.0.6
       ejs: 3.1.9
-      electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.1.7)
+      electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.1.8)
       electron-publish: 25.1.7
       form-data: 4.0.0
       fs-extra: 10.1.0
@@ -8403,7 +8296,7 @@ snapshots:
       minimatch: 10.0.1
       resedit: 1.7.1
       sanitize-filename: 1.6.3
-      semver: 7.6.0
+      semver: 7.6.3
       tar: 6.2.0
       temp-file: 3.4.0
     transitivePeerDependencies:
@@ -8967,9 +8860,9 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  dmg-builder@25.1.7(electron-builder-squirrel-windows@24.13.3):
+  dmg-builder@25.1.8(electron-builder-squirrel-windows@24.13.3):
     dependencies:
-      app-builder-lib: 25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 25.1.8(dmg-builder@25.1.8)(electron-builder-squirrel-windows@24.13.3)
       builder-util: 25.1.7
       builder-util-runtime: 9.2.10
       fs-extra: 10.1.0
@@ -9025,9 +8918,9 @@ snapshots:
     dependencies:
       jake: 10.8.7
 
-  electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.7):
+  electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.8):
     dependencies:
-      app-builder-lib: 24.13.3(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 24.13.3(dmg-builder@25.1.8)(electron-builder-squirrel-windows@24.13.3)
       archiver: 5.3.2
       builder-util: 24.13.1
       fs-extra: 10.1.0
@@ -9035,13 +8928,13 @@ snapshots:
       - dmg-builder
       - supports-color
 
-  electron-builder@25.1.7(electron-builder-squirrel-windows@24.13.3):
+  electron-builder@25.1.8(electron-builder-squirrel-windows@24.13.3):
     dependencies:
-      app-builder-lib: 25.1.7(dmg-builder@25.1.7)(electron-builder-squirrel-windows@24.13.3)
+      app-builder-lib: 25.1.8(dmg-builder@25.1.8)(electron-builder-squirrel-windows@24.13.3)
       builder-util: 25.1.7
       builder-util-runtime: 9.2.10
       chalk: 4.1.2
-      dmg-builder: 25.1.7(electron-builder-squirrel-windows@24.13.3)
+      dmg-builder: 25.1.8(electron-builder-squirrel-windows@24.13.3)
       fs-extra: 10.1.0
       is-ci: 3.0.1
       lazy-val: 1.0.5
@@ -11038,7 +10931,7 @@ snapshots:
 
   simple-update-notifier@2.0.0:
     dependencies:
-      semver: 7.6.0
+      semver: 7.6.3
 
   sirv@2.0.4:
     dependencies:
@@ -11560,11 +11453,6 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.12(typescript@5.6.3)
 
-  vue-router@4.4.0(vue@3.4.31(typescript@5.6.3)):
-    dependencies:
-      '@vue/devtools-api': 6.6.4
-      vue: 3.4.31(typescript@5.6.3)
-
   vue-router@4.4.5(vue@3.5.12(typescript@5.6.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
@@ -11575,16 +11463,6 @@ snapshots:
       '@volar/typescript': 2.4.5
       '@vue/language-core': 2.1.6(typescript@5.6.3)
       semver: 7.6.3
-      typescript: 5.6.3
-
-  vue@3.4.31(typescript@5.6.3):
-    dependencies:
-      '@vue/compiler-dom': 3.4.31
-      '@vue/compiler-sfc': 3.4.31
-      '@vue/runtime-dom': 3.4.31
-      '@vue/server-renderer': 3.4.31(vue@3.4.31(typescript@5.6.3))
-      '@vue/shared': 3.4.31
-    optionalDependencies:
       typescript: 5.6.3
 
   vue@3.5.12(typescript@5.6.3):

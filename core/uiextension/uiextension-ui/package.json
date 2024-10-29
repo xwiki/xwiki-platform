@@ -23,7 +23,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "0.11.0",
+    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "vue": "3.5.12"
   },

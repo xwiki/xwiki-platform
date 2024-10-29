@@ -32,6 +32,6 @@
   "devDependencies": {
     "cross-env": "7.0.3",
     "electron": "31.7.1",
-    "electron-builder": "25.1.7"
+    "electron-builder": "25.1.8"
   }
 }

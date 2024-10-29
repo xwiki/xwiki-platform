@@ -20,39 +20,43 @@
 package org.xwiki.refactoring.internal.job;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
-import org.xwiki.job.GroupedJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.model.EntityType;
+import org.xwiki.job.event.status.QuestionAskedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.event.EntitiesRenamedEvent;
 import org.xwiki.refactoring.event.EntitiesRenamingEvent;
-import org.xwiki.refactoring.internal.job.AbstractEntityJob.Visitor;
+import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
+import org.xwiki.refactoring.job.OverwriteQuestion;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.question.EntitySelection;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,83 +66,93 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ComponentTest
 public class MoveJobTest extends AbstractMoveJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(MoveJob.class);
+    @InjectMockComponents
+    private MoveJob moveJob;
+
+    @MockComponent
+    private ObservationManager observationManager;
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
+        return moveJob;
     }
 
     @Test
-    public void moveInsideItsOwnHierarchy() throws Throwable
+    void moveInsideItsOwnHierarchy() throws Throwable
     {
         SpaceReference spaceReference =
             new SpaceReference("Entity", new SpaceReference("Model", new WikiReference("code")));
 
         run(createRequest(spaceReference.getParent(), spaceReference));
-        verify(this.mocker.getMockedLogger()).error("Cannot make [{}] a descendant of itself.",
-            spaceReference.getParent());
+        assertEquals("Cannot make [Space code:Model] a descendant of itself.", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveToTheSameLocation() throws Throwable
+    void moveToTheSameLocation() throws Throwable
     {
         SpaceReference spaceReference =
             new SpaceReference("Entity", new SpaceReference("Model", new WikiReference("code")));
 
         run(createRequest(spaceReference, spaceReference.getParent()));
-        verify(this.mocker.getMockedLogger()).error("Cannot move [{}] into [{}], it's already there.", spaceReference,
-            spaceReference.getParent());
+        assertEquals("Cannot move [Space code:Model.Entity] into [Space code:Model], it's already there.",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveUnsupportedEntity() throws Throwable
+    void moveUnsupportedEntity() throws Throwable
     {
         run(createRequest(new WikiReference("from"), new WikiReference("to")));
-        verify(this.mocker.getMockedLogger()).error("Unsupported source entity type [{}].", EntityType.WIKI);
+        assertEquals("Unsupported entity type [WIKI].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
+
+        assertEquals("Unsupported source entity type [WIKI].", getLogCapture().getMessage(1));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveToUnsupportedDestination() throws Throwable
+    void moveToUnsupportedDestination() throws Throwable
     {
         run(createRequest(new DocumentReference("wiki", "Space", "Page"), new WikiReference("test")));
-        verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
-            EntityType.WIKI);
+        assertEquals("Unsupported destination entity type [WIKI] for a document.", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         run(createRequest(new DocumentReference("wiki", "Space", "Page"), new DocumentReference("test", "A", "B")));
-        verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
-            EntityType.DOCUMENT);
+        assertEquals("Unsupported destination entity type [DOCUMENT] for a document.", getLogCapture().getMessage(1));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         run(createRequest(new SpaceReference("Space", new WikiReference("wiki")),
             new DocumentReference("test", "A", "B")));
-        verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a space.",
-            EntityType.DOCUMENT);
+        assertEquals("Unsupported destination entity type [DOCUMENT] for a space.", getLogCapture().getMessage(2));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveMissingDocument() throws Throwable
+    void moveMissingDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("foo", "A", "Page");
         run(createRequest(sourceReference, new SpaceReference("B", new WikiReference("bar"))));
-        verify(this.mocker.getMockedLogger()).warn("Skipping [{}] because it doesn't exist.", sourceReference);
+        assertEquals("Skipping [foo:A.Page] because it doesn't exist.", getLogCapture().getMessage(0));
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentWithoutDeleteRight() throws Throwable
+    void moveDocumentWithoutDeleteRight() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -156,13 +170,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
+        assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentWithoutDeleteRightAuthor() throws Throwable
+    void moveDocumentWithoutDeleteRightAuthor() throws Throwable
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(documentReference)).thenReturn(true);
@@ -180,13 +195,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger()).error("You are not allowed to delete [{}].", documentReference);
+        assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentToRestrictedDestination() throws Throwable
+    void moveDocumentToRestrictedDestination() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -209,14 +225,15 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger())
-            .error("You don't have sufficient permissions over the destination document [{}].", newReference);
+        assertEquals("You don't have sufficient permissions over the destination document [wiki:Two.Page].",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentToRestrictedDestinationAuthor() throws Throwable
+    void moveDocumentToRestrictedDestinationAuthor() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -239,14 +256,15 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger())
-            .error("You don't have sufficient permissions over the destination document [{}].", newReference);
+        assertEquals("You don't have sufficient permissions over the destination document [wiki:Two.Page].",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
 
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentFromRestrictedSource() throws Throwable
+    void moveDocumentFromRestrictedSource() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -269,14 +287,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger())
-            .error("You don't have sufficient permissions over the source document [{}].", oldReference);
-
+        assertEquals("You don't have sufficient permissions over the source document [wiki:One.Page].",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentFromRestrictedSourceAuthor() throws Throwable
+    void moveDocumentFromRestrictedSourceAuthor() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
@@ -299,14 +317,14 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setAuthorReference(authorReference);
         run(request);
 
-        verify(this.mocker.getMockedLogger())
-            .error("You don't have sufficient permissions over the source document [{}].", oldReference);
-
+        assertEquals("You don't have sufficient permissions over the source document [wiki:One.Page].",
+            getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
         verifyNoMove();
     }
 
     @Test
-    public void moveDocumentToSpace() throws Throwable
+    void moveDocumentToSpace() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
@@ -336,7 +354,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void cancelEntitiesRenamingEvent() throws Throwable
+    void cancelEntitiesRenamingEvent() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);
@@ -367,7 +385,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void cancelDocumentRenamingEvent() throws Throwable
+    void cancelDocumentRenamingEvent() throws Throwable
     {
         SpaceReference sourceReference = new SpaceReference("wiki", "Source");
         DocumentReference oldAliceReference = new DocumentReference("Alice", sourceReference);
@@ -375,7 +393,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference oldBobReference = new DocumentReference("Bob", sourceReference);
         when(this.modelBridge.exists(oldBobReference)).thenReturn(true);
         when(this.modelBridge.getDocumentReferences(sourceReference))
-            .thenReturn(Arrays.asList(oldAliceReference, oldBobReference));
+            .thenReturn(List.of(oldAliceReference, oldBobReference));
 
         SpaceReference destinationReference = new SpaceReference("wiki", "Destination");
         DocumentReference newAliceReference =
@@ -417,7 +435,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveDocumentToSpaceHome() throws Throwable
+    void moveDocumentToSpaceHome() throws Throwable
     {
         DocumentReference source = new DocumentReference("wiki", "A", "B");
         when(this.modelBridge.exists(source)).thenReturn(true);
@@ -434,12 +452,12 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void moveSpaceHomeDeep() throws Throwable
+    void moveSpaceHomeDeep() throws Throwable
     {
-        DocumentReference spaceHome = new DocumentReference("chess", Arrays.asList("A", "B", "C"), "WebHome");
+        DocumentReference spaceHome = new DocumentReference("chess", List.of("A", "B", "C"), "WebHome");
         DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
         when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
-            .thenReturn(Arrays.asList(docFromSpace));
+            .thenReturn(List.of(docFromSpace));
         when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
 
         WikiReference newWiki = new WikiReference("tennis");
@@ -453,15 +471,15 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.modelBridge).rename(docFromSpace, new DocumentReference("tennis", "C", "X"));
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
-            eq(Collections.singletonMap(docFromSpace, new EntitySelection(docFromSpace))));
+            eq(Map.of(docFromSpace, new EntitySelection(docFromSpace))));
     }
 
     @Test
-    public void moveSpaceToSpaceHome() throws Throwable
+    void moveSpaceToSpaceHome() throws Throwable
     {
         SpaceReference sourceSpace = new SpaceReference("wiki", "A", "B");
         DocumentReference sourceDoc = new DocumentReference("X", sourceSpace);
-        when(this.modelBridge.getDocumentReferences(sourceSpace)).thenReturn(Arrays.asList(sourceDoc));
+        when(this.modelBridge.getDocumentReferences(sourceSpace)).thenReturn(List.of(sourceDoc));
         when(this.modelBridge.exists(sourceDoc)).thenReturn(true);
 
         DocumentReference destination = new DocumentReference("wiki", "C", "WebHome");
@@ -471,30 +489,28 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setCheckAuthorRights(false);
         run(request);
 
-        verify(this.modelBridge).rename(sourceDoc, new DocumentReference("wiki", Arrays.asList("C", "B"), "X"));
+        verify(this.modelBridge).rename(sourceDoc, new DocumentReference("wiki", List.of("C", "B"), "X"));
     }
 
     @Test
-    public void getGroupPath() throws Exception
+    void getGroupPath()
     {
-        DocumentReference alice = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
-        DocumentReference bob = new DocumentReference("chess", Arrays.asList("A", "B"), "D");
-        DocumentReference carol = new DocumentReference("chess", Arrays.asList("A", "E"), "F");
+        DocumentReference alice = new DocumentReference("chess", List.of("A", "B"), "C");
+        DocumentReference bob = new DocumentReference("chess", List.of("A", "B"), "D");
+        DocumentReference carol = new DocumentReference("chess", List.of("A", "E"), "F");
 
         MoveRequest request = new MoveRequest();
-        request.setEntityReferences(Arrays.asList(alice, bob));
+        request.setEntityReferences(List.of(alice, bob));
         request.setDestination(carol);
+        this.moveJob.initialize(request);
 
-        GroupedJob job = (GroupedJob) getMocker().getComponentUnderTest();
-        job.initialize(request);
-
-        assertEquals(new JobGroupPath(Arrays.asList(RefactoringJobs.GROUP, "chess", "A")), job.getGroupPath());
+        assertEquals(new JobGroupPath(List.of(RefactoringJobs.GROUP, "chess", "A")), this.moveJob.getGroupPath());
     }
 
     @Test
-    public void cancelMove() throws Throwable
+    void cancelMove() throws Throwable
     {
-        DocumentReference sourceReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Source");
+        DocumentReference sourceReference = new DocumentReference("wiki", List.of("Path", "To"), "Source");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
         DocumentReference destinationReference = new DocumentReference("wiki", "Destination", "WebHome");
         MoveRequest request = createRequest(sourceReference, destinationReference);
@@ -512,18 +528,16 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void checkEntitySelection() throws Throwable
+    void checkEntitySelection() throws Throwable
     {
-        DocumentReference sourceReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Source");
+        DocumentReference sourceReference = new DocumentReference("wiki", List.of("Path", "To"), "Source");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
         DocumentReference destinationReference = new DocumentReference("wiki", "Destination", "WebHome");
         MoveRequest request = createRequest(sourceReference, destinationReference);
         request.setCheckRights(false);
 
         doAnswer((Answer<Void>) invocation -> {
-            @SuppressWarnings("unchecked")
-            Map<EntityReference, EntitySelection> concernedEntities =
-                (Map<EntityReference, EntitySelection>) invocation.getArgument(2);
+            Map<EntityReference, EntitySelection> concernedEntities = invocation.getArgument(2);
             concernedEntities.get(sourceReference).setSelected(false);
             return null;
         }).when(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class), any(Map.class));
@@ -534,7 +548,7 @@ public class MoveJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void visitDocuments() throws Exception
+    void visitDocuments() throws Exception
     {
         SpaceReference sourceReference = new SpaceReference("wiki", "Path", "To", "Space");
         SpaceReference destinationReference = new SpaceReference("wiki", "Other", "Space");
@@ -546,21 +560,48 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference five = new DocumentReference("AAA", sourceReference);
         DocumentReference six = new DocumentReference("WebHome", sourceReference);
         when(this.modelBridge.getDocumentReferences(sourceReference))
-            .thenReturn(Arrays.asList(one, two, three, four, five, six));
-
-        MoveJob job = ((MoveJob) getMocker().getComponentUnderTest());
-        job.initialize(createRequest(sourceReference, destinationReference));
+            .thenReturn(List.of(one, two, three, four, five, six));
+        this.moveJob.initialize(createRequest(sourceReference, destinationReference));
 
         List<DocumentReference> visitedPages = new ArrayList<>();
-        job.visitDocuments(sourceReference, new Visitor<DocumentReference>()
-        {
-            @Override
-            public void visit(DocumentReference node)
-            {
-                visitedPages.add(node);
-            }
-        });
+        this.moveJob.visitDocuments(sourceReference, visitedPages::add);
 
-        assertEquals(Arrays.asList(five, six, two, one, three, four), visitedPages);
+        assertEquals(List.of(five, six, two, one, three, four), visitedPages);
+    }
+
+    @Test
+    void confirmOverwrite() throws Throwable
+    {
+        DocumentReference oldReference = new DocumentReference("wiki", "One", "Page");
+        DocumentReference spaceHomReference = new DocumentReference("wiki", "Two", "WebHome");
+        DocumentReference newReference = new DocumentReference("wiki", "Two", "Page");
+        MoveRequest request = createRequest(oldReference, spaceHomReference);
+        request.setInteractive(true);
+        request.setCheckRights(false);
+
+        when(this.modelBridge.exists(oldReference)).thenReturn(true);
+        when(this.modelBridge.exists(newReference)).thenReturn(true);
+        when(this.modelBridge.canOverwriteSilently(newReference)).thenReturn(false);
+
+        doAnswer(invocationOnMock -> {
+            QuestionAskedEvent questionAskedEvent = invocationOnMock.getArgument(0);
+            assertEquals("org.xwiki.refactoring.job.OverwriteQuestion", questionAskedEvent.getQuestionType());
+            questionAskedEvent.answered();
+            return null;
+        }).when(this.observationManager).notify(any(QuestionAskedEvent.class), any());
+
+        try (MockedConstruction<OverwriteQuestion> ignored = mockConstruction(OverwriteQuestion.class,
+            (mock, context) -> {
+                when(mock.isOverwrite()).thenReturn(false);
+            })) {
+            this.moveJob.initialize(request);
+            EntityJobStatus<MoveRequest> status = this.moveJob.getStatus();
+
+            run(request);
+        }
+        verifyNoMove();
+        assertEquals("Skipping [wiki:One.Page] because [wiki:Two.Page] already exists and the user doesn't want to "
+            + "overwrite it.", getLogCapture().getMessage(0));
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
     }
 }

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { APITypes } from "./apiTypes";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
 
@@ -47,8 +47,7 @@ const api: APITypes = {
     });
   },
   saveAttachment(path: string, file: File): Promise<PageData> {
-    const filePath = file.path;
-    console.log("filePath", filePath);
+    const filePath = webUtils.getPathForFile(file);
     return ipcRenderer.invoke("saveAttachment", { path, filePath: filePath });
   },
   listChildren(page: string): Promise<Array<string>> {

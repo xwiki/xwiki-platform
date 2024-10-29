@@ -1060,8 +1060,8 @@ importers:
         specifier: 7.0.3
         version: 7.0.3
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
       electron-builder:
         specifier: 25.1.8
         version: 25.1.8(electron-builder-squirrel-windows@24.13.3)
@@ -1075,8 +1075,8 @@ importers:
         specifier: 1.7.7
         version: 1.7.7
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
       electron-store:
         specifier: 10.0.0
         version: 10.0.0
@@ -1087,8 +1087,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
 
   electron/authentication/authentication-xwiki/authentication-xwiki-renderer:
     dependencies:
@@ -1111,8 +1111,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/browser/browser-api
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -1129,8 +1129,8 @@ importers:
         specifier: workspace:*
         version: link:../storage
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
     devDependencies:
       '@types/node':
         specifier: 22.7.7
@@ -1222,8 +1222,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/backends/backend-api
       electron:
-        specifier: 31.7.1
-        version: 31.7.1
+        specifier: 33.0.2
+        version: 33.0.2
       inversify:
         specifier: 6.0.2
         version: 6.0.2
@@ -4019,8 +4019,8 @@ packages:
   electron-updater@6.3.0:
     resolution: {integrity: sha512-3Xlezhk+dKaSQrOnkQNqCGiuGSSUPO9BV9TQZ4Iig6AyTJ4FzJONE5gFFc382sY53Sh9dwJfzKsA3DxRHt2btw==}
 
-  electron@31.7.1:
-    resolution: {integrity: sha512-kBSSELVTZM1x4y/FQIh6SC2JNpytFPPaLUuVfds7repvqj5CJsi8KZF28XjBXNKutuG2gX6PozxCPo9O8QkfUA==}
+  electron@33.0.2:
+    resolution: {integrity: sha512-C2WksfP0COsMHbYXSJG68j6S3TjuGDrw/YT42B526yXalIlNQZ2GeAYKryg6AEMkIp3p8TUfDRD0+HyiyCt/nw==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -6094,6 +6094,7 @@ packages:
 
   unplugin-auto-expose@0.2.4:
     resolution: {integrity: sha512-piVmCwoKPEAe/IskcjN52U5UmnM/RZc8Z5kmN69TX9PWE92WzKOVsu3UQt7jJll7jwHLbR3nmDGPSfBxdxPZ2g==}
+    deprecated: 'The plugin should be replaced by native module resulution features. You can find the reference here: https://github.com/cawa-93/vite-electron-builder/pull/1018'
 
   unplugin@1.6.0:
     resolution: {integrity: sha512-BfJEpWBu3aE/AyHx8VaNE/WgouoQxgH9baAiH82JjX8cqVyi3uJQstqwD5J+SZxIK326SZIhsSZlALXVBCknTQ==}
@@ -8987,7 +8988,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@31.7.1:
+  electron@33.0.2:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.16.10

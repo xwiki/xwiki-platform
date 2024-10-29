@@ -30,7 +30,7 @@
     "inversify": "6.0.2"
   },
   "peerDependencies": {
-    "electron": "31.7.1"
+    "electron": "33.0.2"
   },
   "publishConfig": {
     "exports": {

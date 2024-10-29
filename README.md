@@ -28,7 +28,10 @@ Read our [Release Notes](https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 
 ![XWiki Platform Activity](https://repobeats.axiom.co/api/embed/7d0980aec51d3e1b8622875db877a3eaacabe169.svg "XWiki Platform Activity")
 
+Note that we're [using an issue tracker](https://jira.xwiki.org/browse/XWIKI) other than GitHub Issues (hence the empty left column in the stats).
+
 We're always looking for contributors!
+
 You should read our [Get Involved Guide](https://dev.xwiki.org/xwiki/bin/view/Community/Contributing) or get in touch:
 * [Blog](https://www.xwiki.org/xwiki/bin/view/Blog/)
 * [Forum](https://dev.xwiki.org/xwiki/bin/view/Community/Discuss)

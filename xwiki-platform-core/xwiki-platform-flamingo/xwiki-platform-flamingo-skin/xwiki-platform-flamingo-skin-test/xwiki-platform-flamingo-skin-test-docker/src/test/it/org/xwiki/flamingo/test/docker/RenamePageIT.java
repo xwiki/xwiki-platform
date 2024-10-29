@@ -698,5 +698,23 @@ class RenamePageIT
         SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
         wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
         assertEquals("[[Alice]]", wikiEditPage.getContent());
+
+        SpaceReference newAliceSpace = new SpaceReference("Alice", newRootSpace);
+        DocumentReference newAliceReference = new DocumentReference("WebHome", newAliceSpace);
+        viewPage = testUtils.gotoPage(newAliceReference);
+        rename = viewPage.rename();
+        rename.getDocumentPicker().setName("Alice2");
+        statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+
+        SpaceReference Alice2Space = new SpaceReference("Alice2", newRootSpace);
+        DocumentReference Alice2Reference = new DocumentReference("WebHome", Alice2Space);
+        wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
+        String serializedAlice2Reference = testUtils.serializeLocalReference(Alice2Reference);
+        assertEquals(String.format("[[%s]]\n[[Bob]]\n[[Eve]]", serializedAlice2Reference), wikiEditPage.getContent());
+
+        // FIXME: ideally this one should be refactored too, however it's not a regression.
+        //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
+        //assertEquals(String.format("[[%s]]", serializedAlice2Reference), wikiEditPage.getContent());
     }
 }

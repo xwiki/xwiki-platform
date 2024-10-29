@@ -146,14 +146,16 @@ public class ResourceReferenceRenamer
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
-        // TODO: test in subwiki
         EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
         // currentDocument) then we must update it
-        boolean shouldBeUpdated =
-            linkTargetDocumentReference.equals(oldReference) && absoluteResolvedReference.equals(linkEntityReference);
+        // We also update the link if it's not an absolute link but the current document is not part of the move job,
+        // as in this case there won't be any other call to perform the link refactoring.
+        boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
+            && (absoluteResolvedReference.equals(linkEntityReference)
+            || !movedReferences.contains(currentDocumentReference));
 
         if (shouldBeUpdated) {
             // If the link was resolved to a space...

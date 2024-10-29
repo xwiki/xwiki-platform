@@ -33,9 +33,10 @@ Note that we're [using an issue tracker](https://jira.xwiki.org/browse/XWIKI) ot
 We're always looking for contributors!
 
 You should read our [Get Involved Guide](https://dev.xwiki.org/xwiki/bin/view/Community/Contributing) or get in touch:
-* [Blog](https://www.xwiki.org/xwiki/bin/view/Blog/)
 * [Forum](https://dev.xwiki.org/xwiki/bin/view/Community/Discuss)
 * [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
+
+You can follow the XWiki news in [our blog](https://www.xwiki.org/xwiki/bin/view/Blog/).
 
 Thank you to all contributors:
 

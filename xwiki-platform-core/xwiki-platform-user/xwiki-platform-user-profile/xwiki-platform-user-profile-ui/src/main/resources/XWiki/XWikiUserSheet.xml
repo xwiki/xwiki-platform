@@ -602,7 +602,7 @@ ul.shortcut-list {
     justify-content: space-between;
     align-items: center;
     /* Keep the line large enough to fit an input in both view and edit mode. */
-    height: 38px;
+    min-height: 38px;
     border-top: 1px dashed $theme.textPrimaryColor;
     &amp;:first-child {
       border-top: none;

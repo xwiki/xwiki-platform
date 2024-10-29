@@ -95,16 +95,18 @@ var XWiki = (function(XWiki) {
     },
 
     addShortcuts: function() {
-      var shortcuts = {
-        'action_cancel' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.cancel')")",
-        'action_preview' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.preview')")",
-        // The following 2 are both "Back to edit" in the preview mode, depending on the used editor
-        'action_edit' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.backtoedit')")",
-        'action_inline' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.backtoedit')")",
-        'action_save' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.save')")",
-        'action_propupdate' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.saveandview')")",
-        'action_saveandcontinue' : "$escapetool.javascript("#getShortcutValue('core.shortcuts.edit.saveandcontinue')")"
-      }
+      ## Somehow the crtUserDoc variable is not properly set when evaluating this file with VTL. We set it again
+      #set($crtUserDoc = $!xwiki.getDocument($xcontext.user))
+      #set ($shortcutMap = {})
+      #set ($discard = $shortcutMap.put("action_cancel", "#getShortcutValue('core.shortcuts.edit.cancel')"))
+      #set ($discard = $shortcutMap.put("action_preview", "#getShortcutValue('core.shortcuts.edit.preview')"))
+      ## The following two entries are both "Back to edit" in the preview mode, depending on the used editor
+      #set ($discard = $shortcutMap.put("action_edit", "#getShortcutValue('core.shortcuts.edit.backtoedit')"))
+      #set ($discard = $shortcutMap.put("action_inline", "#getShortcutValue('core.shortcuts.edit.backtoedit')"))
+      #set ($discard = $shortcutMap.put("action_save", "#getShortcutValue('core.shortcuts.edit.save')"))
+      #set ($discard = $shortcutMap.put("action_propupdate", "#getShortcutValue('core.shortcuts.edit.saveandview')"))
+      #set ($discard = $shortcutMap.put("action_saveandcontinue", "#getShortcutValue('core.shortcuts.edit.saveandcontinue')"))
+      var shortcuts = $jsontool.serialize($shortcutMap);
       for (var key in shortcuts) {
         var targetButtons = $$("input[name=" + key + "]");
         if (targetButtons.length) {

@@ -93,7 +93,7 @@ public class ResetPasswordIT
         }
 
         restoreSettings(setup);
-        logCaptureConfiguration.registerExcludes("CSRFToken: Secret token verification failed, token");
+        logCaptureConfiguration.registerExcludes("Secret CSRF token verification failed");
     }
 
     @Test

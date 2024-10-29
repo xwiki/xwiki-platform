@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>16.10.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -69,7 +69,7 @@
       <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature.. -->
       <optional>true</optional>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->

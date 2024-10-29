@@ -167,6 +167,9 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
             excludeFirstHeading(result);
         }
 
+        // Step 5a: if the macro is in an inline context, try converting the included content to inline.
+        maybeConvertToInline(result, context);
+
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());

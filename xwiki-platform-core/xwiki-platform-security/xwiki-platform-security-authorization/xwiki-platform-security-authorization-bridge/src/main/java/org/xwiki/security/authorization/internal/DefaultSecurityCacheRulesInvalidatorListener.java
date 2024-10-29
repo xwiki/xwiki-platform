@@ -20,9 +20,9 @@
 package org.xwiki.security.authorization.internal;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.Priority;
@@ -31,7 +31,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -39,24 +38,21 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
-import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.event.RightUpdatedEvent;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
  * This class monitors updates and invalidates right cache entries whenever necessary.
@@ -83,10 +79,6 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         new HashSet<>(Arrays.asList(XWikiConstants.GROUP_CLASS_REFERENCE, XWikiConstants.GLOBAL_CLASS_REFERENCE,
             XWikiConstants.LOCAL_CLASS_REFERENCE, XWIKISERVER_CLASS));
 
-    /** Logger. **/
-    @Inject
-    private Logger logger;
-
     /** The right cache. */
     @Inject
     private SecurityCache securityCache;
@@ -104,10 +96,6 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
     @Named("user")
     private DocumentReferenceResolver<String> userResolver;
 
-    /** Entity reference serializer. */
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
     /** Execution object. */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -124,7 +112,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
     }
 
     /**
-     * @param source an xwiki document, that has just been updated.
+     * @param document an xwiki document, that has just been updated.
      * @return true if and only if the xwiki document corresponds to a group.
      */
     private boolean isGroupDocument(XWikiDocument document)
@@ -136,43 +124,35 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         return objects != null && objects.size() > 0;
     }
 
-    /**
-     * Drop from the cache all members of a given group.
-     * 
-     * @param group The group.
-     * @param securityCache Right cache instance to invalidate.
-     * @throws org.xwiki.security.authorization.AuthorizationException on error.
-     */
-    public void invalidateGroupMembers(DocumentReference group, SecurityCache securityCache)
-        throws AuthorizationException
+    private void invalidateNewGroupMembers(XWikiDocument document)
     {
-        try {
-            XWikiContext xwikiContext = this.xcontextProvider.get();
-            XWikiGroupService groupService = xwikiContext.getWiki().getGroupService(xwikiContext);
-            String groupName = serializer.serialize(group);
+        DocumentReference documentReference = document.getDocumentReference();
+        List<BaseObject> newMembers =
+            document.getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
+        List<BaseObject> originalMembers =
+            document.getOriginalDocument().getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
 
-            // The group members inherit the wiki from the group
-            // itself, unless the wiki name is explicitly given.
+        for (BaseObject newMemberObject : newMembers) {
+            if (newMemberObject != null) {
+                String newMember = newMemberObject.getStringValue(XWikiGroupsDocumentInitializer.PROPERTY_MEMBER);
 
-            WikiReference wikiReference = group.getWikiReference();
-            final int nb = 100;
-            int i = 0;
-            Collection<String> memberNames;
-            do {
-                memberNames = groupService.getAllMembersNamesForGroup(groupName, nb, i * nb, xwikiContext);
-                for (String member : memberNames) {
-                    DocumentReference memberRef = userResolver.resolve(member, wikiReference);
+                BaseObject originalMemberObject = originalMembers.size() > newMemberObject.getNumber()
+                    ? originalMembers.get(newMemberObject.getNumber()) : null;
 
-                    // Avoid infinite loops.
+                if (originalMemberObject == null) {
+                    // Invalidate new member
+                    DocumentReference memberRefeference = this.userResolver.resolve(newMember, documentReference);
+                    this.securityCache.remove(this.securityReferenceFactory.newUserReference(memberRefeference));
+                } else {
+                    String originalMember = originalMemberObject.getStringValue("member");
 
-                    if (!memberRef.equals(group)) {
-                        securityCache.remove(securityReferenceFactory.newUserReference(memberRef));
+                    if (!Objects.equals(newMember, originalMember)) {
+                        // Invalidate modified member
+                        DocumentReference memberRefeference = this.userResolver.resolve(newMember, documentReference);
+                        this.securityCache.remove(this.securityReferenceFactory.newUserReference(memberRefeference));
                     }
                 }
-                i++;
-            } while (memberNames.size() == nb);
-        } catch (XWikiException e) {
-            throw new AuthorizationException("Failed to invalidate group member.", e);
+            }
         }
     }
 
@@ -182,18 +162,14 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         XWikiDocument document = (XWikiDocument) source;
 
         DocumentReference ref = document.getDocumentReference();
-        try {
-            deliverUpdateEvent(ref);
-            if (isGroupDocument(document)) {
-                // When a group receive a new member, the update event is triggered and the above invalidate the
-                // group and also all its existing members already in cache, but NOT the new member that could be
-                // currently in the cache, and is not yet linked to the group. Here, we invalidate individually all
-                // members of the group based on the updated group, which will only have the effect of invalidating
-                // new members.
-                invalidateGroupMembers(ref, securityCache);
-            }
-        } catch (AuthorizationException e) {
-            this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
+        deliverUpdateEvent(ref);
+        if (isGroupDocument(document)) {
+            // When a group receive a new member, the update event is triggered and the above invalidate the
+            // group and also all its existing members already in cache, but NOT the new member that could be
+            // currently in the cache, and is not yet linked to the group. The following method is in charge of
+            // invalidating any member which changed during the save (which include new group member or more complex
+            // changed of the group like replacing a member by another).
+            invalidateNewGroupMembers(document);
         }
 
         // Make sure to send the RightUpdatedEvent event after the security cache is cleaned

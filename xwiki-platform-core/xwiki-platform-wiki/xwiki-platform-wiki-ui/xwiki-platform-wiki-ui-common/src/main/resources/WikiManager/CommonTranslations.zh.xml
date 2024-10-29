@@ -40,10 +40,10 @@
 admin.wikis.descriptor=描述符号
 admin.wikis.descriptor.description=配置Wiki描述符号
 admin.wiki.description=描述您的Wiki（好听的名称和描述）并设置其所有者和主页。
-### Missing: platform.wiki.admin.wiki.ownerProblemConfirmation=The new owner's user does not exist or it may come from a different wiki.\\nAre you sure you want to use it and continue with the save operation?
-### Missing: platform.wiki.admin.wiki.csrfInvalidError=Invalid security (CSRF) token. Please refresh the page and try again.
-### Missing: platform.wiki.admin.wiki.requiredFieldsError=The 'Homepage' field cannot be empty.
-### Missing: platform.wiki.admin.wiki.ownerWarning=Warning: Once you change this, the previous owner will lose their owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.
+platform.wiki.admin.wiki.ownerProblemConfirmation=新所有者的用户不存在，或者它可能来自其他 wiki。\\n您确定要使用它并继续保存操作吗？
+platform.wiki.admin.wiki.csrfInvalidError=安全 （CSRF） 令牌无效。请刷新页面并重试。
+platform.wiki.admin.wiki.requiredFieldsError='主页' 字段不能为空。
+platform.wiki.admin.wiki.ownerWarning=警告： 更改此设置后，以前的所有者将失去其所有者权限。如果那是你，请确保你不要把自己锁在 wiki 之外。如果这是错误的，您将需要联系主 wiki 的管理员或使用超级管理员帐户。
 
 ###############################################################################
 ## Deprecated
@@ -59,5 +59,6 @@ admin.wiki.description=描述您的Wiki（好听的名称和描述）并设置�
 ### Missing: admin.wiki=Wiki
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

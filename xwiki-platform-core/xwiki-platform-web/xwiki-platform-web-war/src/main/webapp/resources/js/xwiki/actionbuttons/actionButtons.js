@@ -612,7 +612,9 @@ var XWiki = (function(XWiki) {
         require(['jquery'], function ($) {
           var action = $('input[name=warningConflictAction]:checked').val();
           getConflictIds().map(retrieveDecisions);
-          $('#previewDiffModal').modal('hide');
+          // Store the selected action so that others listening to the modal hide event can know how the modal was
+          // closed (i.e. whether the merge conflict was resolved or not).
+          $('#previewDiffModal').data('action', action).modal('hide');
           if (action === "reload") {
             self.reloadEditor();
           } else {
@@ -695,7 +697,8 @@ var XWiki = (function(XWiki) {
           }
           $(response.responseText).appendTo('body');
           radioToogleClass();
-          $('#previewDiffModal').modal('show');
+          // Set the action to cancel by default before showing the modal.
+          $('#previewDiffModal').data('action', 'cancel').modal('show');
 
           // We want to remove the html of the modal and the backdrop when the modal is closed.
           $('#previewDiffModal').on('hidden.bs.modal', function (e) {

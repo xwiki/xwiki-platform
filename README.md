@@ -25,8 +25,17 @@ Read our [Release Notes](https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 * [![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.xwiki.org/scans)
 
 ## Community
+
+![XWiki Platform Activity](https://repobeats.axiom.co/api/embed/7d0980aec51d3e1b8622875db877a3eaacabe169.svg "XWiki Platform Activity")
+
 We're always looking for contributors!
 You should read our [Get Involved Guide](https://dev.xwiki.org/xwiki/bin/view/Community/Contributing) or get in touch:
 * [Blog](https://www.xwiki.org/xwiki/bin/view/Blog/)
 * [Forum](https://dev.xwiki.org/xwiki/bin/view/Community/Discuss)
 * [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat)
+
+Thank you to all contributors:
+
+<a href="https://github.com/xwiki/xwiki-platform/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xwiki/xwiki-platform&max=5000" />
+</a>

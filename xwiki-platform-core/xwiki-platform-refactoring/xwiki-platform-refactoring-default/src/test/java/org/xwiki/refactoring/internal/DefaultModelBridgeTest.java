@@ -881,5 +881,15 @@ class DefaultModelBridgeTest
         }
     }
     
-    
+    @Test
+    void rename() throws Exception
+    {
+        DocumentReference source = new DocumentReference("wiki", "space", "sourcePage");
+        DocumentReference target = new DocumentReference("wiki", "space", "targetPage");
+
+        when(this.xwiki.renameDocument(source, target, true, List.of(), List.of(), this.xcontext)).thenReturn(true);
+        assertTrue(this.modelBridge.rename(source, target));
+
+        verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), this.xcontext);
+    }
 }

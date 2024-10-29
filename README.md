@@ -24,11 +24,15 @@ Read our [Release Notes](https://www.xwiki.org/xwiki/bin/view/ReleaseNotes/).
 * [Development Flow](https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HGeneralDevelopmentFlow) to see the full list of tools we use to build the XWiki software.
 * [![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.xwiki.org/scans)
 
-## Community
+## Project Statistics
 
 ![XWiki Platform Activity](https://repobeats.axiom.co/api/embed/7d0980aec51d3e1b8622875db877a3eaacabe169.svg "XWiki Platform Activity")
 
 Note that we're [using an issue tracker](https://jira.xwiki.org/browse/XWIKI) other than GitHub Issues (hence the empty left column in the stats).
+
+See the [Project Health page](https://dev.xwiki.org/xwiki/bin/view/Community/ProjectHealth) for more statistics about the XWiki project.
+
+## Community
 
 We're always looking for contributors!
 

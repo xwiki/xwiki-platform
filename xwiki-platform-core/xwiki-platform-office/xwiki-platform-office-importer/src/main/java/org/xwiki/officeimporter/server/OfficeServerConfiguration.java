@@ -70,9 +70,11 @@ public interface OfficeServerConfiguration
     int getServerType();
 
     /**
+     * Returns the hostname of the office server instance, used only when the office server is externally managed and
+     * remotely deployed.
      * @return the hostname of the office server instance
      * @since 16.10.0RC1
-     * @since 16.4.5
+     * @since 16.4.6
      */
     @Unstable
     default String getServerHost()
@@ -118,7 +120,7 @@ public interface OfficeServerConfiguration
      * @return the path where the files are exchanged between XWiki and the office server (if absent or blank: use the
      * default environment temporary directory)
      * @since 16.10.0RC1
-     * @since 16.4.5
+     * @since 16.4.6
      */
     @Unstable
     default Optional<String> getWorkDir()

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.OfficeImporterAdmin" locale="">
+<xwikidoc version="1.5" reference="XWiki.OfficeImporterAdmin" locale="">
   <web>XWiki</web>
   <name>OfficeImporterAdmin</name>
   <language/>
@@ -108,6 +108,18 @@
         &lt;/dt&gt;
         &lt;dd&gt;$escapetool.html($serverType)&lt;/dd&gt;
         ###
+        ### Server Host
+        ###
+        #if ($services.officemanager.config.serverType == 2)
+          &lt;dt&gt;
+            &lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.serverhost'))&lt;/label&gt;
+            &lt;span class="xHint"&gt;
+              $escapetool.xml($services.localization.render('office.config.serverHost.hint'))
+            &lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;$escapetool.html($services.officemanager.config.serverHost)&lt;/dd&gt;
+        #end
+        ###
         ### Server Port
         ###
         &lt;dt&gt;
@@ -164,6 +176,13 @@
               $escapetool.html($services.officemanager.config.profilePath)
             #end
           &lt;/dd&gt;
+        #end
+        ###
+        ### Work directory
+        ###
+        #if ($services.officemanager.config.workDir.isPresent())
+          &lt;dt&gt;&lt;label&gt;$escapetool.html($services.localization.render('xe.officeimporter.openoffice.workdir'))&lt;/label&gt;&lt;/dt&gt;
+          &lt;dd&gt;$escapetool.html($services.officemanager.config.workDir.get())&lt;/dd&gt;
         #end
         ###
         ### Server State

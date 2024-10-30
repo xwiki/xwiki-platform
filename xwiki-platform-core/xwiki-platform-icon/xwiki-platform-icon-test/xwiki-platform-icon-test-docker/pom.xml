@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-icon-test</artifactId>
-    <version>16.4.5-SNAPSHOT</version>
+    <version>16.4.5</version>
   </parent>
   <artifactId>xwiki-platform-icon-test-docker</artifactId>
   <name>XWiki Platform - Icon - Tests - Functional Tests</name>

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-vfs</artifactId>
-    <version>16.4.5</version>
+    <version>16.4.6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-vfs-test</artifactId>
   <name>XWiki Platform - VFS - Tests - Parent POM</name>

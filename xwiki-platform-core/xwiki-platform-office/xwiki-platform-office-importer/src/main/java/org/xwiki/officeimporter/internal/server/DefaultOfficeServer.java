@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -173,11 +174,14 @@ public class DefaultOfficeServer implements OfficeServer
 
     private File getWorkDir()
     {
-        File workDir = this.environment.getTemporaryDirectory();
-        if (StringUtils.isNotBlank(this.config.getWorkDir())) {
-            workDir = new File(this.config.getWorkDir());
+        Optional<String> workDirFromConfiguration = this.config.getWorkDir();
+        if (workDirFromConfiguration.isPresent() && StringUtils.isNotBlank(workDirFromConfiguration.get())) {
+            File workDir = new File(workDirFromConfiguration.get());
+            if (workDir.isDirectory() && workDir.canWrite()) {
+                return workDir;
+            }
         }
-        return workDir;
+        return this.environment.getTemporaryDirectory();
     }
 
     @Override

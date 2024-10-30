@@ -20,38 +20,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Index.Translations" locale="zh">
-  <web>Index</web>
+<xwikidoc version="1.5" reference="XWiki.Logging.Code.Translations" locale="zh">
+  <web>XWiki.Logging.Code</web>
   <name>Translations</name>
   <language>zh</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=全部删除
-index.administration.remainingTasks.heading=剩余文档分析任务
-index.administration.remainingTasks.emptyQueue=没有剩余任务。
-admin.documentanalysis=文档分析
-
-#######################################
-## until 16.3.0RC1
-#######################################
-
-index.spacesMacro.title=空间
-index.spacesMacro.spaceIndex.title=查看空间索引
-index.spacesMacro.spaceIndex.alt=空间索引
-index.spacesMacro.spaceAdministration.title=查看空间管理
-index.spacesMacro.spaceAdministration.alt=管理空间
-index.spacesMacro.createSpace.link=创建新空间
-index.spacesMacro.createSpace.defaultSpaceName=空间名
-index.spacesMacro.createSpace.submit=创建
+  <content>logging.admin.unsetLevel.success=记录器 "{0}" 级别已被取消设置。
+logging.admin.setLevel.success=日志记录器"{0}" 级别已设置为 "{1}"。
+logging.admin.setLevel.error=设置日志级别失败：日志记录器 "{0}" 不存在。
 </content>
-</xwikidoc>
+  </xwikidoc>

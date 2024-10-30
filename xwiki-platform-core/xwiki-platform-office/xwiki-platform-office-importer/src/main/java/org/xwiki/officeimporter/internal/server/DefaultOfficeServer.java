@@ -39,6 +39,7 @@ import org.xwiki.officeimporter.internal.converter.DefaultOfficeConverter;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.text.StringUtils;
 
 /**
  * Default {@link OfficeServer} implementation.
@@ -137,6 +138,7 @@ public class DefaultOfficeServer implements OfficeServer
             ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
             externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
             externalProcessOfficeManager.connectOnStart(true);
+            externalProcessOfficeManager.hostName(config.getServerHost());
             this.jodManager = externalProcessOfficeManager.build();
         } else {
             setState(ServerState.CONF_ERROR);
@@ -167,6 +169,9 @@ public class DefaultOfficeServer implements OfficeServer
         }
 
         File workDir = this.environment.getTemporaryDirectory();
+        if (StringUtils.isNotBlank(this.config.getWorkDir())) {
+            workDir = new File(this.config.getWorkDir());
+        }
         this.converter = new DefaultOfficeConverter(this.jodConverter, workDir);
     }
 

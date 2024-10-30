@@ -59,6 +59,16 @@ public interface OfficeServerConfiguration
     int getServerType();
 
     /**
+     * @return the hostname of the office server instance
+     * @since 16.10.0RC1
+     */
+    default String getServerHost()
+    {
+        // Coming from org.jodconverter.local.office.ExternalOfficeManager.DEFAULT_HOSTNAME
+        return "127.0.0.1";
+    }
+
+    /**
      * @return the port number used for connecting to the office server instance
      * @deprecated Since 12.1RC1. Now use {@link #getServerPorts()}.
      */
@@ -90,6 +100,16 @@ public interface OfficeServerConfiguration
      * @return the path to office server execution profile, {@code null} by default
      */
     String getProfilePath();
+
+    /**
+     * @return the path where the files are exchanged between XWiki and the office server (null means: use the default
+     * environment temporary directory)
+     * @see 16.10.0RC1
+     */
+    default String getWorkDir()
+    {
+        return null;
+    }
 
     /**
      * @return the maximum number of simultaneous conversion tasks to be handled by a single office process instance

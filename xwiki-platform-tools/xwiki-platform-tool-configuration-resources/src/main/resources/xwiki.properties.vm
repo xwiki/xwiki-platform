@@ -350,6 +350,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType = 0
 
+#-# [Since 16.10RC1]
+#-# Hostname used for connecting to the openoffice server instance.
+# openoffice.host = localhost
+
 #-# [Since 12.1RC1]
 #-# Port numbers used for connecting to the openoffice server instance.
 #-# For an internally managed server instance, it will create the process for all ports.
@@ -370,6 +374,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Path to openoffice execution profile (serverType:0 only).
 #-# If no path is provided, a default value will be calculated based on the operating environment.
 # openoffice.profilePath = /home/user/.openoffice.org/3
+
+#-# [Since 16.10RC1]
+#-# Path to a folder where XWiki could exchange temporary files with the openoffice server.
+#-# If no path is provided, the temporary folder set for XWiki will be used.
+# openoffice.workDir = /tmp
 
 #-# [Since 1.8RC3]
 #-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process (serverType:0 only).

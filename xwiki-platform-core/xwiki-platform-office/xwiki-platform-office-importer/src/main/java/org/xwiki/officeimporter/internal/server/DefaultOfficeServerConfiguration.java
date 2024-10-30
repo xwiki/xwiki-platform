@@ -53,6 +53,11 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
+     * @see OfficeServerConfiguration#getServerHost()
+     */
+    private static final String DEFAULT_SERVER_HOST = "127.0.0.1";
+
+    /**
      * @see OfficeServerConfiguration#getServerPorts()
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
@@ -87,6 +92,12 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     public int getServerType()
     {
         return this.configuration.getProperty(PREFIX + "serverType", DEFAULT_SERVER_TYPE);
+    }
+
+    @Override
+    public String getServerHost()
+    {
+        return this.configuration.getProperty(PREFIX + "host", DEFAULT_SERVER_HOST);
     }
 
     @Override
@@ -132,6 +143,12 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
         }
         
         return homePath;
+    }
+
+    @Override
+    public String getWorkDir()
+    {
+        return this.configuration.getProperty(PREFIX + "workDir");
     }
 
     @Override

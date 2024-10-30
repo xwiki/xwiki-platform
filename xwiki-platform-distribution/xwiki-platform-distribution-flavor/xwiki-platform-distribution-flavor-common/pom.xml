@@ -263,7 +263,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>jquery-migrate</artifactId>
-      <version>3.4.1</version>
+      <version>3.5.2</version>
       <optional>true</optional>
     </dependency>
     <!-- Inject the legacy event migrator in the administration -->

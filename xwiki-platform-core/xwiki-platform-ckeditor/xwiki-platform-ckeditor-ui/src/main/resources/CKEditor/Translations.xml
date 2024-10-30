@@ -300,6 +300,7 @@ resource.user.placeholder=alias
 
 resourcePicker.attach.hint=Select an attachment
 resourcePicker.doc.hint=Select a page
+resourcePicker.dropdown.toggle.title=Toggle the display of resource types.
 
 entityResourceSuggester.doc.placeholder=Find a page...
 entityResourceSuggester.attach.placeholder=Find an attachment...

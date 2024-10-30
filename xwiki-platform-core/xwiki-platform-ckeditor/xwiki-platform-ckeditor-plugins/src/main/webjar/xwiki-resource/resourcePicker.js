@@ -19,7 +19,8 @@
  */
 define('resourcePickerTranslationKeys', [], [
   'attach.hint',
-  'doc.hint'
+  'doc.hint',
+  'dropdown.toggle.title'
 ]);
 
 define('resourcePicker', [
@@ -35,7 +36,9 @@ define('resourcePicker', [
           '<button type="button" class="resourceType btn btn-default">' +
             '<span class="icon">' +
           '</button>' +
-          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
+          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" ' +
+            'title="' + translations.get('dropdown.toggle.title') + '">' +
+            '<span class="sr-only">' + translations.get('dropdown.toggle.title') + '</span>' +
             '<span class="caret"></span>' +
           '</button>' +
           '<ul class="resourceTypes dropdown-menu dropdown-menu-right"></ul>' +

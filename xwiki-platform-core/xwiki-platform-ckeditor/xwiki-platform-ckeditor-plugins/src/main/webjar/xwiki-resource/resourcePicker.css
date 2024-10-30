@@ -19,6 +19,18 @@
  */
 #template('colorThemeInit.vm')
 
+/* We need to redefine this class to have better priority than the CKEditor CSS reset. */
+.resourcePicker .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 .resourcePicker .dropdown-menu > .active > a,
 .resourcePicker .dropdown-menu > .active > a:hover,
 .resourcePicker .dropdown-menu > .active > a:focus {

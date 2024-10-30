@@ -168,11 +168,16 @@ public class DefaultOfficeServer implements OfficeServer
                 .filterChain(new LinkedImagesEmbedderFilter()).build();
         }
 
+        this.converter = new DefaultOfficeConverter(this.jodConverter, getWorkDir());
+    }
+
+    private File getWorkDir()
+    {
         File workDir = this.environment.getTemporaryDirectory();
         if (StringUtils.isNotBlank(this.config.getWorkDir())) {
             workDir = new File(this.config.getWorkDir());
         }
-        this.converter = new DefaultOfficeConverter(this.jodConverter, workDir);
+        return workDir;
     }
 
     @Override

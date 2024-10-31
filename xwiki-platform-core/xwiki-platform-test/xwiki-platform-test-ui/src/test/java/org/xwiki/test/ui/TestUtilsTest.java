@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -69,5 +70,8 @@ class TestUtilsTest
 
         assertEquals("http://localhost:8080/xwiki/bin/edit/Space1/Space2/Foo/WebHome?form_token=myToken&editor=wiki",
             testUtils.getURL(myReference, "edit", "editor=wiki"));
+
+        myReference = new LocalDocumentReference("MySpace", "MyPage");
+        assertEquals("http://localhost:8080/xwiki/bin/view/MySpace/MyPage", testUtils.getURL(myReference));
     }
 }

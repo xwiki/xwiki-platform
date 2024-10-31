@@ -1202,8 +1202,10 @@ public class TestUtils
         if (locale != null) {
             queryString += "&language=" + locale;
         }
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment,
-            reference.extractReference(EntityType.WIKI).getName());
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : "";
+        return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
+        fragment);
     }
 
     /**
@@ -1368,7 +1370,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        return getURL(action, path, queryString, null, null);
+        return getURL(null, action, path, queryString, null);
     }
 
     /**
@@ -1376,7 +1378,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString, String fragment)
     {
-        return getURL(action, path, queryString, fragment, null);
+        return getURL(null, action, path, queryString, fragment);
     }
 
     /**
@@ -1385,7 +1387,7 @@ public class TestUtils
      * @since 16.4.6
      */
     @Unstable
-    public String getURL(String action, String[] path, String queryString, String fragment, String wikiName)
+    public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
     {
         StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));
 

@@ -711,7 +711,7 @@ class RenamePageIT
         DocumentReference Alice2Reference = new DocumentReference("WebHome", Alice2Space);
         wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
         String serializedAlice2Reference = testUtils.serializeLocalReference(Alice2Reference);
-        assertEquals(String.format("[[%s]]\n[[Bob]]\n[[Eve]]", serializedAlice2Reference), wikiEditPage.getContent());
+        assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]", serializedAlice2Reference), wikiEditPage.getContent());
 
         // FIXME: ideally this one should be refactored too, however it's not a regression.
         //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));

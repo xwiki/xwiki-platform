@@ -100,6 +100,7 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.stability.Unstable;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -188,6 +189,8 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+
+    private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static PersistentTestContext context;
 
@@ -1199,7 +1202,8 @@ public class TestUtils
         if (locale != null) {
             queryString += "&language=" + locale;
         }
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
+        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment,
+            reference.extractReference(EntityType.WIKI).getName());
     }
 
     /**
@@ -1350,7 +1354,13 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
+        String wikiName = MAIN_WIKI_NAME;
+        if (!StringUtils.isEmpty(wiki)) {
+            wikiName = wiki;
+        } else if (!StringUtils.isEmpty(this.currentWiki)) {
+            wikiName = this.currentWiki;
+        }
+        return getBaseURL() + (wikiName.equals(MAIN_WIKI_NAME) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1358,7 +1368,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        return getURL(action, path, queryString, null);
+        return getURL(action, path, queryString, null, null);
     }
 
     /**
@@ -1366,7 +1376,18 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString, String fragment)
     {
-        StringBuilder builder = new StringBuilder(getBaseBinURL());
+        return getURL(action, path, queryString, fragment, null);
+    }
+
+    /**
+     * @since 16.10.0RC1
+     * @since 15.10.14
+     * @since 16.4.6
+     */
+    @Unstable
+    public String getURL(String action, String[] path, String queryString, String fragment, String wikiName)
+    {
+        StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));
 
         if (!StringUtils.isEmpty(action)) {
             builder.append(action).append('/');

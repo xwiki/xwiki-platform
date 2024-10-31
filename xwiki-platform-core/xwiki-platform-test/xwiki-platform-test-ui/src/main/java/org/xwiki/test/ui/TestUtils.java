@@ -1202,7 +1202,7 @@ public class TestUtils
             queryString += "&language=" + locale;
         }
         EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
-        String wikiName = (wikiReference != null) ? wikiReference.getName() : "";
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
         return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
         fragment);
     }

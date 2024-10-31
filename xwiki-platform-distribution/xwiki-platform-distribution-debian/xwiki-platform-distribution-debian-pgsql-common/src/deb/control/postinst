@@ -12,6 +12,7 @@ if [ -f /usr/share/dbconfig-common/dpkg/postinst.pgsql ]; then
   . /usr/share/dbconfig-common/dpkg/postinst.pgsql
 
   # Make sure the new database uses the right encoding and collation
+  # Ideally we would use "UTF8' LOCALE_PROVIDER = 'builtin' LOCALE = 'C.UTF-8", but this only works in PosgreSQL 17+
   dbc_pgsql_createdb_encoding="UTF8' lc_collate='C"
 
   dbc_generate_include='template:/etc/xwiki/hibernate.cfg.xml'

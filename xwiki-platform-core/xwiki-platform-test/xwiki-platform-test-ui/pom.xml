@@ -31,6 +31,9 @@
   <name>XWiki Platform - Test - UI Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - UI Tests Framework</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.05</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

@@ -19,8 +19,6 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.test.po.TableLayoutElement;
@@ -180,11 +178,14 @@ class SubWikiIT
         assertEquals("Done.", renameStatusPage.getInfoMessage());
 
         SpaceReference Alice2Space = new SpaceReference("Alice2", newRootSpace);
+        DocumentReference newrootPage = new DocumentReference("WebHome", newRootSpace);
         DocumentReference Alice2Reference = new DocumentReference("WebHome", Alice2Space);
-        wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
+        wikiEditPage = WikiEditPage.gotoPage(newrootPage);
         String serializedlocalAlice2Reference = setup.serializeLocalReference(Alice2Reference);
         assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]", serializedlocalAlice2Reference),
             wikiEditPage.getContent());
+        wikiEditPage.setContent(String.format("[[Alice2]]%n[[%s]]%n[[Bob]]%n[[Eve]]",serializedlocalAlice2Reference));
+        wikiEditPage.clickSaveAndView();
 
         viewPage = setup.gotoPage(mainWikiLinkPage);
         wikiEditPage = viewPage.editWiki();
@@ -192,6 +193,25 @@ class SubWikiIT
             String.format("[[%s]]%n[[%s]]%n[[%s]]",
                 setup.serializeReference(movedPageReference),
                 setup.serializeReference(Alice2Reference),
+                setup.serializeReference(newBobPage)), wikiEditPage.getContent());
+
+        viewPage = setup.gotoPage(Alice2Reference);
+        renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setWiki("xwiki");
+        renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+
+        Alice2Reference = Alice2Reference.setWikiReference(new WikiReference("xwiki"));
+        String serializedAliceReference = setup.serializeReference(Alice2Reference);
+        wikiEditPage = WikiEditPage.gotoPage(newrootPage);
+        assertEquals(String.format("[[%1$s]]%n[[%1$s]]%n[[Bob]]%n[[Eve]]", serializedAliceReference),
+            wikiEditPage.getContent());
+        viewPage = setup.gotoPage(mainWikiLinkPage);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(
+            String.format("[[%s]]%n[[%s]]%n[[%s]]",
+                setup.serializeReference(movedPageReference),
+                setup.serializeLocalReference(Alice2Reference),
                 setup.serializeReference(newBobPage)), wikiEditPage.getContent());
 
         deleteSubWiki(setup);

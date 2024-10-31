@@ -100,7 +100,6 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
-import org.xwiki.stability.Unstable;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -1386,7 +1385,6 @@ public class TestUtils
      * @since 15.10.14
      * @since 16.4.6
      */
-    @Unstable
     public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
     {
         StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));

@@ -127,7 +127,9 @@ var XWiki = (function (XWiki) {
      * Callback triggered when the suggest element is collapsed, because of a focusout event for example.
      */
     onSuggestCollapsed: function(event) {
-      this.suggest.clearSuggestions();
+      /* We match the collapse of the input field timing to close the suggest panel.
+         As of 16.2.0-RC1, this value is defined in action-menus.less -> #headerglobalsearchinput */
+      this.suggest.resetTimeout($('#headerglobalsearchinput').css('transition-duration'));
     },
 
     /**

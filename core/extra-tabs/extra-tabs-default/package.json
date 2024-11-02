@@ -27,7 +27,7 @@
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.10"
+    "@types/lodash": "4.17.13"
   },
   "publishConfig": {
     "exports": {

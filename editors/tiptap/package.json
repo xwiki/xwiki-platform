@@ -62,7 +62,7 @@
     "yjs": "13.6.20"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.10",
+    "@types/lodash": "4.17.13",
     "@types/markdown-it": "14.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
     "vue-tsc": "2.1.6"

@@ -1232,8 +1232,8 @@ importers:
         specifier: 22.8.6
         version: 22.8.6
       vite-plugin-node:
-        specifier: 3.1.0
-        version: 3.1.0(vite@5.4.9(@types/node@22.8.6))
+        specifier: 4.0.0
+        version: 4.0.0(vite@5.4.9(@types/node@22.8.6))
 
   extension-manager:
     dependencies:
@@ -6171,11 +6171,11 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  vite-plugin-node@3.1.0:
-    resolution: {integrity: sha512-LN9byKedZaokEWcH+DTdeV7YLN34dWH7Em2ldHZ77oVGvC/uxHnK43AGPrV9+9CoOh1x9X3Yc55vW/OQYssFDQ==}
+  vite-plugin-node@4.0.0:
+    resolution: {integrity: sha512-KwINBvYBjNqYml/dSmBWJo2rSr+qrRbqbuuG5oNhu7+R3R5Rh9fibpslvr3LUwOjjkreIb9VId/37Rf7KL96qg==}
     peerDependencies:
-      '@swc/core': ^1.2.153
-      vite: ^4.0.0
+      '@swc/core': ^1.7.26
+      vite: ^5.0.0
     peerDependenciesMeta:
       '@swc/core':
         optional: true
@@ -11358,11 +11358,11 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-node@3.1.0(vite@5.4.9(@types/node@22.8.6)):
+  vite-plugin-node@4.0.0(vite@5.4.9(@types/node@22.8.6)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       vite: 5.4.9(@types/node@22.8.6)
     transitivePeerDependencies:
       - supports-color

@@ -123,8 +123,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       pinia:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+        specifier: 2.2.5
+        version: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -169,8 +169,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       pinia:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+        specifier: 2.2.5
+        version: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -398,8 +398,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       pinia:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+        specifier: 2.2.5
+        version: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1010,8 +1010,8 @@ importers:
         specifier: 14.1.0
         version: 14.1.0
       pinia:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+        specifier: 2.2.5
+        version: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       tippy.js:
         specifier: 6.3.7
         version: 6.3.7
@@ -1371,8 +1371,8 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
       pinia:
-        specifier: 2.2.4
-        version: 2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
+        specifier: 2.2.5
+        version: 2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -5392,12 +5392,12 @@ packages:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
 
-  pinia@2.2.4:
-    resolution: {integrity: sha512-K7ZhpMY9iJ9ShTC0cR2+PnxdQRuwVIsXDO/WIEV/RnMC/vmSoKDTKW/exNQYPI+4ij10UjXqdNiEHwn47McANQ==}
+  pinia@2.2.5:
+    resolution: {integrity: sha512-T4PEQ4uFv2KIRC8A1Y3k1ceQGTDtxtd7nngYGu1IJUUSpuQoYfGq7w7rOc+f5YN1vx3mEs2NjjtN2IFbNS7jqA==}
     peerDependencies:
       '@vue/composition-api': ^1.4.0
       typescript: '>=4.4.4'
-      vue: ^2.6.14 || ^3.3.0
+      vue: ^2.6.14 || ^3.5.11
     peerDependenciesMeta:
       '@vue/composition-api':
         optional: true
@@ -10543,7 +10543,7 @@ snapshots:
 
   pify@4.0.1: {}
 
-  pinia@2.2.4(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)):
+  pinia@2.2.5(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.12(typescript@5.6.3)

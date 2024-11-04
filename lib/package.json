@@ -59,7 +59,7 @@
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
     "inversify": "6.0.3",
-    "pinia": "2.2.4",
+    "pinia": "2.2.5",
     "reflect-metadata": "0.2.2",
     "utility-types": "3.11.0",
     "vue": "3.5.12",

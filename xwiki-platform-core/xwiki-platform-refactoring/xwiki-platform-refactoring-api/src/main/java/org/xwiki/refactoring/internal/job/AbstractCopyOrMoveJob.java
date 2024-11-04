@@ -60,9 +60,9 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         try {
             this.progressManager.startStep(this);
-            BeginFoldEvent beginEvent = getBeginEvent();
+            BeginFoldEvent beginEvent = createBeginEvent();
             this.observationManager.notify(beginEvent, this, this.getRequest());
-            if (((CancelableEvent) beginEvent).isCanceled()) {
+            if (beginEvent instanceof CancelableEvent && ((CancelableEvent) beginEvent).isCanceled()) {
                 return;
             }
             this.progressManager.endStep(this);
@@ -74,7 +74,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             this.progressManager.endStep(this);
 
             this.progressManager.startStep(this);
-            EndFoldEvent endEvent = getEndEvent();
+            EndFoldEvent endEvent = createEndEvent();
             this.observationManager.notify(endEvent, this, this.getRequest());
             this.progressManager.endStep(this);
         } finally {
@@ -337,7 +337,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
      * @return {@code true} if the operation worked well.
      */
     protected abstract boolean atomicOperation(DocumentReference source, DocumentReference target);
-    protected abstract <B extends BeginFoldEvent & CancelableEvent> B getBeginEvent();
-
-    protected abstract EndFoldEvent getEndEvent();
+    protected abstract BeginFoldEvent createBeginEvent();
+    protected abstract EndFoldEvent createEndEvent();
 }

@@ -29,18 +29,28 @@ $response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 <div class="main layoutsubsection">
 ## Set as an HTML main for better DOM tree semantics to facilitate navigation with assistive technologies.
 <main id="mainContentArea">
-#xwikimessageboxstart($services.localization.render('warning') $services.localization.render('csrf.confirmation', [
-  '<p>', '</p>',
-  '<p>', '</p>',
-  '<ul><li>', '</li>',
-  '<li>', '</li>',
-  '<li>', '</li></ul>',
-  '<p class="force-underline">', 
-  '<a href="http://jira.xwiki.org/">', '</a></p>',
-  '<p>', '<strong>',
-  '</strong>', '</p>'
-  ]))
-  coucou
+#define ($messageBoxContent)
+<p>
+$services.localization.render('csrf.confirmation.status')
+</p>
+<p>
+$services.localization.render('csrf.confirmation.possibleReasons.description')
+</p>
+<ul><li>
+$services.localization.render('csrf.confirmation.possibleReasons.firstReason')
+</li><li>
+$services.localization.render('csrf.confirmation.possibleReasons.secondReason')
+</li><li>
+$services.localization.render('csrf.confirmation.possibleReasons.thirdReason')
+</li></ul>
+<p class="force-underline">
+$services.localization.render('csrf.confirmation.unsure', ["<a href='http://jira.xwiki.org/'>", "</a>"])
+</p>
+<p>
+$services.localization.render('csrf.confirmation.question', ["<strong>", "</strong>"])
+</p>
+#end
+#xwikimessageboxstart($services.localization.render('warning') $messageBoxContent)
 #getSanitizedURLAttributeValue('form','action', $request.getParameter('resubmit'), '', $resubmit)
 #getSanitizedURLAttributeValue('a','href', $request.getParameter('xback'), $doc.getURL(), $xback)
 <form action="$resubmit" method="post">

@@ -298,9 +298,8 @@ export default {
       return this.data.meta.pagination.showEntryRange
     },
     showPagination() {
-    return this.isMoreThanOnePage() || this.data.meta.showPaginationOnSinglePage;
-    },
-    isMoreThanOnePage () { return this.logic.getPageCount() > 1 }
+      return this.logic.getPageCount() > 1 || this.data.meta.pagination.showPaginationOnSinglePage;
+    }
   },
 
   methods: {

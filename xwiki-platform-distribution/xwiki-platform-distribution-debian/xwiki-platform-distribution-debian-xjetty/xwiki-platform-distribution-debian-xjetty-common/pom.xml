@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-xjetty</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-xjetty-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - XJetty - Common</name>
@@ -41,14 +41,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
-      <version>16.5.0-SNAPSHOT</version>
+      <version>16.10.0-SNAPSHOT</version>
       <type>war</type>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
-      <version>16.5.0-SNAPSHOT</version>
+      <version>16.10.0-SNAPSHOT</version>
       <type>zip</type>
       <optional>true</optional>
     </dependency>
@@ -192,12 +192,12 @@
               <linkTarget>/var/lib/xwiki/tmp</linkTarget>
             </data>
 
-            <!-- Custom Jetty context configuration -->
+            <!-- Be more explicit about which configuration file is used by XJetty -->
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/jetty-web.xml</linkName>
-              <linkTarget>/etc/xwiki/jetty-web.xml</linkTarget>
+              <linkName>/etc/xwiki/xjetty-web.xml</linkName>
+              <linkTarget>/etc/xwiki/jetty-ee8-web.xml</linkTarget>
             </data>
           </dataSet>
         </configuration>

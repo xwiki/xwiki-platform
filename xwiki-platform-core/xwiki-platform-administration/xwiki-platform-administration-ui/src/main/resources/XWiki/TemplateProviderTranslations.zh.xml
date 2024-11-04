@@ -1,0 +1,49 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.TemplateProviderTranslations" locale="zh">
+  <web>XWiki</web>
+  <name>TemplateProviderTranslations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.TemplateProviderClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>TemplateProvider Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.templateProvider.description=描述
+administration.templateProvider.description.hint=当创建一个新的页面时，模板提供者会显示的信息。
+administration.templateProvider.icon=图标
+administration.templateProvider.icon.hint=创建新页面时为模板提供者会显示的图标。在完整列表 {0} 中选择一个图标 {1} 。
+administration.templateProvider.creationRestrictions=创建限制
+administration.templateProvider.creationRestrictions.hint=此模板被允许创建页面的位置列表（包括其子位置）
+administration.templateProvider.creationRestrictions.none=这个模板可以在任何地方创建页面
+administration.templateProvider.creationRestrictionsAreSuggestions=创建限制作为建议
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=允许用户选择使用此模板在任何位置创建页面，当从列表中选择此模板时，使用第一个创建限制作为预填充的默认位置。
+</content>
+  </xwikidoc>

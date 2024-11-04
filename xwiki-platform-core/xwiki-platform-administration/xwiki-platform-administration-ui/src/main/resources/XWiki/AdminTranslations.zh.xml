@@ -37,128 +37,154 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>administration.title=管理
-administration.title.page=管理此页面
-administration.title.wiki=Wiki管理
-administration.title.global=全域管理
+administration.title.page=页面管理
+administration.title.wiki=Wiki 管理
+administration.title.global=全局管理
 administration.sectionTitle=管理：{0}
-administration.sectionTitle.page=管理此页面：{0}
-administration.sectionTitle.wiki=管理此维基：{0}
-administration.sectionTitle.global=全域管理：{0}
+administration.sectionTitle.page=页面管理：{0}
+administration.sectionTitle.wiki=Wiki 管理：{0}
+administration.sectionTitle.global=全局管理：{0}
+administration.menu.label=管理部分。
 administration.menu.search.hint=查找…
-administration.menu.search.noResults=尚无结果。
+administration.menu.search.noResults=没有结果。
 
 # Registration Section
-XWiki.XWikiPreferences_use_email_verification.hint=向新注册的用户发送电子邮件以确认邮件地址。
-### Missing: XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
-### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
-### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
-### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
-### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
-### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.XWikiPreferences_use_email_verification.hint=如果设置为“是”，则将发送电子邮件到填写注册表格时提供的电子邮件地址。
+XWiki.XWikiPreferences_validation_email_content.hint=用于发送给用户以验证其电子邮件地址的电子邮件模板。
+XWiki.XWikiPreferences_confirmation_email_content.hint=用户通过点击他收到的第一封电子邮件中的验证链接验证其账户后，所发送的对应电子邮件的模板。
+XWiki.XWikiPreferences_invitation_email_content.hint=发送给被邀请注册用户的电子邮件模板。
+XWiki.Registration_heading.hint=这是页面上方显示给正在注册和刚刚注册完用户的文字行。可以使用 Velocity 和 wiki 语法。
+XWiki.Registration_welcomeMessage.hint=仅在用户填写表单时显示。可以使用 Velocity 和 wiki 语法代码。
+XWiki.Registration_loginButton_enabled.hint=当用户注册后，我们会提供一个按钮供他们点击，该按钮会将用户名和密码发送到登录操作，并立即让他们登录。然而，这会导致用户名和密码在HTML中回传，根据您的安全需求，这可能是不可接受的。
+XWiki.Registration_loginButton_autoLogin_enabled.hint=如果登录按钮是启用的，那么你可以使用一段 JavaScript 代码来为用户自动点击登录按钮。
+XWiki.Registration_defaultRedirect.hint=如果未指定 xredirect 参数，用户点击登录按钮后将被重定向到此 URL。可以使用 Velocity 代码。
+XWiki.Registration_requireCaptcha.hint=将此设置为 true，要求用户在注册时解决 CAPTCHA 验证。
+XWiki.Registration_registrationSuccessMessage.hint=当用户成功注册后，会向他们显示此内容。可以使用 Velocity 和 wiki 语法代码。
+XWiki.Registration_passwordLength.hint=密码的最小长度。更长的密码更安全，建议保持密码长度在6个字符以上。
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=如果勾选此项，将强制用户选择的密码中至少包含一个小写字母。
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=如果勾选此项，将强制用户选择的密码中至少包含一个大写字母。
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=如果勾选此项，将强制用户选择的密码中至少包含一个数字。
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=如果勾选此项，将强制用户选择的密码中至少包含一个符号字符。
 
 # Look &amp; Feel Sections
-### Missing: admin.themes=Themes
-### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
-### Missing: admin.colorthemes.local=Local
-### Missing: admin.colorthemes.global=Global
-### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
-### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
-### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
-### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
-### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
-### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
-### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
-### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
-### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
-### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+admin.themes=主题
+admin.themes.description=自定义颜色、图标主题、外观和徽标。
+admin.colorthemes.local=本地的
+admin.colorthemes.global=全局的
+XWiki.XWikiPreferences_showannotations.hint=在页面布局中显示注释部分。
+XWiki.XWikiPreferences_showcomments.hint=在页面布局中显示评论部分。
+XWiki.XWikiPreferences_showattachments.hint=在页面布局中显示附件部分。
+XWiki.XWikiPreferences_showhistory.hint=在页面布局中显示历史记录部分。
+XWiki.XWikiPreferences_showinformation.hint=在页面布局中显示信息部分。
+XWiki.XWikiPreferences_title.hint=定义浏览器显示的页面标题格式。
+XWiki.XWikiPreferences_meta.hint=定义添加到每个页面的元数据，包括页面描述、作者、关键词等。
+XWiki.XWikiPreferences_webcopyright.hint=定义页脚版权部分显示的信息。
+XWiki.XWikiPreferences_version.hint=定义页脚版本部分显示的信息。
+XWiki.XWikiPreferences_skin.hint=指定使用的默认外观。它可以是文件系统中的一个外观，例如 “flamingo”，也可以是自定义页面外观，例如 “XWiki.DefaultSkin”。
+XWiki.XWikiPreferences_iconTheme.hint=指定默认情况下使用的图标主题。
+XWiki.XWikiPreferences_colorTheme.hint=指定默认使用的颜色主题。
 
 # Editing Sections
-### Missing: admin.edit=Editing
-### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
-### Missing: admin.title=Title
-### Missing: XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Prevent the users from creating wiki pages with empty title.
-### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
-### Missing: XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
-### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
-### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+admin.edit=编辑
+admin.edit.description=配置编辑模式、所见即所得编辑器和可用语法。
+admin.title=标题
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=防止用户创建带有空标题的 wiki 页面。
+XWiki.XWikiPreferences_editor.hint=选择默认情况下用于编辑页面内容的编辑器类型。
+XWiki.XWikiPreferences_editcomment.hint=在创建新版本页面时允许输入消息。
+XWiki.XWikiPreferences_editcomment_mandatory.hint=对于每次更改，只有提供了版本摘要消息后，页面才会被保存。
+XWiki.XWikiPreferences_minoredit.hint=允许页面有主要（x.1）和次要（1.x）版本。次要版本可以使用页面历史记录中的 “显示次要编辑” 按钮查看。
+admin.wysiwyg.description=选择默认的 所见即所得 编辑器并对其进行配置。
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=当创建一个新的 wiki 页面时，默认用于页面内容的标记语法。
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
-### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
-### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+XWiki.XWikiPreferences_multilingual.hint=如果您的 wiki 内容包含多种语言，请启用多语言模式。这将允许用户翻译 wiki 页面，并以他们喜欢的语言查看界面。
+XWiki.XWikiPreferences_languages.hint=选择将在界面中可用的语言。如果启用了多语言模式，用户将能够使用这些语言中的任何一种翻译您的 wiki 页面。
+XWiki.XWikiPreferences_default_language.hint=选择 wiki 的默认语言
+XWiki.XWikiPreferences_dateformat.hint=指定用于显示日期的格式（例如页面创建日期）
+XWiki.XWikiPreferences_timezone.hint=全局设置日期的时区
 
 # Import Section
-### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+administration.section.import.hint=首先，上传一个新的软件包或从可用软件包列表中选择一个。所选软件包的内容将显示在右侧，同时显示导入选项。
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
-### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported wiki pages.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
-### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
-### Missing: administration.section.export.author.hint=The package author, displayed when importing the package.
-### Missing: administration.section.export.licence.hint=The content license. E.g.: LGPL, GPLV2, etc.
-### Missing: administration.section.export.version.hint=The package version, stored in the package descriptor.
-### Missing: administration.section.export.backupPack.hint=Preserve the page author when importing the pages. This option has no effect on the exported content and can be changed before the import.
+administration.section.export.pages=页面
+administration.section.export.pages.all=所有页面
+administration.section.export.withHistory.hint=在导出中包含页面历史版本。否则，只导出最新版本的页面。
+administration.section.export.targetXWikiVersion=目标 XWiki 版本
+administration.section.export.targetXWikiVersion.hint=要导入页面的 XWiki 版本。当前版本为 {0}。
+administration.section.export.targetXWikiVersion.12plus=12.0 及以上
+administration.section.export.targetXWikiVersion.below12=低于 12.0
+administration.section.export.packageName.hint=导出 wiki 页面时生成归档文件所使用的文件名。
+administration.section.export.moreOptions=更多选项
+administration.section.export.lessOptions=更少选项
+administration.section.export.description.hint=导入包时显示的包描述。
+administration.section.export.author.hint=包作者，导入包时显示。
+administration.section.export.licence.hint=内容许可证。例如：LGPL、GPLV2等。
+administration.section.export.version.hint=包版本，存储在包描述符中。
+administration.section.export.backupPack.hint=在导入页面时保留页面作者。此选项对导出的内容没有影响且可以在导入前进行更改。
 
 # Users Section
-### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
-### Missing: administration.section.users.enableUser.done=User account enabled
-### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
-### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
-### Missing: administration.section.users.disableUser.done=User account disabled
-### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
-### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.newAuthor=New Author
-### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
-### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
-### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
+administration.section.users.enableUser.inProgress=启用用户帐号...
+administration.section.users.enableUser.done=用户帐号已启用
+administration.section.users.enableUser.failed=无法启用用户帐号
+administration.section.users.disableUser.inProgress=禁用用户账号…
+administration.section.users.disableUser.done=用户帐号已禁用
+administration.section.users.disableUser.failed=无法禁用用户帐号
+administration.section.users.deleteUser.confirmationMessage=用户 {0} 将被删除并从其所属的所有 {1} 组 {2} 中移除。您确定要继续吗？
+administration.section.users.deleteUser.programmingRightsWarning=您要删除的用户具有编程权限，并且是 {0}{1,选择,1#1 页面|1&lt;{1} 页面}{2} 的最后一个作者。如果 {1,选择,1#此页有|1&lt;这些页有} 脚本需要编程权限，那么如果您删除用户而不替换作者，这些脚本将停止工作。
+administration.section.users.deleteUser.scriptRightsWarning=要删除的用户具有脚本权限，并且是 {0}{1,选择,1#1 页面|1&lt;{1} 页面}{2} 的最后一个作者。如果删除用户而不替换作者，{1,选择,1#此页有|1&lt;这些页有} 中的脚本可能会停止工作。
+administration.section.users.deleteUser.newAuthor=新作者
+administration.section.users.deleteUser.newAuthor.hint=选择一个具有 {0} 权限的用户，或者如果您不想替换作者，请将此字段留空。
+administration.section.users.deleteUser.newAuthor.error=所选用户没有 {0} 权限！
+administration.section.users.deleteUser.newAuthor.programming=编程
+administration.section.users.deleteUser.newAuthor.script=脚本
+admin.usersgroups.extensionrights=扩展权限
+
+# Groups section
+administration.section.groups.deleteUserFromGroup.loading=从组中删除成员
+administration.section.groups.deleteUserFromGroup.success=已成功从组中删除成员
+administration.section.groups.deleteUserFromGroup.failure=无法从组中删除成员
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=Various configurations for extensions.
-### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+admin.other=其他的
+admin.other.description=扩展的各种配置。
+administration.section.analytics.status=状态
+administration.section.analytics.status.hint=确定 Google Analytics™ 中的跟踪是否处于活动状态
 
 # Social category
-### Missing: admin.social=Social
-### Missing: admin.social.description=Configuration for social features.
+admin.social=社交
+admin.social.description=社交功能的配置。
+
+# Configurable Class
+XWiki.ConfigurableClass_displayInSection=分段显示
+XWiki.ConfigurableClass_heading=标题
+XWiki.ConfigurableClass_configurationClass=配置类
+XWiki.ConfigurableClass_linkPrefix=链接前缀
+XWiki.ConfigurableClass_propertiesToShow=要显示的属性
+XWiki.ConfigurableClass_codeToExecute=要执行的代码
+XWiki.ConfigurableClass_iconAttachment=图标附件
+XWiki.ConfigurableClass_displayInCategory=分类显示
+XWiki.ConfigurableClass_displayBeforeCategory=分类前显示
+XWiki.ConfigurableClass_categoryIcon=分类图标
+XWiki.ConfigurableClass_scope=范围
+XWiki.ConfigurableClass_scope_WIKI=Wiki
+XWiki.ConfigurableClass_scope_SPACE=当前空间
+XWiki.ConfigurableClass_scope_ALL_SPACES=所有空间
+XWiki.ConfigurableClass_scope_WIKI+ALL_SPACES=Wiki 和所有空间
+XWiki.ConfigurableClass_sectionOrder=分段顺序
+
 
 ## Used to indicate where deprecated keys end
 #@deprecatedstart
 
 ## Deprecated since 11.6RC1
-### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+XWiki.XWikiPreferences_auth_active_check.hint=如果设置为 “是”，它将阻止用户在没有输入之前通过电子邮件发送的令牌的情况下登录。
+administration.section.users.deleteUser.markInactiveMessage=您可以选择不删除用户，而是将其配置文件标记为不活跃。这将阻止他们登录，并保留他们编写的脚本所关联的访问权限。
 
 ## Deprecated since 11.8RC1
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=您可以将用户的配置文件标记为已禁用，而不是删除用户。这将阻止他们登录，并保留与他们编写的脚本相关的访问权限。
+XWiki.Registration_liveValidation_enabled.hint=将此项设置为 false 以禁用实时验证 JavaScript 代码（字段仍将在服务器端进行验证）。
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=实时验证显示一条消息，向用户表明他们已满意地填写了该字段。如果没有为特定字段覆盖该消息，则它们将得到此消息。可以使用 Velocity 代码。
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

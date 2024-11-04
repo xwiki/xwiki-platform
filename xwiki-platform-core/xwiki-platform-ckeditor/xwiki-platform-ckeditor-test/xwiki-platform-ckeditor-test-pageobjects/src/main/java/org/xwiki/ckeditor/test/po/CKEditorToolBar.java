@@ -143,6 +143,20 @@ public class CKEditorToolBar extends BaseElement
     }
 
     /**
+     * Opens the table properties dialog to insert a new table.
+     *
+     * @return the page object to interact with the table properties dialog
+     * @since 16.8.0RC1
+     * @since 16.4.4
+     * @since 15.10.13
+     */
+    public TablePropertiesDialog insertTable()
+    {
+        clickButton("table");
+        return new TablePropertiesDialog();
+    }
+
+    /**
      * @return the element containing the tool bar
      */
     protected WebElement getContainer()

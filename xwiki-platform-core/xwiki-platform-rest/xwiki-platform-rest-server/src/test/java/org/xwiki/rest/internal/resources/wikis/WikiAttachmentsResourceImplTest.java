@@ -19,17 +19,22 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.rest.internal.resources.AbstractAttachmentsResourceTest;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -38,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -50,6 +56,9 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 {
     @InjectMockComponents
     private WikiAttachmentsResourceImpl wikiAttachmentsResource;
+
+    @MockComponent
+    private ContextualAuthorizationManager authorization;
 
     @BeforeEach
     @Override
@@ -71,7 +80,17 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(query.setLimit(10)).thenReturn(query);
 
         XWikiAttachment xwikiAttachment = mock(XWikiAttachment.class);
-        List<Object> results = Collections.singletonList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment});
+        AttachmentReference xwikiAttachmentReference = mock(AttachmentReference.class, "image");
+        when(xwikiAttachment.getReference()).thenReturn(xwikiAttachmentReference);
+        when(this.authorization.hasAccess(Right.VIEW, xwikiAttachmentReference)).thenReturn(true);
+
+        XWikiAttachment forbiddenAttachment = mock(XWikiAttachment.class);
+        AttachmentReference forbiddenAttachmentReference = mock(AttachmentReference.class, "forbidden");
+        when(forbiddenAttachment.getReference()).thenReturn(forbiddenAttachmentReference);
+        when(this.authorization.hasAccess(Right.VIEW, forbiddenAttachmentReference)).thenReturn(false);
+
+        List<Object> results = Arrays.asList(new Object[] {"Path.To", "Page", "1.3", xwikiAttachment},
+            new Object[] {"Path.To", "ForbiddenPage", "1.3", forbiddenAttachment});
         when(query.execute()).thenReturn(results);
 
         when(this.defaultSpaceReferenceResover.resolve(eq("Path.To"), any()))
@@ -83,6 +102,9 @@ class WikiAttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
 
         Attachments attachments =
             this.wikiAttachmentsResource.getAttachments("test", "", "", "abc", "", "", 0, 10, true);
+
+        verify(this.authorization).hasAccess(Right.VIEW, xwikiAttachmentReference);
+        verify(this.authorization).hasAccess(Right.VIEW, forbiddenAttachmentReference);
 
         assertEquals(Collections.singletonList(attachment), attachments.getAttachments());
     }

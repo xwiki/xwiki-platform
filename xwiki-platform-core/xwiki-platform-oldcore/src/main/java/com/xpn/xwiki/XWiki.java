@@ -1462,7 +1462,7 @@ public class XWiki implements EventListener
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
                 }
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }
@@ -4102,7 +4102,7 @@ public class XWiki implements EventListener
 
     public String generateRandomString(int size)
     {
-        return RandomStringUtils.randomAlphanumeric(size);
+        return RandomStringUtils.secure().nextAlphanumeric(size);
     }
 
     public String generateValidationKey(int size)
@@ -4237,9 +4237,6 @@ public class XWiki implements EventListener
 
             saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
 
-            // Now let's add the user to XWiki.XWikiAllGroup
-            setUserDefaultGroup(doc.getFullName(), context);
-
             return 1;
         } catch (Exception e) {
             Object[] args = { "XWiki." + userName };
@@ -4259,7 +4256,26 @@ public class XWiki implements EventListener
         return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
     }
 
-    public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
+    /**
+     * @param documentReference the reference of the user document
+     * @param xcontext the XWiki context
+     * @since 16.7.0
+     */
+    @Unstable
+    public void setUserDefaultGroup(DocumentReference documentReference, XWikiContext xcontext)
+    {
+        WikiReference currentWikiReference = xcontext.getWikiReference();
+
+        try {
+            xcontext.setWikiReference(documentReference.getWikiReference());
+
+            setUserDefaultGroup(getLocalStringEntityReferenceSerializer().serialize(documentReference), xcontext);
+        } finally {
+            xcontext.setWikiReference(currentWikiReference);
+        }
+    }
+
+    public void setUserDefaultGroup(String fullwikiname, XWikiContext context)
     {
         String groupsPreference = isAllGroupImplicit() ? getConfiguration().getProperty("xwiki.users.initialGroups")
             : getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
@@ -4268,7 +4284,13 @@ public class XWiki implements EventListener
             String[] groups = groupsPreference.split(",");
             for (String groupName : groups) {
                 if (StringUtils.isNotBlank(groupName)) {
-                    addUserToGroup(fullwikiname, groupName.trim(), context);
+                    String cleanedGroupName = groupName.trim();
+
+                    try {
+                        addUserToGroup(fullwikiname, cleanedGroupName, context);
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to update group [{}] with member [{}]", cleanedGroupName, fullwikiname, e);
+                    }
                 }
             }
         }
@@ -4279,12 +4301,17 @@ public class XWiki implements EventListener
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
-        BaseObject memberObject =
-            groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        memberObject.setStringValue("member", userName);
+        // Make sure the user is not already part of the group
+        if (groupDoc.getXObject(groupClassReference, "member", userName,
+            false) == null) {
+            BaseObject memberObject =
+                groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+            memberObject.setStringValue("member", userName);
+
+            saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+        }
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
@@ -4726,67 +4753,74 @@ public class XWiki implements EventListener
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2,
         boolean triggeredByUser, XWikiContext context) throws XWikiException
     {
-        Version v1 = new Version(version1);
-        Version v2 = new Version(version2);
+        WikiReference currentWikiReference = context.getWikiReference();
 
-        // Find the lower and upper bounds
-        Version upperBound = v1;
-        Version lowerBound = v2;
-        if (upperBound.compareVersions(lowerBound) < 0) {
-            Version tmp = upperBound;
-            upperBound = lowerBound;
-            lowerBound = tmp;
-        }
+        try {
+            context.setWikiReference(document.getDocumentReference().getWikiReference());
 
-        XWikiDocumentArchive archive = document.getDocumentArchive(context);
+            Version v1 = new Version(version1);
+            Version v2 = new Version(version2);
 
-        if (archive.getNodes(upperBound, lowerBound).isEmpty()) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
-                String.format("Cannot find any revision to delete matching the range defined by [%s] and [%s]",
-                    lowerBound, upperBound));
-        }
-        // Remove the versions
-        archive.removeVersions(upperBound, lowerBound, context);
-
-        // Is this the last remaining version? If so, then recycle the document.
-        if (archive.getLatestVersion() == null) {
-            // Wrap the work as a batch operation.
-            BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
-            batchOperationExecutor.execute(() -> {
-                if (document.getLocale().equals(Locale.ROOT)) {
-                    context.getWiki().deleteAllDocuments(document, context);
-                } else {
-                    // Only delete the translation
-                    context.getWiki().deleteDocument(document, context);
-                }
-            });
-        } else {
-            // Notify before versions delete
-            getObservationManager()
-                .notify(new DocumentVersionRangeDeletingEvent(document.getDocumentReferenceWithLocale(),
-                    lowerBound.toString(), upperBound.toString()), document, context);
-
-
-            // There are still some versions left.
-            // If we delete the most recent (current) version, then rollback to latest undeleted version.
-            // We do that right before updating the archive, in case it would cancel the action.
-            Version previousVersion = archive.getLatestVersion();
-            if (!document.getRCSVersion().equals(previousVersion)) {
-                context.getWiki().rollback(document, previousVersion.toString(), false, triggeredByUser, context);
+            // Find the lower and upper bounds
+            Version upperBound = v1;
+            Version lowerBound = v2;
+            if (upperBound.compareVersions(lowerBound) < 0) {
+                Version tmp = upperBound;
+                upperBound = lowerBound;
+                lowerBound = tmp;
             }
 
-            // Update the archive
-            context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
-            // Make sure the cached document archive is updated too
-            XWikiDocument cachedDocument =
-                context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
-            cachedDocument.setDocumentArchive(archive);
+            XWikiDocumentArchive archive = document.getDocumentArchive(context);
 
-            // Notify after versions delete
-            getObservationManager()
-                .notify(new DocumentVersionRangeDeletedEvent(document.getDocumentReferenceWithLocale(),
-                    lowerBound.toString(), upperBound.toString()), document, context);
+            if (archive.getNodes(upperBound, lowerBound).isEmpty()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                    String.format("Cannot find any revision to delete matching the range defined by [%s] and [%s]",
+                        lowerBound, upperBound));
+            }
+            // Remove the versions
+            archive.removeVersions(upperBound, lowerBound, context);
+
+            // Is this the last remaining version? If so, then recycle the document.
+            if (archive.getLatestVersion() == null) {
+                // Wrap the work as a batch operation.
+                BatchOperationExecutor batchOperationExecutor = Utils.getComponent(BatchOperationExecutor.class);
+                batchOperationExecutor.execute(() -> {
+                    if (document.getLocale().equals(Locale.ROOT)) {
+                        context.getWiki().deleteAllDocuments(document, context);
+                    } else {
+                        // Only delete the translation
+                        context.getWiki().deleteDocument(document, context);
+                    }
+                });
+            } else {
+                // Notify before versions delete
+                getObservationManager()
+                    .notify(new DocumentVersionRangeDeletingEvent(document.getDocumentReferenceWithLocale(),
+                        lowerBound.toString(), upperBound.toString()), document, context);
+
+                // There are still some versions left.
+                // If we delete the most recent (current) version, then rollback to latest undeleted version.
+                // We do that right before updating the archive, in case it would cancel the action.
+                Version previousVersion = archive.getLatestVersion();
+                if (!document.getRCSVersion().equals(previousVersion)) {
+                    context.getWiki().rollback(document, previousVersion.toString(), false, triggeredByUser, context);
+                }
+
+                // Update the archive
+                context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
+                // Make sure the cached document archive is updated too
+                XWikiDocument cachedDocument =
+                    context.getWiki().getDocument(document.getDocumentReferenceWithLocale(), context);
+                cachedDocument.setDocumentArchive(archive);
+
+                // Notify after versions delete
+                getObservationManager()
+                    .notify(new DocumentVersionRangeDeletedEvent(document.getDocumentReferenceWithLocale(),
+                        lowerBound.toString(), upperBound.toString()), document, context);
+            }
+        } finally {
+            context.setWikiReference(currentWikiReference);
         }
     }
 
@@ -4869,6 +4903,13 @@ public class XWiki implements EventListener
             // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
             // the overwritten is accepted.
             if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
+                if (!targetDocument.isNew()) {
+                    // If there is a document at the target location we need to delete it first.
+                    // But we don't want to notify about this delete since from outside world point of view it's an
+                    // update and not a delete+create
+                    deleteDocument(targetDocument, true, false, context);
+                }
+
                 // Ensure that the current context contains the wiki reference of the source document.
                 WikiReference wikiReference = context.getWikiReference();
                 context.setWikiReference(sourceDocumentReference.getWikiReference());
@@ -6272,14 +6313,21 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Generate a display user name and return it.
+     * Generate a username for display.
      *
-     * @param userReference
-     * @param format a Velocity scnippet used to format the user name
-     * @param link true if a full html link snippet should be returned
-     * @param escapeXML true if the returned name should be escaped (forced true if {@code link} is true)
+     * @param userReference the reference to the user profile page
+     * @param format an optional Velocity script used to format the username. If {@code null} the use the user's first
+     *        name followed by the user's last name and separated by a space. All the {@code XWiki.XWikiUsers}
+     *        xproperties are bound to the Velocity Context and can be referenced in the passed script.
+     * @param link true if an HTML link snippet should be returned. If false, just return the username for display as
+     *        a plain text string.
+     * @param escapeXML true if the returned text should be escaped (forced to true if the {@code link} parameter is
+     *        true)
      * @param context see {@link XWikiContext}
-     * @return the display user name or a html snippet with the link to the passed user
+     * @return the username for display as plain text, or a HTML snippet with the link to the passed user, or the
+     *         user profile page name if an error occurred when computing the username to display (e.g. when executing
+     *         the passed Velocity script). If the passed user reference is null, return some text specifying an
+     *         unknown user
      * @since 6.4RC1
      */
     public String getUserName(DocumentReference userReference, String format, boolean link, boolean escapeXML,
@@ -6289,7 +6337,7 @@ public class XWiki implements EventListener
             return localizePlainOrKey("core.users.unknownUser");
         }
 
-        XWikiDocument userdoc = null;
+        XWikiDocument userdoc;
         try {
             userdoc = getDocument(userReference, context);
             if (userdoc == null) {
@@ -6320,15 +6368,14 @@ public class XWiki implements EventListener
                     vcontext = getVelocityContextFactory().createContext();
                 } catch (XWikiVelocityException e) {
                     LOGGER.error("Failed to create standard VelocityContext", e);
-
                     vcontext = new XWikiVelocityContext();
                 }
-
                 for (String propname : userobj.getPropertyList()) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text = evaluateVelocity(format,
-                    "<username formatting code in " + context.getDoc().getDocumentReference() + ">", vcontext);
+                    String.format("<username formatting code in %s>", context.getDoc().getDocumentReference()),
+                    vcontext);
             }
 
             if (escapeXML || link) {
@@ -6336,8 +6383,8 @@ public class XWiki implements EventListener
             }
 
             if (link) {
-                text = "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context) + "\">" + text
-                    + "</a></span>";
+                text = String.format("<span class=\"wikilink\"><a href=\"%s\">%s</a></span>",
+                    userdoc.getURL("view", context), text);
             }
             return text;
         } catch (Exception e) {
@@ -6459,11 +6506,11 @@ public class XWiki implements EventListener
             DateFormatSymbols formatSymbols = null;
             try {
                 String language = getLanguagePreference(context);
-                formatSymbols = new DateFormatSymbols(new Locale(language));
+                formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
             } catch (Exception e2) {
                 String language = getXWikiPreference("default_language", context);
                 if ((language != null) && (!language.equals(""))) {
-                    formatSymbols = new DateFormatSymbols(new Locale(language));
+                    formatSymbols = new DateFormatSymbols(LocaleUtils.toLocale(language));
                 }
             }
 

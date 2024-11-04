@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-resource-test</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource-test-tests</artifactId>
   <name>XWiki Platform - Resource - Tests - Functional Tests</name>

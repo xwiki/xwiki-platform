@@ -75,7 +75,7 @@
     }
   ],
   'paths': {
-    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'bootstrap': "#removeJsSuffix($services.webjars.url('org.xwiki.platform:xwiki-platform-bootstrap', ""js/xwiki-bootstrap${jsExtension}""))",
     'deferred': $xwiki.getSkinFile('uicomponents/require/deferred.js'),
     'iscroll': "#removeJsSuffix($services.webjars.url('org.webjars.npm:iscroll', 'build/iscroll-lite.js'))",
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",

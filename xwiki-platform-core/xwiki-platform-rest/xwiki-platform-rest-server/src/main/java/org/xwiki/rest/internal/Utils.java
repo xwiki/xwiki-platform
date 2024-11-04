@@ -146,18 +146,57 @@ public class Utils
 
     public static List<String> getSpacesFromSpaceId(String spaceId)
     {
-        return getSpacesHierarchy(resolveLocalSpaceId(spaceId, "whatever"));
+        return getSpaces(resolveLocalSpaceId(spaceId, "whatever"));
     }
-    
-    public static List<String> getSpacesHierarchy(SpaceReference spaceReference) 
+
+    /**
+     * @param entityReference the reference from which to extract the spaces
+     * @return the spaces
+     * @since 16.8.0RC1
+     * @since 16.4.4
+     */
+    public static List<String> getSpaces(EntityReference entityReference)
     {
+        EntityReference spaceReference = entityReference.extractReference(EntityType.SPACE);
+
         List<String> spaces = new ArrayList<>();
         for(EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE;
                 ref = ref.getParent()) {
             spaces.add(ref.getName());
         }
         Collections.reverse(spaces);
+
         return spaces;
+    }
+
+    /**
+     * @param entityReference the reference from which to extract the spaces
+     * @return the value to pass to the URL factory for the space
+     * @since 16.8.0RC1
+     * @since 16.4.4
+     */
+    public static List<String> getSpacesURLElements(EntityReference entityReference)
+    {
+        return getSpacesURLElements(getSpaces(entityReference));
+    }
+
+    /**
+     * @param spaces the spaces
+     * @return the value to pass to the URL factory for the space
+     * @since 16.8.0RC1
+     * @since 16.4.4
+     */
+    public static List<String> getSpacesURLElements(List<String> spaces)
+    {
+        List<String> restSpaces = new ArrayList<>(spaces.size());
+        for (String space : spaces) {
+            if (!restSpaces.isEmpty()) {
+                restSpaces.add("spaces");
+            }
+            restSpaces.add(space);
+        }
+
+        return restSpaces;
     }
 
     /**

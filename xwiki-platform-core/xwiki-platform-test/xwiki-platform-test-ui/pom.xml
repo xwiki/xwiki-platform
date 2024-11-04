@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>16.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-ui</artifactId>
   <name>XWiki Platform - Test - UI Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - UI Tests Framework</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.05</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -75,7 +78,7 @@
     <dependency>
       <groupId>com.deque.html.axe-core</groupId>
       <artifactId>selenium</artifactId>
-      <version>4.8.2</version>
+      <version>4.10.0</version>
     </dependency>
   </dependencies>
   <build>

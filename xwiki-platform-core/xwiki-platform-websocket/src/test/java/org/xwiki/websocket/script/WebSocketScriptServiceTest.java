@@ -109,4 +109,11 @@ class WebSocketScriptServiceTest
             "Failed to create WebSocket URL for [test]. Root cause is [MalformedURLException: Invalid server URL!].",
             this.logCapture.getMessage(0));
     }
+
+    @Test
+    void urlWithRootServletContext() {
+        when(this.xcontext.getWiki().getWebAppPath(xcontext)).thenReturn("/");
+        assertEquals("ws://www.xwiki.org:80/websocket/one/two", this.service.url("/one/two"));
+    }
+
 }

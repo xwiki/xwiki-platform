@@ -43,9 +43,14 @@
   #set ($query = $query.bindValue('input').anyChars().literal($input).anyChars().query())
   #set ($rawResults = $query.execute())
   #set ($results = [])
-  ## Iterate over the results and select the first 10 results that are accessible to the current user.
-  #foreach($rawResult in $rawResults)
-    #if($results.size() >= 10)
+  #set ($limit = $numbertool.toNumber($request.limit))
+  #if ("$!limit" == '')
+    #set ($limit = 10)
+  #end
+  ## Iterate over the results and select the first N results (based on the limit request parameter) that are accessible
+  ## to the current user.
+  #foreach ($rawResult in $rawResults)
+    #if ($results.size() >= $limit)
       #break
     #end
     #if ($services.security.authorization.hasAccess('view', $services.model.resolveDocument($rawResult, $wikiReference)))

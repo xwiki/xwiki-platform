@@ -19,7 +19,6 @@
  */
 package org.xwiki.platform.notifications.test.ui;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -127,6 +126,7 @@ class NotificationsIT
     @AfterEach
     public void tearDown(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
         setup.deletePage("XWiki", FIRST_USER_NAME);
         setup.deletePage("XWiki", SECOND_USER_NAME);
         setup.forceGuestUser();
@@ -344,12 +344,11 @@ class NotificationsIT
             setup.createPage(testReference.getLastSpaceReference().getName(), "NotificationDisplayerClassTest",
                 "Page used for the tests of the NotificationDisplayerClass XObject.", "Test page 2");
 
-            Map<String, String> notificationDisplayerParameters = new HashMap<>()
-            {{
-                put("XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update");
-                put("XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
-                    "This is a test template");
-            }};
+            Map<String, String> notificationDisplayerParameters = Map.of(
+                "XWiki.Notifications.Code.NotificationDisplayerClass_0_eventType", "update",
+                "XWiki.Notifications.Code.NotificationDisplayerClass_0_notificationTemplate",
+                    "This is a test template"
+            );
 
             ObjectEditPage editObjects = setup.editObjects(testReference.getLastSpaceReference().getName(),
                 "NotificationDisplayerClassTest");

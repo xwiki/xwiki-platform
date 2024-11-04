@@ -175,19 +175,13 @@ public class CreateAction extends XWikiAction
         scontext.setAttribute("recommendedTemplateProviders", handler.getRecommendedTemplateProviders(),
             ScriptContext.ENGINE_SCOPE);
 
-        DocumentReference newDocumentReference = handler.getNewDocumentReference();
-        if (newDocumentReference == null) {
-            // There is information still missing, go back to the template and fill it.
+        DocumentReference newDocumentReference = handler.getDocumentReference();
+
+        XWikiDocument newDocument;
+        if (newDocumentReference == null)
+        {
             return CREATE_TEMPLATE;
         }
-
-        // Check if the creation in the spaceReference is allowed.
-        if (!handler.isTemplateProviderAllowedToCreateInCurrentSpace()) {
-            // The selected template provider is not usable in the selected location. Go back to the template and pick
-            // something else.
-            return CREATE_TEMPLATE;
-        }
-
         // Checking the rights to create the new document.
         // Note: Note checking the logical spaceReference, but the space of the final actual document reference, since
         // that is where we are creating the new document.
@@ -195,11 +189,18 @@ public class CreateAction extends XWikiAction
 
         // Check if the document to create already exists and if it respects the name strategy
         // Also check the CSRF token.
-        XWikiDocument newDocument = context.getWiki().getDocument(newDocumentReference, context);
+        newDocument = context.getWiki().getDocument(newDocumentReference, context);
         if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)
             || !this.isEntityReferenceNameValid(newDocumentReference)
             || !this.csrf.isTokenValid(context.getRequest().getParameter(FORM_TOKEN_PARAMETER)))
         {
+            return CREATE_TEMPLATE;
+        }
+
+        if (!handler.isTemplateInfoProvided() || !handler.isTemplateProviderAllowedToCreateInCurrentSpace())
+        {
+            // No template is selected or the selected template provider is not usable in the selected location. Go
+            // back to the template and pick something else.
             return CREATE_TEMPLATE;
         }
 

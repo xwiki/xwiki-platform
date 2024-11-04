@@ -23,12 +23,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
@@ -59,6 +61,18 @@ class InplaceEditIT
     void beforeEach(TestUtils setup, TestReference testReference)
     {
         setup.createPage(testReference, "before\n\n== Section ==\n\nafter", "test title");
+    }
+
+    @AfterEach
+    void afterEach(TestUtils setup, TestReference testReference)
+    {
+        // We might have an alert in case one test failed during an edition, in which case we just want to get rid of
+        // the alert to move to next page.
+        try {
+            setup.gotoPage(testReference);
+        } catch (UnhandledAlertException e) {
+            setup.getDriver().switchTo().alert().accept();
+        }
     }
 
     @Test
@@ -183,6 +197,7 @@ class InplaceEditIT
         ckeditor.getRichTextArea().click();
         ckeditor.getToolBar().toggleSourceMode();
         assertEquals("{{success}}\ntest\n{{/success}}", ckeditor.getSourceTextArea().getAttribute("value"));
+        viewPage.cancel();
     }
 
     @Test

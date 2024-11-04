@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.BeginFoldEvent;
-import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.event.DocumentRenamingEvent;
@@ -54,13 +53,13 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     }
 
     @Override
-    protected <T extends BeginFoldEvent & CancelableEvent> T getBeginEvent()
+    protected BeginFoldEvent createBeginEvent()
     {
-        return (T) new EntitiesRenamingEvent();
+        return new EntitiesRenamingEvent();
     }
 
     @Override
-    protected EndFoldEvent getEndEvent()
+    protected EndFoldEvent createEndEvent()
     {
         return new EntitiesRenamedEvent();
     }

@@ -24,7 +24,6 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.BeginFoldEvent;
-import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.event.DocumentCopiedEvent;
 import org.xwiki.refactoring.event.DocumentCopyingEvent;
@@ -68,13 +67,13 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     }
 
     @Override
-    protected <T extends BeginFoldEvent & CancelableEvent> T getBeginEvent()
+    protected BeginFoldEvent createBeginEvent()
     {
-        return (T) new EntitiesCopyingEvent();
+        return new EntitiesCopyingEvent();
     }
 
     @Override
-    protected EndFoldEvent getEndEvent()
+    protected EndFoldEvent createEndEvent()
     {
         return new EntitiesCopiedEvent();
     }

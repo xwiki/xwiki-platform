@@ -560,6 +560,38 @@ class ConfigurableClassIT
         setup.getDriver().switchTo().window(firstTab);
     }
 
+    /**
+     * Make sure a user with only ADMIN right on a space can access a Configurable section.
+     */
+    @Test
+    @Order(11)
+    void testSpaceAdminUserAcess(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Create the admin page in a space where normal users are not allowed to edit
+        DocumentReference adminSheet = new DocumentReference("xwiki", "XWiki", "testSpaceAdminUserAcess");
+
+        // Cleanup
+        setup.rest().delete(adminSheet);
+        setup.deleteSpace(testReference.getLastSpaceReference());
+
+        // Create an admin page available in a page administration
+        String section = "testSpaceAdminUserAcess";
+        setupConfigurableApplication(setup, adminSheet,
+            "displayInSection", section,
+            "scope", "WIKI+ALL_SPACES",
+            "codeToExecute", "<div id=\"testSpaceAdminUserAcess\">OK</div>");
+
+        // Create a normal user with ADMIN right on the test space
+        setup.setRightsOnSpace(testReference.getLastSpaceReference(), "", "XWiki.spaceadmin", "admin", true);
+        setup.createUserAndLogin("spaceadmin", "spaceadmin");
+
+        // Make sure the user has access to the space admin section
+        AdministrationSectionPage adminPage =
+            AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
+        adminPage.waitUntilActionButtonIsLoaded();
+        assertFalse(setup.getDriver().hasElementWithoutWaiting(By.id("testSpaceAdminUserAcess")));
+    }
+
     private void setupConfigurableApplication(TestUtils setup, DocumentReference testReference,
         Object... configurableClassProperties)
     {

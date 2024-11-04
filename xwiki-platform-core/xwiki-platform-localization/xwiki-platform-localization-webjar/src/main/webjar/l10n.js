@@ -20,7 +20,7 @@
 require.config({
   config: {
     'xwiki-l10n': {
-      url: `${XWiki.contextPath}/rest/wikis/${XWiki.currentWiki}/localization/translations`
+      url: `${XWiki.contextPath}/rest/wikis/${encodeURIComponent(XWiki.currentWiki)}/localization/translations`
     }
   }
 });

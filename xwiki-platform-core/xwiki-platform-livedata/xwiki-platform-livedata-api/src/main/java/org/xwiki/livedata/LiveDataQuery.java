@@ -34,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataQuery
+public class LiveDataQuery implements InitializableLiveDataElement
 {
     /**
      * Specifies where to take the data from. Represents the "from" clause.
@@ -490,9 +490,7 @@ public class LiveDataQuery
         this.sort = sort;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.properties == null) {

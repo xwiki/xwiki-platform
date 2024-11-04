@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Adds the jar file from $JETTY_HOME/lib/ext and $JETTY_BASE/lib/ext to the server classpath.

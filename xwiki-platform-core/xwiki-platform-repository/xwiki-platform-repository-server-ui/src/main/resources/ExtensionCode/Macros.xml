@@ -1,0 +1,86 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="ExtensionCode.Macros" locale="">
+  <web>ExtensionCode</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (_sheetInit $classFullNameInput $transationPrefix)
+  #set ($classFullName = $classFullNameInput)
+  #set ($object = $doc.getObject($classFullName))
+  #if (!$object)
+    #set ($messageKey = "${transationPrefix}.sheet.description")
+    #set ($messageType = 'info')
+    #set ($className = ${object.xWikiClass.reference.name})
+    #if ($doc.documentReference.name != "${className.substring(0, $className.length() - 5)}Sheet")
+      #set ($messageKey = "${transationPrefix}.sheet.noObject")
+      #set ($messageType = 'warning')
+    #end
+    {{$messageType}}
+      $services.localization.render($messageKey)
+    {{/$messageType}}
+    #stop
+  #end
+  #set ($discard = $doc.use($object))
+  #set ($editing = $xcontext.action == 'edit')
+  #set ($discard = $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {
+    'forceSkinAction': true,
+    'language': $xcontext.locale
+  }))
+#end
+
+#macro (_formProperty, $object, $propertyId)
+  #set ($propertyType = $object.property($propertyId).propertyClass.type)
+  #if ($propertyType == 'boolean' &amp;&amp; $editing)
+    &lt;dt&gt;
+      &lt;label for="${classFullName}_0_active"&gt;
+        $doc.display('active')
+        $escapetool.xml($doc.displayPrettyName('active', false, false))
+      &lt;/label&gt;
+    &lt;/dt&gt;
+  #else
+    &lt;dt #if (!$editing &amp;&amp; $hasEdit)
+        class="editableProperty"
+        data-property="$escapetool.xml($services.model.serialize($object.getPropertyReference($propertyId)))"
+        data-property-type="object"#end&gt;
+      &lt;label#if ($editing) for="${classFullName}_0_${propertyId}"#end&gt;
+        $escapetool.xml($doc.displayPrettyName($propertyId, false, false))
+      &lt;/label&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;$doc.display($propertyId)&lt;/dd&gt;
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

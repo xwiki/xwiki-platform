@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -141,7 +141,7 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
 
         // If still not found, generate one and store it in the permanent configuration
         if (generatedKey == null) {
-            generatedKey = RandomStringUtils.random(32);
+            generatedKey = RandomStringUtils.secure().next(32);
             try {
                 this.permanentConfiguration.setProperty(name, generatedKey);
             } catch (ConfigurationSaveException e) {

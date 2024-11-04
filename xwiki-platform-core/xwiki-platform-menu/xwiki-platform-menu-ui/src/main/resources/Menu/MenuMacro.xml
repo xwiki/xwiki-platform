@@ -226,6 +226,18 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
       $(dropDownHeader).next().addClass('xDropdown-menu');
   });
 
+  $('.xDropdown-menu').each(function() {
+     this.addEventListener('keyup', function(event) {
+       if (event.key === 'Escape') {
+         // We change the state of the parent xDropdown
+         this.parentNode.classList.remove('open');
+         // We set the focus on the toggle button of the section we just collapsed
+         this.parentNode.querySelector(':scope > .xDropdown-header > .xDropdown-header-toggle').focus();
+       }
+       event.stopPropagation();
+     });
+  });
+
   $('.menu-horizontal .xDropdown').each(function() {
     // In case of horizontal menus, make it so that a class is added on hover, instead of using the :hover pseudo-class
     this.addEventListener("mouseover", function() {
@@ -812,19 +824,19 @@ require(['jquery','xwiki-l10n!menu-ui-translation-keys'], function($, l10n) {
         margin-top: 0;
         border-top-right-radius: 0;
         border-top-left-radius: 0;
+        overflow-wrap: break-word;
+        hyphens: auto;
         li {
           /* Text inside menu */
           color: @dropdown-link-color;
+          padding: 3px 20px;
           /* Links inside menu */
           a {
             display: block;
-            padding: 3px 20px;
             clear: both;
             font-weight: normal;
             line-height: @line-height-base;
             color: @dropdown-link-color;
-            overflow: hidden;
-            text-overflow: ellipsis; // Displaying ... if the text is too long
             &amp;:hover, &amp;:focus-within {
               /* &amp;:extend(.dropdown-menu&gt;li&gt;a:hover); */
               text-decoration: none;

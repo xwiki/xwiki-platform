@@ -33,10 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 15.9RC1
  */
-@UITest(properties = {
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
-})
+@UITest
 class RequiredRightsIT
 {
     @Test

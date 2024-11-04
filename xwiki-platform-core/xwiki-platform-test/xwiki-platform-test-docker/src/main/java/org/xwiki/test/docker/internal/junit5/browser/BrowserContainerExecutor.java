@@ -19,6 +19,13 @@
  */
 package org.xwiki.test.docker.internal.junit5.browser;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+
+import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BrowserWebDriverContainer;
@@ -26,10 +33,9 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.BrowserTestUtils;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
-
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 
 /**
  * Create and execute the browser docker container for driving the tests.
@@ -97,6 +103,18 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             .withNetworkAliases("vnchost")
             .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.SKIP, null);
 
+        if (testConfiguration.getServletEngine().isOutsideDocker()) {
+            // The servlet engine is running on the host so we need to map the servlet engine aliases to the host in
+            // order for the browser to be able to access XWiki using the configured aliases.
+            String host = DockerTestUtils.isInAContainer() ? getXWikiBuildContainerIPAddress() : "host-gateway";
+            if (this.testConfiguration.isVerbose()) {
+                LOGGER.info("Mapping servlet engine network aliases [{}] to [{}].",
+                    testConfiguration.getServletEngineNetworkAliases(), host);
+            }
+            testConfiguration.getServletEngineNetworkAliases()
+                .forEach(alias -> webDriverContainer.withExtraHost(alias, host));
+        }
+
         // In case some test-resources are provided, they need to be available from the browser
         // for example in order to upload some files on the wiki.
         mountFromHostToContainer(webDriverContainer, getTestResourcePathOnHost(), browser.getTestResourcesPath());
@@ -115,6 +133,31 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
         }
 
         return webDriverContainer;
+    }
+
+    /**
+     * @return the IP address of the Docker container running the XWiki build
+     */
+    private String getXWikiBuildContainerIPAddress()
+    {
+        // This gives the local address that would be used to connect to the specified remote host. There is no real
+        // connection established, hence the specified remote IP can be unreachable.
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            String ipAddress = socket.getLocalAddress().getHostAddress();
+            if (this.testConfiguration.isVerbose()) {
+                LOGGER.info("The IP address of the XWiki build container is [{}].", ipAddress);
+            }
+            return ipAddress;
+        } catch (IOException e) {
+            // We assume the build container runs directly on the Docker host and uses the default bridge network.
+            String defaultIPAddress = "172.17.0.2";
+            LOGGER.warn(
+                "Failed to determine the IP address of the XWiki build container. Root cause: [{}]. "
+                    + "Falling back to the default IP address [{}].",
+                ExceptionUtils.getRootCauseMessage(e), defaultIPAddress);
+            return defaultIPAddress;
+        }
     }
 
     /**

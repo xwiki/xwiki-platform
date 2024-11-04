@@ -105,17 +105,12 @@
         ## An invitation exists.
         #if (($request.acceptInvitation || $request.rejectInvitation) &amp;&amp; $services.csrf.isTokenValid($form_token))
           ##
-          ## The user decided whether to accept or to reject the invitation.
-          #set ($notificationMessage = $services.localization.render('platform.wiki.users.invitation.userAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
           ## Accept
           #if ($request.acceptInvitation)
             #set ($discard = $services.wiki.user.acceptInvitation($existingInvitation, $request.userComment))
           #else
             #set ($discard = $services.wiki.user.refuseInvitation($existingInvitation, $request.userComment))
-          #end          
-          ## Send message to wiki admins. (XWikiAdminGroup)
-          #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
-          #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
+          #end
           ## Display the proper success info.
           {{success}}
           #if ($request.acceptInvitation)
@@ -271,10 +266,6 @@
           ##
           #set ($request = $services.wiki.user.askToJoin($currentUser, $wikiId, $request.userComment))
           #if ($request)
-            ## Send message to wiki admins. (XWikiAdminGroup)
-            #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
-            #set ($notificationMessage = $services.localization.render('platform.wiki.users.join.request.saveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $wikiName, $wikiId]))
-            #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
             {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
           #else
             #printException($services.wiki.user.lastError.message)

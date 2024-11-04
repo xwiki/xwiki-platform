@@ -68,14 +68,22 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     getOutputHTML() {
       const fullPage = this._ckeditor.config.fullPage;
+      const includeUploadWidgetsInOutputHTML = this._ckeditor.config._includeUploadWidgetsInOutputHTML;
       try {
         // We're interested only in the edited content (what's inside the content wrapper). Moreover, the returned HTML
         // should be independent of the editor type (iframe-based on in-place).
         this._ckeditor.config.fullPage = false;
+        // We have to include the upload widgets in the output HTML (that gets synchronized with remote users),
+        // otherwise they are lost when a remote change is applied. We can't simply ignore the diff changes that remove
+        // the upload widgets because it leads to conflicts when applying remote patches (the DOM structure is
+        // different: e.g. instead of <text><uploadWidget><text> we end up having only <text>, i.e. the adjacent text
+        // nodes are merged together).
+        this._ckeditor.config._includeUploadWidgetsInOutputHTML = true;
         return this._ckeditor.getData();
       } finally {
         // Restore the configuration value.
         this._ckeditor.config.fullPage = fullPage;
+        this._ckeditor.config._includeUploadWidgetsInOutputHTML = includeUploadWidgetsInOutputHTML;
       }
     }
 
@@ -142,6 +150,10 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     restoreSelection(ranges) {
       this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, ranges);
+
+      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
+      // selection is restored.
+      this._ckeditor.widgets.checkSelection();
     }
 
     /** @inheritdoc */
@@ -235,7 +247,7 @@ define('xwiki-ckeditor-realtime-adapter', [
         // name and data. We can only update an existing widget in a generic way if its type doesn't change.
         const widgetPlaceholder = widgetWrapper.ownerDocument.createElement('xwiki-widget-' + widget.name);
         widgetPlaceholder.classList.add('xwiki-widget');
-        widgetPlaceholder.setAttribute('value', JSONSortify(widget.data));
+        widgetPlaceholder.setAttribute('value', this._serializeWidgetData(widget));
         widgetPlaceholder.dataset.widgetId = widget.id;
         widgetWrapper.replaceWith(widgetPlaceholder);
 
@@ -266,7 +278,7 @@ define('xwiki-ckeditor-realtime-adapter', [
           // data is an object and this makes the check always return false. The problem with this is that when the data
           // event is fired the scroll postion is updated, making it hard to scroll the content while remote changes are
           // applied (the scroll bar jumps). So we have to check ourselves if the data has changed.
-          if (widgetData !== JSONSortify(widget.data)) {
+          if (widgetData !== this._serializeWidgetData(widget)) {
             widgetData = JSON.parse(widgetData);
             widget.setData(widgetData);
           }
@@ -312,6 +324,27 @@ define('xwiki-ckeditor-realtime-adapter', [
 
       // We only need to cache the widgets until they are restored.
       this._widgetCache = {};
+    }
+
+    _serializeWidgetData(widget) {
+      // Clone the data so that we can modify it without affecting the widget.
+      const data = JSON.parse((JSON.stringify(widget.data)));
+      if (widget.name === 'xwiki-macro') {
+        // Whether a macro widget is inline or block depends on the macro output, which is not synchronized and thus is
+        // missing from the new content that we want to apply to the editor. When the macro widgets from the new content
+        // are initialized the inline flag is set (in the absence of the macro outut) based on the siblings and the
+        // parent of the macro widget. But there are cases where the macro can be both inline and block in the same
+        // context (parent and siblings) so we don't know for sure if the original macro widget was inline or block
+        // (e.g. an info box can technically be both inline and block inside a table cell because a table cell accepts
+        // both inline and block level content). We had two options:
+        // * include information about whether a macro widget is inline or block in the content that we synchronize (so
+        //   that the inline flag is properly set when the macro widgets from the new content are initialized)
+        // * ignore the inline flag when computing the changes between the old and the new content
+        // We chose the second option because it's simpler and because the user can't change only the inline flag
+        // without also changing either the macro parameters and content or the context where the macro is called.
+        delete data.inline;
+      }
+      return JSONSortify(data);
     }
 
     async _updateWidgets(updatedNodes) {
@@ -369,10 +402,6 @@ define('xwiki-ckeditor-realtime-adapter', [
       if (shouldRefreshContent) {
         await this._refreshContent();
       }
-
-      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
-      // selection is restored.
-      setTimeout(() => this._ckeditor.widgets.checkSelection(), 0);
     }
 
     async _refreshContent() {

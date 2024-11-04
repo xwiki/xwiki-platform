@@ -29,6 +29,7 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various helpers around the Solr API.
@@ -328,6 +329,22 @@ public interface SolrUtils
     default <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
     {
         return getCollection(fieldName, document);
+    }
+
+    /**
+     * Extract from the document the values associated with the passed field name.
+     * 
+     * @param <T> the of the value to return
+     * @param fieldName the name of the field in the document
+     * @param document the Solr document
+     * @param targetType the type of the value to return
+     * @return the value associated with the passed field name in the document
+     * @since 16.8.0RC1
+     */
+    @Unstable
+    default <T> List<T> getList(String fieldName, SolrDocument document, Type targetType)
+    {
+        return getList(fieldName, document);
     }
 
     /**

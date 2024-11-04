@@ -226,7 +226,14 @@ public class ArtifactResolver
             JAR, platformVersion);
         dependentArtifacts.add(skinArtifact);
 
-        // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.
+        // Use the Platform extension of the Message rendering macros, to get the pretty name provider using
+        // translations.
+        Artifact platformRenderingMessageArtifact = new DefaultArtifact(PLATFORM_GROUPID,
+            "xwiki-platform-rendering-macro-message", JAR, platformVersion);
+        dependentArtifacts.add(platformRenderingMessageArtifact);
+
+        // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg, so we need the dependency for our
+        // tests.
         Artifact componentScript = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-component-script",
             JAR, platformVersion);
         dependentArtifacts.add(componentScript);

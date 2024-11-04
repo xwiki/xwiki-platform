@@ -32,6 +32,8 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.LRUCacheConfiguration;
+import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -69,7 +71,7 @@ import com.xpn.xwiki.web.Utils;
 @Named("cache")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiCacheStore extends AbstractXWikiStore
-    implements XWikiCacheStoreInterface, EventListener, Initializable
+    implements XWikiCacheStoreInterface, EventListener, Initializable, CacheEntryListener<XWikiDocument>
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCacheStore.class);
 
@@ -134,6 +136,24 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
+    public void cacheEntryAdded(CacheEntryEvent<XWikiDocument> event)
+    {
+        event.getEntry().getValue().setCached(true);
+    }
+
+    @Override
+    public void cacheEntryModified(CacheEntryEvent<XWikiDocument> event)
+    {
+        // No need to do anything as XWikiDocument is taking care of switching cached to false
+    }
+
+    @Override
+    public void cacheEntryRemoved(CacheEntryEvent<XWikiDocument> event)
+    {
+        // No need to do anything as XWikiDocument is taking care of switching cached to false
+    }
+
+    @Override
     public void initialize() throws InitializationException
     {
         try {
@@ -168,6 +188,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
         int pageCacheCapacity = this.configuration.getProperty("xwiki.store.cache.capacity", 500);
         this.cache =
             this.cacheManager.createNewCache(new LRUCacheConfiguration("xwiki.store.pagecache", pageCacheCapacity));
+        this.cache.addCacheEntryListener(this);
 
         int pageExistCacheCapacity = this.configuration.getProperty("xwiki.store.cache.pageexistcapacity", 10000);
         this.pageExistCache = this.cacheManager

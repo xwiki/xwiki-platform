@@ -87,7 +87,7 @@ class ForgotUsernameIT
         }
 
         restoreSettings(setup);
-        logCaptureConfiguration.registerExcludes("CSRFToken: Secret token verification failed, token");
+        logCaptureConfiguration.registerExcludes("Secret CSRF token verification failed");
     }
 
     private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)

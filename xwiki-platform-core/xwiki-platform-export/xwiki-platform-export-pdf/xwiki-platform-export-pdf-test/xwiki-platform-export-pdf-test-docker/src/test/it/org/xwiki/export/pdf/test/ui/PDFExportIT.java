@@ -19,10 +19,6 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,6 +55,10 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -1151,9 +1151,9 @@ class PDFExportIT
             // The first image is the presentation (ppt) slide. The second image is from the word document.
             assertEquals(2, images.size());
 
-            // The presenation slide.
-            assertEquals(800, images.get(0).getRawWidth());
-            assertEquals(449, images.get(0).getRawHeight());
+            // The presentation slide.
+            assertEquals(1920, images.get(0).getRawWidth());
+            assertEquals(1080, images.get(0).getRawHeight());
 
             // The image from the word document.
             assertEquals(81, images.get(1).getRawWidth());

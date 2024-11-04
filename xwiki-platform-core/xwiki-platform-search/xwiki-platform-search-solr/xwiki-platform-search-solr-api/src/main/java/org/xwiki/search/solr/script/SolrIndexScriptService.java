@@ -41,6 +41,7 @@ import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -79,6 +80,9 @@ public class SolrIndexScriptService implements ScriptService
      */
     @Inject
     private AuthorizationManager authorization;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     /**
      * Used to access the current {@link XWikiContext}.
@@ -298,7 +302,7 @@ public class SolrIndexScriptService implements ScriptService
         XWikiContext xcontext = this.xcontextProvider.get();
 
         this.authorization.checkAccess(Right.ADMIN, xcontext.getUserReference(), wikiReference);
-        this.authorization.checkAccess(Right.PROGRAM, xcontext.getAuthorReference(), null);
+        this.contextualAuthorizationManager.checkAccess(Right.PROGRAM);
     }
 
     /**

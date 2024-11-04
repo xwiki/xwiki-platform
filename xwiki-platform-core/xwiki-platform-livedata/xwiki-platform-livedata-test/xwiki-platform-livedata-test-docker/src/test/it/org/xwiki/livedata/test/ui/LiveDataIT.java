@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.node.ArrayNode;
@@ -157,6 +158,14 @@ class LiveDataIT
 
         // Test the Live Data content.
         assertEquals(3, tableLayout.countRows());
+
+        assertEquals(List.of(5, 15, 25, 50, 100), liveDataElement.getPaginationPageSizes());
+
+        // Check that the list of page sizes is preserved when we select a standard page size (see XWIKI-20650)
+        liveDataElement = liveDataElement.setPagination(15);
+        assertEquals(3, liveDataElement.getTableLayout().countRows());
+        assertEquals(List.of(5, 15, 25, 50, 100), liveDataElement.getPaginationPageSizes());
+
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O2 1");
         tableLayout.assertRow(DOC_TITLE_COLUMN, "O3 1");
@@ -246,6 +255,7 @@ class LiveDataIT
         // Test filter on boolean values
         suggestInputElement.clear().hideSuggestions();
         liveDataElement.waitUntilReady();
+        tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
 
         // Take the focus on the is active filter.
@@ -256,9 +266,21 @@ class LiveDataIT
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
         liveDataElement.waitUntilReady();
+        tableLayout.waitUntilRowCountEqualsTo(1);
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
 
+        // Refresh the page and ensure the filter is still there
+        testUtils.getDriver().navigate().refresh();
+        tableLayout.waitUntilReady();
+        liveDataElement.waitUntilReady();
+
+        WebElement isActiveFilter = tableLayout.getFilter(IS_ACTIVE_COLUMN);
+        assertEquals("1", isActiveFilter.getAttribute("value"));
+        assertEquals(1, tableLayout.countRows());
+        tableLayout.assertRow(NAME_COLUMN, NAME_LYNDA);
+
+        suggestInputElement = new SuggestInputElement(isActiveFilter);
         suggestInputElement.clear();
         suggestInputElement.sendKeys(Boolean.FALSE.toString());
         suggestInputElement.waitForSuggestions();
@@ -266,11 +288,13 @@ class LiveDataIT
         assertEquals(1, suggestionElements.size());
         suggestionElements.get(0).select();
         liveDataElement.waitUntilReady();
+        tableLayout.waitUntilRowCountEqualsTo(1);
         assertEquals(1, tableLayout.countRows());
         tableLayout.assertRow(NAME_COLUMN, NAME_NIKOLAY);
 
         suggestInputElement.clear().hideSuggestions();
         liveDataElement.waitUntilReady();
+        tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
     }
 
@@ -354,6 +378,7 @@ class LiveDataIT
         assertEquals(3, tableLayout.countRows());
         tableLayout.clickAction(1, "delete");
         viewPage.waitForNotificationSuccessMessage("Delete Success");
+        tableLayout.waitUntilRowCountEqualsTo(2);
         assertEquals(2, tableLayout.countRows());
     }
 
@@ -425,6 +450,7 @@ class LiveDataIT
             + "{{liveData\n"
             + "  id=\"test\"\n"
             + "  properties=\"" + String.join(",", properties) + "\"\n"
+            + "  limit=\"5\"\n"
             + "  source=\"liveTable\"\n"
             + "  sourceParameters=\"translationPrefix=&className=" + testUtils.serializeReference(
             testReference.getLocalDocumentReference()) + "\"\n"

@@ -116,7 +116,8 @@ public class ImportAdministrationSectionPage extends ViewPage
         // Click submit
         this.importPackageLink.click();
         // Wait for the "Import successful message"
-        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='packagecontainer']/div[@class='infomessage']"));
+        getDriver().waitUntilElementIsVisible(By.xpath(
+            "//div[@id='packagecontainer']/div[contains(@class, 'infomessage')]"));
     }
 
     public ViewPage clickImportedPage(String pageName)

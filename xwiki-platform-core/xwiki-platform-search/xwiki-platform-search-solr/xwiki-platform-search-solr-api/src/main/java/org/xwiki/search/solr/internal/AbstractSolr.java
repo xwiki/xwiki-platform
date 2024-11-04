@@ -155,13 +155,16 @@ public abstract class AbstractSolr implements Solr, Disposable
         throws SolrException, SolrServerException, IOException
     {
         Integer sVersion = getSVersion(newCore);
-        int solrVersion = getSolrMajorVersion();
-        if (sVersion == null || sVersion < getSolrMajorVersion()) {
-            for (int previousVersion = solrVersion - 1; previousVersion >= 8; --previousVersion) {
+        int solrMajorVersion = getSolrMajorVersion();
+        if (sVersion == null || sVersion < solrMajorVersion) {
+            for (int previousVersion = solrMajorVersion - 1; previousVersion >= 8; --previousVersion) {
                 // Check if a core for this version of Solr exist
                 XWikiSolrCore previousCore = getCore(xwikiCoreName, previousVersion, false);
 
                 if (previousCore != null) {
+                    this.logger.debug("A previous core was found for name [{}] ([{}])", xwikiCoreName,
+                        previousCore.getSolrName());
+
                     // Copy the previous core
                     initializer.migrate(previousCore, newCore);
 
@@ -169,11 +172,13 @@ public abstract class AbstractSolr implements Solr, Disposable
                     previousCore.getClient().close();
 
                     break;
+                } else {
+                    this.logger.debug("Not previous core could be found for name [{}]", xwikiCoreName);
                 }
             }
 
             // Mark the core as fully migrated
-            setSVersion(newCore, solrVersion, sVersion == null);
+            setSVersion(newCore, solrMajorVersion, sVersion == null);
         }
     }
 

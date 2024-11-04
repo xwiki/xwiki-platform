@@ -110,8 +110,7 @@ class WikiTemplateIT
         // Delete the template wiki.
         deleteTemplateWiki();
 
-        logCaptureConfiguration.registerExcludes(
-            "CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExcludes("Secret CSRF token verification failed");
     }
 
     private void createTemplateWiki(TestUtils setup) throws Exception

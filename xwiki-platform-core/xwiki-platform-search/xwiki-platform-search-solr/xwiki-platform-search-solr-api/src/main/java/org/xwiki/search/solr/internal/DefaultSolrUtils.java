@@ -614,6 +614,12 @@ public class DefaultSolrUtils implements SolrUtils
     @Override
     public <T> Collection<T> getCollection(String fieldName, SolrDocument document, Type targetType)
     {
+        return getList(fieldName, document, targetType);
+    }
+
+    @Override
+    public <T> List<T> getList(String fieldName, SolrDocument document, Type targetType)
+    {
         Collection<?> solrCollection = document.getFieldValues(fieldName);
 
         if (solrCollection == null) {
@@ -648,6 +654,6 @@ public class DefaultSolrUtils implements SolrUtils
             return null;
         }
 
-        return collection instanceof Set ? (List<T>) collection : new ArrayList<>(collection);
+        return collection instanceof List ? (List<T>) collection : new ArrayList<>(collection);
     }
 }

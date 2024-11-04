@@ -19,46 +19,35 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.EntityType;
+import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.refactoring.RefactoringConfiguration;
 import org.xwiki.refactoring.batch.BatchOperation;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
-import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.question.EntitySelection;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.LogLevel;
-import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import ch.qos.logback.classic.Level;
 
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,22 +58,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-class DeleteJobTest
+class DeleteJobTest extends AbstractEntityJobTest
 {
-    @RegisterExtension
-    public LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
-
     @InjectMockComponents
     private DeleteJob deleteJob;
 
     @MockComponent
-    private ModelBridge modelBridge;
-
-    @MockComponent
     private ObservationManager observationManager;
-
-    @MockComponent
-    private AuthorizationManager authorization;
 
     @MockComponent
     private RefactoringConfiguration configuration;
@@ -93,21 +73,12 @@ class DeleteJobTest
     private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
-    private EntityReferenceProvider defaultEntityReferenceProvider;
-
-    @MockComponent
-    private Execution jobExecution;
-
-    @MockComponent
     private BatchOperationExecutor batchOperationExecutor;
 
-    @BeforeEach
-    void beforeEach()
+    @Override
+    protected Job getJob()
     {
-        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(this.jobExecution.getContext()).thenReturn(executionContext);
+        return this.deleteJob;
     }
 
     @Test
@@ -128,7 +99,7 @@ class DeleteJobTest
         run(request);
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
-            eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
+            eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(documentReference);
     }
@@ -155,7 +126,7 @@ class DeleteJobTest
         run(request);
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(DeleteJob.class),
-            eq(Collections.singletonMap(documentReference, new EntitySelection(documentReference))));
+            eq(Map.of(documentReference, new EntitySelection(documentReference))));
         verify(this.modelBridge).setContextUserReference(userReference);
         verify(this.modelBridge).delete(documentReference, true);
     }
@@ -167,9 +138,9 @@ class DeleteJobTest
 
         run(createRequest(documentReference));
 
-        assertEquals(1, this.logCapture.size());
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("Skipping [wiki:Space.Page] because it doesn't exist.", this.logCapture.getMessage(0));
+        assertEquals(1, getLogCapture().size());
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
+        assertEquals("Skipping [wiki:Space.Page] because it doesn't exist.", getLogCapture().getMessage(0));
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
@@ -193,9 +164,9 @@ class DeleteJobTest
 
         run(request);
 
-        assertEquals(1, this.logCapture.size());
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("You are not allowed to delete [wiki:Space.Page].", this.logCapture.getMessage(0));
+        assertEquals(1, getLogCapture().size());
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
+        assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
@@ -219,9 +190,9 @@ class DeleteJobTest
 
         run(request);
 
-        assertEquals(1, this.logCapture.size());
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals("You are not allowed to delete [wiki:Space.Page].", this.logCapture.getMessage(0));
+        assertEquals(1, getLogCapture().size());
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
+        assertEquals("You are not allowed to delete [wiki:Space.Page].", getLogCapture().getMessage(0));
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
@@ -245,16 +216,16 @@ class DeleteJobTest
         DocumentReference aliceReference = new DocumentReference("wiki", "Space", "Alice");
         DocumentReference bobReference = new DocumentReference("wiki", "Space", "Bob");
         when(this.modelBridge.getDocumentReferences(spaceReference)).thenReturn(
-            Arrays.asList(aliceReference, bobReference));
+            List.of(aliceReference, bobReference));
 
         run(createRequest(spaceReference));
 
         // We only verify that the code tries to delete the documents.
-        assertEquals(2, this.logCapture.size());
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals(Level.WARN, this.logCapture.getLogEvent(1).getLevel());
-        assertEquals("Skipping [wiki:Space.Alice] because it doesn't exist.", this.logCapture.getMessage(0));
-        assertEquals("Skipping [wiki:Space.Bob] because it doesn't exist.", this.logCapture.getMessage(1));
+        assertEquals(2, getLogCapture().size());
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(0).getLevel());
+        assertEquals(Level.WARN, getLogCapture().getLogEvent(1).getLevel());
+        assertEquals("Skipping [wiki:Space.Alice] because it doesn't exist.", getLogCapture().getMessage(0));
+        assertEquals("Skipping [wiki:Space.Bob] because it doesn't exist.", getLogCapture().getMessage(1));
     }
 
     @Test
@@ -264,11 +235,11 @@ class DeleteJobTest
 
         run(createRequest(foo));
 
-        assertEquals(2, this.logCapture.size());
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(0).getLevel());
-        assertEquals(Level.ERROR, this.logCapture.getLogEvent(1).getLevel());
-        assertEquals("Unsupported entity type [WIKI].", this.logCapture.getMessage(0));
-        assertEquals("Unsupported entity type [WIKI].", this.logCapture.getMessage(1));
+        assertEquals(2, getLogCapture().size());
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(1).getLevel());
+        assertEquals("Unsupported entity type [WIKI].", getLogCapture().getMessage(0));
+        assertEquals("Unsupported entity type [WIKI].", getLogCapture().getMessage(1));
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
     }
 
@@ -290,7 +261,7 @@ class DeleteJobTest
             return null;
         }).when(this.batchOperationExecutor).execute(any(BatchOperation.class));
         EntityRequest request = new EntityRequest();
-        request.setEntityReferences(singletonList(entityReference));
+        request.setEntityReferences(List.of(entityReference));
         return request;
     }
 }

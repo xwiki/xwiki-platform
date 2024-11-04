@@ -362,3 +362,14 @@ already take care of padding and shadow. */
   border-left-color: fade((@xwiki-border-color), 80%);
   border-right-color: fade((@xwiki-border-color), 80%);
 }
+
+.skip-nav {
+  a {
+    position: absolute;
+    top: -20em;
+    z-index: 10;
+    &:focus, &:active {
+      top: 0;
+    }
+  }
+}

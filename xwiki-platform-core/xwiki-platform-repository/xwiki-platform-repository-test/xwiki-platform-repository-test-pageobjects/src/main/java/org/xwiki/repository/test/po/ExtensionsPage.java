@@ -21,7 +21,7 @@ package org.xwiki.repository.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.repository.test.po.editor.ExtensionInlinePage;
+import org.xwiki.repository.test.po.edit.ExtensionInlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**

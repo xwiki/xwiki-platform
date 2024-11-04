@@ -200,6 +200,7 @@ filter = filter
 table_sort = sort
 fast-backward = fast-backward
 arrow_in = window-minimize
+reposition = arrows
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
@@ -391,6 +392,7 @@ user = user
 user_add=user-plus
 user_delete=user-times
 vcard = vcard-o
+wand = magic
 weather_clouds = cloud
 weather_sun = sun-o
 weather_snow=snowflake-o

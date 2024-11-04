@@ -117,7 +117,7 @@ Caused by: #printThrowable($throwable.cause true)
     #elseif ($argument.listIterator())
       ## Assume the argument is a job id.
       #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
-    #elseif ($argument.startsWith('wiki:'))
+    #elseif ($argument.class.name == 'java.lang.String' && $argument.startsWith('wiki:'))
       #set ($message = "$message#wikiHomePageLink($argument)")
     #elseif ($argument.previous && $argument.next)
       ## Assume the argument is a diff Delta.

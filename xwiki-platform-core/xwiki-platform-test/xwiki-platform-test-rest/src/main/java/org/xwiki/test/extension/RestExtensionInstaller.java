@@ -114,7 +114,6 @@ public class RestExtensionInstaller
             } else {
                 version = extensionId.getVersion().getValue();
             }
-
             resolvedExtensions.add(new ExtensionId(extensionId.getId(), version));
         }
 
@@ -166,6 +165,7 @@ public class RestExtensionInstaller
 
         JobExecutor jobExecutor = new JobExecutor();
         JobRequest request = getModelFactory().toRestJobRequest(installRequest);
+        LOGGER.info("Provisioning the extensions...", request);
         jobExecutor.execute(InstallJob.JOBTYPE, request, xwikiRESTURL, credentials);
     }
 

@@ -1,0 +1,254 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.5" reference="ExtensionCode.ExtensionSupportPlanClass" locale="">
+  <web>ExtensionCode</web>
+  <name>ExtensionSupportPlanClass</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content/>
+  <class>
+    <name>ExtensionCode.ExtensionSupportPlanClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <active>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>active</name>
+      <number>5</number>
+      <prettyName>active</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </active>
+    <content>
+      <customDisplay>{{include reference="AppWithinMinutes.Content"/}}</customDisplay>
+      <disabled>0</disabled>
+      <hint/>
+      <name>content</name>
+      <number>7</number>
+      <prettyName>Content</prettyName>
+      <script/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.ComputedFieldClass</classType>
+    </content>
+    <name>
+      <customDisplay>{{include reference="AppWithinMinutes.Title"/}}</customDisplay>
+      <disabled>0</disabled>
+      <hint/>
+      <name>name</name>
+      <number>6</number>
+      <prettyName>Name</prettyName>
+      <script/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.ComputedFieldClass</classType>
+    </name>
+    <paying>
+      <customDisplay/>
+      <defaultValue>0</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>paying</name>
+      <number>4</number>
+      <prettyName>paying</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </paying>
+    <summary>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>summary</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>summary</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </summary>
+    <supporter>
+      <cache>0</cache>
+      <classname>ExtensionCode.ExtensionSupporterClass</classname>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <freeText/>
+      <hint/>
+      <idField>doc.fullName</idField>
+      <largeStorage>0</largeStorage>
+      <multiSelect>0</multiSelect>
+      <name>supporter</name>
+      <number>1</number>
+      <picker>1</picker>
+      <prettyName>Supporter</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort>value</sort>
+      <sql/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField>doc.title</valueField>
+      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+    </supporter>
+    <url>
+      <contenttype>PureText</contenttype>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>---</editor>
+      <hint/>
+      <name>url</name>
+      <number>3</number>
+      <picker>1</picker>
+      <prettyName>url</prettyName>
+      <restricted>0</restricted>
+      <rows>1</rows>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </url>
+  </class>
+  <object>
+    <name>ExtensionCode.ExtensionSupportPlanClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>73aa3372-1c44-470c-9ff1-836abc11762c</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>ExtensionCode.ExtensionSupportPlanSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <name>ExtensionCode.ExtensionSupportPlanClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>1921b253-231b-45cc-ad5c-9f5d15e3049a</guid>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Sheet</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>XWiki.ClassSheet</sheet>
+    </property>
+  </object>
+</xwikidoc>

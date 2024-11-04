@@ -97,4 +97,28 @@ public interface URLSecurityManager
     {
         throw new SecurityException("Cannot guarantee safeness of " + serializedURI);
     }
+
+    /**
+     * Parse the given string to create a URI that is safe to use.
+     * This method throws a {@link SecurityException} if the parsed URI is not safe to use according to
+     * {@link #isURITrusted(URI)}. It might also throw a {@link URISyntaxException} if the parameter cannot be properly
+     * parsed.
+     * Note that this method might try to "repair" URI that are not parsed correctly by {@link URI#URI(String)}
+     * (e.g. serialized uri containing spaces).
+     *
+     * @param serializedURI a string representing a URI that needs to be parsed.
+     * @param requestHost the host the current request, this host will be added to the safe domains, when omitted this
+     * host is extracted from the context, this parameter exists for cases where the context is not available
+     * @return a URI safe to use
+     * @throws URISyntaxException if the given parameter cannot be properly parsed
+     * @throws SecurityException if the parsed URI is not safe according to {@link #isURITrusted(URI)}
+     * @since 16.8.0
+     * @since 16.4.4
+     * @since 15.10.13
+     */
+    @Unstable
+    default URI parseToSafeURI(String serializedURI, String requestHost) throws URISyntaxException, SecurityException
+    {
+        throw new SecurityException("Cannot guarantee that " + serializedURI + " is safe.");
+    }
 }

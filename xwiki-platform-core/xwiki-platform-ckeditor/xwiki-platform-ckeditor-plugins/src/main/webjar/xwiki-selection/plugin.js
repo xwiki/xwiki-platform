@@ -190,6 +190,25 @@
       require(['textSelection'], function(textSelection) {
         CKEDITOR.plugins.xwikiSelection.textSelection = textSelection;
       });
+
+      // Make sure the ContextManager used by the balloon toolbar doesn't shrink the selection when it's fake.
+      // See XWIKI-22403: WYSIWYG deletes typed text due to fake table selection
+      const ContextManager = CKEDITOR.plugins.balloontoolbar?.contextManager;
+      if (ContextManager) {
+        const originalCheck = ContextManager.prototype.check;
+        ContextManager.prototype.check = function(...args) {
+          let selection = args[0];
+          if (!selection) {
+            selection = this.editor.getSelection();
+            if (selection.isFake) {
+              // When check() is called without a selection parameter it shrinks the current editor selection, even if
+              // that selection is fake. By passing the current (fake) editor selection we prevent it from being shrunk.
+              args[0] = selection;
+            }
+          }
+          return originalCheck.apply(this, args);
+        };
+      }
     },
 
     beforeInit: function(editor) {

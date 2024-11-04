@@ -1039,6 +1039,23 @@ body[data-maximized="true"] {
     padding: .5em;
     z-index: 9995;
   }
+}
+
+/*
+ * Override the CKEditor reset for the table border color.
+ * The default border color from CKEditor is quite lacking on contrast.
+ */
+.cke_editable.cke_show_borders table.cke_show_border,
+.cke_editable.cke_show_borders table.cke_show_border > tr > th,
+.cke_editable.cke_show_borders table.cke_show_border > tr > td,
+.cke_editable.cke_show_borders table.cke_show_border > thead > tr > th,
+.cke_editable.cke_show_borders table.cke_show_border > thead > tr > td,
+.cke_editable.cke_show_borders table.cke_show_border > tbody > tr > th,
+.cke_editable.cke_show_borders table.cke_show_border > tbody > tr > td,
+.cke_editable.cke_show_borders table.cke_show_border > tfoot > tr > th,
+.cke_editable.cke_show_borders table.cke_show_border > tfoot > tr > td {
+  border-color: @table-border-color;
+  border-style: solid;
 }</code>
     </property>
     <property>

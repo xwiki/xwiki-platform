@@ -176,6 +176,24 @@ public class ImagePlugin extends XWikiDefaultPlugin
         this.imageCache = null;
     }
 
+    private int parseIntIgnoringException(String parameter)
+    {
+        try {
+            return Integer.parseInt(parameter);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private float parseFloatIgnoringException(String parameter)
+    {
+        try {
+            return Float.parseFloat(parameter);
+        } catch (NumberFormatException | NullPointerException e) {
+            return -1;
+        }
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -189,45 +207,26 @@ public class ImagePlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        if (attachment == null || !this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
-            return attachment;
-        }
+        XWikiAttachment result = attachment;
+        if (attachment != null && this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
+            int height = parseIntIgnoringException(context.getRequest().getParameter("height"));
+            int width = parseIntIgnoringException(context.getRequest().getParameter("width"));
+            float quality = parseFloatIgnoringException(context.getRequest().getParameter("quality"));
 
-        int height = -1;
-        try {
-            height = Integer.parseInt(context.getRequest().getParameter("height"));
-        } catch (NumberFormatException e) {
-            // Ignore.
+            // If no scaling is needed, return the original image.
+            if (!(height <= 0 && width <= 0 && quality < 0)) {
+                try {
+                    // Transform the image attachment before is it downloaded.
+                    result = downloadImage(attachment, width, height, quality, context);
+                } catch (Exception e) {
+                    LOG.warn(
+                        "Failed to transform image attachment {} for scaling, falling back to original attachment.",
+                        attachment.getFilename());
+                    LOG.debug("Full stack trace for image attachment scaling error: ", e);
+                }
+            }
         }
-
-        int width = -1;
-        try {
-            width = Integer.parseInt(context.getRequest().getParameter("width"));
-        } catch (NumberFormatException e) {
-            // Ignore.
-        }
-
-        float quality = -1;
-        try {
-            quality = Float.parseFloat(context.getRequest().getParameter("quality"));
-        } catch (NumberFormatException | NullPointerException e) {
-            // Ignore.
-        }
-
-        // If no scaling is needed, return the original image.
-        if (height <= 0 && width <= 0 && quality < 0) {
-            return attachment;
-        }
-
-        try {
-            // Transform the image attachment before is it downloaded.
-            return downloadImage(attachment, width, height, quality, context);
-        } catch (Exception e) {
-            LOG.warn("Failed to transform image attachment {} for scaling, falling back to original attachment.",
-                attachment.getFilename());
-            LOG.debug("Full stack trace for image attachment scaling error: ", e);
-            return attachment;
-        }
+        return result;
     }
 
     /**

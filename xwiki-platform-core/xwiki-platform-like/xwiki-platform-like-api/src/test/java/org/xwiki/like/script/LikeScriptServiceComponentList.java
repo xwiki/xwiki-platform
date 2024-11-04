@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 import org.xwiki.like.internal.DefaultLikeConfiguration;
 import org.xwiki.like.internal.DefaultLikeManager;
 import org.xwiki.like.internal.LikeConfigurationSource;
+import org.xwiki.like.internal.LikeManagerCacheHelper;
 import org.xwiki.ratings.internal.DefaultRatingsConfiguration;
 import org.xwiki.ratings.internal.DefaultRatingsManagerFactory;
 import org.xwiki.ratings.internal.RatingsConfigurationSource;
@@ -49,6 +50,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
 @ComponentList({
     LikeScriptService.class,
+    LikeManagerCacheHelper.class,
     DefaultLikeManager.class,
     DefaultRatingsManagerFactory.class,
     DefaultLikeConfiguration.class,

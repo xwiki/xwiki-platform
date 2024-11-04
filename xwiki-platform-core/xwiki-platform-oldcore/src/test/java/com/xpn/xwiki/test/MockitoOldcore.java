@@ -77,11 +77,13 @@ import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.XWikiTempDirUtil;
+import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.URLConfiguration;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
@@ -205,6 +207,8 @@ public class MockitoOldcore
     private boolean mockXWiki = true;
 
     private UserReferenceSerializer<DocumentReference> documentReferenceUserReferenceSerializer;
+
+    private UserPropertiesResolver allUserPropertiesResolver;
 
     /**
      * @version $Id$
@@ -397,7 +401,9 @@ public class MockitoOldcore
                 when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
                     .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
-                initEnvironmentDirectories();
+                Environment testEnvironment = new TestEnvironment();
+                this.temporaryDirectory = testEnvironment.getTemporaryDirectory();
+                this.permanentDirectory = testEnvironment.getPermanentDirectory();
 
                 servletEnvironment.setTemporaryDirectory(this.temporaryDirectory);
                 servletEnvironment.setPermanentDirectory(this.permanentDirectory);
@@ -1107,6 +1113,16 @@ public class MockitoOldcore
             });
         }
 
+        // A default implementation of UserReferenceResolver<CurrentUserReference> is expected by
+        // EffectiveAuthorSetterListener which otherwise fails to be registered as a component when @AllComponents
+        // annotation is used in tests that depend on oldcore. We register a mock implementation in case there's none
+        // registered already.
+        DefaultParameterizedType currentUserReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
+        if (!this.componentManager.hasComponent(currentUserReferenceResolverType)) {
+            getMocker().registerMockComponent(currentUserReferenceResolverType);
+        }
+
         DefaultParameterizedType userReferenceDocumentReferenceResolverType =
             new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class);
         if (!this.componentManager.hasComponent(userReferenceDocumentReferenceResolverType, "document")) {
@@ -1121,6 +1137,12 @@ public class MockitoOldcore
             } else {
                 this.documentReferenceUserReferenceSerializer =
                     getMocker().getInstance(userReferenceDocumentReferenceSerializer, "document");
+            }
+
+            if (!this.componentManager.hasComponent(UserPropertiesResolver.class, "all")) {
+                this.allUserPropertiesResolver = getMocker().registerMockComponent(UserPropertiesResolver.class, "all");
+            } else {
+                this.allUserPropertiesResolver = getMocker().getInstance(UserPropertiesResolver.class, "all");
             }
 
             // we ensure that when trying to resolve a DocumentReference to UserReference, then the returned mock
@@ -1403,24 +1425,20 @@ public class MockitoOldcore
         return this.wikiConfigurationSource;
     }
 
-    private void initEnvironmentDirectories()
-    {
-        File testDirectory = XWikiTempDirUtil.createTemporaryDirectory();
-
-        this.temporaryDirectory = new File(testDirectory, "temporary");
-        this.permanentDirectory = new File(testDirectory, "permanent-dir");
-    }
-
     /**
      * @since 7.2M2
      */
     public void registerMockEnvironment() throws Exception
     {
-        this.environment = getMocker().registerMockComponent(Environment.class);
+        this.environment = new TestEnvironment();
+        getMocker().registerComponent(Environment.class, this.environment);
 
-        initEnvironmentDirectories();
+        this.temporaryDirectory = this.environment.getTemporaryDirectory();
+        this.permanentDirectory = this.environment.getPermanentDirectory();
+    }
 
-        when(this.environment.getTemporaryDirectory()).thenReturn(this.temporaryDirectory);
-        when(this.environment.getPermanentDirectory()).thenReturn(this.permanentDirectory);
+    public UserPropertiesResolver getMockAllUserPropertiesResolver()
+    {
+        return this.allUserPropertiesResolver;
     }
 }

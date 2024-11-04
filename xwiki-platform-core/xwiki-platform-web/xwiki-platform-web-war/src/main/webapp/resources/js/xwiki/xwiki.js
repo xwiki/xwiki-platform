@@ -436,170 +436,6 @@ Object.extend(XWiki, {
       }
   },
 
-  /**
-   * Display a modal box allowing to create the new document from a template when clicking on broken links.
-   *
-   * @param container where to look for broken links
-   */
-  insertCreatePageFromTemplateModalBoxes: function(container) {
-      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit && XWiki.widgets.ModalPopup) {
-          XWiki.widgets.CreatePagePopup = Class.create(XWiki.widgets.ModalPopup, {
-              initialize : function($super, interactionParameters) {
-                  var content =  new Element('div', {'class': 'modal-popup'});
-                  content.insert(interactionParameters.content);
-                  $super(
-                          content,
-                          {
-                              "show"  : { method : this.showDialog,  keys : [] },
-                              "close" : { method : this.closeDialog, keys : ['Esc'] }
-                          },
-                          {
-                              displayCloseButton : true,
-                              verticalPosition : "center",
-                              backgroundColor : "#FFF"
-                          }
-                  );
-                  this.showDialog();
-                  this.setClass("createpage-modal-popup");
-              }
-          });
-
-          var spans = $(container || 'body').select("span.wikicreatelink:not(.skipCreatePagePopup)");
-          for (var i = 0; i < spans.length; i++) {
-              spans[i].down('a').observe('click', function(event) {
-                  // Remove the fragment identifier from the link URL.
-                  new Ajax.Request(event.findElement('a').href.replace(/#.*$/, ''), {
-                      method:'get',
-                      parameters: {
-                        xpage: 'createinline',
-                        ajax: 1
-                      },
-                      onSuccess: function(transport) {
-                          var redirect = transport.getHeader('redirect');
-                          if (redirect) {
-                            window.location = redirect;
-                          } else {
-                            // The create action actually loads some JS and CSS. This modal box needs them too, but we
-                            // load them on demand.
-                            // We display an notification while the browser fetch the resources/
-                            var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
-                            // Add the CSS
-                            var newStyle = new Element('link', {'rel': 'stylesheet', 'type':'text/css', 
-                              'href': '$xwiki.getSkinFile("uicomponents/widgets/select/select.css", true)'});
-                            $(document.head).insert(newStyle);
-                            // Add the JS
-                            require(["$xwiki.getSkinFile('js/xwiki/create.js', true)",
-                                     "$xwiki.getSkinFile('uicomponents/widgets/select/select.js', true)"],
-                                    function($) {
-                                       // We are sure that the JS have been loaded, so we finally display
-                                       // the create popup
-                                       new XWiki.widgets.CreatePagePopup({content: transport.responseText});
-                                       notification.hide();
-                                    });
-                          }
-                      },
-                      onFailure: function() {
-                        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}).show();
-                      }
-                  });
-                  event.stop();
-              });
-          }
-      }
-  },
-
-  /**
-   * Watchlist methods.
-   * 
-   * @deprecated Since XWiki 7.4, the watchlist UI is implemented in a UI extension. This code is still there to not 
-   * break the retro-compatibility but we can consider removing it.
-   */
-  watchlist : {
-
-    /**
-     * Mapping between link IDs and associated actions.
-     */
-    actionsMap : {
-        'tmWatchDocument' : 'adddocument',
-        'tmUnwatchDocument' : 'removedocument',
-        'tmWatchSpace' : 'addspace',
-        'tmUnwatchSpace' : 'removespace',
-        'tmWatchWiki' : 'addwiki',
-        'tmUnwatchWiki' : 'removewiki'
-    },
-
-    /**
-     * Mapping allowing to know which action to display when a previous action has been executed.
-     */
-    flowMap : {
-        'tmWatchDocument' : 'tmUnwatchDocument',
-        'tmUnwatchDocument' : 'tmWatchDocument',
-        'tmWatchSpace' : 'tmUnwatchSpace',
-        'tmUnwatchSpace' : 'tmWatchSpace',
-        'tmWatchWiki' : 'tmUnwatchWiki',
-        'tmUnwatchWiki' : 'tmWatchWiki'
-    },
-
-    /**
-     * Execute a watchlist action (add or remove the given document/space/wiki from watchlist).
-     *
-     * @param element the element that fired the action.
-     */
-    executeAction : function(element) {
-        var surl = window.docgeturl + "?xpage=watch&do=" + this.actionsMap[element.id];
-        new Ajax.Request(
-          surl,
-          {
-            method: 'get',
-            onComplete: function() {
-              if (element.nodeName == 'A') {
-                element.up().toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).up().toggleClassName('hidden');
-              } else {
-                element.toggleClassName('hidden');
-                $(XWiki.watchlist.flowMap[element.id]).toggleClassName('hidden');
-              }
-            }
-          });
-    },
-
-    /**
-     * Initialize watchlist UI.
-     */
-    initialize: function(container) {
-        container = $(container || 'body');
-        for (var button in XWiki.watchlist.actionsMap) {
-          var element = container.down('#' + button);
-          if (element) {
-            if (element.nodeName != 'A') {
-              element = $(button).down('A');
-            }
-
-            if (!element) {
-              // This is supposed to happen every time since the watchlist icons are implemented in the notifications
-              // menu. The watchlist icons are now implemented as a UI extension, and the inputs are handled with a 
-              // custom solution (bootstrap-switch).
-              // For these reasons, we stop the initialization here.
-              // We keep this function for old skins (like Colibri), that still have the old-fashioned watchlist icons.
-              return;
-            }
-
-            // unregister previously registered handler if any
-            element.stopObserving('click');
-            element.observe('click', function(event) {
-                Event.stop(event);
-                var element = event.element();
-                while (element.id == '') {
-                    element = element.up();
-                }
-                XWiki.watchlist.executeAction(element);
-              });
-          }
-        }
-    }
-  },
-
   cookies: {
     /**
      * Create a cookie, with or without expiration date.
@@ -669,33 +505,6 @@ Object.extend(XWiki, {
   },
 
   /**
-   * Extracts the file name from the value of the specified file input.
-   */
-  extractFileName: function(fileInput) {
-    fileInput = $(fileInput);
-    if (fileInput.files && fileInput.files.length > 0) {
-      // Modern browsers provide additional information about the selected file(s).
-      return fileInput.files[0].name;
-    } else if (fileInput.value.substr(0, 12) == 'C:\\fakepath\\') {
-      // Most browsers hide the real path for security reasons.
-      return fileInput.value.substr(12);
-    } else {
-      var lastPathSeparatorIndex = fileInput.value.lastIndexOf('/');
-      if (lastPathSeparatorIndex >= 0) {
-        // Unix-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      lastPathSeparatorIndex = fileInput.value.lastIndexOf('\\');
-      if (lastPathSeparatorIndex >= 0) {
-        // Windows-based path.
-        return fileInput.value.substr(lastPathSeparatorIndex + 1);
-      }
-      // The file input value is just the file name.
-      return fileInput.value;
-    }
-  },
-
-  /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
    * It makes rendering errors expandable and fixes external links on the body content.
    * Then it fires an custom event to signify the (modified) DOM is now loaded.
@@ -737,8 +546,6 @@ Object.extend(XWiki, {
     this.makeRenderingErrorsExpandable(container);
     this.fixLinksTargetAttribute(container);
     this.insertSectionEditLinks(container);
-    this.insertCreatePageFromTemplateModalBoxes(container);
-    this.watchlist.initialize(container);
     this.registerPanelToggle(container);
   }
 });
@@ -2027,4 +1834,48 @@ require(['jquery'], ($) => {
     containers.forEach(init);
   });
   $(() => init(document.documentElement));
+});
+
+require(['jquery', 'xwiki-meta', 'bootstrap'], ($, xm) => {
+    function init(rootElement) {
+        if (XWiki.docsyntax !== "xwiki/1.0" && XWiki.contextaction === "view" && XWiki.hasEdit) {
+            $(rootElement).find('span.wikicreatelink:not(.skipCreatePagePopup) a').on('click', loadCreateModal);
+        }
+    }
+
+    function loadCreateModal(event) {
+        event.preventDefault();
+        let linkElement = $(this);
+        let link = linkElement.attr('href').replace(/#.*$/, '');
+        // FIXME: we should load translation another way
+        let notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.popup.loading'))", 'inprogress');
+        $.get(link, {
+            'xpage': 'createinline',
+            'ajax': 1,
+            'form_token': xm.form_token
+        }).done(function (data, status, jqXHR) {
+            let redirect = jqXHR.getResponseHeader('redirect');
+            if (redirect) {
+                window.location = redirect;
+            } else {
+                let createModalContainer = $('#createModalContainer');
+                if (createModalContainer.length === 0) {
+                    createModalContainer = $('<div id="createModalContainer">');
+                    $('body').append(createModalContainer);
+                }
+                createModalContainer.html(data);
+                $(document).trigger('xwiki:dom:updated', {'elements': createModalContainer.toArray()});
+                createModalContainer.find('.modal').modal('show');
+                notification.hide();
+            }
+        }).fail(function (data) {
+            notification.replace(new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.create.ajax.error'))", 'error', {inactive: true}));
+        })
+    }
+
+    $(document).on('xwiki:dom:updated', (event, data) => {
+        const containers = data?.elements || [document.documentElement];
+        containers.forEach(init);
+    });
+    $(() => init(document.documentElement));
 });

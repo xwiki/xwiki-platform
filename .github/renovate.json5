@@ -40,6 +40,26 @@
     {
       "matchPackagePrefixes": ["org.xwiki.commons:", "org.xwiki.rendering:", "org.xwiki.platform:", "org.xwiki.enterprise:"],
       "enabled": false
+    },
+
+    // Automatically assign npm packages to @manuelleduc
+    {
+      "matchDatasources": ["npm"],
+      "assignees": ["manuelleduc"]
+    },
+
+    // Automatically assign webjars packages to @mflorea
+    {
+      "matchDatasources": ["maven"],
+      "matchPackageNames": ["org.webjars*"],
+      "assignees": ["mflorea"]
+    },
+
+    // Automatically assign other Maven dependencies to @tmortagne
+    {
+      "matchDatasources": ["maven"],
+      "matchPackageNames": ["!org.webjars*"],
+      "assignees": ["tmortagne"]
     }
   ]
 }

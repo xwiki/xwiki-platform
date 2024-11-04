@@ -81,13 +81,13 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 * **##Parameter##**: Eine optionale Liste von durch Leerzeichen getrennten Parametern, die an das Bild durchgereicht werden. Beispiel: ##width="800" height="600" alt="Ein beispielhaftes Bild" title="Dies ist ein schönes Bild"## 
 ** **HTML Attribute**: Alle Attribute, welche im HTML Standard vorgesehen sind, werden zu dem erzeugten ##&lt;img&gt;## Element hinzugefügt.
 *** **##style##**: CSS-Stil Anweisungen, welche auf das Bild angewendet werden. Beispiele: ##style="float:right;height:50px"## (d.h. das Bild wird rechtsbündig eingebettet mit einer Höhe von 50 Pixeln),
- ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (Bild wird zentriert dargestellt in einer Breite von 80% des zur verfügung stehenden Platzes).
+ ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (Bild wird zentriert dargestellt in einer Breite von 80% des zur Verfügung stehenden Platzes).
  ##style="vertical-align:bottom"## (Der folgende Text startet direkt an unteren Ende des Bildes).
 *** **##height##**: Die vertikale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##height="80"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##height="40%"##)
 *** **##width##**: Die horizontale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##width="120"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##width="80%"##)
 *** **##title##**: Der Text, der beim Überfahren den Bildes mit dem Mauszeiger angezeigt wird. Beispiel: ##title="Dies ist ein schönes Bild"##
 *** **##alt##**: Der Text, welcher //alt//ernativ angezeigt wird, wenn der Browser das Bild nicht darstellen kann. Da dies im HTML eine Pflichtangabe ist, verwendet XWiki den Dateinamen, wenn kein Wert für ##alt## angegeben wurde. Beispiel: alt="Ein beispielhaftes Bild"
-*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt; https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
+*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
 
 === 2.1 Images ===
 
@@ -136,6 +136,6 @@ Das vollständige Format eines Bilder ist entweder **##image~: (Verweis)##** ode
 *** **##width##**: Die horizontale Grösse des angezeigten Bildes. Der Parameterwert sollte entweder in Bildschirmpixeln angeben werden (Beispiel ##width="120"##) oder in prozentualen Anteilen des Anzeigebereichs (Beispiel ##width="80%"##)
 *** **##title##**: Der Text, der beim Überfahren den Bildes mit dem Mauszeiger angezeigt wird. Beispiel: ##title="Dies ist ein schönes Bild"##
 *** **##alt##**: Der Text, welcher //alt//ernativ angezeigt wird, wenn der Browser das Bild nicht darstellen kann. Da dies im HTML eine Pflichtangabe ist, verwendet XWiki den Dateinamen, wenn kein Wert für ##alt## angegeben wurde. Beispiel: alt="Ein beispielhaftes Bild"
-*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt; https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
+*** **... und mehr**: Die offizielle Liste aller unterstützten Attribute kann auf der offiziellen [[Seite des HTML-Standards&gt;&gt;https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element]] (in Englisch) eingesehen werden.
 ** **##queryString##**: Ein optionaler Text, welcher als Abfrageparameter an die URL angehangen wird, unter der das Bild vom Server abgeholt wird. Beispiel: ##queryString="width=100&amp;height=800&amp;keepAspectRatio=true"## (**##keepAspectRatio=true##** soll den Server veranlassen, die Seitenverhältnisse des Bildes beizubehalten, wird aber ignoriert, wenn sowohl ##width## als auch ##height## angegeben werden)</content>
 </xwikidoc>

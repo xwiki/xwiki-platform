@@ -219,7 +219,7 @@
       msgDiv.text(messages[index]);
     });
   };
-  
+
   var initRating = function () {
     var ratingWrapper = $(this);
     // Augment only the ratings which are not locked
@@ -514,7 +514,7 @@ position: relative;
     </property>
     <property>
       <content>{{velocity}}
-#set($canView = $services.security.authorization.hasAccess('view', 'XWiki.Ratings.RatingsMacros'))
+#set($canView = !$doc.isNew() &amp;&amp; $services.security.authorization.hasAccess('view', 'XWiki.Ratings.RatingsMacros'))
 #if($canView)
   {{include reference='XWiki.Ratings.RatingsMacros'/}}
 #end

@@ -85,19 +85,19 @@
       $supplementaryForm
     </div>
   #end
-  <dt class="submitSection">
-    <input type="submit" class="btn btn-primary col-xs-12" value="$escapetool.xml($services.localization.render('login'))"/>
+  </dl>
+<div class="submitSection">
+  <input type="submit" class="btn btn-primary col-xs-12" value="$escapetool.xml($services.localization.render('login'))"/>
 
-    #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
-    #if("$!forgotUsernameURL" != "")
-      <span class="xAdditional"><a href="$forgotUsernameURL">$escapetool.xml($services.localization.render('xe.admin.forgotUsername.loginMessage'))</a></span>
-    #end
-    #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
-    #if("$!resetPasswordUrl" != '')
-      <span class="xAdditional recoverPassword"><a href="$resetPasswordUrl" >$escapetool.xml($services.localization.render('xe.admin.passwordReset.loginMessage'))</a></span>
-    #end
-  </dt>
-</dl>
+  #set ($forgotUsernameURL = $services.security.authentication.getAuthenticationURL('retrieveusername', $NULL))
+  #if("$!forgotUsernameURL" != "")
+    <span class="xAdditional"><a href="$forgotUsernameURL">$escapetool.xml($services.localization.render('xe.admin.forgotUsername.loginMessage'))</a></span>
+  #end
+  #set ($resetPasswordUrl = $services.security.authentication.getAuthenticationURL('resetpassword', $NULL))
+  #if("$!resetPasswordUrl" != '')
+    <span class="xAdditional recoverPassword"><a href="$resetPasswordUrl" >$escapetool.xml($services.localization.render('xe.admin.passwordReset.loginMessage'))</a></span>
+  #end
+</div>
 #xwikimessageboxend()
 </form>
 </main>## mainContentArea

@@ -164,7 +164,7 @@
     </property>
     <property>
       <content>{{velocity}}
-        #if ($services.like.isEnabled())
+        #if ($services.like.isEnabled() &amp;&amp; !$doc.isNew())
         {{html clean="false"}}
         #template('menus_macros.vm')
         #submenuitem($doc.getURL('view','viewer=likers'), $services.localization.render('like.unlike.modal.viewLikersButton'), 'likers', '', 'heart')

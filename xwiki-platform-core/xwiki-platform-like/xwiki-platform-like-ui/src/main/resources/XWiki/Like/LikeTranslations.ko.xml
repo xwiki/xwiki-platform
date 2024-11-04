@@ -64,4 +64,4 @@ XWiki.Like.LikeConfigurationClass_cacheCapacity.hint=캐시에 보관된 좋아�
 XWiki.Like.LikeConfigurationClass_enabled=좋아요 기능 활성화
 XWiki.Like.LikeConfigurationClass_enabled.hint=선택을 취소하면 좋아요 기능이 비활성화되고 좋아요와 관련된 정보가 숨겨집니다.
 </content>
-  </xwikidoc>
+</xwikidoc>

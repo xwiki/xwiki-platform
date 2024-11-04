@@ -214,7 +214,7 @@ figure.image figcaption {
 /* CKEditor specific style. */
 /* Must be an inline-block, a block can lead to the editor freezing, and inline makes the outline of the image widget
 look bad on Firefox. */
-span[data-cke-display-name="image"] .cke_widget_element {
+span.cke_widget_element[data-widget="image"] {
   display: inline-block;
 }
 

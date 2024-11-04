@@ -37,14 +37,24 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>edit.inplace.close=关闭
-
 edit.inplace.page.lockFailed=锁定页面失败。
 edit.inplace.page.loadFailed=加载页面失败。
 edit.inplace.page.renderFailed=渲染页面失败。
+edit.inplace.page.translate.messageBefore=您正在编辑此页的 {0} 翻译（其原始版本），因为此页尚未在 {1}（当前语言环境）中翻译。
+edit.inplace.page.translate.messageAfter=您现在正在编辑 {0} 翻译。从翻译页面标题开始。
+
+
+edit.inplace.actionButtons.loadFailed=加载动作按钮失败。
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
 
 edit.inplace.page.original=您正在编辑原始页面 ({0})
 edit.inplace.page.translation=您正在编辑以下翻译：{0}。
 
-
-edit.inplace.actionButtons.loadFailed=加载动作按钮失败。</content>
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

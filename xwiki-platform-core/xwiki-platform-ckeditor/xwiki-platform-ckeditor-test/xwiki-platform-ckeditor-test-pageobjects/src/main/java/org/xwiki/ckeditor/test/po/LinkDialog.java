@@ -109,6 +109,23 @@ public class LinkDialog extends CKEditorDialog
         return this;
     }
 
+    public LinkDialog createLinkOfNewPage(boolean exactReference)
+    {
+        String resourceLabelName = (exactReference) ? "Create with exact reference..." : "Create new page...";
+        getResourcePicker().findElements(DROPDOWN_ITEM_SELECTOR).stream()
+            .filter(element ->
+                Objects.equals(element.findElement(cssSelector(".resource-label")).getText(), resourceLabelName))
+            .findFirst().orElseThrow(() -> new NoSuchElementException(String.format("%s not found", resourceLabelName)))
+            .click();
+        return this;
+    }
+
+    public LinkPickerModal openDocumentPicker()
+    {
+        getContainer().findElement(By.cssSelector("button.resourceType")).click();
+        return new LinkPickerModal(By.cssSelector(".entity-resource-picker-modal.modal"));
+    }
+
     /**
      * Select a resource type for the resource picker (e.g., {@code "doc"}, or {@code "attachment"}).
      *

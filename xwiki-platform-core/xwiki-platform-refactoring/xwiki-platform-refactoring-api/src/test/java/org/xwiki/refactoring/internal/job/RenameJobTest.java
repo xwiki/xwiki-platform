@@ -19,17 +19,19 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
+import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.MoveRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,26 +42,27 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class RenameJobTest extends AbstractMoveJobTest
+@ComponentTest
+class RenameJobTest extends AbstractMoveJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(RenameJob.class);
+    @InjectMockComponents
+    private RenameJob renameJob;
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
+        return this.renameJob;
     }
 
     @Test
-    public void renameMultipleEntities() throws Throwable
+    void renameMultipleEntities() throws Throwable
     {
         DocumentReference blackReference = new DocumentReference("wiki", "Color", "Black");
         DocumentReference whiteReference = new DocumentReference("wiki", "Color", "White");
         DocumentReference orangeReference = new DocumentReference("wiki", "Color", "Orange");
 
         MoveRequest request = new MoveRequest();
-        request.setEntityReferences(Arrays.<EntityReference>asList(blackReference, whiteReference));
+        request.setEntityReferences(List.of(blackReference, whiteReference));
         request.setDestination(orangeReference);
         run(request);
 
@@ -67,7 +70,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void changeEntityType() throws Throwable
+    void changeEntityType() throws Throwable
     {
         DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
         SpaceReference bobReference = new SpaceReference("wiki", "Bob");
@@ -75,12 +78,12 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(createRequest(aliceReference, bobReference));
 
         verifyNoMove();
-        verify(this.mocker.getMockedLogger()).error("You cannot change the entity type (from [{}] to [{}]).",
-            aliceReference.getType(), bobReference.getType());
+        assertEquals("You cannot change the entity type (from [DOCUMENT] to [SPACE]).", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void convertNotTerminalDocumentToTerminalDocumentPreservingChildren() throws Throwable
+    void convertNotTerminalDocumentToTerminalDocumentPreservingChildren() throws Throwable
     {
         DocumentReference nonTerminalReference = new DocumentReference("wiki", "One", "WebHome");
         DocumentReference terminalReference = new DocumentReference("wiki", "Zero", "One");
@@ -90,13 +93,13 @@ public class RenameJobTest extends AbstractMoveJobTest
         run(request);
 
         verifyNoMove();
-        verify(this.mocker.getMockedLogger()).error(
-            "You cannot transform a non-terminal document [{}] into a terminal document [{}]"
-                + " and preserve its child documents at the same time.", nonTerminalReference, terminalReference);
+        assertEquals("You cannot transform a non-terminal document [wiki:One.WebHome] into a terminal document "
+            + "[wiki:Zero.One] and preserve its child documents at the same time.", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void renameSpaceHomeDeep() throws Throwable
+    void renameSpaceHomeDeep() throws Throwable
     {
         DocumentReference aliceReference = new DocumentReference("wiki", "Alice", "WebHome");
         DocumentReference bobReference = new DocumentReference("wiki", "Bob", "WebHome");
@@ -110,7 +113,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameSpace() throws Throwable
+    void renameSpace() throws Throwable
     {
         SpaceReference aliceReference = new SpaceReference("wiki", "Alice");
         SpaceReference bobReference = new SpaceReference("wiki", "Bob");
@@ -122,7 +125,7 @@ public class RenameJobTest extends AbstractMoveJobTest
     }
 
     @Test
-    public void renameDocument() throws Throwable
+    void renameDocument() throws Throwable
     {
         DocumentReference oldReference = new DocumentReference("wiki", "Space", "Old");
         when(this.modelBridge.exists(oldReference)).thenReturn(true);

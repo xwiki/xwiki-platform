@@ -144,8 +144,10 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
                     absoluteUrl, Utils.getXWikiContext(componentManager)));
 
-                String pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
+                String pageUri = Utils
+                    .createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
+                        Utils.getSpacesURLElements(doc.getDocumentReference()), doc.getDocumentReference().getName())
+                    .toString();
                 Link pageLink = objectFactory.createLink();
                 pageLink.setHref(pageUri);
                 pageLink.setRel(Relations.PAGE);

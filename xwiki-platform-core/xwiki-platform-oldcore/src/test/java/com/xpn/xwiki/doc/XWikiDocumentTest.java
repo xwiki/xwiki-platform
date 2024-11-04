@@ -48,8 +48,11 @@ import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -102,6 +105,9 @@ public class XWikiDocumentTest
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     private static final String DOCWIKI = "Wiki";
 

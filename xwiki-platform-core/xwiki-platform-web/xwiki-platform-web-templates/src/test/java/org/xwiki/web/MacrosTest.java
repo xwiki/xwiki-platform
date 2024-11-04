@@ -287,36 +287,36 @@ class MacrosTest extends PageTest
         StringWriter out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser($NULL)";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser(\"\")";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.XWikiGuest\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"XWikiGuest\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">XWikiGuest</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/XWikiGuest\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "XWikiGuest</a>"
             + "</div>", out.toString().trim());
 
         script = "#displayUser(\"XWiki.Foo\")";
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"Foo\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "Foo</a>"
             + "</div>", out.toString().trim());
 
         DocumentReference userFoo = new DocumentReference("xwiki", "XWiki", "Foo");
@@ -326,9 +326,9 @@ class MacrosTest extends PageTest
         out = new StringWriter();
         this.velocityManager.evaluate(out, "displayUser", new StringReader(script));
         assertEquals("<div class=\"user\" data-reference=\"xwiki:XWiki.Foo\">"
-            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" "
-            + "alt=\"Foo\" />"
-            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">Foo</a>"
+            + "<a class=\"user-name\" href=\"/xwiki/bin/view/XWiki/Foo\">"
+            + "<img class=\"user-avatar\" src=\"/xwiki/bin/skin/skins/flamingo/icons/xwiki/noavatar.png\" alt=\"\" />"
+            + "Foo</a>"
             + "</div>", out.toString().trim());
     }
 

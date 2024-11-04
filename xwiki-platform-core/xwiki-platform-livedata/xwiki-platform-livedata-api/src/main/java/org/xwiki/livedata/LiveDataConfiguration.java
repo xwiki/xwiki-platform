@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LiveDataConfiguration
+public class LiveDataConfiguration implements InitializableLiveDataElement
 {
     private String id;
 
@@ -112,9 +112,7 @@ public class LiveDataConfiguration
         this.meta = meta;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.query == null) {

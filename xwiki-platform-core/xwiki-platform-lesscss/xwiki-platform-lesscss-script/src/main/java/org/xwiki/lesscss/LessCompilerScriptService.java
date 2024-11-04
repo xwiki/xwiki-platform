@@ -21,7 +21,6 @@ package org.xwiki.lesscss;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -38,10 +37,8 @@ import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * This script service provides a LESS preprocessor (http://lesscss.org/) for CSS generation.
@@ -67,9 +64,6 @@ public class LessCompilerScriptService implements ScriptService
     private ColorThemeCache colorThemeCache;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
     private LESSColorThemeConverter lessColorThemeConverter;
 
     @Inject
@@ -79,7 +73,7 @@ public class LessCompilerScriptService implements ScriptService
     private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager authorizationManager;
 
     /**
      * Compile a LESS file located in the "less" directory of the current skin directory.
@@ -184,11 +178,8 @@ public class LessCompilerScriptService implements ScriptService
      */
     public boolean clearCache()
     {
-        XWikiContext xcontext = xcontextProvider.get();
-
         // Check if the current script has the programing rights
-        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-            xcontext.getDoc().getDocumentReference())) {
+        if (!authorizationManager.hasAccess(Right.PROGRAM)) {
             return false;
         }
 
@@ -205,11 +196,8 @@ public class LessCompilerScriptService implements ScriptService
      */
     public boolean clearCacheFromColorTheme(String colorTheme)
     {
-        XWikiContext xcontext = xcontextProvider.get();
-
         // Check if the current script has the programing rights
-        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                xcontext.getDoc().getDocumentReference())) {
+        if (!authorizationManager.hasAccess(Right.PROGRAM)) {
             return false;
         }
 
@@ -233,11 +221,8 @@ public class LessCompilerScriptService implements ScriptService
      */
     public boolean clearCacheFromSkin(String skin)
     {
-        XWikiContext xcontext = xcontextProvider.get();
-
         // Check if the current script has the programing rights
-        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                xcontext.getDoc().getDocumentReference())) {
+        if (!authorizationManager.hasAccess(Right.PROGRAM)) {
             return false;
         }
 

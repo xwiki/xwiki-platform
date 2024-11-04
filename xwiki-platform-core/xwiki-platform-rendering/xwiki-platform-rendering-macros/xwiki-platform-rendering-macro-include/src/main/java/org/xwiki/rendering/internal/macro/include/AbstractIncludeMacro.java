@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.include;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -39,6 +40,8 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 /**
@@ -84,6 +87,8 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
      * A stack of all currently executing include/display macros for catching recursive inclusions/displays.
      */
     protected ThreadLocal<Stack<Object>> macrosBeingExecuted = new ThreadLocal<>();
+
+    private final ParserUtils parserUtils = new ParserUtils();
 
     protected AbstractIncludeMacro(String name, String description, Class<?> parametersBeanClass)
     {
@@ -148,6 +153,21 @@ public abstract class AbstractIncludeMacro<P> extends AbstractMacro<P>
         if (references != null && references.contains(reference)) {
             throw new MacroExecutionException(String.format("Found recursive %s of document [%s]", messageText,
                 reference));
+        }
+    }
+
+    protected void maybeConvertToInline(XDOM result, MacroTransformationContext context)
+    {
+        // Only remove the top-level paragraph for backwards-compatibility. If the first block is a macro,
+        // ParserUtils#convertToInline converts that macro to inline, but that causes regressions when the include macro
+        // is used inside the HTML macro in an inline parsing context that isn't in an inline HTML context and includes
+        // a single macro as in Main.AllDocs.
+        // Only modify things when there is only a single child to avoid copying many children in cases there is
+        // nothing to do.
+        if (context.isInline() && result.getChildren().size() == 1) {
+            List<Block> modifiableChildren = new ArrayList<>(result.getChildren());
+            this.parserUtils.removeTopLevelParagraph(modifiableChildren);
+            result.setChildren(modifiableChildren);
         }
     }
 }

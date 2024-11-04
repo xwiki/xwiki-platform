@@ -40,6 +40,8 @@
 
 {{include reference="XWiki.Ratings.RatingsMacros"/}}
 
+{{template name="extension.vm"/}}
+
 {{velocity output="false"}}
 #if ($xcontext.action == 'edit')
   #set($isEditMode = true)
@@ -106,10 +108,6 @@
         #end
       #end
 
-      ##------- Recommended -----------------
-      #if ("$!recommended" == "1")
-        {{html wiki='true' clean='false'}}(% class="pull-right"%){{success}}**Recommended**{{/success}}{{/html}}
-      #end
       (% class="extensionInfo" %)
       ##------- Type --------------
       #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
@@ -132,6 +130,11 @@
         #else
           $doc.display('authors')
         #end
+      ##------- Supported By --------
+      #set($supportPlans = $doc.getValue("supportPlans"))
+      #if (!$supportPlans.isEmpty())
+        |(% class="label" %)Support(%%)|((({{html}}#displayExtensionSupportPlans($services.repository.resolveExtensionSupportPlans($supportPlans), true){{/html}})))
+      #end
       ##------- Active Installs --------
       #if ($doc.getValue('installedCount') &amp;&amp; $doc.getValue('showInstalledCount') != 0)
         |(% class="label" %)Active Installs(%%)|$services.rendering.escape($!doc.getValue('installedCount'), 'xwiki/2.1')
@@ -246,6 +249,7 @@
     |Display Icon Location
 (Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
     |Show Active Installs|$doc.display('showInstalledCount')
+    |Support plans|$doc.display('supportPlans')
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)
@@ -485,10 +489,6 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
-.box.floatinginfobox {
-  margin-top: 0;
-}
-
 .extensionSummary {
   background-color: $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;
@@ -496,33 +496,14 @@
   display: block;
 }
 
-.floatinginfobox .wikiexternallink {
-  background: none;
-  padding: 0;
-}
-
-.errormessage, .warningmessage, .infomessage, .plainmessage {
-  background-color: $theme.backgroundSecondaryColor;
-}
-
 .main .extensionInfo {
   margin: 0;
 }
 
-.label {
+.extensionInfo .label {
   font-size: 0.85em;
   font-weight: bold;
   text-transform: uppercase;
-}
-
-.toc .label {
-  display: block;
-  margin-top: 1.1em;
-  padding: 0 1em;
-}
-
-.toc ul {
-  margin-top: 0;
 }
 
 /*Rating*/

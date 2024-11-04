@@ -75,9 +75,11 @@ class DocumentRestURLGeneratorTest
     @Test
     void getURLWithoutLocale() throws Exception
     {
-        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page",
-            this.generator.getURL(documentReference).toString());
+            this.generator.getURL(new DocumentReference("wiki", "space", "page")).toString());
+
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space1/spaces/space2/pages/page",
+            this.generator.getURL(new DocumentReference("wiki", List.of("space1", "space2"), "page")).toString());
     }
 
     @Test

@@ -107,7 +107,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #foreach($appName in $outputList)
     ##
     ## Make sure the current user has permission to edit the configurable application.
-    #set($userHasAccessToDocument = $xcontext.hasAccessLevel('edit', $appName))
+    ## Unless we are in the page administration which is never about modifying the application configuration page
+    #set($userHasAccessToDocument = $level == '.page' || $xcontext.hasAccessLevel('edit', $appName))
     ##
     ## If the document was not last saved by a user with edit privilege on this page
     ## then we can't safely display the page but we should warn the viewer.

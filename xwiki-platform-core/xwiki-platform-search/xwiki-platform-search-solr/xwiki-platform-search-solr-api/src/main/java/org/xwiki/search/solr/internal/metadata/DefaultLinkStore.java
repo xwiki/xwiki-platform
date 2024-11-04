@@ -49,6 +49,8 @@ import org.xwiki.search.solr.SolrUtils;
 import org.xwiki.search.solr.internal.SolrClientInstance;
 import org.xwiki.search.solr.internal.SolrSearchCoreUtils;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.SolrIndexer;
+import org.xwiki.store.ReadyIndicator;
 
 /**
  * @version $Id$
@@ -68,6 +70,9 @@ public class DefaultLinkStore implements LinkStore
 
     @Inject
     private SolrLinkSerializer linkSerializer;
+
+    @Inject
+    private SolrIndexer solrIndexer;
 
     @Inject
     private EntityReferenceResolver<EntityReference> referenceConverter;
@@ -183,6 +188,12 @@ public class DefaultLinkStore implements LinkStore
         }
 
         return references;
+    }
+
+    @Override
+    public ReadyIndicator waitReady()
+    {
+        return this.solrIndexer.waitReady();
     }
 
     EntityReference toDocumentBasedReference(EntityReference entityReference)

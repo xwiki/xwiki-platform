@@ -26,13 +26,15 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.imageio.ImageIO;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -85,6 +87,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DefaultPresentationBuilderTest
 {
+    private static final int EXPECTED_WIDTH = 1920;
+
     @InjectMockComponents
     private DefaultPresentationBuilder presentationBuilder;
 
@@ -111,6 +115,9 @@ class DefaultPresentationBuilderTest
     @MockComponent
     private OfficeServer officeServer;
 
+    @MockComponent
+    private PresentationBuilderConfiguration configuration;
+
     @XWikiTempDir
     private File outputDirectory;
 
@@ -118,6 +125,10 @@ class DefaultPresentationBuilderTest
     public void configure() throws Exception
     {
         when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
+
+        when(this.configuration.getSlideWidth()).thenReturn(EXPECTED_WIDTH);
+        when(this.configuration.getQuality()).thenReturn(.95f);
+        when(this.configuration.getImageFormat()).thenReturn("jpg");
     }
 
     @Test
@@ -135,37 +146,27 @@ class DefaultPresentationBuilderTest
 
         OfficeConverterResult officeConverterResult = mock(OfficeConverterResult.class);
         when(officeConverterResult.getOutputDirectory()).thenReturn(this.outputDirectory);
-        // Slide numbers including 10 so that we can validate that XWIKI-19565 has been fixed.
-        List<Integer> slideNumbers = Arrays.asList(0, 1, 2, 10);
-        File firstSlide = new File(this.outputDirectory, "img0.html");
-        when(officeConverterResult.getOutputFile()).thenReturn(firstSlide);
 
-        // list of files usually created by jodconverter for a presentation
-        Set<File> allFiles = new HashSet<>();
-        slideNumbers.forEach(slideNumber -> {
-            allFiles.add(new File(this.outputDirectory, String.format("img%d.html", slideNumber)));
-            allFiles.add(new File(this.outputDirectory, String.format("text%d.html", slideNumber)));
-            allFiles.add(new File(this.outputDirectory, String.format("img%d.jpg", slideNumber)));
-        });
+        // Copy the pdf file to the output directory
+        File outputFile = new File(this.outputDirectory, "presentation.pdf");
+        Files.copy(Objects.requireNonNull(getClass().getResourceAsStream("/pdf.pdf")),
+            outputFile.toPath());
 
-        // We create the files since some IO operations will happen on them
-        for (File file : allFiles) {
-            Files.createFile(file.toPath());
-        }
+        when(officeConverterResult.getOutputFile()).thenReturn(outputFile);
 
-        when(officeConverterResult.getAllFiles()).thenReturn(allFiles);
+        when(officeConverterResult.getAllFiles()).thenReturn(Set.of(outputFile));
 
         when(this.officeConverter.convertDocument(Collections.singletonMap("input.odp", officeFileStream), "input.odp",
-            "img0.html")).thenReturn(officeConverterResult);
+            "presentation.pdf")).thenReturn(officeConverterResult);
 
         HTMLCleanerConfiguration config = mock(HTMLCleanerConfiguration.class);
         when(this.officeHTMLCleaner.getDefaultConfiguration()).thenReturn(config);
 
         Document xhtmlDoc = XMLUtils.createDOMDocument();
         xhtmlDoc.appendChild(xhtmlDoc.createElement("html"));
-        String presentationHTML = slideNumbers.stream().map(slideNumber ->
+        String presentationHTML = Stream.of(0).map(slideNumber ->
             String.format("<p><img src=\"file-slide%d.jpg\"/></p>", slideNumber)).collect(Collectors.joining());
-        when(this.officeHTMLCleaner.clean(any(Reader.class), eq(config)))
+        when(this.officeHTMLCleaner.clean(any(), eq(config)))
             .then(returnMatchingDocument(presentationHTML, xhtmlDoc));
 
         XDOM galleryContent = new XDOM(Collections.<Block>emptyList());
@@ -174,11 +175,22 @@ class DefaultPresentationBuilderTest
         XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
-        Map<String, OfficeDocumentArtifact> expectedArtifacts = slideNumbers.stream()
+        Map<String, OfficeDocumentArtifact> expectedArtifacts = Stream.of(0)
             .map(slideNumber -> new FileOfficeDocumentArtifact(String.format("file-slide%d.jpg", slideNumber),
-                new File(this.outputDirectory, String.format("img%d.jpg", slideNumber))))
+                new File(this.outputDirectory, String.format("slide%d.jpg", slideNumber))))
             .collect(Collectors.toMap(OfficeDocumentArtifact::getName, Function.identity()));
         assertEquals(expectedArtifacts, result.getArtifactsMap());
+
+        // Check for each output file that it has the expected width.
+        expectedArtifacts.values().forEach(artifact -> {
+            // Read the image from the content input stream.
+            try (InputStream is = artifact.getContentInputStream()) {
+                // Check the image width.
+                assertEquals(EXPECTED_WIDTH, ImageIO.read(is).getWidth());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         assertEquals("wiki:Path.To.Page", result.getContentDocument().getMetaData().getMetaData(MetaData.BASE));
 

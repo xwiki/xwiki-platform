@@ -318,10 +318,12 @@ $xwiki.getUserName("xwiki:${username}")
     ## We avoid the whitespace because the users are displayed as inline blocks.
     #set ($discard = $output.addAll([
       "<$userTag class=""$type"" data-reference=""$escapetool.xml($userReference)"">",
+        "<$userNameTag $userNameTagAttributes>",
         $avatarWrapperStart,
-          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt=""$escapedUserName"" />",
+          "<img class=""${type}-avatar"" src=""$escapetool.xml($avatarURL.url)"" alt="""" />",
         $avatarWrapperEnd,
-        "<$userNameTag $userNameTagAttributes>$escapedUserName</$userNameTag>",
+        $escapedUserName,
+        "</$userNameTag>",
         $userAliasDisplay,
       "</$userTag>"
     ]))
@@ -952,15 +954,15 @@ $html
 ###
 
 #macro(warning $text)
-<div class="warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
+<div class="box warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
 #end
 
 #macro(error $text)
-<div class="errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
+<div class="box errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
 #end
 
 #macro(info $text)
-<div class="infomessage">$text</div>
+<div class="box infomessage">$text</div>
 #end
 
 #macro(message $text)
@@ -1716,7 +1718,7 @@ $displayName##
       #if ("$!action.icon" == '')
         #set ($defaultActionIcons = {
           'rename': 'move',
-          'delete': 'cross',
+          'delete': 'trash',
           'restore': 'refresh',
           'undelete': 'refresh',
           'rights': 'lock',

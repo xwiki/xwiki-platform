@@ -55,7 +55,7 @@ public class AllIT
     class NestedLinkIT extends LinkIT
     {
     }
-    
+
     @Nested
     @DisplayName("Quick Actions")
     class NestedQuickActionsIT extends QuickActionsIT
@@ -67,7 +67,7 @@ public class AllIT
     class NestedUndoRedoIT extends UndoRedoIT
     {
     }
-    
+
     @Nested
     @DisplayName("Localization")
     class NestedLocalizationIT extends LocalizationIT
@@ -77,6 +77,12 @@ public class AllIT
     @Nested
     @DisplayName("Filter")
     class NestedFilterIT extends FilterIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Table")
+    class NestedTableIT extends TableIT
     {
     }
 }

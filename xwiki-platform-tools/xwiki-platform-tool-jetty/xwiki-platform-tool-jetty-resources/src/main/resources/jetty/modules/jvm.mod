@@ -18,7 +18,7 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
 Creates an ini template for setting JVM arguments (eg -Xmx ).

@@ -45,7 +45,7 @@
 {{info}}No XWiki Syntax 1.0 era possível inserir scripts Velocity em qualquer lugar diretamente na página. Isso pode levar a problemas, por exemplo, quando o usuário entra involuntariamente no conteúdo do Velocity. Também exige desempenho para páginas que não requerem conteúdo do Velocity. Existem várias outras limitações técnicas. O mesmo vale para inserir scripts Groovy.{{/info}}
 
 |=Recurso|=Sintaxe do XWiki 1.0
-|Script de velocidade|((({{{
+|Script velocity|((({{{
 #set($var = "tanto faz")
 }}})))
 |Roteiro bacana|((({{{
@@ -59,14 +59,14 @@ def var = "tanto faz"
 {{info}}XWiki [[suporta diversas linguagens de script&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/DevGuide/Scripting/]].{{/info}}
 
 |=Recurso|=Sintaxe do XWiki {{velocity}}$crtSyntaxVer{{/velocity}}
-|Script de velocidade|((({{{
-{{velocidade}}
+|Script velocity|((({{{
+{{velocity}}
 #set($var = "tanto faz")
-{{/velocidade}}
+{{/velocity}}
 }}})))
 |Roteiro bacana|((({{{
-{{legal}}
+{{groovy}}
 def var = "tanto faz"
-{{/legal}}
+{{/groovy}}
 }}})))</content>
 </xwikidoc>

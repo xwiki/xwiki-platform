@@ -91,4 +91,4 @@ index.documentTree.more={0}개 더 ...
 rendering.macro.documentTree.parameter.showChildDocuments.name=하위 문서 표시
 rendering.macro.documentTree.parameter.showChildDocuments.description=문서 상위 필드를 기반으로 하위 문서를 표시할지 여부입니다.
 </content>
-  </xwikidoc>
+</xwikidoc>

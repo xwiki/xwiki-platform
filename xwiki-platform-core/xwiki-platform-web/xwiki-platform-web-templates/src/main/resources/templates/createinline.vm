@@ -57,12 +57,31 @@
 ## to allow creation from template directly, without necessarily going through template provider.
 #set($template = "$!request.template")
 
+#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+## If an ajax request we want to display a bootstrap modal.
+#if ($isAjaxRequest)
+  ## Needed for skin extensions macros.
+  #template('display_macros.vm')
+  #initRequiredSkinExtensions()
+  <div class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"
+              aria-label="$escapetool.xml($services.localization.render('close'))">
+        <span aria-hidden="true">$services.icon.renderHTML('cross')</span>
+      </button>
+      <div class="modal-title">$services.localization.render('core.create.pageTitle')</div>
+    </div>
+#end
+
 ## ---------------------------------------------------------------------------------------------------------
 ## If there was an exception creating the page because of invalid space, notify. 
 ## Should set the other variables only if there is no exception. Otherwise, if there's an exception other than the 
 ## 11016 one, nothing will be displayed, depending on the other passed parameters.
 ## ---------------------------------------------------------------------------------------------------------
 #set($exception = $createException)
+#set ($disableModalConfirmation = false)
 ## check if the exception is about the non-allowed spaces for template
 #if("$!exception" != '' && $exception.code == 11016)
   <div class="box errormessage">
@@ -75,6 +94,7 @@
         $allowedSpaces.toString()]))
     #end
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document which already exists
 #if("$!exception" != '' && $exception.code == 11002)
@@ -87,13 +107,25 @@
         ]
       )
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 ## check if the exception is about the document name being invalid
 #if("$!exception" != '' && $exception.code == 11018)
 <div class='box errormessage'>
   ## Use the 'invalidNameReference' context binding set by the create action for this case.
-  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidname', [$invalidNameReference]))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidNameError', [$invalidNameReference]))
+  #if ($isAjaxRequest)
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.possibleSolutionForLink'))
+  #else
+    $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.possibleSolution'))
+  #end
+  <br /><br />
+  #set ($currentStrategy = $services.modelvalidation.configuration.entityNameValidation)
+  #set ($strategyName = $services.localization.render("entitynamevalidation.${currentStrategy}.name"))
+  #set ($strategyUsage = $services.localization.render("entitynamevalidation.${currentStrategy}.usage"))
+  $escapetool.xml($services.localization.render('entitynamevalidation.create.invalidName.strategyInfo',[$strategyName, $strategyUsage]))
 </div>
+  #set ($disableModalConfirmation = true)
 #end
 
 ## check if the exception is about the document having a path too long
@@ -109,6 +141,7 @@
         ]
       )
   </div>
+  #set ($disableModalConfirmation = true)
 #end
 
 ## ---------------------------------------------------------------------------------------------------------
@@ -267,8 +300,10 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
-#set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 <form action="$doc.getURL('create')" method="post" id="create" class="xform">
+#if ($isAjaxRequest)
+  <div class="modal-body">
+#end
   <fieldset>
 
   ## Deprecated: Pass along any received page parent.
@@ -393,6 +428,7 @@
     </div>
   </div>
 
+#if (!$isAjaxRequest)
   <div class='buttons'>
     <span class='buttonwrapper'>
       <input type='submit' class='button' value="$services.localization.render('create')"/>
@@ -401,6 +437,22 @@
       <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
     </span>
   </div>
-
+#end
   </fieldset>
-</form>
+#if ($isAjaxRequest)
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">$services.localization.render('cancel')</button>
+    <button type="submit" class="btn btn-primary" #if($disableModalConfirmation)disabled="disabled")#end>
+      $services.localization.render('create')
+    </button>
+  </div>
+  </form>
+</div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
+#else
+  </form>
+#end

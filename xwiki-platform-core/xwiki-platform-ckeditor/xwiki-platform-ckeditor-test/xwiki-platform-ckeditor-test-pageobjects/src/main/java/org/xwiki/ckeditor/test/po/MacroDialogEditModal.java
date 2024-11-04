@@ -82,6 +82,49 @@ public class MacroDialogEditModal extends BaseElement
     }
 
     /**
+     * Set the value of the macro content.
+     *
+     * @param content the macro content
+     * @return this modal
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public MacroDialogEditModal setMacroContent(CharSequence... content)
+    {
+        WebElement contentInput = getMacroContentInput();
+        contentInput.clear();
+        contentInput.sendKeys(content);
+        return this;
+    }
+
+    /**
+     * Retrieves the value of the macro content from the macro editor modal.
+     * 
+     * @return the value of the macro content
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public String getMacroContent()
+    {
+        return getMacroContentInput().getAttribute("value");
+    }
+
+    /**
+     * @return the text area used to edit the macro content
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public WebElement getMacroContentInput()
+    {
+        return getDriver().findElementWithoutWaitingWithoutScrolling(
+            // We match *-editor-modal so the page object can be used both in Dashboard and CKEditor tests.
+            By.cssSelector("[class*=-editor-modal] .macro-parameter-field textarea[name='$content']"));
+    }
+
+    /**
      * Click on the macro submission button.
      */
     public void clickSubmit()

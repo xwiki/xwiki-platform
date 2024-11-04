@@ -144,7 +144,7 @@ public class RepositoryResolver
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWiki = new RemoteRepository.Builder(
-            "xwiki", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public")
+            "xwiki", DEFAULT_REPO_TYPE, "https://nexus-snapshots.xwiki.org/repository/public-proxy")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWikiSnapshot = new RemoteRepository.Builder(

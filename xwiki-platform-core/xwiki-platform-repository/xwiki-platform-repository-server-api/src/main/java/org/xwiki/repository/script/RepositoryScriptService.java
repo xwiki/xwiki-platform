@@ -19,6 +19,8 @@
  */
 package org.xwiki.repository.script;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,10 +28,12 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionSupportPlans;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.repository.internal.ExtensionStore;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.script.service.ScriptService;
 
@@ -48,6 +52,9 @@ public class RepositoryScriptService implements ScriptService
 
     @Inject
     private ExtensionRepositoryManager extensionRepositoryManager;
+
+    @Inject
+    private ExtensionStore extensionStore;
 
     /**
      * Provides access to the current context.
@@ -104,5 +111,15 @@ public class RepositoryScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    /**
+     * @param supportPlanIds the identifier of the support plans
+     * @return the {@link ExtensionSupportPlans} instance describing how an extension is supported
+     * @since 16.8.0RC1
+     */
+    public ExtensionSupportPlans resolveExtensionSupportPlans(Collection<String> supportPlanIds)
+    {
+        return this.extensionStore.resolveExtensionSupportPlans(supportPlanIds);
     }
 }

@@ -26,7 +26,7 @@ package org.xwiki.livedata;
  * @since 12.10.1
  * @since 13.0
  */
-public class LiveDataSelectionConfiguration
+public class LiveDataSelectionConfiguration implements InitializableLiveDataElement
 {
     /**
      * Specified whether live data entry selection is enabled.
@@ -49,12 +49,5 @@ public class LiveDataSelectionConfiguration
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
-    }
-
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
-    public void initialize()
-    {
     }
 }

@@ -23,22 +23,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,7 +47,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class EntityJobTest
+public class EntityJobTest extends AbstractEntityJobTest
 {
     public static class NoopEntityJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
     {
@@ -93,23 +88,13 @@ public class EntityJobTest
         }
     }
 
-    @MockComponent
-    private AuthorizationManager authorization = mock(AuthorizationManager.class);
-
-    @MockComponent
-    private ModelBridge modelBridge = mock(ModelBridge.class);
-
-    @MockComponent
-    private EntityReferenceProvider defaultEntityReferenceProvider;
-
     @InjectMockComponents
     private NoopEntityJob job;
 
-    @BeforeEach
-    void beforeEach()
+    @Override
+    protected Job getJob()
     {
-        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
-            .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
+        return this.job;
     }
 
     private void initialize(EntityRequest request)

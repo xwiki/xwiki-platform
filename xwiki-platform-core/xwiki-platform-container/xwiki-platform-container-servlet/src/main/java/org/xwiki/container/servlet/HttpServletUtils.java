@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HeaderElement;
 import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
 
 /**
@@ -63,6 +65,8 @@ public final class HttpServletUtils
     private static final String HTTP = "http";
 
     private static final String HTTPS = "https";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServletUtils.class);
 
     private HttpServletUtils()
     {
@@ -187,7 +191,27 @@ public final class HttpServletUtils
             return;
         }
 
-        // Received host:port
+        // Ask the application server (we don't start with that because it's very often wrong or badly configured
+        // behind an HTTP proxy...)
+        StringBuffer buffer = request.getRequestURL();
+        if (buffer != null && !buffer.isEmpty()) {
+            String requestURLString = buffer.toString();
+            try {
+                URL requestURL = new URL(requestURLString);
+                builder.append(requestURL.getHost());
+                int port = requestURL.getPort();
+                if (port != -1) {
+                    builder.append(':');
+                    builder.append(port);
+                }
+                return;
+            } catch (MalformedURLException e) {
+                LOGGER.error("The request URL indicated by the application server is wrong: {}", requestURLString, e);
+            }
+        }
+
+        // Ask the application server another way (in which we cannot be sure if the port is explicitly indicated or
+        // not)
         builder.append(request.getServerName());
         int port = request.getServerPort();
         if (port != -1) {

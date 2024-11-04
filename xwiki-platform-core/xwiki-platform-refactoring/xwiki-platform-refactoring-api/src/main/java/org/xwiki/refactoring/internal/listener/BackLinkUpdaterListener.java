@@ -20,10 +20,12 @@
 package org.xwiki.refactoring.internal.listener;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -79,6 +81,10 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
 
     @Inject
     private JobContext jobContext;
+
+    // Use a Provider to avoid early initialization of dependencies.
+    @Inject
+    private Provider<LinkIndexingWaitingHelper> linkIndexingHelper;
 
     /**
      * Default constructor.
@@ -138,6 +144,8 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         throws RefactoringException
     {
         this.logger.info("Updating the back-links for document [{}].", source);
+
+        this.linkIndexingHelper.get().maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
 
         // TODO: it's possible to optimize a bit the actual entities to modify (especially which translation of the
         // document to load and parse) since we have the information in the store

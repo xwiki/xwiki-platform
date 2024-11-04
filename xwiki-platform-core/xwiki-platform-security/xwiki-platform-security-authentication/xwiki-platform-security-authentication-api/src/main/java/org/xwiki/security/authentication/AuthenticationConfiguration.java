@@ -81,7 +81,7 @@ public interface AuthenticationConfiguration
      */
     default String getValidationKey()
     {
-        return RandomStringUtils.random(32);
+        return RandomStringUtils.secure().next(32);
     }
 
     /**
@@ -95,6 +95,6 @@ public interface AuthenticationConfiguration
      */
     default String getEncryptionKey()
     {
-        return RandomStringUtils.random(32);
+        return RandomStringUtils.secure().next(32);
     }
 }

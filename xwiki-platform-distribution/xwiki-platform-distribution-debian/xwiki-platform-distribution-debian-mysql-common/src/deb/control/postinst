@@ -20,7 +20,7 @@ if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
   dbc_go xwiki $@
 
   # if they don't want our help, quit
-  if [ "$dbc_install" != "true" ]; then return 0; fi
+  if [ "$dbc_install" != "true" ]; then exit 0; fi
 
   # find out if we're upgrading/reinstalling
   if [ "$dbc_oldversion" ]; then
@@ -35,7 +35,7 @@ if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
         db_get $dbc_package/dbconfig-reinstall && reinstall=$RET
         db_reset $dbc_package/dbconfig-reinstall
         # if they've said they don't want to reinstall stuff...
-        if [ "$reinstall" = "false" ]; then return 0; fi
+        if [ "$reinstall" = "false" ]; then exit 0; fi
     fi
   fi
 

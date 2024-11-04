@@ -644,7 +644,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     #end## $followedUsers.size() &gt; 0
     &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
     {{/html}}##
-  #end## isMyProfile &amp;&amp; $isMessageStreamActive &amp;&amp; $hasWatch
+  #end## Condition ($isMyProfile and $hasWatch)
       #end## User object exists
       {{/velocity}}</content>
     </property>

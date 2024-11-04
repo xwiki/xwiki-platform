@@ -101,7 +101,7 @@ public class LoginPage extends ViewPage
     public String getErrorMessages()
     {
         StringBuilder messages = new StringBuilder();
-        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='errormessage']"))) {
+        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='box errormessage']"))) {
             messages.append(element.getText());
         }
         return messages.toString();

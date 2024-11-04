@@ -386,8 +386,9 @@
      * @returns {CKEDITOR.dom.element}
      */
     createGroup: function(group) {
-      var encodedGroup = encodeItem(group),
-        groupElement = CKEDITOR.dom.element.createFromHtml(this.groupTemplate.output(encodedGroup), this.document);
+      const encodedGroup = encodeItem(group);
+      encodedGroup.parentId = this.element.getAttribute('id');
+      const groupElement = CKEDITOR.dom.element.createFromHtml(this.groupTemplate.output(encodedGroup), this.document);
       return groupElement;
     }
   });
@@ -423,9 +424,13 @@
     // Call the parent class constructor.
     AutoComplete.call(this, editor, config);
 
+    // Although this HTML passes the WCAG tests, the way we implemented support for groups in the autocomplete feature
+    // is not perfect because the groups are not wrapping the options that the user can select.
+    // See https://www.w3.org/WAI/ARIA/apg/patterns/listbox/examples/listbox-grouped/ .
     var groupTemplate = config.groupTemplate || [
-      '<li data-group="{id}" class="ckeditor-autocomplete-group" title="{name}">',
-        '<h6>{name}</h6>',
+      '<li id="{parentId}_{id}" data-group="{id}" class="ckeditor-autocomplete-group" title="{name}" ',
+          'role="group" aria-labelledby="{parentId}_{id}_label">',
+        '<h6 id="{parentId}_{id}_label" role="presentation">{name}</h6>',
       '</li>'
     ].join('');
     this.view.groupTemplate = new CKEDITOR.template(groupTemplate);

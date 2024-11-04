@@ -53,9 +53,9 @@ Use a localização atual {{displayIcon name="home"/}} localizada acima do títu
 
 Você também pode usar o [[Sandbox&gt;&gt;Sandbox.WebHome]] para obter mais conteúdo de demonstração e geralmente um lugar para experimentar os recursos do seu wiki. 
 
- {{box}}Saiba mais sobre como usar o XWiki com o [[Guia de primeiros passos&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/ caixa}}
+ {{box}}Saiba mais sobre como usar o XWiki com o [[Guia de primeiros passos&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome]].{{/box}}
 
-(% classe = "linha"%)
+(% class="row" %)
 (((
 (% class="col-xs-12 col-sm-6" %)
 (((

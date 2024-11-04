@@ -5,4 +5,5 @@ xwiki.iconset.render.html = <img src="$xwiki.getSkinFile("icons/silk/${icon}.png
 xwiki.iconset.icon.url = $xwiki.getSkinFile("icons/silk/${icon}.png")
 
 chart-organisation = chart-organisation
+cross = cross
 home = home

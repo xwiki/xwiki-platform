@@ -867,7 +867,7 @@ public class Utils
         Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         String key;
         do {
-            key = "KEY" + RandomStringUtils.randomAlphanumeric(10) + "KEY";
+            key = "KEY" + RandomStringUtils.secure().nextAlphanumeric(10) + "KEY";
         } while (renderingKeys.containsKey(key));
         renderingKeys.put(key, value);
 

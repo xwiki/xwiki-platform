@@ -18,92 +18,94 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define(['jquery', 'xwiki-entityReference', 'xwiki-events-bridge'], function($, XWiki) {
-  var XWikiMeta = function () {
-    var self = this;
+  class XWikiMeta {
+    constructor() {
+      this.init();
+    }
 
-    self.init = function () {
+    // We keep the init function for backward compatibility (otherwise we would have moved the code in the constructor).
+    init() {
       // Note: Starting with XWiki 7.2M3, the returned "document", "xwiki", "space" and "page" variables are deprecated
       // and it's recommended to use the new "reference" variable, which holds the full String reference of the current
       // document.
       // In addition starting with XWiki 7.2M1, the "space" variable now holds the full space reference (i.e. one or
       // several spaces separated by dots, e.g. "space1.space2").
-      var html = $('html');
+      const html = document.documentElement;
       // Case 1: meta information are stored in the data- attributes of the <html> tag
       // (since Flamingo)
-      if (html.data('xwiki-reference') !== undefined) {
-        self.documentReference = XWiki.Model.resolve(html.data('xwiki-reference'), XWiki.EntityType.DOCUMENT);
-        var wikiReference = documentReference.extractReference(XWiki.EntityType.WIKI);
-        var spaceReference = documentReference.extractReference(XWiki.EntityType.SPACE);
+      if (html.dataset.xwikiReference) {
+        this.documentReference = XWiki.Model.resolve(html.dataset.xwikiReference, XWiki.EntityType.DOCUMENT);
+        const wikiReference = this.documentReference.extractReference(XWiki.EntityType.WIKI);
+        const spaceReference = this.documentReference.extractReference(XWiki.EntityType.SPACE);
         // deprecated, use 'documentReference' instead
-        self.document = XWiki.Model.serialize(documentReference.relativeTo(wikiReference));
+        this.document = XWiki.Model.serialize(this.documentReference.relativeTo(wikiReference));
         // deprecated, use 'documentReference' instead
-        self.wiki = wikiReference.getName();
+        this.wiki = wikiReference.getName();
         // deprecated, use 'documentReference' instead
-        self.space = XWiki.Model.serialize(spaceReference.relativeTo(wikiReference));
-        self.page = documentReference.getName();
-        self.version = html.data('xwiki-version');
-        self.restURL = html.data('xwiki-rest-url');
-        self.form_token = html.data('xwiki-form-token');
+        this.space = XWiki.Model.serialize(spaceReference.relativeTo(wikiReference));
+        this.page = this.documentReference.getName();
+        this.version = html.dataset.xwikiVersion;
+        this.restURL = html.dataset.xwikiRestUrl;
+        this.form_token = html.dataset.xwikiFormToken;
         // Since 10.4RC1
         // For the guest user we set userReference to null
-        var userReferenceString = html.data('xwiki-user-reference');
+        const userReferenceString = html.dataset.xwikiUserReference;
         if (userReferenceString) {
-          self.userReference = XWiki.Model.resolve(userReferenceString, XWiki.EntityType.DOCUMENT);
+          this.userReference = XWiki.Model.resolve(userReferenceString, XWiki.EntityType.DOCUMENT);
         } else {
-          self.userReference = null;
+          this.userReference = null;
         }
         // Since 11.2RC1
-        self.isNew = html.data('xwiki-isnew');
+        this.isNew = html.dataset.xwikiIsnew === 'true';
         // Since 12.3RC1
         // Note that the 'data-xwiki-locale' attribute is set since XWiki 10.4RC1 but it hasn't been exposed here.
-        self.locale = html.data('xwiki-locale');
+        this.locale = html.dataset.xwikiLocale;
       } else {
         // Case 2: meta information are stored in deprecated <meta> tags
         // (in colibri)
-        var metaTags = $('meta');
-        var lookingFor = ['document', 'wiki', 'space', 'page', 'version', 'restURL', 'form_token'];
-        for (var i = 0; i < metaTags.length; ++i) {
-          var metaTag = $(metaTags[i]);
-          var name = metaTag.attr('name');
-          for (var j = 0; j < lookingFor.length; ++j) {
-            if (name == lookingFor[j]) {
-              self[name] = metaTag.attr('content');
-            }
+        const lookingFor = ['document', 'wiki', 'space', 'page', 'version', 'restURL', 'form_token']
+        document.querySelectorAll('meta').forEach(metaTag => {
+          if (lookingFor.includes(metaTag.name)) {
+            this[metaTag.name] = metaTag.content;
           }
-        }
+        });
       }
-    };
+    }
 
-    self.setVersion = function (newVersion) {
-      self.version = newVersion;
+    setVersion(newVersion) {
+      this.version = newVersion;
       $(document).trigger('xwiki:document:changeVersion', {
-        'version': self.version,
-        'documentReference': documentReference
+        'version': this.version,
+        'documentReference': this.documentReference
       });
-    };
+    }
 
     /**
      * Refresh the version of a document from a REST endpoint. It fires a xwiki:document:changeVersion event.
      * In case of 404 this certainly means that the document is new.
-     * @param handle404 function to choose how to handle when the document is new.
+     *
+     * @param handle404 function to choose how to handle when the document is new
      */
-    self.refreshVersion = function (handle404) {
-      var pageInfoUrl = self.restURL;
+    async refreshVersion(handle404) {
       // We put a timestamp in the JSON URL to avoid getting it from cache.
-      pageInfoUrl += "?media=json&timestamp=" + new Date().getTime();
-      $.getJSON(pageInfoUrl).then(data => {
-        self.setVersion(data.version);
-      }).catch(error => {
-        if (error.status === 404 && typeof(handle404) === "function") {
-          handle404(error);
-        } else {
-          console.error("Error while refreshing the version from URL " + pageInfoUrl, error);
+      const pageInfoUrl = this.restURL + "?media=json&timestamp=" + new Date().getTime();
+      try {
+        const response = await fetch(pageInfoUrl);
+        if (!response.ok) {
+          if (response.status === 404 && typeof(handle404) === "function") {
+            handle404(response);
+          } else {
+            throw new Error(`Response status: ${response.status}`);
+          }
         }
-      });
-    };
-
-    self.init();
-  };
+    
+        const json = await response.json();
+        this.setVersion(json.version);
+      } catch (error) {
+        console.error("Error while refreshing the version from URL " + pageInfoUrl, error);
+      }
+    }
+  }
 
   return new XWikiMeta();
 });

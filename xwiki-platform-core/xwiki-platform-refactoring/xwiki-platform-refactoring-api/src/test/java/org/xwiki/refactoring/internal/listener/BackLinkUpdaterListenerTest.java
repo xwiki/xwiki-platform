@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal.listener;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +61,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class BackLinkUpdaterListenerTest
 {
+    protected static final String FINISH_WAITING_MESSAGE =
+        "Finished waiting for the link index, starting the update of backlinks.";
+
     @InjectMockComponents
     private BackLinkUpdaterListener listener;
 
@@ -74,6 +78,9 @@ class BackLinkUpdaterListenerTest
 
     @MockComponent
     private JobContext jobContext;
+
+    @MockComponent
+    private LinkIndexingWaitingHelper waitingHelper;
 
     @Mock
     private RenameJob renameJob;
@@ -108,6 +115,7 @@ class BackLinkUpdaterListenerTest
 
         when(this.jobContext.getCurrentJob()).thenReturn(deleteJob);
         when(this.deleteJob.getRequest()).thenReturn(deleteRequest);
+        when(this.renameJob.getRequest()).thenReturn(this.renameRequest);
         deleteRequest.setNewBacklinkTargets(Collections.singletonMap(aliceReference, bobReference));
     }
 
@@ -130,7 +138,9 @@ class BackLinkUpdaterListenerTest
     @Test
     void onDocumentRenamedWithUpdateLinksOnFarmAndNoEditRight()
     {
-        renameRequest.setUpdateLinks(true);
+        when(this.jobContext.getCurrentJob()).thenReturn(this.renameJob);
+        this.renameRequest.setUpdateLinks(true);
+        this.renameRequest.setWaitForIndexing(false);
 
         when(this.renameJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.renameJob.hasAccess(Right.EDIT, denisReference)).thenReturn(false);
@@ -146,6 +156,7 @@ class BackLinkUpdaterListenerTest
     @Test
     void onDocumentRenamedWithUpdateLinksOnWiki()
     {
+        when(this.jobContext.getCurrentJob()).thenReturn(this.renameJob);
         renameRequest.setUpdateLinks(true);
 
         when(this.renameJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
@@ -156,6 +167,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
         assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        verify(this.waitingHelper).maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -173,6 +185,7 @@ class BackLinkUpdaterListenerTest
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -187,6 +200,7 @@ class BackLinkUpdaterListenerTest
     {
         when(this.authorization.hasAccess(Right.EDIT, carolReference)).thenReturn(false);
         when(this.authorization.hasAccess(Right.EDIT, denisReference)).thenReturn(true);
+        when(this.jobContext.getCurrentJob()).thenReturn(null);
 
         this.listener.onEvent(documentRenamedEvent, null, null);
 
@@ -231,6 +245,7 @@ class BackLinkUpdaterListenerTest
     void onDocumentDeleteWithUpdateLinksOnFarmAndNoEditRight()
     {
         deleteRequest.setUpdateLinks(true);
+        deleteRequest.setWaitForIndexing(false);
 
         when(this.deleteJob.hasAccess(Right.EDIT, carolReference)).thenReturn(true);
         when(this.deleteJob.hasAccess(Right.EDIT, denisReference)).thenReturn(false);
@@ -240,7 +255,7 @@ class BackLinkUpdaterListenerTest
         verify(this.updater).update(carolReference, aliceReference, bobReference);
         verify(this.updater, never()).update(eq(denisReference), any(DocumentReference.class), any());
 
-        assertEquals("Updating the back-links for document [foo:Users.Alice].", logCapture.getMessage(0));
+        assertEquals("Updating the back-links for document [foo:Users.Alice].", this.logCapture.getMessage(0));
     }
 
     @Test

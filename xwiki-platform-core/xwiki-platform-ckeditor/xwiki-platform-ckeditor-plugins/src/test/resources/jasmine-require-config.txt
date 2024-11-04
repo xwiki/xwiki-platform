@@ -6,7 +6,7 @@ paths: {
 
   // Tree
   jsTree: '/webjars/jstree',
-  JobRunner: '/webjars/jobRunner',
+  'xwiki-job-runner': '/webjars/jobRunner',
   'xwiki-tree-finder': '/webjars/finder',
   'xwiki-tree': '/webjars/tree',
 
@@ -32,6 +32,7 @@ paths: {
   entityResourceSuggester: 'xwiki-resource/entityResourceSuggester',
   entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
   l10n: 'xwiki-localization/l10n',
+  modal: 'xwiki-dialog/modal',
 
   textSelection: 'xwiki-selection/plugin',
   scrollUtils: 'xwiki-selection/plugin'

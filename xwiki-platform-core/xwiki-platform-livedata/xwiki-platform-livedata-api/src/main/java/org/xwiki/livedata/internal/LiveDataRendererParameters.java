@@ -54,6 +54,8 @@ public class LiveDataRendererParameters
 
     private String description;
 
+    private Boolean showPaginationOnSinglePage;
+
     /**
      * @return the Live Data instance id
      */
@@ -276,6 +278,27 @@ public class LiveDataRendererParameters
         this.description = description;
     }
 
+    /**
+     * @return whether to show or not the pagination list when there is only one page.
+     */
+    public Boolean getShowPaginationOnSinglePage()
+    {
+        return this.showPaginationOnSinglePage;
+    }
+
+    /**
+     * Sets whether to show or not the pagination list when there is only one page.
+     *
+     * @param showPaginationOnSinglePage {@code true} to always show the page list, 
+     * {@code false} only show it when there's multiple pages;
+     * leave {@code null} to inherit from the default configuration
+     * @since 16.10.0RC1
+     */
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        this.showPaginationOnSinglePage = showPaginationOnSinglePage;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -302,6 +325,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown, that.showPageSizeDropdown)
             .append(this.pageSizes, that.pageSizes)
             .append(this.description, that.description)
+            .append(this.showPaginationOnSinglePage, that.showPaginationOnSinglePage)
             .isEquals();
     }
 
@@ -321,6 +345,7 @@ public class LiveDataRendererParameters
             .append(this.showPageSizeDropdown)
             .append(this.pageSizes)
             .append(this.description)
+            .append(this.showPaginationOnSinglePage)
             .toHashCode();
     }
 }

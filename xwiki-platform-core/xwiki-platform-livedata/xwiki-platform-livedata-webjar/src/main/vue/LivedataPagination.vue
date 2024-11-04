@@ -31,8 +31,8 @@
   <nav class="livedata-pagination"
        :aria-label="this.data.id
         ? $t('livedata.pagination.label', [this.data.id])
-        : $t('livedata.pagination.label.empty')
-      ">
+        : $t('livedata.pagination.label.empty')"
+        v-if="showPagination">
 
     <!--
       Display the pagination current entry range
@@ -296,7 +296,11 @@ export default {
     },
     showEntryRange() {
       return this.data.meta.pagination.showEntryRange
-    }
+    },
+    showPagination() {
+    return this.isMoreThanOnePage() || this.data.meta.showPaginationOnSinglePage;
+    },
+    isMoreThanOnePage () { return this.logic.getPageCount() > 1 }
   },
 
   methods: {

@@ -37,7 +37,8 @@ import _ from "lodash";
  *           maxShownPages: 10,
  *           showEntryRange: true,
  *           showPageSizeDropdown: true,
- *           pageSizes: [10, 20, 30]
+ *           pageSizes: [10, 20, 30],
+ *           showPaginationOnSinglePage: true
  *         }
  *       },
  *       query: { limit: 20 },
@@ -75,7 +76,8 @@ function initWrapper({provide} = {}) {
               maxShownPages: 10,
               showEntryRange: true,
               showPageSizeDropdown: true,
-              pageSizes: [10, 20, 30, 100]
+              pageSizes: [10, 20, 30, 100],
+              showPaginationOnSinglePage: true
             }
           },
           query: {limit: 20},

@@ -158,4 +158,17 @@ public class LiveDataMacroParameters extends LiveDataRendererParameters
     {
         super.setDescription(description);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 16.10.0RC1
+     */
+    @Override
+    @Unstable
+    @PropertyDescription("Show or hide the page list that allows the user to switch pages when there is only one page.")
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        super.setShowPaginationOnSinglePage(showPaginationOnSinglePage);
+    }
 }

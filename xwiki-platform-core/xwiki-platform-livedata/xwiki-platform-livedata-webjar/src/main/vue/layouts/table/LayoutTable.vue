@@ -90,7 +90,7 @@
       <div v-if="entriesFetched && entries.length === 0" class="noentries-table">
         {{ $t('livedata.bottombar.noEntries') }}
       </div>
-      <LivedataPagination v-if="isMoreThanOnePage" />
+      <LivedataPagination/>
     </LivedataBottombar>
   </div>
 </template>
@@ -128,23 +128,18 @@ export default {
   inject: ["logic"],
   
   data: () => ({
-    entriesFetched: false,
-    layoutLoaded: false
+    entriesFetched: false
   }),
 
   computed: {
     data () { return this.logic.data; },
     entries () { return this.logic.data.data.entries; },
     canAddEntry () { return this.logic.canAddEntry(); },
-    isMoreThanOnePage () { return (this.logic.getPageCount() > 1) || this.layoutLoaded },
   },
   
   mounted() {
     this.logic.onEvent('afterEntryFetch', () => {
       this.entriesFetched = true;
-    });
-    this.logic.onEvent("layoutLoaded", () => {
-      this.layoutLoaded = true;
     });
   }
 

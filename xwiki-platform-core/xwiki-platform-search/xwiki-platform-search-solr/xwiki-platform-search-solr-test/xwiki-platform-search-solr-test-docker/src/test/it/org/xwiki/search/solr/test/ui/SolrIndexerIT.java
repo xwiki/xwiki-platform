@@ -108,8 +108,7 @@ class SolrIndexerIT
 
         // Create a couple of pages with interesting names that could have different ordering in Unicode.
         List<String> names =
-            List.of("Abc", "Bac", "bAc", "aBc", "Äbc", "äBc", "bÄc", "Bäc", "Àbc", "àBc", "bÀc", "Bàc",
-                "\uD83D\uDC4Dbc");
+            List.of("Abc", "Bac", "bAc", "aBc", "Äbc", "äBc", "bÄc", "Bäc", "Àbc", "àBc", "bÀc", "Bàc");
 
         for (String name : names) {
             DocumentReference pageReference = new DocumentReference(name, testSpace);

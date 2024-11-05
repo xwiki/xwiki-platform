@@ -164,7 +164,6 @@ class SolrIndexerIT
         List<List<String>> nonSkipOperations = iteratorOutput.get("diff").stream()
             .filter(item -> !skipAction.equals(item.get(1)))
             .toList();
-        // Compare to an empty list to show the actual list when the list isn't empty.
         List<List<String>> databaseDocuments = iteratorOutput.get("database");
         List<List<String>> solrDocuments = iteratorOutput.get("solr");
 

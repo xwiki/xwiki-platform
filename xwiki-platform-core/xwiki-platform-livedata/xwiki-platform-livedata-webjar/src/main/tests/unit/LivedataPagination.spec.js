@@ -168,5 +168,22 @@ describe('LivedataPagination.vue', () => {
     expect(pageNavs.at(0).text()).toBe("1");
     expect(pageNavs.at(1).text()).toBe("2");
     expect(pageNavs.at(2).text()).toBe("3");
+  });
+  
+  it('Displays the pagination indexes when there is only one page and the option to display it is OFF', () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: {
+              pagination: {
+                showPaginationOnSinglePage: false
+              }
+            }
+          }
+        }
+      }
+    });
+    expect(wrapper.findAll('.livedata-pagination').length).toBe(0);
   })
 })

@@ -298,7 +298,7 @@ export default {
       return this.data.meta.pagination.showEntryRange
     },
     showPagination() {
-      return this.logic.getPageCount() > 1 || this.data.meta.pagination.showPaginationOnSinglePage;
+      return (this.logic.getPageCount() > 1) || this.data.meta.pagination.showPaginationOnSinglePage;
     }
   },
 

@@ -126,7 +126,7 @@ class SolrIndexerIT
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, List<List<String>>> iteratorOutput = objectMapper.readValue(jsonContent,
-            new TypeReference<>()
+            new TypeReference<Map<String, List<List<String>>>>()
             {
             });
 

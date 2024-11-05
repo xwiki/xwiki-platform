@@ -103,13 +103,16 @@ public class RegisterAction extends XWikiAction
             }
             getCurrentScriptContext().setAttribute(REG_CONSTANT, Integer.valueOf(result), ScriptContext.ENGINE_SCOPE);
 
-            // Redirect if a redirection parameter is passed.
-            String redirect = Utils.getRedirect(request, null);
-            if (redirect == null) {
-                return true;
-            } else {
-                sendRedirect(response, redirect);
-                return false;
+            // We never want to send redirect when the result is wrong.
+            if (result > 0) {
+                // Redirect if a redirection parameter is passed.
+                String redirect = Utils.getRedirect(request, null);
+                if (redirect == null) {
+                    return true;
+                } else {
+                    sendRedirect(response, redirect);
+                    return false;
+                }
             }
         }
 

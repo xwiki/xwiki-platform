@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { MacroData, MacroProvider } from "@xwiki/cristal-skin";
 import {
   DefaultVueTemplateProvider,
   DefaultMacroData,
 } from "@xwiki/cristal-skin";
+import type { MacroData, MacroProvider } from "@xwiki/cristal-skin";
 
 export abstract class DefaultMacroProvider
   extends DefaultVueTemplateProvider

@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
 import { FileSystemConfig } from "./components/FileSystemConfig";
 import FileSystemStorage from "./components/fileSystemStorage";
+import type { Container } from "inversify";
+import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
 
 export default class ComponentInit {
   logger: Logger;

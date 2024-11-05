@@ -23,11 +23,12 @@ declare module window {
     logout(): Promise<void>;
   }
 
+  // eslint-disable-next-line import/group-exports
   export const authenticationXWiki: authenticationXWiki;
 }
 
 @injectable()
-export class XWikiAuthenticationManager implements AuthenticationManager {
+class XWikiAuthenticationManager implements AuthenticationManager {
   constructor(
     @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
   ) {}
@@ -63,3 +64,6 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
     await window.authenticationXWiki.logout();
   }
 }
+
+// eslint-disable-next-line import/group-exports
+export { XWikiAuthenticationManager };

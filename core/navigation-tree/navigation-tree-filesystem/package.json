@@ -19,7 +19,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",

@@ -19,8 +19,8 @@
  */
 
 import "reflect-metadata";
-import { expect, test } from "vitest";
 import { DefaultPageData } from "../DefaultPageData";
+import { expect, test } from "vitest";
 
 // Dumb test to have at least one test result to show in the CI.
 test("DefaultPageData", () => {

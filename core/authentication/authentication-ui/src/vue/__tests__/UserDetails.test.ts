@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import UserDetails from "../UserDetails.vue";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { config, flushPromises, mount } from "@vue/test-utils";
-import UserDetails from "../UserDetails.vue";
 import {
   makeInjectable,
   mockI18n,

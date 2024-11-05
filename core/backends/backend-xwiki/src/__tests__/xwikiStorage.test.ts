@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import "reflect-metadata";
+import { XWikiStorage } from "../xwikiStorage";
 import { DefaultLogger, type WikiConfig } from "@xwiki/cristal-api";
 import { describe, expect, it } from "vitest";
 
-import { XWikiStorage } from "../xwikiStorage";
 import type {
   AuthenticationManager,
   AuthenticationManagerProvider,

@@ -18,22 +18,22 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { inject, onMounted, Ref, ref, watch } from "vue";
-import type { CristalApp, PageData } from "@xwiki/cristal-api";
-import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
 import CPageCreationMenu from "./c-page-creation-menu.vue";
 import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
 import CHelp from "./c-help.vue";
 import xlogo from "../images/xwiki-logo-color.svg";
-import { CIcon } from "@xwiki/cristal-icons";
 import { useMouseCoordinates } from "../composables/mouse";
 import { useViewportType, ViewportType } from "../composables/viewport";
+import { CIcon } from "@xwiki/cristal-icons";
+import { inject, onMounted, Ref, ref, watch } from "vue";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import {
   DocumentService,
   name as documentServiceName,
 } from "@xwiki/cristal-document-api";
+import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 
 const logo = xlogo;
 const viewportType: Ref<ViewportType> = useViewportType();

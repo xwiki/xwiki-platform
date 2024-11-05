@@ -19,7 +19,7 @@
  */
 import { Ref, onMounted, onUnmounted, ref } from "vue";
 
-export enum ViewportType {
+enum ViewportType {
   Mobile,
   Desktop,
 }
@@ -32,7 +32,7 @@ export enum ViewportType {
  *
  * @since 0.8
  **/
-export function useViewportType(): Ref<ViewportType> {
+function useViewportType(): Ref<ViewportType> {
   const viewportType: Ref<ViewportType> = ref(getNewViewportType());
 
   function onResize() {
@@ -52,3 +52,5 @@ export function useViewportType(): Ref<ViewportType> {
 
   return viewportType;
 }
+
+export { ViewportType, useViewportType };

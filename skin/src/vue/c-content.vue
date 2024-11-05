@@ -18,6 +18,15 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
+import { ContentTools } from "./contentTools";
+import xavatarImg from "../images/no-one.svg";
+import messages from "../translations";
+import { marked } from "marked";
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
+import { useI18n } from "vue-i18n";
+import { type CristalApp, PageData } from "@xwiki/cristal-api";
+import { useRoute } from "vue-router";
 import {
   computed,
   type ComputedRef,
@@ -27,19 +36,6 @@ import {
   type Ref,
   watch,
 } from "vue";
-import { useRoute } from "vue-router";
-import { type CristalApp, PageData } from "@xwiki/cristal-api";
-import type {
-  PageHierarchyItem,
-  PageHierarchyResolverProvider,
-} from "@xwiki/cristal-hierarchy-api";
-import { marked } from "marked";
-import { ContentTools } from "./contentTools";
-import { CIcon, Size } from "@xwiki/cristal-icons";
-import xavatarImg from "../images/no-one.svg";
-import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
-import { useI18n } from "vue-i18n";
-import messages from "../translations";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import {
   type DocumentService,
@@ -47,6 +43,10 @@ import {
 } from "@xwiki/cristal-document-api";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
+import type {
+  PageHierarchyItem,
+  PageHierarchyResolverProvider,
+} from "@xwiki/cristal-hierarchy-api";
 
 const { t } = useI18n({
   messages,

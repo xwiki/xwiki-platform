@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { contextBridge, ipcRenderer } from "electron";
 import { APITypes } from "./apiTypes";
+import { contextBridge, ipcRenderer } from "electron";
 
 const api: APITypes = {
   reloadBrowser() {

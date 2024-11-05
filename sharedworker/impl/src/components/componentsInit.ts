@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import DefaultQueueWorker from "./defaultQueueWorker";
 import type { Container } from "inversify";
 import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
-import DefaultQueueWorker from "./defaultQueueWorker";
 
 export default class ComponentInit {
   constructor(container: Container) {

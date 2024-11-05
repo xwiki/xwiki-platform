@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DSFRDesignSystemLoader } from "./dsfrDesignSystemLoader";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
-import { DSFRDesignSystemLoader } from "./dsfrDesignSystemLoader";
 
 export default class ComponentInit {
   constructor(container: Container) {

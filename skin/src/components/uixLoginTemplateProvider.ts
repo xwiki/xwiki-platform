@@ -19,9 +19,9 @@
  */
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
-import type { Component } from "vue";
 import Login from "../vue/c-login.vue";
 import { injectable } from "inversify";
+import type { Component } from "vue";
 
 @injectable()
 export class UIXLoginTemplateProvider extends DefaultVueTemplateProvider {

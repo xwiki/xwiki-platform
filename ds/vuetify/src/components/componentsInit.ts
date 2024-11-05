@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { VuetifyDesignSystemLoader } from "./vuetifyDesignSystemLoader";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
-import { VuetifyDesignSystemLoader } from "./vuetifyDesignSystemLoader";
 
 export default class ComponentInit {
   constructor(container: Container) {

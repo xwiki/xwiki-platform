@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { UixTiptapEditorProvider } from "./uixTiptapEditorProvider";
 import { Container } from "inversify";
 import { UIXTemplateProvider } from "@xwiki/cristal-skin";
-import { UixTiptapEditorProvider } from "./uixTiptapEditorProvider";
 
 export default class ComponentInit {
   constructor(container: Container) {

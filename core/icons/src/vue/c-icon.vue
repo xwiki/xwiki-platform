@@ -19,8 +19,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { computed } from "vue";
 import { Size } from "../size";
+import { computed } from "vue";
 
 // TODO: make sure that we have the good parameters available for accessibility
 const props = withDefaults(

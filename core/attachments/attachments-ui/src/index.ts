@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
+import { AttachmentExtraTab } from "./AttachmentExtraTab";
 import { Container } from "inversify";
 import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
-import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
-import { AttachmentExtraTab } from "./AttachmentExtraTab";
 
 export class ComponentInit {
   constructor(container: Container) {

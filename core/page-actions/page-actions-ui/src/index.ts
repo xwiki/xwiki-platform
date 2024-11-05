@@ -18,16 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import type {
-  PageActionCategory,
-  PageAction,
-} from "@xwiki/cristal-page-actions-api";
 import {
   PageManagementActionCategory,
   PageDeleteAction,
 } from "./PageManagement";
 import PageActions from "./vue/PageActions.vue";
+import type { Container } from "inversify";
+import type {
+  PageActionCategory,
+  PageAction,
+} from "@xwiki/cristal-page-actions-api";
 
 class ComponentInit {
   constructor(container: Container) {

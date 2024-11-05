@@ -18,6 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import {
+  type DesignSystemLoader,
+  registerAsyncComponent,
+} from "./api/designSystemLoader.js";
+import { DefaultPageData } from "./components/DefaultPageData.js";
+import { DefaultWikiConfig } from "./components/defaultWikiConfig.js";
+import { JSONLDDocument } from "./components/JSONLDDocument.js";
+import { DefaultLogger } from "./components/defaultLogger.js";
+import { DefaultLoggerConfig } from "./components/defaultLoggerConfig.js";
+import ComponentInit from "./components/componentsInit.js";
 import type { SkinManager } from "./api/skinManager.js";
 import type { CristalApp } from "./api/cristalApp.js";
 import type { WikiConfig } from "./api/WikiConfig.js";
@@ -28,17 +38,7 @@ import type { Document } from "./api/document.js";
 import type { Logger } from "./api/logger.js";
 import type { LoggerConfig } from "./api/loggerConfig.js";
 import type { AttachmentsData } from "./api/attachmentsData";
-import {
-  type DesignSystemLoader,
-  registerAsyncComponent,
-} from "./api/designSystemLoader.js";
-import { DefaultPageData } from "./components/DefaultPageData.js";
-import { DefaultWikiConfig } from "./components/defaultWikiConfig.js";
-import { JSONLDDocument } from "./components/JSONLDDocument.js";
-import { DefaultLogger } from "./components/defaultLogger.js";
-import { DefaultLoggerConfig } from "./components/defaultLoggerConfig.js";
 import type { WrappingStorage } from "./api/wrappingStorage.js";
-import ComponentInit from "./components/componentsInit.js";
 
 export type {
   SkinManager,

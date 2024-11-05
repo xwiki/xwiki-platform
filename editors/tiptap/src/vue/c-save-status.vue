@@ -18,9 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { AutoSaver, AutoSaverStatus } from "../extensions/autoSaver";
 import { type Ref, ref } from "vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { AutoSaver, AutoSaverStatus } from "../extensions/autoSaver";
 
 const props = withDefaults(
   defineProps<{

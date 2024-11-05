@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Storage, WikiConfig } from "@xwiki/cristal-api";
 import { NextcloudWikiConfig } from "./NextcloudWikiConfig";
 import { NextcloudStorage } from "./nextcloudStorage";
 import { Container } from "inversify";
+import type { Storage, WikiConfig } from "@xwiki/cristal-api";
 
 export class ComponentInit {
   constructor(container: Container) {

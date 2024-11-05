@@ -18,19 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { queryEqualityOperator } from "./filter-helper";
+import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
+import linkSuggestStore, {
+  LinkSuggestStore,
+} from "../../stores/link-suggest-store";
 import { Editor, Extension, Range } from "@tiptap/vue-3";
 import Suggestion from "@tiptap/suggestion";
 
 import { App, createApp } from "vue";
-import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 import { PluginKey } from "@tiptap/pm/state";
 import { Container } from "inversify";
 import { SkinManager } from "@xwiki/cristal-api";
 import { createPinia } from "pinia";
-import linkSuggestStore, {
-  LinkSuggestStore,
-} from "../../stores/link-suggest-store";
-import { queryEqualityOperator } from "./filter-helper";
 import { Link, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 /**

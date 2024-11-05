@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import DeletePage from "./vue/DeletePage.vue";
+import messages from "./translations";
 import { type Component } from "vue";
 import { injectable } from "inversify";
 import {
   type PageAction,
   AbstractPageActionCategory,
 } from "@xwiki/cristal-page-actions-api";
-import DeletePage from "./vue/DeletePage.vue";
-import messages from "./translations";
 
 const PAGE_MANAGEMENT_ID: string = "page-management";
 

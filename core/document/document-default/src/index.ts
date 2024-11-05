@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultDocumentService } from "./defaultDocumentService";
 import { Container } from "inversify";
 import { type DocumentService, name } from "@xwiki/cristal-document-api";
-import { DefaultDocumentService } from "./defaultDocumentService";
 
 /**
  * @since 0.11

@@ -32,17 +32,17 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  *     item was disabled. Default hover effects, such as changing the cursor
  *     on items, were also disabled.
  */
+import { NavigationTreeSelection } from "../utils/navigation-tree-selection";
 import { type Ref, onBeforeMount, onMounted, ref, watch } from "vue";
 import "@shoelace-style/shoelace/dist/components/tree/tree";
 import "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
+import { type PageData } from "@xwiki/cristal-api";
 import type SlTree from "@shoelace-style/shoelace/dist/components/tree/tree";
 import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
-import { type PageData } from "@xwiki/cristal-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
-import { NavigationTreeSelection } from "../utils/navigation-tree-selection";
 
 type OnClickAction = (node: NavigationTreeNode) => void;
 

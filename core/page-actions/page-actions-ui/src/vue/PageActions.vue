@@ -18,14 +18,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import PageActionsCategory from "./PageActionsCategory.vue";
 import { inject } from "vue";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageActionCategory,
   PageActionCategoryService,
 } from "@xwiki/cristal-page-actions-api";
-import { CIcon, Size } from "@xwiki/cristal-icons";
-import PageActionsCategory from "./PageActionsCategory.vue";
 
 defineProps<{
   currentPage: PageData | undefined;

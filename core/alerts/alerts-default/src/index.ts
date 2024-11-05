@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultAlertsService } from "./defaultAlertsService";
 import { Container } from "inversify";
 import { type AlertsService } from "@xwiki/cristal-alerts-api";
-import { DefaultAlertsService } from "./defaultAlertsService";
 
 export class ComponentInit {
   constructor(container: Container) {

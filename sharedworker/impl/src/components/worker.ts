@@ -18,19 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { WorkerCristalApp } from "./workerCristalApp";
+import WorkerQueueWorker from "./workerQueueWorker";
 import * as Comlink from "comlink";
-import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
-import type { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
-import { type WikiConfig } from "@xwiki/cristal-api";
+import {
+  type WikiConfig,
+  CristalApp,
+  WrappingStorage,
+} from "@xwiki/cristal-api";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
 import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
+import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import type { Container } from "inversify";
-import { WorkerCristalApp } from "./workerCristalApp";
-import WorkerQueueWorker from "./workerQueueWorker";
 
 export class Worker implements MyWorker {
   private currentNumber: number = 0;

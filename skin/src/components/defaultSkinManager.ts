@@ -29,10 +29,10 @@ import Edit from "../vue/c-edit.vue";
 import Blog from "../vue/c-blog.vue";
 import Movie from "../vue/c-movie.vue";
 
+import { injectable } from "inversify";
 import type { App, Component } from "vue";
 import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
-import { injectable } from "inversify";
 import "reflect-metadata";
 
 @injectable()

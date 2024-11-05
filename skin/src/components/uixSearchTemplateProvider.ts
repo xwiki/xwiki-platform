@@ -19,9 +19,9 @@
  */
 
 import DefaultVueTemplateProvider from "./defaultVueTemplateProvider";
-import type { Component } from "vue";
 import Search from "../vue/c-search.vue";
 import { injectable } from "inversify";
+import type { Component } from "vue";
 
 @injectable()
 export class UIXSearchTemplateProvider extends DefaultVueTemplateProvider {

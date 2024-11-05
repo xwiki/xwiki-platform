@@ -19,9 +19,9 @@
  */
 
 import { chrome } from "../.electron-vendors.cache.json";
+import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
 import { preload } from "unplugin-auto-expose";
 import { join } from "node:path";
-import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, "../..");

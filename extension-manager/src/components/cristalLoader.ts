@@ -18,12 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Logger } from "@xwiki/cristal-api";
-import type { LoggerConfig } from "@xwiki/cristal-api";
-import { DefaultLogger, DefaultLoggerConfig } from "@xwiki/cristal-api";
-import type { ExtensionManager } from "../api/extensionManager";
 import ComponentInit from "./componentsInit";
+import { DefaultLogger, DefaultLoggerConfig } from "@xwiki/cristal-api";
 import { Container } from "inversify";
+import type { Logger, LoggerConfig } from "@xwiki/cristal-api";
+import type { ExtensionManager } from "../api/extensionManager";
 
 export class CristalLoader {
   // @ts-expect-error logger can be temporarily undefined during class

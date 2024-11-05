@@ -18,13 +18,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { getUserProfile } from "./utils/getUserProfile";
+import messages from "../translations";
 import { inject } from "vue";
 import { CristalApp } from "@xwiki/cristal-api";
-import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import { I18nT, useI18n } from "vue-i18n";
 import { BrowserApi, name as browserApiName } from "@xwiki/cristal-browser-api";
-import messages from "../translations";
-import { getUserProfile } from "./utils/getUserProfile";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 const { t } = useI18n({
   messages,

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import { ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
 import { DefaultExtraTabsService } from "./DefaultExtraTabsService";
+import { ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

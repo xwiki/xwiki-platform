@@ -19,10 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 
 <script setup lang="ts">
-import { CIcon } from "@xwiki/cristal-icons";
 import UserDetails from "./UserDetails.vue";
-import { useI18n } from "vue-i18n";
 import messages from "../translations";
+import { CIcon } from "@xwiki/cristal-icons";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n({
   messages,

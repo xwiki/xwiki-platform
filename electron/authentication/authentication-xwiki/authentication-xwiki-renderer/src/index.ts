@@ -1,7 +1,6 @@
-import type { Container } from "inversify";
-
-import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 import { XWikiAuthenticationManager } from "./xWikiAuthenticationManager";
+import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

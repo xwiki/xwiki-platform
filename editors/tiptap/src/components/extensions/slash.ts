@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { CommandParams } from "./menu-helpers";
+import { queryEqualityOperator } from "./filter-helper";
+import Selector from "../../vue/c-tiptap-selector.vue";
+import slashStore, { Props, SlashStore } from "../../stores/slash-store";
 import { Editor, Extension, Range } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 import { App, createApp } from "vue";
-import Selector from "../../vue/c-tiptap-selector.vue";
 import { Plugin } from "@tiptap/pm/state";
-import { CommandParams } from "./menu-helpers";
 import { createPinia } from "pinia";
-import slashStore, { Props, SlashStore } from "../../stores/slash-store";
-import { queryEqualityOperator } from "./filter-helper";
 
 const Slash = Extension.create({
   name: "slash",
@@ -59,7 +59,7 @@ const Slash = Extension.create({
  * that category.
  * @since 0.8
  */
-export interface ActionCategoryDescriptor {
+interface ActionCategoryDescriptor {
   actions: ActionDescriptor[];
   title: string;
 }
@@ -179,7 +179,7 @@ function getAllActions(): ActionCategoryDescriptor[] {
   ];
 }
 
-export function filterActionsByQuery(
+function filterActionsByQuery(
   query: string,
   actions: ActionCategoryDescriptor[],
 ) {
@@ -276,4 +276,10 @@ function renderItems() {
   };
 }
 
-export { Slash, renderItems, getSuggestionItems };
+export {
+  Slash,
+  renderItems,
+  getSuggestionItems,
+  type ActionCategoryDescriptor,
+  filterActionsByQuery,
+};

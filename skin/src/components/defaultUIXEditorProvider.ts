@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import DefaultUIXTemplateProvider from "./defaultUIXTemplateProvider";
 import { UIXEditorProvider } from "../api/uixEditorProvider";
 import { injectable } from "inversify";
 import "reflect-metadata";
-import DefaultUIXTemplateProvider from "./defaultUIXTemplateProvider";
 import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()

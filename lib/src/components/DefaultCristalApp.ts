@@ -18,37 +18,36 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import { inject, injectable, multiInject } from "inversify";
-import "reflect-metadata";
-
-import type {
-  CristalApp,
-  LoggerConfig,
-  PageData,
-  WikiConfig,
-} from "@xwiki/cristal-api";
+import Index from "../c-index.vue";
 import {
+  type CristalApp,
+  type LoggerConfig,
+  type PageData,
+  type WikiConfig,
   DefaultLogger,
   DefaultPageData,
   type Logger,
   type SkinManager,
 } from "@xwiki/cristal-api";
-import type { App, Component, Ref } from "vue";
 import { createApp } from "vue";
+import { inject, injectable, multiInject } from "inversify";
+import { createPinia } from "pinia";
+import { createI18n } from "vue-i18n";
+import {
+  type DocumentService,
+  name as documentServiceName,
+} from "@xwiki/cristal-document-api";
+import { type BrowserApi } from "@xwiki/cristal-browser-api";
 import {
   createRouter,
   createWebHashHistory,
   Router,
   RouteRecordRaw,
 } from "vue-router";
-
-import { type BrowserApi } from "@xwiki/cristal-browser-api";
-
+import type { Container } from "inversify";
+import "reflect-metadata";
+import type { App, Component, Ref } from "vue";
 import "@mdi/font/css/materialdesignicons.css";
-
-import Index from "../c-index.vue";
-
 import type { ExtensionManager } from "@xwiki/cristal-extension-manager";
 import type {
   UIXTemplateProvider,
@@ -56,12 +55,6 @@ import type {
 } from "@xwiki/cristal-skin";
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
 import type { Renderer } from "@xwiki/cristal-rendering";
-import { createPinia } from "pinia";
-import { createI18n } from "vue-i18n";
-import {
-  type DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
 
 @injectable()
 export class DefaultCristalApp implements CristalApp {

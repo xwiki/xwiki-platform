@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
 import messages from "../translations";
+import { useI18n } from "vue-i18n";
 import { Attachment } from "@xwiki/cristal-attachments-api";
 
 const { t } = useI18n({

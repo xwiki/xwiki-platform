@@ -18,16 +18,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed, ComputedRef, onMounted, onUnmounted, ref } from "vue";
-
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
-import { ActionDescriptor } from "../components/extensions/slash";
-import { CIcon, Size } from "@xwiki/cristal-icons";
-
+import { listNavigation } from "./list-navigation-helper";
 import slashStore from "../stores/slash-store";
+import { ActionDescriptor } from "../components/extensions/slash";
+import { computed, ComputedRef, onMounted, onUnmounted, ref } from "vue";
+import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 import { storeToRefs } from "pinia";
 import { SuggestionProps } from "@tiptap/suggestion";
-import { listNavigation } from "./list-navigation-helper";
 
 const container = ref();
 

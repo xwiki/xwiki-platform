@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type {
-  Attachment,
-  AttachmentsService,
-} from "@xwiki/cristal-attachments-api";
 import { Ref } from "vue";
 import { inject, injectable } from "inversify";
 import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
 import { type CristalApp } from "@xwiki/cristal-api";
+import type {
+  Attachment,
+  AttachmentsService,
+} from "@xwiki/cristal-attachments-api";
 
 type Id = "attachments";
 type State = {

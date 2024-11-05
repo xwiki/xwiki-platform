@@ -20,6 +20,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
     "test": "vitest --run"
   },
   "dependencies": {

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import XCol from "../x-col.vue";
 import { describe, expect, it } from "vitest";
 import { shallowMount } from "@vue/test-utils";
-import XCol from "../x-col.vue";
 
 describe("x-col", () => {
   it("contains the provided default slot", () => {

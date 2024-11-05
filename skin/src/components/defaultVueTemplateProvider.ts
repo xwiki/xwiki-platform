@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import { injectable } from "inversify";
+import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import "reflect-metadata";
 import type { Component } from "vue";
 

@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { inject, injectable } from "inversify";
-import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
-import * as Comlink from "comlink";
 import Worker from "./worker?sharedworker";
+import * as Comlink from "comlink";
+import { inject, injectable } from "inversify";
 import { type CristalApp, type Logger } from "@xwiki/cristal-api";
 import {
   type DocumentService,
   name as documentServiceName,
 } from "@xwiki/cristal-document-api";
+import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 
 @injectable()
 export default class DefaultQueueWorker implements QueueWorker {

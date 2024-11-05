@@ -19,13 +19,13 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
   type NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 
 // TODO: To be replaced by an actual authentication with CRISTAL-267
 const USERNAME = "test";

@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { App } from "vue";
 import {
   type DesignSystemLoader,
   registerAsyncComponent,
@@ -27,6 +26,7 @@ import {
 import { injectable } from "inversify";
 
 import VueDsfr from "@gouvminint/vue-dsfr";
+import type { App } from "vue";
 
 @injectable()
 export class DSFRDesignSystemLoader implements DesignSystemLoader {

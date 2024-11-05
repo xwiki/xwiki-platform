@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { inject, injectable } from "inversify";
-import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
 import axios from "axios";
 import Cookies, { type CookieAttributes } from "js-cookie";
 import {
   AuthenticationManager,
   type UserDetails,
 } from "@xwiki/cristal-authentication-api";
+import type { CristalApp, WikiConfig } from "@xwiki/cristal-api";
 
 /**
  * @since 0.11

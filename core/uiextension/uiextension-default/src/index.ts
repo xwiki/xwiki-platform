@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
 import { DefaultUIExtensionsManager } from "./DefaultUIExtensionsManager";
+import { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

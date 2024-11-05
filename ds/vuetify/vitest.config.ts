@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import localConfig from "./vite.config";
 import { defineConfig, mergeConfig } from "vitest/config";
 import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";
-import localConfig from "./vite.config";
 
 export default mergeConfig(
   mergeConfig(defaultConfig, localConfig),

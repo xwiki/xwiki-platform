@@ -18,7 +18,8 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.json && vite build"
+    "build": "tsc --project tsconfig.json && vite build",
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*"

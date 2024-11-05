@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import CTiptapLinkEdit from "../../vue/c-tiptap-link-edit.vue";
 import { Primitive } from "@tiptap/vue-3";
 import { type Editor } from "@tiptap/core";
 import { EditorState } from "@tiptap/pm/state";
 import { Range } from "@tiptap/core";
 import { Level } from "@tiptap/extension-heading";
 import { type Component } from "vue";
-import CTiptapLinkEdit from "../../vue/c-tiptap-link-edit.vue";
 
 // TODO: also add condition, for instance some actions shouldn't be proposed on
 // code.

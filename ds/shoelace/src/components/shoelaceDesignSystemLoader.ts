@@ -18,11 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { registerAsyncComponent } from "@xwiki/cristal-api";
+import { injectable } from "inversify";
 import type { App } from "vue";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
-import { registerAsyncComponent } from "@xwiki/cristal-api";
-
-import { injectable } from "inversify";
 
 @injectable()
 export class ShoelaceDesignSystemLoader implements DesignSystemLoader {

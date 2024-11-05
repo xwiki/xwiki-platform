@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { WikiModel } from "./wikimodel-teavm";
+import { inject, injectable } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
 import type { Converter } from "../api/converter";
-import { inject, injectable } from "inversify";
-import { WikiModel } from "./wikimodel-teavm";
 
 @injectable()
 export class XWiki21ToHTMLConverter implements Converter {

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { AttachmentsData } from "./attachmentsData";
 import type { PageData } from "./PageData";
 import type { WikiConfig } from "./WikiConfig";
-import { AttachmentsData } from "./attachmentsData";
 
 export interface Storage {
   setWikiConfig(config: WikiConfig): void;

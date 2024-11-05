@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "../api/WikiConfig";
 import { inject, injectable } from "inversify";
+import type { WikiConfig } from "../api/WikiConfig";
 import type { Storage } from "../api/storage";
 import type { CristalApp } from "../api/cristalApp";
 import type { WrappingStorage } from "../api/wrappingStorage";

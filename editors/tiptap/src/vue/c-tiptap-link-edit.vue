@@ -18,18 +18,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { CIcon, Size } from "@xwiki/cristal-icons";
-import { BubbleMenuAction } from "../components/extensions/bubble-menu";
-import { Range } from "@tiptap/vue-3";
-import { type Editor } from "@tiptap/core";
-import { inject, onMounted, onUpdated, Ref, ref, toRefs, watch } from "vue";
-import { ContentTools } from "@xwiki/cristal-skin";
-import type { CristalApp } from "@xwiki/cristal-api";
 import CTiptapLinkSuggest from "./c-tiptap-link-suggest.vue";
-import {
-  type LinkSuggestService,
-  type LinkSuggestServiceProvider,
-} from "@xwiki/cristal-link-suggest-api";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../stores/link-suggest-store";
@@ -37,7 +26,18 @@ import {
   initSuggestionsService,
   LinkSuggestionActionDescriptor,
 } from "../components/extensions/link-suggest";
+import { BubbleMenuAction } from "../components/extensions/bubble-menu";
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { Range } from "@tiptap/vue-3";
+import { type Editor } from "@tiptap/core";
+import { inject, onMounted, onUpdated, Ref, ref, toRefs, watch } from "vue";
+import { ContentTools } from "@xwiki/cristal-skin";
+import {
+  type LinkSuggestService,
+  type LinkSuggestServiceProvider,
+} from "@xwiki/cristal-link-suggest-api";
 import { debounce } from "lodash";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 const emits = defineEmits(["close"]);
 

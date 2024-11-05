@@ -18,14 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
-import type { Logger } from "@xwiki/cristal-api";
-import type { Converter } from "../api/converter";
+import macro from "./marked-macro";
 import { marked } from "marked";
 import { baseUrl } from "marked-base-url";
-import macro from "./marked-macro";
 import DOMPurify from "dompurify";
 import { inject, injectable } from "inversify";
+import type { WikiConfig, Logger } from "@xwiki/cristal-api";
+import type { Converter } from "../api/converter";
 
 @injectable()
 export class MarkdownToHTMLConverter implements Converter {

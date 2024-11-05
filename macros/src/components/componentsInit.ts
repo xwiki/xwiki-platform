@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
-import type { MacroProvider } from "@xwiki/cristal-skin";
 import { ErrorMacro } from "./errorMacro";
 import { WarningMacro } from "./warningMacro";
 import { InfoMacro } from "./infoMacro";
 import { SuccessMacro } from "./successMacro";
+import type { MacroProvider } from "@xwiki/cristal-skin";
+import type { Container } from "inversify";
 
 export default class ComponentInit {
   constructor(container: Container) {

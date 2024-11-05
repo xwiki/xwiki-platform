@@ -18,12 +18,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { BubbleMenu, Range } from "@tiptap/vue-3";
-import { type Editor } from "@tiptap/core";
+import CTiptapLinkEdit from "./c-tiptap-link-edit.vue";
 import getMenuActions, {
   BubbleMenuAction,
   getLinkAction,
 } from "../components/extensions/bubble-menu";
+import { BubbleMenu, Range } from "@tiptap/vue-3";
+import { type Editor } from "@tiptap/core";
 import {
   type Component,
   computed,
@@ -36,7 +37,6 @@ import { CIcon, Size } from "@xwiki/cristal-icons";
 import { isTextSelection } from "@tiptap/core";
 import { EditorView } from "@tiptap/pm/view";
 import { EditorState } from "@tiptap/pm/state";
-import CTiptapLinkEdit from "./c-tiptap-link-edit.vue";
 import { ResolvedPos } from "@tiptap/pm/model";
 
 const props = defineProps<{

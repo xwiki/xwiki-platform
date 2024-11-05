@@ -22,9 +22,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   <div :id="panelidname" v-html="content.currentContent" />
 </template>
 <script lang="ts">
+import { ContentTools } from "./contentTools";
 import { inject, ref } from "vue";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
-import { ContentTools } from "./contentTools";
 
 let currentContent = "Panel content";
 // TODO get rid of any

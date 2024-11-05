@@ -19,9 +19,9 @@
  */
 
 import { type LinkSuggestService } from "./linkSuggestService";
-import { Container } from "inversify";
 import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
+import { Container } from "inversify";
 
 /**
  * @since 0.11

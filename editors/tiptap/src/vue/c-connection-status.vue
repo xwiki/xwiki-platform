@@ -18,16 +18,18 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import { User } from "../extensions/collaboration";
 import { type Ref, ref } from "vue";
 import {
   HocuspocusProvider,
+  // eslint-disable-next-line import/named
   onStatusParameters,
+  // eslint-disable-next-line import/named
   onAwarenessChangeParameters,
   WebSocketStatus,
 } from "@hocuspocus/provider";
 import { Avvvatars } from "avvvatars-vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { User } from "../extensions/collaboration";
 
 const props = withDefaults(
   defineProps<{

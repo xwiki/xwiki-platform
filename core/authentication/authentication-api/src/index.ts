@@ -19,10 +19,10 @@
  */
 
 import { type AuthenticationManagerProvider } from "./authenticationManagerProvider";
-import { Container } from "inversify";
 import { DefaultAuthenticationManagerProvider } from "./defaultAuthenticationManagerProvider";
 import { type AuthenticationManager } from "./authenticationManager";
 import { type UserDetails } from "./userDetails";
+import { Container } from "inversify";
 
 class ComponentInit {
   constructor(container: Container) {

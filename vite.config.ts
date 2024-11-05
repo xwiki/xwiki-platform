@@ -20,11 +20,11 @@
 
 import { defineConfig, mergeConfig, UserConfig } from "vite";
 import dts from "vite-plugin-dts";
+import vue from "@vitejs/plugin-vue";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import { readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import vue from "@vitejs/plugin-vue";
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 function pathsComputation(path: string) {
   const dir = dirname(fileURLToPath(path));
@@ -35,7 +35,7 @@ function pathsComputation(path: string) {
   return { packageDirName, pkg };
 }
 
-export function generateConfig(path: string): UserConfig {
+function generateConfig(path: string): UserConfig {
   const { packageDirName, pkg } = pathsComputation(path);
 
   const libFileName = (format: string) => `index.${format}.js`;
@@ -60,7 +60,7 @@ export function generateConfig(path: string): UserConfig {
   });
 }
 
-export function generateConfigVue(path: string): Record<string, any> {
+function generateConfigVue(path: string): Record<string, any> {
   return mergeConfig(
     generateConfig(path),
     defineConfig({
@@ -92,3 +92,5 @@ export function generateConfigVue(path: string): Record<string, any> {
     }),
   );
 }
+
+export { generateConfig, generateConfigVue };

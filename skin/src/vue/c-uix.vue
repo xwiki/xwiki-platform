@@ -18,8 +18,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import type { Component } from "vue";
 import { inject, shallowRef } from "vue";
+import type { Component } from "vue";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 
 let components: Array<Component> = [];

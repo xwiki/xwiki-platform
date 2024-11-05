@@ -18,17 +18,16 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
-
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
-import { storeToRefs } from "pinia";
-import linkSuggestStore from "../stores/link-suggest-store";
 import { listNavigation } from "./list-navigation-helper";
-import { SuggestionProps } from "@tiptap/suggestion";
+import linkSuggestStore from "../stores/link-suggest-store";
 import {
   LinkSuggestionActionDescriptor,
   LinkType,
 } from "../components/extensions/link-suggest";
+import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
+import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import { storeToRefs } from "pinia";
+import { SuggestionProps } from "@tiptap/suggestion";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 
 const container = ref();

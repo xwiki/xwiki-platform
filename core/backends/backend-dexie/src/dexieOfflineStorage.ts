@@ -18,11 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { PageData } from "@xwiki/cristal-api";
-import { DefaultPageData, type Logger } from "@xwiki/cristal-api";
-import type { OfflineStorage } from "@xwiki/cristal-backend-api";
 import DexiePageStorage from "./dexiePageStorage";
+import { DefaultPageData, type Logger, PageData } from "@xwiki/cristal-api";
 import { inject, injectable } from "inversify";
+import type { OfflineStorage } from "@xwiki/cristal-backend-api";
 
 @injectable()
 export default class DexieOfflineStorage implements OfflineStorage {

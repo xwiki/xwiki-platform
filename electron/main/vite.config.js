@@ -19,8 +19,8 @@
  */
 
 import { node } from "../.electron-vendors.cache.json";
-import { join } from "node:path";
 import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
+import { join } from "node:path";
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, "../..");

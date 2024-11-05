@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Container } from "inversify";
 import { MarkdownToHTMLConverter } from "./MarkdownToHTMLConverter";
-import type { Converter } from "../api/converter";
 import { XWiki21ToHTMLConverter } from "./XWikI21ToHTMLConverter";
-import type { Renderer } from "../api/renderer";
 import { DefaultRenderer } from "./defaultRenderer";
+import type { Container } from "inversify";
+import type { Converter } from "../api/converter";
+import type { Renderer } from "../api/renderer";
 
 export default class ComponentInit {
   constructor(container: Container) {

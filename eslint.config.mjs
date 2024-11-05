@@ -7,6 +7,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import pluginVue from "eslint-plugin-vue";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintPluginTsdoc from "eslint-plugin-tsdoc";
+import eslintPluginImport from "eslint-plugin-import";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,47 @@ export default [
   ...pluginVue.configs["flat/recommended"],
   eslintPluginPrettierRecommended,
   {
+    languageOptions: {
+      parserOptions: {
+        // Eslint doesn't supply ecmaVersion in `parser.js` `context.parserOptions`
+        // This is required to avoid ecmaVersion < 2015 error or 'import' / 'export' error
+        ecmaVersion: 2015,
+        sourceType: "module",
+      },
+    },
+    plugins: { import: eslintPluginImport },
+    settings: {
+      // This will do the trick
+      "import/parsers": {
+        espree: [".js", ".cjs", ".mjs", ".jsx"],
+      },
+      "import/resolver": {
+        typescript: true,
+        node: true,
+      },
+    },
+    rules: {
+      ...eslintPluginImport.configs["recommended"].rules,
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "index",
+            "sibling",
+            "parent",
+            "internal",
+            "external",
+            "builtin",
+            "object",
+            "type",
+          ],
+        },
+      ],
+      "import/export": "error",
+      "import/group-exports": "error",
+    },
+  },
+  {
     plugins: {
       tsdoc: eslintPluginTsdoc,
     },
@@ -46,7 +88,7 @@ export default [
 
     languageOptions: {
       parser: parser,
-      ecmaVersion: 5,
+      ecmaVersion: "latest",
       sourceType: "module",
 
       parserOptions: {

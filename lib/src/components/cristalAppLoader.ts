@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import { DefaultCristalApp } from "./DefaultCristalApp";
+import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import { type CristalApp } from "@xwiki/cristal-api";
 import { Container } from "inversify";
 import { Primitive } from "utility-types";
@@ -30,7 +30,7 @@ import type { AuthenticationManagerProvider } from "@xwiki/cristal-authenticatio
  * @param input - the input string
  * @since 0.8
  */
-export function loadConfig(input: string) {
+function loadConfig(input: string) {
   return async (): Promise<Record<string, Primitive>> => {
     const response = await fetch(input);
     return await response.json();
@@ -49,7 +49,7 @@ async function handleCallback(container: Container): Promise<void> {
   }
 }
 
-export class CristalAppLoader extends CristalLoader {
+class CristalAppLoader extends CristalLoader {
   // @ts-expect-error cristal is temporarily undefined during class
   // initialization
   public cristal: DefaultCristalApp;
@@ -166,3 +166,5 @@ export class CristalAppLoader extends CristalLoader {
     );
   }
 }
+
+export { loadConfig, CristalAppLoader };

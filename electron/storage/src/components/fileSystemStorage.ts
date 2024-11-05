@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { APITypes } from "../electron/preload/apiTypes";
 import { inject, injectable } from "inversify";
 import {
   AttachmentsData,
@@ -26,7 +27,6 @@ import {
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
-import { APITypes } from "../electron/preload/apiTypes";
 
 declare const fileSystemStorage: APITypes;
 

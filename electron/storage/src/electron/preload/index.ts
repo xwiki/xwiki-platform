@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { APITypes } from "./apiTypes";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
 
 const api: APITypes = {

@@ -19,12 +19,12 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 import {
   name,
   type PageHierarchyItem,
   type PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
+import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 
 /**
  * Implementation of PageHierarchyResolver for the GitHub backend.

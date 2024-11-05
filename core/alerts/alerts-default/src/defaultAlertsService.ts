@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { Ref } from "vue";
+import { injectable } from "inversify";
+import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
 import type {
   Alert,
   Action,
   AlertsService,
   Type as AlertType,
 } from "@xwiki/cristal-alerts-api";
-import { Ref } from "vue";
-import { injectable } from "inversify";
-import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
 
 type Id = "alerts";
 type State = {

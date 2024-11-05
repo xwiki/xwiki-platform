@@ -23,7 +23,7 @@ import { EditorState } from "@tiptap/pm/state";
 import { findParentNode } from "@tiptap/vue-3";
 import { Primitive } from "utility-types";
 
-export function isNodeActive(
+function isNodeActive(
   type: NodeType,
   attrs?: Record<string, Primitive>,
 ): (state: EditorState) => boolean {
@@ -47,7 +47,7 @@ export function isNodeActive(
   };
 }
 
-export function isMarkActive(type: MarkType): (state: EditorState) => boolean {
+function isMarkActive(type: MarkType): (state: EditorState) => boolean {
   return (state) => {
     let isActive = false;
     if (type) {
@@ -62,3 +62,5 @@ export function isMarkActive(type: MarkType): (state: EditorState) => boolean {
     return isActive;
   };
 }
+
+export { isNodeActive, isMarkActive };

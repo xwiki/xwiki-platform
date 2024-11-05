@@ -18,29 +18,29 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
+import CSaveStatus from "./c-save-status.vue";
+import CConnectionStatus from "./c-connection-status.vue";
+import { Slash } from "../components/extensions/slash";
+import { loadLinkSuggest } from "../components/extensions/link-suggest";
+import { CollaborationKit, User } from "../extensions/collaboration";
+import Link from "../extensions/link";
+import Markdown from "../extensions/markdown";
 import { computed, type ComputedRef, inject, type Ref, ref, watch } from "vue";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { useRoute } from "vue-router";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Slash } from "../components/extensions/slash";
-import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import Image from "@tiptap/extension-image";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
-import { CollaborationKit, User } from "../extensions/collaboration";
-import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
-import CSaveStatus from "./c-save-status.vue";
-import CConnectionStatus from "./c-connection-status.vue";
 import {
   type LinkSuggestService,
   type LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
-import Link from "../extensions/link";
-import Markdown from "../extensions/markdown";
 import {
   type DocumentService,
   name as documentServiceName,

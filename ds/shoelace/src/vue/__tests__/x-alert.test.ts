@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import XAlert from "../x-alert.vue";
 import { describe, expect, it } from "vitest";
 import { shallowMount } from "@vue/test-utils";
-import XAlert from "../x-alert.vue";
 
 describe("x-alert", () => {
   it("has a description", () => {

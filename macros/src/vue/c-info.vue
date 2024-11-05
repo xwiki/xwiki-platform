@@ -24,10 +24,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   </x-alert>
 </template>
 <script lang="ts">
-import type { Logger, CristalApp } from "@xwiki/cristal-api";
-import type { PropType } from "vue";
 import { inject } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
+import type { Logger, CristalApp } from "@xwiki/cristal-api";
+import type { PropType } from "vue";
 import type { MacroData } from "@xwiki/cristal-skin";
 
 let logger: Logger | null = null;

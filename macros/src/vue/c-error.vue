@@ -24,11 +24,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   </x-alert>
 </template>
 <script lang="ts">
+import { inject } from "vue";
+import { ContentTools } from "@xwiki/cristal-skin";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { PropType } from "vue";
-import { inject } from "vue";
 import type { MacroData } from "@xwiki/cristal-skin";
-import { ContentTools } from "@xwiki/cristal-skin";
 
 let logger: Logger | null = null;
 let addedHTMLField: Array<string> = [];

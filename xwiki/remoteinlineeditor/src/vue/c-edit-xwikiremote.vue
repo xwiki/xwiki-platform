@@ -38,8 +38,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 </template>
 <script lang="ts">
 import { Logger, CristalApp } from "@xwiki/cristal-api";
-import { inject } from "vue";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import { CTemplate } from "@xwiki/cristal-skin";
 
 const pageStatus = ref({

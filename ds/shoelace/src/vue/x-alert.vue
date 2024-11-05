@@ -20,9 +20,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/alert/alert";
 import "@shoelace-style/shoelace/dist/components/icon/icon";
-import type { AlertProps } from "@xwiki/cristal-dsapi";
 import { CIcon } from "@xwiki/cristal-icons";
 import { computed } from "vue";
+import type { AlertProps } from "@xwiki/cristal-dsapi";
 
 const { type } = defineProps<AlertProps>();
 

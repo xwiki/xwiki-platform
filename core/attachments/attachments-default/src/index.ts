@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultAttachmentsService } from "./defaultAttachmentsService";
 import { Container } from "inversify";
 import { type AttachmentsService } from "@xwiki/cristal-attachments-api";
-import { DefaultAttachmentsService } from "./defaultAttachmentsService";
 
 export class ComponentInit {
   constructor(container: Container) {

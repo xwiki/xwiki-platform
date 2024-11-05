@@ -19,8 +19,8 @@
  */
 
 import { ipcMain, app } from "electron";
-import BrowserWindow = Electron.BrowserWindow;
 import { resolve } from "node:path";
+import BrowserWindow = Electron.BrowserWindow;
 
 /**
  * Reload the browser by reloading the index file.

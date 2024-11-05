@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { loadFile } from "./reload";
 import { app, BrowserWindow, shell } from "electron";
 import { join } from "node:path";
-import { loadFile } from "./reload";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({

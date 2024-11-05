@@ -19,17 +19,17 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 import {
   name as PageHierarchyResolverName,
   type PageHierarchyItem,
   type PageHierarchyResolver,
   type PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 
 /**
  * Default implementation for PageHierarchyResolver.
- * This should can be used as a fallback, and only returns the homepage and the current page.
+ * This can be used as a fallback, and only returns the homepage and the current page.
  *
  * @since 0.9
  **/

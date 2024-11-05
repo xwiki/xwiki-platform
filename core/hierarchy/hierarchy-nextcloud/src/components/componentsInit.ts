@@ -19,13 +19,13 @@
  */
 
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 import {
   name,
   type PageHierarchyItem,
   type PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
 import { getPageHierarchyFromPath } from "@xwiki/cristal-hierarchy-default";
+import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 
 /**
  * Implementation of PageHierarchyResolver for Nextcloud backend.

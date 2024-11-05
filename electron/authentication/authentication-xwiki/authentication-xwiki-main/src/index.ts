@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { BrowserWindow, ipcMain } from "electron";
-import axios from "axios";
 import {
   getAccessToken,
   getTokenType,
@@ -28,6 +26,8 @@ import {
   deleteAccessToken,
   deleteTokenType,
 } from "./storage.js";
+import { BrowserWindow, ipcMain } from "electron";
+import axios from "axios";
 import { UserDetails } from "@xwiki/cristal-authentication-api";
 
 const callbackUrl = "http://callback/";

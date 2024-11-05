@@ -52,9 +52,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   </div>
 </template>
 <script lang="ts">
-import type { CristalApp, Document, Logger } from "@xwiki/cristal-api";
-import { inject } from "vue";
 import Field from "./c-field.vue";
+import { inject } from "vue";
+import type { CristalApp, Document, Logger } from "@xwiki/cristal-api";
 import type { PropType } from "vue/dist/vue";
 
 let logger: Logger;

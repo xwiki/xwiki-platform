@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { defineStore, Store, StoreDefinition } from "pinia";
 import { ActionCategoryDescriptor } from "../components/extensions/slash";
+import { defineStore, Store, StoreDefinition } from "pinia";
 
-export type Props = { items: ActionCategoryDescriptor[] };
+type Props = { items: ActionCategoryDescriptor[] };
 
 type State = {
   props: Props;
@@ -55,3 +55,4 @@ const store: StoreDefinition<"slash-store", State, Getters, Actions> =
     },
   });
 export default store;
+export { type Props };

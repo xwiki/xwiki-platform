@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultUIXTemplateProvider } from "@xwiki/cristal-skin";
 import Menu from "./c-menu.vue";
+import { DefaultUIXTemplateProvider } from "@xwiki/cristal-skin";
 import { injectable } from "inversify";
 import "reflect-metadata";
 import type { Component } from "vue";

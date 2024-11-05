@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
-import { Storage } from "@xwiki/cristal-api";
-import { Container } from "inversify";
 import { GitHubWikiConfig } from "./GitHubWikiConfig";
 import { GitHubStorage } from "./githubStorage";
+import { Storage } from "@xwiki/cristal-api";
+import { Container } from "inversify";
+import type { WikiConfig } from "@xwiki/cristal-api";
 
 export class ComponentInit {
   constructor(container: Container) {

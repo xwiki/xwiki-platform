@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import InfoAction from "../InfoAction.vue";
 import { describe, expect, it, vi } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { InfoAction as InfoActionAPI } from "@xwiki/cristal-info-actions-api";
 import { ref, Ref } from "vue";
 import { useRoute } from "vue-router";
-import InfoAction from "../InfoAction.vue";
 import { wrapInSuspense } from "@xwiki/cristal-dev-test-utils";
 
 describe("info-action", () => {

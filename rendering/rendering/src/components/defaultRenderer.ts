@@ -18,9 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
-import { type CristalApp, type Logger } from "@xwiki/cristal-api";
 import { inject, injectable } from "inversify";
+import type { WikiConfig, CristalApp, Logger } from "@xwiki/cristal-api";
 import type { Renderer } from "../api/renderer";
 import type { Converter } from "../api/converter";
 

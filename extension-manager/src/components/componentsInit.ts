@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { ExtensionManager } from "../api/extensionManager";
 import { DefaultExtensionManager } from "./defaultExtensionManager";
+import type { ExtensionManager } from "../api/extensionManager";
 import type { Container } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
 

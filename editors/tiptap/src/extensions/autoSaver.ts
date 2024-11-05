@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { User } from "./collaboration";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import EventEmitter from "eventemitter3";
-import { User } from "./collaboration";
 
 interface AutoSaverAwarenessState {
   // The number of local changes made so far.
@@ -37,13 +37,13 @@ interface AutoSaverAwarenessState {
   saving: boolean;
 }
 
-export enum AutoSaverStatus {
+enum AutoSaverStatus {
   UNSAVED = 1,
   SAVING,
   SAVED,
 }
 
-export class AutoSaver extends EventEmitter {
+class AutoSaver extends EventEmitter {
   private static readonly AWARENESS_FIELD = "autoSaver";
 
   private hocuspocusProvider: HocuspocusProvider;
@@ -226,3 +226,5 @@ export class AutoSaver extends EventEmitter {
     }
   }
 }
+
+export { AutoSaverStatus, AutoSaver };

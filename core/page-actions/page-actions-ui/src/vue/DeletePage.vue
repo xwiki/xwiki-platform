@@ -18,16 +18,16 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import messages from "../translations";
 import { type Ref, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { CIcon, Size } from "@xwiki/cristal-icons";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
-import { CIcon, Size } from "@xwiki/cristal-icons";
-import messages from "../translations";
 
 const { t } = useI18n({
   messages,

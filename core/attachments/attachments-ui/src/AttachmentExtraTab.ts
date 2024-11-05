@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { injectable } from "inversify";
-import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import messages from "./translations";
 import AttachmentsTab from "./vue/AttachmentsTab.vue";
+import { injectable } from "inversify";
+import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { Component } from "vue";
 
 @injectable()

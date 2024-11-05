@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { getParentNodesIdFromPath } from "../utils";
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import {
   name as NavigationTreeSourceName,
   type NavigationTreeNode,
   type NavigationTreeSource,
   type NavigationTreeSourceProvider,
 } from "@xwiki/cristal-navigation-tree-api";
-import { getParentNodesIdFromPath } from "../utils";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 
 /**
  * Default implementation for NavigationTreeSource.

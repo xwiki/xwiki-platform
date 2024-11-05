@@ -18,9 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Logger } from "../api/logger";
-
 import { inject, injectable, optional } from "inversify";
+import type { Logger } from "../api/logger";
 import type { LoggerConfig } from "../api/loggerConfig";
 
 @injectable()

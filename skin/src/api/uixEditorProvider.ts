@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CristalApp } from "@xwiki/cristal-api";
 import { UIXTemplateProvider } from "./uixTemplateProvider";
+import { CristalApp } from "@xwiki/cristal-api";
 
 export interface UIXEditorProvider extends UIXTemplateProvider {
   isSupported(cristal: CristalApp): boolean;

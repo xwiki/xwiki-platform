@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { NextcloudLinkSuggestService } from "./nextcloudLinkSuggestService";
 import { Container } from "inversify";
 import { name, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
-import { NextcloudLinkSuggestService } from "./nextcloudLinkSuggestService";
 
 /**
  * @since 0.11

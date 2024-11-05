@@ -18,9 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import type { CristalApp, Document, Logger } from "@xwiki/cristal-api";
-import { inject, ref } from "vue";
 import Field from "./c-field.vue";
+import { inject, ref } from "vue";
+import type { CristalApp, Document, Logger } from "@xwiki/cristal-api";
 
 type Props = { document: Document; mode: string };
 const props = defineProps<Props>();

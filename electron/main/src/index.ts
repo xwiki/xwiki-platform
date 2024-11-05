@@ -18,16 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { restoreOrCreateWindow } from "./mainWindow";
+import { loadFile } from "./reload";
 import { app, BrowserWindow } from "electron";
 import "./security-restrictions";
-import { restoreOrCreateWindow } from "./mainWindow";
-import { platform } from "node:process";
-// @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
+// @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import load from "@xwiki/cristal-electron-storage/main";
-// @ts-expect-error shouldn't happen but we need to generate the types for the whole project once.
+// @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import loadBrowser from "@xwiki/cristal-browser-electron/main";
 import { load as loadAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";
-import { loadFile } from "./reload";
+import { platform } from "node:process";
 
 /**
  * Prevent electron from running multiple instances.

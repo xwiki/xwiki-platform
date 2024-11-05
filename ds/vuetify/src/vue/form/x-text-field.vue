@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import messages from "../../translations";
 import { type TextFieldProps } from "@xwiki/cristal-dsapi";
 import { computed } from "vue";
 import { VTextField } from "vuetify/components/VTextField";
-import messages from "../../translations";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n({

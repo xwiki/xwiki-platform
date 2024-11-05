@@ -18,12 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { ExtensionManager } from "../api/extensionManager";
-import type { ExtensionConfig } from "../api/extensionConfig";
 import { DefaultComponent } from "./defaultComponent";
 import { DefaultExtensionConfig } from "./defaultExtensionConfig";
-import type { Container } from "inversify";
 import { injectable, inject } from "inversify";
+import type { ExtensionManager } from "../api/extensionManager";
+import type { ExtensionConfig } from "../api/extensionConfig";
+import type { Container } from "inversify";
 import "reflect-metadata";
 import type { Logger } from "@xwiki/cristal-api";
 

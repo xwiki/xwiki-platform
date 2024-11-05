@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { injectable } from "inversify";
 import type {
   CristalApp as CristalApp,
   Logger,
@@ -27,7 +28,6 @@ import type {
   WikiConfig,
 } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
-import { injectable } from "inversify";
 import type { App, Component } from "vue";
 import type { Router } from "vue-router";
 

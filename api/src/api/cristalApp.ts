@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { PageData } from "./PageData";
 import type { Container } from "inversify";
 import type { App, Component, Ref } from "vue";
 import type { WikiConfig } from "./WikiConfig";
@@ -25,7 +26,6 @@ import type { Router } from "vue-router";
 import type { Logger } from "./logger";
 import type { LoggerConfig } from "./loggerConfig";
 import type { SkinManager } from "./skinManager";
-import { PageData } from "./PageData";
 
 export interface CristalApp {
   getApp(): App;

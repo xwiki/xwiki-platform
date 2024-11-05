@@ -19,9 +19,9 @@
  */
 
 import { DefaultMacroProvider } from "./defaultMacroProvider";
-import type { MacroData } from "@xwiki/cristal-skin";
 import Warning from "../vue/c-warning.vue";
 import { Component } from "vue";
+import type { MacroData } from "@xwiki/cristal-skin";
 
 export class AlertMacro extends DefaultMacroProvider {
   public static override cname = "cristal.macro.alert";

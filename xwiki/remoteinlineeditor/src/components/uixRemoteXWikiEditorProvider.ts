@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import TextEditor from "../vue/c-edit-xwikiremote.vue";
 import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { type Component } from "vue";
 import { injectable } from "inversify";
-import TextEditor from "../vue/c-edit-xwikiremote.vue";
 import { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()

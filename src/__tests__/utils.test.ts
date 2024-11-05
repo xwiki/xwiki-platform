@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
-import { describe, expect, it } from "vitest";
-
 import { getRestSpacesApiUrl } from "../utils";
+import { describe, expect, it } from "vitest";
+import type { WikiConfig } from "@xwiki/cristal-api";
 
 describe("getRestSpacesApiUrl", () => {
   const wikiConfig: WikiConfig = {

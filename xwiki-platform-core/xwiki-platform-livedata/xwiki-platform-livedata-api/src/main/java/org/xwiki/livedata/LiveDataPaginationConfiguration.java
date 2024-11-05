@@ -49,6 +49,8 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     private Boolean showFirstLast;
 
     private Boolean showPageSizeDropdown;
+    
+    private Boolean showPaginationOnSinglePage;
 
     /**
      * @return the maximum number of page links to display in the pagination
@@ -158,6 +160,24 @@ public class LiveDataPaginationConfiguration implements InitializableLiveDataEle
     public void setShowPageSizeDropdown(Boolean showPageSizeDropdown)
     {
         this.showPageSizeDropdown = showPageSizeDropdown;
+    }
+
+    /**
+     * @return whether to show or not the pagination should be shown when there's only one page.
+     */
+    public Boolean getShowPaginationOnSinglePage()
+    {
+        return showPaginationOnSinglePage;
+    }
+
+    /**
+     * Sets whether to show or not the pagination should be shown when there's only one page.
+     *
+     * @param showPaginationOnSinglePage {@code true} to always show the pagination, {@code false} otherwise
+     */
+    public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
+    {
+        this.showPaginationOnSinglePage = showPaginationOnSinglePage;
     }
 
     @Override

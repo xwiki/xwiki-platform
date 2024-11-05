@@ -211,15 +211,17 @@ public class BaseSearchResult extends XWikiResource
                         f.format("(upper(doc.title) like :keywords");
                         if (isLocaleAware) {
                             f.format(" and (");
-                            f.format("(doc.language = :locale or"
-                                    + " (doc.language = '' and doc.defaultLanguage = :locale)) ");
-                            f.format("or (doc.language = :language or"
-                                    + " (doc.language = '' and doc.defaultLanguage = :language)) ");
-                            f.format("or (doc.language = '' and not exists("
+                            // In Oracle database, an empty language is stored as null.
+                            String emptyLanguageCondition = "(doc.language = '' or doc.language is null)";
+                            f.format("(doc.language = :locale or (%s and doc.defaultLanguage = :locale)) ",
+                                emptyLanguageCondition);
+                            f.format("or (doc.language = :language or (%s and doc.defaultLanguage = :language)) ",
+                                emptyLanguageCondition);
+                            f.format(("or (%s and not exists("
                                     + " from XWikiDocument as doc2"
                                     + " where doc2.fullName = doc.fullName"
                                     + " and (doc2.language = :locale or doc2.language = :language)))"
-                                    + ")");
+                                    + ")"), emptyLanguageCondition);
                         }
                         f.format(") ");
                         acceptedScopes++;

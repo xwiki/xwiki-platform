@@ -129,7 +129,8 @@ class PagePickerIT
 
         List<SuggestInputElement.SuggestionElement> suggestions =
             pagePicker.sendKeys(searchText).waitForSuggestions().getSuggestions();
-        assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
+        assertEquals(1, suggestions.size(),
+            String.format("Didn't find anything searching for %s", searchText));
         assertEquals(title, suggestions.get(0).getLabel());
     }
 }

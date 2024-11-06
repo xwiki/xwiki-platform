@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.render;
 
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -117,7 +118,8 @@ public class DefaultOldRendering implements OldRendering
         DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         this.referenceRenamer.renameReferences(document.getXDOM(), document.getDocumentReference(),
-            oldDocumentReference, newDocumentReference, false, Set.of());
+            oldDocumentReference, newDocumentReference, false,
+            Map.of(oldDocumentReference, newDocumentReference));
     }
 
     @Override

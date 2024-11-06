@@ -19,11 +19,12 @@
  */
 package org.xwiki.refactoring;
 
-import java.util.Set;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.stability.Unstable;
 
@@ -57,15 +58,15 @@ public interface ReferenceRenamer
      * @param oldTarget the previous reference of the renamed entity (attachment or document)
      * @param newTarget the new reference of the renamed entity (attachment or document)
      * @param relative {@code true} if the link should be serialized relatively to the current document
-     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
-     *                          old references before the rename
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return {@code true} if the given {@link Block} was modified
      * @since 16.10.0RC1
      */
     @Unstable
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
-        DocumentReference oldTarget,
-        DocumentReference newTarget, boolean relative, Set<DocumentReference> updatedDocuments)
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
     {
         return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative);
     }
@@ -95,15 +96,15 @@ public interface ReferenceRenamer
      * @param oldTarget the previous reference of the renamed entity (attachment or document)
      * @param newTarget the new reference of the renamed entity (attachment or document)
      * @param relative {@code true} if the link should be serialized relatively to the current document
-     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
-     *     old references before the rename
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return {@code true} if the given {@link Block} was modified
      * @since 16.10.0RC1
      */
     @Unstable
     default boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
-        Set<DocumentReference> updatedDocuments)
+        Map<EntityReference, EntityReference> updatedEntities)
     {
         return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative);
     }

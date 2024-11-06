@@ -21,6 +21,9 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -100,26 +103,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         EntityReference destination = this.request.getDestination();
 
-        if (processOnlySameSourceDestinationTypes()) {
-            if (source.getType() != destination.getType()) {
-                this.logger.error("You cannot change the entity type (from [{}] to [{}]).", source.getType(),
-                    destination.getType());
-                return;
-            }
-        }
-
-        if (isDescendantOrSelf(destination, source)) {
-            this.logger.error("Cannot make [{}] a descendant of itself.", source);
-            return;
-        }
-
-        if (source.getParent() != null && source.getParent().equals(destination)) {
-            this.logger.error("Cannot move [{}] into [{}], it's already there.", source, destination);
+        try {
+            checkSourceDestination(source, destination);
+        } catch (InternalCopyOrMoveJobException e) {
+            this.logger.error(e.getMessage());
             return;
         }
 
         // Dispatch the move operation based on the source entity type.
-
         switch (source.getType()) {
             case DOCUMENT:
                 try {
@@ -129,10 +120,31 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                 }
                 break;
             case SPACE:
-                process(new SpaceReference(source), destination);
+                visitSpace(new SpaceReference(source), destination, this::maybePerformRefactoring);
                 break;
             default:
                 this.logger.error("Unsupported source entity type [{}].", source.getType());
+        }
+    }
+
+    private void checkSourceDestination(EntityReference source, EntityReference destination)
+        throws InternalCopyOrMoveJobException
+    {
+        if (processOnlySameSourceDestinationTypes() && source.getType() != destination.getType()) {
+            throw new InternalCopyOrMoveJobException(
+                String.format("You cannot change the entity type (from [%s] to [%s]).",
+                    source.getType(),
+                    destination.getType()));
+        }
+
+        if (isDescendantOrSelf(destination, source)) {
+            throw new InternalCopyOrMoveJobException(
+                String.format("Cannot make [%s] a descendant of itself.", source));
+        }
+
+        if (source.getParent() != null && source.getParent().equals(destination)) {
+            throw new InternalCopyOrMoveJobException(
+                String.format("Cannot move [%s] into [%s], it's already there.", source, destination));
         }
     }
 
@@ -145,6 +157,71 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         return parent != null;
     }
 
+    @Override
+    protected void getEntities(DocumentReference documentReference)
+    {
+        this.putInConcernedEntities(documentReference);
+    }
+
+    @Override
+    protected void putInConcernedEntities(DocumentReference documentReference)
+    {
+        DocumentReference source = cleanLocale(documentReference);
+        try {
+            EntityReference destination = this.request.getDestination();
+            checkSourceDestination(source, destination);
+            DocumentReference destinationDocumentReference;
+            if (processOnlySameSourceDestinationTypes()) {
+                putInConcernedEntitiesOnlySameSource(source, destination);
+            } else {
+                if (this.request.isDeep() && isSpaceHomeReference(source)) {
+                    visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
+                } else if (destination.getType() == EntityType.SPACE) {
+                    destinationDocumentReference =
+                        new DocumentReference(source.getName(), new SpaceReference(destination));
+                    this.putInConcernedEntities(source, destinationDocumentReference);
+                } else if (destination.getType() == EntityType.DOCUMENT
+                    && isSpaceHomeReference(new DocumentReference(destination))) {
+                    destinationDocumentReference =
+                        new DocumentReference(source.getName(), new SpaceReference(destination.getParent()));
+                    this.putInConcernedEntities(source, destinationDocumentReference);
+                } else if (destination.getType() == EntityType.WIKI) {
+                    visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
+                }
+            }
+        } catch (InternalCopyOrMoveJobException e) {
+            this.logger.debug(e.getMessage());
+        }
+    }
+
+    private void putInConcernedEntitiesOnlySameSource(DocumentReference source, EntityReference destination)
+    {
+        DocumentReference destinationDocumentReference = new DocumentReference(destination);
+        if (this.request.isDeep() && isSpaceHomeReference(source)) {
+            if (isSpaceHomeReference(destinationDocumentReference)) {
+                visitSpace(source.getLastSpaceReference(), destinationDocumentReference.getLastSpaceReference(),
+                    this::putInConcernedEntities);
+            }
+        } else {
+            this.putInConcernedEntities(source, destinationDocumentReference);
+        }
+    }
+
+    private void putInConcernedEntities(DocumentReference sourceDocument, DocumentReference destination)
+    {
+        try {
+            if (!this.modelBridge.exists(sourceDocument)) {
+                this.logger.warn("Skipping [{}] because it doesn't exist.", sourceDocument);
+            } else if (this.checkAllRights(sourceDocument, destination)) {
+                this.concernedEntities.put(sourceDocument, new EntitySelection(sourceDocument, destination));
+            }
+        } catch (Exception e) {
+            logger.error("Failed to perform the refactoring from document with reference [{}] to [{}]",
+                sourceDocument, destination, e);
+        }
+    }
+
+    // FIXME: this should be factorized with the code from getTargetReference
     protected void process(DocumentReference source, EntityReference destination) throws Exception
     {
         if (processOnlySameSourceDestinationTypes()) {
@@ -153,7 +230,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             this.process(source, destinationDocumentReference);
         } else {
             if (this.request.isDeep() && isSpaceHomeReference(source)) {
-                process(source.getLastSpaceReference(), destination);
+                visitSpace(source.getLastSpaceReference(), destination, this::maybePerformRefactoring);
             } else if (destination.getType() == EntityType.SPACE) {
                 maybePerformRefactoring(source,
                     new DocumentReference(source.getName(), new SpaceReference(destination)));
@@ -182,39 +259,35 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         }
     }
 
-    protected void process(SpaceReference source, EntityReference destination)
+    private void visitSpace(final SpaceReference source, final EntityReference destination,
+        BiConsumer<DocumentReference, DocumentReference> callback)
     {
+        SpaceReference spaceDestination;
         if (processOnlySameSourceDestinationTypes()) {
             // We know the destination is a space (see above).
-            process(source, new SpaceReference(destination));
+            spaceDestination = new SpaceReference(destination);
         } else {
             if (destination.getType() == EntityType.SPACE || destination.getType() == EntityType.WIKI) {
-                process(source, new SpaceReference(source.getName(), destination));
+                spaceDestination = new SpaceReference(source.getName(), destination);
             } else if (destination.getType() == EntityType.DOCUMENT
                 && isSpaceHomeReference(new DocumentReference(destination))) {
-                process(source, new SpaceReference(source.getName(), destination.getParent()));
+                spaceDestination = new SpaceReference(source.getName(), destination.getParent());
             } else {
+                spaceDestination = null;
                 this.logger.error("Unsupported destination entity type [{}] for a space.", destination.getType());
             }
+        }
+        if (spaceDestination != null) {
+            visitDocuments(source, oldChildReference -> {
+                DocumentReference newChildReference = oldChildReference.replaceParent(source, spaceDestination);
+                callback.accept(oldChildReference, newChildReference);
+            });
         }
     }
 
     protected void process(final SpaceReference source, final SpaceReference destination)
     {
-        visitDocuments(source, new Visitor<DocumentReference>()
-        {
-            @Override
-            public void visit(DocumentReference oldChildReference)
-            {
-                DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
-                try {
-                    maybePerformRefactoring(oldChildReference, newChildReference);
-                } catch (Exception e) {
-                    logger.error("Failed to perform the refactoring from document with reference [{}] to [{}]",
-                        oldChildReference, newChildReference, e);
-                }
-            }
-        });
+        visitSpace(source, destination, this::maybePerformRefactoring);
     }
 
     protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
@@ -232,18 +305,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     }
 
     protected void maybePerformRefactoring(DocumentReference oldReference, DocumentReference newReference)
-        throws Exception
     {
         // Perform checks that are specific to the document source/destination type.
-
         EntitySelection entitySelection = this.getConcernedEntitiesEntitySelection(oldReference);
         if (entitySelection == null) {
             this.logger.info("Skipping [{}] because it does not match any entity selection.", oldReference);
         } else if (!entitySelection.isSelected()) {
             this.logger.info("Skipping [{}] because it has been unselected.", oldReference);
-        } else if (!this.modelBridge.exists(oldReference)) {
-            this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
-        } else if (this.checkAllRights(oldReference, newReference)) {
+        } else {
             performRefactoring(oldReference, newReference);
         }
     }
@@ -328,6 +397,19 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
         entityReferences.add(this.request.getDestination());
         return getCommonParent(entityReferences);
+    }
+
+    /**
+     * @return the list of references that have been selected to be refactored.
+     * @since 16.10.0RC1
+     */
+    public Map<EntityReference, EntityReference> getSelectedEntities()
+    {
+        return this.concernedEntities.values().stream()
+            .filter(EntitySelection::isSelected)
+            .filter(entity -> entity.getTargetEntityReference().isPresent())
+            .collect(Collectors.toMap(EntitySelection::getEntityReference,
+                entity -> entity.getTargetEntityReference().get()));
     }
 
     /**

@@ -20,6 +20,7 @@
 package org.xwiki.refactoring.internal;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -36,6 +37,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.ReferenceRenamer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
@@ -150,23 +152,23 @@ public class DefaultMacroRefactoring implements MacroRefactoring
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
-        Set<DocumentReference> updatedDocuments)
+        Map<EntityReference, EntityReference> updatedEntities)
         throws MacroRefactoringException
     {
         return innerReplaceReference(macroBlock,
             xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-            sourceReference, targetReference, relative, updatedDocuments));
+            sourceReference, targetReference, relative, updatedEntities));
     }
 
     @Override
     public Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
-        Set<DocumentReference> updatedDocuments)
+        Map<EntityReference, EntityReference> updatedEntities)
         throws MacroRefactoringException
     {
         return innerReplaceReference(macroBlock,
             xdom -> this.referenceRenamerProvider.get().renameReferences(xdom, currentDocumentReference,
-            sourceReference, targetReference, relative, updatedDocuments));
+            sourceReference, targetReference, relative, updatedEntities));
     }
 
     @Override
@@ -175,7 +177,7 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         throws MacroRefactoringException
     {
         return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
-            Set.of(sourceReference));
+            Map.of(sourceReference, targetReference));
     }
 
     @Override
@@ -184,7 +186,7 @@ public class DefaultMacroRefactoring implements MacroRefactoring
         throws MacroRefactoringException
     {
         return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative,
-            Set.of());
+            Map.of(sourceReference.getDocumentReference(), targetReference.getDocumentReference()));
     }
 
     private Optional<MacroBlock> innerReplaceReference(MacroBlock macroBlock, Predicate<Block> lambda)

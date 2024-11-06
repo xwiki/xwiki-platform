@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -110,7 +111,7 @@ class IncludeMacroRefactoringTest
     {
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(block, null, null,
-            (DocumentReference) null, false, Set.of()));
+            (DocumentReference) null, false, Map.of()));
     }
 
     @Test
@@ -119,7 +120,7 @@ class IncludeMacroRefactoringTest
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("reference", "");
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(block, null, null,
-            (DocumentReference) null, false, Set.of()));
+            (DocumentReference) null, false, Map.of()));
     }
 
     @Test
@@ -128,7 +129,7 @@ class IncludeMacroRefactoringTest
         MacroBlock block = new MacroBlock("include", Collections.emptyMap(), false);
         block.setParameter("page", "");
         assertEquals(Optional.empty(), this.includeMacroRefactoring.replaceReference(block, null, null,
-            (DocumentReference) null, false, Set.of()));
+            (DocumentReference) null, false, Map.of()));
     }
 
     @Test
@@ -153,7 +154,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
-            sourceReference, targetReference, false, Set.of());
+            sourceReference, targetReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("targetwiki:targetspace.targetfoo", result.get().getParameter("reference"));
     }
@@ -189,7 +190,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
-            sourceReference, targetReference, false, Set.of());
+            sourceReference, targetReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("sourcewiki:sourcespace.foo", result.get().getParameter("reference"));
     }
@@ -225,7 +226,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace/foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
-            sourceReference, targetReference, false, Set.of());
+            sourceReference, targetReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("sourcewiki:sourcespace.foo", result.get().getParameter("page"));
     }
@@ -254,7 +255,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace/foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
-            sourceReference, targetReference, false, Set.of());
+            sourceReference, targetReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("targetwiki:targetspace.targetfoo", result.get().getParameter("page"));
     }
@@ -282,7 +283,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null, sourceReference,
-            targetReference, false, Set.of());
+            targetReference, false, Map.of());
         assertTrue(result.isEmpty());
     }
 
@@ -312,7 +313,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, currentReference,
-            sourceReference, targetAttachmentReference, false, Set.of());
+            sourceReference, targetAttachmentReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("targetwiki:targetspace.targetfoo@targetfile", result.get().getParameter("reference"));
     }
@@ -355,7 +356,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace.foopage@foofile");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
-            sourceReference, targetReference, false, Set.of());
+            sourceReference, targetReference, false, Map.of());
         assertFalse(result.isEmpty());
         assertEquals("sourcewiki:sourcespace.foopage@foofile", result.get().getParameter("reference"));
     }
@@ -370,7 +371,7 @@ class IncludeMacroRefactoringTest
 
         Throwable exception = assertThrows(MacroRefactoringException.class,
             () -> this.includeMacroRefactoring.replaceReference(block, null, null, (DocumentReference) null, false,
-                Set.of()));
+                Map.of()));
         assertEquals("There's one or several invalid parameters for an [include] macro with parameters "
             + "[{type=invalid}]", exception.getMessage());
     }

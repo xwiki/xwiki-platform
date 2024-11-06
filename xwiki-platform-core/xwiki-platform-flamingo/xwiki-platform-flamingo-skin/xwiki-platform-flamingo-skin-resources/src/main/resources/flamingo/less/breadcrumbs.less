@@ -19,9 +19,9 @@
 
     // Styles for the tree navigation.
     &.dropdown {
-      /* We make sure the dropdown toggle carets and the links get the same colors. */
-      & > .dropdown-toggle, & > a {
-        color: @breadcrumb-color;
+      /* We make sure the dropdown links get their own specific color. */
+      & > a {
+        color: @breadcrumb-link-color;
         &:hover, &:focus {
           color: @breadcrumb-active-color;
         }
@@ -39,6 +39,7 @@
         line-height: .5rem;
 
         &:hover, &:focus {
+          color: @breadcrumb-active-color;  
           /* We want to revert the default from bootstrap where the outline is removed... */
           outline: revert;
         }

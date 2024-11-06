@@ -226,7 +226,7 @@ class IncludeMacroRefactoringTest
             new EntityReference("sourcewiki", EntityType.WIKI))).thenReturn("sourcespace/foo");
 
         Optional<MacroBlock> result = this.includeMacroRefactoring.replaceReference(block, null,
-            sourceReference, targetReference, false, Map.of());
+            sourceReference, targetReference, false);
         assertFalse(result.isEmpty());
         assertEquals("sourcewiki:sourcespace.foo", result.get().getParameter("page"));
     }

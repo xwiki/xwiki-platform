@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -34,9 +35,11 @@ import org.mockito.Mock;
 import org.xwiki.job.AbstractJobStatus;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.link.LinkStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -119,6 +122,12 @@ class DefaultModelBridgeTest
     @Named("document")
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
+    @MockComponent
+    private Provider<LinkStore> linkStoreProvider;
+
+    @MockComponent
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -140,6 +149,9 @@ class DefaultModelBridgeTest
     @Mock
     private XWikiRightService xWikiRightService;
 
+    @Mock
+    private LinkStore linkStore;
+
     @BeforeEach
     void configure(MockitoComponentManager componentManager) throws Exception
     {
@@ -158,6 +170,7 @@ class DefaultModelBridgeTest
             .thenReturn(new DocumentReference("what", "ever", "WebHome"));
         when(entityReferenceProvider.getDefaultReference(EntityType.SPACE))
             .thenReturn(new SpaceReference("whatever", "Main"));
+        when(this.linkStoreProvider.get()).thenReturn(this.linkStore);
     }
 
     private void assertLog(Level level, String message, Object... arguments)
@@ -891,5 +904,24 @@ class DefaultModelBridgeTest
         assertTrue(this.modelBridge.rename(source, target));
 
         verify(this.xwiki).renameDocument(source, target, true, List.of(), List.of(), this.xcontext);
+    }
+
+    @Test
+    void getBackLinkedDocuments() throws Exception
+    {
+        EntityReference source = mock(EntityReference.class);
+        EntityReference ref1 = mock(EntityReference.class, "ref1");
+        EntityReference ref2 = mock(EntityReference.class, "ref2");
+        EntityReference ref3 = mock(EntityReference.class, "ref3");
+        when(this.linkStore.resolveBackLinkedEntities(source)).thenReturn(Set.of(ref1, ref2, ref3));
+
+        DocumentReference docRef1 = mock(DocumentReference.class, "docRef1");
+        DocumentReference docRef2 = mock(DocumentReference.class, "docRef2");
+        DocumentReference docRef3 = mock(DocumentReference.class, "docRef3");
+        when(this.documentReferenceResolver.resolve(ref1, this.xcontext)).thenReturn(docRef1);
+        when(this.documentReferenceResolver.resolve(ref2, this.xcontext)).thenReturn(docRef2);
+        when(this.documentReferenceResolver.resolve(ref3, this.xcontext)).thenReturn(docRef3);
+
+        assertEquals(Set.of(docRef1, docRef2, docRef3), this.modelBridge.getBackLinkedDocuments(source));
     }
 }

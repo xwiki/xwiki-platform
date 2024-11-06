@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>16.10.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-cores</artifactId>
   <packaging>pom</packaging>
@@ -41,7 +41,8 @@
  This package contains a pre configured Solr core for XWiki ${debian.solr.core} to be used in a standalone Solr setup.
     </debian.description>
 
-    <debian.package>xwiki-solr${solr.major.version}-${debian.xwiki.core}</debian.package>
+    <debian.package.core>${debian.xwiki.core}</debian.package.core>
+    <debian.package>xwiki-solr${solr.major.version}-${debian.package.core}</debian.package>
 
     <debian.solr.package>xwiki-platform-search-solr-server-core-minimal</debian.solr.package>
 
@@ -68,13 +69,13 @@ if [ -d ${debian.xwiki.var.oldsolr8core} ]; then
   # Remove the link to the old location
   rm -f ${debian.solr.var.oldsolr8core}
   # And replace it with the actual core
-  mv -r ${debian.xwiki.var.oldsolr8core} ${debian.solr.var.oldsolr8core}
+  mv ${debian.xwiki.var.oldsolr8core} ${debian.solr.var.oldsolr8core}
 fi
 
 # Migrate the core files stored at the previous Solr 9 location (XWiki 16.2.0 and 16.3.0)
 if [ -d ${debian.xwiki.var.oldsolr9corecore} ]; then
   # Move the data
-  mv -r ${debian.xwiki.var.oldsolr9corecore}/data ${debian.solr.var.data.core}/
+  mv ${debian.xwiki.var.oldsolr9corecore}/data ${debian.solr.var.data.core}/
   # Replace the default schema with the previous one (so that it matches the data)
   mv -f ${debian.xwiki.var.oldsolr9corecore}/conf/managed-schema ${debian.solr.var.data.core}/conf/managed-schema
   # Delete what remains of the old core location
@@ -109,7 +110,7 @@ fi
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>${debian.solr.package}</artifactId>
-      <version>16.9.0-SNAPSHOT</version>
+      <version>16.10.0-SNAPSHOT</version>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>

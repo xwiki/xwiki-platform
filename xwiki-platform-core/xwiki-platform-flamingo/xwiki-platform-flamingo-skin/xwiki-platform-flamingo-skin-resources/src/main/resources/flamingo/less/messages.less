@@ -10,13 +10,13 @@ span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
 span.box, span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
   padding: 0 floor(@font-size-base * 0.2);
   box-shadow: none;
-  & > img {
+  & > .icon-block > img {
     // Style the silk icons
     margin: 0 .6rem 0 .2rem;
     vertical-align: sub;
   }
 
-  & > span.fa {
+  & > .icon-block > span.fa {
     // Style the font awesome icons
     margin: 0 .6rem 0 .2rem;
   }
@@ -24,19 +24,22 @@ span.box, span.successmessage, span.errormessage, span.warningmessage, span.info
 
 // Used by: message boxes
 div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
+  // In case the structure of the div is not the same as the one from the macro
+  // we do not add those new style rules, in order to not break the looks of the content inside.
+  // The selector below relies on the class introduced in the IconProvider at
+  // the same time as the new style for the message boxes.
+  // This makes it so that this new style will never apply on an older hardcoded box.
+  &:has(>.icon-block) {
+    display: flex;
+    gap: 2rem;
+    justify-content: left;
+    align-items: baseline;
+  }
   padding: 2rem;
   border: none;
   border-left: 4px solid;
   box-shadow: none;
-
-  & > .icon-block {
-    // Ensure to let some space between the icon of the message and the content.
-    padding-right: 2rem;
-    // We want the icon to remain on the left. Note that we don't use display: flex for now since it's causing issues
-    // when the box contains some specific content such as em
-    float: left;
-  }
-
+  
   & > img {
     // Improve alignment for silk icons
     align-self: flex-start;

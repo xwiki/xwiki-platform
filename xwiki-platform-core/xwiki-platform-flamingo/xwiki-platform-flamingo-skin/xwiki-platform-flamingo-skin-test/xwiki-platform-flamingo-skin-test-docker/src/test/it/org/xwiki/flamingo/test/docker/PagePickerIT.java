@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.openqa.selenium.By;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -42,9 +44,12 @@ class PagePickerIT
 {
     private static final String PICKER_ID = "pagePickerTest";
 
+    private static final String PICKER_TEMPLATE =
+        "{{velocity}}{{html}}#pagePicker({'id': '%s'}){{/html}}{{/velocity}}";
+
     /**
      * See XWIKI-16078: Selected (and deleted) users/subgroups are not displayed properly in drop-down when editing a
-     * group
+     * group.
      */
     @Test
     @Order(1)
@@ -80,12 +85,12 @@ class PagePickerIT
         for (int i = 0; i < 11; i++) {
             DocumentReference childReference = new DocumentReference(childName + i,
                 reference.getLastSpaceReference());
-            setup.createPage(childReference, "Test page " + i, "Child page " + i);
+            setup.rest().savePage(childReference, "Test page " + i, "Child page " + i);
         }
 
         String pageName = reference.getLastSpaceReference().getName();
         setup.createPage(reference,
-            String.format("{{velocity}}{{html}}#pagePicker({'id': '%s'}){{/html}}{{/velocity}}", PICKER_ID),
+            String.format(PICKER_TEMPLATE, PICKER_ID),
             pageName);
 
         SuggestInputElement pagePicker =
@@ -99,5 +104,32 @@ class PagePickerIT
         // Just to be sure that searching for the children also works, search and select the first child.
         pagePicker.clear().sendKeys(childName).waitForSuggestions()
             .selectByVisibleText("Child page 0");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "ähm", "töst", "école", "hôtelière" })
+    @Order(3)
+    void searchCaseInsensitiveUnicode(String searchText, TestUtils setup, TestReference reference)
+        throws Exception
+    {
+        String pageName = reference.getLastSpaceReference().getName();
+
+        String title = "École hôtelière";
+        setup.rest().savePage(new DocumentReference("ÄhmTöst", reference.getLastSpaceReference()), "Content",
+            title);
+
+        setup.rest().delete(reference);
+        setup.createPage(reference, String.format(PICKER_TEMPLATE, PICKER_ID), pageName);
+
+        SuggestInputElement pagePicker =
+            new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
+
+        // Make sure the picker is ready. TODO: remove once XWIKI-19056 is closed.
+        pagePicker.click().waitForSuggestions();
+
+        List<SuggestInputElement.SuggestionElement> suggestions =
+            pagePicker.sendKeys(searchText).waitForSuggestions().getSuggestions();
+        assertEquals(1, suggestions.size(), "Didn't find anything searching for %s".formatted(searchText));
+        assertEquals(title, suggestions.get(0).getLabel());
     }
 }

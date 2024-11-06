@@ -27,7 +27,9 @@
 ## copy menu action. Checking if the user (or guest) doesn't have edit
 ## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
 ## only check for view permissions.
-#set ($canCopy = $canView)
+## When the wiki server is in readonly mode, edit permissions are OFF everywhere. We can safely assume that the copy
+## action is not allowed.
+#set ($canCopy = $canView && !$xwiki.isReadOnly())
 
 #set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
 #set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
@@ -350,7 +352,7 @@
     #end
     #set ($discard = $staticExtensions.add( { 'content': $rename, 'order': 30000}))
     #define ($delete)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove', $extraAttributes)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'trash', $extraAttributes)
     #end
     #set ($discard = $staticExtensions.add( { 'content': $delete, 'order': 40000}))
   #end
@@ -450,7 +452,9 @@
         #end
         <dd>
           <ul>
-            #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #if ($canView)
+              #submenuitem($doc.getURL('view', "viewer=code$!{revisionParameter}") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search', $extraAttributes)
+            #end
             $viewersContent
             ## Display Viewers menu UIX..
             #displaySecureUIX('org.xwiki.platform.template.menu.viewers', [])

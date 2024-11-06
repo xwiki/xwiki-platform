@@ -31,7 +31,7 @@ plus
 ee8-plus
 
 [ini]
-ee8.asm.version?=9.7
+ee8.asm.version?=9.7.1
 ee8.jakarta.annotation.api.version?=1.3.5
 
 [lib]

@@ -39,52 +39,52 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-core.menu.type.wiki=维基
-core.menu.watchlist.add.wiki=关注Wiki
-core.menu.watchlist.remove.wiki=取消关注Wiki
-core.menu.admin.wiki=管理Wiki
+core.menu.type.wiki=Wiki
+core.menu.watchlist.add.wiki=关注 Wiki
+core.menu.watchlist.remove.wiki=取消关注 Wiki
+core.menu.admin.wiki=管理 Wiki
 
 # WIKI INFORMATION PANEL
-platform.wiki.panel.title=Wiki信息
+platform.wiki.panel.title=Wiki 信息
 
 # MESSAGES
-platform.wiki.currentwiki.welcome=欢迎来到{0}{1}{2} Wiki.
-platform.wiki.currentwiki.currentUserIsOwner=您是该Wiki的所有者。
-platform.wiki.currentwiki.currentUserIsAdmin=您是该Wiki的管理员。
-platform.wiki.currentwiki.joinNeedToLogin=您需要先登录，才能加入该Wiki。
-platform.wiki.currentwiki.currentUserNotMember=您不是该Wiki的成员。
-platform.wiki.currentwiki.currentuserCanJoin=如果您喜欢这个Wiki {1}，您可以{0}加入它。
-platform.wiki.currentwiki.currentUserIsMember=您是这个Wiki的成员。
-platform.wiki.currentwiki.currentUserCanLeave=如果你愿意，你可以{0}离开{1} Wiki。
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=通过{0}用户列表{1}，你可以看到所有的Wiki成员。
-platform.wiki.currentwiki.invitationPendingForCurrentWiki=您已经被邀请加入这个Wiki。
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=你已经请求了加入这个Wiki。
-platform.wiki.currentwiki.joinRequestAcceptedNotification=你加入Wiki''{0}''的请求已经通过。
-platform.wiki.currentwiki.joinRequestRejectedNotification=您请求加入Wiki ''{0}'' 的请求已经被拒绝。
-platform.wiki.currentwiki.candidateHandledSaveComment=已处理候选人{0} ({1})
+platform.wiki.currentwiki.welcome=欢迎来到 {0}{1}{2} wiki。
+platform.wiki.currentwiki.currentUserIsOwner=您是本 wiki 的所有者。
+platform.wiki.currentwiki.currentUserIsAdmin=您是本 wiki 的管理员。
+platform.wiki.currentwiki.joinNeedToLogin=要加入这个 wiki，您需要登录。
+platform.wiki.currentwiki.currentUserNotMember=您不是本 wiki 的成员。
+platform.wiki.currentwiki.currentuserCanJoin=如果您愿意，您可以 {0} 加入本 wiki {1}。
+platform.wiki.currentwiki.currentUserIsMember=您是本 wiki 的成员。
+platform.wiki.currentwiki.currentUserCanLeave=如果您愿意，您可以 {0} 离开这个 wiki {1}。
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=要查看 wiki 成员的完整列表，请参见 {0} 用户目录 {1} 。
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=您已被邀请加入本 wiki。
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=您已请求加入本 wiki。
+platform.wiki.currentwiki.joinRequestAcceptedNotification=您加入 wiki ''{0}'' 的请求已被接受。
+platform.wiki.currentwiki.joinRequestRejectedNotification=您加入 wiki ''{0}'' 的请求已被拒绝。
+platform.wiki.currentwiki.candidateHandledSaveComment=已处理的候选 {0} ({1})
 platform.wiki.currentwiki.candidateHandledComment=评论：
 platform.wiki.currentwiki.candidateAcceptedSuccess=请求被接受。
 platform.wiki.currentwiki.candidateRejectedSuccess=请求被拒绝。
-platform.wiki.currentwiki.inviteUserAlreadyMember={0} 现在是Wiki的成员。
-platform.wiki.currentwiki.inviteRequestAlreadyExists=请响应{0}已有的未处理请求。
-platform.wiki.currentwiki.inviteUserAlreadyInvited={0}已有未处理请求。
-platform.wiki.currentwiki.inviteSaveComment=用户''{0}''已经被邀请加入Wiki。
-platform.wiki.currentwiki.inviteNotification=您已经被邀请加入Wiki ''{0}''。
-platform.wiki.currentwiki.inviteSuccess={0}邀请成功。
-platform.wiki.currentwiki.invitationCancelSaveComment=已取消邀请{0} ({1})
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} 已经是wiki的成员。
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} 已经有一个挂起的请求。请回复那个请求。
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} 已经有待处理的邀请。
+platform.wiki.currentwiki.inviteSaveComment=用户 ''{0}'' 已被邀请加入此 wiki。
+platform.wiki.currentwiki.inviteNotification=您已被邀请加入 Wiki ''{0}''。
+platform.wiki.currentwiki.inviteSuccess={0} 邀请成功。
+platform.wiki.currentwiki.invitationCancelSaveComment=取消邀请 {0} ({1})
 platform.wiki.currentwiki.invitationCancelNotification=您的邀请已被取消，不再有效。
 platform.wiki.currentwiki.invitationCancelSuccess=邀请已成功取消。
-platform.wiki.currentwiki.invitationCancelFailure=错误，您不能取消这个邀请。
-platform.wiki.currentwiki.candidateReviewFailure=错误，您不能取消这个邀请。
+platform.wiki.currentwiki.invitationCancelFailure=错误，您无法取消此邀请。
+platform.wiki.currentwiki.candidateReviewFailure=错误，您无法取消此邀请。
 
 # LABELS
 platform.wiki.currentwiki.prop.wikiprettyname.label=全称
 platform.wiki.currentwiki.prop.description.label=描述
-platform.wiki.currentwiki.prop.owner.label=所有人
+platform.wiki.currentwiki.prop.owner.label=所有者
 platform.wiki.currentwiki.prop.membershipType.label=成员类型
-platform.wiki.currentwiki.prop.secure.label=安全(SSL)
-platform.wiki.currentwiki.member.add=为Wiki增加或邀请用户
-platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki信息
+platform.wiki.currentwiki.prop.secure.label=安全性 (SSL)
+platform.wiki.currentwiki.member.add=添加或邀请用户到 wiki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki 信息
 platform.wiki.currentwiki.gadget.topActiveUsers.label=最活跃贡献者
 platform.wiki.currentwiki.panel.information.name.label=名称
 platform.wiki.currentwiki.panel.information.description.label=描述
@@ -93,7 +93,7 @@ platform.wiki.currentwiki.invitation.view.label=查看邀请
 platform.wiki.currentwiki.joinrequest.cancel.label=取消请求
 platform.wiki.currentwiki.joinreques.request.label=请求加入
 platform.wiki.currentwiki.join.label=加入
-platform.wiki.currentwiki.leave.label=离开Wiki
+platform.wiki.currentwiki.leave.label=离开 Wiki
 platform.wiki.currentwiki.invite.username.label=用户名
 platform.wiki.currentwiki.invite.message.label=消息
 platform.wiki.currentwiki.invite.button.label=邀请
@@ -101,33 +101,33 @@ platform.wiki.currentwiki.candidates.label=申请人
 platform.wiki.currentwiki.candidates.status.label=状态：
 platform.wiki.currentwiki.candidates.type.label=类型：
 platform.wiki.currentwiki.candidates.reviewer.label=管理：
-platform.wiki.currentwiki.candidates.reviewermessage.label=管理消息：
+platform.wiki.currentwiki.candidates.reviewermessage.label=管理员的信息：
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=私人评论：
 platform.wiki.currentwiki.candidates.accept.label=接受
 platform.wiki.currentwiki.candidates.reject.label=拒绝
 platform.wiki.currentwiki.candidates.invitation.cancel.label=取消邀请
-platform.wiki.currentwiki.wikiusers.title=Wiki用户
+platform.wiki.currentwiki.wikiusers.title=Wiki 用户
 platform.wiki.currentwiki.managewikis.title=Wiki
-WikiManager.WikiCandidateMemberClass_status_pending=待定
+WikiManager.WikiCandidateMemberClass_status_pending=挂起
 WikiManager.WikiCandidateMemberClass_status_accepted=已接受
 WikiManager.WikiCandidateMemberClass_status_rejected=已拒绝
 WikiManager.WikiCandidateMemberClass_type_request=请求
 WikiManager.WikiCandidateMemberClass_type_invitation=邀请
 
 # HINTS
-platform.wiki.currentwiki.prop.wikiprettyname.hint=Wiki显示名称。
-platform.wiki.currentwiki.prop.description.hint=Wiki及其目的简要描述。
-platform.wiki.currentwiki.prop.owner.hint=拥有Wiki所有权限的用户。
-platform.wiki.currentwiki.prop.membershipType.hint=用户加入Wiki的途径。
-platform.wiki.currentwiki.prop.secure.hint=如果启用，该Wiki产生的所有外部URL地址以{0}https:~/~/{1}开始。
-platform.wiki.currentwiki.invite.username.hint=要添加到该Wiki的用户名称。
+platform.wiki.currentwiki.prop.wikiprettyname.hint=wiki 的显示名称。
+platform.wiki.currentwiki.prop.description.hint=对 wiki 及其目的的简要描述。
+platform.wiki.currentwiki.prop.owner.hint=在 wiki 上拥有所有权限的用户。
+platform.wiki.currentwiki.prop.membershipType.hint=用户可以加入此 wiki 的方式。
+platform.wiki.currentwiki.prop.secure.hint=如果启用，所有 wiki 生成的外部 URLs 将以 {0}https:~/~/{1} 开头。
+platform.wiki.currentwiki.invite.username.hint=要添加到 wiki 的用户的名称。
 platform.wiki.currentwiki.invite.message.hint=要发送给用户的消息。
-platform.wiki.currentwiki.candidates.hint=已申请或被邀请加入该Wiki的用户。
-platform.wiki.currentwiki.candidates.empty=没有用户申请或被邀请加入该Wiki。
+platform.wiki.currentwiki.candidates.hint=已申请或被邀请加入该 wiki 的用户。
+platform.wiki.currentwiki.candidates.empty=没有用户申请或被邀请加入此 wiki。
 
 # ADMIN
-admin.xwiki.manageworkspace.description=管理Wiki名称、描述、所有者和成员类型等设置。
-admin.xwiki.workspaceusers.description=管理Wiki成员：增加、删除、邀请、接受或拒绝。
+admin.xwiki.manageworkspace.description=管理 wiki 名称、描述、所有者和成员类型等设置。
+admin.xwiki.workspaceusers.description=管理 wiki 成员：添加、删除、邀请、接受或拒绝 wiki 成员。
 admin.xwiki.usersconfiguration.title=配置
 admin.xwiki.members.title=当前成员
 admin.xwiki.users.title=所有用户

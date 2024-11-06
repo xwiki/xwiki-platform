@@ -71,10 +71,10 @@ public class LinkTreeElement extends DocumentTreeElement
     public void createNode(DocumentReference origin, String name)
     {
         String createDocumentNodeId = getCreateDocumentNodeId(origin);
-        WebElement originNode = getDriver().findElementWithoutWaiting(By.id(createDocumentNodeId));
+        WebElement originNode = getDriver().findElement(By.id(createDocumentNodeId));
         originNode.findElement(By.tagName("a")).click();
         // We cannot reuse the element
-        getDriver().findElementWithoutWaiting(By.id(createDocumentNodeId))
+        getDriver().findElement(By.id(createDocumentNodeId))
             .findElement(By.tagName("input"))
             .sendKeys(name, Keys.ENTER);
         SpaceReference targetSpace = new SpaceReference(name, origin.getLastSpaceReference());

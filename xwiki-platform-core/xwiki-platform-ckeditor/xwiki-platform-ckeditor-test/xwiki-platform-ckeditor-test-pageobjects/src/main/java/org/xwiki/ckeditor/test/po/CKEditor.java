@@ -125,7 +125,7 @@ public class CKEditor extends BaseElement
      */
     public RichTextAreaElement getRichTextArea(boolean wait)
     {
-        return new RichTextAreaElement(getContentContainer(), wait);
+        return new RichTextAreaElement(this, wait);
     }
 
     /**

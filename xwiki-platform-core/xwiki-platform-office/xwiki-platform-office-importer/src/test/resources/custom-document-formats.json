@@ -13,7 +13,8 @@
       "PRESENTATION": {
         "FilterName": "impress_html_Export",
         "FilterData": {
-          "PublishMode": 0
+          "PublishMode": 0,
+          "Quality": 56
         }
       },
       "TEXT": {

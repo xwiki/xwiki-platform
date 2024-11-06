@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Provider;
 import javax.servlet.http.Cookie;
@@ -1094,13 +1093,14 @@ class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference, Set.of());
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference,
+            Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false, Set.of());
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false, Set.of());
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false, Set.of());
+            targetReference, false, Map.of(sourceReference, targetReference));
 
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());

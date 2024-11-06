@@ -19,7 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
-import java.util.Set;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -107,7 +107,7 @@ class ResourceReferenceRenamerTest
         assertTrue(this.renamer.updateResourceReference(resourceReference,
             oldReference,
             newReference,
-            new DocumentReference("xwiki", "Space", "Page"), true, Set.of()));
+            new DocumentReference("xwiki", "Space", "Page"), true, Map.of()));
 
         verify(this.compactEntityReferenceSerializer).serialize(oldReference, newReference);
     }
@@ -133,7 +133,7 @@ class ResourceReferenceRenamerTest
 
         assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
             currentDocumentReference,
-            false, Set.of()));
+            false, Map.of()));
         assertEquals(new AttachmentResourceReference("xwiki:Space.Page.file2.txt"), resourceReference);
     }
 }

@@ -21,7 +21,7 @@ package org.xwiki.refactoring.internal;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -266,20 +266,20 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     }
 
     private void renameLinks(DocumentReference documentReference, DocumentReference oldLinkTarget,
-        DocumentReference newLinkTarget, boolean relative, Set<DocumentReference> updatedDocuments)
+        DocumentReference newLinkTarget, boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget, relative, (xdom, currentDocumentReference,
             r) -> this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r,
-            updatedDocuments));
+            updatedEntities));
     }
 
     private void renameLinks(DocumentReference documentReference, AttachmentReference oldLinkTarget,
-        AttachmentReference newLinkTarget, boolean relative, Set<DocumentReference> updatedDocuments)
+        AttachmentReference newLinkTarget, boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         internalRenameLinks(documentReference, oldLinkTarget, newLinkTarget, relative, (xdom, currentDocumentReference,
             r) ->
             this.renamer.renameReferences(xdom, currentDocumentReference, oldLinkTarget, newLinkTarget, r,
-                updatedDocuments));
+                updatedEntities));
     }
 
     private void internalRenameLinks(DocumentReference documentReference, EntityReference oldLinkTarget,
@@ -335,7 +335,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
 
     @Override
     public void update(DocumentReference documentReference, EntityReference oldTargetReference,
-        EntityReference newTargetReference, Set<DocumentReference> updatedDocuments)
+        EntityReference newTargetReference, Map<EntityReference, EntityReference> updatedEntities)
     {
         // If the current document is the moved entity the links should be serialized relative to it
         boolean relative = newTargetReference.equals(documentReference);
@@ -348,10 +348,10 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
         // Only support documents and attachments targets
         if (oldTargetReference.getType() == EntityType.ATTACHMENT) {
             renameLinks(documentReference, toAttachmentReference(oldTargetReference),
-                toAttachmentReference(newTargetReference), relative, updatedDocuments);
+                toAttachmentReference(newTargetReference), relative, updatedEntities);
         } else if (oldTargetReference.getType() == EntityType.DOCUMENT) {
             renameLinks(documentReference, toDocumentReference(oldTargetReference),
-                toDocumentReference(newTargetReference), relative, updatedDocuments);
+                toDocumentReference(newTargetReference), relative, updatedEntities);
         }
     }
 
@@ -359,6 +359,7 @@ public class DefaultReferenceUpdater implements ReferenceUpdater
     public void update(DocumentReference documentReference, EntityReference oldTargetReference,
         EntityReference newTargetReference)
     {
-        update(documentReference, oldTargetReference, newTargetReference, Set.of());
+        update(documentReference, oldTargetReference, newTargetReference,
+            Map.of(oldTargetReference, newTargetReference));
     }
 }

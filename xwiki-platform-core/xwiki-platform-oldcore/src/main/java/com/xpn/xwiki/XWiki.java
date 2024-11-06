@@ -4974,7 +4974,8 @@ public class XWiki implements EventListener
         JobContext jobContext = Utils.getComponent(JobContext.class);
         Job currentJob = jobContext.getCurrentJob();
 
-        Set<DocumentReference> updatedReferences = Set.of();
+        Map<EntityReference, EntityReference> updatedReferences =
+            Map.of(sourceDoc.getDocumentReference(), newDocumentReference);
         if (currentJob instanceof AbstractCopyOrMoveJob) {
             updatedReferences = ((AbstractCopyOrMoveJob) currentJob).getSelectedEntities();
         }

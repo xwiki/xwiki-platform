@@ -20,12 +20,14 @@
 package org.xwiki.rendering.macro;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.stability.Unstable;
@@ -70,8 +72,8 @@ public interface MacroRefactoring
      * @param targetReference the reference to use as replacement.
      * @param relative if {@code true} indicate that the reference should be resolved relatively to the current
      *     document
-     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
-     *                         old references before the rename
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return an optional containing the new macro block with proper information if it needs to be updated, else an
      *     empty optional.
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
@@ -80,7 +82,7 @@ public interface MacroRefactoring
     @Unstable
     default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         DocumentReference sourceReference, DocumentReference targetReference, boolean relative,
-        Set<DocumentReference> updatedDocuments)
+        Map<EntityReference, EntityReference> updatedEntities)
         throws MacroRefactoringException
     {
         return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);
@@ -118,8 +120,8 @@ public interface MacroRefactoring
      * @param targetReference the reference to use as replacement
      * @param relative if {@code true} indicate that the reference should be resolved relatively to the current
      *     document
-     * @param updatedDocuments the list of documents that have been renamed in the same job: this list contains the
-     *                         old references before the rename
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return an optional containing the new macro block with proper information if it needs to be updated, else an
      *     empty optional.
      * @throws MacroRefactoringException in case of problem to parse or render the macro content.
@@ -128,7 +130,7 @@ public interface MacroRefactoring
     @Unstable
     default Optional<MacroBlock> replaceReference(MacroBlock macroBlock, DocumentReference currentDocumentReference,
         AttachmentReference sourceReference, AttachmentReference targetReference, boolean relative,
-        Set<DocumentReference> updatedDocuments)
+        Map<EntityReference, EntityReference> updatedEntities)
         throws MacroRefactoringException
     {
         return replaceReference(macroBlock, currentDocumentReference, sourceReference, targetReference, relative);

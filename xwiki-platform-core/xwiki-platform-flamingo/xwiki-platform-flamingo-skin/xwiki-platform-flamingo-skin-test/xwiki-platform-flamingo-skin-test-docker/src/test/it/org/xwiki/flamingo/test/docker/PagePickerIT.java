@@ -89,9 +89,10 @@ class PagePickerIT
         }
 
         String pageName = reference.getLastSpaceReference().getName();
+        String pageTitle = "Test Title";
         setup.createPage(reference,
             String.format(PICKER_TEMPLATE, PICKER_ID),
-            pageName);
+            pageTitle);
 
         SuggestInputElement pagePicker =
             new SuggestInputElement(setup.getDriver().findElementWithoutWaiting(By.id(PICKER_ID)));
@@ -100,9 +101,9 @@ class PagePickerIT
         List<SuggestInputElement.SuggestionElement> suggestions =
             pagePicker.sendKeys(pageName).waitForSuggestions().getSuggestions();
         assertEquals(1, suggestions.size());
-        assertEquals(pageName, suggestions.get(0).getLabel());
+        assertEquals(pageTitle, suggestions.get(0).getLabel());
         // Just to be sure that searching for the children also works, search and select the first child.
-        pagePicker.clear().sendKeys(childName).waitForSuggestions()
+        pagePicker.clear().sendKeys(childName + "0").waitForSuggestions()
             .selectByVisibleText("Child page 0");
     }
 

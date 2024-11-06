@@ -116,7 +116,8 @@ class PagePickerIT
         String pageName = reference.getLastSpaceReference().getName();
 
         String title = "École hôtelière";
-        setup.rest().savePage(new DocumentReference("ÄhmTöst", reference.getLastSpaceReference()), "Content",
+        // Use setup.createPage() as the REST helper/REST API doesn't seem to support UTF-8.
+        setup.createPage(new DocumentReference("ÄhmTöst", reference.getLastSpaceReference()), "Content",
             title);
 
         setup.rest().delete(reference);

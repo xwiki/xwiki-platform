@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.internal.junit5.database;
 
+import java.lang.module.ModuleDescriptor;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -209,7 +210,18 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration);
 
         databaseContainer.addEnv("POSTGRES_ROOT_PASSWORD", DBPASSWORD);
-        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8");
+        // Postgres 17 adds the builtin locale which we prefer over the libc locale as it is OS-independent.
+        // See https://postgresql.verite.pro/blog/2024/07/01/pg17-utf8-collation.html for a longer discussion.
+        ModuleDescriptor.Version builtinVersion = ModuleDescriptor.Version.parse("17");
+        String localeArgument;
+        if (testConfiguration.getDatabaseTag() != null
+            && ModuleDescriptor.Version.parse(testConfiguration.getDatabaseTag()).compareTo(builtinVersion) < 0)
+        {
+            localeArgument = "--locale=C.utf8";
+        } else {
+            localeArgument = "--locale-provider=builtin --locale=C.UTF-8";
+        }
+        databaseContainer.addEnv("POSTGRES_INITDB_ARGS", "--encoding=UTF8 " + localeArgument);
 
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
     }

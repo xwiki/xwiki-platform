@@ -173,14 +173,13 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         // Remove the previous key from the query string. We have to do this since this might not be the first
         // time the conversion fails for this redirect URL.
         queryString = queryString.replaceAll("key=.*&?", "");
-        if (queryString.length() > 0 && !queryString.endsWith(String.valueOf('&'))) {
+        if (!queryString.isEmpty() && !queryString.endsWith(String.valueOf('&'))) {
             queryString += '&';
         }
         // Save the output and the caught exceptions on the session.
         queryString += "key=" + save(conversionResult);
         String unsafeURL = redirectURL + '?' + queryString;
-        if (originalRequest instanceof HttpServletRequest) {
-            HttpServletRequest httpRequest = (HttpServletRequest) originalRequest;
+        if (originalRequest instanceof HttpServletRequest httpRequest) {
             try {
                 URI safeURI = this.urlSecurityManager.parseToSafeURI(unsafeURL, httpRequest.getServerName());
                 mutableRequest.sendRedirect(res, safeURI.toString());

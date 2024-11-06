@@ -159,7 +159,7 @@
         <customDisplay/>
         <disabled>0</disabled>
         <name>breadcrumb-link-color</name>
-        <number>48</number>
+        <number>60</number>
         <picker>0</picker>
         <prettyName>breadcrumb-link-color</prettyName>
         <size>30</size>
@@ -820,6 +820,9 @@
     </property>
     <property>
       <breadcrumb-color/>
+    </property>
+    <property>
+      <breadcrumb-link-color/>
     </property>
     <property>
       <breadcrumb-link-color/>

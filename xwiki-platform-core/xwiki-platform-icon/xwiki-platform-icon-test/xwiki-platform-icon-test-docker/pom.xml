@@ -66,6 +66,12 @@
       <type>xar</type>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
       Test only dependencies
      ================================ -->

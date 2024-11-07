@@ -21,7 +21,6 @@ package org.xwiki.icon.test.ui;
 
 import java.util.Arrays;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.By;
@@ -46,8 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class IconThemesAdminIT
 {
-  static String SILK_THEME = "IconThemes.Silk";
-  static String FA_THEME = "IconThemes.FontAwesome";
+  static String SILK_THEME = "Silk";
+  static String FA_THEME = "Font Awesome";
   
   @Test
   void validateIconThemeFeatures(TestUtils setup, TestInfo info)

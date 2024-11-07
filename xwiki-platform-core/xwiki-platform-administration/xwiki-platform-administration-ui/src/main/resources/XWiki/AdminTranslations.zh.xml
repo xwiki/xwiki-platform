@@ -80,7 +80,7 @@ XWiki.XWikiPreferences_title.hint=定义浏览器显示的页面标题格式。
 XWiki.XWikiPreferences_meta.hint=定义添加到每个页面的元数据，包括页面描述、作者、关键词等。
 XWiki.XWikiPreferences_webcopyright.hint=定义页脚版权部分显示的信息。
 XWiki.XWikiPreferences_version.hint=定义页脚版本部分显示的信息。
-XWiki.XWikiPreferences_skin.hint=指定使用的默认外观。它可以是文件系统中的一个外观，例如 “flamingo”，也可以是自定义页面外观，例如 “XWiki.DefaultSkin”。
+XWiki.XWikiPreferences_skin.hint=指定使用的默认外观。它可以是文件系统中的一个外观，例如 “flamingo”，也可以是自定义页面外观，例如 “XWiki.DefaultSkin”
 XWiki.XWikiPreferences_iconTheme.hint=指定默认情况下使用的图标主题。
 XWiki.XWikiPreferences_colorTheme.hint=指定默认使用的颜色主题。
 

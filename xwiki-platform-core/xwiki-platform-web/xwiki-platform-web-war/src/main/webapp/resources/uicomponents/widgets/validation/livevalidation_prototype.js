@@ -457,8 +457,8 @@ LiveValidation.prototype = {
    *	Empties out the message elements if they exist
    */
   removeMessage: function(){
-    for (let i = 0; i < this.validations.length; i++) {
-      let messageHolder = this.validations[i].messageHolder;
+    for (let validation of validations) {
+      let messageHolder = validation.messageHolder;
       this.removeMessageClass(messageHolder);
       messageHolder.lastChild.textContent = '';
     }

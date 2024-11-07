@@ -284,7 +284,7 @@
     ## Also, not filled back in if there is an error ('noReturn').
     #set($field =
       {'name' : 'captcha_placeholder',
-        'label' : $services.localization.render('core.captcha.label')
+        'label' : $services.localization.render('core.captcha.label'),
         'skipLabelFor' : true,
         'type'  : 'html',
         'html'  : "&lt;span class='xHint'&gt;$escapetool.xml($services.localization.render('core.captcha.instruction'))

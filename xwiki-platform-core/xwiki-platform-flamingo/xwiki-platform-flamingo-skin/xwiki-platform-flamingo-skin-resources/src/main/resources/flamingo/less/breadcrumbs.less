@@ -19,6 +19,14 @@
 
     // Styles for the tree navigation.
     &.dropdown {
+      /* We make sure the links get their own specific color. */
+      & > a {
+        color: @breadcrumb-link-color;
+        &:hover, &:focus {
+          color: @breadcrumb-active-color;
+        }
+      }
+      
       > .dropdown-toggle {
         color: @breadcrumb-color;
         cursor: pointer;

@@ -68,9 +68,6 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
         XWikiContext context = Utils.getXWikiContext(componentManager);
         WikiReference wikiReference = context.getWikiReference();
         context.setWikiReference(new WikiReference(wikiName));
-        if (!this.contextualAuthorizationManager.hasAccess(Right.VIEW, new WikiReference(wikiName))) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-        }
 
         Pages pages = objectFactory.createPages();
         try {

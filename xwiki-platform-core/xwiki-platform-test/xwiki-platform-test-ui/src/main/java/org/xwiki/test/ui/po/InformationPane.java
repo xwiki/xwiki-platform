@@ -36,6 +36,8 @@ public class InformationPane extends BaseElement
 {
     private static final By ORIGINAL_LOCALE_SELECTOR = By.cssSelector("dd[data-key='originalLocale']");
 
+    private static final String INFORMATION_TAB_ID = "Informationtab";
+
     @FindBy(id = "informationcontent")
     private WebElement pane;
 
@@ -130,5 +132,27 @@ public class InformationPane extends BaseElement
     public DocumentSyntaxPropertyPane editSyntax()
     {
         return new DocumentSyntaxPropertyPane().clickEdit();
+    }
+
+    /**
+     * @return {@code true} if the information tab is found, {@code false} otherwise
+     * @since 15.10.14
+     * @since 16.4.6
+     * @since 16.10.0RC1
+     */
+    public boolean exists()
+    {
+        return getDriver().findElements(By.id(INFORMATION_TAB_ID)).size() == 1;
+    }
+
+    /**
+     * @return {@code true} if the information tab is not found, {@code false} otherwise
+     * @since 15.10.14
+     * @since 16.4.6
+     * @since 16.10.0RC1
+     */
+    public boolean doesNotExist()
+    {
+        return getDriver().findElements(By.id(INFORMATION_TAB_ID)).isEmpty();
     }
 }

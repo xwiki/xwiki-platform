@@ -132,8 +132,6 @@ class WikiPagesResourceImplTest
         String author = "buz";
         int number = 3;
 
-        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, new WikiReference(wikiName))).thenReturn(true);
-
         Query mockQuery = mock(Query.class);
         when(queryManager.createQuery(any(), eq(Query.XWQL))).thenReturn(mockQuery);
         when(mockQuery.setOffset(anyInt())).thenReturn(mockQuery);

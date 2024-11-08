@@ -18,14 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { Link, LinkType, name } from "@xwiki/cristal-link-suggest-api";
 import { Container, inject, injectable } from "inversify";
-import {
-  Link,
-  type LinkSuggestService,
-  LinkType,
-  name,
-} from "@xwiki/cristal-link-suggest-api";
-import { type CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 /**
  * Default implementation of the link suggestion service, for XWiki.

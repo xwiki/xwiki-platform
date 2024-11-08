@@ -132,12 +132,12 @@
   $(document).off('input.shortcutPreference');
   let updateShortcut = function (shortcutPreferenceDOM) {
     let shortcutPreference = $(shortcutPreferenceDOM);
-    let translateKey = shortcutPreference.attr("data-translatekey");
+    let translateKey = shortcutPreference.attr("data-translate-key");
     let newValue = shortcutPreference.val();
     let url = xm.restURL;
-    let oldItemNumber = shortcutPreference.attr("data-shortcutprefnumber");
+    let oldItemNumber = shortcutPreference.attr("data-shortcut-pref-number");
     if (oldItemNumber == null) {
-      if (newValue !== shortcutPreference.attr("data-defaultvalue")) {
+      if (newValue !== shortcutPreference.attr("data-default-value")) {
         // Create the new user preference
         let creationUrl = url + "/objects";
         let data = {
@@ -146,17 +146,17 @@
           'property#value': newValue
         };
         $.post(creationUrl, data, function(newObject) {
-          shortcutPreference.attr("data-shortcutprefnumber", newObject.firstChild.getElementsByTagName("number")[0].textContent);
+          shortcutPreference.attr("data-shortcut-pref-number", newObject.firstChild.getElementsByTagName("number")[0].textContent);
         });
       }
     } else {
-      if (newValue == shortcutPreference.attr("data-defaultvalue")) {
+      if (newValue == shortcutPreference.attr("data-default-value")) {
         // Remove the existing preference, we don't want to keep it if the user is back to normal.
         let destructionUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber;
         $.ajax({url: destructionUrl,
           type: "DELETE"
         });
-        shortcutPreference.removeAttr("data-shortcutprefnumber");
+        shortcutPreference.removeAttr("data-shortcut-pref-number");
       } else {
         // Update the existing preference
         let updateUrl = url + "/objects/XWiki.UserPreferenceShortcutsClass/" + oldItemNumber +"/properties/value";
@@ -175,7 +175,7 @@
    */
   $('.reset-shortcut-preference').on('click', function (event) {
     const shortcutPrefInput = $(this).siblings('input');
-    const defaultValue = shortcutPrefInput.attr('data-defaultvalue');
+    const defaultValue = shortcutPrefInput.attr('data-default-value');
     shortcutPrefInput.val(defaultValue).trigger("input");
   });
   var timeoutId = 0;
@@ -422,9 +422,9 @@
     #set ($value = $doc.getValue('value', $shortcutPreference))
     #if ($isEdit)
       &lt;input type="text" class="shortcutPreference" name="$escapedSelectId" id="$escapedSelectId" size="30"
-        data-translatekey="$translationKey"
-        data-defaultvalue="$defaultValue"
-        #if ("$!shortcutPreference" != '')data-shortcutprefnumber='$shortcutPreference.getReference().getObjectNumber()'#end
+        data-translate-key="$translationKey"
+        data-default-value="$defaultValue"
+        #if ("$!shortcutPreference" != '')data-shortcut-pref-number='$shortcutPreference.getReference().getObjectNumber()'#end
         #if ($services.localization.get("XWiki.XWikiUsers_${fieldName}.hint"))
           #set ($escapedHintId = $escapedSelectId + "_hint")
           aria-describedby="$escapedHintId"

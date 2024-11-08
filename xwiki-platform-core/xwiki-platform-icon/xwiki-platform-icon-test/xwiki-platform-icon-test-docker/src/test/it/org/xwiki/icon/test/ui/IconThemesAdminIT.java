@@ -54,13 +54,14 @@ class IconThemesAdminIT
     setup.loginAsSuperAdmin();
     
     // Validate setting a icon theme from the wiki Admin UI
-    validateSetThemeFromWikiAdminUI();
+    validateSetThemeFromWikiAdminUI(setup);
 
     // Validate setting a icon theme from the page Admin UI for the page and its children
     validateSetThemeFromPageAdminUI(setup, info);
+    
   }
   
-  private void validateSetThemeFromWikiAdminUI()
+  private void validateSetThemeFromWikiAdminUI(TestUtils setup)
   {
     // Go to the Theme Admin UI to verify we can set a new theme from there using the select control
     AdministrationPage administrationPage = AdministrationPage.gotoPage();
@@ -68,11 +69,11 @@ class IconThemesAdminIT
 
     // Set the newly created color theme as the active theme
     presentationAdministrationSectionPage.setIconTheme(FA_THEME);
-    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentColorTheme());
+    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
     presentationAdministrationSectionPage.clickSave();
 
     // Verify that the icon theme has been applied.
-    assertIconThemeIsFA(new ViewPage());
+    assertIconThemeIsFA(setup);
 
     // Switch back to Silk
     administrationPage = AdministrationPage.gotoPage();
@@ -98,29 +99,26 @@ class IconThemesAdminIT
     AdministrationPage page = ap.clickAdministerPage();
     ThemesAdministrationSectionPage presentationAdministrationSectionPage = page.clickThemesSection();
 
-    // Set the newly created color theme as the active theme for the page and children
+    // Set the newly created icon theme as the active theme for the page and children
     presentationAdministrationSectionPage.setIconTheme(FA_THEME);
-    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentColorTheme());
+    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
     presentationAdministrationSectionPage.clickSave();
 
     // Verify that the icon theme has been applied to the top page
     ViewPage viewPage = setup.gotoPage(topPage);
-    assertIconThemeIsFA(viewPage);
+    assertIconThemeIsFA(setup);
 
     // Verify that the icon theme has been applied to the children page
     viewPage = setup.gotoPage(childPage);
-    assertIconThemeIsFA(viewPage);
+    assertIconThemeIsFA(setup);
 
     /*// Verify that the icon theme has not been applied to other pages
     viewPage = setup.gotoPage("NonExistentSpace", "NonExistentPage");
     assertColor(255, 255, 255, vp.getPageBackgroundColor());*/
   }
 
-  private void assertIconThemeIsFA(ViewPage page)
+  private void assertIconThemeIsFA(TestUtils setup)
   {
-    WikiEditPage editPage = page.editWiki();
-    editPage.setContent("{{displayIcon name=\"home\"/}}");
-    editPage.clickSaveAndView(true);
-    assertTrue(page.contentContainsElement(By.cssSelector(".fa-home")));
+    assertTrue(setup.getDriver().findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed());
   }
 }

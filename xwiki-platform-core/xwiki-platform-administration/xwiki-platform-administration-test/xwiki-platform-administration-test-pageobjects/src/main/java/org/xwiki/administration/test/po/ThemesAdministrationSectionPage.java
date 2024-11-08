@@ -116,7 +116,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     }
     
     private void setTheme(String themeName, WebElement themeInput) {
-        // Make sure the color theme that we want to set is available from the list first
+        // Make sure the theme that we want to set is available from the list first
         try {
             getDriver().waitUntilCondition(driver -> getThemeOptionElement(themeName, themeInput) != null);
         } catch (TimeoutException e) {

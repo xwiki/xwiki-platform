@@ -219,7 +219,7 @@
             <dependency>
               <groupId>org.mortbay.jasper</groupId>
               <artifactId>apache-el</artifactId>
-              <version>${apachache-el.version}</version>
+              <version>${apache-el.version}</version>
             </dependency>
             <!-- Ratings API has a migrator to migrate old Ratings xobjects to the new store -->
             <dependency>

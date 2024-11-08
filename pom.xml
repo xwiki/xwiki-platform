@@ -55,13 +55,17 @@
     <tika.version>2.9.2</tika.version>
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.12</jetty.server.version>
+    <jetty.server.version>12.0.15</jetty.server.version>
     <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SLF4J used and set the
          version here. -->
-    <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
+    <jetty.server.slf4j.version>2.0.16</jetty.server.slf4j.version>
+    <!-- Force using the version of apache-el from Jetty dependencies instead of the one set by XWiki. The version used
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
+         version here. -->
+    <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
     <netty.version>4.1.114.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>

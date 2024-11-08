@@ -442,7 +442,7 @@
       &lt;span&gt;
         #if("$!shortcutPreference" != '') $!value##
         #if("$!value" == '')&lt;small&gt;($escapetool.xml($services.localization.render('platform.core.profile.shortcut.hint.unbound')))&lt;/small&gt;#end
-        #else $defaultValue##
+        #else $defaultValue ##
           &lt;small&gt;($escapetool.xml($services.localization.render('userprofile.default')))&lt;/small&gt;##
         #end&lt;/span&gt;
     #end

@@ -19,14 +19,14 @@
  */
 
 import { getRestSpacesApiUrl } from "../utils";
+import { name } from "@xwiki/cristal-hierarchy-api";
 import { Container, inject, injectable } from "inversify";
-import {
-  name,
-  type PageHierarchyItem,
-  type PageHierarchyResolver,
-} from "@xwiki/cristal-hierarchy-api";
-import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type {
+  PageHierarchyItem,
+  PageHierarchyResolver,
+} from "@xwiki/cristal-hierarchy-api";
 
 /**
  * Implementation of PageHierarchyResolver for the XWiki backend.

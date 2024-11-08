@@ -109,7 +109,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     }
 
     /**
-     * @return the list of available color themes
+     * @return the list of available icon themes
      */
     public List<String> getIconThemes() {
         return getThemes(iconThemeInput);
@@ -147,7 +147,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified icon theme.
-     * @param iconThemeName name of the color theme to select
+     * @param iconThemeName name of the icon theme to select
      */
     public void setIconTheme(String iconThemeName)
     {

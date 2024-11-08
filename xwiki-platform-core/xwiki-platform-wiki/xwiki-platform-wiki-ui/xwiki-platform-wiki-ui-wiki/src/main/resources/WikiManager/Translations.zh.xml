@@ -39,7 +39,7 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-### Missing: core.menu.type.wiki=
+core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=关注 Wiki
 core.menu.watchlist.remove.wiki=取消关注 Wiki
 core.menu.admin.wiki=管理 Wiki

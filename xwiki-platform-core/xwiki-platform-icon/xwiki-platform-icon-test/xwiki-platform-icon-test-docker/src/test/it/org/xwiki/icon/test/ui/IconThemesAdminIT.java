@@ -30,10 +30,9 @@ import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -45,8 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class IconThemesAdminIT
 {
-  static String SILK_THEME = "Silk";
-  static String FA_THEME = "Font Awesome";
+  private static final String SILK_THEME = "Silk";
+  private static final String FA_THEME = "Font Awesome";
   
   @Test
   void validateIconThemeFeatures(TestUtils setup, TestInfo info)
@@ -66,14 +65,16 @@ class IconThemesAdminIT
     // Go to the Theme Admin UI to verify we can set a new theme from there using the select control
     AdministrationPage administrationPage = AdministrationPage.gotoPage();
     ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+    // We expect the default icon to be Silk
+    assertFalse(iconThemeIsFA(setup));
 
-    // Set the newly created color theme as the active theme
+    // Set the new icon theme as the active theme
     presentationAdministrationSectionPage.setIconTheme(FA_THEME);
     assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
     presentationAdministrationSectionPage.clickSave();
 
     // Verify that the icon theme has been applied.
-    assertIconThemeIsFA(setup);
+    assertTrue(iconThemeIsFA(setup));
 
     // Switch back to Silk
     administrationPage = AdministrationPage.gotoPage();
@@ -105,20 +106,19 @@ class IconThemesAdminIT
     presentationAdministrationSectionPage.clickSave();
 
     // Verify that the icon theme has been applied to the top page
-    ViewPage viewPage = setup.gotoPage(topPage);
-    assertIconThemeIsFA(setup);
+    setup.gotoPage(topPage);
+    assertTrue(iconThemeIsFA(setup));
 
     // Verify that the icon theme has been applied to the children page
-    viewPage = setup.gotoPage(childPage);
-    assertIconThemeIsFA(setup);
+    setup.gotoPage(childPage);
+    assertTrue(iconThemeIsFA(setup));
 
-    /*// Verify that the icon theme has not been applied to other pages
-    viewPage = setup.gotoPage("NonExistentSpace", "NonExistentPage");
-    assertColor(255, 255, 255, vp.getPageBackgroundColor());*/
+    /*Possible extension of the test:
+     Verify that the icon theme has not been applied to other pages*/
   }
 
-  private void assertIconThemeIsFA(TestUtils setup)
+  private boolean iconThemeIsFA(TestUtils setup)
   {
-    assertTrue(setup.getDriver().findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed());
+    return setup.getDriver().findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed();
   }
 }

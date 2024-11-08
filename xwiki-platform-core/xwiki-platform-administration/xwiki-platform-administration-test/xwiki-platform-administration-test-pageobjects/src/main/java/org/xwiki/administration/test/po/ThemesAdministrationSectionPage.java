@@ -126,12 +126,12 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
                 options.add(option.getText());
             }
             throw new TimeoutException(String.format("Theme [%s] wasn't found among [%s]", themeName,
-                    StringUtils.join(options, ',')), e);
+                StringUtils.join(options, ',')), e);
         }
-    
+
         // Click on it to set the theme
         getThemeOptionElement(themeName, themeInput).click();
-    
+
         // Waiting to be sure the change is effective
         getDriver().waitUntilCondition(driver -> StringUtils.equals(getCurrentTheme(themeInput), themeName));
     }
@@ -147,7 +147,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified icon theme.
-     * @param colorThemeName name of the color theme to select
+     * @param iconThemeName name of the color theme to select
      */
     public void setIconTheme(String iconThemeName)
     {

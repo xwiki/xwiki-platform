@@ -116,7 +116,9 @@ public abstract class AbstractRegistrationPage extends BasePage
     public boolean validationFailureMessagesInclude(String message)
     {
         return !getDriver().findElementsWithoutWaiting(
-            By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid') and . = '" + message + "']"))
+            By.xpath("//dd/span[contains(@class, 'LV_validation_message') and " + 
+                "contains(@class, 'LV_invalid') and " +
+                "contains(., '" + message + "')]"))
             .isEmpty();
     }
 

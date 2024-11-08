@@ -23,21 +23,15 @@ import getMenuActions, {
   BubbleMenuAction,
   getLinkAction,
 } from "../components/extensions/bubble-menu";
-import { BubbleMenu, Range } from "@tiptap/vue-3";
-import { type Editor } from "@tiptap/core";
-import {
-  type Component,
-  computed,
-  ComputedRef,
-  ref,
-  Ref,
-  shallowRef,
-} from "vue";
-import { CIcon, Size } from "@xwiki/cristal-icons";
 import { isTextSelection } from "@tiptap/core";
-import { EditorView } from "@tiptap/pm/view";
-import { EditorState } from "@tiptap/pm/state";
 import { ResolvedPos } from "@tiptap/pm/model";
+import { EditorState } from "@tiptap/pm/state";
+import { EditorView } from "@tiptap/pm/view";
+import { BubbleMenu, Range } from "@tiptap/vue-3";
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { ComputedRef, Ref, computed, ref, shallowRef } from "vue";
+import type { Editor } from "@tiptap/core";
+import type { Component } from "vue";
 
 const props = defineProps<{
   editor: Editor;

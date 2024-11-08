@@ -20,10 +20,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 <script lang="ts" setup>
 import messages from "../translations";
-import { useI18n } from "vue-i18n";
-import { inject } from "vue";
 import { CristalApp } from "@xwiki/cristal-api";
-import { type AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import { inject } from "vue";
+import { useI18n } from "vue-i18n";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 const { t } = useI18n({
   messages,

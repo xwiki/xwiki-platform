@@ -19,8 +19,8 @@
  */
 import { addVuetifyOptions } from "./utils/vuetify";
 import XBtn from "../x-btn.vue";
+import { VueWrapper, mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
-import { mount, VueWrapper } from "@vue/test-utils";
 
 /**
  * Mount a XBtn component with the default configuration.

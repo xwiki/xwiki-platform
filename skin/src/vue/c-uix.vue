@@ -19,8 +19,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import { inject, shallowRef } from "vue";
-import type { Component } from "vue";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { Component } from "vue";
 
 let components: Array<Component> = [];
 let logger: Logger | undefined = undefined;

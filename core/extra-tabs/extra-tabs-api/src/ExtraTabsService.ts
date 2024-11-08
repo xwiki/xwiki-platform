@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { injectable, unmanaged } from "inversify";
 import { Component } from "vue";
 import { ComposerTranslation, useI18n } from "vue-i18n";
-import { injectable, unmanaged } from "inversify";
 
 /**
  * Defines the structure of a tab. Including its content.
@@ -87,4 +87,4 @@ abstract class AbstractExtraTab implements ExtraTab {
   abstract panel(): Promise<Component>;
 }
 
-export { type ExtraTabsService, type ExtraTab, AbstractExtraTab };
+export { AbstractExtraTab, type ExtraTab, type ExtraTabsService };

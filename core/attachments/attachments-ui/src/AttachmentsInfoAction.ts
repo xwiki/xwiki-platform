@@ -20,8 +20,8 @@
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
 import { inject, injectable } from "inversify";
 import { Ref } from "vue";
-import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
 
 /**
  * Display the total attachments count of the current page.

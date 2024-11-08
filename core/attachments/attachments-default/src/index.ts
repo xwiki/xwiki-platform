@@ -20,7 +20,7 @@
 
 import { DefaultAttachmentsService } from "./defaultAttachmentsService";
 import { Container } from "inversify";
-import { type AttachmentsService } from "@xwiki/cristal-attachments-api";
+import type { AttachmentsService } from "@xwiki/cristal-attachments-api";
 
 export class ComponentInit {
   constructor(container: Container) {

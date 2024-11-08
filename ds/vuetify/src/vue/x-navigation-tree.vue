@@ -31,10 +31,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  */
 import { Ref, onBeforeMount, ref, watch } from "vue";
 import { VTreeview } from "vuetify/labs/VTreeview";
-import { type PageData } from "@xwiki/cristal-api";
+import type { PageData } from "@xwiki/cristal-api";
 import type {
-  NavigationTreeSource,
   NavigationTreeNode,
+  NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
 
 type TreeItem = {

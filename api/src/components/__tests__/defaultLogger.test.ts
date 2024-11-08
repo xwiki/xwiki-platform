@@ -20,8 +20,8 @@
 
 import "reflect-metadata";
 import { DefaultLogger } from "../defaultLogger";
-import { describe, expect, it, vi } from "vitest";
 import { Container } from "inversify";
+import { describe, expect, it, vi } from "vitest";
 
 describe("DefaultPageData", () => {
   it("info", () => {

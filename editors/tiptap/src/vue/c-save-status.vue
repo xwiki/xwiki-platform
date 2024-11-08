@@ -19,8 +19,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { AutoSaver, AutoSaverStatus } from "../extensions/autoSaver";
-import { type Ref, ref } from "vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
+import { ref } from "vue";
+import type { Ref } from "vue";
 
 const props = withDefaults(
   defineProps<{

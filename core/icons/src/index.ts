@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import CIcon from "./vue/c-icon.vue";
 import { Size } from "./size";
+import CIcon from "./vue/c-icon.vue";
 
 export { CIcon, Size };

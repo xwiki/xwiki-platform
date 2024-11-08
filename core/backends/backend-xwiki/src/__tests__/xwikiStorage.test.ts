@@ -19,8 +19,9 @@
  */
 import "reflect-metadata";
 import { XWikiStorage } from "../xwikiStorage";
-import { DefaultLogger, type WikiConfig } from "@xwiki/cristal-api";
+import { DefaultLogger } from "@xwiki/cristal-api";
 import { describe, expect, it } from "vitest";
+import type { WikiConfig } from "@xwiki/cristal-api";
 
 import type {
   AuthenticationManager,

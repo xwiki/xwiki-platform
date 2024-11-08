@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type Component } from "vue";
-import { ComposerTranslation, useI18n } from "vue-i18n";
 import { injectable, unmanaged } from "inversify";
+import { ComposerTranslation, useI18n } from "vue-i18n";
+import type { Component } from "vue";
 
 /**
  * Defines a category for page actions.
@@ -123,9 +123,9 @@ abstract class AbstractPageActionCategory implements PageActionCategory {
 }
 
 export {
+  AbstractPageActionCategory,
   type PageAction,
-  type PageActionService,
   type PageActionCategory,
   type PageActionCategoryService,
-  AbstractPageActionCategory,
+  type PageActionService,
 };

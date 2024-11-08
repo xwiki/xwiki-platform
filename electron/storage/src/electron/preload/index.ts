@@ -19,8 +19,8 @@
  */
 
 import { APITypes } from "./apiTypes";
-import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 const api: APITypes = {
   readPage: (path: string) => {

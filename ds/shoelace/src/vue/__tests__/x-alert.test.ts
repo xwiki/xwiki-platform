@@ -19,8 +19,8 @@
  */
 
 import XAlert from "../x-alert.vue";
-import { describe, expect, it } from "vitest";
 import { shallowMount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
 
 describe("x-alert", () => {
   it("has a description", () => {

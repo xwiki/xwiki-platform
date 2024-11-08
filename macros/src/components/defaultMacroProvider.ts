@@ -19,8 +19,8 @@
  */
 
 import {
-  DefaultVueTemplateProvider,
   DefaultMacroData,
+  DefaultVueTemplateProvider,
 } from "@xwiki/cristal-skin";
 import type { MacroData, MacroProvider } from "@xwiki/cristal-skin";
 

@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CommandParams } from "./menu-helpers";
 import { queryEqualityOperator } from "./filter-helper";
-import Selector from "../../vue/c-tiptap-selector.vue";
+import { CommandParams } from "./menu-helpers";
 import slashStore, { Props, SlashStore } from "../../stores/slash-store";
+import Selector from "../../vue/c-tiptap-selector.vue";
 import { Editor, Extension, Range } from "@tiptap/core";
-import Suggestion from "@tiptap/suggestion";
-import { App, createApp } from "vue";
 import { Plugin } from "@tiptap/pm/state";
+import Suggestion from "@tiptap/suggestion";
 import { createPinia } from "pinia";
+import { App, createApp } from "vue";
 
 const Slash = Extension.create({
   name: "slash",
@@ -277,9 +277,9 @@ function renderItems() {
 }
 
 export {
-  Slash,
-  renderItems,
-  getSuggestionItems,
   type ActionCategoryDescriptor,
+  Slash,
   filterActionsByQuery,
+  getSuggestionItems,
+  renderItems,
 };

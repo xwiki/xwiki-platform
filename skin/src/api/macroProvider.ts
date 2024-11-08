@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { VueTemplateProvider } from "./vueTemplateProvider";
 import type { MacroData } from "./macroData";
+import type { VueTemplateProvider } from "./vueTemplateProvider";
 
 export interface MacroProvider extends VueTemplateProvider {
   getMacroName(): string;

@@ -18,33 +18,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
-import { ComponentInit as VueDSComponentInit } from "@xwiki/cristal-dsvuetify";
-import { ComponentInit as DSFRComponentInit } from "@xwiki/cristal-dsfr";
-import { ComponentInit as ShoelaceComponentInit } from "@xwiki/cristal-dsshoelace";
+import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
+import { ComponentInit as AttachmentsDefaultComponentInit } from "@xwiki/cristal-attachments-default";
+import { ComponentInit as AttachmentsUIComponentInit } from "@xwiki/cristal-attachments-ui";
+import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
+import { ComponentInit as AuthenticationUIComponentInit } from "@xwiki/cristal-authentication-ui";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
-import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
-import { ComponentInit as MenuButtonsComponentInit } from "@xwiki/cristal-extension-menubuttons";
-import { ComponentInit as QueueWorkerComponentInit } from "@xwiki/cristal-sharedworker-impl";
-import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
+import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
+import { ComponentInit as DSFRComponentInit } from "@xwiki/cristal-dsfr";
+import { ComponentInit as ShoelaceComponentInit } from "@xwiki/cristal-dsshoelace";
+import { ComponentInit as VueDSComponentInit } from "@xwiki/cristal-dsvuetify";
 import { ComponentInit as EditorTiptapComponentInit } from "@xwiki/cristal-editors-tiptap";
+import { ComponentInit as MenuButtonsComponentInit } from "@xwiki/cristal-extension-menubuttons";
 import { ComponentInit as ExtraTabsComponentInit } from "@xwiki/cristal-extra-tabs-default";
 import { ComponentInit as InfoActionsComponentInit } from "@xwiki/cristal-info-actions-default";
-import { ComponentInit as AttachmentsUIComponentInit } from "@xwiki/cristal-attachments-ui";
-import { ComponentInit as AttachmentsDefaultComponentInit } from "@xwiki/cristal-attachments-default";
-import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal-uiextension-default";
-import { ComponentInit as AuthenticationUIComponentInit } from "@xwiki/cristal-authentication-ui";
-import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
 import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-api";
-import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
-import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
-import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
+import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
+import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
 import { ComponentInit as ActionsPagesComponentInit } from "@xwiki/cristal-page-actions-default";
 import { ComponentInit as ActionsPagesUIComponentInit } from "@xwiki/cristal-page-actions-ui";
+import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
+import { ComponentInit as QueueWorkerComponentInit } from "@xwiki/cristal-sharedworker-impl";
+import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
+import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal-uiextension-default";
 import type { Container } from "inversify";
 
 export class StaticBuild {

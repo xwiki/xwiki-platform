@@ -20,8 +20,8 @@
 
 import { registerAsyncComponent } from "@xwiki/cristal-api";
 import { injectable } from "inversify";
-import type { App } from "vue";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
+import type { App } from "vue";
 
 @injectable()
 export class ShoelaceDesignSystemLoader implements DesignSystemLoader {

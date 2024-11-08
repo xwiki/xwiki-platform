@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import { LinkSuggestService } from "./linkSuggestService";
 import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
+import { LinkSuggestService } from "./linkSuggestService";
 import { inject, injectable } from "inversify";
-import { type CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * @since 0.11

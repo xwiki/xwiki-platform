@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import CIcon from "../c-icon.vue";
 import { Size } from "../../size";
-import { describe, expect, it } from "vitest";
+import CIcon from "../c-icon.vue";
 import { shallowMount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
 
 describe("c-icon", () => {
   it("has a name", () => {

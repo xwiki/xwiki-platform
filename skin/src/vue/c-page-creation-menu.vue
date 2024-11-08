@@ -18,13 +18,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { type Ref, defineProps, inject, ref } from "vue";
 import { CIcon } from "@xwiki/cristal-icons";
+import { defineProps, inject, ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSourceProvider,
 } from "@xwiki/cristal-navigation-tree-api";
+import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 

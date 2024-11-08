@@ -20,9 +20,9 @@
 
 import DexieOfflineStorage from "./dexieOfflineStorage";
 import { WrappingOfflineStorage } from "./wrappingOfflineStorage";
-import { Container } from "inversify";
-import { OfflineStorage } from "@xwiki/cristal-backend-api";
 import { WrappingStorage } from "@xwiki/cristal-api";
+import { OfflineStorage } from "@xwiki/cristal-backend-api";
+import { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

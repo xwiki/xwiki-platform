@@ -21,9 +21,9 @@
 import { MarkdownToHTMLConverter } from "./MarkdownToHTMLConverter";
 import { XWiki21ToHTMLConverter } from "./XWikI21ToHTMLConverter";
 import { DefaultRenderer } from "./defaultRenderer";
-import type { Container } from "inversify";
 import type { Converter } from "../api/converter";
 import type { Renderer } from "../api/renderer";
+import type { Container } from "inversify";
 
 export default class ComponentInit {
   constructor(container: Container) {

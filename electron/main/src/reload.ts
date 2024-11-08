@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow, app } from "electron";
 import { resolve } from "node:path";
 
 function loadFile(win: BrowserWindow) {

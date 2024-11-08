@@ -19,7 +19,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import { computed } from "vue";
-import { type BtnProps } from "@xwiki/cristal-dsapi";
+import type { BtnProps } from "@xwiki/cristal-dsapi";
 
 const { variant } = defineProps<BtnProps>();
 

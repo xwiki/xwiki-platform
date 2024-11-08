@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AuthenticationManagerProvider } from "./authenticationManagerProvider";
 import { AuthenticationManager } from "./authenticationManager";
+import { AuthenticationManagerProvider } from "./authenticationManagerProvider";
 import { inject, injectable } from "inversify";
-import { type CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 /**
  * Default implementation of the authentication manager. Resolve the class

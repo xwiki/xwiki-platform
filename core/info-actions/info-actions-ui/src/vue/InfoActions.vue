@@ -20,8 +20,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 <script setup lang="ts">
 import InfoAction from "./InfoAction.vue";
-import { inject } from "vue";
 import { InfoActionsService } from "@xwiki/cristal-info-actions-api";
+import { inject } from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
 
 const cristal = inject<CristalApp>("cristal")!;

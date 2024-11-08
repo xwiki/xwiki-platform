@@ -18,8 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { NextcloudLinkSuggestService } from "./nextcloudLinkSuggestService";
+import { name } from "@xwiki/cristal-link-suggest-api";
 import { Container } from "inversify";
-import { name, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 /**
  * @since 0.11

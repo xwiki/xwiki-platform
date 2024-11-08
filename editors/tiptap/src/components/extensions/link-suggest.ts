@@ -19,19 +19,20 @@
  */
 
 import { queryEqualityOperator } from "./filter-helper";
-import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 import linkSuggestStore, {
   LinkSuggestStore,
 } from "../../stores/link-suggest-store";
-import { Editor, Extension, Range } from "@tiptap/vue-3";
-import Suggestion from "@tiptap/suggestion";
+import LinkSuggestVue from "../../vue/c-tiptap-link-suggest.vue";
 
-import { App, createApp } from "vue";
 import { PluginKey } from "@tiptap/pm/state";
-import { Container } from "inversify";
+import Suggestion from "@tiptap/suggestion";
+import { Editor, Extension, Range } from "@tiptap/vue-3";
 import { SkinManager } from "@xwiki/cristal-api";
+import { Link } from "@xwiki/cristal-link-suggest-api";
+import { Container } from "inversify";
 import { createPinia } from "pinia";
-import { Link, type LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
+import { App, createApp } from "vue";
+import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 /**
  * @since 0.11
@@ -254,4 +255,4 @@ function renderItems(
   };
 }
 
-export { loadLinkSuggest, initSuggestionsService, LinkType };
+export { LinkType, initSuggestionsService, loadLinkSuggest };

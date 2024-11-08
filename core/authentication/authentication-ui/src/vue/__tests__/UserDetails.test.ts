@@ -19,7 +19,6 @@
  */
 
 import UserDetails from "../UserDetails.vue";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { config, flushPromises, mount } from "@vue/test-utils";
 import {
   makeInjectable,
@@ -27,6 +26,7 @@ import {
   wrapInSuspense,
 } from "@xwiki/cristal-dev-test-utils";
 import { Container } from "inversify";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import "reflect-metadata";
 
 function mountUserDetails(container) {

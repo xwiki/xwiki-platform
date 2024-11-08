@@ -19,29 +19,29 @@
  */
 
 import ComponentInit from "./components/componentsInit";
-import { ContentTools } from "./vue/contentTools";
-import { DefaultSkinManager } from "./components/defaultSkinManager";
 import { DefaultMacroData } from "./components/defaultMacroData";
-import DefaultVueTemplateProvider from "./components/defaultVueTemplateProvider";
+import { DefaultSkinManager } from "./components/defaultSkinManager";
 import DefaultUIXTemplateProvider from "./components/defaultUIXTemplateProvider";
+import DefaultVueTemplateProvider from "./components/defaultVueTemplateProvider";
 import CTemplate from "./vue/c-template.vue";
-import type { VueTemplateProvider } from "./api/vueTemplateProvider";
-import type { UIXTemplateProvider } from "./api/uixTemplateProvider";
-import type { MacroProvider } from "./api/macroProvider";
+import { ContentTools } from "./vue/contentTools";
 import type { MacroData } from "./api/macroData";
+import type { MacroProvider } from "./api/macroProvider";
+import type { UIXTemplateProvider } from "./api/uixTemplateProvider";
+import type { VueTemplateProvider } from "./api/vueTemplateProvider";
 
 export type {
-  VueTemplateProvider,
-  UIXTemplateProvider,
-  MacroProvider,
   MacroData,
+  MacroProvider,
+  UIXTemplateProvider,
+  VueTemplateProvider,
 };
 export {
-  ComponentInit,
-  DefaultSkinManager,
-  DefaultVueTemplateProvider,
-  DefaultUIXTemplateProvider,
-  DefaultMacroData,
-  ContentTools,
   CTemplate,
+  ComponentInit,
+  ContentTools,
+  DefaultMacroData,
+  DefaultSkinManager,
+  DefaultUIXTemplateProvider,
+  DefaultVueTemplateProvider,
 };

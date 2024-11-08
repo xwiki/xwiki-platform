@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type Ref } from "vue";
 import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
+import type { Ref } from "vue";
 
 /**
  * Utility class to manage the selected node in a Navigation Tree for Shoelace ds.

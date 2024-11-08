@@ -18,10 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  type ExtraTabsService,
-  type ExtraTab,
-  AbstractExtraTab,
-} from "./ExtraTabsService";
+import { AbstractExtraTab } from "./ExtraTabsService";
+import type { ExtraTab, ExtraTabsService } from "./ExtraTabsService";
 
-export { type ExtraTabsService, type ExtraTab, AbstractExtraTab };
+export { AbstractExtraTab, type ExtraTab, type ExtraTabsService };

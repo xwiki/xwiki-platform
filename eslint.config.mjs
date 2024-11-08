@@ -67,10 +67,15 @@ export default [
             "object",
             "type",
           ],
+          alphabetize: {
+            order: "asc",
+          },
+          named: { import: true, export: true },
         },
       ],
       "import/export": "error",
       "import/group-exports": "error",
+      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
     },
   },
   {

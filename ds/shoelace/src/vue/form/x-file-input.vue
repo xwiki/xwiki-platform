@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { type TextFieldModel, type TextFieldProps } from "@xwiki/cristal-dsapi";
-import "@shoelace-style/shoelace/dist/components/input/input";
 import { defineModel, ref, watch } from "vue";
+import type { TextFieldModel, TextFieldProps } from "@xwiki/cristal-dsapi";
+import "@shoelace-style/shoelace/dist/components/input/input";
 
 const model = defineModel<TextFieldModel>();
 defineProps<TextFieldProps>();

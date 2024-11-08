@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { Container, inject, injectable } from "inversify";
-import {
-  name as NavigationTreeSourceName,
-  type NavigationTreeNode,
-  type NavigationTreeSource,
-} from "@xwiki/cristal-navigation-tree-api";
-import { type AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type {
+  NavigationTreeNode,
+  NavigationTreeSource,
+} from "@xwiki/cristal-navigation-tree-api";
 
 /**
  * Implementation of NavigationTreeSource for the XWiki backend.

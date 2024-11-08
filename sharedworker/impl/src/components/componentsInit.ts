@@ -19,8 +19,8 @@
  */
 
 import DefaultQueueWorker from "./defaultQueueWorker";
-import type { Container } from "inversify";
 import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
+import type { Container } from "inversify";
 
 export default class ComponentInit {
   constructor(container: Container) {

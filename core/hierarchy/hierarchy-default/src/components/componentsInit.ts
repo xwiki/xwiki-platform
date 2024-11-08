@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { name as PageHierarchyResolverName } from "@xwiki/cristal-hierarchy-api";
 import { Container, inject, injectable } from "inversify";
-import {
-  name as PageHierarchyResolverName,
-  type PageHierarchyItem,
-  type PageHierarchyResolver,
-  type PageHierarchyResolverProvider,
+import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type {
+  PageHierarchyItem,
+  PageHierarchyResolver,
+  PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
-import type { CristalApp, PageData, Logger } from "@xwiki/cristal-api";
 
 /**
  * Default implementation for PageHierarchyResolver.

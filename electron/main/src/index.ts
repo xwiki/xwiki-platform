@@ -20,13 +20,13 @@
 
 import { restoreOrCreateWindow } from "./mainWindow";
 import { loadFile } from "./reload";
-import { app, BrowserWindow } from "electron";
 import "./security-restrictions";
-// @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
-import load from "@xwiki/cristal-electron-storage/main";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import loadBrowser from "@xwiki/cristal-browser-electron/main";
 import { load as loadAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";
+// @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
+import load from "@xwiki/cristal-electron-storage/main";
+import { BrowserWindow, app } from "electron";
 import { platform } from "node:process";
 
 /**

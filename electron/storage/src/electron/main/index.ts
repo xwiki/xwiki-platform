@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { app, ipcMain, shell } from "electron";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
-import { dirname, join, relative } from "node:path";
+import { app, ipcMain, shell } from "electron";
 import fs from "node:fs";
+import { dirname, join, relative } from "node:path";
 
 const HOME_PATH = ".cristal";
 const HOME_PATH_FULL = join(app.getPath("home"), HOME_PATH);

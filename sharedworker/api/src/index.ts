@@ -18,6 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { QueueWorker } from "./api/queueWorker";
 import type { MyWorker } from "./api/myworker";
+import type { QueueWorker } from "./api/queueWorker";
 export type { MyWorker, QueueWorker };

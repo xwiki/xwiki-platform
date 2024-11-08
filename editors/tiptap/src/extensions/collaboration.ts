@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { AutoSaver } from "./autoSaver";
+import { TiptapCollabProvider } from "@hocuspocus/provider";
 import { Extension } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import { TiptapCollabProvider } from "@hocuspocus/provider";
 import * as Y from "yjs";
 
 interface CollaborationKitOptions {

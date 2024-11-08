@@ -19,19 +19,19 @@
  */
 
 import ComponentInit from "./components/componentsInit";
+import { CristalLoader } from "./components/cristalLoader";
 import { DefaultExtensionConfig } from "./components/defaultExtensionConfig";
 import { DefaultExtensionManager } from "./components/defaultExtensionManager";
-import { CristalLoader } from "./components/cristalLoader";
+import type { CristalComponent } from "./api/cristalComponent";
 import type { ExtensionConfig } from "./api/extensionConfig";
 import type { ExtensionManager } from "./api/extensionManager";
-import type { CristalComponent } from "./api/cristalComponent";
 import type { DefaultComponent } from "./components/defaultComponent";
 
-export type { ExtensionConfig, ExtensionManager, CristalComponent };
+export type { CristalComponent, ExtensionConfig, ExtensionManager };
 export {
   ComponentInit,
+  CristalLoader,
   DefaultComponent,
   DefaultExtensionConfig,
   DefaultExtensionManager,
-  CristalLoader,
 };

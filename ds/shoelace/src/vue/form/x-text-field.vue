@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type TextFieldProps } from "@xwiki/cristal-dsapi";
+import type { TextFieldProps } from "@xwiki/cristal-dsapi";
 import "@shoelace-style/shoelace/dist/components/input/input";
 
 defineProps<TextFieldProps>();

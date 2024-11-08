@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 /**
  * Access to user profile.

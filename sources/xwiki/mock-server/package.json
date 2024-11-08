@@ -19,7 +19,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev": "nodemon src/index.ts",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0 --fix"
   },
   "types": "dist/index.d.ts",
   "dependencies": {

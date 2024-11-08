@@ -19,13 +19,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { listNavigation } from "./list-navigation-helper";
-import slashStore from "../stores/slash-store";
 import { ActionDescriptor } from "../components/extensions/slash";
-import { computed, ComputedRef, onMounted, onUnmounted, ref } from "vue";
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import slashStore from "../stores/slash-store";
+import { SuggestionProps } from "@tiptap/suggestion";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { storeToRefs } from "pinia";
-import { SuggestionProps } from "@tiptap/suggestion";
+import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import { ComputedRef, computed, onMounted, onUnmounted, ref } from "vue";
 
 const container = ref();
 

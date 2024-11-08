@@ -34,8 +34,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 </template>
 <script lang="ts">
 import { ContentTools } from "./contentTools";
-import { defineComponent, inject, type PropType, ref, type Ref } from "vue";
+import { defineComponent, inject, ref } from "vue";
 import type { CristalApp, Document, Logger, Storage } from "@xwiki/cristal-api";
+import type { PropType, Ref } from "vue";
 
 let logger: Logger | null = null;
 let editFieldMap: Map<string, Ref> = new Map<string, Ref>();

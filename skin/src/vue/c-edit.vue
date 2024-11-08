@@ -18,8 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts">
-import { inject, type Component, markRaw } from "vue";
-import { Logger, CristalApp } from "@xwiki/cristal-api";
+import { CristalApp, Logger } from "@xwiki/cristal-api";
+import { inject, markRaw } from "vue";
+import type { Component } from "vue";
 
 let comps: Array<Component>;
 let logger: Logger;

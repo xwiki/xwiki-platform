@@ -80,4 +80,4 @@ interface AlertsService {
   dismiss(id: number): void;
 }
 
-export type { Action, AlertsService, Alert, Type };
+export type { Action, Alert, AlertsService, Type };

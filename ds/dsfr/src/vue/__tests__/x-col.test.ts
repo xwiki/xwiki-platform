@@ -19,8 +19,8 @@
  */
 
 import XCol from "../x-col.vue";
-import { describe, expect, it } from "vitest";
 import { shallowMount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
 
 describe("x-col", () => {
   it("contains the provided default slot", () => {

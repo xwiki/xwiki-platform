@@ -18,8 +18,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import CTemplate from "./c-template.vue";
 import CMain from "./c-main.vue";
+import CTemplate from "./c-template.vue";
 import { ViewportType, useViewportType } from "../composables/viewport";
 import { Ref, onMounted, ref, watch } from "vue";
 import "../css/main.css";

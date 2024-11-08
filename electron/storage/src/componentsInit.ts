@@ -20,8 +20,8 @@
 
 import { FileSystemConfig } from "./components/FileSystemConfig";
 import FileSystemStorage from "./components/fileSystemStorage";
-import type { Container } from "inversify";
 import type { Logger, Storage, WikiConfig } from "@xwiki/cristal-api";
+import type { Container } from "inversify";
 
 export default class ComponentInit {
   logger: Logger;

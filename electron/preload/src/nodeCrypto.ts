@@ -18,7 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type BinaryLike, createHash } from "node:crypto";
+import { createHash } from "node:crypto";
+import type { BinaryLike } from "node:crypto";
 
 export function sha256sum(data: BinaryLike) {
   return createHash("sha256").update(data).digest("hex");

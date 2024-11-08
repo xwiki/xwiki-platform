@@ -21,32 +21,24 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { ContentTools } from "./contentTools";
 import xavatarImg from "../images/no-one.svg";
 import messages from "../translations";
-import { marked } from "marked";
-import { CIcon, Size } from "@xwiki/cristal-icons";
-import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
-import { useI18n } from "vue-i18n";
-import { type CristalApp, PageData } from "@xwiki/cristal-api";
-import { useRoute } from "vue-router";
-import {
-  computed,
-  type ComputedRef,
-  inject,
-  onUpdated,
-  ref,
-  type Ref,
-  watch,
-} from "vue";
-import { InfoActions } from "@xwiki/cristal-info-actions-ui";
-import {
-  type DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
-import { PageActions } from "@xwiki/cristal-page-actions-ui";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
+import { PageData } from "@xwiki/cristal-api";
+import { name as documentServiceName } from "@xwiki/cristal-document-api";
+import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { InfoActions } from "@xwiki/cristal-info-actions-ui";
+import { PageActions } from "@xwiki/cristal-page-actions-ui";
+import { marked } from "marked";
+import { computed, inject, onUpdated, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type { ComputedRef, Ref } from "vue";
 
 const { t } = useI18n({
   messages,

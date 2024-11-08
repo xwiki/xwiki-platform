@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultPageActionService } from "./DefaultPageActionService";
 import { DefaultPageActionCategoryService } from "./DefaultPageActionCategoryService";
-import type { Container } from "inversify";
+import { DefaultPageActionService } from "./DefaultPageActionService";
 import type {
-  PageActionService,
   PageActionCategoryService,
+  PageActionService,
 } from "@xwiki/cristal-page-actions-api";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

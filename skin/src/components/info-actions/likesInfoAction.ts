@@ -19,8 +19,8 @@
  */
 
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
-import { ref } from "vue";
 import { injectable } from "inversify";
+import { ref } from "vue";
 
 @injectable()
 export class LikesInfoAction implements InfoAction {

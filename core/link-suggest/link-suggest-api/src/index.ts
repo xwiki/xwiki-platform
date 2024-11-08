@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type LinkSuggestService } from "./linkSuggestService";
-import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 import { DefaultLinkSuggestServiceProvider } from "./DefaultLinkSuggestServiceProvider";
+import { LinkSuggestServiceProvider } from "./LinkSuggestServiceProvider";
 import { Container } from "inversify";
+import type { LinkSuggestService } from "./linkSuggestService";
 
 /**
  * @since 0.11
@@ -63,10 +63,10 @@ class ComponentInit {
 }
 
 export {
-  type LinkSuggestService,
-  name,
-  type Link,
-  LinkType,
   ComponentInit,
+  type Link,
+  type LinkSuggestService,
   type LinkSuggestServiceProvider,
+  LinkType,
+  name,
 };

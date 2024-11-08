@@ -1,8 +1,8 @@
-import { Ref } from "vue";
 import { inject, injectable } from "inversify";
-import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
-import type { DocumentService } from "@xwiki/cristal-document-api";
+import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
+import { Ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 
 type Id = "document";
 type State = {

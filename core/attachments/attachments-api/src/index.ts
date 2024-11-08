@@ -57,4 +57,4 @@ interface AttachmentsService {
   upload(page: string, files: File[]): Promise<void>;
 }
 
-export type { AttachmentsService, Attachment };
+export type { Attachment, AttachmentsService };

@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 import { inject, injectable } from "inversify";
-import {
-  type AuthenticationManagerProvider,
-  type AuthenticationManager,
+import type {
+  AuthenticationManager,
+  AuthenticationManagerProvider,
 } from "@xwiki/cristal-authentication-api";
 import type { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { Component } from "vue";

@@ -19,9 +19,9 @@
  */
 
 import { APITypes } from "../electron/preload/apiTypes";
+import { WikiConfig } from "@xwiki/cristal-api";
 import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { injectable } from "inversify";
-import { WikiConfig } from "@xwiki/cristal-api";
 
 declare const browserElectron: APITypes;
 

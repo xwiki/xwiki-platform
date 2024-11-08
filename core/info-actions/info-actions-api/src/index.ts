@@ -49,4 +49,4 @@ interface InfoActionsService {
   list(): Promise<InfoAction[]>;
 }
 
-export type { InfoActionsService, InfoAction };
+export type { InfoAction, InfoActionsService };

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import messages from "../../translations";
 import { computed, defineModel } from "vue";
-import { VFileInput } from "vuetify/components/VFileInput";
 import { useI18n } from "vue-i18n";
+import { VFileInput } from "vuetify/components/VFileInput";
 import type { TextFieldModel, TextFieldProps } from "@xwiki/cristal-dsapi";
 
 const { t } = useI18n({

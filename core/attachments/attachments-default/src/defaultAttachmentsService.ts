@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Ref } from "vue";
 import { inject, injectable } from "inversify";
-import { defineStore, Store, StoreDefinition, storeToRefs } from "pinia";
-import { type CristalApp } from "@xwiki/cristal-api";
+import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
+import { Ref } from "vue";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type {
   Attachment,
   AttachmentsService,

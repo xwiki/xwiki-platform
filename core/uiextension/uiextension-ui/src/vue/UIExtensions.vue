@@ -19,9 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 
 <script lang="ts" setup>
-import { type Component, inject } from "vue";
 import { CristalApp } from "@xwiki/cristal-api";
 import { UIExtensionsManager } from "@xwiki/cristal-uiextension-api";
+import { inject } from "vue";
+import type { Component } from "vue";
 //
 const { uixName } = defineProps<{
   uixName: string;

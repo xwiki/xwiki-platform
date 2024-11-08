@@ -19,17 +19,18 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { User } from "../extensions/collaboration";
-import { type Ref, ref } from "vue";
 import {
   HocuspocusProvider,
-  // eslint-disable-next-line import/named
-  onStatusParameters,
+  WebSocketStatus,
   // eslint-disable-next-line import/named
   onAwarenessChangeParameters,
-  WebSocketStatus,
+  // eslint-disable-next-line import/named
+  onStatusParameters,
 } from "@hocuspocus/provider";
-import { Avvvatars } from "avvvatars-vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
+import { Avvvatars } from "avvvatars-vue";
+import { ref } from "vue";
+import type { Ref } from "vue";
 
 const props = withDefaults(
   defineProps<{

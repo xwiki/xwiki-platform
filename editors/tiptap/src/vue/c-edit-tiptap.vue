@@ -18,33 +18,32 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
-import CSaveStatus from "./c-save-status.vue";
 import CConnectionStatus from "./c-connection-status.vue";
-import { Slash } from "../components/extensions/slash";
+import CSaveStatus from "./c-save-status.vue";
+import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
+import { Slash } from "../components/extensions/slash";
 import { CollaborationKit, User } from "../extensions/collaboration";
 import Link from "../extensions/link";
 import Markdown from "../extensions/markdown";
-import { computed, type ComputedRef, inject, type Ref, ref, watch } from "vue";
-import { CristalApp, PageData } from "@xwiki/cristal-api";
-import { useRoute } from "vue-router";
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import Image from "@tiptap/extension-image";
+import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
-import {
-  type LinkSuggestService,
-  type LinkSuggestServiceProvider,
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
+import StarterKit from "@tiptap/starter-kit";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import { CristalApp, PageData } from "@xwiki/cristal-api";
+import { name as documentServiceName } from "@xwiki/cristal-document-api";
+import { computed, inject, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import type { DocumentService } from "@xwiki/cristal-document-api";
+import type {
+  LinkSuggestService,
+  LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
-import {
-  type DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
+import type { ComputedRef, Ref } from "vue";
 
 const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;

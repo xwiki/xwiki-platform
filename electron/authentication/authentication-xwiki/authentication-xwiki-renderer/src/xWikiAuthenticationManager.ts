@@ -1,9 +1,7 @@
-import {
-  type AuthenticationManager,
-  UserDetails,
-} from "@xwiki/cristal-authentication-api";
+import { UserDetails } from "@xwiki/cristal-authentication-api";
 import { inject, injectable } from "inversify";
-import { type CristalApp } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 // TODO: find out how to move the type declaration to a separate location.
 // eslint-disable-next-line @typescript-eslint/prefer-namespace-keyword, @typescript-eslint/no-namespace

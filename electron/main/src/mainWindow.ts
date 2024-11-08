@@ -19,7 +19,7 @@
  */
 
 import { loadFile } from "./reload";
-import { app, BrowserWindow, shell } from "electron";
+import { BrowserWindow, app, shell } from "electron";
 import { join } from "node:path";
 
 async function createWindow() {

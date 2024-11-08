@@ -18,18 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { TemplateComponent } from "./templateTemplateProvider";
+import { InformationExtraTab } from "./InformationTab";
 import { DefaultSkinManager } from "./defaultSkinManager";
-import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
+import { CommentsInfoAction } from "./info-actions/commentsInfoAction";
+import { LikesInfoAction } from "./info-actions/likesInfoAction";
+import { ConfigMenuUIExtension } from "./sidebar-actions/ConfigMenuUIExtension";
+import { TemplateComponent } from "./templateTemplateProvider";
 import { UIXLoginTemplateProvider } from "./uixLoginTemplateProvider";
 import { UIXSearchTemplateProvider } from "./uixSearchTemplateProvider";
-import { InformationExtraTab } from "./InformationTab";
-import { LikesInfoAction } from "./info-actions/likesInfoAction";
-import { CommentsInfoAction } from "./info-actions/commentsInfoAction";
-import { ConfigMenuUIExtension } from "./sidebar-actions/ConfigMenuUIExtension";
-import { UIExtension } from "@xwiki/cristal-uiextension-api";
-import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { UIXVueTemplateProvider } from "./uixVueTemplateProvider";
 import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import type { UIXTemplateProvider } from "../api/uixTemplateProvider";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import type { Logger, SkinManager } from "@xwiki/cristal-api";

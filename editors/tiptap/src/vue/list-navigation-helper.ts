@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { nextTick, readonly, Ref, ref, watch } from "vue";
+import { Ref, nextTick, readonly, ref, watch } from "vue";
 
 /**
  * Build the Vue operations to easily bind the up/down/enter events to a Vue

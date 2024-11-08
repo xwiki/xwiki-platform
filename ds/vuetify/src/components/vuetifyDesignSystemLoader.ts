@@ -18,16 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { registerAsyncComponent } from "@xwiki/cristal-api";
+import { injectable } from "inversify";
+import { createVuetify } from "vuetify";
 // eslint-disable-next-line import/namespace
 import * as components from "vuetify/components";
 import { VCol, VContainer, VRow, VTextField } from "vuetify/components";
 
-import { createVuetify } from "vuetify";
-import { blue, blueGrey } from "vuetify/util/colors";
-import { mdi } from "vuetify/iconsets/mdi";
 import * as directives from "vuetify/directives";
-import { injectable } from "inversify";
-import { registerAsyncComponent } from "@xwiki/cristal-api";
+import { mdi } from "vuetify/iconsets/mdi";
+import { blue, blueGrey } from "vuetify/util/colors";
 import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { App } from "vue";
 

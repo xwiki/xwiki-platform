@@ -19,7 +19,7 @@
  */
 
 import Link from "@tiptap/extension-link";
-import { type Mark } from "@tiptap/pm/model";
+import type { Mark } from "@tiptap/pm/model";
 
 /**
  * Extends the default tiptap extension link with custom markdown serializion

@@ -19,12 +19,12 @@
  */
 
 import macro from "./marked-macro";
-import { marked } from "marked";
-import { baseUrl } from "marked-base-url";
 import DOMPurify from "dompurify";
 import { inject, injectable } from "inversify";
-import type { WikiConfig, Logger } from "@xwiki/cristal-api";
+import { marked } from "marked";
+import { baseUrl } from "marked-base-url";
 import type { Converter } from "../api/converter";
+import type { Logger, WikiConfig } from "@xwiki/cristal-api";
 
 @injectable()
 export class MarkdownToHTMLConverter implements Converter {

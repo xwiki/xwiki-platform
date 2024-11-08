@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { type UserDetails } from "./userDetails";
+import type { UserDetails } from "./userDetails";
 
 /**
  * Interface to implement for a given backend to allow users to authenticate.

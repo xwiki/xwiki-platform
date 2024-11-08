@@ -19,7 +19,7 @@
  */
 
 import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
-import { defineStore, Store, StoreDefinition } from "pinia";
+import { Store, StoreDefinition, defineStore } from "pinia";
 
 type State = {
   links: LinkSuggestionActionDescriptor[];

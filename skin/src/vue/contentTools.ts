@@ -19,8 +19,8 @@
  */
 
 import { createVNode, render } from "vue";
-import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { MacroProvider } from "../api/macroProvider";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { App, Component, VNode } from "vue";
 
 // import { DefaultMacroData } from "../components/defaultMacroData";

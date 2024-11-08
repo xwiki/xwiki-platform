@@ -19,7 +19,7 @@
  */
 
 import { ActionCategoryDescriptor } from "../components/extensions/slash";
-import { defineStore, Store, StoreDefinition } from "pinia";
+import { Store, StoreDefinition, defineStore } from "pinia";
 
 type Props = { items: ActionCategoryDescriptor[] };
 

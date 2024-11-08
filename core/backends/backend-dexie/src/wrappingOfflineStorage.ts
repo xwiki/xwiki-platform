@@ -19,7 +19,6 @@
  */
 
 import { inject, injectable } from "inversify";
-import { type OfflineStorage } from "@xwiki/cristal-backend-api";
 import type {
   AttachmentsData,
   Document,
@@ -29,6 +28,7 @@ import type {
   WikiConfig,
   WrappingStorage,
 } from "@xwiki/cristal-api";
+import type { OfflineStorage } from "@xwiki/cristal-backend-api";
 import type { QueueWorker } from "@xwiki/cristal-sharedworker-api";
 
 @injectable()

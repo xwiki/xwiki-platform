@@ -19,9 +19,9 @@
  */
 
 import { inject, injectable } from "inversify";
-import type { WikiConfig, CristalApp, Logger } from "@xwiki/cristal-api";
-import type { Renderer } from "../api/renderer";
 import type { Converter } from "../api/converter";
+import type { Renderer } from "../api/renderer";
+import type { CristalApp, Logger, WikiConfig } from "@xwiki/cristal-api";
 
 @injectable()
 export class DefaultRenderer implements Renderer {

@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { contextBridge, ipcRenderer } from "electron";
 import { UserDetails } from "@xwiki/cristal-authentication-api";
+import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("authenticationXWiki", {
   login: async (oidcUrl: string) => {

@@ -18,13 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultWikiConfig } from "@xwiki/cristal-api";
 import { inject, injectable, named } from "inversify";
-import {
-  type CristalApp,
-  DefaultWikiConfig,
-  type Logger,
-  type Storage,
-} from "@xwiki/cristal-api";
+import type { CristalApp, Logger, Storage } from "@xwiki/cristal-api";
 
 @injectable()
 export class FileSystemConfig extends DefaultWikiConfig {

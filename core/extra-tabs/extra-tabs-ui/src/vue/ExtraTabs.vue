@@ -19,16 +19,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { ExtraTab, ExtraTabsService } from "@xwiki/cristal-extra-tabs-api";
-import {
-  type Component,
-  inject,
-  onBeforeMount,
-  ref,
-  Ref,
-  ShallowRef,
-  shallowRef,
-} from "vue";
+import { Ref, ShallowRef, inject, onBeforeMount, ref, shallowRef } from "vue";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { Component } from "vue";
 
 const cristal = inject<CristalApp>("cristal")!;
 

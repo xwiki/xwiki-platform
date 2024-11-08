@@ -18,10 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { LoginMenuUIExtension } from "./LoginMenuUIExtension";
 import { LoggedInMenuUIExtension } from "./LoggedInMenuUIExtension";
-import { Container } from "inversify";
+import { LoginMenuUIExtension } from "./LoginMenuUIExtension";
 import { UIExtension } from "@xwiki/cristal-uiextension-api";
+import { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

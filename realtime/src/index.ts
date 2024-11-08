@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { Server as HocuspocusServer } from "@hocuspocus/server";
 import express from "express";
 import expressWebsockets from "express-ws";
-import { Server as HocuspocusServer } from "@hocuspocus/server";
 
 const hocuspocusServer = HocuspocusServer.configure({
   // See https://developer.chrome.com/blog/timer-throttling-in-chrome-88/

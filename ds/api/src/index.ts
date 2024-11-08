@@ -85,6 +85,6 @@ export type {
   BtnProps,
   TabPanelProps,
   TabProps,
-  TextFieldProps,
   TextFieldModel,
+  TextFieldProps,
 };

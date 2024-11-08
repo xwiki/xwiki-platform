@@ -22,8 +22,8 @@ import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
 import UIX from "../vue/c-uix.vue";
 import { injectable } from "inversify";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
-import type { Component } from "vue";
 import type { Container } from "inversify";
+import type { Component } from "vue";
 import "reflect-metadata";
 
 @injectable()

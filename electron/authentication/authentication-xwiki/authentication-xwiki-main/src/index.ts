@@ -19,16 +19,16 @@
  */
 
 import {
+  deleteAccessToken,
+  deleteTokenType,
   getAccessToken,
   getTokenType,
   setAccessToken,
   setTokenType,
-  deleteAccessToken,
-  deleteTokenType,
 } from "./storage.js";
-import { BrowserWindow, ipcMain } from "electron";
-import axios from "axios";
 import { UserDetails } from "@xwiki/cristal-authentication-api";
+import axios from "axios";
+import { BrowserWindow, ipcMain } from "electron";
 
 const callbackUrl = "http://callback/";
 

@@ -17,14 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-import {
-  Link,
-  type LinkSuggestService,
-  LinkType,
-} from "@xwiki/cristal-link-suggest-api";
+import { Link, LinkType } from "@xwiki/cristal-link-suggest-api";
 import { inject, injectable } from "inversify";
 import xmlescape from "xml-escape";
 import type { CristalApp } from "@xwiki/cristal-api";
+import type { LinkSuggestService } from "@xwiki/cristal-link-suggest-api";
 
 // TODO: To be replaced by an actual authentication with CRISTAL-267
 const USERNAME = "test";

@@ -18,14 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  type DesignSystemLoader,
-  registerAsyncComponent,
-} from "@xwiki/cristal-api";
+import VueDsfr from "@gouvminint/vue-dsfr";
+import { registerAsyncComponent } from "@xwiki/cristal-api";
 
 import { injectable } from "inversify";
 
-import VueDsfr from "@gouvminint/vue-dsfr";
+import type { DesignSystemLoader } from "@xwiki/cristal-api";
 import type { App } from "vue";
 
 @injectable()

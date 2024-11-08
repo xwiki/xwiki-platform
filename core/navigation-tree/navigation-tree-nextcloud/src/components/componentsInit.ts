@@ -18,14 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { Container, inject, injectable } from "inversify";
-import {
-  name as NavigationTreeSourceName,
-  type NavigationTreeNode,
-  type NavigationTreeSource,
-} from "@xwiki/cristal-navigation-tree-api";
+import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
+import { Container, inject, injectable } from "inversify";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type {
+  NavigationTreeNode,
+  NavigationTreeSource,
+} from "@xwiki/cristal-navigation-tree-api";
 
 // TODO: To be replaced by an actual authentication with CRISTAL-267
 const USERNAME = "test";

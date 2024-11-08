@@ -63,4 +63,4 @@ function isMarkActive(type: MarkType): (state: EditorState) => boolean {
   };
 }
 
-export { isNodeActive, isMarkActive };
+export { isMarkActive, isNodeActive };

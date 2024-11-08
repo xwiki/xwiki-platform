@@ -19,9 +19,9 @@
  */
 
 import TiptapEditor from "../vue/c-edit-tiptap.vue";
+import { CristalApp } from "@xwiki/cristal-api";
 import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { injectable } from "inversify";
-import { CristalApp } from "@xwiki/cristal-api";
 import type { Component } from "vue";
 
 @injectable()

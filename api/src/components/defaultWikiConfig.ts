@@ -20,10 +20,10 @@
 
 import { inject, injectable } from "inversify";
 import type { WikiConfig } from "../api/WikiConfig";
-import type { Storage } from "../api/storage";
 import type { CristalApp } from "../api/cristalApp";
-import type { WrappingStorage } from "../api/wrappingStorage";
 import type { Logger } from "../api/logger";
+import type { Storage } from "../api/storage";
+import type { WrappingStorage } from "../api/wrappingStorage";
 
 @injectable()
 export class DefaultWikiConfig implements WikiConfig {

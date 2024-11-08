@@ -227,4 +227,4 @@ class AutoSaver extends EventEmitter {
   }
 }
 
-export { AutoSaverStatus, AutoSaver };
+export { AutoSaver, AutoSaverStatus };

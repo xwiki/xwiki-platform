@@ -19,16 +19,16 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { listNavigation } from "./list-navigation-helper";
-import linkSuggestStore from "../stores/link-suggest-store";
 import {
   LinkSuggestionActionDescriptor,
   LinkType,
 } from "../components/extensions/link-suggest";
-import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
-import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
-import { storeToRefs } from "pinia";
+import linkSuggestStore from "../stores/link-suggest-store";
 import { SuggestionProps } from "@tiptap/suggestion";
 import { CIcon, Size } from "@xwiki/cristal-icons";
+import { storeToRefs } from "pinia";
+import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
+import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
 
 const container = ref();
 

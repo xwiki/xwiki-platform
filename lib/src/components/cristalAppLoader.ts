@@ -20,9 +20,9 @@
 
 import { DefaultCristalApp } from "./DefaultCristalApp";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
-import { type CristalApp } from "@xwiki/cristal-api";
 import { Container } from "inversify";
 import { Primitive } from "utility-types";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
 /**
@@ -167,4 +167,4 @@ class CristalAppLoader extends CristalLoader {
   }
 }
 
-export { loadConfig, CristalAppLoader };
+export { CristalAppLoader, loadConfig };

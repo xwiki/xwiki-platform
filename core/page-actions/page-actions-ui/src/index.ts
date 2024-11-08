@@ -19,15 +19,15 @@
  */
 
 import {
-  PageManagementActionCategory,
   PageDeleteAction,
+  PageManagementActionCategory,
 } from "./PageManagement";
 import PageActions from "./vue/PageActions.vue";
-import type { Container } from "inversify";
 import type {
-  PageActionCategory,
   PageAction,
+  PageActionCategory,
 } from "@xwiki/cristal-page-actions-api";
+import type { Container } from "inversify";
 
 class ComponentInit {
   constructor(container: Container) {

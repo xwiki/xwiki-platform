@@ -20,7 +20,7 @@
 
 import { DefaultAlertsService } from "./defaultAlertsService";
 import { Container } from "inversify";
-import { type AlertsService } from "@xwiki/cristal-alerts-api";
+import type { AlertsService } from "@xwiki/cristal-alerts-api";
 
 export class ComponentInit {
   constructor(container: Container) {

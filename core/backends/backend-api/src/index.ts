@@ -21,4 +21,4 @@
 import { AbstractStorage } from "./abstractStorage";
 import type OfflineStorage from "./offlineStorage";
 
-export { OfflineStorage, AbstractStorage };
+export { AbstractStorage, OfflineStorage };

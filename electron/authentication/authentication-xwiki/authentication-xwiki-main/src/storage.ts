@@ -80,10 +80,10 @@ function deleteAccessToken(): void {
 }
 
 export {
-  setTokenType,
-  setAccessToken,
-  getTokenType,
-  getAccessToken,
-  deleteTokenType,
   deleteAccessToken,
+  deleteTokenType,
+  getAccessToken,
+  getTokenType,
+  setAccessToken,
+  setTokenType,
 };

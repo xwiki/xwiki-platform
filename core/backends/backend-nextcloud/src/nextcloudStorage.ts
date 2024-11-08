@@ -18,15 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { inject, injectable } from "inversify";
 import {
   AttachmentsData,
   DefaultPageData,
-  type Logger,
   PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
+import { inject, injectable } from "inversify";
+import type { Logger } from "@xwiki/cristal-api";
 
 // TODO: To be replaced by an actual authentication with CRISTAL-267
 const USERNAME = "test";

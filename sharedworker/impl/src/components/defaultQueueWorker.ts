@@ -19,13 +19,11 @@
  */
 
 import Worker from "./worker?sharedworker";
+import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import * as Comlink from "comlink";
 import { inject, injectable } from "inversify";
-import { type CristalApp, type Logger } from "@xwiki/cristal-api";
-import {
-  type DocumentService,
-  name as documentServiceName,
-} from "@xwiki/cristal-document-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
 import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 
 @injectable()

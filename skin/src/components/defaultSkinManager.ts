@@ -18,21 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import View from "../vue/c-view.vue";
-import Config from "../vue/c-config.vue";
-import Sidebar from "../vue/c-sidebar.vue";
-import Footer from "../vue/c-footer.vue";
-import Content from "../vue/c-content.vue";
-import Panel from "../vue/c-panel.vue";
-import Main from "../vue/c-main.vue";
-import Edit from "../vue/c-edit.vue";
 import Blog from "../vue/c-blog.vue";
+import Config from "../vue/c-config.vue";
+import Content from "../vue/c-content.vue";
+import Edit from "../vue/c-edit.vue";
+import Footer from "../vue/c-footer.vue";
+import Main from "../vue/c-main.vue";
 import Movie from "../vue/c-movie.vue";
+import Panel from "../vue/c-panel.vue";
+import Sidebar from "../vue/c-sidebar.vue";
+import View from "../vue/c-view.vue";
 
 import { injectable } from "inversify";
-import type { App, Component } from "vue";
 import type { DesignSystemLoader, SkinManager } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
+import type { App, Component } from "vue";
 import "reflect-metadata";
 
 @injectable()

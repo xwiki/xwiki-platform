@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ipcMain, app } from "electron";
+import { app, ipcMain } from "electron";
 import { resolve } from "node:path";
 import BrowserWindow = Electron.BrowserWindow;
 

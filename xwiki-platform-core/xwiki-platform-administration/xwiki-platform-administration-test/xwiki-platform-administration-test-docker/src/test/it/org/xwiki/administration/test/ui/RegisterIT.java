@@ -348,9 +348,11 @@ class RegisterIT
                 + "wiki: %s withRegistrationConfig: %s", isModal, closedWiki, withRegistrationConfig));
             // TODO: looks like a pretty strange behavior, there might be a message box title missing somewhere
             String messagePrefix = closedWiki ? "" : "Information ";
+            messagePrefix = !closedWiki&&withRegistrationConfig ? "Welcome ": messagePrefix;
 
-            assertEquals(String.format("%s%s %s (%s): Registration successful.", messagePrefix, firstName, lastName,
-                    AbstractRegistrationPage.JOHN_SMITH_USERNAME),
+            assertEquals(String.format("%s%s %s (%s)%s", messagePrefix, firstName, lastName,
+                    AbstractRegistrationPage.JOHN_SMITH_USERNAME, 
+                    !closedWiki&&withRegistrationConfig ? "" : ": Registration successful."),
                 ((RegistrationPage) registrationPage).getRegistrationSuccessMessage().orElseThrow());
         }
     }

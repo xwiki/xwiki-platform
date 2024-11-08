@@ -462,8 +462,8 @@
     #end
     ## Display a "registration successful" message
     ## Define some strings which may be used by the welcome message
-    #set($firstName = $escapetool.xml($!request.get('register_first_name')))
-    #set($lastName = $escapetool.xml($!request.get('register_last_name')))
+    #set($firstName = $!request.get('register_first_name'))
+    #set($lastName = $!request.get('register_last_name'))
     #evaluate($registrationConfig.registrationSuccessMessage)
 
     ## Empty line prevents message from being forced into a &lt;p&gt; block.

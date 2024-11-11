@@ -33,7 +33,7 @@
     "mime": "4.0.4"
   },
   "peerDependencies": {
-    "electron": "33.0.2"
+    "electron": "33.2.0"
   },
   "devDependencies": {
     "@types/node": "22.9.3",

@@ -160,12 +160,12 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
                 String pageUri;
                 if (StringUtils.isBlank(language)) {
                     pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName,
-                        Utils.getSpaces(documentReference.getLastSpaceReference()),
+                        Utils.getSpacesURLElements(documentReference.getLastSpaceReference()),
                         documentReference.getName()).toString();
                 } else {
                     searchResult.setLanguage(language);
                     pageUri = Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
-                        Utils.getSpaces(documentReference.getLastSpaceReference()),
+                        Utils.getSpacesURLElements(documentReference.getLastSpaceReference()),
                         documentReference.getName(), language).toString();
                 }
 

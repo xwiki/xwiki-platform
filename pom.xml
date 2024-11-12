@@ -59,7 +59,7 @@
     <jetty.server.version>10.0.21</jetty.server.version>
     <jetty.client.version>${jetty.server.version}</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.114.Final</netty.version>
+    <netty.version>4.1.115.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.3.6</dockerJava.version>
     <cvssCalculator.version>1.4.2</cvssCalculator.version>

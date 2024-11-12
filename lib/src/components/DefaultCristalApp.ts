@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
+// reflect-metadata is placed at the top because it needs to be imported
+// before any use of an inversify annotation.
+import "reflect-metadata";
 import Index from "../c-index.vue";
 import { DefaultLogger, DefaultPageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
@@ -41,7 +43,6 @@ import type {
 } from "@xwiki/cristal-api";
 import type { BrowserApi } from "@xwiki/cristal-browser-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
-import "reflect-metadata";
 import "@mdi/font/css/materialdesignicons.css";
 import type { ExtensionManager } from "@xwiki/cristal-extension-manager";
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";

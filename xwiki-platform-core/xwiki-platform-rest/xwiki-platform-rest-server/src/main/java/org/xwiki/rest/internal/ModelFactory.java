@@ -210,7 +210,10 @@ public class ModelFactory
             modified = true;
         }
 
-        doc.setHidden(restPage.isHidden());
+        if (restPage.isHidden() != null) {
+            doc.setHidden(restPage.isHidden());
+            modified = true;
+        }
 
         // Set objects
         if (restPage.getObjects() != null) {

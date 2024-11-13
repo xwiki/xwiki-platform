@@ -127,7 +127,7 @@
           <element name="language" type="string"></element>
           <element name="majorVersion" type="int"></element>
           <element name="minorVersion" type="int"></element>
-          <element name="hidden" type="boolean" default="false"></element>
+          <element name="hidden" type="boolean" minOccurs="0"></element>
           <element name="created" type="dateTime"></element>
           <element name="creator" type="string"></element>
           <element name="creatorName" type="string"></element>

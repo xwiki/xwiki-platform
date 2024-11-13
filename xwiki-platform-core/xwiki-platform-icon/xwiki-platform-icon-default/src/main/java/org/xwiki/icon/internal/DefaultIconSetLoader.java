@@ -36,8 +36,9 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconType;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -77,7 +78,7 @@ public class DefaultIconSetLoader implements IconSetLoader
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     @Named("document")
@@ -94,10 +95,10 @@ public class DefaultIconSetLoader implements IconSetLoader
             // have script right.
             DocumentReference contentAuthor =
                 this.documentUserSerializer.serialize(doc.getAuthors().getContentAuthor());
-            this.authorizationManager.checkAccess(Right.SCRIPT, contentAuthor, iconSetReference);
+            this.authorizationManager.checkAccess(Right.SCRIPT, EntityType.DOCUMENT, contentAuthor, iconSetReference);
             DocumentReference metadataAuthor =
                 this.documentUserSerializer.serialize(doc.getAuthors().getEffectiveMetadataAuthor());
-            this.authorizationManager.checkAccess(Right.SCRIPT, metadataAuthor, iconSetReference);
+            this.authorizationManager.checkAccess(Right.SCRIPT, EntityType.DOCUMENT, metadataAuthor, iconSetReference);
 
             String content = doc.getContent();
             // The name of the icon set is stored in the IconThemesCode.IconThemeClass XObject of the document

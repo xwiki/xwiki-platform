@@ -43,7 +43,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -123,8 +123,8 @@ public class DocumentTitleDisplayerTest
         WikiReference currentWikiReference = new WikiReference("currentWiki");
         when(modelContext.getCurrentEntityReference()).thenReturn(currentWikiReference);
 
-        AuthorizationManager authorizationManager = this.mocker.getInstance(AuthorizationManager.class);
-        when(authorizationManager.hasAccess(eq(Right.SCRIPT), any(), any())).thenReturn(true);
+        DocumentAuthorizationManager authorizationManager = this.mocker.getInstance(DocumentAuthorizationManager.class);
+        when(authorizationManager.hasAccess(eq(Right.SCRIPT), eq(EntityType.DOCUMENT), any(), any())).thenReturn(true);
 
         DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
 

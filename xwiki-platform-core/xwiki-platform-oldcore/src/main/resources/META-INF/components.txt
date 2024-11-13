@@ -281,3 +281,6 @@ org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
 org.xwiki.internal.document.DocumentOverrideListener
+org.xwiki.internal.document.DocumentRequiredRightsReader
+org.xwiki.internal.document.DefaultDocumentRequiredRightsManager
+org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer

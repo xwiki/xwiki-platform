@@ -43,6 +43,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,7 +56,11 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
@@ -139,6 +144,10 @@ public class Document extends Api
 
     private ConfigurationSource configuration;
 
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
+
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -183,6 +192,24 @@ public class Document extends Api
         }
 
         return this.configuration;
+    }
+
+    private DocumentRequiredRightsManager getDocumentRequiredRightsManager()
+    {
+        if (this.documentRequiredRightsManager == null) {
+            this.documentRequiredRightsManager = Utils.getComponent(DocumentRequiredRightsManager.class);
+        }
+
+        return this.documentRequiredRightsManager;
+    }
+
+    private DocumentAuthorizationManager getDocumentAuthorizationManager()
+    {
+        if (this.documentAuthorizationManager == null) {
+            this.documentAuthorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
+        }
+
+        return this.documentAuthorizationManager;
     }
 
     /**
@@ -2500,9 +2527,64 @@ public class Document extends Api
 
     private void updateAuthor()
     {
+        updateAuthor(getDoc(), getXWikiContext());
+    }
+
+    protected static void updateAuthor(XWikiDocument document, XWikiContext xcontext)
+    {
         // Temporary set as author of the document the current script author (until the document is saved)
-        XWikiContext xcontext = getXWikiContext();
-        getDoc().setAuthorReference(xcontext.getAuthorReference());
+        document.setAuthorReference(xcontext.getAuthorReference());
+
+        XWikiDocument secureDocument = xcontext.getSecureDocument();
+        // If there is a secure document that has required rights enforced, we need to be careful.
+        if (secureDocument != null) {
+            DocumentRequiredRightsManager requiredRightsManager =
+                Utils.getComponent(DocumentRequiredRightsManager.class);
+            DocumentReference secureDocumentReference = secureDocument.getDocumentReference();
+            try {
+                DocumentRequiredRights secureRequiredRights =
+                    requiredRightsManager.getRequiredRights(secureDocumentReference)
+                        .orElse(DocumentRequiredRights.EMPTY);
+                DocumentRequiredRights requiredRights =
+                    requiredRightsManager.getRequiredRights(document.getDocumentReference())
+                        .orElse(DocumentRequiredRights.EMPTY);
+
+                DocumentAuthorizationManager authorizationManager =
+                    Utils.getComponent(DocumentAuthorizationManager.class);
+                if (secureRequiredRights.enforce()
+                    // If the secure document has programming right, everything is fine.
+                    && !authorizationManager.hasRequiredRight(Right.PROGRAM, null, secureDocumentReference)
+                    // If this document doesn't have required rights enforced or has more rights than the secure
+                    // document, we need to restrict this document to be safe.
+                    && (!requiredRights.enforce() || !hasAllRequiredRights(requiredRights, secureDocumentReference)))
+                {
+                    document.setRestricted(true);
+                }
+            } catch (AuthorizationException e) {
+                document.setRestricted(true);
+
+                LOGGER.error("Failed to load or check required rights in update of document [{}]",
+                    document.getDocumentReference(), e);
+            }
+        }
+    }
+
+    private static boolean hasAllRequiredRights(DocumentRequiredRights requiredRights,
+        DocumentReference secureDocumentReference)
+    {
+        DocumentAuthorizationManager authorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
+        return !requiredRights.rights().stream().allMatch(requiredRight ->
+        {
+            try {
+                return authorizationManager.hasRequiredRight(requiredRight.right(),
+                    requiredRight.scope(), secureDocumentReference);
+            } catch (AuthorizationException e) {
+                LOGGER.error(
+                    "Failed to check required rights for secure document[{}] in document update",
+                    secureDocumentReference, e);
+                return false;
+            }
+        });
     }
 
     public void setContent(String content)
@@ -2720,14 +2802,64 @@ public class Document extends Api
             doc.getAuthors().setCreator(currentUserReference);
         }
 
+        XWikiContext xWikiContext = getXWikiContext();
         if (checkSaving) {
+            DocumentReference author = doc.getAuthorReference();
+
+            XWikiDocument secureDocument = xWikiContext.getSecureDocument();
+            if (secureDocument != null) {
+                checkRequiredRightsForSaving(secureDocument, doc, author);
+            }
+
             // Make sure the user is allowed to make this modification
-            getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
-                getXWikiContext());
+            xWikiContext.getWiki().checkSavingDocument(author, doc, comment, minorEdit,
+                xWikiContext);
         }
 
-        getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
+        xWikiContext.getWiki().saveDocument(doc, comment, minorEdit, xWikiContext);
         this.initialDoc = this.doc;
+    }
+
+    private void checkRequiredRightsForSaving(XWikiDocument secureDocument, XWikiDocument doc, DocumentReference author)
+        throws XWikiException
+    {
+        DocumentRequiredRights documentRequiredRights;
+        try {
+            documentRequiredRights =
+                getDocumentRequiredRightsManager().getRequiredRights(secureDocument.getDocumentReference())
+                    .orElse(DocumentRequiredRights.EMPTY);
+        } catch (AuthorizationException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "The required rights for document [%s] couldn't be loaded"
+                    .formatted(secureDocument.getDocumentReference()), e);
+        }
+
+        try {
+            // No programming right? Enforce required rights!
+            if (documentRequiredRights.enforce()
+                && !getDocumentAuthorizationManager().hasRequiredRight(
+                Right.PROGRAM, null, secureDocument.getDocumentReference()))
+            {
+                if (!doc.isEnforceRequiredRights()) {
+                    doc.setEnforceRequiredRights(true);
+                }
+
+                DocumentRequiredRightsReader rightsReader =
+                    Utils.getComponent(DocumentRequiredRightsReader.class);
+                DocumentRequiredRights newRequiredRights = rightsReader.readRequiredRights(doc);
+
+                for (DocumentRequiredRight requiredRight : newRequiredRights.rights()) {
+                    getDocumentAuthorizationManager()
+                        .checkAccess(requiredRight.right(), requiredRight.scope(), author,
+                            doc.getDocumentReference());
+                }
+            }
+        } catch (AuthorizationException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                ("The document cannot be saved because rights on the secure document [%s] are restricted using "
+                    + "required rights and the document to save [%s] has more rights than the secure document.")
+                    .formatted(secureDocument.getDocumentReference(), doc.getDocumentReference()), e);
+        }
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
@@ -3261,6 +3393,44 @@ public class Document extends Api
     public void setHidden(boolean hidden)
     {
         this.doc.setHidden(hidden);
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public boolean isEnforceRequiredRights()
+    {
+        return this.doc.isEnforceRequiredRights();
+    }
+
+    /**
+     * @return the required rights that have been set on this document
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public DocumentRequiredRights getRequiredRights()
+    {
+        return Utils.getComponent(DocumentRequiredRightsReader.class).readRequiredRights(this.doc);
+    }
+
+    /**
+     * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
+     * more rights than defined in the object
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(boolean enforceRequiredRights)
+    {
+        getDoc().setEnforceRequiredRights(enforceRequiredRights);
+
+        updateAuthor();
+
+        updateContentAuthor();
     }
 
     /**

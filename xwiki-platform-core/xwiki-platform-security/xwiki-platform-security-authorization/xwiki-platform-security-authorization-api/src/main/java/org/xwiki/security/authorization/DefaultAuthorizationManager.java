@@ -38,6 +38,7 @@ import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
+import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
 import org.xwiki.security.internal.XWikiBridge;
 
 /**
@@ -78,6 +79,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
     /** XWiki bridge to check for read only wiki. */
     @Inject
     private XWikiBridge xwikiBridge;
+
+    @Inject
+    private DocumentRequiredRightsChecker documentRequiredRightsChecker;
 
     /**
      * Check if the user is the super admin.
@@ -148,9 +152,7 @@ public class DefaultAuthorizationManager implements AuthorizationManager
         }
 
         if (right == null || right == Right.ILLEGAL) {
-            if (check) {
-                logDeny(userReference, entityReference, right, "no such right");
-            }
+            logDenyIfCheck(right, userReference, entityReference, check, "no such right");
             return false;
         }
 
@@ -159,7 +161,24 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return false;
         }
 
+        // For edit right, check if the user has all required rights.
+        if (right == Right.EDIT && !this.documentRequiredRightsChecker.hasRequiredRights(userReference,
+            entityReference))
+        {
+            logDenyIfCheck(right, userReference, entityReference, check, "misses required right");
+
+            return false;
+        }
+
         return evaluateSecurityAccess(right, userReference, entityReference, check);
+    }
+
+    private void logDenyIfCheck(Right right, DocumentReference userReference, EntityReference entityReference,
+        boolean check, String info)
+    {
+        if (check) {
+            logDeny(userReference, entityReference, right, info);
+        }
     }
 
     private boolean evaluateSecurityAccess(Right right, DocumentReference userReference,

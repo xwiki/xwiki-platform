@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +57,10 @@ import org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoade
 import org.xwiki.security.authorization.cache.internal.TestCache;
 import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.authorization.internal.DefaultAuthorizationSettler;
+import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRights;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.security.authorization.testwikis.SecureTestEntity;
 import org.xwiki.security.authorization.testwikis.TestAccessRule;
 import org.xwiki.security.authorization.testwikis.TestDefinition;
@@ -112,7 +118,7 @@ import static org.xwiki.security.authorization.Right.values;
     DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class,
     AuthorizationManagerConfiguration.class, DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
     DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class, DefaultSymbolScheme.class,
-    EntityReferenceFactory.class})
+    EntityReferenceFactory.class, DocumentRequiredRightsChecker.class })
 class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTestCase
 {
     @InjectMockComponents
@@ -136,6 +142,9 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     /** Mocked securityCacheRulesInvalidator */
     @MockComponent
     private SecurityCacheRulesInvalidator securityCacheRulesInvalidator;
+
+    @MockComponent
+    private DocumentRequiredRightsManager documentRequiredRightsManager;
 
     /** Mocked cache */
     private TestCache<Object> cache;
@@ -399,6 +408,23 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
                             && other.getRules().size() == mockedRules.size();
                     }
                 };
+            }
+        });
+
+        when(this.documentRequiredRightsManager.getRequiredRights(any())).then(invocation -> {
+            DocumentReference documentReference = invocation.getArgument(0);
+
+            TestEntity testEntity = testDefinition.searchEntity(documentReference);
+
+            if (testEntity instanceof TestDocument testDocument) {
+                return Optional.of(new DocumentRequiredRights(testDocument.isEnforceRequiredRights(),
+                    testDocument.getRequiredRights().stream()
+                        // TODO: adjust the scope of the required right?
+                        .map(testRequiredRight -> new DocumentRequiredRight(testRequiredRight.getRight(),
+                            testRequiredRight.getScope()))
+                        .collect(Collectors.toUnmodifiableSet())));
+            } else {
+                return Optional.empty();
             }
         });
 

@@ -69,9 +69,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -107,15 +107,16 @@ class IncludeMacroTest
 
     private final static DocumentReference INCLUDED_AUTHOR = new DocumentReference("wiki", "XWiki", "included");
 
+    private static final DocumentReference INCLUDED_PAGE = new DocumentReference("wiki", "Space", "IncludedPage");
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
     @MockComponent
     private DocumentAccessBridge dab;
 
-    // Make sure to not load the standard AuthorizationManager which trigger too many things
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -189,7 +190,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR, INCLUDED_PAGE)).thenReturn(true);
 
         List<Block> blocks = runIncludeMacro(Context.CURRENT, "word", false);
 
@@ -329,7 +330,7 @@ class IncludeMacroTest
             + "endDocument";
         // @formatter:on
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR, INCLUDED_PAGE)).thenReturn(true);
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
         List<Block> blocks = runIncludeMacroWithPreVelocity(Context.CURRENT, "#macro(testmacro)#end",
@@ -656,7 +657,8 @@ class IncludeMacroTest
         when(this.dab.getCurrentDocumentReference())
             .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR,
+            new DocumentReference("wiki", "space", "document"))).thenReturn(true);
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
@@ -827,7 +829,8 @@ class IncludeMacroTest
             verify(this.dab).popDocumentFromContext(any(Map.class));
         } else {
             if (parameters.getAuthor() == Author.CURRENT || (parameters.getAuthor() == Author.AUTO
-                && this.authorizationManager.hasAccess(Right.PROGRAM, INCLUDED_AUTHOR, null))) {
+                && this.authorizationManager.hasAccess(Right.PROGRAM, null, INCLUDED_AUTHOR, includedDocumentReference)))
+            {
                 verifyNoInteractions(this.authorExecutor);
             } else {
                 DocumentReference includedReference = this.includedDocument.getDocumentReference();

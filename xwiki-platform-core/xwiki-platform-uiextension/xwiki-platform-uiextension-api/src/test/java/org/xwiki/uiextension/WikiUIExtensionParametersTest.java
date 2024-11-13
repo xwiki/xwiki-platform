@@ -31,11 +31,12 @@ import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.logging.LoggerConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
@@ -95,7 +96,7 @@ class WikiUIExtensionParametersTest
     private AuthorExecutor authorExecutor;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @RegisterExtension
     private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
@@ -118,7 +119,8 @@ class WikiUIExtensionParametersTest
             return callable.call();
         });
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(true);
 
         when(this.modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
     }
@@ -254,7 +256,8 @@ class WikiUIExtensionParametersTest
     @Test
     void getParametersWithoutScriptRight() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, DOCUMENT_REFERENCE)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE,
+            DOCUMENT_REFERENCE)).thenReturn(false);
         BaseObject mockUIX = constructMockUIXObject("key=value");
         WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(mockUIX, this.componentManager);
 

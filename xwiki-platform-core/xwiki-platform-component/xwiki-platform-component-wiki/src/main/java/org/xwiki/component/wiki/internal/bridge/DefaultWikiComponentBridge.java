@@ -41,7 +41,7 @@ import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -75,7 +75,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     private ContentParser renderingBridge;
 
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAuthorizationManager authorization;
 
     @Override
     public Syntax getSyntax(DocumentReference reference) throws WikiComponentException
@@ -201,7 +201,8 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     {
         XWikiDocument document = getDocument(reference);
 
-        return this.authorization.hasAccess(Right.PROGRAM, document.getAuthorReference(), null);
+        return this.authorization.hasAccess(Right.PROGRAM, null, document.getAuthorReference(),
+            document.getDocumentReference());
     }
 
     /**

@@ -27,6 +27,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRight;
 import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -121,6 +122,16 @@ public class RequiredRight implements Serializable
     public boolean isManualReviewNeeded()
     {
         return this.manualReviewNeeded;
+    }
+
+    /**
+     * @return the document required right equivalent of this required right
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public DocumentRequiredRight toDocumentRequiredRight()
+    {
+        return new DocumentRequiredRight(this.right, this.entityType);
     }
 
     @Override

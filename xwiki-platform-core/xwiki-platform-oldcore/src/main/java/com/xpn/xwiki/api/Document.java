@@ -3399,7 +3399,7 @@ public class Document extends Api
      * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
      * enforced, meaning that editing will be limited to users with these rights and content of this document can't
      * use more rights than defined in the object, {@code false} otherwise
-     * @since 16.6.0RC1
+     * @since 16.10.0RC1
      */
     @Unstable
     public boolean isEnforceRequiredRights()
@@ -3408,10 +3408,20 @@ public class Document extends Api
     }
 
     /**
+     * @return the required rights that have been set on this document
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public DocumentRequiredRights getRequiredRights()
+    {
+        return Utils.getComponent(DocumentRequiredRightsReader.class).readRequiredRights(this.doc);
+    }
+
+    /**
      * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
      * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
      * more rights than defined in the object
-     * @since 16.6.0RC1
+     * @since 16.10.0RC1
      */
     @Unstable
     public void setEnforceRequiredRights(boolean enforceRequiredRights)

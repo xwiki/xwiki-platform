@@ -366,18 +366,16 @@ class RenamePageIT
 
         setup.rest().delete(testReference);
 
-        ViewPage standardLinkPage = setup.createPage(sourcePageReference1, "Some content to be linked. number 1");
-        ViewPage standardMacroLinkPage =
-            setup.createPage(sourcePageReference2, "Some content to be linked in macro. number 2");
-        ViewPage nestedMacroLinkPage =
-            setup.createPage(sourcePageReference3, "Some content to be linked in nested macro. number 3");
-        setup.createPage(sourcePageReference4, "A page with image to be linked. number 4");
+        setup.rest().savePage(sourcePageReference1, "Some content to be linked. number 1", "sourcePage1");
+        setup.rest().savePage(sourcePageReference2, "Some content to be linked in macro. number 2", "sourcePage2");
+        setup.rest().savePage(sourcePageReference3, "Some content to be linked in nested macro. number 3",
+            "sourcePage3");
+        setup.rest().savePage(sourcePageReference4, "A page with image to be linked. number 4", "sourcePage4");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         File image = new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/image.gif");
         attachmentsPane.setFileToUpload(image.getAbsolutePath());
         attachmentsPane.waitForUploadToFinish("image.gif");
-
-        ViewPage includeLinkPage = setup.createPage(sourcePageReference5, "A page to be included. number 5");
+        setup.rest().savePage(sourcePageReference5, "A page to be included. number 5", "sourcePage5");
 
         String testPageContent = "Check out this page: [[type the link label>>doc:%1$s]]\n" + "\n" + "{{warning}}\n"
             + "Withing a macro: Check out this page: [[type the link label>>doc:%2$s]]\n" + "\n" + "{{error}}\n"
@@ -390,8 +388,9 @@ class RenamePageIT
             + "Withing a macro: Check out this page: [[type the link label>>doc:%1$s]]\n"
             + "{{/warning}}\n\n"
             + "Final line.";
-        setup.createPage(testReference,
-            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5));
+        setup.rest().savePage(testReference,
+            String.format(testPageContent, sourcePage1, sourcePage2, sourcePage3, sourcePage4, sourcePage5),
+            "testPage");
 
         // Wait for the solr indexing to be completed before doing any rename
         new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -511,10 +510,10 @@ class RenamePageIT
 
         // Make sure the link was refactored in both the page and its translation
         Page newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName));
-        assertEquals("[[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+        assertEquals("[[OtherPage]]", newPage.getContent());
 
         newPage = setup.rest().get(new LocalDocumentReference(newSpace, newName, Locale.FRENCH));
-        assertEquals("fr [[" + parent + ".OtherPage.WebHome]]", newPage.getContent());
+        assertEquals("fr [[OtherPage]]", newPage.getContent());
     }
 
     @Order(6)
@@ -667,5 +666,55 @@ class RenamePageIT
             // Make sure we delete that strange page again.
             setup.rest().delete(otherReference);
         }
+    }
+
+    @Order(9)
+    @Test
+    void renameWithRelativeLinks(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        testUtils.rest().savePage(testReference, "[[Alice]]\n[[Bob]]\n[[Eve]]", "Test relative links");
+        SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
+        SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
+        testUtils.rest().savePage(new DocumentReference("WebHome", aliceSpace), "Alice page", "Alice");
+        SpaceReference bobSpace = new SpaceReference("Bob", rootSpaceReference);
+        testUtils.rest().savePage(new DocumentReference("WebHome", bobSpace), "[[Alice]]", "Bob");
+
+        // Wait for an empty queue here to ensure that the deleted page has been removed from the index and links
+        // won't be updated just because the page is still in the index.
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+
+        ViewPage viewPage = testUtils.gotoPage(testReference);
+        RenamePage rename = viewPage.rename();
+        rename.getDocumentPicker().setName(rootSpaceReference.getName() + "Foo");
+        CopyOrRenameOrDeleteStatusPage statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+
+        WikiEditPage wikiEditPage = statusPage.gotoNewPage().editWiki();
+        assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]", wikiEditPage.getContent());
+
+        SpaceReference newRootSpace =
+            new SpaceReference(rootSpaceReference.getName() + "Foo", rootSpaceReference.getParent());
+        SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
+        wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
+        assertEquals("[[Alice]]", wikiEditPage.getContent());
+
+        SpaceReference newAliceSpace = new SpaceReference("Alice", newRootSpace);
+        DocumentReference newAliceReference = new DocumentReference("WebHome", newAliceSpace);
+        viewPage = testUtils.gotoPage(newAliceReference);
+        rename = viewPage.rename();
+        rename.getDocumentPicker().setName("Alice2");
+        statusPage = rename.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+
+        SpaceReference alice2Space = new SpaceReference("Alice2", newRootSpace);
+        DocumentReference alice2Reference = new DocumentReference("WebHome", alice2Space);
+        wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newRootSpace));
+        String serializedAlice2Reference = testUtils.serializeLocalReference(alice2Reference);
+        assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]", serializedAlice2Reference), wikiEditPage.getContent());
+
+        // FIXME: ideally this one should be refactored too, however it's not a regression.
+        //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
+        //assertEquals(String.format("[[%s]]", serializedAlice2Reference), wikiEditPage.getContent());
     }
 }

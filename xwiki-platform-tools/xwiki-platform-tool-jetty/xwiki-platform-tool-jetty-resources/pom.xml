@@ -42,6 +42,7 @@
     -->
     <jetty.version>${jetty.server.version}</jetty.version>
     <slf4j.version>${jetty.server.slf4j.version}</slf4j.version>
+    <apache-el.version>${jetty.server.apache-el.version}</apache-el.version>
   </properties>
   <dependencies>
     <dependency>

@@ -79,6 +79,16 @@
     }
   }
 }
+// Authentication buttons ========================================================
+// Reduce the spacing between both items if there's both
+li:has(#tmLogin) + li #tmRegister {
+  padding-right: 8px;
+}
+li:has(+ li #tmRegister) #tmLogin {
+  padding-left: 8px;
+}
+
+// Quick search ========================================================
 
 #globalsearch {
   display: flex;

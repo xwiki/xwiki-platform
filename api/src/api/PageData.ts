@@ -31,7 +31,7 @@ export interface PageData {
   document: Document;
   css: Array<string>;
   js: Array<string>;
-  version: string;
+  version: string | undefined;
 
   // TODO: remove any
   toObject(): any; // eslint-disable-line

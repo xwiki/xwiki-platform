@@ -84,13 +84,14 @@ export interface CristalApp {
    * Return the requested page
    * @param page - a page identifier (e.g., a document reference for the XWiki
    *  backend, or a filename for the filesystem backend)
+   * @param revision - the revision requested, undefined will default to latest
    * @returns the page data, or undefined if the page is not found
    *
    * @since 0.7
    */
   getPage(
     page: string,
-    options?: { requeue: boolean },
+    options?: { requeue?: boolean; revision?: string },
   ): Promise<PageData | undefined>;
 
   getLogger(module: string): Logger;

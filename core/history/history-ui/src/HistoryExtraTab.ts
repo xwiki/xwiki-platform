@@ -18,25 +18,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { WikiConfig } from "@xwiki/cristal-api";
+import messages from "./translations";
+import HistoryTab from "./vue/HistoryTab.vue";
+import { AbstractExtraTab } from "@xwiki/cristal-extra-tabs-api";
+import { inject, injectable } from "inversify";
+import { Component } from "vue";
+import type { PageRevisionManagerProvider } from "@xwiki/cristal-history-api";
 
-/**
- * Returns URL to XWiki spaces rest API for a given document.
- *
- * @param wikiConfig - the current wiki configuration
- * @param documentId - the id of the document
- * @returns the crafted URL
- * @since 0.9
- */
-export function getRestSpacesApiUrl(
-  wikiConfig: WikiConfig,
-  documentId: string,
-): string {
-  return `${wikiConfig.baseURL}/rest/wikis/xwiki/spaces/${encodeURIComponent(
-    documentId,
-  )
-    .replace(/((?:%5C%5C)*)%5C\./g, "$1%2E") // Unescape dots in identifiers
-    .replace(/%5C%5C/g, "%5C") // Unescape backslashes in identifiers
-    .replace(/\.(?=.*\.)/g, "/spaces/") // Transform separators to spaces endpoints
-    .replace(/\./, "/pages/")}`; // Transform last separator to pages endpoint
+@injectable()
+export class HistoryExtraTab extends AbstractExtraTab {
+  title: string;
+
+  constructor(
+    @inject("PageRevisionManagerProvider")
+    private readonly pageRevisionManagerProvider: PageRevisionManagerProvider,
+  ) {
+    super(messages);
+    this.title = this.t("history.extraTabs.title");
+  }
+
+  order = 3000;
+  id = "history";
+
+  async panel(): Promise<Component> {
+    return HistoryTab;
+  }
+
+  override async enabled(): Promise<boolean> {
+    return this.pageRevisionManagerProvider.has();
+  }
 }

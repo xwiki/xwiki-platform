@@ -21,6 +21,7 @@
 import { expect, test } from "@playwright/test";
 import { DesignSystem } from "./DesignSystem";
 import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
+import { HistoryExtraTabPageObject } from "./pageObjects/HistoryExtraTab";
 import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
 
 test.afterEach(async ({ page }, testInfo) => {
@@ -142,6 +143,35 @@ configs.forEach(
       expect(await children[0].getLink()).toEqual(
         "#/Deep1.Deep2/view",
       )
+    });
+
+    test(`[${name}] has working history`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const revisions = await new HistoryExtraTabPageObject(
+        page,
+        designSystem,
+      ).findRevisions();
+      expect(revisions.length == 3);
+      expect(await revisions[0].getVersion()).toEqual("3.1");
+      expect(await revisions[1].getVersion()).toEqual("2.1");
+      expect(await revisions[2].getVersion()).toEqual("1.1");
+      expect(await revisions[0].getDate()).toEqual("1/1/24, 9:00 PM");
+      expect(await revisions[1].getDate()).toEqual("1/1/22, 9:00 PM");
+      expect(await revisions[2].getDate()).toEqual("1/1/20, 9:00 PM");
+      expect(await revisions[0].getUser()).toEqual("XWiki.User3");
+      expect(await revisions[1].getUser()).toEqual("XWiki.User2");
+      expect(await revisions[2].getUser()).toEqual("XWiki.User1");
+      expect(await revisions[0].getComment()).toEqual("Best version");
+      expect(await revisions[1].getComment()).toEqual("");
+      expect(await revisions[2].getComment()).toEqual("Initial version");
+
+      // We open a revision and check that the content updated.
+      await (await revisions[1].getLink()).click();
+      await expect(page.locator("#xwikicontent")).toContainText(
+        "Revision 2.1",
+      );
+
     });
 
     if (offlineDefaultPage) {

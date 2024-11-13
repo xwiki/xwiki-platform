@@ -23,7 +23,7 @@ import type { AlertProps } from "@xwiki/cristal-dsapi";
 defineProps<AlertProps>();
 </script>
 <template>
-  <v-alert closable :title="title" :type="type" :text="description">
+  <v-alert :closable="closable" :title="title" :type="type" :text="description">
     <x-btn
       v-for="action of actions"
       :key="action.name"
@@ -32,5 +32,6 @@ defineProps<AlertProps>();
       @click="action.callback"
       >{{ action.name }}</x-btn
     >
+    <slot />
   </v-alert>
 </template>

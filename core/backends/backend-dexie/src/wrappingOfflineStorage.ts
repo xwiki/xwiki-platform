@@ -86,6 +86,7 @@ export class WrappingOfflineStorage implements WrappingStorage {
   public async getPageContent(
     page: string,
     syntax: string,
+    _revision?: string,
     requeue?: boolean,
   ): Promise<PageData | undefined> {
     this.logger.debug("Trying to get data for page ", page);

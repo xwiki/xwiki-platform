@@ -33,10 +33,13 @@ export class GitHubStorage extends AbstractStorage {
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getPageRestURL(page: string, syntax: string): string {
+  getPageRestURL(page: string, _syntax: string, revision?: string): string {
     this.logger?.debug("GitHub Loading page", page);
-    return this.wikiConfig.baseRestURL + page;
+    let baseRestURL = this.wikiConfig.baseRestURL;
+    if (revision) {
+      baseRestURL = baseRestURL.replace(/\/[^/]*\/$/, `/${revision}/`);
+    }
+    return baseRestURL + page;
   }
 
   getPageFromViewURL(url: string): string | null {
@@ -68,9 +71,13 @@ export class GitHubStorage extends AbstractStorage {
     return "" + hash;
   };
 
-  async getPageContent(page: string, syntax: string): Promise<PageData> {
+  async getPageContent(
+    page: string,
+    syntax: string,
+    revision?: string,
+  ): Promise<PageData> {
     this.logger?.debug("GitHub Loading page", page);
-    const url = this.getPageRestURL(page, syntax);
+    const url = this.getPageRestURL(page, syntax, revision);
     const response = await fetch(url, { cache: "no-store" });
     const text = await response.text();
     let content = "";

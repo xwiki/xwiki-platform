@@ -57,6 +57,8 @@ const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
 const currentPage: Ref<PageData | undefined> =
   documentService.getCurrentDocument();
+const currentPageRevision: Ref<string | undefined> =
+  documentService.getCurrentDocumentRevision();
 const currentPageName: ComputedRef<string> = computed(() => {
   // TODO: define a proper abstraction.
   return (
@@ -172,12 +174,19 @@ onUpdated(() => {
             </suspense>
             <div class="doc-page-actions">
               <router-link
-                :to="{
-                  name: 'edit',
-                  params: { page: currentPageName },
-                }"
+                :to="
+                  currentPageRevision
+                    ? ''
+                    : {
+                        name: 'edit',
+                        params: { page: currentPageName },
+                      }
+                "
               >
-                <x-btn size="small">
+                <x-btn
+                  size="small"
+                  :disabled="currentPageRevision !== undefined"
+                >
                   <c-icon name="pencil" :size="Size.Small"></c-icon>
                   Edit
                 </x-btn>
@@ -185,9 +194,25 @@ onUpdated(() => {
               <page-actions
                 :current-page="currentPage"
                 :current-page-name="currentPageName"
+                :disabled="currentPageRevision !== undefined"
               ></page-actions>
             </div>
           </div>
+        </div>
+        <div class="doc-header-alerts">
+          <!-- Indicate that the page displayed is not the current version. -->
+          <x-alert v-if="currentPageRevision !== undefined" type="warning">
+            {{
+              t("history.alert.content", {
+                revision: currentPageRevision,
+                pageName: currentPageName,
+              })
+            }}
+            <router-link
+              :to="{ name: 'view', params: { page: currentPageName } }"
+              >{{ t("history.alert.link.label") }}</router-link
+            >
+          </x-alert>
         </div>
       </div>
     </div>
@@ -318,6 +343,10 @@ onUpdated(() => {
   top: 0;
   background: white;
   z-index: 1;
+}
+
+.doc-header-alerts:not(:empty) {
+  margin-top: var(--cr-spacing-x-small);
 }
 
 .doc-title {

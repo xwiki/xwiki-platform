@@ -30,6 +30,7 @@ import type {
 defineProps<{
   currentPage: PageData | undefined;
   currentPageName: string;
+  disabled: boolean;
 }>();
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -39,9 +40,9 @@ const actionCategoryService: PageActionCategoryService = cristal
 const actionCategories: PageActionCategory[] = actionCategoryService.list();
 </script>
 <template>
-  <x-menu>
+  <x-menu :disabled="disabled">
     <template #activator="{}">
-      <x-btn size="small">
+      <x-btn size="small" :disabled="disabled">
         <c-icon name="three-dots-vertical" :size="Size.Small"></c-icon>
       </x-btn>
     </template>

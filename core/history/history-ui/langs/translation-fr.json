@@ -1,0 +1,6 @@
+{
+  "history.extraTabs.title": "Historique",
+  "history.extraTabs.loading": "Chargement en cours ...",
+  "history.extraTabs.header": "Ce document a {nRevisions} versions stockées.",
+  "history.extraTabs.entry": "{date} par {user}"
+}

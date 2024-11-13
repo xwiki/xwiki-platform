@@ -1,5 +1,7 @@
 {
     "third": "Troisième",
     "page.actions.create.label": "Créer un nouveau document",
-    "information.extraTabs.title": ""
+    "information.extraTabs.title": "",
+    "history.alert.content": "Vous consultez actuellement la version {revision} de {pageName}. L'édition est désactivée.",
+    "history.alert.link.label": "Ciquez ici pour retourner à la dernière version."
 }

@@ -49,6 +49,12 @@ interface ExtraTab {
    * it.
    */
   panel(): Promise<Component>;
+
+  /**
+   * Compute whether the ExtraTab should be displayed or not.
+   * @since 0.12
+   */
+  enabled(): Promise<boolean>;
 }
 
 /**
@@ -85,6 +91,10 @@ abstract class AbstractExtraTab implements ExtraTab {
   abstract title: string;
 
   abstract panel(): Promise<Component>;
+
+  async enabled(): Promise<boolean> {
+    return true;
+  }
 }
 
 export { AbstractExtraTab, type ExtraTab, type ExtraTabsService };

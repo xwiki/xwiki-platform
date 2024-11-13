@@ -33,12 +33,17 @@ app.get("/", (_req, res) => {
 
 let offlineCount = 0;
 
-function getHtml(page: string, options: { offline: boolean }) {
+function getHtml(
+  page: string,
+  revision: string | undefined,
+  options: { offline: boolean },
+) {
   let html = `<h1>Welcome to ${page}!</h1>
 
 XWiki is the best tool to organize your knowledge.
 
 <a href="Page2.WebHome">XWiki Syntax</a>
+${revision ? "Revision " + revision : ""}
 `;
 
   if (options.offline) {
@@ -52,6 +57,8 @@ XWiki is the best tool to organize your knowledge.
 
 app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
   const page: string = (req.query.page as string) || "Main.WebHome";
+  const revision: string | undefined =
+    (req.query.revision as string) || undefined;
   const offline = page === "Main.Offline";
   res.appendHeader("Access-Control-Allow-Origin", "*");
 
@@ -60,8 +67,9 @@ app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
 XWiki is the best tool to organize your knowledge.
 
 [[XWiki Syntax>>Page2.WebHome]]
-`;
-  const html = getHtml(page, {
+${revision ? "Revision " + revision : ""}
+}`;
+  const html = getHtml(page, revision, {
     offline,
   });
   res.json({
@@ -116,6 +124,36 @@ app.get(
           },
         ],
       },
+    });
+  },
+);
+
+app.get(
+  "/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome/history",
+  (_req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
+
+    res.json({
+      historySummaries: [
+        {
+          version: "3.1",
+          modified: 1704139200000,
+          modifier: "XWiki.User3",
+          comment: "Best version",
+        },
+        {
+          version: "2.1",
+          modified: 1641067200000,
+          modifier: "XWiki.User2",
+          comment: "",
+        },
+        {
+          version: "1.1",
+          modified: 1577908800000,
+          modifier: "XWiki.User1",
+          comment: "Initial version",
+        },
+      ],
     });
   },
 );

@@ -77,6 +77,7 @@ type AlertProps = {
   type: "success" | "warning" | "error" | "info";
   description: string;
   actions?: [{ name: string; callback: () => void }];
+  closable?: boolean;
 };
 
 export type {

@@ -26,6 +26,7 @@ import {
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
+import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
 import { inject, injectable } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
@@ -73,16 +74,18 @@ export class XWikiStorage extends AbstractStorage {
     return true;
   }
 
-  getPageRestURL(page: string, syntax: string): string {
+  getPageRestURL(page: string, syntax: string, revision?: string): string {
     this.logger?.debug("XWiki Loading page", page);
-    return (
-      this.wikiConfig.baseURL +
-      this.wikiConfig.baseRestURL +
-      "&page=" +
-      encodeURIComponent(page) +
-      "&format=" +
-      syntax
-    );
+    const url = new URL(this.wikiConfig.baseURL + this.wikiConfig.baseRestURL);
+    const searchParams = new URLSearchParams([
+      ["page", page],
+      ["format", syntax],
+    ]);
+    if (revision) {
+      searchParams.append("revision", revision);
+    }
+    url.search = searchParams.toString();
+    return url.toString();
   }
 
   getPageFromViewURL(url: string): string | null {
@@ -119,12 +122,16 @@ export class XWikiStorage extends AbstractStorage {
     return imageURL;
   }
 
-  async getPageContent(page: string, syntax: string): Promise<PageData> {
+  async getPageContent(
+    page: string,
+    syntax: string,
+    revision?: string,
+  ): Promise<PageData> {
     this.logger?.debug("XWiki Loading page", page);
     if (page == "") {
       page = "Main.WebHome";
     }
-    const url = this.getPageRestURL(page, syntax);
+    const url = this.getPageRestURL(page, syntax, revision);
     this.logger?.debug("XWiki Loading url", url);
     const response = await fetch(url, { cache: "no-store" });
     const json = await response.json();
@@ -326,10 +333,6 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   private buildAttachmentsURL(page: string) {
-    const strings = page.split(".");
-    const lastIndex = strings.length - 1;
-    const spaces = strings.splice(0, lastIndex).join("/spaces/");
-    const pageName = strings[lastIndex] || "WebHome";
-    return `${this.wikiConfig.baseURL}/rest/wikis/xwiki/spaces/${spaces}/pages/${pageName}/attachments`;
+    return `${getRestSpacesApiUrl(this.wikiConfig, page)}/attachments`;
   }
 }

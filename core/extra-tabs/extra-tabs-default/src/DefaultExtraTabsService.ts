@@ -34,7 +34,13 @@ class DefaultExtraTabsService implements ExtraTabsService {
    * Returns the list of tabs sorted by ascending order
    */
   async list(): Promise<ExtraTab[]> {
-    return sortBy(this.extraTabs, ["order"]);
+    const enabledTabs: boolean[] = await Promise.all(
+      this.extraTabs.map(async (tab) => tab.enabled()),
+    );
+    return sortBy(
+      this.extraTabs.filter((_, i) => enabledTabs[i]),
+      ["order"],
+    );
   }
 }
 

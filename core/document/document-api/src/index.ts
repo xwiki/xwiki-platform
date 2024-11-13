@@ -33,6 +33,12 @@ interface DocumentService {
   getCurrentDocument(): Ref<PageData | undefined>;
 
   /**
+   * @returns the revision of the current document, or undefined if it's the last one
+   * @since 0.12
+   */
+  getCurrentDocumentRevision(): Ref<string | undefined>;
+
+  /**
    * @returns a ref to the loading state. true when the page is loading, false otherwise
    */
   isLoading(): Ref<boolean>;
@@ -45,8 +51,9 @@ interface DocumentService {
   /**
    * Update the reference of the latest document.
    * @param documentReference - the current document reference
+   * @param revision - the revision of the document, undefined for latest
    */
-  setCurrentDocument(documentReference: string): void;
+  setCurrentDocument(documentReference: string, revision?: string): void;
 
   /**
    * Force reloading the content of the document without changing the current document reference

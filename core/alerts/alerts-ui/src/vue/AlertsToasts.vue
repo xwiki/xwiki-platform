@@ -18,9 +18,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { inject, type Ref } from "vue";
-import type { CristalApp } from "@xwiki/cristal-api";
+import { inject } from "vue";
 import type { Alert, AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { Ref } from "vue";
 
 const cristal = inject<CristalApp>("cristal")!;
 const alertsService = cristal
@@ -35,6 +36,7 @@ const alerts: Ref<Alert[]> = alertsService.list();
     <XAlert
       v-for="alert of alerts"
       :key="alert.id"
+      closable
       :type="alert.type"
       :description="alert.message"
       :actions="alert.actions"

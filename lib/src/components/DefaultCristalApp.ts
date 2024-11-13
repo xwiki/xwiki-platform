@@ -123,9 +123,10 @@ export class DefaultCristalApp implements CristalApp {
     });
   }
 
-  handlePopState(name: string): void {
+  handlePopState(name: string, revision?: string): void {
     this.logger?.debug("In handlePopState ", name);
     this.page.name = name || this.getWikiConfig().defaultPageName();
+    this.page.version = revision;
     this.page.source = "";
     this.page.html = "";
     this.loadPage();
@@ -235,11 +236,12 @@ export class DefaultCristalApp implements CristalApp {
       this.logger?.debug("Loading page", this.page.name);
       const documentService =
         this.getContainer().get<DocumentService>(documentServiceName);
-      documentService.setCurrentDocument(this.page.name);
+      documentService.setCurrentDocument(this.page.name, this.page.version);
       if (this.getWikiConfig().isSupported("jsonld")) {
         const pageData = await this.getWikiConfig().storage.getPageContent(
           this.page.name,
           "jsonld",
+          this.page.version,
           options?.requeue,
         );
 
@@ -279,6 +281,7 @@ export class DefaultCristalApp implements CristalApp {
         const pageData = await this.getWikiConfig().storage.getPageContent(
           this.page.name,
           "html",
+          this.page.version,
         );
         if (!pageData) {
           this.logger.error(
@@ -400,7 +403,7 @@ export class DefaultCristalApp implements CristalApp {
         component: this.skinManager.getTemplate("content"),
       } as RouteRecordRaw,
       {
-        path: "/:page/view",
+        path: "/:page/view/:revision?",
         name: "view",
         component: this.skinManager.getTemplate("content"),
       } as RouteRecordRaw,
@@ -487,7 +490,10 @@ export class DefaultCristalApp implements CristalApp {
     this.app.mount("#xwCristalApp");
 
     this.router.beforeEach((to) => {
-      this.handlePopState(to.params.page as string);
+      this.handlePopState(
+        to.params.page as string,
+        to.params.revision as string,
+      );
     });
 
     this.logger?.debug("After vue");
@@ -551,13 +557,14 @@ export class DefaultCristalApp implements CristalApp {
 
   async getPage(
     page: string,
-    options?: { requeue: boolean },
+    options?: { requeue?: boolean; revision?: string },
   ): Promise<PageData | undefined> {
     const isJsonLD = this.getWikiConfig().isSupported("jsonld");
     const syntax = isJsonLD ? "jsonld" : "html";
     const pageData = await this.getWikiConfig().storage.getPageContent(
       page,
       syntax,
+      options?.revision,
       options?.requeue,
     );
     if (isJsonLD && pageData) {

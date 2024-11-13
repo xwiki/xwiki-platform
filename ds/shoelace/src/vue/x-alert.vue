@@ -56,7 +56,7 @@ open.value = true;
 
 <template>
   <sl-alert
-    closable
+    :closable="closable"
     :variant="variant.variant"
     :open="open"
     @sl-show="open = true"
@@ -74,5 +74,6 @@ open.value = true;
       @click="action.callback"
       >{{ action.name }}</x-btn
     >
+    <slot />
   </sl-alert>
 </template>

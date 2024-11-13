@@ -18,26 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { getRestSpacesApiUrl } from "../utils";
-import { describe, expect, it } from "vitest";
-import type { WikiConfig } from "@xwiki/cristal-api";
+import en from "../langs/translation-en.json";
+import fr from "../langs/translation-fr.json";
 
-describe("getRestSpacesApiUrl", () => {
-  const wikiConfig: WikiConfig = {
-    baseURL: "<baseURL>",
-  } as WikiConfig;
-  it("regular identifier", () => {
-    expect(
-      getRestSpacesApiUrl(wikiConfig, "Space1.Space2.WebHome"),
-    ).toStrictEqual(
-      "<baseURL>/rest/wikis/xwiki/spaces/Space1/spaces/Space2/pages/WebHome",
-    );
-  });
-  it("identifier with special characters", () => {
-    expect(
-      getRestSpacesApiUrl(wikiConfig, "Space1\\\\\\.Space\\\\2.Web/Home"),
-    ).toStrictEqual(
-      "<baseURL>/rest/wikis/xwiki/spaces/Space1%5C%2ESpace%5C2/pages/Web%2FHome",
-    );
-  });
-});
+const translations: Record<string, Record<string, string>> = {
+  en,
+  fr,
+};
+export default translations;

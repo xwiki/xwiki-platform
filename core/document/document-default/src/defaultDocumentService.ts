@@ -7,7 +7,9 @@ import type { DocumentService } from "@xwiki/cristal-document-api";
 type Id = "document";
 type State = {
   lastDocumentReference: string | undefined;
+  lastRevision: string | undefined;
   document: PageData | undefined;
+  revision: string | undefined;
   loading: boolean;
   error: Error | undefined;
 };
@@ -27,10 +29,15 @@ type Actions = {
 
   /**
    * Update the page data for the provided document reference
-   * @param documentReference - the reference o the document to update
+   * @param documentReference - the reference of the document to update
    * @param requeue - true in case of offline refresh required
+   * @param revision - the revision of the document, undefined for latest
    */
-  update(documentReference: string, requeue: boolean): Promise<void>;
+  update(
+    documentReference: string,
+    requeue: boolean,
+    revision?: string,
+  ): Promise<void>;
 };
 type DocumentStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
 type DocumentStore = Store<Id, State, Getters, Actions>;
@@ -40,7 +47,9 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
     state() {
       return {
         lastDocumentReference: undefined,
+        lastRevision: undefined,
         document: undefined,
+        revision: undefined,
         loading: false,
         error: undefined,
       };
@@ -51,23 +60,31 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
       setLoading() {
         this.loading = true;
       },
-      async update(documentReference: string, requeue: boolean) {
+      async update(
+        documentReference: string,
+        requeue: boolean,
+        revision?: string,
+      ) {
         this.lastDocumentReference = documentReference;
         this.setLoading();
         try {
           const doc = await cristal.getPage(documentReference, {
             requeue,
+            revision,
           });
           // Only store the result if the current document reference is equal to
           // the most recently requested one.
           if (this.lastDocumentReference === documentReference) {
             this.document = doc;
+            // We clean up the revision before storing if it was empty.
+            this.revision = revision === "" ? undefined : revision;
             this.error = undefined;
             this.loading = false;
           }
         } catch (e) {
           if (this.lastDocumentReference === documentReference) {
             this.document = undefined;
+            this.revision = undefined;
             this.loading = false;
             if (e instanceof Error) {
               this.error = e;
@@ -93,6 +110,10 @@ export class DefaultDocumentService implements DocumentService {
     return this.refs.document;
   }
 
+  getCurrentDocumentRevision(): Ref<string | undefined> {
+    return this.refs.revision;
+  }
+
   isLoading(): Ref<boolean> {
     return this.refs.loading;
   }
@@ -101,16 +122,16 @@ export class DefaultDocumentService implements DocumentService {
     return this.refs.error;
   }
 
-  setCurrentDocument(documentReference: string): void {
+  setCurrentDocument(documentReference: string, revision?: string): void {
     // this.store.setLoading();
-    this.store.update(documentReference, true);
+    this.store.update(documentReference, true, revision);
   }
 
   refreshCurrentDocument(): void {
     const documentReference = this.store.lastDocumentReference;
     if (documentReference) {
       // this.store.setLoading();
-      this.store.update(documentReference, false);
+      this.store.update(documentReference, false, this.store.lastRevision);
     }
   }
 }

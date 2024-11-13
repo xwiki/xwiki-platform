@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import "reflect-metadata";
 import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
 import Template from "../vue/c-template.vue";
 import { injectable } from "inversify";
 import type { VueTemplateProvider } from "../api/vueTemplateProvider";
 import type { Container } from "inversify";
 import type { Component } from "vue";
-import "reflect-metadata";
 
 @injectable()
 export class TemplateComponent extends DefaultVueTemplateProvider {

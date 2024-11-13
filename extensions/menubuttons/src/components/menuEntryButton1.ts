@@ -18,8 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { injectable } from "inversify";
 import "reflect-metadata";
+import { injectable } from "inversify";
 
 import type { MenuEntry } from "../api/menuEntry";
 

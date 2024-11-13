@@ -260,9 +260,6 @@ importers:
       '@xwiki/cristal-dev-test-utils':
         specifier: workspace:*
         version: link:../../../dev/test-utils
-      reflect-metadata:
-        specifier: 0.2.2
-        version: 0.2.2
       vitest:
         specifier: 2.1.4
         version: 2.1.4(@types/node@22.8.7)(happy-dom@14.12.0)
@@ -1211,6 +1208,9 @@ importers:
       inversify:
         specifier: 6.0.3
         version: 6.0.3
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)

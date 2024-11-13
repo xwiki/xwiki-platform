@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import "reflect-metadata";
 import { DefaultComponent } from "./defaultComponent";
 import { DefaultExtensionConfig } from "./defaultExtensionConfig";
 import { inject, injectable } from "inversify";
@@ -25,7 +26,6 @@ import type { ExtensionConfig } from "../api/extensionConfig";
 import type { ExtensionManager } from "../api/extensionManager";
 import type { Logger } from "@xwiki/cristal-api";
 import type { Container } from "inversify";
-import "reflect-metadata";
 
 @injectable()
 export class DefaultExtensionManager

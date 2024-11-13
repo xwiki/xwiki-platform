@@ -146,7 +146,10 @@ export function load(
     },
   );
   ipcMain.handle("authentication:xwiki:authorizationValue", () => {
-    return getAuthorizationValue();
+    return {
+      tokenType: getTokenType(),
+      accessToken: getAccessToken(),
+    };
   });
   ipcMain.handle("authentication:xwiki:logout", () => {
     deleteAccessToken();

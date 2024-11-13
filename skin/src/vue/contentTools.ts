@@ -23,8 +23,6 @@ import type { MacroProvider } from "../api/macroProvider";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { App, Component, VNode } from "vue";
 
-// import { DefaultMacroData } from "../components/defaultMacroData";
-
 export class ContentTools {
   static logger: Logger;
 
@@ -32,9 +30,9 @@ export class ContentTools {
     this.logger = cristal?.getLogger("skin.vue.contenttools");
   }
 
-  /*
-        Method to intercept clicks in the HTML content and load the page using Cristal Wiki
-    */
+  /**
+   * Method to intercept clicks in the HTML content and load the page using Cristal Wiki
+   */
   public static listenToClicks(
     element: HTMLElement,
     cristal: CristalApp | undefined,
@@ -90,9 +88,9 @@ export class ContentTools {
     );
   }
 
-  /*
-        Method to load CSS sent by XWiki page
-    */
+  /**
+   * Method to load CSS sent by XWiki page
+   */
   public static loadCSS(css: string[]): void {
     if (css && css.length > 0) {
       // check new css
@@ -113,10 +111,10 @@ export class ContentTools {
     }
   }
 
-  /*
-        Method to load JS send by XWiki page
-        THis code is not working
-    */
+  /**
+   * Method to load JS send by XWiki page
+   * THis code is not working
+   */
   public static loadJS(js: string[]): void {
     if (js && js.length > 0) {
       ContentTools.logger?.debug("Loading JS code for content");
@@ -210,9 +208,9 @@ export class ContentTools {
     }
   }
 
-  /*
-        Experimental function to transform scripts
-    */
+  /**
+   * Experimental function to transform scripts
+   */
   public static transformScripts(): void {
     const transformScript = function (scriptEl: HTMLScriptElement) {
       const srcItem = scriptEl.attributes.getNamedItem("src");
@@ -294,18 +292,18 @@ export class ContentTools {
     return destroy;
   }
 
-  /*
-        Method to look for Macros in client side rendering
-        Macros are inserted by the WikiModel parser using the following syntax
-          <pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2">
-            <!--[CDATA[CONTENT]]-->
-          </pre>
-
-        Example with warning macro:
-          <pre class="wikimodel-macro" macroname="warning" title="WARNING">
-            <!--[CDATA[This is a warning message]]-->
-          </pre>
-    */
+  /**
+   * Method to look for Macros in client side rendering
+   * Macros are inserted by the WikiModel parser using the following syntax
+   *   <pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2">
+   *     <!--[CDATA[CONTENT]]-->
+   *   </pre>
+   *
+   * Example with warning macro:
+   *   <pre class="wikimodel-macro" macroname="warning" title="WARNING">
+   *     <!--[CDATA[This is a warning message]]-->
+   *   </pre>
+   */
   public static transformMacros(
     element: HTMLElement,
     cristal: CristalApp,

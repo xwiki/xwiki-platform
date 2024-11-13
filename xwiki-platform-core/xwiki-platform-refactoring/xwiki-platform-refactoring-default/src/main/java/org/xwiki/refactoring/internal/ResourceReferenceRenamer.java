@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -36,6 +37,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
@@ -146,16 +148,23 @@ public class ResourceReferenceRenamer
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
-        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
+        EntityReference absoluteResolvedEntityReference = this.entityReferenceResolver.resolve(resourceReference, null);
+        DocumentReference absoluteResolvedDocumentReference =
+            this.defaultReferenceDocumentReferenceResolver.resolve(absoluteResolvedEntityReference);
+
+        boolean isRelativePageReferenceOutsideOfParent = false;
 
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
         // currentDocument) then we must update it
         // We also update the link if it's not an absolute link but the current document is not part of the move job,
         // as in this case there won't be any other call to perform the link refactoring.
+        // Finally, if we're in the special case of a page reference starting with ../ then we check if it doesn't
+        // contain a space that we're actually moving, in which case we want to actually fix the reference.
         boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
-            && (absoluteResolvedReference.equals(linkEntityReference)
-            || !updatedEntities.containsKey(currentDocumentReference));
+            && (absoluteResolvedDocumentReference.equals(linkEntityReference)
+            || !updatedEntities.containsKey(currentDocumentReference)
+            || isPageReferenceOutOfParent(resourceReference, linkTargetDocumentReference, updatedEntities));
 
         if (shouldBeUpdated) {
             // If the link was resolved to a space...
@@ -190,6 +199,25 @@ public class ResourceReferenceRenamer
             resourceReference.setReference(newReferenceString);
             resourceReference.setType(newResourceType);
             result = true;
+        }
+        return result;
+    }
+
+    private boolean isPageReferenceOutOfParent(ResourceReference resourceReference,
+        DocumentReference linkTargetDocumentReference, Map<EntityReference, EntityReference> updatedEntities)
+    {
+        boolean result = false;
+        if (resourceReference.getType().equals(ResourceType.PAGE)
+            && resourceReference.getReference().startsWith("../")) {
+            List<SpaceReference> spaceReferences = linkTargetDocumentReference.getSpaceReferences();
+            result = updatedEntities.keySet().stream().anyMatch(entityReference -> {
+                boolean match = false;
+                if ("WebHome".equals(entityReference.getName())) {
+                    EntityReference spaceReference = entityReference.extractReference(EntityType.SPACE);
+                    match = spaceReference != null && spaceReferences.contains(spaceReference);
+                }
+                return match;
+            });
         }
         return result;
     }

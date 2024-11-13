@@ -295,14 +295,14 @@ export class ContentTools {
   /**
    * Method to look for Macros in client side rendering
    * Macros are inserted by the WikiModel parser using the following syntax
-   *   <pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2">
-   *     <!--[CDATA[CONTENT]]-->
-   *   </pre>
+   *   \<pre class="wikimodel-macro" macroname="MACRONAME" param1="PARAMVALUE1" param2="PARAMVALUE2"\>
+   *     \<!--[CDATA[CONTENT]]--\>
+   *   \</pre\>
    *
    * Example with warning macro:
-   *   <pre class="wikimodel-macro" macroname="warning" title="WARNING">
-   *     <!--[CDATA[This is a warning message]]-->
-   *   </pre>
+   *   \<pre class="wikimodel-macro" macroname="warning" title="WARNING"\>
+   *     \<!--[CDATA[This is a warning message]]--\>
+   *   \</pre\>
    */
   public static transformMacros(
     element: HTMLElement,

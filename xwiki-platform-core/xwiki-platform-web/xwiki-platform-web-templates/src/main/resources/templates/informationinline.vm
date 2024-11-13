@@ -138,6 +138,58 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
 }))
 
 ##
+## Required rights
+##
+#set ($documentRequiredRights = $doc.getRequiredRights())
+#set ($suggestedChanges = $services.security.requiredrights.getSuggestedOperations($doc))
+#set ($suggestedChangesDisplay = "")
+#foreach ($suggestedChange in $suggestedChanges)
+  #if ($suggestedChange.increasesRights())
+    #if (!$suggestedChange.requiresManualReview())
+      #set ($suggestedChangesDisplay = "${suggestedChangesDisplay} This document requires ${suggestedChange.rightToAdd()}.")
+    #else
+      #set ($suggestedChangesDisplay = "${suggestedChangesDisplay} This document might require ${suggestedChange.rightToAdd()} but the automated analysis couldn't determine if it is really needed. Please manually review the content.")
+    #end
+  #else
+    #if ($suggestedChange.requiresManualReview())
+      #set ($suggestedChangesDisplay = "${suggestedChangesDisplay} According to the analysis, this document doesn't
+      require the ${suggestedChange.rightToRemove()}. Instead, ${suggestedChange.rightToRemove()} might be enough.")
+    #else
+      #set ($suggestedChangesDisplay = "${suggestedChangesDisplay} The analysis couldn't determine if the
+        ${suggestedChange.rightToRemove()} is really needed. It might be enough to require ${suggestedChange.rightToRemove()}. Please review the analysis results.")
+    #end
+  #end
+#end
+#set ($discard = $staticUIX.add({'content': "
+  <dt>
+    <label>$escapetool.xml($services.localization.render('core.viewers.information.requiredRights'))</label>
+  </dt>
+  <dd>
+    #if ($documentRequiredRights.enforce())
+      #if ($documentRequiredRights.rights().isEmpty())
+        $escapetool.xml($services.localization.render('core.viewers.information.requiredRights.enforcedNoRight'))
+      #else
+        ## Get a display string for every right.
+        #foreach($right in $documentRequiredRights.rights())
+          ## TODO: this isn't correct.
+          #set ($rightDisplay = $services.localization.render('core.viewers.information.requiredRights.right.${right}'))
+          #if ($velocityCount > 1)
+            ,
+          #end
+          $escapetool.xml($services.localization.render('core.viewers.information.requiredRights.enforced',
+            $rightDisplay))
+        #end
+      #end
+    #else
+      $escapetool.xml($services.localization.render('core.viewers.information.requiredRights.notEnforced'))
+    #end
+    $suggestedChangesDisplay
+  </dd>
+  ",
+  'order': 600
+}))
+
+##
 ## Included Pages
 ##
 #set ($discard = $staticUIX.add({'content': "

@@ -20,17 +20,14 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
-    "test": "vitest --run"
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-hierarchy-api": "workspace:*",
+    "@xwiki/cristal-xwiki-utils": "workspace:*",
     "inversify": "6.0.3"
-  },
-  "devDependencies": {
-    "@xwiki/cristal-dev-config": "workspace:*"
   },
   "publishConfig": {
     "exports": {

@@ -1,0 +1,8 @@
+{
+    "page.action.category.page.management.title": "Verwalten",
+    "page.action.action.delete.page.title": "Löschen",
+    "page.action.action.delete.page.dialog.title": "Seite löschen",
+    "page.action.action.delete.page.success": "Die Seite „{page}“ wurde gelöscht.",
+    "page.action.action.delete.page.error": "Die Seite „{page}“ konnte nicht gelöscht werden. Grund: [{reason}]",
+    "page.action.action.delete.page.confirm": "Durch diesen Vorgang wird die Seite „{page}“ gelöscht. Wirklich?"
+}

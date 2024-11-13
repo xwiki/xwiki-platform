@@ -61,12 +61,19 @@ class RenameJobTest extends AbstractMoveJobTest
         DocumentReference whiteReference = new DocumentReference("wiki", "Color", "White");
         DocumentReference orangeReference = new DocumentReference("wiki", "Color", "Orange");
 
+        when(this.modelBridge.exists(blackReference)).thenReturn(true);
+        when(this.modelBridge.exists(whiteReference)).thenReturn(true);
+
         MoveRequest request = new MoveRequest();
         request.setEntityReferences(List.of(blackReference, whiteReference));
         request.setDestination(orangeReference);
+        request.setCheckAuthorRights(false);
+        request.setCheckRights(false);
         run(request);
 
         verifyNoMove();
+        assertEquals(1, getLogCapture().size());
+        assertEquals("Cannot rename multiple entities.", getLogCapture().getMessage(0));
     }
 
     @Test

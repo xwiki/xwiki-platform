@@ -19,9 +19,13 @@
  */
 package org.xwiki.refactoring.job.question;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represent an entity with an information about either or not the entity is selected to perform some refactoring.
@@ -55,7 +59,8 @@ public class EntitySelection implements Comparable<EntitySelection>
     /**
      * Reference to the entity to select for the refactoring.
      */
-    private EntityReference entityReference;
+    private final EntityReference sourceEntityReference;
+    private final EntityReference targetEntityReference;
 
     /**
      * Indicate if the entity is selected or not by the user.
@@ -68,7 +73,20 @@ public class EntitySelection implements Comparable<EntitySelection>
      */
     public EntitySelection(EntityReference entityReference)
     {
-        this.entityReference = entityReference;
+        this(entityReference, null);
+    }
+
+    /**
+     * Constructor of an EntitySelection when there is a target destination.
+     * @param sourceEntityReference the original reference
+     * @param targetEntityReference the target reference of the refactoring
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public EntitySelection(EntityReference sourceEntityReference, EntityReference targetEntityReference)
+    {
+        this.sourceEntityReference = sourceEntityReference;
+        this.targetEntityReference = targetEntityReference;
     }
 
     /**
@@ -76,7 +94,17 @@ public class EntitySelection implements Comparable<EntitySelection>
      */
     public EntityReference getEntityReference()
     {
-        return entityReference;
+        return sourceEntityReference;
+    }
+
+    /**
+     * @return the target reference of the refactoring if any.
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public Optional<EntityReference> getTargetEntityReference()
+    {
+        return (targetEntityReference != null) ? Optional.of(targetEntityReference) : Optional.empty();
     }
 
     /**
@@ -111,7 +139,11 @@ public class EntitySelection implements Comparable<EntitySelection>
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(3, 13).append(getEntityReference()).append(isSelected).toHashCode();
+        return new HashCodeBuilder(3, 13)
+            .append(getEntityReference())
+            .append(getTargetEntityReference())
+            .append(isSelected)
+            .toHashCode();
     }
 
     @Override
@@ -127,8 +159,21 @@ public class EntitySelection implements Comparable<EntitySelection>
             return false;
         }
         EntitySelection entitySelection = (EntitySelection) object;
-        return new EqualsBuilder().append(getEntityReference(), entitySelection.getEntityReference())
-            .append(isSelected(), entitySelection.isSelected()).isEquals();
+        return new EqualsBuilder()
+            .append(getEntityReference(), entitySelection.getEntityReference())
+            .append(getTargetEntityReference(), entitySelection.getTargetEntityReference())
+            .append(isSelected(), entitySelection.isSelected())
+            .isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder(this)
+            .append("sourceEntityReference", sourceEntityReference)
+            .append("targetEntityReference", targetEntityReference)
+            .append("isSelected", isSelected)
+            .toString();
     }
 
     @Override
@@ -142,15 +187,15 @@ public class EntitySelection implements Comparable<EntitySelection>
             return 0;
         }
 
-        if (entityReference == null) {
+        if (sourceEntityReference == null) {
             return -1;
         }
 
-        if (entitySelection.entityReference == null) {
+        if (entitySelection.sourceEntityReference == null) {
             return 1;
         }
 
-        int result = entityReference.compareTo(entitySelection.entityReference);
+        int result = sourceEntityReference.compareTo(entitySelection.sourceEntityReference);
 
         if (result == 0) {
             return isSelected.compareTo(entitySelection.isSelected);

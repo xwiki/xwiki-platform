@@ -19,44 +19,20 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Collection;
-
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.refactoring.job.RefactoringJobs;
-
 /**
- * A job that can rename entities.
- * 
+ * Internal exception to be used in {@link AbstractCopyOrMoveJob}.
+ *
  * @version $Id$
- * @since 7.2M1
+ * @since 16.10.0RC1
  */
-@Component
-@Named(RefactoringJobs.RENAME)
-public class RenameJob extends MoveJob
+public class InternalCopyOrMoveJobException extends Exception
 {
-    @Override
-    public String getType()
+    /**
+     * Default constructor.
+     * @param message the message of the exception.
+     */
+    public InternalCopyOrMoveJobException(String message)
     {
-        return RefactoringJobs.RENAME;
-    }
-
-    @Override
-    protected void process(Collection<EntityReference> entityReferences)
-    {
-        if (entityReferences.size() == 1) {
-            process(entityReferences.iterator().next());
-        } else {
-            this.logger.warn("Cannot rename multiple entities.");
-        }
-    }
-
-    @Override
-    protected boolean processOnlySameSourceDestinationTypes()
-    {
-        // rename always process same destination types
-        return true;
+        super(message);
     }
 }

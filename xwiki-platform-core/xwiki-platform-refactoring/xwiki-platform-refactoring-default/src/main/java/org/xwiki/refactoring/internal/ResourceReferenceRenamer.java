@@ -19,10 +19,14 @@
  */
 package org.xwiki.refactoring.internal;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -34,6 +38,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.PageReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 import static com.xpn.xwiki.XWiki.DEFAULT_SPACE_HOMEPAGE;
 
@@ -60,6 +67,12 @@ public class ResourceReferenceRenamer
     @Inject
     private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private Logger logger;
+
     /**
      * Update the given document reference so that if it targets the old document reference, the new document reference
      * is used instead.
@@ -69,16 +82,31 @@ public class ResourceReferenceRenamer
      * @param newReference the new document reference target
      * @param currentDocumentReference the current document where the resource reference is located
      * @param relative {@code true} if the reference should be kept relative to the current document
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return {@code true} if the resource reference has been updated
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative)
+        boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference, updatedEntities)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference);
+            currentDocumentReference, updatedEntities);
+    }
+
+    private boolean checkIfDocExists(DocumentReference documentReference)
+    {
+        XWikiContext context = contextProvider.get();
+        boolean docExists = false;
+        try {
+            docExists = context.getWiki().exists(documentReference, context);
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking if [{}] exists for link refactoring.", documentReference,
+                e);
+        }
+        return docExists;
     }
 
     /**
@@ -90,20 +118,23 @@ public class ResourceReferenceRenamer
      * @param newReference the new attachment reference target
      * @param currentDocumentReference the current document where the resource reference is located
      * @param relative {@code true} if the reference should be kept relative to the current document
+     * @param updatedEntities the map of entities that are or are going to be updated: the map contains the source
+     *      and target destination.
      * @return {@code true} if the attachment reference has been updated
      */
     public boolean updateResourceReference(ResourceReference resourceReference,
         AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
-        boolean relative)
+        boolean relative, Map<EntityReference, EntityReference> updatedEntities)
     {
         return (relative)
-            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference)
+            ? this.updateRelativeResourceReference(resourceReference, oldReference, newReference, updatedEntities)
             : this.updateAbsoluteResourceReference(resourceReference, oldReference, newReference,
-            currentDocumentReference);
+            currentDocumentReference, updatedEntities);
     }
 
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
-        DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference)
+        DocumentReference oldReference, DocumentReference newReference, DocumentReference currentDocumentReference,
+        Map<EntityReference, EntityReference> updatedEntities)
     {
         boolean result = false;
 
@@ -115,9 +146,18 @@ public class ResourceReferenceRenamer
             this.defaultReferenceDocumentReferenceResolver.resolve(linkEntityReference);
         EntityReference newTargetReference = newReference;
         ResourceType newResourceType = resourceReference.getType();
+        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
-        // If the link targets the old (renamed) document reference, we must update it.
-        if (linkTargetDocumentReference.equals(oldReference)) {
+        // If the link targets the old (renamed) document reference and it's an absolute reference
+        // (i.e. its resolution without any given parameter gives same result than its resolution with the
+        // currentDocument) then we must update it
+        // We also update the link if it's not an absolute link but the current document is not part of the move job,
+        // as in this case there won't be any other call to perform the link refactoring.
+        boolean shouldBeUpdated = linkTargetDocumentReference.equals(oldReference)
+            && (absoluteResolvedReference.equals(linkEntityReference)
+            || !updatedEntities.containsKey(currentDocumentReference));
+
+        if (shouldBeUpdated) {
             // If the link was resolved to a space...
             if (EntityType.SPACE.equals(linkEntityReference.getType())) {
                 if (DEFAULT_SPACE_HOMEPAGE.equals(newReference.getName())) {
@@ -155,24 +195,48 @@ public class ResourceReferenceRenamer
     }
 
     private <T extends EntityReference> boolean updateRelativeResourceReference(ResourceReference resourceReference,
-        T oldReference, T newReference)
+        T oldReference, T newReference, Map<EntityReference, EntityReference> updatedEntities)
     {
         boolean result = false;
 
         EntityReference linkEntityReference = this.entityReferenceResolver.resolve(resourceReference, null,
             newReference);
-
-        if (newReference.equals(linkEntityReference.extractReference(EntityType.DOCUMENT))) {
-            // If the link is relative to the containing document we don't modify it
-            return false;
-        }
-
         // current link, use the old document's reference to fill in blanks.
         EntityReference oldLinkReference =
             this.entityReferenceResolver.resolve(resourceReference, null, oldReference);
+        EntityReference absoluteResolvedReference = this.entityReferenceResolver.resolve(resourceReference, null);
 
-        // If the new and old link references don`t match, then we must update the relative link.
-        if (!linkEntityReference.equals(oldLinkReference)) {
+        boolean docExists = false;
+        EntityType entityType = linkEntityReference.getType();
+        DocumentReference documentReference = null;
+        DocumentReference documentReferenceTarget = null;
+        if (entityType == EntityType.DOCUMENT || entityType.getAllowedParents().contains(EntityType.DOCUMENT)) {
+            documentReference =
+                (DocumentReference) oldLinkReference.extractReference(EntityType.DOCUMENT);
+            documentReferenceTarget =
+                (DocumentReference) linkEntityReference.extractReference(EntityType.DOCUMENT);
+            docExists = checkIfDocExists(documentReference);
+        } else {
+            docExists = true;
+        }
+
+        boolean anyMatchInMovedReferences =
+            (oldLinkReference.hasParent(oldReference)
+                || (documentReferenceTarget != null
+                && documentReferenceTarget.equals(updatedEntities.get(documentReference))));
+
+        // We should update the reference if:
+        //  - it's relative: the resolution of the reference without any parameter, and the resolution of the reference
+        //                   with the new reference should give different results
+        //  - it doesn't match any reference moved in the same job, i.e. in the same hierarchy
+        //  - the new and old link references don`t match
+        //  - the link refers to a doc that exists
+        boolean shouldBeUpdated = !absoluteResolvedReference.equals(linkEntityReference)
+            && !anyMatchInMovedReferences
+            && !linkEntityReference.equals(oldLinkReference)
+            && docExists;
+
+        if (shouldBeUpdated) {
             // Serialize the old (original) link relative to the new document's location, in compact form.
             String serializedLinkReference =
                 this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
@@ -182,8 +246,10 @@ public class ResourceReferenceRenamer
         return result;
     }
 
+    // FIXME: Check if we shouldn't use the updatedEntities here.
     private boolean updateAbsoluteResourceReference(ResourceReference resourceReference,
-        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference)
+        AttachmentReference oldReference, AttachmentReference newReference, DocumentReference currentDocumentReference,
+        Map<EntityReference, EntityReference> updatedEntities)
     {
         boolean result = false;
 

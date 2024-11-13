@@ -451,14 +451,22 @@ public class MoveJobTest extends AbstractMoveJobTest
         verify(this.modelBridge).rename(source, new DocumentReference("wiki", "C", "B"));
     }
 
+    /*
+     * This test scenario checks performing a move of the space chess:A.B.C that contains docs X et Y to wiki tennis.
+     * The resulting references are tennis:C.X and tennis:C.Y. Note that it's a space move because the request is using
+     * deep flag set to true.
+     */
     @Test
     void moveSpaceHomeDeep() throws Throwable
     {
         DocumentReference spaceHome = new DocumentReference("chess", List.of("A", "B", "C"), "WebHome");
         DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
+        DocumentReference otherDocFromSpace = new DocumentReference("Y", spaceHome.getLastSpaceReference());
         when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
-            .thenReturn(List.of(docFromSpace));
+            .thenReturn(List.of(spaceHome, docFromSpace, otherDocFromSpace));
+        when(this.modelBridge.exists(spaceHome)).thenReturn(false);
         when(this.modelBridge.exists(docFromSpace)).thenReturn(true);
+        when(this.modelBridge.exists(otherDocFromSpace)).thenReturn(true);
 
         WikiReference newWiki = new WikiReference("tennis");
 
@@ -468,10 +476,19 @@ public class MoveJobTest extends AbstractMoveJobTest
         request.setDeep(true);
         run(request);
 
-        verify(this.modelBridge).rename(docFromSpace, new DocumentReference("tennis", "C", "X"));
+        DocumentReference targetDoc1 = new DocumentReference("tennis", "C", "X");
+        verify(this.modelBridge).rename(docFromSpace, targetDoc1);
+
+        DocumentReference targetDoc2 = new DocumentReference("tennis", "C", "Y");
+        verify(this.modelBridge).rename(otherDocFromSpace, targetDoc2);
 
         verify(this.observationManager).notify(any(DocumentsDeletingEvent.class), any(MoveJob.class),
-            eq(Map.of(docFromSpace, new EntitySelection(docFromSpace))));
+            eq(Map.of(
+                docFromSpace, new EntitySelection(docFromSpace, targetDoc1),
+                otherDocFromSpace, new EntitySelection(otherDocFromSpace, targetDoc2)
+            )));
+        assertEquals(1, getLogCapture().size());
+        assertEquals("Skipping [chess:A.B.C.WebHome] because it doesn't exist.", getLogCapture().getMessage(0));
     }
 
     @Test

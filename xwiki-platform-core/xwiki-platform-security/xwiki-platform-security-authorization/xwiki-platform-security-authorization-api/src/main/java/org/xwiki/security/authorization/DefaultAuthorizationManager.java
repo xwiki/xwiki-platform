@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -49,6 +50,8 @@ import org.xwiki.security.internal.XWikiBridge;
  */
 @Component
 @Singleton
+// The fan-out is of 21 instead of 20 after introducing the ModelContext, not an easy one to refactor.
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class DefaultAuthorizationManager implements AuthorizationManager
 {
     /**
@@ -82,6 +85,9 @@ public class DefaultAuthorizationManager implements AuthorizationManager
 
     @Inject
     private DocumentRequiredRightsChecker documentRequiredRightsChecker;
+
+    @Inject
+    private ModelContext modelContext;
 
     /**
      * Check if the user is the super admin.
@@ -156,21 +162,30 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return false;
         }
 
-        if ((!right.isReadOnly() && xwikiBridge.isWikiReadOnly())
-            || (userReference == null && xwikiBridge.needsAuthentication(right))) {
-            return false;
-        }
-
-        // For edit right, check if the user has all required rights.
-        if (right == Right.EDIT && !this.documentRequiredRightsChecker.hasRequiredRights(userReference,
-            entityReference))
-        {
-            logDenyIfCheck(right, userReference, entityReference, check, "misses required right");
-
+        if (checkWikiPreferencesDiscardAccess(right, userReference, entityReference)) {
             return false;
         }
 
         return evaluateSecurityAccess(right, userReference, entityReference, check);
+    }
+
+    private boolean checkWikiPreferencesDiscardAccess(Right right, DocumentReference userReference,
+        EntityReference entityReference)
+    {
+        if (entityReference != null) {
+            EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
+            this.modelContext.setCurrentEntityReference(entityReference);
+
+            try {
+                if ((!right.isReadOnly() && xwikiBridge.isWikiReadOnly())
+                    || (userReference == null && xwikiBridge.needsAuthentication(right))) {
+                    return true;
+                }
+            } finally {
+                this.modelContext.setCurrentEntityReference(currentEntityReference);
+            }
+        }
+        return false;
     }
 
     private void logDenyIfCheck(Right right, DocumentReference userReference, EntityReference entityReference,

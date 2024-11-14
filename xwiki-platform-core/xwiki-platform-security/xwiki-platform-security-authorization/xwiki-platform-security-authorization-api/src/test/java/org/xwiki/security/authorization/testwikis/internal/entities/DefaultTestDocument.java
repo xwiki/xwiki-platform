@@ -21,7 +21,7 @@
 package org.xwiki.security.authorization.testwikis.internal.entities;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.model.EntityType;
@@ -51,7 +51,7 @@ public class DefaultTestDocument extends AbstractSecureTestEntity implements Tes
     private final DocumentReference creator;
 
     /** Map of security rules. */
-    private final Map<EntityReference, TestRequiredRight> requiredRights = new HashMap<>();
+    private final Map<EntityReference, TestRequiredRight> requiredRights = new LinkedHashMap<>();
 
     private final boolean enforceRequiredRights;
 

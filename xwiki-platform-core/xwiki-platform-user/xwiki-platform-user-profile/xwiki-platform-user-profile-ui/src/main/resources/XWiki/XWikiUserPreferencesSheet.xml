@@ -126,18 +126,51 @@
     </property>
     <property>
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
+  const SHORTCUT_XOBJ_ACTION = Object.freeze({
+    CREATE: 'create',
+    DELETE: 'delete',
+    UPDATE: 'update',
+    NONE: 'none'
+  });
   /**
    * Handle the shortcut preference modifications
    */
   $(document).off('input.shortcutPreference');
-  let updateShortcut = function (shortcutPreferenceDOM) {
-    let shortcutPreference = $(shortcutPreferenceDOM);
+  let updateShortcut = function (shortcutPreferenceInput) {
+    // Step 1: We retrieve information about the shortcut preference state.
+    let shortcutPreference = $(shortcutPreferenceInput);
     let translateKey = shortcutPreference.attr("data-translate-key");
     let newValue = shortcutPreference.val();
+    let oldValue = shortcutPreference.attr('value');
+    let defaultValue = shortcutPreference.attr("data-default-value");
     let url = xm.restURL;
     let oldItemNumber = shortcutPreference.attr("data-shortcut-pref-number");
+    // Step 2: We want to compute what is the XObject action we'll need to take when the form is submitted
+    let xObjectAction = SHORTCUT_XOBJ_ACTION.NONE;
+    // If the new value is the same as the one that is already here, we do not have to do any action on the XObject
+    if (newValue === oldValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.NONE; }
+    else {
+      // If it's equal to the default value from the translation 
+      // (the translation is different to the default value so there was a preference)
+      // Then we can remove the preference object. There's no need to store user preferences about this.
+      if (newValue === defaultValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.DELETE; }
+      else {
+        // The new value is different from both the old value and the translation value (default)
+        // If the old value is the same as the default value then it means there was no object, 
+        // and we should create one.
+        // If not, it means that the shortcut was already customized and we should just update the object.
+        if (defaultValue === oldValue) { xObjectAction = SHORTCUT_XOBJ_ACTION.CREATE; }
+        else { xObjectAction = SHORTCUT_XOBJ_ACTION.UPDATE; }
+      }
+    }
+    // Step 3: We retrieve information about the current state of the form
+    // All the hidden inputs are stored as siblings of the main input.
+    let inputCreation = shortcutPreference.siblings('input[name=addedObjects]');
+    let inputDeletion = shortcutPreference.siblings('input[name=deletedObjects]');
+    let inputUpdate = shortcutPreference.siblings('input[name=addedObjects]');
+    // Step 4: We update the form so that it properly updates the state of the XObjects when submitted.
     if (oldItemNumber == null) {
-      if (newValue !== shortcutPreference.attr("data-default-value")) {
+      if (newValue !== defaultValue) {
         // Create the new user preference
         let creationUrl = url + "/objects";
         let data = {
@@ -178,6 +211,8 @@
     const defaultValue = shortcutPrefInput.attr('data-default-value');
     shortcutPrefInput.val(defaultValue).trigger("input");
   });
+  
+  // Buffer system to avoid updating the state of the preferences at each small change.
   var timeoutId = 0;
   var lastInput = null;
   $(document).on('input.shortcutPreference', '.shortcutPreference', function () {

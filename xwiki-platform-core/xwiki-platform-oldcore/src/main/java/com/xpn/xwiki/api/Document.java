@@ -2823,9 +2823,9 @@ public class Document extends Api
     private void checkRequiredRightsForSaving(XWikiDocument secureDocument, XWikiDocument doc, DocumentReference author)
         throws XWikiException
     {
-        DocumentRequiredRights documentRequiredRights;
+        DocumentRequiredRights secureDocumentRequiredRights;
         try {
-            documentRequiredRights =
+            secureDocumentRequiredRights =
                 getDocumentRequiredRightsManager().getRequiredRights(secureDocument.getDocumentReference())
                     .orElse(DocumentRequiredRights.EMPTY);
         } catch (AuthorizationException e) {
@@ -2836,22 +2836,39 @@ public class Document extends Api
 
         try {
             // No programming right? Enforce required rights!
-            if (documentRequiredRights.enforce()
+            if (secureDocumentRequiredRights.enforce()
                 && !getDocumentAuthorizationManager().hasRequiredRight(
                 Right.PROGRAM, null, secureDocument.getDocumentReference()))
             {
-                if (!doc.isEnforceRequiredRights()) {
-                    doc.setEnforceRequiredRights(true);
+
+                DocumentRequiredRights rightsToCheck;
+                if (isTranslation()) {
+                    // For translations, check the required rights of the main document.
+                    rightsToCheck = getDocumentRequiredRightsManager().getRequiredRights(doc.getDocumentReference())
+                        .orElse(DocumentRequiredRights.EMPTY);
+                    // If the main document doesn't enforce required rights, there is nothing we can do.
+                    if (!rightsToCheck.enforce()) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED, ("The document cannot be saved because rights on"
+                            + " the secure document [%s] are restricted using required rights and the document to "
+                            + "save [%s] doesn't enforce required rights.")
+                            .formatted(secureDocument.getDocumentReference(), doc.getDocumentReference()));
+                    }
+                } else {
+                    // Enable enforcing to avoid breaking scripts that save other documents.
+                    if (!doc.isEnforceRequiredRights()) {
+                        doc.setEnforceRequiredRights(true);
+                    }
+
+                    // Check if the new required rights aren't more than what the secure document has.
+                    DocumentRequiredRightsReader rightsReader = Utils.getComponent(DocumentRequiredRightsReader.class);
+                    rightsToCheck = rightsReader.readRequiredRights(doc);
                 }
 
-                DocumentRequiredRightsReader rightsReader =
-                    Utils.getComponent(DocumentRequiredRightsReader.class);
-                DocumentRequiredRights newRequiredRights = rightsReader.readRequiredRights(doc);
-
-                for (DocumentRequiredRight requiredRight : newRequiredRights.rights()) {
+                for (DocumentRequiredRight requiredRight : rightsToCheck.rights()) {
                     getDocumentAuthorizationManager()
                         .checkAccess(requiredRight.right(), requiredRight.scope(), author,
-                            doc.getDocumentReference());
+                            secureDocument.getDocumentReference());
                 }
             }
         } catch (AuthorizationException e) {
@@ -3398,7 +3415,7 @@ public class Document extends Api
     /**
      * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
      * enforced, meaning that editing will be limited to users with these rights and content of this document can't
-     * use more rights than defined in the object, {@code false} otherwise
+     * use more rights than defined in the object, {@code false} otherwise. This property is ignored on translations.
      * @since 16.10.0RC1
      */
     @Unstable
@@ -3408,19 +3425,9 @@ public class Document extends Api
     }
 
     /**
-     * @return the required rights that have been set on this document
-     * @since 16.10.0RC1
-     */
-    @Unstable
-    public DocumentRequiredRights getRequiredRights()
-    {
-        return Utils.getComponent(DocumentRequiredRightsReader.class).readRequiredRights(this.doc);
-    }
-
-    /**
      * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
      * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
-     * more rights than defined in the object
+     * more rights than defined in the object. This property is ignored on translations.
      * @since 16.10.0RC1
      */
     @Unstable

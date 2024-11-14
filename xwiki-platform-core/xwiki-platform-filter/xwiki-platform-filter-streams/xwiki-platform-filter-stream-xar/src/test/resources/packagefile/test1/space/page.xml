@@ -21,7 +21,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
-  <enforceRequiredRights>false</enforceRequiredRights>
   <content>content</content>
   <class>
     <name>space.page</name>

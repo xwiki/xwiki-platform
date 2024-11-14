@@ -19,9 +19,9 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <enforceRequiredRights>true</enforceRequiredRights>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
+  <enforceRequiredRights>true</enforceRequiredRights>
   <content>content</content>
   <class>
     <name>space.nestedspace.page</name>

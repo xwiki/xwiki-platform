@@ -48,10 +48,6 @@
               <boolean>true</boolean>
             </entry>
             <entry>
-              <string>enforce_required_rights</string>
-              <boolean>false</boolean>
-            </entry>
-            <entry>
               <string>parent_reference</string>
               <org.xwiki.model.reference.EntityReference>
                 <name>parent</name>
@@ -156,10 +152,6 @@
               <boolean>true</boolean>
             </entry>
             <entry>
-              <string>enforce_required_rights</string>
-              <boolean>false</boolean>
-            </entry>
-            <entry>
               <string>parent_reference</string>
               <org.xwiki.model.reference.EntityReference>
                 <name>parent</name>
@@ -262,10 +254,6 @@
             <entry>
               <string>hidden</string>
               <boolean>true</boolean>
-            </entry>
-            <entry>
-              <string>enforce_required_rights</string>
-              <boolean>false</boolean>
             </entry>
             <entry>
               <string>parent_reference</string>

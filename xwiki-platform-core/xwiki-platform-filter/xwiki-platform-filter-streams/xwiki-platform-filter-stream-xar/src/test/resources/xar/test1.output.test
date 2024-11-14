@@ -43,10 +43,6 @@
                 <boolean>false</boolean>
               </entry>
               <entry>
-                <string>enforce_required_rights</string>
-                <boolean>true</boolean>
-              </entry>
-              <entry>
                 <string>revision_author</string>
                 <string>XWiki.author</string>
               </entry>
@@ -89,6 +85,10 @@
               <entry>
                 <string>revision_minor</string>
                 <boolean>false</boolean>
+              </entry>
+              <entry>
+                <string>enforce_required_rights</string>
+                <boolean>true</boolean>
               </entry>
               <entry>
                 <string>content</string>

@@ -404,7 +404,6 @@ public class DocumentLocaleReader extends AbstractReader
         // Initialize with a few defaults (thing that don't exist in old XAR format)
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
-        this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS, false);
 
         // Reference
         String referenceString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);

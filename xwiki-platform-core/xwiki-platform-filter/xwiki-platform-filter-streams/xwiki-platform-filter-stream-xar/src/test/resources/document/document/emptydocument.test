@@ -39,10 +39,6 @@
               <string>hidden</string>
               <boolean>false</boolean>
             </entry>
-            <entry>
-              <string>enforce_required_rights</string>
-              <boolean>false</boolean>
-            </entry>
           </parameters>
         </p>
       </wikiDocumentRevision>

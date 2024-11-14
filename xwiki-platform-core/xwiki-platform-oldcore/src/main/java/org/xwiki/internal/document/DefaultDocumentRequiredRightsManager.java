@@ -59,7 +59,7 @@ public class DefaultDocumentRequiredRightsManager implements DocumentRequiredRig
 
             // Load the document.
             try {
-                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                XWikiDocument document = context.getWiki().getDocument(documentReference.withoutLocale(), context);
                 if (!document.isNew()) {
                     return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
                 }

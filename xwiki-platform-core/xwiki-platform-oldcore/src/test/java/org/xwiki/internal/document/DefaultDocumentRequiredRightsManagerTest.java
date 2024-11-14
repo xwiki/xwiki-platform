@@ -19,6 +19,8 @@
  */
 package org.xwiki.internal.document;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -33,6 +35,7 @@ import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -70,6 +73,22 @@ class DefaultDocumentRequiredRightsManagerTest
 
         assertEquals(documentRequiredRights,
             this.documentRequiredRightsManager.getRequiredRights(DOCUMENT_REFERENCE).orElseThrow());
+    }
+
+    @Test
+    void documentWithLocale() throws XWikiException, AuthorizationException
+    {
+        XWikiDocument document =
+            this.mockitoOldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, this.mockitoOldcore.getXWikiContext());
+        this.mockitoOldcore.getSpyXWiki().saveDocument(document, this.mockitoOldcore.getXWikiContext());
+
+        DocumentRequiredRights documentRequiredRights = mock();
+        when(this.documentRequiredRightsReader.readRequiredRights(document)).thenReturn(documentRequiredRights);
+
+        DocumentReference documentReferenceWithLocale = new DocumentReference(DOCUMENT_REFERENCE, Locale.GERMAN);
+
+        assertSame(documentRequiredRights,
+            this.documentRequiredRightsManager.getRequiredRights(documentReferenceWithLocale).orElseThrow());
     }
 
     @Test

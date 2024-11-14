@@ -2533,7 +2533,8 @@ public class Document extends Api
     protected static void updateAuthor(XWikiDocument document, XWikiContext xcontext)
     {
         // Temporary set as author of the document the current script author (until the document is saved)
-        document.setAuthorReference(xcontext.getAuthorReference());
+        DocumentReference author = xcontext.getAuthorReference();
+        document.setAuthorReference(author);
 
         XWikiDocument secureDocument = xcontext.getSecureDocument();
         // If there is a secure document that has required rights enforced, we need to be careful.
@@ -2553,10 +2554,11 @@ public class Document extends Api
                     Utils.getComponent(DocumentAuthorizationManager.class);
                 if (secureRequiredRights.enforce()
                     // If the secure document has programming right, everything is fine.
-                    && !authorizationManager.hasRequiredRight(Right.PROGRAM, null, secureDocumentReference)
+                    && !authorizationManager.hasAccess(Right.PROGRAM, null, author, secureDocumentReference)
                     // If this document doesn't have required rights enforced or has more rights than the secure
                     // document, we need to restrict this document to be safe.
-                    && (!requiredRights.enforce() || !hasAllRequiredRights(requiredRights, secureDocumentReference)))
+                    && (!requiredRights.enforce()
+                    || !hasAllRequiredRights(requiredRights, secureDocumentReference, author)))
                 {
                     document.setRestricted(true);
                 }
@@ -2570,21 +2572,12 @@ public class Document extends Api
     }
 
     private static boolean hasAllRequiredRights(DocumentRequiredRights requiredRights,
-        DocumentReference secureDocumentReference)
+        DocumentReference secureDocumentReference, DocumentReference author)
     {
         DocumentAuthorizationManager authorizationManager = Utils.getComponent(DocumentAuthorizationManager.class);
-        return !requiredRights.rights().stream().allMatch(requiredRight ->
-        {
-            try {
-                return authorizationManager.hasRequiredRight(requiredRight.right(),
-                    requiredRight.scope(), secureDocumentReference);
-            } catch (AuthorizationException e) {
-                LOGGER.error(
-                    "Failed to check required rights for secure document[{}] in document update",
-                    secureDocumentReference, e);
-                return false;
-            }
-        });
+        return requiredRights.rights().stream().allMatch(requiredRight ->
+            authorizationManager.hasAccess(requiredRight.right(),
+                requiredRight.scope(), author, secureDocumentReference));
     }
 
     public void setContent(String content)
@@ -2808,7 +2801,11 @@ public class Document extends Api
 
             XWikiDocument secureDocument = xWikiContext.getSecureDocument();
             if (secureDocument != null) {
-                checkRequiredRightsForSaving(secureDocument, doc, author);
+                // Use the context author here as these required right checks are only on the secure document and
+                // this shouldn't rely on the current user but the script author.
+                // The existing required rights on doc have already been verified by the edit right check.
+                // If required rights shall be changed, they are checked by a listener in checkSavingDocument() below.
+                checkRequiredRightsForSaving(secureDocument, doc, xWikiContext.getAuthorReference());
             }
 
             // Make sure the user is allowed to make this modification
@@ -2837,8 +2834,8 @@ public class Document extends Api
         try {
             // No programming right? Enforce required rights!
             if (secureDocumentRequiredRights.enforce()
-                && !getDocumentAuthorizationManager().hasRequiredRight(
-                Right.PROGRAM, null, secureDocument.getDocumentReference()))
+                && !getDocumentAuthorizationManager()
+                .hasAccess(Right.PROGRAM, null, author, secureDocument.getDocumentReference()))
             {
 
                 DocumentRequiredRights rightsToCheck;

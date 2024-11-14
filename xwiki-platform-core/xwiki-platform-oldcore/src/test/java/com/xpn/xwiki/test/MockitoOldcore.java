@@ -1130,7 +1130,12 @@ public class MockitoOldcore
         DefaultParameterizedType currentUserReferenceResolverType =
             new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
         if (!this.componentManager.hasComponent(currentUserReferenceResolverType)) {
-            getMocker().registerMockComponent(currentUserReferenceResolverType);
+            UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver =
+                getMocker().registerMockComponent(currentUserReferenceResolverType);
+            // Ensure that getting the current user reference can be serialized to a DocumentReference that
+            // corresponds to the user in the context.
+            when(currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+                .thenAnswer(invocationOnMock -> new TestDocumentUserReference(getXWikiContext().getUserReference()));
         }
 
         DefaultParameterizedType userReferenceDocumentReferenceResolverType =

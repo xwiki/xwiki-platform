@@ -22,6 +22,8 @@ package org.xwiki.test.docker.internal.junit5.database;
 import java.lang.module.ModuleDescriptor;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -214,7 +216,9 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // See https://postgresql.verite.pro/blog/2024/07/01/pg17-utf8-collation.html for a longer discussion.
         ModuleDescriptor.Version builtinVersion = ModuleDescriptor.Version.parse("17");
         String localeArgument;
-        if (testConfiguration.getDatabaseTag() != null
+        // Check if the database tag starts with a number and that version is below 17, otherwise assume that the
+        // version is at least 17 (e.g., when "latest" is specified).
+        if (NumberUtils.isCreatable(StringUtils.substring(testConfiguration.getDatabaseTag(), 0, 1))
             && ModuleDescriptor.Version.parse(testConfiguration.getDatabaseTag()).compareTo(builtinVersion) < 0)
         {
             localeArgument = "--locale=C.utf8";

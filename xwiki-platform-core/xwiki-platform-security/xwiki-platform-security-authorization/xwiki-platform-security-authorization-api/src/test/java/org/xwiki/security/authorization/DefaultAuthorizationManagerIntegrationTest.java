@@ -34,6 +34,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
@@ -87,6 +88,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.COMMENT;
@@ -129,6 +131,9 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     @MockComponent
     private UserBridge userBridge;
 
+    @MockComponent
+    private ModelContext modelContext;
+
     /** Mocked securityEntryReader */
     @MockComponent
     private SecurityEntryReader securityEntryReader;
@@ -142,6 +147,8 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
 
     /** Factory for security reference */
     private SecurityReferenceFactory securityReferenceFactory;
+
+    private DocumentReference currentEntityReference = new DocumentReference("xwiki", "Page", "Space");
 
     @BeforeComponent
     void initializeMocks() throws Exception
@@ -168,6 +175,7 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     {
         securityReferenceFactory = componentManager.getInstance(SecurityReferenceFactory.class);
         authorizationManager = componentManager.getInstance(AuthorizationManager.class);
+        when(this.modelContext.getCurrentEntityReference()).thenReturn(currentEntityReference);
     }
 
     /**
@@ -440,7 +448,20 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
         // Any Local user on another subwiki
         assertAccess(null, getUser("a local user", "any SubWiki"),
             getDoc("an another subwiki", "anySpace", "any Other SubWiki"));
+    }
 
+    @Test
+    void verifyNeedsAuthentication() throws Exception
+    {
+        initialiseWikiMock("emptyWikis");
+        when(this.xWikiBridge.needsAuthentication(VIEW)).thenReturn(true);
+        DocumentReference documentReference = getXDoc("an empty main wiki", "anySpace");
+        assertFalse(authorizationManager.hasAccess(VIEW, null, documentReference));
+        verify(this.modelContext).setCurrentEntityReference(documentReference);
+        verify(this.modelContext).setCurrentEntityReference(currentEntityReference);
+
+        when(this.xWikiBridge.needsAuthentication(VIEW)).thenReturn(false);
+        assertTrue(authorizationManager.hasAccess(VIEW, null, documentReference));
     }
 
     @Test

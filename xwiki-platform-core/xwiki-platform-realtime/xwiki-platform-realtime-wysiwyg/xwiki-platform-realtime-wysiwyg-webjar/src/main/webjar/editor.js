@@ -61,8 +61,9 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     /**
      * Update the edited content as a result of a remote change.
      *
-     * @param {Function} updater a function that takes the current content of the editor, modifies it and returns the
-     *   updated nodes
+     * @param {object} updater an object that has two functions: 'patchContent' takes the current content of the editor,
+     *   modifies it and returns the updated nodes, and 'restoreSelection' takes the modified editor content and returns
+     *   the new selection to be set
      * @param {boolean} propagate true when the new content should be propagated to coeditors
      * @returns {Promise} a promise that resolves when the editor has finished handling the content update (some
      *   changes, like for instance if you modify some macro parameters, might require a full refresh of the edited
@@ -94,23 +95,6 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * Save the current selection so that it can be restored later, usually after a DOM change.
-     */
-    saveSelection() {
-      throw new Error('Not implemented!');
-    }
-
-    /**
-     * Restore the given DOM selection ranges, or the last saved text selection if no ranges are specified.
-     *
-     * @param {Range[]} ranges the DOM selection ranges to restore; if not specified, the last saved text selection is
-     *   restored
-     */
-    restoreSelection(ranges) {
-      throw new Error('Not implemented!');
-    }
-
-    /**
      * Simulates the loading of the given HTML in the editor without affecting the content that is currently being
      * edited. The given HTML is parsed into a DOM representation and filtered as if it were to be edited in the editor.
      * The returned element is similar to calling {@link #getContentWrapper()} after loading the given HTML in the
@@ -138,12 +122,13 @@ define('xwiki-realtime-wysiwyg-editor', [], function () {
     }
 
     /**
-     * Shows a notification message inside the editor.
-     * 
-     * @param {string} message the notification message to show
-     * @param {string} type the type of notification (e.g. 'info', 'warning', 'error')
+     * Filter the content before it is loaded in the editor. This is useful for instance to protect content that
+     * otherwise would be removed (filtered out) by the editor. This is usually called on the content received from the
+     * other users participating in the realtime session.
+     *
+     * @param {Element} contentWrapper the DOM element containing the input content to filter
      */
-    showNotification(message, type) {
+    filterInputContent(contentWrapper) {
       throw new Error('Not implemented!');
     }
 

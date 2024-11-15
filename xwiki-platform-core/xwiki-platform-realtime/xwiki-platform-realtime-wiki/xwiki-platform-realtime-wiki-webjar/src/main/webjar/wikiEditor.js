@@ -222,18 +222,10 @@ define('xwiki-realtime-wikiEditor', [
           channel: eventsChannel,
           // This function displays a message notifying users that there was a merge.
           showNotification: Interface.createMergeMessageElement(toolbar.toolbar.find('.rt-toolbar-rightside')),
-          setTextValue: function(newText, toConvert, callback) {
-            setValueWithCursor(newText);
-            callback();
+          reload: async () => {
+            const data = await $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'})));
+            setValueWithCursor(data.content);
             realtimeOptions.onLocal();
-          },
-          getTextValue: function() {
-            return editor.getValue();
-          },
-          getTextAtCurrentRevision: function() {
-            return $.get(XWiki.currentDocument.getRestURL('', $.param({media:'json'}))).then(data => {
-              return data.content;
-            });
           }
         });
       }

@@ -514,7 +514,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeWYSIWYGEditPage firstEditPage = RealtimeWYSIWYGEditPage.gotoPage(testReference);
         RealtimeCKEditor firstEditor = firstEditPage.getContenEditor();
         RealtimeRichTextAreaElement firstTextArea = firstEditor.getRichTextArea();
-        firstTextArea.sendKeys("bold italic");
+        firstTextArea.sendKeys("bold");
 
         //
         // Second Tab
@@ -526,7 +526,7 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         RealtimeCKEditor secondEditor = secondEditPage.getContenEditor();
         RealtimeRichTextAreaElement secondTextArea = secondEditor.getRichTextArea();
 
-        secondTextArea.waitUntilTextContains("italic");
+        secondTextArea.waitUntilTextContains("bold");
         secondTextArea.sendKeys(Keys.END, " underline");
         // Select the "underline" word.
         secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
@@ -536,13 +536,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        // We want to insert the 'italic' text between the 'bold' and 'underline' text, so we need to wait until the
+        // first letter is received, otherwise the 'underline' text could be inserted before 'italic'.
+        firstTextArea.waitUntilTextContains("u");
 
-        // If we don't wait then the italic style might be applied before the "underline" word is retrieved, which leads
-        // to the "underline" word being inserted inside the italic style.
-        firstTextArea.waitUntilTextContains("underline");
-
-        // Select the "italic" word and apply the italic style.
-        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+        // Verify also that we can apply inline style without selecting text.
+        firstTextArea.sendKeys(" ");
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "i"));
 
         //
@@ -558,9 +557,46 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
-        // Select the "bold" word and apply the bold style.
-        firstTextArea.sendKeys(Keys.ARROW_LEFT, Keys.ARROW_LEFT);
+        // Verify that the caret remains inside the empty italic element after remote patches are applied.
+        firstTextArea.waitUntilContentContains("<ins>underline</ins>");
+        // We expect the inline style to have been preserved.
+        firstTextArea.sendKeys("italic");
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        // Move the caret after the underlined text.
+        secondTextArea.sendKeys(Keys.ARROW_RIGHT);
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        // Select partially the "bold" word to apply the bold style, because we want to verify that the selection
+        // direction is preserved.
+        firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT));
+        firstTextArea.sendKeys(Keys.LEFT);
         firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.ARROW_LEFT));
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.RIGHT));
+
+        //
+        // Second Tab
+        //
+
+        setup.getDriver().switchTo().window(secondTabHandle);
+        secondTextArea.sendKeys(" end");
+
+        //
+        // First Tab
+        //
+
+        setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
+        firstTextArea.waitUntilTextContains("end");
+        firstTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.LEFT));
         firstTextArea.sendKeys(Keys.chord(Keys.CONTROL, "b"));
 
         //
@@ -568,9 +604,9 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         //
 
         setup.getDriver().switchTo().window(secondTabHandle);
-        secondTextArea.sendKeys(Keys.ARROW_RIGHT);
-        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "u"));
-        secondTextArea.sendKeys(" end");
+        // Select the "end" word and make it bold.
+        secondTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.CONTROL, Keys.LEFT));
+        secondTextArea.sendKeys(Keys.chord(Keys.CONTROL, "b"));
 
         //
         // First Tab
@@ -579,11 +615,12 @@ class RealtimeWYSIWYGEditorIT extends AbstractRealtimeWYSIWYGEditorIT
         setup.getDriver().switchTo().window(multiUserSetup.getFirstTabHandle());
         firstTextArea.sendKeys(Keys.ARROW_RIGHT, "er");
 
-        firstTextArea.waitUntilTextContains("end");
+        firstTextArea.waitUntilContentContains("<strong>end</strong>");
         // Normalize the spaces because not all browsers behave the same (where some browser inserts a space another may
         // insert a non-breaking space).
         String content = firstTextArea.getContent().replace("&nbsp;", " ");
-        assertTrue(content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> end"),
+        assertTrue(
+            content.contains("<strong>bolder</strong> <em>italic</em> <ins>underline</ins> <strong>end</strong>"),
             "Unexpected content: " + content);
     }
 

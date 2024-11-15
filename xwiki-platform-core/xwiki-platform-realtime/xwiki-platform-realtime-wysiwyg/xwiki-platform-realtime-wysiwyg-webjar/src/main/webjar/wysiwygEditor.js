@@ -28,13 +28,14 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-typingTests',
   'xwiki-realtime-interface',
   'xwiki-realtime-saver',
+  'xwiki-realtime-textCursor',
   'chainpad',
   'xwiki-realtime-crypto',
   'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
   $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  ChainPad, Crypto, Patches
+  TextCursor, ChainPad, Crypto, Patches
 ) {
   'use strict';
 
@@ -261,24 +262,14 @@ define('xwiki-realtime-wysiwyg', [
         channel: this._eventsChannel,
         showNotification: Interface.createMergeMessageElement(
           this._connection.toolbar.toolbar.find('.rt-toolbar-rightside')),
-        setTextValue: (newText) => {
-          this._patchedEditor.setHTML(newText, true);
-        },
-        getTextValue: () => {
-          try {
-            return this._editor.getOutputHTML();
-          } catch (e) {
-            this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
-            return null;
-          }
-        },
-        getTextAtCurrentRevision: () => {
-          return $.get(XWiki.currentDocument.getURL('get', $.param({
+        reload: async () => {
+          const html = await $.get(XWiki.currentDocument.getURL('get', $.param({
             xpage:'get',
             outputSyntax:'annotatedhtml',
             outputSyntaxVersion:'5.0',
             transformations:'macro'
           })));
+          this._patchedEditor.setHTML(html, true);
         }
       };
       this._saver = await new Saver(saverConfig).toBeReady();
@@ -346,7 +337,7 @@ define('xwiki-realtime-wysiwyg', [
 
     _getRealtimeOptions() {
       return {
-        initialState: this._patchedEditor.getHyperJSON() || '{}',
+        initialState: this._patchedEditor.getData().content,
         websocketURL: this._realtimeContext.webSocketURL,
         userName: this._realtimeContext.user.name,
         channel: this._channel,
@@ -360,7 +351,7 @@ define('xwiki-realtime-wysiwyg', [
 
         validateContent: (content) => {
           try {
-            JSON.parse(content || '{}');
+            JSON.parse(content || '[]');
             return true;
           } catch (e) {
             console.error("Failed to parse JSON content, rejecting patch.", {
@@ -467,14 +458,16 @@ define('xwiki-realtime-wysiwyg', [
       this.setEditable(true);
     }
 
-    _onLocal(localContent) {
+    _onLocal(localData) {
       if (this._connection.status !== ConnectionStatus.CONNECTED) {
         return;
       }
-      if (typeof localContent !== 'string') {
-        // Stringify the JSON and send it into ChainPad.
-        localContent = this._patchedEditor.getHyperJSON();
+
+      if (typeof localData?.content !== 'string') {
+        localData = this._patchedEditor.getData();
       }
+      this._connection.localData = localData;
+      const localContent = localData.content;
       console.debug('Push local content: ' + localContent);
       this._connection.chainpad.contentUpdate(localContent);
 
@@ -496,16 +489,57 @@ define('xwiki-realtime-wysiwyg', [
       let remoteContent = info.realtime.getUserDoc();
       console.debug('Received remote content: ' + remoteContent);
 
+      this._maybeTransformLocalSelection(info.patch?.operations, remoteContent);
+
+      const expectedData = {
+        content: remoteContent,
+        // The transformed local selection.
+        selection: this._connection.localData?.selection
+      };
+
       // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
       // to be reloaded, e.g. rendering macros have to be rendered server-side).
-      await this._patchedEditor.setHyperJSON(remoteContent);
+      await this._patchedEditor.setData(expectedData);
 
-      const localContent = this._patchedEditor.getHyperJSON();
-      if (localContent !== remoteContent) {
+      // Verify that the content and the selection have been correctly updated.
+      const actualData = this._patchedEditor.getData();
+      this._verifyLocalDataWasSynced(expectedData, actualData);
+
+      // Update the cached local data.
+      this._connection.localData = actualData;
+    }
+
+    /**
+     * Transform the local (text-based) selection (that was saved relative to the HyperJSON content) using the (remote)
+     * operations that were applied to the local content.
+     *
+     * @param {ChainPad.Operation[]} operations an array of operations to apply to the local selection
+     * @param {string} updatedContent the content after the given operations were applied
+     */
+    _maybeTransformLocalSelection(operations, updatedContent) {
+      // Check if there is a saved local selection to transform.
+      if (this._connection.localData?.selection?.length) {
+        operations = operations || ChainPad.Diff.diff(this._connection.localData.content, updatedContent);
+        this._connection.localData.selection.forEach(boundary => {
+          boundary.offset = TextCursor.transformCursor(boundary.offset, operations);
+        });
+      }
+    }
+
+    _verifyLocalDataWasSynced(expectedData, actualData) {
+      if (actualData.content !== expectedData.content) {
         console.warn('Unexpected local content after synchronization: ', {
-          expected: remoteContent,
-          actual: localContent,
-          diff: ChainPad.Diff.diff(remoteContent, localContent)
+          expected: expectedData.content,
+          actual: actualData.content,
+          diff: ChainPad.Diff.diff(expectedData.content, actualData.content)
+        });
+      }
+
+      if (expectedData.selection?.length &&
+          JSON.stringify(expectedData.selection) !== JSON.stringify(actualData.selection)) {
+        console.warn('Unexpected local selection after synchronization: ', {
+          expected: expectedData.selection,
+          actual: actualData.selection
         });
       }
     }
@@ -530,7 +564,7 @@ define('xwiki-realtime-wysiwyg', [
       this._updateChannels().then(() => {
         if (this._channel === oldChannel) {
           // The Netflux channel used before the WebSocket connection closed is still available so we can still use it.
-          callback(this._channel, this._patchedEditor.getHyperJSON());
+          callback(this._channel, this._patchedEditor.getData().content);
         } else {
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
@@ -611,15 +645,15 @@ define('xwiki-realtime-wysiwyg', [
       if (this._connection.status === ConnectionStatus.PAUSED) {
         this._connection.status = ConnectionStatus.CONNECTED;
         const remoteContentAfterLock = this._connection.chainpad.getUserDoc();
-        const localContentAfterLock = this._patchedEditor.getHyperJSON();
+        const localDataAfterLock = this._patchedEditor.getData();
         if (remoteContentAfterLock === this._connection.remoteContentBeforeLock) {
           // We didn't receive any remote changes while the editor was locked.
-          if (localContentAfterLock !== this._connection.remoteContentBeforeLock) {
+          if (localDataAfterLock.content !== this._connection.remoteContentBeforeLock) {
             // The local content has changed while the editor was locked (e.g. because one of the inserted macros is
             // editable in-place and its rendering added nested editable areas).
             this._onLocal();
           }
-        } else if (localContentAfterLock === this._connection.remoteContentBeforeLock) {
+        } else if (localDataAfterLock.content === this._connection.remoteContentBeforeLock) {
           // The local content didn't change while the editor was locked, but we received remote changes. Let's apply
           // them.
           this._onRemote({
@@ -627,8 +661,11 @@ define('xwiki-realtime-wysiwyg', [
           });
         } else {
           // The local content and the remote content have diverged. We need a 3-way merge.
-          this._onLocal(Patches.merge(this._connection.remoteContentBeforeLock, remoteContentAfterLock,
-            localContentAfterLock));
+          this._onLocal({
+            content: Patches.merge(this._connection.remoteContentBeforeLock, remoteContentAfterLock,
+              localDataAfterLock.content),
+            selection: localDataAfterLock.selection
+          });
           this._onRemote({
             realtime: this._connection.chainpad
           });

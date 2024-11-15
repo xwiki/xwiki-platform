@@ -23,6 +23,14 @@ define('xwiki-ckeditor-realtime-adapter', [
 ], function (Editor, JSONSortify) {
   'use strict';
 
+  // The attribute used to mark the empty elements that hold the caret of the current user or some remote user. We need
+  // to mark these elements in order to prevent CKEditor from removing them from the output HTML that is synchronized
+  // between editors.
+  const EMPTY_CARET_HOLDER = 'data-xwiki-realtime-empty-caret';
+
+  // The attribute used by CKEditor to mark elements that must not be removed when filtering the input and output HTML.
+  const CKE_SURVIVE = 'data-cke-survive';
+
   /**
    * Implementation of the {@link Editor} "interface" for CKEditor.
    */
@@ -58,6 +66,8 @@ define('xwiki-ckeditor-realtime-adapter', [
           this._unlockCallbacks.forEach(callback => callback());
         }
       });
+
+      this._protectEmptyElementsHoldingCaret();
     }
 
     /** @inheritdoc */
@@ -69,6 +79,7 @@ define('xwiki-ckeditor-realtime-adapter', [
     getOutputHTML() {
       const fullPage = this._ckeditor.config.fullPage;
       const includeUploadWidgetsInOutputHTML = this._ckeditor.config._includeUploadWidgetsInOutputHTML;
+      const includeEmptyElementsHoldingCaret = this._ckeditor.config._includeEmptyElementsHoldingCaret;
       try {
         // We're interested only in the edited content (what's inside the content wrapper). Moreover, the returned HTML
         // should be independent of the editor type (iframe-based on in-place).
@@ -79,11 +90,14 @@ define('xwiki-ckeditor-realtime-adapter', [
         // different: e.g. instead of <text><uploadWidget><text> we end up having only <text>, i.e. the adjacent text
         // nodes are merged together).
         this._ckeditor.config._includeUploadWidgetsInOutputHTML = true;
+        // See _protectEmptyElementsHoldingCaret()
+        this._ckeditor.config._includeEmptyElementsHoldingCaret = true;
         return this._ckeditor.getData();
       } finally {
         // Restore the configuration value.
         this._ckeditor.config.fullPage = fullPage;
         this._ckeditor.config._includeUploadWidgetsInOutputHTML = includeUploadWidgetsInOutputHTML;
+        this._ckeditor.config._includeEmptyElementsHoldingCaret = includeEmptyElementsHoldingCaret;
       }
     }
 
@@ -111,10 +125,11 @@ define('xwiki-ckeditor-realtime-adapter', [
 
       let updatedNodes = [];
       try {
+        this._CKEDITOR.plugins.xwikiSelection.saveSelection(this._ckeditor);
         this._protectWidgets(this._ckeditor.widgets.instances);
-        updatedNodes = updater(this.getContentWrapper());
+        updatedNodes = updater.patchContent(this.getContentWrapper());
       } finally {
-        await this._updateWidgets(updatedNodes);
+        await this._updateWidgetsAndRestoreSelection(updater, updatedNodes);
 
         // Push the updated content to remote users, when saving the snapshot, if this is a local change.
         // See #onChange() below.
@@ -125,6 +140,31 @@ define('xwiki-ckeditor-realtime-adapter', [
         // empty line placeholders).
         this._ckeditor.fire('saveSnapshot');
         delete this._isRemoteChange;
+      }
+    }
+
+    async _updateWidgetsAndRestoreSelection(updater, updatedNodes) {
+      const shouldRefreshContent = this._updateWidgets(updatedNodes);
+
+      const ranges = updater.restoreSelection(this.getContentWrapper());
+      if (ranges.length) {
+        // Restore the selection that was transformed using the received remote patches.
+        console.debug('Restore transformed selection');
+        this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, ranges);
+      }
+
+      if (shouldRefreshContent) {
+        // Preserve the selection if it was restored above, after the content was updated. Otherwise we'll take care
+        // of restoring the selection after the content is refreshed (see below).
+        await this._refreshContent(ranges.length > 0);
+      }
+
+      if (!ranges.length) {
+        // Restore the selection using the saved text-based selection because there were no ranges transformed by the
+        // remote patches. This can happen for instance when the selection starts or ends inside the read-only part of
+        // a widget (e.g. the macro output) which is not synchronized between editors.
+        console.debug('Restore saved text selection');
+        this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor);
       }
     }
 
@@ -140,20 +180,6 @@ define('xwiki-ckeditor-realtime-adapter', [
     /** @inheritdoc */
     getSelection() {
       return this._CKEDITOR.plugins.xwikiSelection.getSelection(this._ckeditor);
-    }
-
-    /** @inheritdoc */
-    saveSelection() {
-      this._CKEDITOR.plugins.xwikiSelection.saveSelection(this._ckeditor);
-    }
-
-    /** @inheritdoc */
-    restoreSelection(ranges) {
-      this._CKEDITOR.plugins.xwikiSelection.restoreSelection(this._ckeditor, ranges);
-
-      // Update the focused and selected widgets, as well as the widget holding the focused editable, after the
-      // selection is restored.
-      this._ckeditor.widgets.checkSelection();
     }
 
     /** @inheritdoc */
@@ -175,8 +201,14 @@ define('xwiki-ckeditor-realtime-adapter', [
     }
 
     /** @inheritdoc */
-    showNotification(message, type) {
-      this._ckeditor.showNotification(message, type);
+    filterInputContent(contentWrapper) {
+      // Make sure the empty elements holding the caret for remote users are not removed when the content is parsed (and
+      // filtered) by CKEditor. They are removed by default because they can't be edited by the current user, but in our
+      // case it's not the current user that is editing them but the remote user that has the caret in that position.
+      // See _protectEmptyElementsHoldingCaret()
+      contentWrapper.querySelectorAll(`[${EMPTY_CARET_HOLDER}]:empty`).forEach(emptyCaretHolder => {
+        emptyCaretHolder.setAttribute(CKE_SURVIVE, '1');
+      });
     }
 
     /** @inheritdoc */
@@ -347,7 +379,7 @@ define('xwiki-ckeditor-realtime-adapter', [
       return JSONSortify(data);
     }
 
-    async _updateWidgets(updatedNodes) {
+    _updateWidgets(updatedNodes) {
       // Reset the focused and selected widgets, as well as the widget holding the focused editable because they may
       // have been invalidated by the DOM changes.
       this._ckeditor.widgets.focused = null;
@@ -399,16 +431,12 @@ define('xwiki-ckeditor-realtime-adapter', [
       // the DOM.
       this._ckeditor.widgets.checkWidgets();
 
-      if (shouldRefreshContent) {
-        await this._refreshContent();
-      }
+      return shouldRefreshContent;
     }
 
-    async _refreshContent() {
+    async _refreshContent(preserveSelection) {
       console.debug('Refreshing the content to re-render the macros.');
-      // Refresh the content to re-render the macros. Don't preserve the selection because this is done by the realtime
-      // framework when applying remove changes.
-      this._ckeditor.execCommand('xwiki-refresh', {preserveSelection: false});
+      this._ckeditor.execCommand('xwiki-refresh', {preserveSelection});
 
       return new Promise(resolve => {
         const macroPlugin = this._ckeditor.plugins['xwiki-macro'];
@@ -418,6 +446,52 @@ define('xwiki-ckeditor-realtime-adapter', [
           resolve();
         }
       });
+    }
+
+    /**
+     * CKEditor removes by default from the input / output HTML all the empty elements because they can't be edited.
+     * This is fine when the content is saved or loaded into the editor, but it's not good when the content is
+     * synchronized between editors because it prevents the user from inserting inline styles without selecting some
+     * text first, if other users are making changes at the same time.
+     */
+    _protectEmptyElementsHoldingCaret() {
+      // Used to find the previous empty element holding the caret. We don't keep the reference to the actual DOM
+      // element because the DOM nodes can change when remote changes are applied.
+      const userId = String(Math.random()).substring(2);
+      this._ckeditor.on('change', () => {
+        // Remove the marker from the previous empty element holding the caret.
+        this._ckeditor.editable().findOne(`[${EMPTY_CARET_HOLDER}="${userId}"]`)
+          ?.removeAttributes([EMPTY_CARET_HOLDER, CKE_SURVIVE]);
+        // Check if the selection is collapsed in an empty element.
+        const ranges = this._ckeditor.getSelection()?.getRanges();
+        if (ranges?.length === 1 && ranges[0].collapsed &&
+            ranges[0].startContainer.type === this._CKEDITOR.NODE_ELEMENT &&
+            !ranges[0].startContainer.getChildCount()) {
+          ranges[0].startContainer.setAttributes({
+            [EMPTY_CARET_HOLDER]: userId,
+            // Force CKEditor to keep this element in the HTML output so that it gets included in the content that is
+            // synchronized between editors.
+            [CKE_SURVIVE]: 1
+          });
+        }
+      // If we don't use a lower priority for our listener then the CKE_SURVIVE attribute gets removed.
+      }, null, null, 1000);
+
+      // Make sure the EMPTY_CARET_HOLDER marker is not saved. We want it to be included in the output HTML only when
+      // that HTML is used for realtime synchronization.
+      this._ckeditor.dataProcessor?.htmlFilter?.addRules({
+        elements: {
+          '^': element => {
+            if (!this._ckeditor.config._includeEmptyElementsHoldingCaret && element.attributes[EMPTY_CARET_HOLDER]) {
+              delete element.attributes[EMPTY_CARET_HOLDER];
+              if (!element.children.length) {
+                // Remove the empty element (replicate the default CKEditor behavior).
+                return false;
+              }
+            }
+          }
+        }
+      }, {priority: 5, applyToAll: true});
     }
   }
 

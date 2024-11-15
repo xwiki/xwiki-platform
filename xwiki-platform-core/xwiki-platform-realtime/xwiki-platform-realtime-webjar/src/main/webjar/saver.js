@@ -394,9 +394,7 @@ define('xwiki-realtime-saver', [
         reloadEditor: () => {
           doc.reload();
           // TODO: Handle the page title.
-          this._config.getTextAtCurrentRevision().then(data => {
-            this._config.setTextValue(data);
-          });
+          this._config.reload();
           // HACK: Replicate the behavior from the in-place editor.
           setTimeout(() => {
             $(form).trigger('xwiki:actions:reload');

@@ -1246,7 +1246,7 @@ path=$services.webjars.url('org.xwiki.contrib:netflux-websocket-webjar', 'netflu
     <property>
       <parameters>id=xwiki-realtime
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-webjar', 'webjar.bundle.min.js')
-bundles=xwiki-realtime-config,xwiki-realtime-crypto,xwiki-realtime-document,xwiki-realtime-interface,xwiki-realtime-loader,xwiki-realtime-messages,xwiki-realtime-saver,xwiki-realtime-toolbar,xwiki-realtime-typingTests,xwiki-realtime-userData</parameters>
+bundles=xwiki-realtime-config,xwiki-realtime-crypto,xwiki-realtime-document,xwiki-realtime-interface,xwiki-realtime-loader,xwiki-realtime-messages,xwiki-realtime-saver,xwiki-realtime-textCursor,xwiki-realtime-toolbar,xwiki-realtime-typingTests,xwiki-realtime-userData</parameters>
     </property>
     <property>
       <scope>wiki</scope>

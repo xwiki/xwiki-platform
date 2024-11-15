@@ -482,7 +482,7 @@ require(['xwiki-realtime-wikiEditor-loader'], function() {});</code>
     <property>
       <parameters>id=xwiki-realtime-wikiEditor-bundle
 path=$services.webjars.url('org.xwiki.platform:xwiki-platform-realtime-wiki-webjar', 'webjar.bundle.min.js')
-bundles=xwiki-realtime-wikiEditor,xwiki-realtime-wikiEditor-loader,xwiki-realtime-textCursor</parameters>
+bundles=xwiki-realtime-wikiEditor,xwiki-realtime-wikiEditor-loader</parameters>
     </property>
     <property>
       <scope>wiki</scope>

@@ -688,8 +688,7 @@ class PDFExportIT
                 contentWithoutWhitespace.indexOf(/* Page */ "Child" + /* Location */ "PDFExportITLiveTable" + "Child");
             int parentIndex =
                 contentWithoutWhitespace.indexOf(/* Page */ "WebHome" + /* Location */ "PDFExportITLiveTable");
-            assertTrue(childIndex < parentIndex,
-                "Unexpected content: " + content + "\n contentWithoutLineEndings: " + contentWithoutWhitespace);
+            assertTrue(childIndex < parentIndex, "Unexpected content: " + content);
         }
     }
 

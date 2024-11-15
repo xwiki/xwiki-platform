@@ -1,1 +1,6 @@
-{}
+{
+    "history.extraTabs.loading": "Lädt...",
+    "history.extraTabs.entry": "{date} von {user}",
+    "history.extraTabs.title": "Historie",
+    "history.extraTabs.header": "Diese Seite hat {nRevisions} Versionen gespeichert."
+}

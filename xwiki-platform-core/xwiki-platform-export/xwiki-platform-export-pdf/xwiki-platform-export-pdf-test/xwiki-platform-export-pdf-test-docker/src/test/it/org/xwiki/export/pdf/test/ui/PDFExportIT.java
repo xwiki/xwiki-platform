@@ -679,9 +679,17 @@ class PDFExportIT
                     .contains("Results 1 - 2 out of 2 per page of 15\nPage Location Date Last Author Actions\nlive\n"),
                 "Unexpected content: " + content);
             // Verify the results and the order.
-            int childIndex = content.indexOf("Child PDFExportITLiveTable\nChild");
-            int parentIndex = content.indexOf("WebHome PDFExportITLiveTable");
-            assertTrue(childIndex < parentIndex, "Unexpected content: " + content);
+            // Depending on the screen width the text from the live table cells might be wrapped on multiple lines,
+            // which translates to new lines in the PDF text as well. For this reason we need to do the lookup ignoring
+            // line endings. Moreover, we normally get a space character between the text from two adjacent cells, but
+            // even this is not always consistent, so we need to ignore spaces also.
+            String contentWithoutWhitespace = content.replaceAll("\\s+", "");
+            int childIndex =
+                contentWithoutWhitespace.indexOf(/* Page */ "Child" + /* Location */ "PDFExportITLiveTable" + "Child");
+            int parentIndex =
+                contentWithoutWhitespace.indexOf(/* Page */ "WebHome" + /* Location */ "PDFExportITLiveTable");
+            assertTrue(childIndex < parentIndex,
+                "Unexpected content: " + content + "\n contentWithoutLineEndings: " + contentWithoutWhitespace);
         }
     }
 

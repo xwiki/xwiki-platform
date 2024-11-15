@@ -84,7 +84,7 @@
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
         <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA" length="768" index="DOC_ORIGINAL_METADATA" />
         <property name="enforceRequiredRights" type="boolean">
-            <column name="XWD_ENFORCE_REQUIRED_RIGHTS" default="false" index="DOC_ENFORCE_REQUIRED_RIGHTS"
+            <column name="XWD_ENFORCE_REQUIRED_RIGHTS" default="0" index="DOC_ENFORCE_REQUIRED_RIGHTS"
                 not-null="true"/>
         </property>
     </class>

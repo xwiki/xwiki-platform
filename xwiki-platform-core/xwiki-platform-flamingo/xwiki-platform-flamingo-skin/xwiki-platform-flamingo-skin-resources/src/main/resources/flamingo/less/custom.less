@@ -1,4 +1,270 @@
-/*
- * Voluntary left empty.
- * This file is intended to be used by custom skins that want to override styling.
- */
+@font-face {
+  font-family: 'OpenSans-R';
+  src: url('../fonts/OpenSans-Regular.ttf');
+}
+@font-face {
+  font-family: 'OpenSans-SB';
+  src: url('../fonts/OpenSans-Semibold.ttf');
+}
+@font-face {
+  font-family: 'CondPro-M';
+  src: url('../fonts/pfdintextcondpro-medium.ttf');
+}
+
+@color-primary: #405965;
+@color-secondary: #0066b3;
+@color-active: #f15a22;
+@color-bg-main: #f4f7fc;
+@color-bg-secondary: #e9ebf0;
+
+@size-text-title: 48px;
+@size-text-subtitle: 24px;
+@size-text-header: 20px;
+@size-text-primary: 16px;
+@size-text-secondary: 14px;
+
+@brand-primary: @color-secondary;
+@text-color: @color-primary;
+
+html, body, #xwikimaincontainer, #xwikimaincontainerinner {
+  height: 100%;
+}
+#xwikimaincontainerinner {
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  color: @color-primary;
+  font-family: 'OpenSans-R';
+  font-size: @size-text-primary;
+}
+
+#contentcontainerinner {
+  background-image: -moz-linear-gradient(top, #e2edf9 0%, #e2edf9 20%, #f4f8fc 60%, rgba(244, 247, 252, 1) 100%);
+  background-image: -webkit-linear-gradient(top, #e2edf9 0%, #e2edf9 20%, #f4f8fc 60%, rgba(244, 247, 252, 1) 100%);
+  background-image: linear-gradient(to bottom, #e2edf9 0%, #e2edf9 20%, #f4f8fc 60%, rgba(244, 247, 252, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2edf9', endColorstr='#f4f7fc',GradientType=0 );
+  background-size: 100% 170px;
+  background-repeat: no-repeat;
+}
+
+a {
+  color: @color-secondary;
+}
+a:hover {
+  color: @color-active;
+}
+
+.btn {
+  color: @color-secondary !important;
+  padding: 8px 16px;
+  border-color: @color-secondary !important;
+  border-radius: 2px;
+  background-color: #fff !important;
+  box-shadow: none !important;
+  outline: transparent !important;
+}
+.btn:hover {
+  border-radius: 8px;
+}
+.btn-primary {
+  color: #fff !important;
+  border-color: @color-secondary !important;
+  background-color: @color-secondary !important;
+}
+.btn-primary:hover {
+  color: #fff !important;
+  background-color: #008ad9 !important;
+  border-color: #008ad9 !important;
+}
+
+.navbar.actionmenu {
+  button, .icon-navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff !important;
+    border-radius: 0 !important;
+    background-color: @color-active !important;
+  }
+  .icon-navbar {
+    padding-top: 18px;
+  }
+  .globalsearch .btn {
+    color: #fff !important;
+    border-radius: 0 !important;
+    background-color: @color-secondary !important;
+  }
+  .btn-primary.drawer-close {
+    color: @color-secondary !important;
+    background-color: #fff !important;
+  }
+}
+
+h1, #document-title h1 {
+  font-family: 'CondPro-M';
+  font-size: @size-text-title;
+}
+h2 {
+  font-family: 'CondPro-M';
+  font-size: @size-text-subtitle;
+}
+h1.xwikipaneltitle, h2.xwikipaneltitle {
+  font-size: @size-text-header;
+  border: 0;
+  box-shadow: none;
+}
+
+.form-control,
+input[type="color"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+select, textarea {
+  height: 38px;
+}
+
+#companylogo {
+  max-width: 200px;
+  height: 55px;
+  line-height: 55px;
+  margin: 5px 0 5px 10px;
+}
+
+.navbar-default {
+  background-color: #fff;
+}
+.navbar-nav > li {
+  padding: 10px 8px 0 0;
+
+  button, .icon-navbar {
+    height: 44px;
+    width: 44px;
+  }
+}
+
+#globalsearch #headerglobalsearchinput {
+  height: 42px;
+  box-shadow: 0 0 15px 0px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  background-color: @color-bg-main;
+}
+
+.main {
+  background-color: transparent;
+}
+
+#leftPanels, #rightPanels {
+  padding-top: 78px;
+  background-color: transparent;
+
+  .nav > li + li {
+    margin-top: 4px;
+  }
+}
+
+.panel {
+  color: @color-primary;
+  background-color: transparent;
+}
+
+.noitems,
+#hierarchy, #xdocAuthors, .xdocLastModification, #xdocFooter, #historyform td, #changes-info {
+  color: @color-primary;
+  font-size: @size-text-secondary;
+}
+
+#hierarchy_breadcrumb {
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  background-color: transparent;
+}
+#hierarchy_breadcrumb .breadcrumb {
+  padding: 0;
+  background-color: transparent;
+}
+
+#mainContentArea {
+  border-radius: 2px;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.07);
+}
+#xdocFooter {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  box-shadow: 0 10px 10px 0px rgba(0, 0, 0, 0.02);
+}
+
+.document-header + hr {
+  border-bottom: solid 7px @color-secondary;
+}
+
+ul.xlist li.create a {
+  color: @color-primary;
+}
+
+.xwikitabbar > li > a, #docextrapanes {
+  border: 0 !important;
+}
+.xwikitabbar > li > a:hover, .xwikitabbar > li > a:focus {
+  background-color: @color-bg-secondary;
+}
+
+.skin-flamingo .jstree-xwiki .jstree-anchor {
+  border: 0;
+  background-color: transparent;
+  box-shadow: none
+}
+
+.jstree-xwiki>.jstree-no-dots.jstree-no-icons {
+  .jstree-ocl {
+    color: @color-secondary;
+  }
+  .jstree-leaf > .jstree-ocl:before {
+    content: '\f0c8';
+    margin-right: 10px;
+  }
+}
+
+#tmDrawer.drawer-nav {
+  .drawer-menu .drawer-brand {
+    border: 0;
+    background-color: @color-secondary;
+  }
+  .drawer-category-header {
+    font-family: 'CondPro-M';
+    font-size: @size-text-header;
+    background-color: @color-bg-secondary;
+  }
+}
+
+.well {
+  padding: 20px;
+  border: 0;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.07);
+}
+
+#xwikicontent .infomessage {
+  color: @color-secondary;
+  background-color: @color-bg-main;
+}
+
+#footerglobal {
+  flex: 1;
+  background: @color-bg-secondary url(../imgs/footer-bg.png) no-repeat bottom right;
+  background-size: 100%;
+
+  a {
+    color: @color-primary;
+  }
+}

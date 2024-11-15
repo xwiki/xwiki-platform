@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>16.9.0</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-webjar</artifactId>
@@ -141,6 +141,16 @@
                     passed to the Java application (CKBuilder in this case). -->
                   <token>java -jar</token>
                   <value>java \$JVM_ARGS -jar</value>
+                </replacement>
+                <replacement>
+                  <!-- The arguments that appear before -jar are passed to the JVM while those that appear after are
+                    passed to the Java application (CKBuilder in this case). -->
+                  <token>VERSION=\$</token>
+                  <value>#VERSION=\$</value>
+                </replacement>
+                <replacement>
+                  <token>REVISION=\$</token>
+                  <value>#REVISION=\$</value>
                 </replacement>
               </replacements>
             </configuration>

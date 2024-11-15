@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-test</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>16.9.0</version>
   </parent>
   <artifactId>xwiki-platform-search-test-docker</artifactId>
   <name>XWiki Platform - Search - Tests - Functional Docker Tests</name>

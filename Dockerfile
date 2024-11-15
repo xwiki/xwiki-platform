@@ -59,4 +59,6 @@ EXPOSE 8080
 
 # Сборка проекта Xwiki
 WORKDIR /src/xwiki
-RUN mvn clean install -DskipTests=true -Dxwiki.checkstyle.skip=true -Denforcer.skip=true -Pclover
+RUN mvn clean install -DskipTests=true -Dxwiki.checkstyle.skip=true -Denforcer.skip=true -Pclover && \
+    cd /src/xwiki/xwiki-platform-distribution/xwiki-platform-distribution-war && \
+    mvn clean install -DskipTests=true -Dxwiki.checkstyle.skip=true -Denforcer.skip=true

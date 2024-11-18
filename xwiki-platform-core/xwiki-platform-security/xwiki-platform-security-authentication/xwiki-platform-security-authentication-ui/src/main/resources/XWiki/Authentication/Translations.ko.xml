@@ -57,4 +57,4 @@ security.authservice.admin.component.noService=대체 인증 서비스를 찾을
 security.authservice.admin.other.warning=현재 인증 서비스는 사용자 정의 시스템에 의해 삽입되므로 수정할 수 없습니다.
 security.authservice.admin.class.warning=현재 인증 서비스는 xwiki .cfg 구성 파일에 의해 제어되기 때문에 수정할 수 없습니다.
 </content>
-</xwikidoc>
+  </xwikidoc>

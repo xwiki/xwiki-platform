@@ -36,16 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.deletedDocuments.deleteAll=全部删除
-index.administration.remainingTasks.heading=剩余文档分析任务
-index.administration.remainingTasks.emptyQueue=没有剩余任务。
-admin.documentanalysis=文档分析
-
-#######################################
-## until 16.3.0RC1
-#######################################
-
-index.spacesMacro.title=空间
+  <content>index.spacesMacro.title=空间
 index.spacesMacro.spaceIndex.title=查看空间索引
 index.spacesMacro.spaceIndex.alt=空间索引
 index.spacesMacro.spaceAdministration.title=查看空间管理
@@ -53,5 +44,5 @@ index.spacesMacro.spaceAdministration.alt=管理空间
 index.spacesMacro.createSpace.link=创建新空间
 index.spacesMacro.createSpace.defaultSpaceName=空间名
 index.spacesMacro.createSpace.submit=创建
-</content>
+index.deletedDocuments.deleteAll=全部删除</content>
 </xwikidoc>

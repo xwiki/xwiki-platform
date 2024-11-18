@@ -86,7 +86,6 @@ rendering.macro.children.name=Unterseiten
 rendering.macro.children.description=Zeigt einen Baum von Unterseiten der aktuellen Seite an
 index.documentTree.empty=Keine Seiten gefunden
 index.documentTree.more={0} mehr ...
-index.documentTree.addDocument=Neue Seite...
 
 ## Deprecated translation keys
 

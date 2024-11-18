@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="zh">
+<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="zh">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>zh</language>
@@ -50,33 +50,5 @@ extension.repository.installedCount=安装次数
 
 ## Administration UI
 admin.repository=扩展库
-
-## Support
-repository.support.createsupporter=注册
-
-## Supporters
-repository.supporter.sheet.description=此页面控制 ExtensionSupporter 页面在查看和编辑模式下的显示方式。
-repository.supporter.sheet.noObject=当前页面没有预期的 ExtensionSupporter 对象。
-repository.supporter.sheet.createplan=添加
-repository.supporter.sheet.plans=计划
-### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
-ExtensionCode.ExtensionSupporterClass_doc.title=名称
-ExtensionCode.ExtensionSupporterClass_summary=摘要
-ExtensionCode.ExtensionSupporterClass_url=网址
-ExtensionCode.ExtensionSupporterClass_email=邮件
-ExtensionCode.ExtensionSupporterClass_content=详情
-ExtensionCode.ExtensionSupporterClass_active=活动
-
-## Support plans
-repository.supportplan.sheet.description=此页面控制 ExtensionSupportPlan 页面在查看和编辑模式下的显示方式。
-repository.supportplan.sheet.noObject=当前页面没有预期的 ExtensionSupportPlan 对象。
-### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
-### Missing: ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
-### Missing: ExtensionCode.ExtensionSupportPlanClass_url=URL
-### Missing: ExtensionCode.ExtensionSupportPlanClass_content=Details
-### Missing: ExtensionCode.ExtensionSupportPlanClass_active=Active
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
 </content>
 </xwikidoc>

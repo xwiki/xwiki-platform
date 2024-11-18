@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.DocumentTreeTranslations" locale="">
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>DocumentTreeTranslations</name>
   <language/>
@@ -88,7 +88,6 @@ rendering.macro.children.description=Displays a tree of children pages of the cu
 
 index.documentTree.empty=No pages found
 index.documentTree.more={0} more ...
-index.documentTree.addDocument=New page...
 
 ## Deprecated translation keys
 
@@ -113,8 +112,6 @@ rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

@@ -57,7 +57,7 @@ rendering.macro.documentTree.parameter.showObjects.description=是否显示页�
 rendering.macro.documentTree.parameter.showClassProperties.name=显示类属性
 rendering.macro.documentTree.parameter.showClassProperties.description=是否显示定义类的页面的类属性。
 rendering.macro.documentTree.parameter.root.name=根
-rendering.macro.documentTree.parameter.root.description=根节点编号。如果您希望只显示给定节点（即特定根节点）的后代，这很有用。该树在第一层显示根节点的子节点，因此根节点实际上不会显示。如果未指定根节点，将显示整个树。节点标识符的格式是实体类型：实体引用，其中实体类型可以是例如Wiki、空间、文档，例如wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.root.description=根节点编号。如果您希望只显示给定节点（即特定根节点）的后代，这很有用。该树在第一层显示根节点的子节点，因此根节点实际上不会显示。如果未指定根节点，将显示整个树。节点标识符的格式是实体类型：实体引用，其中实体类型可以是例如Wiki、空间、文档，例如wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome。
 rendering.macro.documentTree.parameter.showRoot.name=显示根
 rendering.macro.documentTree.parameter.showRoot.description=是否显示根节点。默认情况下不显示根节点，因为它通常是由显示的树的上下文暗示（例如树前面的标签）。但是在某些情况下，您可能想要显示根节点：能够在根下创建一个新节点。
 rendering.macro.documentTree.parameter.compact.name=紧凑
@@ -82,11 +82,8 @@ rendering.macro.documentTree.parameter.showOnlyViewable.name=仅显示可见
 ### Missing: rendering.macro.documentTree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large.
 ### Missing: rendering.macro.documentTree.parameter.exclusions.name=Exclusions
 ### Missing: rendering.macro.documentTree.parameter.exclusions.description=The list of nodes to exclude from the tree. The nodes are specified by their id and separated by comma.
-### Missing: rendering.macro.children.name=Children
-### Missing: rendering.macro.children.description=Displays a tree of children pages of the current page
 index.documentTree.empty=无
 ### Missing: index.documentTree.more={0} more ...
-### Missing: index.documentTree.addDocument=New page...
 
 ## Deprecated translation keys
 

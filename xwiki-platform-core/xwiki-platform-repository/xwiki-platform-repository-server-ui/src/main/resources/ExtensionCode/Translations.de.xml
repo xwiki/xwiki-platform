@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="de">
+<xwikidoc version="1.3" reference="ExtensionCode.Translations" locale="de">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>de</language>
@@ -49,34 +49,5 @@ extension.repository.rating=Bewertung
 extension.repository.installedCount=Installationen
 
 ## Administration UI
-admin.repository=Repository mit Erweiterungen
-
-## Support
-repository.support.createsupporter=Registrieren
-
-## Supporters
-repository.supporter.sheet.description=Diese Seite steuert, wie Extension-Supporter-Seiten im Anzeige- und Bearbeitungsmodus angezeigt werden.
-repository.supporter.sheet.noObject=Die aktuelle Seite verfügt nicht über das erwartete Extension-Supporter-Objekt.
-repository.supporter.sheet.createplan=Hinzufügen
-repository.supporter.sheet.plans=Pläne
-### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
-ExtensionCode.ExtensionSupporterClass_doc.title=Name
-ExtensionCode.ExtensionSupporterClass_summary=Zusammenfassung
-ExtensionCode.ExtensionSupporterClass_url=URL
-ExtensionCode.ExtensionSupporterClass_email=E-Mail
-ExtensionCode.ExtensionSupporterClass_content=Erläuterungen
-ExtensionCode.ExtensionSupporterClass_active=Aktiv
-
-## Support plans
-repository.supportplan.sheet.description=Diese Seite steuert, wie ExtensionSupport-Plan-Seiten sowohl im Ansichts- als auch im Bearbeitungsmodus angezeigt werden.
-repository.supportplan.sheet.noObject=Die aktuelle Seite verfügt nicht über das erwartete Extension-Support-Plan-Objekt.
-### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
-ExtensionCode.ExtensionSupportPlanClass_doc.title=Name
-ExtensionCode.ExtensionSupportPlanClass_supporter=Unterstützer
-ExtensionCode.ExtensionSupportPlanClass_summary=Zusammenfassung
-ExtensionCode.ExtensionSupportPlanClass_url=URL
-ExtensionCode.ExtensionSupportPlanClass_content=Erläuterungen
-ExtensionCode.ExtensionSupportPlanClass_active=Aktiv
-ExtensionCode.ExtensionSupportPlanClass_paying=Bezahlen
-</content>
+admin.repository=Repository mit Erweiterungen</content>
 </xwikidoc>

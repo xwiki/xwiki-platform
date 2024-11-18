@@ -37,14 +37,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.ratings=评级
+
 rating.rate=评价！
 rating.saveexception=保存评价的时候发生错误。
 rating.votenotvalid=你不能对{}进行评级。
 rating.voteoutofbounds=这个评级数值超出计算范围。
 rating.setvote.inprogress=你的评级正在保存...
 rating.setvote.success=你的评级已经保存！
-rating.setvote.error=保存投票时出错。
-XWiki.Ratings.RatingsConfigurationClass_enabled=打开评级
+rating.setvote.error=你评级出现了系统错误！
+XWiki.Ratings.RatingsConfigurationClass_enabled=打开评级开关。
 XWiki.Ratings.RatingsConfigurationClass_enabled.hint=如果打开，用户可以进行对这个页面进行评级，并且可以观看平均评级平均分数，如果关闭就会不能看到相关评级信息。
 
 #@deprecatedstart
@@ -57,11 +58,11 @@ XWiki.Ratings.RatingsConfigurationClass_enabled.hint=如果打开，用户可以
 ### Missing: admin.ratings.ratingsactivated=Ratings have been activated
 ### Missing: admin.ratings.ratingsdeactivated=Ratings have been deactivated
 ### Missing: admin.ratings.illegalrequest=Illegal request
+
 ### Missing: rating.yourvote=Your vote
 ### Missing: rating.logintorate=Login to rate
 ### Missing: rating.novotes=No votes yet
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

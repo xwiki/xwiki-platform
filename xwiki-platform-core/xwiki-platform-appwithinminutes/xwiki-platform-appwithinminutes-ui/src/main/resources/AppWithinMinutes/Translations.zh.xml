@@ -203,7 +203,6 @@ platform.appwithinminutes.appHomePageEditAppLabel=编辑应用
 platform.appwithinminutes.appHomePageTranslateAppLabel=翻译应用
 platform.appwithinminutes.appHomePageDeleteAppLabel=删除应用
 platform.appwithinminutes.appHomePageMovedWarning=此应用可能无法正常工作，因为其已经被改名或移动但没有更新代码。请编辑此应用，按步骤更新代码。
-platform.appwithinminutes.appHomePageNoScriptRight=您没有创建或编辑应用程序所需的脚本权限。继续时，应用程序可能无法正常工作。
 ### Missing: AppWithinMinutes.LiveTableClass_description=Description
 AppWithinMinutes.LiveTableClass_columns=动态列表字段
 
@@ -213,10 +212,6 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=应用 {0} 的所有条�
 platform.appwithinminutes.deleteAppDoesNotExistError=指定的应用不存在。
 platform.appwithinminutes.deleteAppInvalidAppError=指定的名称不是一个有效的快速应用（App Within Minutes）。
 platform.appwithinminutes.deleteAppNotSpecifiedError=没有指定应用名称。
-
-### Rename Application
-appWithinMinutes.renameApp.label=重命名应用
-appWithinMinutes.renameApp.close=关闭
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=要更改应用标题而不改变应用名称，只需要编辑应用主页。

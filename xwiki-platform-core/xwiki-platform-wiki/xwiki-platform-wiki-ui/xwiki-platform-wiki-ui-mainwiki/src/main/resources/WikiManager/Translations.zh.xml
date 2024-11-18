@@ -73,7 +73,7 @@
 ## Menus
 platform.wiki.menu.wikiindex=Wiki 索引
 platform.wiki.menu.deletewiki=删除wiki
-platform.wiki.menu.userwikis=Wikis
+platform.wiki.menu.userwikis=wiki
 
 ## Dependencies
 platform.wiki.dependencies.wiki.missing=未安装“ Wiki” java组件。此页面将无法正常工作。确保安装了“ Wiki API”和“ Wiki Script”扩展（使用扩展管理器）或文件“ xwiki-platform-wiki-api- &lt;版本&gt; .jar”和“ xwiki-platform-wiki-script- &lt;版本&gt; .jar”位于“ WEB-INF / lib /” Web应用程序的文件夹下（如果是手动安装）。
@@ -81,18 +81,18 @@ platform.wiki.dependencies.template.missing=未安装“Wiki Template” java组
 platform.wiki.dependencies.user.missing=未安装“Wiki User” java组件。此页面将无法正常工作。确保已安装“Wiki User API”和“Wiki User Script”扩展（使用扩展管理器）或文件'xwiki-platform-wiki-user-api- &lt;version&gt; .jar'和'xwiki-platform-wiki-user-script- &lt;version&gt; .jar'位于“WEB-INF / lib / ”Web应用程序的文件夹下（如果是手动安装）。
 
 ## Create
-platform.wiki.create.button=创建 Wiki
-platform.wiki.create.title=创建一个新的 wiki
+platform.wiki.create.button=创建Wiki
+platform.wiki.create.title=创建一个新的wiki
 platform.wiki.create.members=成员
-platform.wiki.create.prettyname.empty=Pretty name 不能为空
+platform.wiki.create.prettyname.empty=Pretty name不能为空
 platform.wiki.create.error=Wiki "{0}" 创建失败: {1}.
-platform.wiki.create.error.wikiname.databasealreadyexists=具有此标识符的数据库已经存在
-platform.wiki.create.error.wikiname.wikialreadyexists=此标识符已被使用
-platform.wiki.create.error.wikiname.empty=标识符不能为空
+### Missing: platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
+### Missing: platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
+### Missing: platform.wiki.create.error.wikiname.empty=Identifier can't be empty
 
 ## Common errors and messages
 platform.wiki.error.wikidoesnotexist=Wiki [{0}] 不存在
-platform.wiki.error.oneParameterNotSpecified=未指定 ''{0}'' 参数。
+platform.wiki.error.oneParameterNotSpecified=未指定''{0}'' 参数。
 platform.wiki.error.parameterAcceptsMultipleValues=接受多个值。
 platform.wiki.error.exceptionWithMessage=异常: {0}
 platform.wiki.form.requiredField=需要

@@ -80,18 +80,10 @@ rendering.macro.menu.name=菜单
 rendering.macro.menu.description=显示使用简单Wiki语法（嵌套列表和链接）创建的菜单。
 rendering.macro.menu.parameter.id.name=Id
 rendering.macro.menu.parameter.id.description=将在包装菜单的HTML元素上设置的可选菜单标识符。您可以在JavaScript代码中使用此标识符来访问菜单DOM，或在功能测试中使用此标识符来断言菜单项。
-rendering.macro.menu.parameter.label.name=标签
-rendering.macro.menu.parameter.label.description=用于描述菜单内容的可选菜单标签。对于辅助技术和菜单的可访问性尤其重要。
 rendering.macro.menu.parameter.type.name=类型
 rendering.macro.menu.parameter.type.description=可选的菜单类型确定菜单的外观和行为。支持的值为：水平（默认值）和垂直。
 rendering.macro.menu.content.description=使用Wiki语法定义菜单结构。每个菜单项应为一个列表项，并应包含菜单项的标签或链接。您可以将嵌套列表用于子菜单项。
 
-# Menu UI
-menu.ui.openSubMenu=打开子菜单。
-menu.ui.closeSubMenu=关闭子菜单。
-menu.ui.horizontal.toggler.description=切换水平菜单。
-
 # Menu WebHome
-menu.description=这是一个简单的应用程序，可帮助您创建导航菜单，以将其作为页面标题后的顶部栏水平显示或在侧面面板中垂直显示。
-</content>
+menu.description=这是一个简单的应用程序，可帮助您创建导航菜单，以将其作为页面标题后的顶部栏水平显示或在侧面面板中垂直显示。</content>
 </xwikidoc>

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="lv">
+<xwikidoc version="1.3" reference="ExtensionCode.Translations" locale="lv">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>lv</language>

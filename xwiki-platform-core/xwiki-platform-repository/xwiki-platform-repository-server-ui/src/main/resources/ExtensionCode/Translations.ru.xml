@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="ExtensionCode.Translations" locale="ru">
+<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="ru">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language>ru</language>
@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
+### Missing: extension.repository.emptyvalue=
 extension.repository.name=Название
 extension.repository.summary=Комментарий
 extension.repository.type=Тип

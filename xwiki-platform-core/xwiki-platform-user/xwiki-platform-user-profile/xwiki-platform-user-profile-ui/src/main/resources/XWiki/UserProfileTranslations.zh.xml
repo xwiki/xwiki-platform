@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>XWiki.XWikiUsers_displayHiddenDocuments.hint=wiki包含默认情况下不显示的文档。这些隐藏的文档表示技术内容，例如应用程序类，配置页，宏，样式，脚本等。
-XWiki.XWikiUsers_underline.hint=选择是否应为链接添加下划线。
+XWiki.XWikiUsers_accessibility.hint=额外的可访问性将启用各种视觉增强功能，例如：更大的字体，带下划线的链接等。
 XWiki.XWikiUsers_timezone.hint=使用特定的时区，以便日期反映您的当前位置。
 XWiki.XWikiUsers_editor.hint=选择默认的编辑器，以覆盖全局设置的默认编辑器。如果未定义，则根据要编辑的内容选择默认编辑器。
 XWiki.XWikiUsers_usertype.hint=选择哪种类型的用户将成为默认用户。高级用户将有权使用多种编辑功能，例如创建终止页面。
@@ -61,13 +61,5 @@ user.profile.network.error=保存通知设置时出错
 user.profile.status.done=完成
 user.profile.status.saving=保存...
 user.profile.status.error=保存用户状态时出错
-
-## Used to indicate where deprecated keys start
-#@deprecatedstart
-
-XWiki.XWikiUsers_accessibility.hint=额外的可访问性将启用各种视觉增强功能，例如：更大的字体，带下划线的链接等。
-
-## Used to indicate where deprecated keys end
-#@deprecatedend
 </content>
 </xwikidoc>

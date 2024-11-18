@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -68,22 +69,22 @@ public abstract class AbstractRegistrationPage extends BasePage
         // remove the onfocus on login, to avoid any problem to put the value.
         getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
             "}catch(err){}");
-        if (firstName != null) {
+        if (StringUtils.isNotEmpty(firstName)) {
             map.put("register_first_name", firstName);
         }
-        if (lastName != null) {
+        if (StringUtils.isNotEmpty(lastName)) {
             map.put("register_last_name", lastName);
         }
-        if (username != null) {
+        if (StringUtils.isNotEmpty(username)) {
             map.put("xwikiname", username);
         }
-        if (password != null) {
+        if (StringUtils.isNotEmpty(password)) {
             map.put("register_password", password);
         }
-        if (confirmPassword != null) {
+        if (StringUtils.isNotEmpty(confirmPassword)) {
             map.put("register2_password", confirmPassword);
         }
-        if (email != null) {
+        if (StringUtils.isNotEmpty(email)) {
             map.put("register_email", email);
         }
         getForm().fillFieldsByName(map);

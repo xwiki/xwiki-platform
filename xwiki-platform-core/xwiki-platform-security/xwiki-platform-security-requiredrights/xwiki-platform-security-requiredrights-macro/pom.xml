@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security-requiredrights</artifactId>
-    <version>15.10.14-SNAPSHOT</version>
+    <version>15.10.14</version>
   </parent>
   <artifactId>xwiki-platform-security-requiredrights-macro</artifactId>
   <name>XWiki Platform - Security - Required Rights - Macro</name>

@@ -64,6 +64,9 @@ public class ResourceReferenceRenamer
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
 
     @Inject
@@ -152,8 +155,6 @@ public class ResourceReferenceRenamer
         DocumentReference absoluteResolvedDocumentReference =
             this.defaultReferenceDocumentReferenceResolver.resolve(absoluteResolvedEntityReference);
 
-        boolean isRelativePageReferenceOutsideOfParent = false;
-
         // If the link targets the old (renamed) document reference and it's an absolute reference
         // (i.e. its resolution without any given parameter gives same result than its resolution with the
         // currentDocument) then we must update it
@@ -193,14 +194,25 @@ public class ResourceReferenceRenamer
                 newTargetReference = new AttachmentReference(linkEntityReference.getName(), newReference);
             }
 
-            String newReferenceString =
-                this.compactEntityReferenceSerializer.serialize(newTargetReference, currentDocumentReference);
-
+            String newReferenceString = getNewTargetReference(resourceReference, newTargetReference,
+                currentDocumentReference);
             resourceReference.setReference(newReferenceString);
             resourceReference.setType(newResourceType);
             result = true;
         }
         return result;
+    }
+
+    private String getNewTargetReference(ResourceReference resourceReference, EntityReference newTargetReference,
+        EntityReference currentReference)
+    {
+        // If the reference contains the wiki name, then we should keep the absolute serialization.
+        // TODO: This regex feels really fragile, I'm not sure how we should check presence of a wiki here.
+        if (resourceReference.getReference().matches("^\\w+:\\w.*$")) {
+            return this.defaultEntityReferenceSerializer.serialize(newTargetReference, currentReference);
+        } else {
+            return this.compactEntityReferenceSerializer.serialize(newTargetReference, currentReference);
+        }
     }
 
     private boolean isPageReferenceOutOfParent(ResourceReference resourceReference,
@@ -266,8 +278,7 @@ public class ResourceReferenceRenamer
 
         if (shouldBeUpdated) {
             // Serialize the old (original) link relative to the new document's location, in compact form.
-            String serializedLinkReference =
-                this.compactEntityReferenceSerializer.serialize(oldLinkReference, newReference);
+            String serializedLinkReference = getNewTargetReference(resourceReference, oldLinkReference, newReference);
             resourceReference.setReference(serializedLinkReference);
             result = true;
         }

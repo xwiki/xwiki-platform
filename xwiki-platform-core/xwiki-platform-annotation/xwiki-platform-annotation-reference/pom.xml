@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>15.10.14</version>
+    <version>15.10.15-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-reference</artifactId>
   <name>XWiki Platform - Annotations - References Manipulation</name>

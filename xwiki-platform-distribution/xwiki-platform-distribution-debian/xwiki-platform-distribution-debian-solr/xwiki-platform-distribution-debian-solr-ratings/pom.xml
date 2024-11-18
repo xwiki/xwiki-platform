@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
-    <version>15.10.14</version>
+    <version>15.10.15-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-ratings</artifactId>
   <packaging>deb</packaging>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
-      <version>15.10.14</version>
+      <version>15.10.15-SNAPSHOT</version>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>

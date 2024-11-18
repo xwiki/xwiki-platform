@@ -72,6 +72,9 @@ class ResourceReferenceRenamerTest
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @MockComponent
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @MockComponent
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
 
     @MockComponent
@@ -94,7 +97,7 @@ class ResourceReferenceRenamerTest
     @Test
     void updateResourceReferenceRelative()
     {
-        DocumentResourceReference resourceReference = new DocumentResourceReference("xwiki:Main.WebHome");
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Main.WebHome");
         AttachmentReference oldReference =
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
         AttachmentReference newReference =

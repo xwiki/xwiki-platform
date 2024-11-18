@@ -723,4 +723,24 @@ class RenamePageIT
         //wikiEditPage = WikiEditPage.gotoPage(new DocumentReference("WebHome", newBobSpace));
         //assertEquals(String.format("[[%s]]", serializedAlice2Reference), wikiEditPage.getContent());
     }
+
+    @Order(10)
+    @Test
+    void renameLinkContainingWiki(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "TestLinkWithWiki", "WebHome");
+        testUtils.rest().delete(documentReference);
+        testUtils.rest().savePage(documentReference, "Some content", "TestLinkWithWiki");
+        testUtils.rest().savePage(testReference, "[[MyPage>>xwiki:TestLinkWithWiki.WebHome]]",
+            "renameLinkContainingWiki");
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        RenamePage renamePage = testUtils.gotoPage(documentReference).rename();
+        renamePage.getDocumentPicker().setName("TestLinkWithWikiNew");
+        CopyOrRenameOrDeleteStatusPage statusPage =
+            renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", statusPage.getInfoMessage());
+        WikiEditPage wikiEditPage = WikiEditPage.gotoPage(testReference);
+        assertEquals("[[MyPage>>xwiki:TestLinkWithWikiNew.WebHome]]", wikiEditPage.getContent());
+    }
 }

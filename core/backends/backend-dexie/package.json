@@ -25,7 +25,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
-    "dexie": "4.0.8",
+    "dexie": "4.0.10",
     "inversify": "6.0.3"
   },
   "publishConfig": {

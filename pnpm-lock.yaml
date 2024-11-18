@@ -20,8 +20,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0
       '@eslint/js':
-        specifier: 9.12.0
-        version: 9.12.0
+        specifier: 9.15.0
+        version: 9.15.0
       '@microsoft/tsdoc':
         specifier: 0.15.0
         version: 0.15.0
@@ -2068,8 +2068,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0
       '@eslint/js':
-        specifier: 9.12.0
-        version: 9.12.0
+        specifier: 9.15.0
+        version: 9.15.0
       '@playwright/test':
         specifier: 1.48.2
         version: 1.48.2
@@ -2788,6 +2788,10 @@ packages:
 
   '@eslint/js@9.12.0':
     resolution: {integrity: sha512-eohesHH8WFRUprDNyEREgqP6beG6htMeUYeCpkEgBCieCMme5r9zFWjzAJp//9S+Kub4rqE+jXe9Cp1a7IYIIA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@eslint/js@9.15.0':
+    resolution: {integrity: sha512-tMTqrY+EzbXmKJR5ToI8lxu7jaN5EdmrBFJpQk5JmSlyLsx6o4t27r883K5xsLuCYCpfKBCGswMSWXsM+jB7lg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/object-schema@2.1.4':
@@ -7807,6 +7811,8 @@ snapshots:
       - supports-color
 
   '@eslint/js@9.12.0': {}
+
+  '@eslint/js@9.15.0': {}
 
   '@eslint/object-schema@2.1.4': {}
 

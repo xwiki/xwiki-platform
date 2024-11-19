@@ -19,7 +19,7 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -37,7 +37,7 @@ public abstract class AbstractMoveJobTest extends AbstractEntityJobTest
     protected MoveRequest createRequest(EntityReference source, EntityReference destination)
     {
         MoveRequest request = new MoveRequest();
-        request.setEntityReferences(Arrays.asList(source));
+        request.setEntityReferences(List.of(source));
         request.setDestination(destination);
         return request;
     }

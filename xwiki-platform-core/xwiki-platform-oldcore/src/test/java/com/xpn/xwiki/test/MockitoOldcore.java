@@ -77,6 +77,7 @@ import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
@@ -173,6 +174,8 @@ public class MockitoOldcore
     private AuthorizationManager mockAuthorizationManager;
 
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
+
+    private DocumentAuthorizationManager mockDocumentAuthorizationManager;
 
     private QueryManager queryManager;
 
@@ -330,19 +333,26 @@ public class MockitoOldcore
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());
 
         if (testClass.getAnnotation(AllComponents.class) != null) {
-            // If @AllComponents is enabled force mocking AuthorizationManager and ContextualAuthorizationManager if not
-            // already mocked
+            // If @AllComponents is enabled force mocking AuthorizationManager, ContextualAuthorizationManager, and
+            // DocumentAuthorizationManager if not already mocked
             this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class, false);
             this.mockContextualAuthorizationManager =
                 getMocker().registerMockComponent(ContextualAuthorizationManager.class, false);
+            this.mockDocumentAuthorizationManager =
+                getMocker().registerMockComponent(DocumentAuthorizationManager.class, false);
         } else {
-            // Make sure an AuthorizationManager and a ContextualAuthorizationManager is available
+            // Make sure an AuthorizationManager, a ContextualAuthorizationManager, and a
+            // DocumentAuthorizationManager are available
             if (!getMocker().hasComponent(AuthorizationManager.class)) {
                 this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
             }
             if (!getMocker().hasComponent(ContextualAuthorizationManager.class)) {
                 this.mockContextualAuthorizationManager =
                     getMocker().registerMockComponent(ContextualAuthorizationManager.class);
+            }
+            if (!getMocker().hasComponent(DocumentAuthorizationManager.class)) {
+                this.mockDocumentAuthorizationManager =
+                    getMocker().registerMockComponent(DocumentAuthorizationManager.class);
             }
         }
 
@@ -1120,7 +1130,12 @@ public class MockitoOldcore
         DefaultParameterizedType currentUserReferenceResolverType =
             new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
         if (!this.componentManager.hasComponent(currentUserReferenceResolverType)) {
-            getMocker().registerMockComponent(currentUserReferenceResolverType);
+            UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver =
+                getMocker().registerMockComponent(currentUserReferenceResolverType);
+            // Ensure that getting the current user reference can be serialized to a DocumentReference that
+            // corresponds to the user in the context.
+            when(currentUserReferenceUserReferenceResolver.resolve(CurrentUserReference.INSTANCE))
+                .thenAnswer(invocationOnMock -> new TestDocumentUserReference(getXWikiContext().getUserReference()));
         }
 
         DefaultParameterizedType userReferenceDocumentReferenceResolverType =
@@ -1302,6 +1317,11 @@ public class MockitoOldcore
     public ContextualAuthorizationManager getMockContextualAuthorizationManager()
     {
         return this.mockContextualAuthorizationManager;
+    }
+
+    public DocumentAuthorizationManager getMockDocumentAuthorizationManager()
+    {
+        return this.mockDocumentAuthorizationManager;
     }
 
     public XWikiStoreInterface getMockStore()

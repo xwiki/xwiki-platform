@@ -40,6 +40,7 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class FormContainerElement extends BaseElement
 {
+    private static final String CLASS_ATTRIBUTE = "class";
     private final WebElement formElement;
 
     /**
@@ -77,6 +78,15 @@ public class FormContainerElement extends BaseElement
             valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
         }
         fillFieldsByElements(valuesByElements);
+        
+        /* Register password confirmation is usually the last element that needs to be validated by liveValidation.
+          This wait allows to solve a race condition between the form submission and the computation of the status of
+          those fields. We force the status to be solved before we try anything else, especially submitting the form.
+          */
+        if (valuesByNames.containsKey("register2_password")) {
+            getDriver().waitUntilCondition(driver -> !getFormElement().findElement(By.name("register2_password"))
+                .getAttribute(CLASS_ATTRIBUTE).isEmpty());
+        }
     }
 
     public void fillFieldsByElements(Map<WebElement, String> valuesByElements)
@@ -113,7 +123,7 @@ public class FormContainerElement extends BaseElement
             setCheckBox(fieldElement, value.equals("true"));
         } else if ("select".equals(fieldElement.getTagName())) {
             // if a select uses selectized then we should use a SuggestInputElement.
-            if (fieldElement.getAttribute("class").contains("selectized")) {
+            if (fieldElement.getAttribute(CLASS_ATTRIBUTE).contains("selectized")) {
                 SuggestInputElement suggestInputElement = new SuggestInputElement(fieldElement);
                 suggestInputElement.clearSelectedSuggestions();
 
@@ -135,7 +145,7 @@ public class FormContainerElement extends BaseElement
                 select.selectByValue(value);
             }
         } else {
-            List<String> classes = Arrays.asList(fieldElement.getAttribute("class").split("\\s+"));
+            List<String> classes = Arrays.asList(fieldElement.getAttribute(CLASS_ATTRIBUTE).split("\\s+"));
             // If the field is a date time picker, calling sendKeys after clear triggers a focus and the field,
             // and the picker fills the field with the current date and time before sendKeys is calls, leading to an
             // invalid content field. In this case, we use a javascript expression to set the value without interacting

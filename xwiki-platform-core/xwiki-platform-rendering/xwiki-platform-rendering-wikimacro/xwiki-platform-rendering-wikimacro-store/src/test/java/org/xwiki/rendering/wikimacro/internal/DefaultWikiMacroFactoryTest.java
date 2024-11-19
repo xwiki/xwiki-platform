@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
@@ -157,14 +158,15 @@ class DefaultWikiMacroFactoryTest
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, null,
-            DOCUMENT_REFERENCE.getWikiReference())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.ADMIN, EntityType.WIKI, null, DOCUMENT_REFERENCE)).thenReturn(true);
 
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
         assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.PROGRAM, null, null)).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.PROGRAM, null, null, DOCUMENT_REFERENCE)).thenReturn(true);
 
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
         assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));

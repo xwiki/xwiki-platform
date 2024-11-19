@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.9.0-SNAPSHOT</version>
+  <version>17.0.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -55,14 +55,18 @@
     <tika.version>2.9.2</tika.version>
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.12</jetty.server.version>
+    <jetty.server.version>12.0.15</jetty.server.version>
     <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SLF4J used and set the
          version here. -->
-    <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
-    <netty.version>4.1.114.Final</netty.version>
+    <jetty.server.slf4j.version>2.0.16</jetty.server.slf4j.version>
+    <!-- Force using the version of apache-el from Jetty dependencies instead of the one set by XWiki. The version used
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
+         version here. -->
+    <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
+    <netty.version>4.1.115.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
@@ -71,10 +75,10 @@
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.45</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.2</zookeeper.version>
+    <zookeeper.version>3.9.3</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.2</testcontainers.version>
+    <testcontainers.version>1.20.3</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -108,13 +112,13 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.3</hsqldb.version>
+    <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
-    <mysql.version>9.0.0</mysql.version>
+    <mysql.version>9.1.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.4.1</mariadb.version>
+    <mariadb.version>3.5.0</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -182,7 +186,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.29.2</version>
+        <version>4.30.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -700,7 +704,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.2.16</version>
+        <version>2.2.17</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -710,7 +714,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.1.19</version>
+        <version>3.1.20</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -984,12 +988,12 @@
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-core</artifactId>
-        <version>1.37.0</version>
+        <version>1.38.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite</groupId>
         <artifactId>calcite-linq4j</artifactId>
-        <version>1.37.0</version>
+        <version>1.38.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>

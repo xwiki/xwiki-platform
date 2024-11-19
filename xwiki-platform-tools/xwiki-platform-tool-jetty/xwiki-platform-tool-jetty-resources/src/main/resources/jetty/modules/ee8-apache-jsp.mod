@@ -31,7 +31,7 @@ ee8-servlet
 ee8-annotations
 
 [ini]
-ee8.jsp.impl.version?=9.0.90
+ee8.jsp.impl.version?=9.0.96
 
 [lib]
 lib/ee8-apache-jsp/apache-el-${ee8.jsp.impl.version}.jar

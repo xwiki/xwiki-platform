@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-default</artifactId>
   <name>XWiki Platform - Export - PDF - Default</name>
@@ -81,17 +81,6 @@
     <dependency>
       <groupId>com.github.docker-java</groupId>
       <artifactId>docker-java-transport-httpclient5</artifactId>
-    </dependency>
-    <!-- Starting with version 5.2 org.apache.httpcomponents.client5:httpclient5 uses the HttpVersionPolicy class from
-      org.apache.httpcomponents.core5:httpcore5-h2 . The problem is that docker-java-transport-httpclient5 excludes
-      httpcore5-h2, see https://github.com/docker-java/docker-java/blob/3.2.13/docker-java-transport-httpclient5/pom.xml#L29-L34
-      which leads to a NoClassDefFoundError. In order to fix this we add an explicit dependency to httpclient5 (note that
-      depending on httpcore5-h2 doesn't fix the problem because Extension Manager still favors the exclude; we need to
-      overwrite the dependency used by docker-java-transport-httpclient5 which is httpclient5).
-      TODO: Remove this dependency when docker-java-transport-httpclient5 POM is fixed and we upgrade DockerJava version -->
-    <dependency>
-      <groupId>org.apache.httpcomponents.client5</groupId>
-      <artifactId>httpclient5</artifactId>
     </dependency>
     <!-- Used for interacting with the headless Chrome web browser. -->
     <dependency>

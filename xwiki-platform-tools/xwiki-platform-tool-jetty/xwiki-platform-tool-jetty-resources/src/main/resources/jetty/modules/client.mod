@@ -21,7 +21,10 @@
 # DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Adds the Jetty HTTP client to the server classpath.
+Adds the Jetty HTTP client dependencies to the server classpath.
+
+[tags]
+client
 
 [lib]
 lib/jetty-client-${jetty.version}.jar

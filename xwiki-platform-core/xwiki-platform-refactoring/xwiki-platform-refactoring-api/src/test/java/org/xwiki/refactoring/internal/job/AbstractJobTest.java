@@ -19,12 +19,21 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.Request;
+import org.xwiki.model.ModelContext;
 import org.xwiki.refactoring.internal.ModelBridge;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class for writing unit tests for refactoring jobs extending {@link AbstractJob}.
@@ -34,19 +43,33 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  */
 public abstract class AbstractJobTest
 {
+    @MockComponent
     protected ModelBridge modelBridge;
 
-    @Before
-    public void configure() throws Exception
+    @MockComponent
+    protected ModelContext modelContext;
+
+    @MockComponent
+    private Execution execution;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeEach
+    protected void configure() throws Exception
     {
-        this.modelBridge = getMocker().getInstance(ModelBridge.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(execution.getContext()).thenReturn(executionContext);
     }
 
-    protected abstract MockitoComponentMockingRule<Job> getMocker();
+    protected LogCaptureExtension getLogCapture()
+    {
+        return logCapture;
+    }
 
     protected Job run(Request request) throws Throwable
     {
-        Job job = getMocker().getComponentUnderTest();
+        Job job = getJob();
         job.initialize(request);
         job.run();
 
@@ -57,4 +80,6 @@ public abstract class AbstractJobTest
 
         return job;
     }
+
+    protected abstract Job getJob();
 }

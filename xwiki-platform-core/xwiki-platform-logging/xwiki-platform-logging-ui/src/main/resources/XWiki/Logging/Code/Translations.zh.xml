@@ -1,4 +1,6 @@
-/*
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,31 +18,26 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.test.ui.po;
+-->
 
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
-
-/**
- * Represents the actions possible on the Create Space template page.
- *
- * @version $Id$
- * @since 3.2M3
- * @deprecated since 7.2M3. Use {@link CreatePagePage} instead.
- */
-@Deprecated
-public class CreateSpacePage extends CreatePagePage
-{
-    public WYSIWYGEditPage createSpace(String spaceValue)
-    {
-        this.createPage("", spaceValue);
-        return new WYSIWYGEditPage();
-    }
-
-    public boolean hasError()
-    {
-        // if there is at least one element with errormessage classname
-        return getDriver().findElements(By.className("errormessage")).size() > 0;
-    }
-}
+<xwikidoc version="1.5" reference="XWiki.Logging.Code.Translations" locale="zh">
+  <web>XWiki.Logging.Code</web>
+  <name>Translations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>logging.admin.unsetLevel.success=记录器 "{0}" 级别已被取消设置。
+logging.admin.setLevel.success=日志记录器"{0}" 级别已设置为 "{1}"。
+logging.admin.setLevel.error=设置日志级别失败：日志记录器 "{0}" 不存在。
+</content>
+  </xwikidoc>

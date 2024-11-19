@@ -46,8 +46,6 @@ platform.appwithinminutes.appsLiveTable.doc.author=Last author
 platform.appwithinminutes.appsLiveTable.doc.date=Update date
 platform.appwithinminutes.appsLiveTable._actions=Actions
 platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
-platform.appwithinminutes.title.edit.label=Edit the title of this entry.
-platform.appwithinminutes.content.edit.label=Edit the content of this entry.
 
 ### AWM Applications panel entry
 platform.appwithinminutes.appPanelCreateEntry=Create your own!

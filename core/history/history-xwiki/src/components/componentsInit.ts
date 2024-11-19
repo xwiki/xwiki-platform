@@ -154,7 +154,7 @@ class XWikiPageRevisionManager implements PageRevisionManager {
       const response = await fetch(restApiUrl, { headers });
       const jsonResponse = await response.json();
       let user = jsonResponse.pageName;
-      jsonResponse.property.forEach(
+      jsonResponse.properties.forEach(
         (property: { name: string; value: string }) => {
           // Properties are sorted alphabetically.
           switch (property.name) {

@@ -1188,6 +1188,34 @@ class PDFExportIT
 
     @Test
     @Order(26)
+    void pinnedChildPages(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "PinnedPages"), "WebHome"));
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child pages in the export because we want to verify that the order of the child pages in the
+        // generated PDF matches the order of the child pages in the navigation tree (tree page picker).
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.PinnedPages.WebHome").deselect().select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+            // We should have 10 pages: cover page, table of contents and 8 content pages, one for each wiki page
+            // included in the export.
+            assertEquals(10, pdf.getNumberOfPages());
+
+            // Verify the order of the exported wiki pages in the table of contents.
+            String tocText = pdf.getTextFromPage(1);
+            assertTrue(
+                tocText.contains(
+                    "Table of Contents\nPinnedPages\nBob\nAssignments\nProfile\nCarol\nAlice\nProfile\nAssignments\n"),
+                "Unexpected table of contents: " + tocText);
+        }
+    }
+
+    @Test
+    @Order(27)
     void pageTranslations(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {

@@ -93,6 +93,13 @@
       <artifactId>xwiki-platform-office-macro</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Used to test the PDF export of Pinned Child Pages. -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- JavaScript dependencies -->
     <dependency>
       <groupId>org.webjars</groupId>

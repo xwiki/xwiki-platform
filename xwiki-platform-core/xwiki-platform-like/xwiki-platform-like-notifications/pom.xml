@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>16.10.0-rc-1</version>
   </parent>
   <artifactId>xwiki-platform-like-notifications</artifactId>
   <name>XWiki Platform - Like - Notifications</name>

@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.10.0-SNAPSHOT</version>
+  <version>16.10.0-rc-1</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -137,7 +137,7 @@
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
     <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>stable-16.10.x</tag>
+    <tag>xwiki-platform-16.10.0-rc-1</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

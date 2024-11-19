@@ -137,6 +137,8 @@ platform.appwithinminutes.classEditorMoveFieldLabel=Move
 platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop to change the order
 
 platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Default value
+platform.appwithinminutes.classEditorFieldPrettyNameToolTip=Pretty Name
+platform.appwithinminutes.classEditorFieldHintToolTip=Hint
 
 ### Date Picker
 platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK

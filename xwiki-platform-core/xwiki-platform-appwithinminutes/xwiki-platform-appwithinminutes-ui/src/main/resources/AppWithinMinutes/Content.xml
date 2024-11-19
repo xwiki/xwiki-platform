@@ -53,21 +53,19 @@
     #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
   {{html clean="false"}}
-  ## The "content" id is expected by some JavaScript and CSS code.
-  #set ($id = 'content')
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;
       ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.
       #set ($toolBar = "#template('simpleedittoolbar.vm')")
       $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
       ## Display a simple textarea.
-      &lt;textarea id="$id" cols="80" rows="25" name="$name" ##
-      aria-label="$escapetool.xml($services.localization.render('platform.appwithinminutes.content.edit.label'))"&gt;##
+      ## We want a 
+      &lt;textarea id="${prefix}${name}1" cols="80" rows="25" name="$name"&gt;##
         $escapetool.xml($editedDocument.content)&lt;/textarea&gt;
   #end
   #if ($useWysiwygEditor)
     $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {
-      'id': "$id",
+      'id': "${prefix}${name}1",
       'name': "$name",
       'rows': 25,
       'cols': 80,

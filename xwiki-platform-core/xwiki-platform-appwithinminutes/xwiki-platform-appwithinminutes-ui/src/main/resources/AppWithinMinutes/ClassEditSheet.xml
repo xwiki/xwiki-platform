@@ -314,6 +314,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
  * Displays a configuration property of a class field. This macro can also be used to display a property of an object.
  *#
 #macro (displayFieldProperty $property $prefix $field)
+  ## This 'displayFormType' property only exists for boolean fields.
   #set ($displayFormType = $property.getProperty('displayFormType'))
   #if ($property.classType == 'Boolean' &amp;&amp; (!$displayFormType || $displayFormType.value == 'checkbox'))
     &lt;dt&gt;
@@ -1392,8 +1393,10 @@ XWiki.FormFieldPrettyNameManager = Class.create({
       var label = previousDT.down('label');
       prettyNameInput.title = label.textContent || label.innerText;
     }
+    prettyNameInput.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldPrettyNameToolTip'))';
     // Replace the preview label with the pretty name input.
     var previewLabel = field.getViewer().down('label');
+    // We unset the for attribute, so that this label will not be set implicitely OR explicitely anymore.
     previewLabel.writeAttribute('for', '');
     previewLabel.removeChild(previewLabel.lastChild);
     previewLabel.insert(prettyNameInput);
@@ -1418,10 +1421,12 @@ XWiki.FormFieldDefaultValueManager = Class.create({
   _enhanceFieldDefaultValue : function(event) {
     var field = event.memo.field;
     var fieldName = field.getName();
-    field.getViewer().select('input[type=text]', 'textarea').each(function(input) {
+    // We select the default field input and update it.
+    field.getViewer().select('dd :input').each(function(input) {
       if (!input.title &amp;&amp; input.name.endsWith('_0_' + fieldName)) {
         input.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
       }
+      input.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldDefaultValueToolTip'))';
     });
   },
   _onSave : function() {
@@ -1456,7 +1461,8 @@ XWiki.FormFieldHintManager = Class.create({
     if (hintInput) {
       hintInput.addClassName('xHint');
       if (!hintInput.title) {
-        hintInput.title = 'Hint';
+        hintInput.title = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldHintToolTip'))';
+        hintInput.ariaLabel = '$escapetool.javascript($services.localization.render('platform.appwithinminutes.classEditorFieldHintToolTip'))';
       }
       // Move the hint input below the pretty name input, in the field viewer.
       var dd = hintInput.up('dd');

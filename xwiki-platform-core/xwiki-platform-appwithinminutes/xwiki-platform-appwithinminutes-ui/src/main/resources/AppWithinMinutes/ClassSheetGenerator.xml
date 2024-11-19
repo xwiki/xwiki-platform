@@ -49,7 +49,7 @@ ${indentation}&lt;dt ${escapetool.h}if (!${escapetool.d}editing &amp;&amp; ${esc
 ${indentation}    class="editableProperty"
 ${indentation}    data-property="${escapetool.d}escapetool.xml(${escapetool.d}services.model.serialize(${escapetool.d}object.getPropertyReference('#escapeSingleQuotes($property.name)')))"
 ${indentation}    data-property-type="object"${escapetool.h}end&gt;
-${indentation}  &lt;label${escapetool.h}if (${escapetool.d}editing) for="$escapetool.xml("${doc.fullName}_0_$property.name")"${escapetool.h}end&gt;
+${indentation}  &lt;label for="$escapetool.xml("${doc.fullName}_0_$property.name")"&gt;
 ${indentation}    ${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))
 ${indentation}  &lt;/label&gt;
 #if ("$!property.hint" != '')

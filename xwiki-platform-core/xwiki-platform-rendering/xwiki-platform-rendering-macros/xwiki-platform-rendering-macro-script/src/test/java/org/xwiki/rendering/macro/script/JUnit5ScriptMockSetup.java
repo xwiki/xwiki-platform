@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  * Dynamic mock setup for script macros for JUnit 5 tests.
  *
  * @version $Id$
- * @since 16.10.0
+ * @since 17.0.0
  */
 public class JUnit5ScriptMockSetup
 {

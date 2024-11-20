@@ -3352,7 +3352,6 @@ public class Document extends Api
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     public boolean isRestricted()
     {
         return this.doc.isRestricted();

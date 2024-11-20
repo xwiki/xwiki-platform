@@ -33,7 +33,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -534,7 +533,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 15.5.5
      * @since 14.10.20
      */
-    @Unstable
     public EntityReference removeParameters(boolean recursive)
     {
         EntityReference current;

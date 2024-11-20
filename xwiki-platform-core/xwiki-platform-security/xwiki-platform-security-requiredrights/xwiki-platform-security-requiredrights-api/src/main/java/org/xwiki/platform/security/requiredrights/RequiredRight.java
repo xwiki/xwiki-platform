@@ -38,7 +38,6 @@ import org.xwiki.text.XWikiToStringBuilder;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class RequiredRight implements Serializable
 {
     /**

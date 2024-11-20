@@ -216,7 +216,6 @@ public interface DocumentModelBridge
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     default boolean isRestricted()
     {
         return false;

@@ -4751,7 +4751,6 @@ public class XWiki implements EventListener
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2,
         boolean triggeredByUser, XWikiContext context) throws XWikiException
     {
@@ -7632,7 +7631,6 @@ public class XWiki implements EventListener
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision,
         boolean triggeredByUser, XWikiContext xcontext) throws XWikiException
     {

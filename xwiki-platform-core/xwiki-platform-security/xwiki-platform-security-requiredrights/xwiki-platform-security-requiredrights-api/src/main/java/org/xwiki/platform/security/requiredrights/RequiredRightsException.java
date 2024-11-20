@@ -27,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.9RC1
  */
-@Unstable
 public class RequiredRightsException extends Exception
 {
     /**

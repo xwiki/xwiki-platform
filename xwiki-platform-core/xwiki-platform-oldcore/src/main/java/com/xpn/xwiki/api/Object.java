@@ -24,7 +24,6 @@ import java.util.Map;
 import org.xwiki.evaluation.ObjectEvaluator;
 import org.xwiki.evaluation.ObjectEvaluatorException;
 import org.xwiki.model.reference.ObjectPropertyReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -173,7 +172,6 @@ public class Object extends Collection
      * @since 15.5.5
      * @since 15.10.2
      */
-    @Unstable
     public Map<String, String> evaluate() throws ObjectEvaluatorException
     {
         return getBaseObject().evaluate();

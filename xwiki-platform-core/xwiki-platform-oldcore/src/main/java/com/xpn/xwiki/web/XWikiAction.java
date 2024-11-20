@@ -87,7 +87,6 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -252,7 +251,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
     {
         String result;
@@ -271,7 +269,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizePlainOrReturnKey(String key, Object... parameters)
     {
         return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);

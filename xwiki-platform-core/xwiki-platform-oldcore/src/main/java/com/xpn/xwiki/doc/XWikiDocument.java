@@ -9606,7 +9606,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 15.2RC1
      */
     @Override
-    @Unstable
     public boolean isRestricted()
     {
         return this.restricted;
@@ -9622,7 +9621,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     public void setRestricted(boolean restricted)
     {
         this.restricted = restricted;

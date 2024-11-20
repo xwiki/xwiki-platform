@@ -49,7 +49,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -316,7 +315,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
      * @since 15.3RC1
      * @since 14.10.8
      */
-    @Unstable
     public void invalidate(XWikiDocument document)
     {
         String key = document.getKey();

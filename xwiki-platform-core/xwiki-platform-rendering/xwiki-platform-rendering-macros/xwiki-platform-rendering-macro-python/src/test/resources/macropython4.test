@@ -13,12 +13,12 @@
       </metadata>
     </metadata>
   </p>
-  <macro content="print &quot;&lt;element/&gt;&quot;" id="python"/>
+  <macro content="print &quot;&lt;document/&gt;&quot;" id="python"/>
 </document>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument [[source]=[(((945)))a]]
-beginMacroMarkerStandalone [python] [] [print "<element/>"]
-endMacroMarkerStandalone [python] [] [print "<element/>"]
+beginMacroMarkerStandalone [python] [] [print "<document/>"]
+endMacroMarkerStandalone [python] [] [print "<document/>"]
 endDocument [[source]=[(((945)))a]]

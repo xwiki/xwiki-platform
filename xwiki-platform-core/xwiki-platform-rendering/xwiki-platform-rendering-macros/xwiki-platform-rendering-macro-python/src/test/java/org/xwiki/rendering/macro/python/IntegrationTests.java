@@ -22,14 +22,13 @@ package org.xwiki.rendering.macro.python;
 import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -38,23 +37,19 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-@RenderingTestSuite.Scope(pattern = "macropython.*")
-public class IntegrationTests
+@AllComponents
+@RenderingTests.Scope(pattern = "macropython.*")
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager cm) throws Exception
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager cm) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
-        new ScriptMockSetup(mockery, cm);
+        new JUnit5ScriptMockSetup(cm);
 
         // Script Context Mock
-        final ScriptContextManager scm = cm.registerMockComponent(mockery, ScriptContextManager.class);
-        final SimpleScriptContext scriptContext = new SimpleScriptContext();
+        ScriptContextManager scm = cm.registerMockComponent(ScriptContextManager.class);
+        SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
-        mockery.checking(new Expectations() {{
-            allowing(scm).getScriptContext(); will(returnValue(scriptContext));
-        }});
+        when(scm.getScriptContext()).thenReturn(scriptContext);
     }
 }

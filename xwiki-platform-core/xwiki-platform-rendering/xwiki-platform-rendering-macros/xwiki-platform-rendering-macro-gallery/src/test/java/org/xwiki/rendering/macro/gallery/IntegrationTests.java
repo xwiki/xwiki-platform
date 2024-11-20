@@ -19,15 +19,10 @@
  */
 package org.xwiki.rendering.macro.gallery;
 
-import java.util.Map;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.skinx.SkinExtension;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -36,23 +31,14 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-public class IntegrationTests
+@AllComponents
+@RenderingTests.Scope(pattern = "macrogallery.*")
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
-
-        final SkinExtension jsfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "jsfx", "jsfx");
-        final SkinExtension ssfx = componentManager.registerMockComponent(mockery, SkinExtension.class, "ssfx", "ssfx");
-
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(jsfx).use(with(aNonNull(String.class)), with(aNonNull(Map.class)));
-                allowing(ssfx).use(with(aNonNull(String.class)));
-            }
-        });
+        componentManager.registerMockComponent(SkinExtension.class, "jsfx");
+        componentManager.registerMockComponent(SkinExtension.class, "ssfx");
     }
 }

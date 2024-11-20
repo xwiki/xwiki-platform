@@ -19,10 +19,17 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
-import org.xwiki.test.jmock.MockingComponentManager;
+import java.io.File;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -31,14 +38,23 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-@RenderingTestSuite.Scope(pattern = "macrovelocity.*")
-public class IntegrationTests
+@AllComponents
+@ExtendWith(XWikiTempDirExtension.class)
+@RenderingTests.Scope(pattern = "macrovelocity.*")
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
+    @XWikiTempDir
+    private File permanentDir;
+
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
     {
-        new ScriptMockSetup(componentManager);
+        new JUnit5ScriptMockSetup(componentManager);
+
+        // Set up the permanent directory in the target directory (so that it doesn't fall back on a temporary directory
+        // outside the maven build directory (bad practice)
+        StandardEnvironment environment = componentManager.getInstance(Environment.class);
+        environment.setPermanentDirectory(this.permanentDir);
 
         // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
         // (the Include Macro is reusing it too). We register this mock as real component in components.txt.

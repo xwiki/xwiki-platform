@@ -47,7 +47,7 @@
     <ul class="dropdown-menu dropdown-menu-right">
 
       <!-- Actions -->
-      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.actions') }}</li>
+      <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.actions') }}</span><ul>
 
       <li>
         <!-- Refresh -->
@@ -56,12 +56,10 @@
           {{ $t('livedata.action.refresh') }}
         </a>
       </li>
-
+      </ul></li>
 
       <!-- Layouts -->
-      <li role="separator" class="divider"></li>
-
-      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.layouts') }}</li>
+      <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.layouts') }}</span><ul>
 
       <!-- Layout options -->
       <li
@@ -76,11 +74,10 @@
           {{ layout.name }}
         </a>
       </li>
+      </ul></li>
 
       <!-- Panels -->
-      <li role="separator" class="divider"></li>
-
-      <li class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</li>
+      <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</span><ul>
 
       <li v-for="panel in logic.panels" :key="panel.id">
         <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, panel.id)">
@@ -88,6 +85,7 @@
           {{ panel.name }}
         </a>
       </li>
+      </ul></li>
 
     </ul>
 
@@ -130,7 +128,7 @@ export default {
 <style>
 
 .livedata-dropdown-menu {
-  // Similar to .flat-buttons()
+  /* Similar to .flat-buttons() */
   .btn-default {
     background-color: @breadcrumb-bg;
     background-image: none;
@@ -142,6 +140,12 @@ export default {
 
   .btn-default:hover, .btn-default:active, .btn-default:focus, .open .dropdown-toggle {
       border-color: darken(@dropdown-divider-bg, 10%);
+  }
+
+  /* Style each section of the dropdown */
+  ul.dropdown-menu > li > ul {
+    list-style: none;
+    padding-left: 0;
   }
 }
 

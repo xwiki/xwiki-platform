@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
+@RenderingTests.Scope(pattern = "macroscript.*")
 public class IntegrationTests implements RenderingTests
 {
     @RenderingTests.Initialized

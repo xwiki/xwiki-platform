@@ -38,6 +38,12 @@
       <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Required for the Pinned Pages administration section. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <!-- Used to serialize entity references in order to compute tree node identifiers. -->
       <groupId>org.xwiki.platform</groupId>

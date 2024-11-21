@@ -477,6 +477,82 @@ class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthorizationTe
     }
 
     @Test
+    void requiredRights() throws Exception
+    {
+        initialiseWikiMock("requiredRights");
+        DocumentReference simpleDoc = getXDoc("simpleDocument", "space");
+        DocumentReference enforcedDoc = getXDoc("enforcedDocument", "space");
+        DocumentReference scriptDoc = getXDoc("scriptDocument", "space");
+        DocumentReference adminDoc = getXDoc("adminDocument", "space");
+        DocumentReference programmingDoc = getXDoc("programmingDocument", "space");
+        DocumentReference fakeProgrammingDoc = getXDoc("fakeProgrammingDocument", "space");
+
+        DocumentReference viewUser = getXUser("viewUser");
+        DocumentReference editUser = getXUser("editUser");
+        DocumentReference scriptUser = getXUser("scriptUser");
+        DocumentReference wikiAdminUser = getXUser("wikiAdminUser");
+        DocumentReference spaceAdminUser = getXUser("spaceAdminUser");
+        DocumentReference programmingUser = getXUser("programmingUser");
+
+        // The view user cannot edit any of the documents but view all of them.
+        for (DocumentReference doc : List.of(simpleDoc, enforcedDoc, scriptDoc, adminDoc, programmingDoc,
+            fakeProgrammingDoc)) {
+            assertAccess(new RightSet(VIEW, COMMENT, REGISTER, LOGIN), viewUser, doc);
+        }
+
+        // All users with edit right can edit all documents that don't enforce specific rights.
+        for (DocumentReference doc : List.of(simpleDoc, enforcedDoc, fakeProgrammingDoc)) {
+            assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN), editUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+                doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser, doc);
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM,
+                    CREATE_WIKI),
+                programmingUser, doc);
+        }
+
+        // Edit user cannot edit documents that enforce more rights.
+        for (DocumentReference doc : List.of(scriptDoc, adminDoc, programmingDoc)) {
+            assertAccess(new RightSet(VIEW, COMMENT, REGISTER, LOGIN), editUser, doc);
+        }
+
+        // The script and space admin user can edit the script document.
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, scriptDoc);
+        assertAccess(new RightSet(VIEW, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, adminDoc);
+        assertAccess(new RightSet(VIEW, SCRIPT, COMMENT, REGISTER, LOGIN), scriptUser, programmingDoc);
+
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+            scriptDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser, adminDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), spaceAdminUser,
+            programmingDoc);
+
+        // The wiki admin user can edit the script and admin documents.
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            scriptDoc);
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            adminDoc);
+        assertAccess(new RightSet(VIEW, COMMENT, SCRIPT, DELETE, REGISTER, LOGIN, ADMIN), wikiAdminUser,
+            programmingDoc);
+
+        // The programming user can edit all documents.
+        for (DocumentReference doc : List.of(scriptDoc, adminDoc, programmingDoc)) {
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM,
+                CREATE_WIKI), programmingUser, doc);
+        }
+
+        DocumentReference subWikiAdmin = getUser("subWikiAdmin", "SubWiki");
+        DocumentReference subWikiAdminDocument = getDoc("adminDocument", "subWikiSpace", "SubWiki");
+
+        // Both main wiki and subwiki admin have edit access on the subwiki document.
+        for (DocumentReference user : List.of(wikiAdminUser, subWikiAdmin)) {
+            assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN), user,
+                subWikiAdminDocument);
+        }
+    }
+
+    @Test
     void verifyNeedsAuthentication() throws Exception
     {
         initialiseWikiMock("emptyWikis");

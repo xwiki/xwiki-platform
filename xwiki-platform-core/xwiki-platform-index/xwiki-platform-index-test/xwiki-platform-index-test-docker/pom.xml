@@ -54,6 +54,14 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed to test the Pinned Child Pages feature (provides the RequireJS configuration for some of the JavaScript
+      modules used by Pinned Child Pages, such as jQueryUI) -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

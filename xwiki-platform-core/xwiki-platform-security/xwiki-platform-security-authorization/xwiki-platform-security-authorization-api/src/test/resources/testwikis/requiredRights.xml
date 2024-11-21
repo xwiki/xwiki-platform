@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#requiredRights() -->
+<wikis>
+  <wiki name="MainWiki" mainWiki="true">
+    <user name="scriptUser"/>
+    <user name="wikiAdminUser"/>
+    <user name="spaceAdminUser"/>
+    <user name="programmingUser"/>
+    <user name="viewUser"/>
+    <user name="editUser"/>
+    <allowUser type="edit" name="editUser"/>
+    <allowUser type="edit" name="scriptUser"/>
+    <allowUser type="script" name="scriptUser"/>
+    <allowUser type="admin" name="wikiAdminUser"/>
+    <allowUser type="programming" name="programmingUser"/>
+    <space name="space">
+      <allowUser type="admin" name="spaceAdminUser"/>
+      <document name="simpleDocument"/>
+      <document name="enforcedDocument" enforceRequiredRights="true"/>
+      <document name="scriptDocument" enforceRequiredRights="true">
+        <requiredRight type="script"/>
+      </document>
+      <document name="adminDocument" enforceRequiredRights="true">
+        <requiredRight type="admin" scope="wiki"/>
+      </document>
+      <document name="programmingDocument" enforceRequiredRights="true">
+        <requiredRight type="programming" scope="farm"/>
+      </document>
+      <document name="fakeProgrammingDocument">
+        <requiredRight type="programming" scope="farm"/>
+      </document>
+    </space>
+  </wiki>
+  <wiki name="SubWiki">
+    <user name="subWikiAdmin"/>
+    <allowUser type="admin" name="subWikiAdmin"/>
+    <space name="subWikiSpace">
+      <document name="adminDocument" enforceRequiredRights="true">
+        <requiredRight type="admin" scope="wiki"/>
+      </document>
+    </space>
+  </wiki>
+</wikis>

@@ -166,6 +166,14 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return false;
         }
 
+        // For edit right, check if the user has all required rights.
+        if (right == Right.EDIT && !this.documentRequiredRightsChecker.hasRequiredRights(userReference,
+            entityReference))
+        {
+            logDenyIfCheck(right, userReference, entityReference, check, "misses required right");
+            return false;
+        }
+
         return evaluateSecurityAccess(right, userReference, entityReference, check);
     }
 

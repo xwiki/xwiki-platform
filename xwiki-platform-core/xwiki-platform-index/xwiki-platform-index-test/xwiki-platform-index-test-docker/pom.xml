@@ -83,6 +83,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required for the Pinned Pages administration section. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

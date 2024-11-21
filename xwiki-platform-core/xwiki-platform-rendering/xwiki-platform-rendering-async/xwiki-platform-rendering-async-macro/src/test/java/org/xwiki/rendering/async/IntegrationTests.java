@@ -19,12 +19,6 @@
  */
 package org.xwiki.rendering.async;
 
-import java.util.List;
-
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
 import org.xwiki.environment.Environment;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
@@ -32,14 +26,19 @@ import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.async.internal.AsyncRendererJobRequest;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -47,52 +46,28 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  *
  * @version $Id$
  */
-@RunWith(RenderingTestSuite.class)
-@RenderingTestSuite.Scope(/* pattern = "macroasync3.test" */)
-public class IntegrationTests
+@AllComponents
+@RenderingTests.Scope(pattern = "macroasync.*")
+public class IntegrationTests implements RenderingTests
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager cm) throws Exception
+    @RenderingTests.Initialized
+    public void initialize(MockitoComponentManager cm) throws Exception
     {
-        Mockery mockery = new JUnit4Mockery();
+        cm.registerMockComponent(Environment.class, "default");
+        WikiDescriptorManager wikiDescriptorManager = cm.registerMockComponent(WikiDescriptorManager.class, "default");
+        ObservationManager observationManager = cm.registerMockComponent(ObservationManager.class, "default");
+        AsyncContext asyncContext = cm.registerMockComponent(AsyncContext.class, "default");
+        JobExecutor jobExecutor = cm.registerMockComponent(JobExecutor.class, "default");
+        AuthorizationManager authorization = cm.registerMockComponent(AuthorizationManager.class, "default");
+        Job job = mock(Job.class);
+        AsyncRendererJobRequest jobRequest = new AsyncRendererJobRequest();
+        AsyncRendererJobStatus jobStatus = new AsyncRendererJobStatus(jobRequest, observationManager, null);
 
-        final Environment environment = cm.registerMockComponent(mockery, Environment.class, "default");
-        final WikiDescriptorManager wikiDescriptorManager =
-            cm.registerMockComponent(mockery, WikiDescriptorManager.class, "default");
-        final ObservationManager observationManager =
-            cm.registerMockComponent(mockery, ObservationManager.class, "default");
-        final AsyncContext asyncContext = cm.registerMockComponent(mockery, AsyncContext.class, "default");
-        final JobExecutor jobExecutor = cm.registerMockComponent(mockery, JobExecutor.class, "default");
-        final AuthorizationManager authorization =
-            cm.registerMockComponent(mockery, AuthorizationManager.class, "default");
-        final Job job = mockery.mock(Job.class);
-        final AsyncRendererJobRequest jobRequest = new AsyncRendererJobRequest();
-        final AsyncRendererJobStatus jobStatus = new AsyncRendererJobStatus(jobRequest, observationManager, null);
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(environment).getResourceAsStream(with(any(String.class)));
-                will(returnValue(null));
-                allowing(wikiDescriptorManager).getCurrentWikiId();
-                will(returnValue("wiki"));
-                allowing(observationManager).notify(with(any(Event.class)), with(any(Object.class)));
-                allowing(observationManager).notify(with(any(Event.class)), with(any(Object.class)),
-                    with(any(Object.class)));
-                allowing(asyncContext).isEnabled();
-                will(returnValue(true));
-                allowing(asyncContext).useEntity(with(any(EntityReference.class)));
-                allowing(job).getStatus();
-                will(returnValue(jobStatus));
-                allowing(jobExecutor).execute(with(equal("asyncrenderer")), with(any(Request.class)));
-                will(returnValue(job));
-                allowing(jobExecutor).getJob(with(any(List.class)));
-                will(returnValue(null));
-                allowing(authorization).hasAccess(with(any(Right.class)), with(any(DocumentReference.class)),
-                    with(any(EntityReference.class)));
-                will(returnValue(true));
-                allowing(authorization).checkAccess(with(any(Right.class)), with(any(DocumentReference.class)),
-                    with(any(EntityReference.class)));
-            }
-        });
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wiki");
+        when(asyncContext.isEnabled()).thenReturn(true);
+        when(job.getStatus()).thenReturn(jobStatus);
+        when(jobExecutor.execute(eq("asyncrenderer"), any(Request.class))).thenReturn(job);
+        when(authorization.hasAccess(any(Right.class), any(DocumentReference.class), any(EntityReference.class)))
+            .thenReturn(true);
     }
 }

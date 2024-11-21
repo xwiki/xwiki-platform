@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,7 +73,7 @@ public class FormContainerElement extends BaseElement
 
     public void fillFieldsByName(Map<String, String> valuesByNames)
     {
-        Map<WebElement, String> valuesByElements = new HashMap<>((int) (valuesByNames.size() / 0.75));
+        Map<WebElement, String> valuesByElements = new LinkedHashMap<>((int) (valuesByNames.size() / 0.75));
 
         for (String name : valuesByNames.keySet()) {
             valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));

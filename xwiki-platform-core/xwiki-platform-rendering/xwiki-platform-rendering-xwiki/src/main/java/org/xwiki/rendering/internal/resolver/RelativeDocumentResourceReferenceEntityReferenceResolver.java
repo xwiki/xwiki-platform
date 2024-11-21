@@ -19,11 +19,17 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
@@ -38,14 +44,47 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class RelativeDocumentResourceReferenceEntityReferenceResolver
     extends AbstractRelativeResourceReferenceEntityReferenceResolver
 {
+    @Inject
+    private DocumentReferenceResolver<String> defaultStringDocumentReferenceResolver;
+
+    /**
+     * Default constructor.
+     */
     public RelativeDocumentResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.DOCUMENT);
     }
 
     @Override
-    public EntityType getEntityType()
+    protected EntityType getEntityType()
     {
         return EntityType.DOCUMENT;
+    }
+
+    @Override
+    protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference)
+    {
+        // If the reference is empty fallback on typed logic
+        if (StringUtils.isEmpty(resourceReference.getReference())) {
+            return resolveTyped(resourceReference, baseReference);
+        }
+
+        // Get relative reference
+        EntityReference relativeReference =
+            this.relativeReferenceResolver.resolve(resourceReference.getReference(), EntityType.DOCUMENT,
+                baseReference);
+
+        EntityReference result = relativeReference;
+        if (relativeReference.extractReference(EntityType.WIKI) != null) {
+            // Resolve the full document reference
+            // We don't start from the previously parsed relative reference to not loose "." prefixed reference meaning
+            DocumentReference reference =
+                this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
+
+            // Take care of fallback if needed
+            result = resolveDocumentReference(relativeReference, reference, baseReference);
+        }
+
+        return result;
     }
 }

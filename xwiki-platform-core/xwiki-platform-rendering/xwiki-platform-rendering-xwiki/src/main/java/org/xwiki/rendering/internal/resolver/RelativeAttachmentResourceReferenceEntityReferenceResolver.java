@@ -19,11 +19,18 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
@@ -38,14 +45,55 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class RelativeAttachmentResourceReferenceEntityReferenceResolver
     extends AbstractRelativeResourceReferenceEntityReferenceResolver
 {
+    @Inject
+    private AttachmentReferenceResolver<EntityReference> defaultReferenceAttachmentReferenceResolver;
+
+    /**
+     * Default constructor.
+     */
     public RelativeAttachmentResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.ATTACHMENT);
     }
 
     @Override
-    public EntityType getEntityType()
+    protected EntityType getEntityType()
     {
         return EntityType.ATTACHMENT;
+    }
+
+    @Override
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    {
+        if (StringUtils.isEmpty(resourceReference.getReference())) {
+            return null;
+        }
+
+        // Get relative reference
+        EntityReference relativeReference =
+            this.relativeReferenceResolver
+                .resolve(resourceReference.getReference(), EntityType.ATTACHMENT, baseReference);
+
+        EntityReference result = relativeReference;
+        if (relativeReference.extractReference(EntityType.WIKI) != null) {
+            // Resolve full reference
+            AttachmentReference attachmentReference =
+                this.defaultReferenceAttachmentReferenceResolver.resolve(relativeReference, baseReference);
+
+            // See if the resolved (terminal or WebHome) document exists and, if so, use it.
+            DocumentReference documentReference = attachmentReference.getDocumentReference();
+
+            // Take care of fallback if needed
+            DocumentReference finalDocumentReference =
+                resolveDocumentReference(relativeReference.getParent(), documentReference, baseReference);
+            // Also use that resolution if the relative reference doesn't contain any document, even if it doesn't
+            // exists, to not produce incorrect references.
+            if (finalDocumentReference != documentReference
+                || relativeReference.extractReference(EntityType.DOCUMENT) == null) {
+                result = new AttachmentReference(attachmentReference.getName(), finalDocumentReference);
+            }
+        }
+
+        return result;
     }
 }

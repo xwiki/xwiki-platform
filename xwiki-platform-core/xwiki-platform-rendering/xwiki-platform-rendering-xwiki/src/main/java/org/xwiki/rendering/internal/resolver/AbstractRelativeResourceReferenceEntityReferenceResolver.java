@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,7 +31,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
- * Convert document resource reference into entity reference.
+ * Abstract class for all relative resource reference resolvers.
  *
  * @version $Id$
  * @since 17.0.0RC1
@@ -39,21 +41,84 @@ public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
 {
     @Inject
     @Named("relative")
-    private EntityReferenceResolver<String> relativeReferenceResolver;
+    protected EntityReferenceResolver<String> relativeReferenceResolver;
 
     /**
-     * Default constructor.
+     * @param type the resource type that this resolver will support
      */
-    public AbstractRelativeResourceReferenceEntityReferenceResolver(ResourceType type)
+    protected AbstractRelativeResourceReferenceEntityReferenceResolver(ResourceType type)
     {
         super(type);
     }
 
     @Override
-    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    public EntityReference resolve(ResourceReference resourceReference, EntityType entityType, Object... parameters)
     {
-        return this.relativeReferenceResolver.resolve(resourceReference.getReference(), getEntityType());
+        if (resourceReference == null) {
+            return null;
+        }
+
+        if (this.resourceType != null && !resourceReference.getType().equals(this.resourceType)) {
+            throw new IllegalArgumentException(
+                String.format("You must pass a resource reference of type [%s]. [%s] was passed", this.resourceType,
+                    resourceReference));
+        }
+
+        EntityReference entityReference;
+        EntityReference baseReference = getBaseReference(resourceReference, parameters);
+
+        if (resourceReference.isTyped()) {
+            entityReference = resolveTyped(resourceReference, baseReference);
+        } else {
+            entityReference = resolveUntyped(resourceReference, baseReference);
+        }
+
+        return entityReference;
     }
 
-    public abstract EntityType getEntityType();
+    @Override
+    protected EntityReference getBaseReference(ResourceReference resourceReference, Object... parameters)
+    {
+        EntityReference baseReference =
+            (parameters.length > 0 && parameters[0] instanceof EntityReference entityReference)
+            ? entityReference : null;
+
+        if (!resourceReference.getBaseReferences().isEmpty()) {
+            // If the passed reference has a base reference, resolve it first with a relative resolver (it should
+            // normally be absolute but who knows what the API caller has specified...)
+            baseReference = resolveBaseReference(resourceReference.getBaseReferences(), baseReference);
+        }
+
+        return baseReference;
+    }
+
+    @Override
+    protected EntityReference resolveBaseReference(List<String> baseReferences, EntityReference defaultBaseReference)
+    {
+        EntityReference resolvedBaseReference = defaultBaseReference;
+        for (String baseReference : baseReferences) {
+            resolvedBaseReference =
+                this.relativeReferenceResolver.resolve(baseReference, EntityType.DOCUMENT, resolvedBaseReference);
+        }
+
+        return resolvedBaseReference;
+    }
+
+    @Override
+    protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference)
+    {
+        return resolveTyped(resourceReference, baseReference);
+    }
+
+    @Override
+    protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
+    {
+        return this.relativeReferenceResolver.resolve(resourceReference.getReference(), getEntityType(), baseReference);
+    }
+
+    /**
+     *
+     * @return the entity type of the {@link EntityReference} this resolver produces.
+     */
+    protected abstract EntityType getEntityType();
 }

@@ -39,13 +39,16 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class RelativePageAttachmentResourceReferenceEntityReferenceResolver
     extends AbstractRelativeResourceReferenceEntityReferenceResolver
 {
+    /**
+     * Default constructor.
+     */
     public RelativePageAttachmentResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.PAGE_ATTACHMENT);
     }
 
     @Override
-    public EntityType getEntityType()
+    protected EntityType getEntityType()
     {
         return EntityType.PAGE_ATTACHMENT;
     }

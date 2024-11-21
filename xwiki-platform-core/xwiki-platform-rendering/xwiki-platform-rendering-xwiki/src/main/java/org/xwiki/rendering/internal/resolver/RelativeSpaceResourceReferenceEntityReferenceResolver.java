@@ -38,13 +38,16 @@ import org.xwiki.rendering.listener.reference.ResourceType;
 public class RelativeSpaceResourceReferenceEntityReferenceResolver
     extends AbstractRelativeResourceReferenceEntityReferenceResolver
 {
+    /**
+     * Default constructor.
+     */
     public RelativeSpaceResourceReferenceEntityReferenceResolver()
     {
         super(ResourceType.SPACE);
     }
 
     @Override
-    public EntityType getEntityType()
+    protected EntityType getEntityType()
     {
         return EntityType.SPACE;
     }

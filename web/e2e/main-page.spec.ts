@@ -156,9 +156,9 @@ configs.forEach(
       expect(await revisions[0].getVersion()).toEqual("3.1");
       expect(await revisions[1].getVersion()).toEqual("2.1");
       expect(await revisions[2].getVersion()).toEqual("1.1");
-      expect(await revisions[0].getDate()).toEqual("1/1/24, 9:00 PM");
-      expect(await revisions[1].getDate()).toEqual("1/1/22, 9:00 PM");
-      expect(await revisions[2].getDate()).toEqual("1/1/20, 9:00 PM");
+      expect(await revisions[0].getDate()).toEqual("1/1/24, 8:00 PM");
+      expect(await revisions[1].getDate()).toEqual("1/1/22, 8:00 PM");
+      expect(await revisions[2].getDate()).toEqual("1/1/20, 8:00 PM");
       expect(await revisions[0].getUser()).toEqual("XWiki.User3");
       expect(await revisions[1].getUser()).toEqual("XWiki.User2");
       expect(await revisions[2].getUser()).toEqual("XWiki.User1");

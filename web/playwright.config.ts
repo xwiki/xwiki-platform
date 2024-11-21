@@ -52,6 +52,9 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: `http://localhost:${port}`,
 
+    /* Force a specific timezone. */
+    timezoneId: 'Etc/UTC',
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
     video: "retain-on-failure",

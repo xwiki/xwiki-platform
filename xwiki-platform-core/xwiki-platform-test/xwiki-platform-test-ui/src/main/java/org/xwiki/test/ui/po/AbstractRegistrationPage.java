@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +65,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     public void fillRegisterForm(final String firstName, final String lastName, final String username,
         final String password, final String confirmPassword, final String email)
     {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         // remove the onfocus on login, to avoid any problem to put the value.
         getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
             "}catch(err){}");
@@ -78,11 +78,13 @@ public abstract class AbstractRegistrationPage extends BasePage
         if (StringUtils.isNotEmpty(username)) {
             map.put("xwikiname", username);
         }
-        if (StringUtils.isNotEmpty(password)) {
-            map.put("register_password", password);
-        }
+        // We invert the order of password fields fill to test that the validation of this second password is properly
+        // updated when the first password field is changed.
         if (StringUtils.isNotEmpty(confirmPassword)) {
             map.put("register2_password", confirmPassword);
+        }
+        if (StringUtils.isNotEmpty(password)) {
+            map.put("register_password", password);
         }
         if (StringUtils.isNotEmpty(email)) {
             map.put("register_email", email);

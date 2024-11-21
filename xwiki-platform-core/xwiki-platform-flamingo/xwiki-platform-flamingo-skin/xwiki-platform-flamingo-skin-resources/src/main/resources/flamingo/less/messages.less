@@ -40,9 +40,8 @@ div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
   border-left: 4px solid;
   box-shadow: none;
   
-  & > img {
-    // Improve alignment for silk icons
-    align-self: flex-start;
+  & > .icon-block > img {
+    max-width: unset;
   }
 
   & > div > .box-title,

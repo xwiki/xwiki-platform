@@ -19,8 +19,6 @@
  */
 package org.xwiki.platform.security.requiredrights;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Exception raised by the required rights operations.
  *

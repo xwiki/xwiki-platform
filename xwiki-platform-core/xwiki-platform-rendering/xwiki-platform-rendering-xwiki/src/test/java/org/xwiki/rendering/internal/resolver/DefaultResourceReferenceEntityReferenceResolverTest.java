@@ -248,6 +248,13 @@ public class DefaultResourceReferenceEntityReferenceResolverTest
         assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
             this.mocker.getComponentUnderTest().resolve(documentResource(PAGE, false), null));
 
+        // When the reference cannot be parsed by the relative resolver
+
+        assertEquals(
+            new DocumentReference(CURRENT_WIKI,
+                Arrays.asList(CURRENT_SPACE, CURRENT_SPACE, CURRENT_SPACE, CURRENT_PAGE), DEFAULT_PAGE),
+            this.mocker.getComponentUnderTest().resolve(documentResource("...", false), null));
+
         // When the page is current page
 
         assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),

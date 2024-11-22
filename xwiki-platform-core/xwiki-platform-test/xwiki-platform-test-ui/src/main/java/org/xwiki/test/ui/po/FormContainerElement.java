@@ -75,22 +75,23 @@ public class FormContainerElement extends BaseElement
     {
         Map<WebElement, String> valuesByElements = new LinkedHashMap<>();
         
-        String lastElementName = "";
+        WebElement lastElement = null;
         for (String name : valuesByNames.keySet()) {
-            valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
-            lastElementName = name;
+            lastElement = getFormElement().findElement(By.name(name));
+            valuesByElements.put(lastElement, valuesByNames.get(name));
         }
         fillFieldsByElements(valuesByElements);
         
         /* Register password confirmation is usually the last element that needs to be validated by liveValidation.
           This wait allows to solve a race condition between the form submission and the computation of the status of
           those fields. We force the status to be solved before we try anything else, especially submitting the form.
-          Unfortunately in Java17 we do not have lastEntry(), so we use a few non optimized operations instead. 
+          Unfortunately in Java17 we do not have lastEntry() from LinkedHashMaps, 
+          so we use a few non optimized operations instead. 
           This is okay because the Map should not contain a lot of elements.
           */
         if(!valuesByElements.isEmpty()) {
-            WebElement lastElement = getFormElement().findElement(By.name(lastElementName));
-            getDriver().waitUntilCondition(driver -> !lastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
+            WebElement finalLastElement = lastElement;
+            getDriver().waitUntilCondition(driver -> !finalLastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }
     }
 

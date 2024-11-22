@@ -78,6 +78,7 @@ const error = attachmentPreview.error();
   <x-dialog v-model="openedDialog" :title="t('attachment.preview.modal.title')">
     <template #activator>
       <!-- No activator, the modal is opened when the user clicks on an attachment link. -->
+      <span class="x-dialog-attachment-preview-no-activator"></span>
     </template>
     <template #default>
       <div v-if="loading">{{ t("attachment.preview.loading") }}</div>
@@ -177,6 +178,13 @@ const error = attachmentPreview.error();
 </template>
 
 <style scoped>
+/* Prevent the dialog section of the modal to be displayed, to prevent click on it, which would show the popup without
+an attachments on empty pages. */
+:global(
+    [aria-haspopup="dialog"]:has(.x-dialog-attachment-preview-no-activator)
+  ) {
+  display: none;
+}
 .dialog_content {
   display: grid;
   height: 80vh;

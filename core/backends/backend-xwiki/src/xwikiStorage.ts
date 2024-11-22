@@ -301,11 +301,23 @@ export class XWikiStorage extends AbstractStorage {
   async saveAttachment(page: string, file: File): Promise<unknown> {
     const data = new FormData();
     data.append(file.name, file);
-    await fetch(this.buildAttachmentsURL(page) + "/" + file.name, {
-      method: "PUT",
-      body: data,
-      headers: { ...(await this.getCredentials()), "Content-Type": file.type },
-    });
+    const response = await fetch(
+      this.buildAttachmentsURL(page) + "/" + file.name,
+      {
+        method: "PUT",
+        body: data,
+        headers: {
+          ...(await this.getCredentials()),
+          "Content-Type": file.type,
+        },
+      },
+    );
+    if (!response.ok) {
+      // TODO: make translatable and adapt technical error messages from the backend to human readable errors.
+      throw new Error(
+        `Failed to upload the attachment. Reason: [${response.statusText}]`,
+      );
+    }
     return;
   }
 

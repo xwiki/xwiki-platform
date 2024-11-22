@@ -201,6 +201,9 @@ importers:
 
   core/attachments/attachments-ui:
     dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../../alerts/alerts-api
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api

@@ -20,6 +20,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import AttachmentUploadForm from "./AttachmentUploadForm.vue";
 import AttachmentsTable from "./AttachmentsTable.vue";
+import { AlertsService } from "@xwiki/cristal-alerts-api";
 import { CristalApp } from "@xwiki/cristal-api";
 import { AttachmentsService } from "@xwiki/cristal-attachments-api";
 import { Ref, inject, ref, watch } from "vue";
@@ -34,8 +35,6 @@ const attachments = attachmentsService.list();
 const isLoading = attachmentsService.isLoading();
 const errorMessage = attachmentsService.getError();
 const isUploading = attachmentsService.isUploading();
-
-const uploadError: Ref<string | undefined> = ref();
 
 // Watch for route change to refresh the tab when a user visits a new page.
 const route = useRoute();
@@ -52,6 +51,10 @@ watch(
 
 const attachmentUpload = ref();
 
+const alertsService = cristal
+  .getContainer()
+  .get<AlertsService>("AlertsService")!;
+
 async function upload(files: File[]) {
   try {
     await attachmentsService.upload(
@@ -63,16 +66,13 @@ async function upload(files: File[]) {
     attachmentUpload.value?.reset();
   } catch (e) {
     if (e instanceof Error) {
-      uploadError.value = e.message;
+      alertsService.error(e.message);
     }
   }
 }
 </script>
 
 <template>
-  <!-- TODO: introduce an x-error component -->
-  <div v-if="uploadError">{{ uploadError }}</div>
-  <!-- TODO: raz the field value on upload success... -->
   <AttachmentUploadForm
     ref="attachmentUpload"
     :is-uploading="isUploading"

@@ -70,14 +70,14 @@ class PinnedPagesIT
         DocumentReference denis =
             new DocumentReference("WebHome", new SpaceReference("Denis", levelTwo.getLastSpaceReference()));
 
-        setup.createPage(testReference, "", "");
-        setup.createPage(levelOne, "", "");
-        setup.createPage(levelTwo, "", "");
-        setup.createPage(zero, "", "");
-        setup.createPage(alice, "", "");
-        setup.createPage(bob, "", "");
-        setup.createPage(carol, "", "");
-        setup.createPage(denis, "", "");
+        setup.createPage(testReference, "", "", null, "PinnedPagedIT.WebHome");
+        setup.createPage(levelOne, "", "", null, "PinnedPagedIT.refactorPinnedPages.WebHome");
+        setup.createPage(levelTwo, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.WebHome");
+        setup.createPage(zero, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.LevelTwo.WebHome");
+        setup.createPage(alice, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.LevelTwo.WebHome");
+        setup.createPage(bob, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.LevelTwo.WebHome");
+        setup.createPage(carol, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.LevelTwo.WebHome");
+        setup.createPage(denis, "", "", null, "PinnedPagedIT.refactorPinnedPages.LevelOne.LevelTwo.WebHome");
 
         // Pin the pages.
         PinnedPagesAdministrationSectionPage pinnedPagesAdminSection =

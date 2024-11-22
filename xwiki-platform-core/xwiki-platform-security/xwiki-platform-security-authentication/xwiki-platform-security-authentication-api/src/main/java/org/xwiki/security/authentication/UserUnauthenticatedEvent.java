@@ -17,25 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.security.authentication;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.user.UserReference;
 
 /**
- * This event is triggered every time a user is authenticated.
+ * Event triggered whenever a user is logged out.
  *
  * @version $Id$
- * @since 13.3RC1
+ * @since 16.8.0RC1
+ * @since 16.4.3
+ * @since 15.10.13
  */
-public class UserAuthenticatedEvent extends AbstractUserAuthenticationEvent
+@Unstable
+public class UserUnauthenticatedEvent extends AbstractUserAuthenticationEvent
 {
     /**
-     * This event will match only events of the same type affecting the same user.
+     * Default constructor without user reference for matching.
+     */
+    public UserUnauthenticatedEvent()
+    {
+        this(null);
+    }
+
+    /**
+     * Default constructor.
      *
-     * @param userReference The reference related to an authenticated user for whom a {@link UserAuthenticatedEvent}
+     * @param userReference The reference related to an authenticated user for whom a {@link UserUnauthenticatedEvent}
      * has been triggered.
      */
-    public UserAuthenticatedEvent(UserReference userReference)
+    public UserUnauthenticatedEvent(UserReference userReference)
     {
         super(userReference);
     }
@@ -43,8 +56,6 @@ public class UserAuthenticatedEvent extends AbstractUserAuthenticationEvent
     @Override
     public boolean matches(Object other)
     {
-        return other instanceof UserAuthenticatedEvent && super.matches(other);
+        return other instanceof UserUnauthenticatedEvent && super.matches(other);
     }
-
 }
-

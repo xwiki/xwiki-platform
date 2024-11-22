@@ -27,6 +27,7 @@ import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backe
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
+import { ComponentInit as DateAPIComponentInit } from "@xwiki/cristal-date-api";
 import { ComponentInit as DocumentComponentInit } from "@xwiki/cristal-document-default";
 import { ComponentInit as DSFRComponentInit } from "@xwiki/cristal-dsfr";
 import { ComponentInit as ShoelaceComponentInit } from "@xwiki/cristal-dsshoelace";
@@ -47,6 +48,13 @@ import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-s
 import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
 import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
+import { ComponentInit as ClickListenerComponentInit } from "@xwiki/cristal-model-click-listener";
+import { ComponentInit as ModelReferenceAPIComponentInit } from "@xwiki/cristal-model-reference-api";
+import { ComponentInit as ModelReferenceNextcloudComponentInit } from "@xwiki/cristal-model-reference-nextcloud";
+import { ComponentInit as ModelReferenceXWikiComponentInit } from "@xwiki/cristal-model-reference-xwiki";
+import { ComponentInit as ModelRemoteURLAPIComponentInit } from "@xwiki/cristal-model-remote-url-api";
+import { ComponentInit as ModelRemoteURLNextcloudComponentInit } from "@xwiki/cristal-model-remote-url-nextcloud";
+import { ComponentInit as ModelRemoteURLXWikiComponentInit } from "@xwiki/cristal-model-remote-url-xwiki";
 import { ComponentInit as DefaultNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-default";
 import { ComponentInit as GitHubNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-github";
 import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-nextcloud";
@@ -108,6 +116,14 @@ export class StaticBuild {
       new GitHubPageHistoryComponentInit(container);
       new XWikiPageHistoryComponentInit(container);
       new HistoryUIComponentInit(container);
+      new ClickListenerComponentInit(container);
+      new ModelRemoteURLAPIComponentInit(container);
+      new ModelRemoteURLNextcloudComponentInit(container);
+      new ModelRemoteURLXWikiComponentInit(container);
+      new ModelReferenceAPIComponentInit(container);
+      new ModelReferenceNextcloudComponentInit(container);
+      new ModelReferenceXWikiComponentInit(container);
+      new DateAPIComponentInit(container);
     }
     if (additionalComponents) {
       additionalComponents(container);

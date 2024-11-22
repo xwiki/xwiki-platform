@@ -28,6 +28,7 @@ import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
+import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { marked } from "marked";
 import { computed, inject, onUpdated, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -238,7 +239,9 @@ onUpdated(() => {
         <extra-tabs></extra-tabs>
       </suspense>
     </div>
-    <UIX uixname="content.after" />
+    <suspense>
+      <u-i-extensions uix-name="content.after"></u-i-extensions>
+    </suspense>
   </article>
 </template>
 <style scoped>

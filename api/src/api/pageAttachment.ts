@@ -26,4 +26,9 @@ export interface PageAttachment {
   reference: string;
   mimetype: string;
   href: string;
+  size: number;
+  date: Date;
+  // The author entity reference, or undefined if the author is unknown (e.g., in the case of a file system backend
+  // where the author is the current user)
+  author: string | undefined;
 }

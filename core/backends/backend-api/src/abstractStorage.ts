@@ -20,6 +20,7 @@
 
 import {
   AttachmentsData,
+  PageAttachment,
   PageData,
   Storage,
   WikiConfig,
@@ -67,6 +68,14 @@ export abstract class AbstractStorage implements Storage {
    * @since 0.9
    */
   abstract getAttachments(page: string): Promise<AttachmentsData | undefined>;
+
+  /**
+   * @since 0.12
+   */
+  abstract getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined>;
 
   abstract getPageFromViewURL(url: string): string | null;
 

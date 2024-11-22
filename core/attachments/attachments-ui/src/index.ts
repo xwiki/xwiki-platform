@@ -19,9 +19,11 @@
  */
 
 import { AttachmentExtraTab } from "./AttachmentExtraTab";
+import { AttachmentPreviewContentAfterUIExtension } from "./AttachmentPreviewContentAfterUIExtension";
 import { AttachmentsInfoAction } from "./AttachmentsInfoAction";
 import { ExtraTab } from "@xwiki/cristal-extra-tabs-api";
 import { InfoAction } from "@xwiki/cristal-info-actions-api";
+import { UIExtension } from "@xwiki/cristal-uiextension-api";
 import { Container } from "inversify";
 
 export class ComponentInit {
@@ -33,6 +35,10 @@ export class ComponentInit {
     container
       .bind<InfoAction>("InfoAction")
       .to(AttachmentsInfoAction)
+      .inSingletonScope();
+    container
+      .bind<UIExtension>("UIExtension")
+      .to(AttachmentPreviewContentAfterUIExtension)
       .inSingletonScope();
   }
 }

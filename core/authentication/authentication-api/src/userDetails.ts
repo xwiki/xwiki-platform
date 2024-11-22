@@ -24,6 +24,6 @@
  * @since 0.11
  */
 export interface UserDetails {
-  profile: string;
+  profile?: string;
   name: string;
 }

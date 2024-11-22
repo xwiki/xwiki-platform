@@ -8,6 +8,8 @@
     "@since": true,
     "@param": true,
     "@returns": true,
-    "@deprecated": true
+    "@deprecated": true,
+    "@throws": true,
+    "@link": true
   }
 }

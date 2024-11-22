@@ -20,8 +20,9 @@
 
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
 import { app, ipcMain, shell } from "electron";
+import mime from "mime";
 import fs from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 
 const HOME_PATH = ".cristal";
 const HOME_PATH_FULL = join(app.getPath("home"), HOME_PATH);
@@ -90,14 +91,35 @@ async function readAttachments(
   }
   if (await isDirectory(path)) {
     const pageContent = await fs.promises.readdir(path);
-    return pageContent.map((path) => {
-      return {
-        id: path,
-        mimetype: "",
-        reference: path,
-        href: path,
-      };
-    });
+    return (
+      await Promise.all(
+        pageContent.map((attachment) => readAttachment(join(path, attachment))),
+      )
+    ).filter((it) => it !== undefined);
+  } else {
+    return undefined;
+  }
+}
+
+async function readAttachment(
+  path: string,
+): Promise<PageAttachment | undefined> {
+  if (!(await isWithin(HOME_PATH_FULL, path))) {
+    throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+  }
+
+  if (await isFile(path)) {
+    const stats = await fs.promises.stat(path);
+    const mimetype = mime.getType(path) || "";
+    return {
+      id: basename(path),
+      mimetype,
+      reference: basename(path),
+      href: relative(HOME_PATH_FULL, path),
+      date: stats.mtime,
+      size: stats.size,
+      author: undefined,
+    };
   } else {
     return undefined;
   }
@@ -210,6 +232,9 @@ export default function load(): void {
   });
   ipcMain.handle("readAttachments", (event, { path }) => {
     return readAttachments(path);
+  });
+  ipcMain.handle("readAttachment", (event, { path }) => {
+    return readAttachment(path);
   });
   ipcMain.handle("savePage", (event, { path, content, title }) => {
     return savePage(path, content, title);

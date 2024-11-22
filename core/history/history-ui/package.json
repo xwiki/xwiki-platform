@@ -28,6 +28,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "@xwiki/cristal-history-api": "workspace:*",
+    "@xwiki/cristal-user-ui": "workspace:*",
     "inversify": "6.0.3",
     "vue": "3.5.12",
     "vue-i18n": "10.0.4",

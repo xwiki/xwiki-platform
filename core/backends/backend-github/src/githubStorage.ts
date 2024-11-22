@@ -18,7 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AttachmentsData, DefaultPageData, PageData } from "@xwiki/cristal-api";
+import {
+  AttachmentsData,
+  DefaultPageData,
+  PageAttachment,
+  PageData,
+} from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { inject, injectable } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
@@ -105,6 +110,11 @@ export class GitHubStorage extends AbstractStorage {
    * @since 0.9
    */
   getAttachments(): Promise<AttachmentsData | undefined> {
+    // TODO: to be implemented.
+    throw new Error("unsupported");
+  }
+
+  getAttachment(): Promise<PageAttachment | undefined> {
     // TODO: to be implemented.
     throw new Error("unsupported");
   }

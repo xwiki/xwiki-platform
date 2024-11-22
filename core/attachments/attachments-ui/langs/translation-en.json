@@ -1,7 +1,20 @@
 {
   "attachments.tab.table.header.name": "Name",
   "attachments.tab.table.header.mimetype": "Mime Type",
+  "attachments.tab.table.header.date": "Date",
+  "attachments.tab.table.header.size": "Size",
+  "attachments.tab.table.header.author": "Author",
   "attachments.tab.loading": "Loading...",
   "attachments.tab.noAttachments": "No attachments.",
-  "attachments.extraTabs.title": "Attachments"
+  "attachments.extraTabs.title": "Attachments",
+  "attachment.preview.modal.title": "View Attachment",
+  "attachment.preview.loading": "Loading...",
+  "attachment.preview.name.label": "Name",
+  "attachment.preview.postedBy.label": "Posted by",
+  "attachment.preview.date.label": "Date",
+  "attachment.preview.size.label": "Size",
+  "attachment.preview.type.label": "Type",
+  "attachment.preview.download.button": "Download",
+  "attachment.preview.close.button": "Close",
+  "attachment.preview.error.unknown": "Unknown error message"
 }

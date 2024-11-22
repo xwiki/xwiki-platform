@@ -31,6 +31,8 @@ export interface APITypes {
 
   readAttachments(path: string): Promise<PageAttachment[]>;
 
+  readAttachment(path: string): Promise<PageAttachment>;
+
   savePage(path: string, content: string, title: string): Promise<PageData>;
 
   saveAttachment(path: string, file: File): Promise<PageData>;

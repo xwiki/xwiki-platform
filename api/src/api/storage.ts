@@ -19,6 +19,7 @@
  */
 
 import { AttachmentsData } from "./attachmentsData";
+import { PageAttachment } from "./pageAttachment";
 import type { PageData } from "./PageData";
 import type { WikiConfig } from "./WikiConfig";
 
@@ -59,6 +60,17 @@ export interface Storage {
    * @since 0.9
    */
   getAttachments(page: string): Promise<AttachmentsData | undefined>;
+
+  /**
+   * @param page - the attachment page name
+   * @param name - the attachment name
+   * @returns a promise wrapping the attachment data, or undefined if the requested attachment is not found
+   * @since 0.12
+   */
+  getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined>;
 
   getPanelContent(
     panel: string,

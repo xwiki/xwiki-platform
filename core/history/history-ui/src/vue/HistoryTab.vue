@@ -20,6 +20,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import messages from "../translations";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
+import { User } from "@xwiki/cristal-user-ui";
 import { inject, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
@@ -76,10 +77,7 @@ onMounted(async () => {
             }}</a>
           </template>
           <template #user>
-            <a v-if="revision.user.profile" :href="revision.user.profile">{{
-              revision.user.name
-            }}</a>
-            <span v-else>{{ revision.user.name }}</span>
+            <user :user="revision.user" />
           </template>
         </i18n-t>
         <br />

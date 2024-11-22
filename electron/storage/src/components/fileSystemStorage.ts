@@ -19,7 +19,12 @@
  */
 
 import { APITypes } from "../electron/preload/apiTypes";
-import { AttachmentsData, DefaultPageData, PageData } from "@xwiki/cristal-api";
+import {
+  AttachmentsData,
+  DefaultPageData,
+  PageAttachment,
+  PageData,
+} from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { inject, injectable } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
@@ -57,6 +62,14 @@ export default class FileSystemStorage extends AbstractStorage {
     return {
       attachments: await fileSystemStorage.readAttachments(path),
     };
+  }
+
+  async getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined> {
+    const path = await fileSystemStorage.resolveAttachmentPath(page, name);
+    return fileSystemStorage.readAttachment(path);
   }
 
   getPageFromViewURL(): string | null {

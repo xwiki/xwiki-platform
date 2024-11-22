@@ -22,6 +22,8 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
+    "@xwiki/cristal-authentication-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
     "vue": "3.5.12"
   },
   "publishConfig": {

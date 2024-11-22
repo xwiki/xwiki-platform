@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { createVNode, render } from "vue";
 import type { MacroProvider } from "../api/macroProvider";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
@@ -31,61 +32,16 @@ export class ContentTools {
   }
 
   /**
-   * Method to intercept clicks in the HTML content and load the page using Cristal Wiki
+   * Method to intercept clicks in the HTML content and load the page using Cristal Wiki.
    */
   public static listenToClicks(
     element: HTMLElement,
     cristal: CristalApp | undefined,
   ): void {
-    element.addEventListener(
-      `click`,
-      // TODO get rid of any
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      function handleClick(event: any) {
-        // We cannot use `closest()` because of possible shadow roots.
-        const origin = event
-          .composedPath()
-          .find((e: HTMLElement) => e.nodeName === "A");
-
-        if (origin?.href) {
-          ContentTools.logger?.debug("You clicked", origin.href);
-          ContentTools.logger?.debug(event.target);
-          ContentTools.logger?.debug(event.target.href);
-          ContentTools.logger?.debug(location);
-          ContentTools.logger?.debug(location.origin);
-          ContentTools.logger?.debug(location.hostname);
-          event.preventDefault();
-          // Case 1: the link is relative and/or points to the current host.
-          if (origin.href.startsWith(location.origin)) {
-            ContentTools.logger?.debug("URL is relative URL");
-            const page = origin.href.replace(
-              location.origin + location.pathname,
-              "",
-            );
-            if (!page.startsWith("#")) {
-              ContentTools.logger?.debug("New page should be", page);
-              cristal?.setCurrentPage(page, "view");
-              cristal?.loadPage().then();
-            } else {
-              ContentTools.logger?.debug("Leaving alone page", page);
-              location = page;
-              return;
-            }
-          } else {
-            // Case 2: the link points to an external server, in this case we try to resolve it to a known page.
-            // Otherwise, the link is considered as external.
-            if (cristal != null) {
-              cristal.loadPageFromURL(origin.href).then();
-            } else {
-              ContentTools.logger?.error(
-                "cristal object not injected properly in c-content.vue",
-              );
-            }
-          }
-        }
-      },
-      true,
-    );
+    const clickListener = cristal
+      ?.getContainer()
+      .get<ClickListener>("ClickListener");
+    clickListener?.handleHTMLElement(element);
   }
 
   /**

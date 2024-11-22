@@ -29,6 +29,9 @@ const api: APITypes = {
   readAttachments(path: string): Promise<PageAttachment[]> {
     return ipcRenderer.invoke("readAttachments", { path });
   },
+  readAttachment(path: string): Promise<PageAttachment> {
+    return ipcRenderer.invoke("readAttachment", { path });
+  },
   resolvePath: (page: string) => {
     return ipcRenderer.invoke("resolvePath", { page: page || "index" });
   },

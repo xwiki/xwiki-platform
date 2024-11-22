@@ -68,7 +68,7 @@ export interface CristalApp {
    */
   getCurrentSyntax(): string;
 
-  setCurrentPage(page: string, mode: string): void;
+  setCurrentPage(page: string, mode?: string): void;
 
   /**
    * @deprecated use the document-api instead
@@ -76,6 +76,9 @@ export interface CristalApp {
    */
   setContentRef(ref: Ref): void;
 
+  /**
+   * @deprecated since 0.12, use ClickListener instead
+   */
   loadPageFromURL(url: string): Promise<void>;
 
   loadPage(options?: { requeue: boolean }): Promise<void>;

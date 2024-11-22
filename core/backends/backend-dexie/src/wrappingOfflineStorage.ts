@@ -23,6 +23,7 @@ import type {
   AttachmentsData,
   Document,
   Logger,
+  PageAttachment,
   PageData,
   Storage,
   WikiConfig,
@@ -121,6 +122,13 @@ export class WrappingOfflineStorage implements WrappingStorage {
   public getAttachments(page: string): Promise<AttachmentsData | undefined> {
     // TODO: add support for offline storage of attachments.
     return this.storage.getAttachments(page);
+  }
+
+  getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined> {
+    return this.storage.getAttachment(page, name);
   }
 
   private async savePageContent(

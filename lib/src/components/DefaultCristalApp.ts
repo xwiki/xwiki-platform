@@ -320,6 +320,9 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
+  /**
+   * @deprecated since 0.12
+   */
   async loadPageFromURL(url: string): Promise<void> {
     this.logger?.debug("Trying to load", url);
     const page = this.getWikiConfig().storage.getPageFromViewURL(url);

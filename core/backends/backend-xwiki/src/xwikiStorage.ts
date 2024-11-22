@@ -23,6 +23,7 @@ import {
   DefaultPageData,
   Document,
   JSONLDDocument,
+  PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
@@ -46,7 +47,7 @@ type Attachment = {
   mimeType: string;
   author: string;
   authorName: string | null;
-  date: number;
+  date: Date;
   xwikiRelativeUrl: string;
   xwikiAbsoluteUrl: string;
   // TODO: add hierarchy
@@ -184,12 +185,15 @@ export class XWikiStorage extends AbstractStorage {
     });
     const json: AttachmentsRest = await response.json();
     const attachments = json.attachments.map(
-      ({ id, name, mimeType, xwikiAbsoluteUrl }) => {
+      ({ id, name, mimeType, xwikiAbsoluteUrl, size, date, author }) => {
         return {
           id,
           reference: name,
           mimetype: mimeType,
           href: xwikiAbsoluteUrl,
+          size,
+          date,
+          author,
         };
       },
     );
@@ -197,6 +201,16 @@ export class XWikiStorage extends AbstractStorage {
     // XWiki's rest endpoints without asking for the full list of attachments
     // of a page (see XWIKI-22297).
     return { attachments };
+  }
+
+  async getAttachment(
+    page: string,
+    name: string,
+  ): Promise<PageAttachment | undefined> {
+    const attachments = await this.getAttachments(page);
+    if (attachments) {
+      return attachments.attachments.filter((a) => a.reference == name)[0];
+    }
   }
 
   async getPanelContent(panel: string, contextPage: string): Promise<PageData> {

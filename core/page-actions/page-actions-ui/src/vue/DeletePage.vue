@@ -19,15 +19,16 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import messages from "../translations";
-import { type Ref, inject, ref } from "vue";
-import { useI18n } from "vue-i18n";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import { inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type { Ref } from "vue";
 
 const { t } = useI18n({
   messages,

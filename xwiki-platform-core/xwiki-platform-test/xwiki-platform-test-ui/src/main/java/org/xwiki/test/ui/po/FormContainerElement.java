@@ -89,7 +89,7 @@ public class FormContainerElement extends BaseElement
           so we use a few non optimized operations instead. 
           This is okay because the Map should not contain a lot of elements.
           */
-        if(!valuesByElements.isEmpty()) {
+        if(!valuesByElements.isEmpty() && lastElement != null) {
             WebElement finalLastElement = lastElement;
             getDriver().waitUntilCondition(driver -> !finalLastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }

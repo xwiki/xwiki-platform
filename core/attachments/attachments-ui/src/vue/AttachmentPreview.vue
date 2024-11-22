@@ -180,9 +180,7 @@ const error = attachmentPreview.error();
 <style scoped>
 /* Prevent the dialog section of the modal to be displayed, to prevent click on it, which would show the popup without
 an attachments on empty pages. */
-:global(
-    [aria-haspopup="dialog"]:has(.x-dialog-attachment-preview-no-activator)
-  ) {
+:global(*:has(> .x-dialog-attachment-preview-no-activator)) {
   display: none;
 }
 .dialog_content {

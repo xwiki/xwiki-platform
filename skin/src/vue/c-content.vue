@@ -220,7 +220,7 @@ onUpdated(() => {
 
     <!-- eslint-disable vue/no-v-html -->
     <div
-      v-if="content"
+      v-if="content !== undefined"
       id="xwikicontent"
       ref="contentRoot"
       class="doc-content"

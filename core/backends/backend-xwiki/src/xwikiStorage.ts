@@ -127,7 +127,7 @@ export class XWikiStorage extends AbstractStorage {
     page: string,
     syntax: string,
     revision?: string,
-  ): Promise<PageData> {
+  ): Promise<PageData | undefined> {
     this.logger?.debug("XWiki Loading page", page);
     if (page == "") {
       page = "Main.WebHome";
@@ -135,7 +135,13 @@ export class XWikiStorage extends AbstractStorage {
     const url = this.getPageRestURL(page, syntax, revision);
     this.logger?.debug("XWiki Loading url", url);
     const response = await fetch(url, { cache: "no-store" });
-    const json = await response.json();
+    let json;
+    try {
+      json = await response.json();
+    } catch {
+      // Return undefined in case of missing page.
+      return undefined;
+    }
     let source = "";
     let html = "";
     let jsonContent = {};

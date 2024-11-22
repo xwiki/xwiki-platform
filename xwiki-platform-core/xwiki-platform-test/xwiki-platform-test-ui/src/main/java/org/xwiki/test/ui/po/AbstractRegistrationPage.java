@@ -65,7 +65,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     public void fillRegisterForm(final String firstName, final String lastName, final String username,
         final String password, final String confirmPassword, final String email)
     {
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         // remove the onfocus on login, to avoid any problem to put the value.
         getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
             "}catch(err){}");

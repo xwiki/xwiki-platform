@@ -71,12 +71,14 @@ public class FormContainerElement extends BaseElement
         return this.formElement;
     }
 
-    public void fillFieldsByName(LinkedHashMap<String, String> valuesByNames)
+    public void fillFieldsByName(Map<String, String> valuesByNames)
     {
-        LinkedHashMap<WebElement, String> valuesByElements = new LinkedHashMap<>((int) (valuesByNames.size() / 0.75));
-
+        Map<WebElement, String> valuesByElements = new LinkedHashMap<>();
+        
+        String lastElementName = null;
         for (String name : valuesByNames.keySet()) {
             valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
+            lastElementName = name;
         }
         fillFieldsByElements(valuesByElements);
         
@@ -87,7 +89,7 @@ public class FormContainerElement extends BaseElement
           This is okay because the Map should not contain a lot of elements.
           */
         if(valuesByElements.size() > 0) {
-            WebElement lastElement = ((WebElement)valuesByElements.keySet().toArray()[valuesByElements.size() - 1]);
+            WebElement lastElement = getFormElement().findElement(By.name(lastElementName));
             getDriver().waitUntilCondition(driver -> !lastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }
     }

@@ -92,7 +92,12 @@ export class HistoryExtraTabPageObject {
           return revision.locator("td").nth(0).textContent();
         },
         async getDate() {
-          return revision.locator("td").nth(1).locator("a").nth(0).textContent();
+          return revision
+            .locator("td")
+            .nth(1)
+            .locator("a")
+            .nth(0)
+            .textContent();
         },
         async getUser() {
           const text = await revision.locator("td").nth(1).innerText();

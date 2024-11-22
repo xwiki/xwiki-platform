@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 // reflect-metadata is placed at the top because it needs to be imported
 // before any use of an inversify annotation.
 import "reflect-metadata";

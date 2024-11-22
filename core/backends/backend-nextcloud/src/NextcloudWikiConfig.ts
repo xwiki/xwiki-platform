@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 import { DefaultWikiConfig } from "@xwiki/cristal-api";
 import { inject, injectable, named } from "inversify";
 import type { CristalApp, Logger, Storage } from "@xwiki/cristal-api";

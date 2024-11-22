@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 import localConfig from "./vite.config";
 import { mergeConfig } from "vitest/config";
 import defaultConfig from "@xwiki/cristal-dev-config/vitest-vue.config";

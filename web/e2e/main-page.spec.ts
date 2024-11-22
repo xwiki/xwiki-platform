@@ -127,11 +127,13 @@ configs.forEach(
       expect(await navigationTreeNodes[0].getLink()).toEqual(
         "#/Help.WebHome/view",
       );
-      await expect(navigationTreeNodes[1].getText()).toContainText("Terminal Page");
-      expect(await navigationTreeNodes[1].getLink()).toEqual(
-        "#/Terminal/view",
+      await expect(navigationTreeNodes[1].getText()).toContainText(
+        "Terminal Page",
       );
-      await expect(navigationTreeNodes[2].getText()).toContainText("Deep Page Root");
+      expect(await navigationTreeNodes[1].getLink()).toEqual("#/Terminal/view");
+      await expect(navigationTreeNodes[2].getText()).toContainText(
+        "Deep Page Root",
+      );
       expect(await navigationTreeNodes[2].getLink()).toEqual(
         "#/Deep1.WebHome/view",
       );
@@ -140,9 +142,7 @@ configs.forEach(
       const children = await navigationTreeNodes[2].getChildren();
       expect(children.length).toEqual(1);
       await expect(children[0].getText()).toContainText("Deep Page Leaf");
-      expect(await children[0].getLink()).toEqual(
-        "#/Deep1.Deep2/view",
-      )
+      expect(await children[0].getLink()).toEqual("#/Deep1.Deep2/view");
     });
 
     test(`[${name}] has working history`, async ({ page }) => {
@@ -168,10 +168,7 @@ configs.forEach(
 
       // We open a revision and check that the content updated.
       await (await revisions[1].getLink()).click();
-      await expect(page.locator("#xwikicontent")).toContainText(
-        "Revision 2.1",
-      );
-
+      await expect(page.locator("#xwikicontent")).toContainText("Revision 2.1");
     });
 
     if (offlineDefaultPage) {

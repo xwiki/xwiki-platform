@@ -60,6 +60,10 @@ public class ResourceReferenceRenamer
     private EntityReferenceResolver<ResourceReference> entityReferenceResolver;
 
     @Inject
+    @Named("relative")
+    private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
+
+    @Inject
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
@@ -206,9 +210,10 @@ public class ResourceReferenceRenamer
     private String getNewTargetReference(ResourceReference resourceReference, EntityReference newTargetReference,
         EntityReference currentReference)
     {
+        EntityReference entityReference =
+            this.relativeEntityReferenceResolver.resolve(resourceReference, null, (Object) null);
         // If the reference contains the wiki name, then we should keep the absolute serialization.
-        // TODO: This regex feels really fragile, I'm not sure how we should check presence of a wiki here.
-        if (resourceReference.getReference().matches("^\\w+:\\w.*$")) {
+        if (entityReference.extractReference(EntityType.WIKI) != null) {
             return this.defaultEntityReferenceSerializer.serialize(newTargetReference, currentReference);
         } else {
             return this.compactEntityReferenceSerializer.serialize(newTargetReference, currentReference);

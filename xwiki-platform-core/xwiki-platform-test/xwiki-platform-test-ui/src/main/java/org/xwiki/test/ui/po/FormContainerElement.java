@@ -75,7 +75,7 @@ public class FormContainerElement extends BaseElement
     {
         Map<WebElement, String> valuesByElements = new LinkedHashMap<>();
         
-        String lastElementName = null;
+        String lastElementName = "";
         for (String name : valuesByNames.keySet()) {
             valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
             lastElementName = name;
@@ -88,7 +88,7 @@ public class FormContainerElement extends BaseElement
           Unfortunately in Java17 we do not have lastEntry(), so we use a few non optimized operations instead. 
           This is okay because the Map should not contain a lot of elements.
           */
-        if(valuesByElements.size() > 0) {
+        if(!valuesByElements.isEmpty()) {
             WebElement lastElement = getFormElement().findElement(By.name(lastElementName));
             getDriver().waitUntilCondition(driver -> !lastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }

@@ -22,7 +22,10 @@ import { inject, injectable } from "inversify";
 import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
 import { Ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
-import type { DocumentService } from "@xwiki/cristal-document-api";
+import type {
+  DocumentChange,
+  DocumentService,
+} from "@xwiki/cristal-document-api";
 
 type Id = "document";
 type State = {
@@ -120,6 +123,10 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
 export class DefaultDocumentService implements DocumentService {
   private readonly refs: StateRefs;
   private readonly store: DocumentStore;
+  private readonly documentChangeListeners: Map<
+    DocumentChange,
+    Array<(page: PageData) => Promise<void>>
+  > = new Map();
 
   constructor(@inject("CristalApp") private cristal: CristalApp) {
     this.store = createStore(this.cristal)();
@@ -152,6 +159,28 @@ export class DefaultDocumentService implements DocumentService {
     if (documentReference) {
       // this.store.setLoading();
       this.store.update(documentReference, false, this.store.lastRevision);
+    }
+  }
+
+  registerDocumentChangeListener(
+    change: DocumentChange,
+    listener: (page: PageData) => Promise<void>,
+  ): void {
+    if (this.documentChangeListeners.has(change)) {
+      this.documentChangeListeners.get(change)!.push(listener);
+    } else {
+      this.documentChangeListeners.set(change, [listener]);
+    }
+  }
+
+  async notifyDocumentChange(
+    change: DocumentChange,
+    page: PageData,
+  ): Promise<void> {
+    if (this.documentChangeListeners.has(change)) {
+      await Promise.all(
+        this.documentChangeListeners.get(change)!.map((l) => l(page)),
+      );
     }
   }
 }

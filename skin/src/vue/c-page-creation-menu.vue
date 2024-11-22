@@ -21,10 +21,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { CIcon } from "@xwiki/cristal-icons";
 import { defineProps, inject, ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
-import type {
-  NavigationTreeNode,
-  NavigationTreeSourceProvider,
-} from "@xwiki/cristal-navigation-tree-api";
+import type { NavigationTreeNode } from "@xwiki/cristal-navigation-tree-api";
 import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -90,14 +87,6 @@ function createPage() {
             <label>Parent Location</label>
             <div id="new-page-navigation-tree" class="location-box">
               <XNavigationTree
-                :tree-source="
-                  cristal
-                    .getContainer()
-                    .get<NavigationTreeSourceProvider>(
-                      'NavigationTreeSourceProvider',
-                    )
-                    .get()
-                "
                 :click-action="treeNodeClickAction"
                 :current-page="currentPage"
               ></XNavigationTree>

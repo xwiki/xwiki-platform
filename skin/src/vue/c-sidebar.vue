@@ -33,7 +33,6 @@ import { CIcon } from "@xwiki/cristal-icons";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { Ref, inject, onMounted, ref, watch } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
-import type { NavigationTreeSourceProvider } from "@xwiki/cristal-navigation-tree-api";
 
 const logo = xlogo;
 const viewportType: Ref<ViewportType> = useViewportType();
@@ -165,15 +164,7 @@ function onClickOutsideMainSidebar() {
         <c-page-creation-menu
           :current-page="currentPage!"
         ></c-page-creation-menu>
-        <XNavigationTree
-          :tree-source="
-            cristal
-              .getContainer()
-              .get<NavigationTreeSourceProvider>('NavigationTreeSourceProvider')
-              .get()
-          "
-          :current-page="currentPage"
-        ></XNavigationTree>
+        <XNavigationTree :current-page="currentPage"></XNavigationTree>
       </c-sidebar-panel>
       <c-sidebar-panel name="Applications"></c-sidebar-panel>
       <UIX uixname="sidebar.after" />

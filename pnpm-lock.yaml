@@ -1077,6 +1077,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
       '@xwiki/cristal-hierarchy-api':
         specifier: workspace:*
         version: link:../../hierarchy/hierarchy-api
@@ -1215,6 +1218,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../core/document/document-api
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api
@@ -1246,6 +1252,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../core/document/document-api
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../api

@@ -24,6 +24,12 @@ import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { DocumentService } from "@xwiki/cristal-document-api";
+import { CIcon, Size } from "@xwiki/cristal-icons";
+import { inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import type { AlertsService } from "@xwiki/cristal-alerts-api";
+import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
@@ -42,6 +48,9 @@ const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const alertsService: AlertsService = cristal
   .getContainer()
   .get<AlertsService>("AlertsService")!;
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>("DocumentService");
 const deleteDialogOpen: Ref<boolean> = ref(false);
 
 async function deletePage() {
@@ -57,6 +66,7 @@ async function deletePage() {
   deleteDialogOpen.value = false;
 
   if (result.success) {
+    const deletedPage = props.currentPage!;
     if (hierarchy.length > 1) {
       cristal.setCurrentPage(hierarchy[hierarchy.length - 2].pageId, "view");
     } else {
@@ -67,6 +77,7 @@ async function deletePage() {
         page: props.currentPageName,
       }),
     );
+    documentService.notifyDocumentChange("delete", deletedPage);
   } else {
     alertsService.error(
       t("page.action.action.delete.page.error", {

@@ -22,6 +22,11 @@ import type { PageData } from "@xwiki/cristal-api";
 import type { Ref } from "vue";
 
 /**
+ * @since 0.12
+ */
+type DocumentChange = "update" | "delete";
+
+/**
  * Provide the operation to access a document.
  *
  * @since 0.11
@@ -59,8 +64,29 @@ interface DocumentService {
    * Force reloading the content of the document without changing the current document reference
    */
   refreshCurrentDocument(): void;
+
+  /**
+   * Register a change listener that will be executed on any document change
+   * made on the whole Cristal instance.
+   * @param change - the kind of change
+   * @param listener - the listener to register
+   * @since 0.12
+   */
+  registerDocumentChangeListener(
+    change: DocumentChange,
+    listener: (page: PageData) => Promise<void>,
+  ): void;
+
+  /**
+   * Notify that a document change happened. This will execute all registered
+   * listeners for the given kind of change.
+   * @param change - the kind of change
+   * @param page - the document changed
+   * @since 0.12
+   */
+  notifyDocumentChange(change: DocumentChange, page: PageData): Promise<void>;
 }
 
 const name: string = "DocumentService";
 
-export { type DocumentService, name };
+export { type DocumentChange, type DocumentService, name };

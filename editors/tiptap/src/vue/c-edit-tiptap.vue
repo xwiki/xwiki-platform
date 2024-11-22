@@ -93,6 +93,10 @@ const save = async (authors: User[]) => {
       title.value,
       "html",
     );
+  documentService.notifyDocumentChange(
+    "update",
+    documentService.getCurrentDocument().value!,
+  );
 };
 const submit = async () => {
   await editor.value?.storage.cristalCollaborationKit.autoSaver.save();

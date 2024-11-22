@@ -47,6 +47,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -58,26 +59,24 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Validate {@link DefaultResourceReferenceEntityReferenceResolver}.
+ * Validate {@link RelativeResourceReferenceEntityReferenceResolver}.
  *
  * @version $Id$
+ * @since 17.0.0RC1
  */
 // @formatter:off
 @ComponentList({
-    DefaultResourceReferenceEntityReferenceResolver.class,
-    AttachmentResourceReferenceEntityReferenceResolver.class,
-    DocumentResourceReferenceEntityReferenceResolver.class,
+    RelativeResourceReferenceEntityReferenceResolver.class,
+    RelativeAttachmentResourceReferenceEntityReferenceResolver.class,
+    RelativeDocumentResourceReferenceEntityReferenceResolver.class,
     DefaultStringAttachmentReferenceResolver.class,
     DefaultStringDocumentReferenceResolver.class,
-    SpaceResourceReferenceEntityReferenceResolver.class,
+    RelativeSpaceResourceReferenceEntityReferenceResolver.class,
     DefaultReferenceEntityReferenceResolver.class,
     DefaultStringEntityReferenceResolver.class,
     RelativeStringEntityReferenceResolver.class,
@@ -89,7 +88,7 @@ import static org.mockito.Mockito.when;
 })
 @ComponentTest
 // @formatter:on
-class DefaultResourceReferenceEntityReferenceResolverTest
+class RelativeResourceReferenceEntityReferenceResolverTest
 {
     private static final String DEFAULT_PAGE = "defaultpage";
 
@@ -108,9 +107,18 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     private static final String PAGE = "Page";
 
     private static final String ATTACHMENT = "file.ext";
+
+    private static final SpaceReference BASE_REFERENCE = new SpaceReference(WIKI, SPACE);
+    private static final EntityReference SPACE_ENTITY_REFERENCE = new EntityReference(SPACE, EntityType.SPACE);
+    private static final EntityReference PAGE_ENTITY_REFERENCE =
+        new EntityReference(PAGE, EntityType.DOCUMENT, SPACE_ENTITY_REFERENCE);
+    private static final EntityReference PAGE_ALONE_ENTITY_REFERENCE = new EntityReference(PAGE, EntityType.DOCUMENT);
+    private static final EntityReference DEFAULT_PAGE_ENTITY_REFERENCE =
+        new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT, SPACE_ENTITY_REFERENCE);
+
     
     @InjectMockComponents
-    private DefaultResourceReferenceEntityReferenceResolver resolver;
+    private RelativeResourceReferenceEntityReferenceResolver resolver;
 
     @MockComponent
     @Named("current")
@@ -181,18 +189,12 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     {
         assertEquals(new DocumentReference(WIKI, SPACE, PAGE),
             this.resolver.resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, true), null));
+        assertEquals(PAGE_ENTITY_REFERENCE, this.resolver.resolve(documentResource(SPACE + '.' + PAGE, true), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, PAGE),
-            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, true), null));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
+        assertEquals(new EntityReference(PAGE, EntityType.DOCUMENT),
             this.resolver.resolve(documentResource(PAGE, true), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
-            this.resolver.resolve(documentResource("", true), null));
-
-        when(this.currentEntityReferenceResolver.resolve(eq(WIKI + ':' + SPACE + '.' + PAGE), eq(EntityType.DOCUMENT),
-            any())).thenReturn(new DocumentReference(WIKI, SPACE, PAGE));
+        assertNull(this.resolver.resolve(documentResource("", true), null));
 
         ResourceReference withBaseReference = documentResource("", true);
         withBaseReference.addBaseReference(WIKI + ':' + SPACE + '.' + PAGE);
@@ -210,88 +212,92 @@ class DefaultResourceReferenceEntityReferenceResolverTest
 
         assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
             this.resolver.resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+
+        // TODO: check that this assert is ok, we don't get the default page since we don't have any info to properly
+        // resolve the absolute ref (no wiki, no base reference)
+        assertEquals(PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 
-        // Already ends with default page name
+        assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(PAGE, false), null, BASE_REFERENCE));
 
+        // Already ends with default page name
         assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE), this.resolver
             .resolve(documentResource(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE, false), null));
-        assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, DEFAULT_PAGE),
+
+        assertEquals(DEFAULT_PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + DEFAULT_PAGE, false), null));
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE),
+        assertEquals(new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT),
             this.resolver.resolve(documentResource(DEFAULT_PAGE, false), null));
+
+        assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE), this.resolver
+            .resolve(documentResource(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(SPACE + '.' + DEFAULT_PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE),
+            this.resolver.resolve(documentResource(DEFAULT_PAGE, false), null, BASE_REFERENCE));
+
 
         // When the page exist
 
         this.existingDocuments.add(new DocumentReference(WIKI, SPACE, PAGE));
         assertEquals(new DocumentReference(WIKI, SPACE, PAGE), this.resolver
             .resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, SPACE, PAGE));
-        assertEquals(new DocumentReference(CURRENT_WIKI, SPACE, PAGE),
+
+        assertEquals(PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 
-        // When the reference cannot be parsed by the relative resolver
-
-        assertEquals(
-            new DocumentReference(CURRENT_WIKI,
-                Arrays.asList(CURRENT_SPACE, CURRENT_SPACE, CURRENT_SPACE, CURRENT_PAGE), DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource("...", false), null));
-
-        // When the page is current page
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
-            this.resolver.resolve(documentResource(CURRENT_PAGE, false), null));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
-            this.resolver.resolve(documentResource("", false), null));
+        assertEquals(new DocumentReference(WIKI, SPACE, PAGE),
+            this.resolver.resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, SPACE, PAGE),
+            this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null, BASE_REFERENCE));
+        assertEquals(new DocumentReference(WIKI, SPACE, PAGE),
+            this.resolver.resolve(documentResource(PAGE, false), null, BASE_REFERENCE));
+        
+        assertNull(this.resolver.resolve(documentResource("", false), null));
     }
 
     @Test
     void resolveUntypeDocumentWhenCurrentPageIsSpace()
     {
         // Current is top level space
-
-        when(this.currentDocumentProvider.get())
-            .thenReturn(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, DEFAULT_PAGE));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource('.' + PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE),
+        EntityReference pageSpaceReference = new EntityReference(PAGE, EntityType.SPACE);
+        EntityReference defaultPageSpaceReference =
+            new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT, pageSpaceReference);
+        assertEquals(defaultPageSpaceReference,
             this.resolver.resolve(documentResource('.' + PAGE + '.' + DEFAULT_PAGE, false), null));
 
         // Current is subspace
 
         // When sibling page does not exist
-
-        when(this.currentDocumentProvider.get()).thenReturn(
-            new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE), DEFAULT_PAGE));
-
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
-            DEFAULT_PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
-            DEFAULT_PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource('.' + PAGE, false), null));
 
         assertEquals(
-            new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE), DEFAULT_PAGE),
+            defaultPageSpaceReference,
             this.resolver.resolve(documentResource('.' + PAGE + '.' + DEFAULT_PAGE, false),
                 null));
 
@@ -299,18 +305,16 @@ class DefaultResourceReferenceEntityReferenceResolverTest
 
         this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 
-        assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(PAGE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
-        // FIXME: This should always be resolved to a child (terminal or non-terminal) page and never to a sibling.
-        assertEquals(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE),
+        assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource('.' + PAGE, false), null));
 
-        assertEquals(
-            new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE), DEFAULT_PAGE),
+        assertEquals(defaultPageSpaceReference,
             this.resolver.resolve(documentResource('.' + PAGE + '.' + DEFAULT_PAGE, false),
                 null));
     }
@@ -321,44 +325,55 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         assertEquals(new SpaceReference(WIKI, SPACE),
             this.resolver.resolve(spaceResource(WIKI + ':' + SPACE, true), null));
 
-        assertEquals(new SpaceReference(CURRENT_WIKI, SPACE),
+        assertEquals(SPACE_ENTITY_REFERENCE,
             this.resolver.resolve(spaceResource(SPACE, true), null));
 
-        assertEquals(new SpaceReference(CURRENT_WIKI, CURRENT_SPACE),
-            this.resolver.resolve(spaceResource("", true), null));
+        assertEquals(new SpaceReference(WIKI, SPACE),
+            this.resolver.resolve(spaceResource(SPACE, true), null, new WikiReference(WIKI)));
 
-        when(this.currentEntityReferenceResolver.resolve(eq(WIKI + ':' + SPACE + '.' + PAGE), eq(EntityType.DOCUMENT),
-            any())).thenReturn(new DocumentReference(WIKI, SPACE, PAGE));
+        assertNull(this.resolver.resolve(spaceResource("", true), null));
+        assertEquals(new SpaceReference(WIKI, SPACE), this.resolver
+            .resolve(spaceResource("", true), null, new DocumentReference(WIKI, SPACE, PAGE)));
 
         ResourceReference withBaseReference = spaceResource("", true);
         withBaseReference.addBaseReference(WIKI + ':' + SPACE + '.' + PAGE);
         assertEquals(new SpaceReference(WIKI, SPACE),
             this.resolver.resolve(withBaseReference, null));
-
-        assertEquals(new SpaceReference(WIKI, SPACE), this.resolver
-            .resolve(spaceResource("", true), null, new DocumentReference(WIKI, SPACE, PAGE)));
     }
 
     @Test
     void resolveTypeAttachment()
     {
         // When the page does not exist
+        EntityReference attachmentInSpacePage =
+            new EntityReference(ATTACHMENT, EntityType.ATTACHMENT, PAGE_ENTITY_REFERENCE);
+        EntityReference attachmentInPage =
+            new EntityReference(ATTACHMENT, EntityType.ATTACHMENT, PAGE_ALONE_ENTITY_REFERENCE);
+
+        SpaceReference baseReference = new SpaceReference(WIKI, SPACE);
 
         assertEquals(
             new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE)),
             this.resolver
                 .resolve(attachmentResource(WIKI + ':' + SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null));
-
-        assertEquals(
-            new AttachmentReference(ATTACHMENT,
-                new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE)),
+        assertEquals(attachmentInSpacePage,
             this.resolver.resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, true),
                 null));
+        assertEquals(attachmentInPage,
+            this.resolver.resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null));
 
         assertEquals(
-            new AttachmentReference(ATTACHMENT,
-                new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, PAGE), DEFAULT_PAGE)),
-            this.resolver.resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null));
+            new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE)),
+            this.resolver
+                .resolve(attachmentResource(WIKI + ':' + SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null,
+                    baseReference));
+        assertEquals(
+            new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE)),
+            this.resolver.resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, true),
+                null, baseReference));
+        assertEquals(
+            new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE)),
+            this.resolver.resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null, baseReference));
 
         // When the page exist
 
@@ -366,63 +381,28 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)),
             this.resolver
                 .resolve(attachmentResource(WIKI + ':' + SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null));
-
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, SPACE, PAGE));
-        assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, SPACE, PAGE)),
+        assertEquals(attachmentInSpacePage,
             this.resolver.resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null));
-
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE));
-        assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, PAGE)),
+        assertEquals(attachmentInPage,
             this.resolver.resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null));
 
-        // When page is current page
+        assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)),
+            this.resolver
+                .resolve(attachmentResource(WIKI + ':' + SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null,
+                    baseReference));
+
+        assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)),
+            this.resolver.resolve(attachmentResource(SPACE + '.' + PAGE + '@' + ATTACHMENT, true), null,
+                baseReference));
+
+        assertEquals(new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, PAGE)),
+            this.resolver.resolve(attachmentResource(PAGE + '@' + ATTACHMENT, true), null, baseReference));
 
         assertEquals(
-            new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)),
+            new EntityReference(ATTACHMENT, EntityType.ATTACHMENT),
             this.resolver.resolve(attachmentResource(ATTACHMENT, true), null));
-
-        this.existingDocuments.add(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
         assertEquals(
-            new AttachmentReference(ATTACHMENT, new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)),
-            this.resolver.resolve(attachmentResource(ATTACHMENT, true), null));
-    }
-
-    class VoidResourceReferenceEntityReferenceResolve extends AbstractResourceReferenceEntityReferenceResolver
-    {
-        VoidResourceReferenceEntityReferenceResolve()
-        {
-            this.documentAccessBridge = DefaultResourceReferenceEntityReferenceResolverTest.this.bridge;
-        }
-
-        @Override
-        protected EntityReference resolveTyped(ResourceReference resourceReference, EntityReference baseReference)
-        {
-            return null;
-        }
-    }
-
-    @Test
-    void trySpaceSiblingFallback()
-    {
-        VoidResourceReferenceEntityReferenceResolve resolver = new VoidResourceReferenceEntityReferenceResolve();
-
-        String defaultDocumentName = "Foo";
-        EntityReference sourceReference = new EntityReference("Bar", EntityType.DOCUMENT);
-        DocumentReference finalReference = new DocumentReference("xwiki", "Bar",
-            "WebHome");
-        EntityReference baseReference = sourceReference;
-
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, null,
-            defaultDocumentName));
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
-
-        defaultDocumentName = "Bar";
-        assertTrue(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
-
-        this.existingDocuments.add(finalReference);
-        assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
-            defaultDocumentName));
+            new AttachmentReference(ATTACHMENT, new DocumentReference(WIKI, SPACE, DEFAULT_PAGE)),
+            this.resolver.resolve(attachmentResource(ATTACHMENT, true), null, baseReference));
     }
 }

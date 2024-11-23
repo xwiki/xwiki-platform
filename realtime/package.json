@@ -20,7 +20,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@hocuspocus/server": "2.13.7",
+    "@hocuspocus/server": "2.14.0",
     "express": "4.21.1",
     "express-ws": "5.0.2"
   },

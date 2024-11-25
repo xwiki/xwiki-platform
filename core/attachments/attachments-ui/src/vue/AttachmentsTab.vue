@@ -23,7 +23,7 @@ import AttachmentsTable from "./AttachmentsTable.vue";
 import { AlertsService } from "@xwiki/cristal-alerts-api";
 import { CristalApp } from "@xwiki/cristal-api";
 import { AttachmentsService } from "@xwiki/cristal-attachments-api";
-import { Ref, inject, ref, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 const cristal = inject<CristalApp>("cristal")!;

@@ -62,8 +62,8 @@ importers:
         specifier: 0.3.0
         version: 0.3.0
       eslint-plugin-vue:
-        specifier: 9.29.0
-        version: 9.29.0(eslint@9.15.0)
+        specifier: 9.31.0
+        version: 9.31.0(eslint@9.15.0)
       nx:
         specifier: 20.0.7
         version: 20.0.7
@@ -4712,8 +4712,8 @@ packages:
   eslint-plugin-tsdoc@0.3.0:
     resolution: {integrity: sha512-0MuFdBrrJVBjT/gyhkP2BqpD0np1NxNLfQ38xXDlSs/KVVpKI2A6vN7jx2Rve/CyUsvOsMGwp9KKrinv7q9g3A==}
 
-  eslint-plugin-vue@9.29.0:
-    resolution: {integrity: sha512-hamyjrBhNH6Li6R1h1VF9KHfshJlKgKEg3ARbGTn72CMNDSMhWbgC7NdkRDEh25AFW+4SDATzyNM+3gWuZii8g==}
+  eslint-plugin-vue@9.31.0:
+    resolution: {integrity: sha512-aYMUCgivhz1o4tLkRHj5oq9YgYPM4/EJc0M7TAKRLCUA5OYxRLAhYEVD2nLtTwLyixEFI+/QXSvKU9ESZFgqjQ==}
     engines: {node: ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.2.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
@@ -10172,7 +10172,7 @@ snapshots:
       '@microsoft/tsdoc': 0.15.0
       '@microsoft/tsdoc-config': 0.17.0
 
-  eslint-plugin-vue@9.29.0(eslint@9.15.0):
+  eslint-plugin-vue@9.31.0(eslint@9.15.0):
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.15.0)
       eslint: 9.15.0

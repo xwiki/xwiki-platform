@@ -43,8 +43,8 @@ import static org.xwiki.security.authorization.Right.VIEW;
 
 /**
  * Common abstract class for the implementation of {@link TagsSelector}. Provides an implementation of
- * {@link TagsSelector#getDocumentsWithTag(String, boolean)} taking into account whether the implementation can be
- * considered as safe.
+ * {@link TagsSelector#getDocumentsWithTag(String, boolean, boolean)} taking into account whether the implementation
+ * can be considered as safe.
  *
  * @version $Id$
  * @since 15.0RC1
@@ -78,7 +78,7 @@ public abstract class AbstractTagsSelector implements TagsSelector
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item"
             + " where obj.className=:className and obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags'";
         if (caseSensitive) {
-            hql += "and item = :item";
+            hql += " and item = :item";
         } else {
             hql += " and lower(item)=lower(:item)";
         }

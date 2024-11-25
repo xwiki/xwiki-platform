@@ -333,7 +333,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        return TagQueryUtils.getDocumentsWithTag(tag, context);
+        return TagQueryUtils.getDocumentsWithTag(tag, false, false);
     }
 
     /**

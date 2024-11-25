@@ -111,7 +111,7 @@
     <mysql.version>8.4.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.0</mariadb.version>
+    <mariadb.version>3.5.1</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>

@@ -349,7 +349,13 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
         throws XWikiException
     {
-        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, context);
+        return getDocumentsWithTag(tag, includeHiddenDocuments, false);
+    }
+
+    private List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
+        throws XWikiException
+    {
+        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, caseSensitive);
     }
 
     /**
@@ -560,10 +566,13 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
+        // if the user is renaming a tag to change its case, we want to ensure that we only retrieve tags based on
+        // the case. Else we want to rename the tag for all pages whatever the case.
+        boolean caseSensitive = StringUtils.equalsIgnoreCase(tag, newTag);
         // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
         // accessible to users, it's just not visible for simple users; it doesn't change permissions.
-        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, context);
-        if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
+        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, caseSensitive);
+        if (StringUtils.equals(tag, newTag) || docNamesToProcess.isEmpty() || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
 

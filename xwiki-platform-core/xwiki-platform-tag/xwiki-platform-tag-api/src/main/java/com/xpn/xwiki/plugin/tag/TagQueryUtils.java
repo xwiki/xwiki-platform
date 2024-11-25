@@ -146,8 +146,26 @@ public final class TagQueryUtils
     public static List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
         throws XWikiException
     {
+        return getDocumentsWithTag(tag, includeHiddenDocuments, false);
+    }
+
+    /**
+     * Get documents with the passed tags with the result depending on whether the caller decides to include hidden
+     * documents or not.
+     *
+     * @param tag a list of tags to match.
+     * @param includeHiddenDocuments if true then include hidden documents
+     * @param caseSensitive {@code true} if the case of the tag should be used in the query {@code false} for getting
+     * results whatever the case of the tag.
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 6.2M1
+     */
+    public static List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, boolean caseSensitive)
+        throws XWikiException
+    {
         try {
-            return getTagsSelector().getDocumentsWithTag(tag, includeHiddenDocuments);
+            return getTagsSelector().getDocumentsWithTag(tag, includeHiddenDocuments, caseSensitive);
         } catch (TagException e) {
             throw new XWikiException(MODULE_XWIKI_STORE, ERROR_XWIKI_UNKNOWN,
                 String.format("Failed to get all documents with tag [%s]", tag), e);

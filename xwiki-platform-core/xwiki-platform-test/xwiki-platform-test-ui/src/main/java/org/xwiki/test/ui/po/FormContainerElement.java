@@ -88,8 +88,12 @@ public class FormContainerElement extends BaseElement
           Unfortunately in Java17 we do not have lastEntry() from LinkedHashMaps, 
           so we use a few non optimized operations instead. 
           This is okay because the Map should not contain a lot of elements.
+          ---
+          Not all forms use live-validation, we make sure the last element has some validation going on before waiting.
           */
-        if(!valuesByElements.isEmpty() && lastElement != null) {
+        if(!valuesByElements.isEmpty() && lastElement != null && !lastElement.findElements(
+            By.xpath("//following-sibling::span[contains(@class, 'LV_validation_message')]"))
+            .isEmpty()) {
             WebElement finalLastElement = lastElement;
             getDriver().waitUntilCondition(driver -> !finalLastElement.getAttribute(CLASS_ATTRIBUTE).isEmpty());
         }

@@ -1,5 +1,11 @@
 # @xwiki/cristal-info-actions-api
 
+## 0.12.0
+
+### Minor Changes
+
+- 681a9b7: Cristal 0.12 Release
+
 ## 0.11.0
 
 ### Minor Changes

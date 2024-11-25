@@ -1,5 +1,22 @@
 # @xwiki/cristal-web
 
+## 0.12.0
+
+### Minor Changes
+
+- 681a9b7: Cristal 0.12 Release
+
+### Patch Changes
+
+- Updated dependencies [681a9b7]
+  - @xwiki/cristal-authentication-xwiki@0.12.0
+  - @xwiki/cristal-browser-default@0.12.0
+  - @xwiki/cristal-navigation-tree-default@0.12.0
+  - @xwiki/cristal-navigation-tree-github@0.12.0
+  - @xwiki/cristal-navigation-tree-nextcloud@0.12.0
+  - @xwiki/cristal-navigation-tree-xwiki@0.12.0
+  - @xwiki/cristal-lib@0.12.0
+
 ## 0.11.0
 
 ### Minor Changes

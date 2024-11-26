@@ -46,4 +46,4 @@ administration.templateProvider.creationRestrictions.none=这个模板可以在�
 administration.templateProvider.creationRestrictionsAreSuggestions=创建限制作为建议
 administration.templateProvider.creationRestrictionsAreSuggestions.hint=允许用户选择使用此模板在任何位置创建页面，当从列表中选择此模板时，使用第一个创建限制作为预填充的默认位置。
 </content>
-  </xwikidoc>
+</xwikidoc>

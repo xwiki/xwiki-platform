@@ -39,6 +39,7 @@
   <content>{{velocity}}
 #if ($type == 'edit')
   #set ($className = $object.getxWikiClass().name)
+  #set ($id = $escapetool.xml("${prefix}${name}"))
   #if ($doc.fullName == $className)
     ## We are editing the class so the content must be read from / written to the template document.
     #set ($name = 'templateContent')
@@ -53,7 +54,6 @@
     #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
   {{html clean="false"}}
-  #set ($id = $escapetool.xml("${prefix}${name}"))
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;
       ## The tool bar may have an entry to insert an HTML macro. Make sure it doesn't break the HTML macro we are currently in.

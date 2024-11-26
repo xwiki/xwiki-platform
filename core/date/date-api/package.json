@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "dayjs": "1.11.13",
-    "inversify": "6.0.3"
+    "inversify": "6.1.4"
   },
   "publishConfig": {
     "exports": {

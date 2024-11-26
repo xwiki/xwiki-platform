@@ -22,7 +22,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "inversify": "6.0.3",
+    "inversify": "6.1.4",
     "vue": "3.5.12",
     "vue-i18n": "10.0.4"
   },

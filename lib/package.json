@@ -78,7 +78,7 @@
     "@xwiki/cristal-sharedworker-impl": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "@xwiki/cristal-uiextension-default": "workspace:*",
-    "inversify": "6.0.3",
+    "inversify": "6.1.4",
     "pinia": "2.2.6",
     "reflect-metadata": "0.2.2",
     "utility-types": "3.11.0",

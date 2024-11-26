@@ -32,7 +32,7 @@
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "inversify": "6.0.3",
+    "inversify": "6.1.4",
     "vue": "3.5.12"
   },
   "devDependencies": {

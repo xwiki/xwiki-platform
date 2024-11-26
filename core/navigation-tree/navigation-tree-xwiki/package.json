@@ -26,7 +26,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
-    "inversify": "6.0.3"
+    "inversify": "6.1.4"
   },
   "publishConfig": {
     "exports": {

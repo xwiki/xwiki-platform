@@ -29,7 +29,7 @@
     "@xwiki/cristal-browser-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
-    "inversify": "6.0.3",
+    "inversify": "6.1.4",
     "vue": "3.5.12",
     "vue-i18n": "10.0.4"
   },

@@ -27,7 +27,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-xwiki-utils": "workspace:*",
-    "inversify": "6.0.3"
+    "inversify": "6.1.4"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

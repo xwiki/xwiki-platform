@@ -95,8 +95,8 @@ importers:
   api:
     dependencies:
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -126,8 +126,8 @@ importers:
         specifier: workspace:*
         version: link:../alerts-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       pinia:
         specifier: 2.2.6
         version: 2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
@@ -147,8 +147,8 @@ importers:
         specifier: workspace:*
         version: link:../../../ds/api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -190,8 +190,8 @@ importers:
         specifier: workspace:*
         version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       pinia:
         specifier: 2.2.6
         version: 2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
@@ -235,8 +235,8 @@ importers:
         specifier: workspace:*
         version: link:../../user/user-ui
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -257,8 +257,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -278,8 +278,8 @@ importers:
         specifier: workspace:*
         version: link:../../uiextension/uiextension-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -318,8 +318,8 @@ importers:
         specifier: 1.7.7
         version: 1.7.7
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       js-cookie:
         specifier: 3.0.5
         version: 3.0.5
@@ -334,8 +334,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/backends/backend-dexie:
     dependencies:
@@ -352,8 +352,8 @@ importers:
         specifier: 4.0.10
         version: 4.0.10
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/backends/backend-github:
     dependencies:
@@ -364,8 +364,8 @@ importers:
         specifier: workspace:*
         version: link:../backend-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -376,8 +376,8 @@ importers:
         specifier: workspace:*
         version: link:../backend-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/backends/backend-xwiki:
     dependencies:
@@ -394,8 +394,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -419,8 +419,8 @@ importers:
         specifier: workspace:*
         version: link:../browser-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/date/date-api:
     dependencies:
@@ -428,8 +428,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/date/date-ui:
     dependencies:
@@ -465,8 +465,8 @@ importers:
         specifier: workspace:*
         version: link:../document-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       pinia:
         specifier: 2.2.6
         version: 2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
@@ -477,8 +477,8 @@ importers:
   core/extra-tabs/extra-tabs-api:
     dependencies:
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -492,8 +492,8 @@ importers:
         specifier: workspace:*
         version: link:../extra-tabs-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -552,8 +552,8 @@ importers:
         specifier: workspace:*
         version: link:../hierarchy-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/hierarchy/hierarchy-filesystem:
     dependencies:
@@ -567,8 +567,8 @@ importers:
         specifier: workspace:*
         version: link:../hierarchy-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/hierarchy/hierarchy-github:
     dependencies:
@@ -579,8 +579,8 @@ importers:
         specifier: workspace:*
         version: link:../hierarchy-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/hierarchy/hierarchy-nextcloud:
     dependencies:
@@ -594,8 +594,8 @@ importers:
         specifier: workspace:*
         version: link:../hierarchy-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -612,8 +612,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/history/history-api:
     dependencies:
@@ -633,8 +633,8 @@ importers:
         specifier: workspace:*
         version: link:../history-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/history/history-github:
     dependencies:
@@ -648,8 +648,8 @@ importers:
         specifier: workspace:*
         version: link:../history-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/history/history-ui:
     dependencies:
@@ -672,8 +672,8 @@ importers:
         specifier: workspace:*
         version: link:../../user/user-ui
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -706,8 +706,8 @@ importers:
         specifier: workspace:*
         version: link:../../xwiki/xwiki-utils
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/icons:
     dependencies:
@@ -740,8 +740,8 @@ importers:
         specifier: workspace:*
         version: link:../info-actions-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -787,8 +787,8 @@ importers:
         specifier: workspace:*
         version: link:../../../api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/link-suggest/link-suggest-nextcloud:
     dependencies:
@@ -799,8 +799,8 @@ importers:
         specifier: workspace:*
         version: link:../link-suggest-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       xml-escape:
         specifier: 1.1.0
         version: 1.1.0
@@ -818,8 +818,8 @@ importers:
         specifier: workspace:*
         version: link:../link-suggest-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-api: {}
 
@@ -841,8 +841,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url/model-remote-url-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-local-url:
     dependencies:
@@ -850,8 +850,8 @@ importers:
         specifier: workspace:*
         version: link:../model-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
     devDependencies:
       vitest:
         specifier: 2.1.5
@@ -866,8 +866,8 @@ importers:
         specifier: workspace:*
         version: link:../../model-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-reference/model-reference-filesystem:
     dependencies:
@@ -878,8 +878,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-reference/model-reference-nextcloud:
     dependencies:
@@ -890,8 +890,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-reference/model-reference-xwiki:
     dependencies:
@@ -902,8 +902,8 @@ importers:
         specifier: workspace:*
         version: link:../model-reference-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
     devDependencies:
       reflect-metadata:
         specifier: 0.2.2
@@ -921,8 +921,8 @@ importers:
         specifier: workspace:*
         version: link:../../model-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-remote-url/model-remote-url-filesystem:
     dependencies:
@@ -933,8 +933,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-remote-url/model-remote-url-nextcloud:
     dependencies:
@@ -945,8 +945,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/model/model-remote-url/model-remote-url-xwiki:
     dependencies:
@@ -960,8 +960,8 @@ importers:
         specifier: workspace:*
         version: link:../model-remote-url-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -978,8 +978,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/navigation-tree/navigation-tree-filesystem:
     dependencies:
@@ -996,8 +996,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/navigation-tree/navigation-tree-github:
     dependencies:
@@ -1011,8 +1011,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/navigation-tree/navigation-tree-nextcloud:
     dependencies:
@@ -1026,8 +1026,8 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/navigation-tree/navigation-tree-xwiki:
     dependencies:
@@ -1041,14 +1041,14 @@ importers:
         specifier: workspace:*
         version: link:../navigation-tree-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   core/page-actions/page-actions-api:
     dependencies:
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1062,8 +1062,8 @@ importers:
         specifier: workspace:*
         version: link:../page-actions-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -1093,8 +1093,8 @@ importers:
         specifier: workspace:*
         version: link:../page-actions-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1118,8 +1118,8 @@ importers:
         specifier: workspace:*
         version: link:../uiextension-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -1174,8 +1174,8 @@ importers:
   dev/test-utils:
     dependencies:
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1197,8 +1197,8 @@ importers:
         specifier: workspace:*
         version: link:../../api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1234,8 +1234,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1265,8 +1265,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1359,8 +1359,8 @@ importers:
         specifier: 5.0.1
         version: 5.0.1
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -1457,8 +1457,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   electron/browser:
     dependencies:
@@ -1472,8 +1472,8 @@ importers:
         specifier: 33.2.0
         version: 33.2.0
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
 
   electron/main:
     dependencies:
@@ -1543,8 +1543,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-filesystem
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1568,8 +1568,8 @@ importers:
         specifier: 33.2.0
         version: 33.2.0
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       mime:
         specifier: 4.0.4
         version: 4.0.4
@@ -1587,8 +1587,8 @@ importers:
         specifier: workspace:*
         version: link:../api
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1602,8 +1602,8 @@ importers:
         specifier: workspace:*
         version: link:../../skin
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1774,8 +1774,8 @@ importers:
         specifier: workspace:*
         version: link:../core/uiextension/uiextension-default
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       pinia:
         specifier: 2.2.6
         version: 2.2.6(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))
@@ -1808,8 +1808,8 @@ importers:
         specifier: workspace:*
         version: link:../skin
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -1855,8 +1855,8 @@ importers:
         specifier: 3.1.7
         version: 3.1.7
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       marked:
         specifier: 14.1.3
         version: 14.1.3
@@ -1926,8 +1926,8 @@ importers:
         specifier: 4.4.1
         version: 4.4.1
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1993,8 +1993,8 @@ importers:
         specifier: workspace:*
         version: link:../core/uiextension/uiextension-ui
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       marked:
         specifier: 14.1.3
         version: 14.1.3
@@ -2086,8 +2086,8 @@ importers:
         specifier: 15.12.0
         version: 15.12.0
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vite-plugin-comlink:
         specifier: 5.0.1
         version: 5.0.1(comlink@4.4.1)(vite@5.4.10(@types/node@22.10.0))
@@ -2113,8 +2113,8 @@ importers:
         specifier: workspace:*
         version: link:../../skin
       inversify:
-        specifier: 6.0.3
-        version: 6.0.3
+        specifier: 6.1.4
+        version: 6.1.4(reflect-metadata@0.2.2)
       vue:
         specifier: 3.5.12
         version: 3.5.12(typescript@5.6.3)
@@ -2879,6 +2879,17 @@ packages:
   '@intlify/shared@10.0.4':
     resolution: {integrity: sha512-ukFn0I01HsSgr3VYhYcvkTCLS7rGa0gw4A4AMpcy/A9xx/zRJy7PS2BElMXLwUazVFMAr5zuiTk3MQeoeGXaJg==}
     engines: {node: '>= 16'}
+
+  '@inversifyjs/common@1.3.3':
+    resolution: {integrity: sha512-ZH0wrgaJwIo3s9gMCDM2wZoxqrJ6gB97jWXncROfYdqZJv8f3EkqT57faZqN5OTeHWgtziQ6F6g3L8rCvGceCw==}
+
+  '@inversifyjs/core@1.3.4':
+    resolution: {integrity: sha512-gCCmA4BdbHEFwvVZ2elWgHuXZWk6AOu/1frxsS+2fWhjEk2c/IhtypLo5ytSUie1BCiT6i9qnEo4bruBomQsAA==}
+
+  '@inversifyjs/reflect-metadata-utils@0.2.3':
+    resolution: {integrity: sha512-d3D0o9TeSlvaGM2I24wcNw/Aj3rc4OYvHXOKDC09YEph5fMMiKd6fq1VTQd9tOkDNWvVbw+cnt45Wy9P/t5Lvw==}
+    peerDependencies:
+      reflect-metadata: 0.2.2
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -5213,8 +5224,8 @@ packages:
     resolution: {integrity: sha512-NGnrKwXzSms2qUUih/ILZ5JBqNTSa1+ZmP6flaIp6KmSElgE9qdndzS3cqjrDovwFdmwsGsLdeFgB6suw+1e9g==}
     engines: {node: '>= 0.4'}
 
-  inversify@6.0.3:
-    resolution: {integrity: sha512-s/svzcRQ/scaGUUyaVtFSL1dvOaRgyvE7VvpGcJwXmFz7CCzfSfxC/Uyl7iSHDEmBabJ2gbDES72DaygtMmwvg==}
+  inversify@6.1.4:
+    resolution: {integrity: sha512-PbxrZH/gTa1fpPEEGAjJQzK8tKMIp5gRg6EFNJlCtzUcycuNdmhv3uk5P8Itm/RIjgHJO16oQRLo9IHzQN51bA==}
 
   ip-address@9.0.5:
     resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
@@ -7939,6 +7950,19 @@ snapshots:
       source-map-js: 1.2.1
 
   '@intlify/shared@10.0.4': {}
+
+  '@inversifyjs/common@1.3.3': {}
+
+  '@inversifyjs/core@1.3.4(reflect-metadata@0.2.2)':
+    dependencies:
+      '@inversifyjs/common': 1.3.3
+      '@inversifyjs/reflect-metadata-utils': 0.2.3(reflect-metadata@0.2.2)
+    transitivePeerDependencies:
+      - reflect-metadata
+
+  '@inversifyjs/reflect-metadata-utils@0.2.3(reflect-metadata@0.2.2)':
+    dependencies:
+      reflect-metadata: 0.2.2
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -10792,7 +10816,12 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.0.6
 
-  inversify@6.0.3: {}
+  inversify@6.1.4(reflect-metadata@0.2.2):
+    dependencies:
+      '@inversifyjs/common': 1.3.3
+      '@inversifyjs/core': 1.3.4(reflect-metadata@0.2.2)
+    transitivePeerDependencies:
+      - reflect-metadata
 
   ip-address@9.0.5:
     dependencies:

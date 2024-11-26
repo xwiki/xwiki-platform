@@ -680,12 +680,12 @@
 img.wikigeneratedid {
   height: 50vh;
 }</code>
-  </property>
-  <property>
-    <parse/>
-  </property>
-  <property>
-    <use>onDemand</use>
-  </property>
-</object>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

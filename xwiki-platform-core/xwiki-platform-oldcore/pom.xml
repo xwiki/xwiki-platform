@@ -574,6 +574,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- The Login and Register links are injected as UI extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->

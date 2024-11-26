@@ -218,6 +218,12 @@
       <artifactId>batik-svgrasterizer</artifactId>
     </dependency>
 
+    <!-- Guava, currently only used in SimpleDocumentCache -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
     <!-- Misc -->
     <!-- Better date manipulation than what JDK provides -->
     <dependency>

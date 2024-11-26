@@ -36,6 +36,6 @@
     "vue": "3.5.12"
   },
   "devDependencies": {
-    "@types/node": "22.9.3"
+    "@types/node": "22.10.0"
   }
 }

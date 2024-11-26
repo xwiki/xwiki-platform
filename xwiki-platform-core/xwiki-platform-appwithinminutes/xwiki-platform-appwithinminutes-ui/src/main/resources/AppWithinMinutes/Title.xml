@@ -52,7 +52,7 @@
     #end
   #end
   {{html clean="false"}}
-  &lt;input id="${prefix}$name" type="text" name="$name" value="$!escapetool.xml($value)"
+  &lt;input id="${prefix}$escapetool.xml($name)" type="text" name="$name" value="$!escapetool.xml($value)"
     ## The default value for an AppWithinMinutes field should be optional so we make only the actual page title
     ## mandatory and not the template title, which holds the default title value.
     #if ($name == 'title' &amp;&amp; $xwiki.getSpacePreference('xwiki.title.mandatory') == 1)required #end

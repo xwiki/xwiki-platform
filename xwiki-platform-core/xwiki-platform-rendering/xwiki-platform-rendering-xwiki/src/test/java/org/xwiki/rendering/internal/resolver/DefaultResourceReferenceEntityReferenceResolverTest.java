@@ -38,6 +38,7 @@ import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolve
 import org.xwiki.model.internal.reference.DefaultStringAttachmentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringPageReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
@@ -46,9 +47,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
+import org.xwiki.rendering.listener.reference.PageResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.listener.reference.SpaceResourceReference;
@@ -85,7 +88,9 @@ import static org.mockito.Mockito.when;
     DefaultReferenceDocumentReferenceResolver.class,
     DefaultStringSpaceReferenceResolver.class,
     ContextComponentManagerProvider.class,
-    DefaultSymbolScheme.class
+    DefaultSymbolScheme.class,
+    PageResourceReferenceEntityReferenceResolver.class,
+    DefaultStringPageReferenceResolver.class
 })
 @ComponentTest
 // @formatter:on
@@ -108,7 +113,7 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     private static final String PAGE = "Page";
 
     private static final String ATTACHMENT = "file.ext";
-    
+
     @InjectMockComponents
     private DefaultResourceReferenceEntityReferenceResolver resolver;
 
@@ -144,28 +149,29 @@ class DefaultResourceReferenceEntityReferenceResolverTest
     private DocumentResourceReference documentResource(String referenceString, boolean typed)
     {
         DocumentResourceReference reference = new DocumentResourceReference(referenceString);
-
         reference.setTyped(typed);
-
         return reference;
     }
 
     private SpaceResourceReference spaceResource(String referenceString, boolean typed)
     {
         SpaceResourceReference reference = new SpaceResourceReference(referenceString);
-
         reference.setTyped(typed);
-
         return reference;
     }
 
     private AttachmentResourceReference attachmentResource(String referenceString, boolean typed)
     {
         AttachmentResourceReference reference = new AttachmentResourceReference(referenceString);
-
         reference.setTyped(typed);
-
         return reference;
+    }
+
+    private PageResourceReference pageResource(String referenceString, boolean typed)
+    {
+        PageResourceReference pageReference = new PageResourceReference(referenceString);
+        pageReference.setTyped(typed);
+        return pageReference;
     }
     // Tests
 
@@ -240,8 +246,8 @@ class DefaultResourceReferenceEntityReferenceResolverTest
 
         assertEquals(
             new DocumentReference(CURRENT_WIKI,
-                Arrays.asList(CURRENT_SPACE, CURRENT_SPACE, CURRENT_SPACE, CURRENT_PAGE), DEFAULT_PAGE),
-            this.mocker.getComponentUnderTest().resolve(documentResource("...", false), null));
+                List.of(CURRENT_SPACE, CURRENT_SPACE, CURRENT_SPACE, CURRENT_PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(documentResource("...", false), null));
 
         // When the page is current page
 
@@ -280,14 +286,14 @@ class DefaultResourceReferenceEntityReferenceResolverTest
             new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE), DEFAULT_PAGE));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
-            DEFAULT_PAGE),
+                DEFAULT_PAGE),
             this.resolver.resolve(documentResource(PAGE, false), null));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
 
         assertEquals(new DocumentReference(CURRENT_WIKI, List.of(CURRENT_SPACE, CURRENT_SUBSPACE, PAGE),
-            DEFAULT_PAGE),
+                DEFAULT_PAGE),
             this.resolver.resolve(documentResource('.' + PAGE, false), null));
 
         assertEquals(
@@ -424,5 +430,32 @@ class DefaultResourceReferenceEntityReferenceResolverTest
         this.existingDocuments.add(finalReference);
         assertFalse(resolver.trySpaceSiblingFallback(sourceReference, finalReference, baseReference,
             defaultDocumentName));
+    }
+
+    @Test
+    void resolveTypedPage()
+    {
+        assertEquals(new PageReference(WIKI, SPACE, PAGE),
+            this.resolver.resolve(pageResource(WIKI + ':' + SPACE + '/' + PAGE, true), null));
+
+        assertEquals(new PageReference(WIKI, SPACE),
+            this.resolver.resolve(pageResource(WIKI + ':' + SPACE, true), null));
+
+        assertEquals(new PageReference(CURRENT_WIKI, SPACE),
+            this.resolver.resolve(pageResource(SPACE, true), null));
+
+        assertEquals(new PageReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE),
+            this.resolver.resolve(pageResource("", true), null));
+
+        assertEquals(new PageReference(WIKI, SPACE, PAGE),
+            this.resolver.resolve(pageResource("", true), null, new DocumentReference(WIKI, SPACE, PAGE)));
+
+        assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
+            this.resolver.resolve(pageResource(WIKI + ':' + SPACE + '/' + PAGE, true), EntityType.DOCUMENT));
+
+        // FIXME: See https://jira.xwiki.org/browse/XWIKI-22699
+        //this.existingDocuments.add(new DocumentReference(WIKI, SPACE, PAGE));
+        //assertEquals(new DocumentReference(WIKI, SPACE, PAGE),
+        //    this.resolver.resolve(pageResource(WIKI + ':' + SPACE + '/' + PAGE, true), EntityType.DOCUMENT));
     }
 }

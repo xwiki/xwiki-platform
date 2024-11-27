@@ -113,8 +113,10 @@ class RelativeResourceReferenceEntityReferenceResolverTest
     private static final EntityReference PAGE_ENTITY_REFERENCE =
         new EntityReference(PAGE, EntityType.DOCUMENT, SPACE_ENTITY_REFERENCE);
     private static final EntityReference PAGE_ALONE_ENTITY_REFERENCE = new EntityReference(PAGE, EntityType.DOCUMENT);
-    private static final EntityReference DEFAULT_PAGE_ENTITY_REFERENCE =
+    private static final EntityReference DEFAULT_PAGE_SPACE_ENTITY_REFERENCE =
         new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT, SPACE_ENTITY_REFERENCE);
+    private static final EntityReference DEFAULT_PAGE_ENTITY_REFERENCE =
+        new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT, new EntityReference(PAGE, EntityType.SPACE));
 
     
     @InjectMockComponents
@@ -209,13 +211,11 @@ class RelativeResourceReferenceEntityReferenceResolverTest
     void resolveUntypeDocument()
     {
         // When the page does not exist
-
         assertEquals(new DocumentReference(WIKI, List.of(SPACE, PAGE), DEFAULT_PAGE),
             this.resolver.resolve(documentResource(WIKI + ':' + SPACE + '.' + PAGE, false), null));
 
-        // TODO: check that this assert is ok, we don't get the default page since we don't have any info to properly
-        // resolve the absolute ref (no wiki, no base reference)
-        assertEquals(PAGE_ENTITY_REFERENCE,
+        assertEquals(new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT, new EntityReference(PAGE,
+                EntityType.SPACE, SPACE_ENTITY_REFERENCE)),
             this.resolver.resolve(documentResource(SPACE + '.' + PAGE, false), null));
         assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
@@ -231,7 +231,7 @@ class RelativeResourceReferenceEntityReferenceResolverTest
         assertEquals(new DocumentReference(WIKI, SPACE, DEFAULT_PAGE), this.resolver
             .resolve(documentResource(WIKI + ':' + SPACE + '.' + DEFAULT_PAGE, false), null));
 
-        assertEquals(DEFAULT_PAGE_ENTITY_REFERENCE,
+        assertEquals(DEFAULT_PAGE_SPACE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(SPACE + '.' + DEFAULT_PAGE, false), null));
         assertEquals(new EntityReference(DEFAULT_PAGE, EntityType.DOCUMENT),
             this.resolver.resolve(documentResource(DEFAULT_PAGE, false), null));
@@ -263,12 +263,12 @@ class RelativeResourceReferenceEntityReferenceResolverTest
             this.resolver.resolve(documentResource(PAGE, false), null, BASE_REFERENCE));
         
         assertNull(this.resolver.resolve(documentResource("", false), null));
+        assertNull(this.resolver.resolve(documentResource("...", false), null));
     }
 
     @Test
     void resolveUntypeDocumentWhenCurrentPageIsSpace()
     {
-        // Current is top level space
         assertEquals(PAGE_ALONE_ENTITY_REFERENCE,
             this.resolver.resolve(documentResource(PAGE, false), null));
 

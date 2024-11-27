@@ -52,31 +52,6 @@ public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
     }
 
     @Override
-    public EntityReference resolve(ResourceReference resourceReference, EntityType entityType, Object... parameters)
-    {
-        if (resourceReference == null) {
-            return null;
-        }
-
-        if (this.resourceType != null && !resourceReference.getType().equals(this.resourceType)) {
-            throw new IllegalArgumentException(
-                String.format("You must pass a resource reference of type [%s]. [%s] was passed", this.resourceType,
-                    resourceReference));
-        }
-
-        EntityReference entityReference;
-        EntityReference baseReference = getBaseReference(resourceReference, parameters);
-
-        if (resourceReference.isTyped()) {
-            entityReference = resolveTyped(resourceReference, baseReference);
-        } else {
-            entityReference = resolveUntyped(resourceReference, baseReference);
-        }
-
-        return entityReference;
-    }
-
-    @Override
     protected EntityReference getBaseReference(ResourceReference resourceReference, Object... parameters)
     {
         EntityReference baseReference =
@@ -102,12 +77,6 @@ public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
         }
 
         return resolvedBaseReference;
-    }
-
-    @Override
-    protected EntityReference resolveUntyped(ResourceReference resourceReference, EntityReference baseReference)
-    {
-        return resolveTyped(resourceReference, baseReference);
     }
 
     @Override

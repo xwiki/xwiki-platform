@@ -75,7 +75,7 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
                 baseReference);
 
         EntityReference result = relativeReference;
-        if (relativeReference.extractReference(EntityType.WIKI) != null) {
+        if (relativeReference != null && relativeReference.extractReference(EntityType.WIKI) != null) {
             // Resolve the full document reference
             // We don't start from the previously parsed relative reference to not loose "." prefixed reference meaning
             DocumentReference reference =

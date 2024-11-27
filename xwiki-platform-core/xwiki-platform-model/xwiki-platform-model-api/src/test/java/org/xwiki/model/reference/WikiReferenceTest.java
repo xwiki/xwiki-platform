@@ -24,7 +24,6 @@ import org.xwiki.model.EntityType;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link WikiReference}.
@@ -49,12 +48,5 @@ public class WikiReferenceTest
         IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
             () -> new WikiReference(new EntityReference("wiki", EntityType.WIKI, badParent)));
         assertEquals("Unexpected parent [" + badParent + "] in a wiki reference", expected.getMessage());
-    }
-
-    @Test
-    void instanceOf()
-    {
-        assertTrue(new WikiReference("foo") instanceof WikiReference);
-        assertTrue(new WikiReference("foo") instanceof EntityReference);
     }
 }

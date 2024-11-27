@@ -169,6 +169,7 @@ public class WikiUIExtension extends AbstractWikiUIExtension implements BlockAsy
         uixContext.put(CONTEXT_UIX_INLINE_KEY, inline);
 
         // Remember the previous uix context to restore it
+        @SuppressWarnings("unchecked")
         Map<String, Object> previousUIXContext = (Map<String, Object>) xcontext.get(CONTEXT_UIX_KEY);
         // Put the UIX context in the XWiki context. Note that this is deprecated and using the UIX templates is
         // preferred.

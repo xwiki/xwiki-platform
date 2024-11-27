@@ -17,37 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.uiextension.internal.macro;
+package org.xwiki.uiextension.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.uiextension.UIExtension;
+import org.xwiki.uiextension.internal.macro.UIExtensionMacro;
 
 /**
- * Parameters for the {@link UIExtensionsMacro} Macro.
+ * Parameters for the {@link UIExtensionMacro} Macro.
  *
  * @version $Id$
  * @since 14.0RC1
  */
-public class UIExtensionsMacroParameters
+public class UIExtensionMacroParameters
 {
-    private String extensionPoint;
+    private String id;
 
     /**
-     * @param extensionPoint the ID of the Extension Point to retrieve the {@link UIExtension}s for
+     * @param id the identifier of the UI extensions to insert
      */
-    @PropertyDescription("The ID of the Extension Point to retrieve the {@link UIExtension}s for.")
+    @PropertyDescription("The identifier of the UI extensions to insert.")
     @PropertyMandatory
-    public void setExtensionPoint(String extensionPoint)
+    public void setId(String id)
     {
-        this.extensionPoint = extensionPoint;
+        this.id = id;
     }
 
     /**
-     * @return the ID of the Extension Point to retrieve the {@link UIExtension}s for
+     * @return the identifier of the UI extensions to insert
      */
-    public String getExtensionPoint()
+    public String getId()
     {
-        return this.extensionPoint;
+        return this.id;
     }
 }

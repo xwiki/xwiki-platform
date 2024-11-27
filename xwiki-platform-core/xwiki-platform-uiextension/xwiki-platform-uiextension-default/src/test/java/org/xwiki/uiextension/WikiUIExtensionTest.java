@@ -112,7 +112,7 @@ class WikiUIExtensionTest
     private BaseObject baseObject;
 
     @BeforeEach
-    public void setUp() throws Exception
+    public void setUp()
     {
         XWikiDocument ownerDocument = new XWikiDocument(DOC_REF);
         ownerDocument.setAuthorReference(AUTHOR_REFERENCE);

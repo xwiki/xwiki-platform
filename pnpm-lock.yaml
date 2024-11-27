@@ -35,8 +35,8 @@ importers:
         specifier: 8.16.0
         version: 8.16.0(eslint@9.15.0)(typescript@5.6.3)
       '@vitejs/plugin-vue':
-        specifier: 5.1.4
-        version: 5.1.4(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))
+        specifier: 5.2.0
+        version: 5.2.0(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))
       '@vitest/coverage-v8':
         specifier: 2.1.6
         version: 2.1.6(vitest@2.1.6(@types/node@22.10.0)(happy-dom@14.12.0)(tsx@4.19.2))
@@ -2286,8 +2286,8 @@ importers:
         specifier: 22.10.0
         version: 22.10.0
       '@vitejs/plugin-vue':
-        specifier: 5.1.4
-        version: 5.1.4(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))
+        specifier: 5.2.0
+        version: 5.2.0(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))
       globals:
         specifier: 15.12.0
         version: 15.12.0
@@ -3708,8 +3708,8 @@ packages:
     resolution: {integrity: sha512-pq19gbaMOmFE3CbL0ZB8J8BFCo2ckfHBfaIsaOZgBIF4EoISJIdLX5xRhd0FGB0LlHReNRuzoJoMGpTjq8F2CQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vitejs/plugin-vue@5.1.4':
-    resolution: {integrity: sha512-N2XSI2n3sQqp5w7Y/AN/L2XDjBIRGqXko+eDp42sydYSBeJuSm5a1sLf8zakmo8u7tA8NmBgoDLA1HeOESjp9A==}
+  '@vitejs/plugin-vue@5.2.0':
+    resolution: {integrity: sha512-7n7KdUEtx/7Yl7I/WVAMZ1bEb0eVvXF3ummWTeLcs/9gvo9pJhuLdouSXGjdZ/MKD1acf1I272+X0RMua4/R3g==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0
@@ -8750,7 +8750,7 @@ snapshots:
       '@typescript-eslint/types': 8.16.0
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-vue@5.1.4(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))':
+  '@vitejs/plugin-vue@5.2.0(vite@6.0.1(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.12(typescript@5.6.3))':
     dependencies:
       vite: 6.0.1(@types/node@22.10.0)(tsx@4.19.2)
       vue: 3.5.12(typescript@5.6.3)

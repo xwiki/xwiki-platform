@@ -38,7 +38,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "vitest": "2.1.5",
+    "vitest": "2.1.6",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

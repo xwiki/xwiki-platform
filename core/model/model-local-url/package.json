@@ -27,7 +27,7 @@
     "inversify": "6.1.4"
   },
   "devDependencies": {
-    "vitest": "2.1.5"
+    "vitest": "2.1.6"
   },
   "publishConfig": {
     "exports": {

@@ -36,7 +36,7 @@
     "inversify": "6.1.4",
     "vue": "3.5.13",
     "vue-i18n": "10.0.4",
-    "vue-router": "4.4.5"
+    "vue-router": "4.5.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

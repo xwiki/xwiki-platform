@@ -27,6 +27,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -61,6 +63,9 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
     private RequiredRightAnalyzer<MacroBlock> scriptMacroAnalyzer;
 
     @Inject
+    private Logger logger;
+
+    @Inject
     private Provider<DefaultMacroRequiredRightReporter> macroRequiredRightReporterProvider;
 
     @Override
@@ -82,15 +87,12 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
     {
         List<RequiredRightAnalysisResult> result;
 
-        try {
-            // Check if there is an analyzer specifically for this macro, if yes, use it.
-            RequiredRightAnalyzer<MacroBlock> specificAnalyzer =
-                this.componentManagerProvider.get().getInstance(
-                    new DefaultParameterizedType(null, RequiredRightAnalyzer.class, MacroBlock.class),
-                    macroBlock.getId()
-                );
-            result = specificAnalyzer.analyze(macroBlock);
-        } catch (ComponentLookupException e) {
+        Optional<RequiredRightAnalyzer<MacroBlock>>
+            specificAnalyzer = getMacroBlockRequiredRightAnalyzer(macroBlock);
+
+        if (specificAnalyzer.isPresent()) {
+            result = specificAnalyzer.get().analyze(macroBlock);
+        } else {
             // Check if there is a macro analyzer for this macro, if yes, use it.
             Optional<MacroRequiredRightsAnalyzer> macroAnalyzer = getMacroAnalyzer(macroBlock.getId());
 
@@ -113,6 +115,30 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
         }
 
         return result;
+    }
+
+    private Optional<RequiredRightAnalyzer<MacroBlock>> getMacroBlockRequiredRightAnalyzer(MacroBlock macroBlock)
+    {
+        String macroId = macroBlock.getId();
+        DefaultParameterizedType roleType =
+            new DefaultParameterizedType(null, RequiredRightAnalyzer.class, MacroBlock.class);
+        ComponentManager componentManager = this.componentManagerProvider.get();
+
+        try {
+            // Check if there is an analyzer specifically for this macro, if yes, use it.
+            // Don't try loading the "default" analyzer as this would cause an endless recursion.
+            // For the "default" macro, a MacroRequiredRightsAnalyzer component should be created if needed.
+            if (!"default".equals(macroId) && componentManager.hasComponent(roleType, macroId)) {
+                return Optional.of(componentManager.getInstance(roleType, macroId));
+            }
+        } catch (ComponentLookupException e) {
+            this.logger.warn(
+                "The macro block required rights analyzer for macro [{}] failed to be initialized, root cause: [{}]",
+                macroId, ExceptionUtils.getRootCauseMessage(e));
+            this.logger.debug("Full exception trace: ", e);
+        }
+
+        return Optional.empty();
     }
 
     private Optional<MacroRequiredRightsAnalyzer> getMacroAnalyzer(String id)

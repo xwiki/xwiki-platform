@@ -37,6 +37,7 @@ import org.xwiki.administration.api.ConfigurableObjectEvaluator;
 import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
 import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
 import org.xwiki.localization.macro.internal.TranslationMacro;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -223,11 +224,12 @@ class ConfigurableClassPageTest extends PageTest
         DocumentReference userReference = new DocumentReference(WIKI_NAME, SPACE_NAME, "Admin");
         mySectionDoc.getAuthors().setEffectiveMetadataAuthor(new DocumentUserReference(userReference, true));
         this.xwiki.saveDocument(mySectionDoc, this.context);
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.SCRIPT,
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
             userReference, mySectionDoc.getDocumentReference())).thenReturn(hasScript);
 
         Document htmlPage = renderHTMLPage(CONFIGURABLE_CLASS);
-        verify(this.oldcore.getMockAuthorizationManager()).hasAccess(Right.SCRIPT, userReference, MY_SECTION);
+        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            userReference, MY_SECTION);
 
         String expectedHeading;
         String expectedLink;

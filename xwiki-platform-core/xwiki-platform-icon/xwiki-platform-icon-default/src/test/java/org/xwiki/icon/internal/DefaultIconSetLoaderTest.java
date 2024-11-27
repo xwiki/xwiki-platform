@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,11 +34,16 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconType;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -46,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -65,6 +73,13 @@ class DefaultIconSetLoaderTest
 
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
+    @MockComponent
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> documentUserSerializer;
 
     @BeforeEach
     void setUp()
@@ -113,7 +128,18 @@ class DefaultIconSetLoaderTest
         IOUtils.copyLarge(new InputStreamReader(getClass().getResourceAsStream("/test.iconset")), content);
         when(doc.getContent()).thenReturn(content.toString());
 
-        when(doc.getAuthors()).thenReturn(new DefaultDocumentAuthors(new XWikiDocument(iconSetRef)));
+        DefaultDocumentAuthors authors = new DefaultDocumentAuthors(new XWikiDocument(iconSetRef));
+        when(doc.getAuthors()).thenReturn(authors);
+
+        UserReference contentAuthor = mock();
+        UserReference metadataAuthor = mock();
+        authors.setContentAuthor(contentAuthor);
+        authors.setEffectiveMetadataAuthor(metadataAuthor);
+
+        DocumentReference contentAuthorDocumentReference = mock();
+        DocumentReference metadataAuthorDocumentReference = mock();
+        when(this.documentUserSerializer.serialize(contentAuthor)).thenReturn(contentAuthorDocumentReference);
+        when(this.documentUserSerializer.serialize(metadataAuthor)).thenReturn(metadataAuthorDocumentReference);
 
         // Test
         IconSet result = this.iconSetLoader.loadIconSet(iconSetRef);
@@ -121,6 +147,10 @@ class DefaultIconSetLoaderTest
         // Verify
         verifies(result);
         assertEquals("MyIconTheme", result.getName());
+        verify(this.documentAuthorizationManager).checkAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            contentAuthorDocumentReference, iconSetRef);
+        verify(this.documentAuthorizationManager).checkAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            metadataAuthorDocumentReference, iconSetRef);
     }
 
     @Test

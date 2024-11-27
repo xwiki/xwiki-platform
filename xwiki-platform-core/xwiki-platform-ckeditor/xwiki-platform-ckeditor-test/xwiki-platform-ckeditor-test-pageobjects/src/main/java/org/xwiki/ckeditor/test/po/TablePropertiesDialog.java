@@ -17,30 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui.po;
-
-import org.openqa.selenium.By;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+package org.xwiki.ckeditor.test.po;
 
 /**
- * Represents the actions possible on the Create Space template page.
+ * The page object used to interact with the CKEditor table properties dialog.
  *
- * @version $Id$
- * @since 3.2M3
- * @deprecated since 7.2M3. Use {@link CreatePagePage} instead.
+ * @since 16.8.0RC1
+ * @since 16.4.4
+ * @since 15.10.13
  */
-@Deprecated
-public class CreateSpacePage extends CreatePagePage
+public class TablePropertiesDialog extends CKEditorDialog
 {
-    public WYSIWYGEditPage createSpace(String spaceValue)
-    {
-        this.createPage("", spaceValue);
-        return new WYSIWYGEditPage();
-    }
-
-    public boolean hasError()
-    {
-        // if there is at least one element with errormessage classname
-        return getDriver().findElements(By.className("errormessage")).size() > 0;
-    }
 }

@@ -360,7 +360,7 @@ public class HtmlPackager
         context.setFinished(true);
 
         File dir = this.environment.getTemporaryDirectory();
-        File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
+        File tempdir = new File(dir, RandomStringUtils.secure().nextAlphanumeric(8));
         tempdir.mkdirs();
 
         try {

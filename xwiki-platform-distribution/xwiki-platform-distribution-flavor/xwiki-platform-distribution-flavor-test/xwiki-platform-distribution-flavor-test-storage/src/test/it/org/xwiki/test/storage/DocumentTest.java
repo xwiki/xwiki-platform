@@ -101,7 +101,7 @@ public class DocumentTest extends AbstractTest
     @Test
     public void testSaveOfThreeHundredKilobyteDocument() throws Exception
     {
-        final String content = RandomStringUtils.randomAlphanumeric(300000);
+        final String content = RandomStringUtils.secure().nextAlphanumeric(300000);
         final HttpMethod ret =
             this.doPostAsAdmin(this.spaceName, this.pageName, null, "save", null,
                 new HashMap<String, String>() {{

@@ -1093,13 +1093,14 @@ class XWikiTest
             new DocumentReference(targetReference, Locale.GERMAN), xWikiContext);
 
         // Test links
-        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference);
+        verify(this.referenceUpdater).update(targetReference, sourceReference, targetReference,
+            Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc1.getXDOM(), reference1, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc2.getXDOM(), reference2, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
         verify(this.referenceRenamer).renameReferences(doc3.getXDOM(), reference3, sourceReference,
-            targetReference, false);
+            targetReference, false, Map.of(sourceReference, targetReference));
 
         assertTrue(this.xwiki
             .getDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME), this.oldcore.getXWikiContext()).isNew());

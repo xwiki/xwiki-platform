@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.27.9",
-    "@eslint/eslintrc": "3.1.0",
+    "@eslint/eslintrc": "3.2.0",
     "@eslint/js": "9.15.0",
     "@microsoft/tsdoc": "0.15.0",
     "@microsoft/tsdoc-config": "0.17.0",

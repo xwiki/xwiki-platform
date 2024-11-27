@@ -24,6 +24,7 @@ import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link DisplayIconMacro} Macro.
@@ -102,7 +103,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.8.0RC1
+     * @since 16.10.0
      * @return the text alternative picked for the icon
      */
     @Unstable
@@ -112,7 +113,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.8.0RC1
+     * @since 16.10.0
      * @param textAlternative a text alternative for the icon
      */
     @PropertyName("Text Alternative")

@@ -630,4 +630,40 @@ public class EntityReferenceTest
         assertSame(reference, reference.removeParameters(false));
         assertEquals(parentWithoutParameters, parent.removeParameters(true));
     }
+
+    @Test
+    void getParentType()
+    {
+        // no parent, no custom type, and no fallback for wiki
+        EntityReference wikiReference = new EntityReference(WIKI_NAME, EntityType.WIKI);
+        assertNull(wikiReference.getParentType());
+
+        // parent type
+        EntityReference spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE, wikiReference);
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // parent is set, so custom type cannot be set
+        spaceReference =
+            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // no parent, no custom type, but fallback on first allowed parent type
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE);
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // custom type
+        spaceReference =
+            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+        assertEquals(EntityType.SPACE, spaceReference.getParentType());
+
+        // custom type
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, "SPACE"));
+        assertEquals(EntityType.SPACE, spaceReference.getParentType());
+
+        // invalid parent type, fallback on first allowed parent type
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.PAGE));
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+    }
 }

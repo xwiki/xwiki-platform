@@ -19,7 +19,8 @@
  */
 package org.xwiki.model.internal.reference;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
@@ -303,7 +304,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
             new EntityReference("page1", EntityType.PAGE, new EntityReference("page2", EntityType.PAGE)),
             EntityType.DOCUMENT);
 
-        assertEquals(new DocumentReference(DEFAULT_WIKI, Arrays.asList("page2", "page1"), DEFAULT_DOCUMENT), reference);
+        assertEquals(new DocumentReference(DEFAULT_WIKI, List.of("page2", "page1"), DEFAULT_DOCUMENT), reference);
     }
 
     @Test
@@ -312,12 +313,25 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
         EntityReference reference =
             this.resolver.resolve(new EntityReference("page", EntityType.PAGE), EntityType.SPACE);
 
-        assertEquals(new SpaceReference(DEFAULT_WIKI, Arrays.asList("page")), reference);
+        assertEquals(new SpaceReference(DEFAULT_WIKI, List.of("page")), reference);
 
         reference = this.resolver.resolve(
             new EntityReference("page1", EntityType.PAGE, new EntityReference("page2", EntityType.PAGE)),
             EntityType.SPACE);
 
-        assertEquals(new SpaceReference(DEFAULT_WIKI, Arrays.asList("page2", "page1")), reference);
+        assertEquals(new SpaceReference(DEFAULT_WIKI, List.of("page2", "page1")), reference);
+    }
+
+    @Test
+    void resolveRelativeEntityReference()
+    {
+        // When the space reference has a parent type parameter of tye space, then it's resolved using the base
+        // reference space has parent of it.
+        EntityReference relativeSpaceReference = new EntityReference("Space", EntityType.SPACE,
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+
+        EntityReference reference = this.resolver.resolve(relativeSpaceReference, EntityType.SPACE);
+        SpaceReference spaceReference = new SpaceReference(DEFAULT_WIKI, List.of(DEFAULT_SPACE, "Space"));
+        assertEquals(spaceReference, reference);
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-feed</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-feed-api</artifactId>
   <name>XWiki Platform - Feed - API</name>
@@ -42,23 +42,18 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.sf.jtidy</groupId>
+      <groupId>com.github.jtidy</groupId>
       <artifactId>jtidy</artifactId>
-      <version>r938</version>
+      <version>1.0.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
     <!-- RSS Feed processing -->
     <dependency>
-      <groupId>rome</groupId>
+      <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome-fetcher</artifactId>
-    </dependency>
-    <!-- Rome does not trigger version of jdom we want -->
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -97,7 +92,6 @@
                 **/plugin/feed/SyndEntrySourceApi.java,
                 **/plugin/feed/SyndEntrySource.java,
                 **/plugin/feed/UpdateThread.java,
-                **/plugin/feed/XWikiFeedFetcher.java,
                 **/util/TidyMessageLogger.java
               </excludes>
             </configuration>

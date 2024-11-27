@@ -33,6 +33,7 @@ import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.script.ScriptContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.skinx.SkinExtension;
@@ -75,6 +76,7 @@ public class IntegrationTests implements RenderingTests
         // Grant script right to disable restricted cleaning in the HTML macro.
         when(authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
         componentManager.registerMockComponent(AuthorizationManager.class);
+        componentManager.registerMockComponent(DocumentAuthorizationManager.class);
 
         // Mock the icon set cache as it fails.
         componentManager.registerMockComponent(IconSetCache.class);

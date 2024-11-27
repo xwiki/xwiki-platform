@@ -17,20 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.mockito.configuration;
+package org.xwiki.refactoring.internal.job;
 
 /**
- * Mockito Configuration to disable the class cache for the {@link org.xwiki.test.isolation.IsolatedTestRunner}.
+ * Internal exception to be used in {@link AbstractCopyOrMoveJob}.
  *
  * @version $Id$
- * @since 5.0M2
+ * @since 16.10.0RC1
  */
-public class MockitoConfiguration extends DefaultMockitoConfiguration
+public class InternalCopyOrMoveJobException extends Exception
 {
-    @Override
-    public boolean enableClassCache()
+    /**
+     * Default constructor.
+     * @param message the message of the exception.
+     */
+    public InternalCopyOrMoveJobException(String message)
     {
-        return false;
+        super(message);
     }
 }

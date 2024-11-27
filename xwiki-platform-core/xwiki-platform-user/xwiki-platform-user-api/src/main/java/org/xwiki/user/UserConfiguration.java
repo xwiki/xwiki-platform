@@ -22,7 +22,6 @@ package org.xwiki.user;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the User module.
@@ -57,7 +56,6 @@ public interface UserConfiguration
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     default String getUserQualifierProperty()
     {
         return null;

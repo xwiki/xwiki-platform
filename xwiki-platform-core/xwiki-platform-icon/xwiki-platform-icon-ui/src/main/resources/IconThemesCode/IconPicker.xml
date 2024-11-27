@@ -40,26 +40,30 @@
 ###########################
 ## DATA: ICON THEMES
 ###########################
-#if($request.action == 'data_iconthemes')
-  #set($map = {})
-  #set($discard = $map.put('iconThemes', $services.icon.iconSetNames))
-  #set($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
+#if ($request.action == 'data_iconthemes')
+  #set ($map = {})
+  #set ($discard = $map.put('iconThemes', $services.icon.iconSetNames))
+  #set ($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
   #jsonResponse($map)
 ###########################
 ## DATA: ICONS
 ###########################
-#elseif($request.action == 'data_icons')
-  #set($icons = [])
-  #set($iconTheme = $request.iconTheme)
-  #set($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
-  #foreach($xwikiIcon in $xwikiIcons)
-    #set($icon = {})
-    #set($discard = $icon.put('name', $xwikiIcon))
-    #set($discard = $icon.put('render', $services.icon.renderHTML($xwikiIcon, $iconTheme)))
-    #if($request.metadata == 'true')
-      #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+#elseif ($request.action == 'data_icons')
+  #set ($icons = [])
+  #set ($iconTheme = $request.iconTheme)
+  #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
+  #set ($iconNamePrefix = $request.query.toLowerCase())
+  #foreach ($xwikiIcon in $xwikiIcons)
+    #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
+      #set($icon = {
+        'name': $xwikiIcon,
+        'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
+      })
+      #if($request.metadata == 'true')
+        #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+      #end
+      #set ($discard = $icons.add($icon))
     #end
-    #set($discard = $icons.add($icon))
   #end
   #jsonResponse($icons)
 #else

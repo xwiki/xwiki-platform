@@ -25,12 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr-cores</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-core-extension_index</artifactId>
   <packaging>deb</packaging>
   <name>XWiki Platform - Distribution - Debian - Solr - Core - Extension Index</name>
   <properties>
     <debian.xwiki.core>extension_index</debian.xwiki.core>
+
+    <!-- '_'' is forbidden in a Debian package name so we cannot reuse the core name as is -->
+    <debian.package.core>extension-index</debian.package.core>
   </properties>
 </project>

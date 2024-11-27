@@ -4,6 +4,8 @@ Section: java
 Priority: optional
 Architecture: all
 Depends: 
+Replaces: xwiki-solr9-extension_index
+Conflicts: xwiki-solr9-extension_index
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

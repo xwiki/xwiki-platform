@@ -338,4 +338,78 @@
       console.debug(`Realtime editing is disabled for [${info.field}] field because: ${error}`);
     });
   }
+
+  // Add support for synchronizing the upload widgets when realtime editing is enabled.
+  const originalAddUploadWidget = CKEDITOR.fileTools.addUploadWidget;
+  CKEDITOR.fileTools.addUploadWidget = function(editor, widgetName, ...args) {
+    if (editor.plugins['xwiki-realtime']) {
+      const handler = editor.on('widgetDefinition', function(event) {
+        const widgetDefinition = event.data;
+        if (widgetDefinition.name === widgetName) {
+          handler.removeListener();
+
+          const originalInit = widgetDefinition.init;
+          Object.assign(widgetDefinition, {
+            /**
+             * Upcast upload widgets coming from other users editing at the same content in realtime. These widgets are
+             * temporary placeholders that are going to be replaced with the actual content when the upload is complete.
+             *
+             * @param {CKEDITOR.htmlParser.element} element the element to check if it can be upcasted to this upload
+             *   widget
+             */
+            upcast: function(element) {
+              return element.hasClass?.('xwiki-widget-placeholder-' + this.name);
+            },
+
+            init: function(...args) {
+              const widget = this;
+              // Call the original init method only if this is a real upload widget and not a placeholder.
+              if (widget.wrapper.findOne('[data-cke-upload-id]')) {
+                originalInit.call(widget, ...args);
+              }
+            },
+
+            /**
+             * Upload widgets are by default downcasted to an empty text node because they are temporary placeholders
+             * that are not supposed to be saved. They are replaced with the actual content when the upload is complete.
+             *
+             * The realtime editor synchronizes the output HTML of the editor which by default doesn't include the
+             * upload widgets (because they are not supposed to be saved). This creates a problem when a remote change
+             * is received while an upload is in progress: the remote content doesn't include the upload widget so the
+             * upload widget gets removed when we compute the diff between the local content and the remote content and
+             * then apply the patch.
+             *
+             * In order to overcome this we have to include the upload widgets in the output HTML of the editor, when
+             * this HTML is used for realtime synchronization.
+             *
+             * @param {CKEDITOR.htmlParser.element} widgetElementClone a clone of the widget element to downcast
+             */
+            downcast: function(widgetElementClone) {
+              const widget = this;
+              if (widget.editor.config._includeUploadWidgetsInOutputHTML) {
+                const placeholder = new CKEDITOR.htmlParser.element(widget.inline ? 'span' : 'div', {
+                  'class': 'xwiki-widget-placeholder-' + widget.name
+                });
+                // Add a non-breaking space to ensure the placeholder is visible and thus not removed by CKEditor.
+                placeholder.add(new CKEDITOR.htmlParser.text('\u00A0'));
+                return placeholder;
+              } else {
+                return new CKEDITOR.htmlParser.text('');
+              }
+            },
+          });
+
+          // Make sure the upload widget placeholders are not saved.
+          editor.dataProcessor?.htmlFilter?.addRules({
+            '^': function(element) {
+              if (element.hasClass?.('xwiki-widget-placeholder-' + widgetName)) {
+                return false;
+              }
+            }
+          }, {priority: 5, applyToAll: true});
+        }
+      });
+    }
+    return originalAddUploadWidget.call(this, editor, widgetName, ...args);
+  };
 })();

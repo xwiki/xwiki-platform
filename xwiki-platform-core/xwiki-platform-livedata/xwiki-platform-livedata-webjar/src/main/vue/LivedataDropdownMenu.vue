@@ -48,43 +48,40 @@
 
       <!-- Actions -->
       <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.actions') }}</span><ul>
-
-      <li>
-        <!-- Refresh -->
-        <a href="#" @click.prevent="logic.updateEntries()" class="livedata-action-refresh">
-          <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
-          {{ $t('livedata.action.refresh') }}
-        </a>
-      </li>
+        <li>
+          <!-- Refresh -->
+          <a href="#" @click.prevent="logic.updateEntries()" class="livedata-action-refresh">
+            <XWikiIcon :icon-descriptor="{name: 'repeat'}" /> 
+            {{ $t('livedata.action.refresh') }}
+          </a>
+        </li>
       </ul></li>
 
       <!-- Layouts -->
       <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.layouts') }}</span><ul>
-
-      <!-- Layout options -->
-      <li
-        v-for="layout in data.meta.layouts"
-        :key="layout.id"
-        :class="{
-          'disabled': isCurrentLayout(layout.id),
-        }"
-      >
-        <a href="#" @click.prevent="changeLayout(layout.id)">
-          <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
-          {{ layout.name }}
-        </a>
-      </li>
+        <!-- Layout options -->
+        <li
+          v-for="layout in data.meta.layouts"
+          :key="layout.id"
+          :class="{
+            'disabled': isCurrentLayout(layout.id),
+          }"
+        >
+          <a href="#" @click.prevent="changeLayout(layout.id)">
+            <XWikiIcon :icon-descriptor="layout.icon"></XWikiIcon>
+            {{ layout.name }}
+          </a>
+        </li>
       </ul></li>
 
       <!-- Panels -->
       <li><span class="dropdown-header">{{ $t('livedata.dropdownMenu.panels') }}</span><ul>
-
-      <li v-for="panel in logic.panels" :key="panel.id">
-        <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, panel.id)">
-          <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
-          {{ panel.name }}
-        </a>
-      </li>
+        <li v-for="panel in logic.panels" :key="panel.id">
+          <a href="#" @click.prevent="logic.uniqueArrayToggle(logic.openedPanels, panel.id)">
+            <XWikiIcon :icon-descriptor="{name: panel.icon}"/>
+            {{ panel.name }}
+          </a>
+        </li>
       </ul></li>
 
     </ul>

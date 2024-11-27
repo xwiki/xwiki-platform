@@ -44,6 +44,7 @@ import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.messagetool.internal.MessageToolTranslationMessageParser;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -285,7 +286,8 @@ class DocumentTranslationBundleFactoryTest
         assertTranslation("user.translation", "User translation", Locale.ROOT);
 
         doThrow(new AccessDeniedException(Right.SCRIPT, null, translationDocument))
-            .when(this.oldcore.getMockAuthorizationManager()).checkAccess(Right.SCRIPT, null, translationDocument);
+            .when(this.oldcore.getMockDocumentAuthorizationManager()).checkAccess(Right.SCRIPT, EntityType.DOCUMENT,
+                null, translationDocument);
 
         addTranslation("user.translation2", "User translation", translationDocument, Locale.ROOT, Scope.USER);
 

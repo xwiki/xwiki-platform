@@ -250,7 +250,7 @@ public class ModelBridge
 
         BaseClass xClass = baseObject.getXClass(xcontext);
 
-        List<Object> properties = Arrays.asList(baseObject.getPropertyNames());
+        List<String> properties = Arrays.asList(baseObject.getPropertyNames());
         if (properties.contains(property)) {
             changedValue = baseObject.get(property).toFormString();
 

@@ -20,14 +20,16 @@
 package org.xwiki.rest.internal.resources.wikis;
 
 import java.net.URL;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Relations;
@@ -39,9 +41,13 @@ import org.xwiki.rest.model.jaxb.PageSummary;
 import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.wikis.WikiPagesResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * @version $Id$
@@ -50,111 +56,116 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("org.xwiki.rest.internal.resources.wikis.WikiPagesResourceImpl")
 public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesResource
 {
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     @Override
     public Pages getPages(String wikiName, Integer start, String name, String space, String author, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        XWikiContext context = Utils.getXWikiContext(componentManager);
+        WikiReference wikiReference = context.getWikiReference();
+        context.setWikiReference(new WikiReference(wikiName));
 
         Pages pages = objectFactory.createPages();
-
-        /* This try is just needed for executing the finally clause. */
         try {
-            Map<String, String> filters = new HashMap<String, String>();
-            if (!name.equals("")) {
+            Map<String, String> filters = new HashMap<>();
+            if (!StringUtils.isEmpty(name)) {
                 filters.put("name", name);
             }
-            if (!space.equals("")) {
+            if (!StringUtils.isEmpty(space)) {
                 filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
             }
-            if (!author.equals("")) {
+            if (!StringUtils.isEmpty(author)) {
                 filters.put("author", author);
             }
 
             /* Build the query */
-            Formatter f = new Formatter();
-            f.format("select doc from XWikiDocument as doc");
+            StringBuilder stringBuilder = new StringBuilder("select doc from XWikiDocument as doc");
 
-            if (filters.keySet().size() > 0) {
-                f.format(" where (");
+            if (!filters.isEmpty()) {
+                stringBuilder.append(" where (");
 
                 int i = 0;
                 for (String param : filters.keySet()) {
                     if (param.equals("name")) {
-                        f.format(" upper(doc.fullName) like :name ");
+                        stringBuilder.append("upper(doc.fullName) like :name ");
                     }
-
                     if (param.equals("space")) {
-                        f.format(" upper(doc.space) like :space ");
+                        stringBuilder.append("upper(doc.space) like :space ");
                     }
-
                     if (param.equals("author")) {
-                        f.format(" upper(doc.contentAuthor) like :author ");
+                        stringBuilder.append("upper(doc.contentAuthor) like :author ");
                     }
-
                     i++;
 
                     if (i < filters.keySet().size()) {
-                        f.format(" and ");
+                        stringBuilder.append("and ");
                     }
                 }
 
-                f.format(")");
+                stringBuilder.append(")");
             }
 
-            String queryString = f.toString();
+            String queryString = stringBuilder.toString();
 
             /* Execute the query by filling the parameters */
             List<Object> queryResult = null;
-            try {
-                Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
-                for (String param : filters.keySet()) {
-                    query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
-                }
+            Query query = queryManager.createQuery(queryString, Query.XWQL)
+                .setWiki(wikiName)
+                .setLimit(number)
+                .setOffset(start);
 
-                queryResult = query.execute();
-            } catch (QueryException e) {
-                throw new XWikiRestException(e);
+            for (Map.Entry<String, String> filterEntry : filters.entrySet()) {
+                query.bindValue(filterEntry.getKey(), String.format("%%%s%%", filterEntry.getValue().toUpperCase()));
             }
+
+            queryResult = query.execute();
+            XWikiURLFactory urlFactory = context.getURLFactory();
 
             /* Get the results and populate the returned representation */
             for (Object object : queryResult) {
                 XWikiDocument xwikiDocument = (XWikiDocument) object;
-                xwikiDocument.setDatabase(wikiName);
 
-                Document doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
+                Document doc = new Document(xwikiDocument, context);
+                if (this.contextualAuthorizationManager.hasAccess(Right.VIEW, doc.getDocumentReference())) {
+                    /*
+                     * We manufacture page summaries in place because we don't have all the data for calling the
+                     * DomainObjectFactory method (doing so would require to retrieve an actual Document)
+                     */
+                    PageSummary pageSummary = objectFactory.createPageSummary();
+                    pageSummary.setId(doc.getPrefixedFullName());
+                    pageSummary.setFullName(doc.getFullName());
+                    pageSummary.setWiki(wikiName);
+                    pageSummary.setSpace(doc.getSpace());
+                    pageSummary.setName(doc.getDocumentReference().getName());
+                    pageSummary.setTitle(doc.getTitle());
+                    pageSummary.setParent(doc.getParent());
 
-                /*
-                 * We manufacture page summaries in place because we don't have all the data for calling the
-                 * DomainObjectFactory method (doing so would require to retrieve an actual Document)
-                 */
-                PageSummary pageSummary = objectFactory.createPageSummary();
-                pageSummary.setId(doc.getPrefixedFullName());
-                pageSummary.setFullName(doc.getFullName());
-                pageSummary.setWiki(wikiName);
-                pageSummary.setSpace(doc.getSpace());
-                pageSummary.setName(doc.getDocumentReference().getName());
-                pageSummary.setTitle(doc.getTitle());
-                pageSummary.setParent(doc.getParent());
+                    URL absoluteUrl = urlFactory.createExternalURL(
+                        doc.getSpace(), doc.getDocumentReference().getName(), "view", null, null,
+                        context);
+                    pageSummary.setXwikiAbsoluteUrl(absoluteUrl.toString());
+                    pageSummary.setXwikiRelativeUrl(urlFactory.getURL(
+                        absoluteUrl, context));
 
-                URL absoluteUrl = Utils.getXWikiContext(componentManager).getURLFactory().createExternalURL(
-                    doc.getSpace(), doc.getDocumentReference().getName(), "view", null, null,
-                    Utils.getXWikiContext(componentManager));
-                pageSummary.setXwikiAbsoluteUrl(absoluteUrl.toString());
-                pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
-                    absoluteUrl, Utils.getXWikiContext(componentManager)));
+                    String pageUri = Utils
+                        .createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
+                            Utils.getSpacesURLElements(doc.getDocumentReference()),
+                            doc.getDocumentReference().getName())
+                        .toString();
+                    Link pageLink = objectFactory.createLink();
+                    pageLink.setHref(pageUri);
+                    pageLink.setRel(Relations.PAGE);
+                    pageSummary.getLinks().add(pageLink);
 
-                String pageUri = Utils.createURI(uriInfo.getBaseUri(), PageResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
-                Link pageLink = objectFactory.createLink();
-                pageLink.setHref(pageUri);
-                pageLink.setRel(Relations.PAGE);
-                pageSummary.getLinks().add(pageLink);
-
-                pages.getPageSummaries().add(pageSummary);
+                    pages.getPageSummaries().add(pageSummary);
+                }
             }
+        } catch (QueryException e) {
+            throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            context.setWikiReference(wikiReference);
         }
 
         return pages;

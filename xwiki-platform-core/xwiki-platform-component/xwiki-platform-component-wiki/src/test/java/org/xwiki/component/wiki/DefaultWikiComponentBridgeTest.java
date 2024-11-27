@@ -19,21 +19,17 @@
  */
 package org.xwiki.component.wiki;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.inject.Provider;
 
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiComponentBridge;
-import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -42,14 +38,16 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,6 +61,18 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceRes
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit test for {@link DefaultWikiComponentBridge}.
+ *
+ * @version $Id$
+ */
 @ComponentList({
     DefaultModelContext.class,
     DefaultModelConfiguration.class,
@@ -76,275 +86,203 @@ import com.xpn.xwiki.web.Utils;
     DefaultEntityReferenceProvider.class,
     CompactWikiStringEntityReferenceSerializer.class
 })
-@MockingRequirement(value = DefaultWikiComponentBridge.class,
-exceptions = {EntityReferenceSerializer.class, Parser.class})
-public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTestCase implements WikiComponentConstants
+@ComponentTest
+class DefaultWikiComponentBridgeTest implements WikiComponentConstants
 {
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
+    @Mock
     private XWiki xwiki;
 
-    private XWikiContext xwikiContext;
+    @MockComponent
+    private Provider<XWikiContext> xWikiContextProvider;
 
+    @MockComponent
+    private ContentParser contentParser;
+
+    @Mock
     private XWikiDocument componentDoc;
 
+    @Mock
     private BaseObject componentObject;
 
-    private WikiComponentBridge bridge;
+    @MockComponent
+    private Execution execution;
 
-    @Before
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
+
+    @InjectMockComponents
+    private DefaultWikiComponentBridge bridge;
+
+    @InjectComponentManager
+    private MockitoComponentManager mockitoComponentManager;
+
+    @BeforeEach
     public void configure() throws Exception
     {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        Utils.setComponentManager(this.mockitoComponentManager);
 
-        Utils.setComponentManager(getComponentManager());
+        XWikiContext xwikiContext = new XWikiContext();
+        xwikiContext.setWikiId("xwiki");
+        xwikiContext.setWiki(this.xwiki);
+        when(this.xWikiContextProvider.get()).thenReturn(xwikiContext);
 
-        final Execution execution = registerMockComponent(Execution.class);
-        final ExecutionContext context = new ExecutionContext();
+        ExecutionContext context = new ExecutionContext();
+        context.setProperty("xwikicontext", xwikiContext);
 
-        final Provider<XWikiContext> xcontextProvider = registerMockComponent(XWikiContext.TYPE_PROVIDER);
-
-        this.xwiki = getMockery().mock(XWiki.class);
-
-        this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setWikiId("xwiki");
-        this.xwikiContext.setWiki(this.xwiki);
-
-        context.setProperty("xwikicontext", this.xwikiContext);
-
-        this.componentDoc = getMockery().mock(XWikiDocument.class);
-        this.componentObject = getMockery().mock(BaseObject.class, "component");
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(xcontextProvider).get();
-                will(returnValue(xwikiContext));
-                allowing(execution).getContext();
-                will(returnValue(context));
-                allowing(xwiki).getDocument(DOC_REFERENCE, xwikiContext);
-                will(returnValue(componentDoc));
-            }
-        });
-
-        this.bridge = getComponentManager().getInstance(WikiComponentBridge.class);
+        when(this.execution.getContext()).thenReturn(context);
+        when(this.xwiki.getDocument(DOC_REFERENCE, xwikiContext)).thenReturn(this.componentDoc);
+        when(this.componentDoc.getDocumentReference()).thenReturn(DOC_REFERENCE);
     }
 
     @Test
-    public void getAuthorReference() throws Exception
+    void getAuthorReference() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(componentDoc).getAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-            }
-        });
+        when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
 
-        Assert.assertEquals(AUTHOR_REFERENCE, bridge.getAuthorReference(DOC_REFERENCE));
+        assertEquals(AUTHOR_REFERENCE, this.bridge.getAuthorReference(DOC_REFERENCE));
     }
 
     @Test
-    public void getDeclaredInterfaces() throws Exception
+    void getDeclaredInterfaces() throws Exception
     {
-        final BaseObject interfaceObject = getMockery().mock(BaseObject.class, "interface");
-        final Vector<BaseObject> interfaceObjects = new Vector<BaseObject>();
+        BaseObject interfaceObject = mock();
+        Vector<BaseObject> interfaceObjects = new Vector<>();
         interfaceObjects.add(interfaceObject);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObjectNumbers(INTERFACE_CLASS);
-                will(returnValue(1));
-                oneOf(componentDoc).getObjects(INTERFACE_CLASS);
-                will(returnValue(interfaceObjects));
-                allowing(interfaceObject).getStringValue(INTERFACE_NAME_FIELD);
-                will(returnValue("org.xwiki.component.phase.Initializable"));
-            }
-        });
+        when(this.componentDoc.getObjectNumbers(INTERFACE_CLASS)).thenReturn(1);
+        when(this.componentDoc.getObjects(INTERFACE_CLASS)).thenReturn(interfaceObjects);
+        when(interfaceObject.getStringValue(INTERFACE_NAME_FIELD))
+            .thenReturn("org.xwiki.component.phase.Initializable");
 
-        Assert.assertEquals(1, bridge.getDeclaredInterfaces(DOC_REFERENCE).size());
+        assertEquals(1, this.bridge.getDeclaredInterfaces(DOC_REFERENCE).size());
     }
 
     @Test
-    public void getDependencies() throws Exception
+    void getDependencies() throws Exception
     {
-        final BaseObject dependencyObject = getMockery().mock(BaseObject.class, "dependency");
-        final Vector<BaseObject> dependencyObjects = new Vector<BaseObject>();
+        BaseObject dependencyObject = mock();
+        Vector<BaseObject> dependencyObjects = new Vector<>();
         dependencyObjects.add(dependencyObject);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObjectNumbers(DEPENDENCY_CLASS);
-                will(returnValue(1));
-                oneOf(componentDoc).getObjects(DEPENDENCY_CLASS);
-                will(returnValue(dependencyObjects));
-                allowing(dependencyObject).getStringValue(COMPONENT_ROLE_TYPE_FIELD);
-                will(returnValue("org.xwiki.component.wiki.TestRole"));
-                allowing(dependencyObject).getStringValue(COMPONENT_ROLE_HINT_FIELD);
-                will(returnValue("default"));
-                allowing(dependencyObject).getStringValue(DEPENDENCY_BINDING_NAME_FIELD);
-                will(returnValue("test"));
-            }
-        });
+        when(this.componentDoc.getObjectNumbers(DEPENDENCY_CLASS)).thenReturn(1);
+        when(this.componentDoc.getObjects(DEPENDENCY_CLASS)).thenReturn(dependencyObjects);
+        when(dependencyObject.getStringValue(COMPONENT_ROLE_TYPE_FIELD))
+            .thenReturn("org.xwiki.component.wiki.TestRole");
+        when(dependencyObject.getStringValue(COMPONENT_ROLE_HINT_FIELD))
+            .thenReturn("default");
+        when(dependencyObject.getStringValue(DEPENDENCY_BINDING_NAME_FIELD))
+            .thenReturn("test");
 
-        Assert.assertEquals(1, bridge.getDependencies(DOC_REFERENCE).size());
+        assertEquals(1, this.bridge.getDependencies(DOC_REFERENCE).size());
     }
 
     @Test
-    public void getHandledMethods() throws Exception
+    void getHandledMethods() throws Exception
     {
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class);
-        final ContentParser contentParser = getComponentManager().getInstance(ContentParser.class);
-        final Parser parser = getMockery().mock(Parser.class);
-        final XDOM xdom = new XDOM(new ArrayList<Block>());
-        final BaseObject methodObject = getMockery().mock(BaseObject.class, "method");
-        final Vector<BaseObject> methodObjects = new Vector<BaseObject>();
+        XDOM xdom = new XDOM(List.of());
+        BaseObject methodObject = mock();
+        Vector<BaseObject> methodObjects = new Vector<>();
         methodObjects.add(methodObject);
 
-        getMockery().checking(new Expectations()
-        {
-            {
+        when(this.componentDoc.getObjectNumbers(METHOD_CLASS)).thenReturn(1);
+        when(this.componentDoc.getObjects(METHOD_CLASS)).thenReturn(methodObjects);
+        when(methodObject.getStringValue(METHOD_NAME_FIELD))
+            .thenReturn("test");
+        when(methodObject.getStringValue(METHOD_CODE_FIELD)).thenReturn("test");
+        when(this.componentDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.contentParser.parse("test", Syntax.XWIKI_2_1, DOC_REFERENCE)).thenReturn(xdom);
 
-                oneOf(componentDoc).getObjectNumbers(METHOD_CLASS);
-                will(returnValue(1));
-                oneOf(componentDoc).getObjects(METHOD_CLASS);
-                will(returnValue(methodObjects));
-                allowing(methodObject).getStringValue(METHOD_NAME_FIELD);
-                will(returnValue("test"));
-                allowing(methodObject).getStringValue(METHOD_CODE_FIELD);
-                will(returnValue("test"));
-                oneOf(componentDoc).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_1));
-                oneOf(contentParser).parse("test", Syntax.XWIKI_2_1, DOC_REFERENCE);
-                will(returnValue(xdom));
-            }
-        });
-
-        Assert.assertEquals(1, bridge.getHandledMethods(DOC_REFERENCE).size());
+        assertEquals(1, this.bridge.getHandledMethods(DOC_REFERENCE).size());
     }
 
     @Test
-    public void getRoleHint() throws Exception
+    void getRoleHint() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(componentObject));
-                oneOf(componentObject).getStringValue(COMPONENT_ROLE_HINT_FIELD);
-                will(returnValue("roleHint"));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(this.componentObject);
+        when(this.componentObject.getStringValue(COMPONENT_ROLE_HINT_FIELD)).thenReturn("roleHint");
 
-        Assert.assertEquals("roleHint", bridge.getRoleHint(DOC_REFERENCE));
+        assertEquals("roleHint", this.bridge.getRoleHint(DOC_REFERENCE));
     }
 
     @Test
-    public void getRoleType() throws Exception
+    void getRoleType() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(componentObject));
-                oneOf(componentObject).getStringValue(COMPONENT_ROLE_TYPE_FIELD);
-                will(returnValue("org.xwiki.component.wiki.TestRole"));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(this.componentObject);
+        when(this.componentObject.getStringValue(COMPONENT_ROLE_TYPE_FIELD))
+            .thenReturn("org.xwiki.component.wiki.TestRole");
 
-        Assert.assertEquals(TestRole.class, bridge.getRoleType(DOC_REFERENCE));
+        assertEquals(TestRole.class, this.bridge.getRoleType(DOC_REFERENCE));
     }
 
     @Test
-    public void getRoleTypeWithoutComponentObject() throws Exception
+    void getRoleTypeWithoutComponentObject()
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(null));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(null);
 
-        try {
-            bridge.getRoleType(DOC_REFERENCE);
-            Assert.fail("Should have thrown an exception");
-        } catch (WikiComponentException expected) {
-            Assert.assertEquals("No component object could be found in document [xwiki:XWiki.MyComponent]",
-                expected.getMessage());
-        }
+        WikiComponentException wikiComponentException =
+            assertThrows(WikiComponentException.class, () -> this.bridge.getRoleType(DOC_REFERENCE));
+
+        assertEquals("No component object could be found in document [xwiki:XWiki.MyComponent]",
+            wikiComponentException.getMessage());
     }
 
     @Test
-    public void getRoleTypeWithWrongRole() throws Exception
+    void getRoleTypeWithWrongRole()
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(componentObject));
-                oneOf(componentObject).getStringValue(COMPONENT_ROLE_TYPE_FIELD);
-                will(returnValue("org.xwiki.component.wiki.DoesNotExist"));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(this.componentObject);
+        when(this.componentObject.getStringValue(COMPONENT_ROLE_TYPE_FIELD))
+            .thenReturn("org.xwiki.component.wiki.DoesNotExist");
 
-        try {
-            this.bridge.getRoleType(DOC_REFERENCE);
-            Assert.fail("Should have thrown an exception");
-        } catch (WikiComponentException expected) {
-            Assert.assertEquals("The role type [org.xwiki.component.wiki.DoesNotExist] does not exist",
-                expected.getMessage());
-        }
+        WikiComponentException exception =
+            assertThrows(WikiComponentException.class, () -> this.bridge.getRoleType(DOC_REFERENCE));
+
+        assertEquals("The role type [org.xwiki.component.wiki.DoesNotExist] does not exist",
+            exception.getMessage());
     }
 
     @Test
-    public void getScope() throws Exception
+    void getScope() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(componentObject));
-                oneOf(componentObject).getStringValue(COMPONENT_SCOPE_FIELD);
-                will(returnValue("user"));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(this.componentObject);
+        when(this.componentObject.getStringValue(COMPONENT_SCOPE_FIELD))
+            .thenReturn("user");
 
-        Assert.assertEquals(WikiComponentScope.USER, bridge.getScope(DOC_REFERENCE));
+        assertEquals(WikiComponentScope.USER, this.bridge.getScope(DOC_REFERENCE));
     }
 
     @Test
-    public void getScopeWithWrongScope() throws Exception
+    void getScopeWithWrongScope() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getObject(COMPONENT_CLASS);
-                will(returnValue(componentObject));
-                oneOf(componentObject).getStringValue(COMPONENT_SCOPE_FIELD);
-                will(returnValue("doesnotexist"));
-            }
-        });
+        when(this.componentDoc.getObject(COMPONENT_CLASS)).thenReturn(this.componentObject);
+        when(this.componentObject.getStringValue(COMPONENT_SCOPE_FIELD))
+            .thenReturn("doesnotexist");
 
         // Wiki is the default value
-        Assert.assertEquals(WikiComponentScope.WIKI, this.bridge.getScope(DOC_REFERENCE));
+        assertEquals(WikiComponentScope.WIKI, this.bridge.getScope(DOC_REFERENCE));
     }
 
     @Test
-    public void getSyntax() throws Exception
+    void getSyntax() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(componentDoc).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_1));
-            }
-        });
+        when(this.componentDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
-        Assert.assertEquals(Syntax.XWIKI_2_1, bridge.getSyntax(DOC_REFERENCE));
+        assertEquals(Syntax.XWIKI_2_1, this.bridge.getSyntax(DOC_REFERENCE));
+    }
+
+    @Test
+    void hasProgrammingRights() throws Exception
+    {
+        when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
+
+        assertFalse(this.bridge.hasProgrammingRights(DOC_REFERENCE));
+
+        when(this.documentAuthorizationManager.hasAccess(Right.PROGRAM, null, AUTHOR_REFERENCE, DOC_REFERENCE))
+            .thenReturn(true);
+
+        assertTrue(this.bridge.hasProgrammingRights(DOC_REFERENCE));
     }
 }

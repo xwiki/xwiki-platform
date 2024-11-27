@@ -31,7 +31,6 @@ import org.xwiki.notifications.preferences.email.NotificationEmailDiffType;
 
 import com.xpn.xwiki.doc.AbstractMandatoryClassInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define the NotificationEmailPreferenceClass XClass.
@@ -78,7 +77,6 @@ public class NotificationEmailPreferenceDocumentInitializer extends AbstractMand
      *
      * @since 15.6RC1
      */
-    @Unstable
     public static final String FIELD_DIFF_TYPE = "diffType";
 
     private static final String SELECT = "select";

@@ -20,12 +20,17 @@
 
 package org.xwiki.security.authorization.testwikis.internal.entities;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.security.authorization.testwikis.TestDocument;
 import org.xwiki.security.authorization.testwikis.TestEntity;
+import org.xwiki.security.authorization.testwikis.TestRequiredRight;
 import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
 
 /**
@@ -45,6 +50,11 @@ public class DefaultTestDocument extends AbstractSecureTestEntity implements Tes
     /** The creator of this document. */
     private final DocumentReference creator;
 
+    /** Map of security rules. */
+    private final Map<EntityReference, TestRequiredRight> requiredRights = new LinkedHashMap<>();
+
+    private final boolean enforceRequiredRights;
+
     /**
      * Create a new document entity.
      * @param reference reference of document represented by this entity.
@@ -53,13 +63,29 @@ public class DefaultTestDocument extends AbstractSecureTestEntity implements Tes
      * @param parent parent entity of this entity.
      */
     public DefaultTestDocument(EntityReference reference, EntityReference creator, String description,
-        TestEntity parent) {
+        TestEntity parent)
+    {
+        this(reference, creator, description, false, parent);
+    }
+
+    /**
+     * Create a new document entity.
+     * @param reference reference of document represented by this entity.
+     * @param creator creator of this document.
+     * @param description alternate description of this entity.
+     * @param enforceRequiredRights enforce required rights
+     * @param parent parent entity of this entity.
+     */
+    public DefaultTestDocument(EntityReference reference, EntityReference creator, String description,
+        boolean enforceRequiredRights, TestEntity parent)
+    {
         super(reference, parent);
 
-        this.creator = (creator != null) ? new DocumentReference(creator) :
-            new DocumentReference(XWikiConstants.SUPERADMIN, new SpaceReference(XWikiConstants.XWIKI_SPACE,
-                getDocumentReference().getWikiReference()));
+        this.creator = (creator != null) ? new DocumentReference(creator)
+            : new DocumentReference(XWikiConstants.SUPERADMIN, new SpaceReference(XWikiConstants.XWIKI_SPACE,
+            getDocumentReference().getWikiReference()));
         this.description = description;
+        this.enforceRequiredRights = enforceRequiredRights;
     }
 
     @Override
@@ -84,5 +110,23 @@ public class DefaultTestDocument extends AbstractSecureTestEntity implements Tes
     public String getDescription()
     {
         return description;
+    }
+
+    @Override
+    public boolean isEnforceRequiredRights()
+    {
+        return this.enforceRequiredRights;
+    }
+
+    @Override
+    public void addRequiredRight(TestRequiredRight requiredRight)
+    {
+        this.requiredRights.put(requiredRight.getReference(), requiredRight);
+    }
+
+    @Override
+    public Collection<TestRequiredRight> getRequiredRights()
+    {
+        return this.requiredRights.values();
     }
 }

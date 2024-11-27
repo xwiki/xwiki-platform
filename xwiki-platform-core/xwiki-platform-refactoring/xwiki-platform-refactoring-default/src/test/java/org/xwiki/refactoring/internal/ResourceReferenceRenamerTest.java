@@ -19,8 +19,12 @@
  */
 package org.xwiki.refactoring.internal;
 
-import javax.inject.Named;
+import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,8 +40,15 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +77,20 @@ class ResourceReferenceRenamerTest
     @MockComponent
     private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @BeforeEach
+    void setup() throws XWikiException
+    {
+        XWikiContext context = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(context);
+
+        XWiki xWiki = mock(XWiki.class);
+        when(context.getWiki()).thenReturn(xWiki);
+        when(xWiki.exists(any(DocumentReference.class), eq(context))).thenReturn(true);
+    }
+
     @Test
     void updateResourceReferenceRelative()
     {
@@ -74,6 +99,7 @@ class ResourceReferenceRenamerTest
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
         when(this.compactEntityReferenceSerializer.serialize(oldReference, newReference)).thenReturn("file2.txt");
@@ -81,7 +107,7 @@ class ResourceReferenceRenamerTest
         assertTrue(this.renamer.updateResourceReference(resourceReference,
             oldReference,
             newReference,
-            new DocumentReference("xwiki", "Space", "Page"), true));
+            new DocumentReference("xwiki", "Space", "Page"), true, Map.of()));
 
         verify(this.compactEntityReferenceSerializer).serialize(oldReference, newReference);
     }
@@ -94,8 +120,12 @@ class ResourceReferenceRenamerTest
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
+        AttachmentReference absoluteReference =
+            new AttachmentReference("image.png", new DocumentReference("xwiki", "Main", "WebHome"));
         DocumentReference currentDocumentReference = new DocumentReference("xwiki", "Space", "Page");
 
+        when(this.entityReferenceResolver.resolve(resourceReference, null))
+            .thenReturn(absoluteReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, currentDocumentReference))
             .thenReturn(oldReference);
         when(this.compactEntityReferenceSerializer.serialize(newReference, currentDocumentReference))
@@ -103,7 +133,7 @@ class ResourceReferenceRenamerTest
 
         assertTrue(this.renamer.updateResourceReference(resourceReference, oldReference, newReference,
             currentDocumentReference,
-            false));
+            false, Map.of()));
         assertEquals(new AttachmentResourceReference("xwiki:Space.Page.file2.txt"), resourceReference);
     }
 }

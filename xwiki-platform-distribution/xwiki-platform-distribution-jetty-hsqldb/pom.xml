@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-jetty-hsqldb</artifactId>
   <name>XWiki Platform - Distribution - Jetty HSQLDB</name>

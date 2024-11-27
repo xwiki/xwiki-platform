@@ -33,6 +33,7 @@ import org.xwiki.rendering.test.integration.junit5.RenderingTests;
 import org.xwiki.script.ScriptContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.skinx.SkinExtension;
@@ -72,7 +73,10 @@ public class IntegrationTests implements RenderingTests
             componentManager.registerMockComponent(ContextualAuthorizationManager.class);
         // Grant view right on the icon document.
         when(authorizationManager.hasAccess(Right.VIEW, ICON_DOCUMENT_REFERENCE)).thenReturn(true);
+        // Grant script right to disable restricted cleaning in the HTML macro.
+        when(authorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
         componentManager.registerMockComponent(AuthorizationManager.class);
+        componentManager.registerMockComponent(DocumentAuthorizationManager.class);
 
         // Mock the icon set cache as it fails.
         componentManager.registerMockComponent(IconSetCache.class);
@@ -117,6 +121,13 @@ public class IntegrationTests implements RenderingTests
         documentIconSet.setRenderWiki("document $icon");
         documentIconSet.setSourceDocumentReference(new DocumentReference(ICON_DOCUMENT_REFERENCE));
         when(iconSetManager.getIconSet("document")).thenReturn(documentIconSet);
+
+        // An icon theme that uses the HTML macro to display the icon
+        IconSet htmlSet = new IconSet("html");
+        htmlSet.addIcon("home", new Icon("htmlHome"));
+        htmlSet.setRenderWiki("{{html clean=\"false\"}}<span class=\"fa fa-$icon\" aria-hidden=\"true\"></span>"
+            + "{{/html}}");
+        when(iconSetManager.getIconSet("html")).thenReturn(htmlSet);
 
         // The default icon set to test fallback to the default when the current or specified icon set doesn't
         // contain an icon.

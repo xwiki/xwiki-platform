@@ -43,6 +43,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -83,7 +84,7 @@ public class EditIT
     @AfterEach
     public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
         // Ensure remaining tabs are properly closed.
         if (setup.getDriver().getWindowHandles().size() > 1) {
@@ -240,6 +241,8 @@ public class EditIT
      * page.
      */
     @Test
+    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
+        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {

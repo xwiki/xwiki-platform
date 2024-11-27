@@ -25,12 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-localization-webjar</artifactId>
   <name>XWiki Platform - Localization - WebJar</name>
   <description>A JavaScript API to load localization messages.</description>
+  <properties>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.webjars</groupId>

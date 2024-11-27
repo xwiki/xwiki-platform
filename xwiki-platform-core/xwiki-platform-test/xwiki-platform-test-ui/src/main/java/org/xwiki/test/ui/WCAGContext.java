@@ -70,8 +70,7 @@ public class WCAGContext
 
             // WCAG 2.0 Level A & AA Rules
             entry("area-alt", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("aria-allowed-attr", false),
+            entry("aria-allowed-attr", true),
             entry("aria-command-name", true),
             entry("aria-hidden-body", true),
             entry("aria-hidden-focus", true),
@@ -106,8 +105,7 @@ public class WCAGContext
             entry("html-has-lang", true),
             entry("html-lang-valid", true),
             entry("html-xml-lang-mismatch", true),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("image-alt", false),
+            entry("image-alt", true),
             entry("input-button-name", true),
             entry("input-image-alt", true),
             // Set to true once the build doesn't fail this rule anymore
@@ -126,8 +124,7 @@ public class WCAGContext
             entry("role-img-alt", true),
             // Set to true once the build doesn't fail this rule anymore
             entry("scrollable-region-focusable", false),
-            // Set to true once the build doesn't fail this rule anymore
-            entry("select-name", false),
+            entry("select-name", true),
             entry("server-side-image-map", true),
             entry("svg-img-alt", true),
             entry("td-headers-attr", true),

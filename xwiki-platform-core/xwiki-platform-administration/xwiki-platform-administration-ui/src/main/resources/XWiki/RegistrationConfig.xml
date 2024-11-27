@@ -522,9 +522,30 @@
       <passwordRuleOneUpperCaseEnabled>0</passwordRuleOneUpperCaseEnabled>
     </property>
     <property>
-      <registrationSuccessMessage>#set($message = $services.localization.render('core.register.successful', 'xwiki/2.1', ['USERLINK', $userName]))
+      <registrationSuccessMessage>#set($discard = $xwiki.ssx.use("XWiki.RegistrationConfig"))
+#set($displayName = "$!firstName $!lastName")
+#set($noReadableName = ($!firstName == "") || ($!lastName == ""))
+#if($noReadableName)
+  #set($displayName = $userName)
+#end
+#set($headline = $services.localization.render('core.register.successful.welcome', [$displayName]))
 #set($userLink = $xwiki.getUserName("$userSpace$userName"))
-{{info}}$message.replace('USERLINK', "{{html clean=false}}$userLink{{/html}}"){{/info}}</registrationSuccessMessage>
+#set($successAndLogin = $services.localization.render('core.register.successful.successandlogin'))
+[[image:registration_success_hero.svg||data-xwiki-image-style-alignment="center" height="50vh"]]
+
+{{html}}
+&lt;div class="registration-success-headline"&gt;
+  &lt;h2&gt;$escapetool.xml($headline) &lt;/h2&gt;
+  #if(!$noReadableName)
+  &lt;p class="registration-success-subtitle"&gt;
+    ($escapetool.xml($userName))
+  &lt;/p&gt;
+  #end
+&lt;/div&gt;
+&lt;p class="registration-success-hint"&gt;
+  $escapetool.xml($successAndLogin)
+&lt;/p&gt;
+{{/html}}</registrationSuccessMessage>
     </property>
     <property>
       <requireCaptcha>0</requireCaptcha>
@@ -533,4 +554,138 @@
       <welcomeMessage>{{translation key="core.register.welcome"/}}</welcomeMessage>
     </property>
   </object>
+  <object>
+    <name>XWiki.RegistrationConfig</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>6e9139ba-c4ac-4243-9ca7-9e935b0cc730</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <restricted>0</restricted>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.registration-success-headline {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.registration-success-headline &gt; .registration-success-subtitle {
+  display: block;
+}
+
+.registration-success-hint {
+  display: block;
+  text-align: center;
+}
+
+/* Resize the hero image displayed when the registration is successful so that the buttons are always on screen without
+ needing to scroll. */
+img.wikigeneratedid {
+  height: 50vh;
+}</code>
+  </property>
+  <property>
+    <parse/>
+  </property>
+  <property>
+    <use>onDemand</use>
+  </property>
+</object>
 </xwikidoc>

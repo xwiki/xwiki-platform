@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-ckeditor-plugins</artifactId>
@@ -34,6 +34,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>CKEditor Plugins for XWiki</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>webjar</xwiki.extension.category>
     <!-- This module has been moved from XWiki Contrib to platform. -->
     <xwiki.extension.previousIds>org.xwiki.contrib:application-ckeditor-plugins</xwiki.extension.previousIds>
     <!-- Old name of this module used for retro compatibility when resolving dependencies of old extensions -->
@@ -50,8 +52,9 @@
     </dependency>
     <!-- Bootstrap is used for the editor modals (insert / edit link, image, macro) -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bootstrap</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!-- This is used by the resource tree picker on the link modal. -->
     <dependency>
@@ -66,7 +69,7 @@
       <artifactId>xwiki-platform-realtime-wysiwyg-webjar</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-      <!-- Marked as optional because the realtime plugin is disabled by default. -->
+      <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature.. -->
       <optional>true</optional>
     </dependency>
     <!-- This is used by the resource suggest picker on the link modal. -->

@@ -65,6 +65,14 @@
        1.6: useDocValuesAsStored defaults to true.
     -->
 
+    <!-- XWIKI: the version of the schema from XWiki point of view.
+         The version should be updated when the configuration need to be updated for the core to work as expected.
+         It cause the whole schema to be re-created with embedded Solr setup.
+
+         160600000: added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+    -->
+    <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
+
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field
      type: mandatory - the name of a field type from the
@@ -707,7 +715,7 @@
     <dynamicField name="*__" type="text_general"  indexed="true"  stored="true" multiValued="true"/>
 
     <!-- Arabic -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ar" type="text_ar"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ar" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -722,7 +730,7 @@
     </fieldType>
 
     <!-- Bulgarian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_bg" type="text_bg"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_bg" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -734,7 +742,7 @@
     </fieldType>
 
     <!-- Catalan -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ca" type="text_ca"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ca" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -748,7 +756,7 @@
     </fieldType>
 
     <!-- CJK bigram (see text_ja for a Japanese configuration using morphological analysis) -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_cjk" type="text_cjk"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_cjk" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -762,7 +770,7 @@
     </fieldType>
 
     <!-- Czech -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <!-- cs for XWiki means cz for Solr. 
          See https://issues.apache.org/jira/browse/LUCENE-6366 and https://issues.apache.org/jira/browse/SOLR-7267 -->
     <dynamicField name="*_cs" type="text_cz"  indexed="true"  stored="true" multiValued="true"/>
@@ -776,7 +784,7 @@
     </fieldType>
 
     <!-- Danish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_da" type="text_da"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_da" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -788,8 +796,9 @@
     </fieldType>
 
     <!-- German -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_de" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_de_DE" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>
@@ -803,7 +812,7 @@
     </fieldType>
 
     <!-- Greek -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_el" type="text_el"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_el" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -816,7 +825,7 @@
     </fieldType>
 
     <!-- Spanish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_es" type="text_es"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_es" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -829,7 +838,7 @@
     </fieldType>
 
     <!-- Estonian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_et" type="text_et"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_et" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -841,7 +850,7 @@
     </fieldType>
 
     <!-- Basque -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_eu" type="text_eu"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_eu" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -853,7 +862,7 @@
     </fieldType>
 
     <!-- Persian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_fa" type="text_fa"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fa" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -868,7 +877,7 @@
     </fieldType>
 
     <!-- Finnish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_fi" type="text_fi"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fi" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -881,8 +890,10 @@
     </fieldType>
 
     <!-- French -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_fr" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_FR" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_BE" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fr" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>
@@ -902,7 +913,7 @@
     </fieldType>
 
     <!-- Irish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ga" type="text_ga"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ga" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -918,7 +929,7 @@
     </fieldType>
 
     <!-- Galician -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_gl" type="text_gl"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_gl" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -931,7 +942,7 @@
     </fieldType>
 
     <!-- Hindi -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_hi" type="text_hi"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hi" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -947,7 +958,7 @@
     </fieldType>
 
     <!-- Hungarian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_hu" type="text_hu"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hu" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -960,7 +971,7 @@
     </fieldType>
 
     <!-- Armenian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_hy" type="text_hy"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_hy" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -972,7 +983,7 @@
     </fieldType>
 
     <!-- Indonesian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_id" type="text_id"  indexed="true"  stored="true" multiValued="true"/>
     <!-- XWIKI: "in" is the former code for "id". See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6457127 -->
     <dynamicField name="*_in" type="text_id" indexed="true"  stored="true" multiValued="true" />
@@ -987,7 +998,7 @@
     </fieldType>
 
     <!-- Italian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_it" type="text_it"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_it" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1006,7 +1017,7 @@
          NOTE: If you want to optimize search for precision, use default operator AND in your request
          handler config (q.op) Use OR if you would like to optimize for recall (default).
     -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ja" type="text_ja"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ja" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
       <analyzer>
@@ -1054,7 +1065,7 @@
     </fieldType>
 
     <!-- Korean morphological analysis -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ko" type="text_ko"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ko" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1089,7 +1100,7 @@
     </fieldType>
 
     <!-- Latvian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_lv" type="text_lv"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_lv" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1101,7 +1112,7 @@
     </fieldType>
 
     <!-- Dutch -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_nl" type="text_nl"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_nl" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1114,7 +1125,7 @@
     </fieldType>
 
     <!-- Norwegian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_no" type="text_no"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_no" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1127,8 +1138,18 @@
       </analyzer>
     </fieldType>
 
+    <!-- XWIKI: Polish -->
+    <dynamicField name="*_pl" type="text_pl"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_pl" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="standard"/>
+        <filter name="lowercase"/>
+        <filter name="stempelPolishStem"/>
+      </analyzer>
+    </fieldType>
+
     <!-- Portuguese -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_pt" type="text_pt"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_pt" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1154,7 +1175,7 @@
     </fieldType>
 
     <!-- Romanian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ro" type="text_ro"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ro" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1166,7 +1187,7 @@
     </fieldType>
 
     <!-- Russian -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_ru" type="text_ru"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_ru" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1179,6 +1200,7 @@
     </fieldType>
 
     <!-- XWIKI: Slovak -->
+    <dynamicField name="*_sk" type="text_sk"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_sk" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -1191,7 +1213,7 @@
     </fieldType>
 
     <!-- Swedish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_sv" type="text_sv"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_sv" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1204,7 +1226,7 @@
     </fieldType>
 
     <!-- Thai -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_th" type="text_th"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1215,7 +1237,7 @@
     </fieldType>
 
     <!-- Turkish -->
-    <!-- XWiki: XWiki historically uses a diffferent suffix than the standard one -->
+    <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_tr" type="text_tr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_tr" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
@@ -1223,6 +1245,40 @@
         <filter name="turkishLowercase"/>
         <filter name="stop" ignoreCase="false" words="lang/stopwords_tr.txt" />
         <filter name="snowballPorter" language="Turkish"/>
+      </analyzer>
+    </fieldType>
+
+    <!-- XWIKI: Ukrainian -->
+    <dynamicField name="*_uk" type="text_uk"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_uk" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="standard"/>
+        <filter name="stop" words="org/apache/lucene/analysis/uk/stopwords.txt"/>
+        <filter name="lowercase"/>
+        <filter name="morfologik" dictionary="org/languagetool/resource/uk/ukrainian.dict"/>
+      </analyzer>
+    </fieldType>
+
+    <!-- XWIKI: Simplified Chinese -->
+    <dynamicField name="*_zh" type="text_zh"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_zh" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="hmmChinese"/>
+        <filter name="cjkWidth"/>
+        <filter name="stop"
+                words="org/apache/lucene/analysis/cn/smart/stopwords.txt"/>
+        <filter name="porterStem"/>
+        <filter name="lowercase"/>
+      </analyzer>
+    </fieldType>
+
+    <!-- XWIKI: Traditional Chinese -->
+    <dynamicField name="*_zh_TW" type="text_zh_TW"  indexed="true"  stored="true" multiValued="true"/>
+    <fieldType name="text_zh_TW" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer name="icu"/>
+        <filter name="cjkWidth"/>
+        <filter name="lowercase"/>
       </analyzer>
     </fieldType>
 

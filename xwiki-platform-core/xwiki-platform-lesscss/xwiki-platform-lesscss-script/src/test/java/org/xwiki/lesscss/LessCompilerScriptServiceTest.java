@@ -37,7 +37,7 @@ import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -74,7 +74,7 @@ public class LessCompilerScriptServiceTest
 
     private LESSColorThemeConverter lessColorThemeConverter;
 
-    private AuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager authorizationManager;
 
     private Provider<XWikiContext> xcontextProvider;
 
@@ -92,7 +92,7 @@ public class LessCompilerScriptServiceTest
         lessCache = mocker.getInstance(LESSResourcesCache.class);
         lessResourceReferenceFactory = mocker.getInstance(LESSResourceReferenceFactory.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
-        authorizationManager = mocker.getInstance(AuthorizationManager.class);
+        authorizationManager = mocker.getInstance(ContextualAuthorizationManager.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
         colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
         xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
@@ -247,7 +247,7 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
 
         // Tests
         assertTrue(mocker.getComponentUnderTest().clearCache());
@@ -268,7 +268,7 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
 
         // Tests
         assertFalse(mocker.getComponentUnderTest().clearCache());
@@ -289,7 +289,7 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
 
         ColorThemeReference colorThemeReference = mock(ColorThemeReference.class);
         when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(colorThemeReference);
@@ -313,12 +313,26 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
 
         // Tests
         assertFalse(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
+        verifyNoInteractions(lessCache);
+        verifyNoInteractions(colorThemeCache);
+    }
+
+    @Test
+    public void clearCacheFromColorThemeWithException() throws Exception
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+
+        LESSCompilerException lessCompilerException = new LESSCompilerException("Test Exception");
+        when(this.colorThemeReferenceFactory.createReference("colorTheme")).thenThrow(lessCompilerException);
+
+        assertFalse(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
+
         verifyNoInteractions(lessCache);
         verifyNoInteractions(colorThemeCache);
     }
@@ -334,7 +348,7 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
 
         SkinReference skinReference = mock(SkinReference.class);
         when(skinReferenceFactory.createReference("skin")).thenReturn(skinReference);
@@ -358,7 +372,7 @@ public class LessCompilerScriptServiceTest
         DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
-        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
+        when(authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(false);
 
         // Tests
         assertFalse(mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
@@ -368,4 +382,17 @@ public class LessCompilerScriptServiceTest
         verifyNoInteractions(colorThemeCache);
     }
 
+    @Test
+    public void clearCacheFromSkinWithException() throws Exception
+    {
+        when(this.authorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
+
+        LESSCompilerException exception = new LESSCompilerException("test");
+        when(skinReferenceFactory.createReference("skin")).thenThrow(exception);
+
+        assertFalse(this.mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
+
+        verifyNoInteractions(this.lessCache);
+        verifyNoInteractions(this.colorThemeCache);
+    }
 }

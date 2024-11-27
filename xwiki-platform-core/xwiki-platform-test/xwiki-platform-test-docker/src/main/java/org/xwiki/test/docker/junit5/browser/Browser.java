@@ -98,7 +98,7 @@ public enum Browser
         if (options.getProfile() == null) {
             options.setProfile(new FirefoxProfile());
         }
-        // We want to ensure that those events are taking into account.
+        options.enableBiDi();
         options.addPreference("dom.disable_beforeunload", false);
         return options;
     }
@@ -108,6 +108,7 @@ public enum Browser
         ChromeOptions options = new ChromeOptions();
         LoggingPreferences logPrefs = new LoggingPreferences();
         logPrefs.enable(LogType.BROWSER, Level.ALL);
+        options.enableBiDi();
         options.setCapability(ChromeOptions.LOGGING_PREFS, logPrefs);
         options.addArguments(
             "--whitelisted-ips",

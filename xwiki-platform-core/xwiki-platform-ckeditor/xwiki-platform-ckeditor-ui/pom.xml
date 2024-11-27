@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-ckeditor</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-ckeditor-ui</artifactId>
   <name>XWiki Platform - CKEditor - UI</name>
@@ -125,7 +125,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
       <type>xar</type>
-      <!-- Marked as optional because realtime editing is currently disabled by default. -->
+      <!-- Marked as optional to allow disabling and uninstalling the realtime editing feature. -->
       <optional>true</optional>
     </dependency>
     <!-- Test dependencies. -->

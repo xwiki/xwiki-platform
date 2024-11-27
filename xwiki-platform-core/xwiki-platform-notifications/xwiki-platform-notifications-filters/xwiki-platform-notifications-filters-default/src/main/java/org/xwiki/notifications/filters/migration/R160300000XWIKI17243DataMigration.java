@@ -43,7 +43,6 @@ import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.NotificationFilterPreferenceStore;
-import org.xwiki.notifications.filters.internal.UserProfileNotificationFilterPreferenceProvider;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -263,7 +262,6 @@ public class R160300000XWIKI17243DataMigration extends AbstractHibernateDataMigr
         pref.setId(id);
         pref.setEnabled(true);
         pref.setNotificationFormats(Set.of(NotificationFormat.values()));
-        pref.setProviderHint(UserProfileNotificationFilterPreferenceProvider.HINT);
         pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
         pref.setFilterType(NotificationFilterType.INCLUSIVE);
         return pref;

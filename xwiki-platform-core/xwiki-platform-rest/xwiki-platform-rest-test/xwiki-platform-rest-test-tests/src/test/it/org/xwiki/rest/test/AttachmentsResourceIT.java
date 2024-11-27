@@ -95,15 +95,15 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         /* Test normal random UUID method */
         String randomStr = String.format("%s.txt", UUID.randomUUID());
         /* Test filenames requiring url encoding */
-        putAttachmentFilename(randomStr, "random");
-        putAttachmentFilename("my attach.txt", "space");
-        putAttachmentFilename("^caret.txt", "caret");
-        putAttachmentFilename("#pound.txt", "pound");
-        putAttachmentFilename("%percent.txt", "percent");
-        putAttachmentFilename("{brace}.txt", "braces");
-        putAttachmentFilename("[bracket].txt", "brackets");
+        putAttachmentFilename(randomStr);
+        putAttachmentFilename("my attach.txt");
+        putAttachmentFilename("^caret.txt");
+        putAttachmentFilename("#pound.txt");
+        putAttachmentFilename("%percent.txt");
+        putAttachmentFilename("{brace}.txt");
+        putAttachmentFilename("[bracket].txt");
         /** Causes XWIKI-7874 **/
-        putAttachmentFilename("plus+plus.txt", "plus");
+        putAttachmentFilename("plus+plus.txt");
 
         // Now get all the attachments.
         String attachmentsUri = buildURIForThisPage(AttachmentsResource.class);
@@ -125,7 +125,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
         this.testUtils.deleteAttachement(documentReference, "plus+plus.txt");
     }
 
-    protected void putAttachmentFilename(String attachmentName, String type) throws Exception
+    protected void putAttachmentFilename(String attachmentName) throws Exception
     {
         String content = "ATTACHMENT CONTENT";
         String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
@@ -212,7 +212,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
         String content = "ATTACHMENT CONTENT";
 
-        /* Create NUMBER_OF_ATTACHMENTS attachments */
+        // Create NUMBER_OF_ATTACHMENTS attachments
         for (int i = 0; i < NUMBER_OF_ATTACHMENTS; i++) {
             String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentNames[i]);
 
@@ -233,10 +233,8 @@ public class AttachmentsResourceIT extends AbstractHttpIT
 
             Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-            /*
-             * Check that all attachmentNames[0..i] are present in the list of attachments of page at version
-             * pageVersions[i]
-             */
+            // Check that all attachmentNames[0..i] are present in the list of attachments of page at version
+            // pageVersions[i]
             for (int j = 0; j <= i; j++) {
                 boolean found = false;
                 for (Attachment attachment : attachments.getAttachments()) {
@@ -262,11 +260,11 @@ public class AttachmentsResourceIT extends AbstractHttpIT
     public void testGETAttachmentVersions() throws Exception
     {
         final int NUMBER_OF_VERSIONS = 4;
-        String attachmentName = String.format("%s.txt", UUID.randomUUID().toString());
+        String attachmentName = String.format("%s.txt", UUID.randomUUID());
 
-        Map<String, String> versionToContentMap = new HashMap<String, String>();
+        Map<String, String> versionToContentMap = new HashMap<>();
 
-        /* Create NUMBER_OF_ATTACHMENTS attachments */
+        // Create NUMBER_OF_ATTACHMENTS attachments
         for (int i = 0; i < NUMBER_OF_VERSIONS; i++) {
             String attachmentURI = buildURIForThisPage(AttachmentResource.class, attachmentName);
             String content = String.format("CONTENT %d", i);
@@ -345,7 +343,7 @@ public class AttachmentsResourceIT extends AbstractHttpIT
      */
     protected String buildURIForThisPage(Class<?> resource, Object... args) throws Exception
     {
-        List<Object> pathElements = new ArrayList<Object>();
+        List<Object> pathElements = new ArrayList<>();
         pathElements.add(this.wikiName);
         pathElements.add(this.spaces);
         pathElements.add(this.pageName);

@@ -18,17 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# DO NOT EDIT - See: https://eclipse.dev/jetty/documentation/
+# DO NOT EDIT - See: https://jetty.org/docs/index.html
 
 [description]
-Enables Servlet 3.1 resource injection.
+Adds the Jetty Plus JNDI support to the classpath.
 
 [depend]
 server
-security
-jndi
-webapp
 
 [lib]
 lib/jetty-plus-${jetty.version}.jar
-lib/jakarta.transaction-api-*.jar

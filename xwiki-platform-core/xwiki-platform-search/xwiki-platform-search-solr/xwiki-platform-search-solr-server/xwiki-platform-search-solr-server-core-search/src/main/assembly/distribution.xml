@@ -40,6 +40,7 @@
       <outputDirectory>/lib/</outputDirectory>
       <includes>
         <include>org.xwiki.platform:xwiki-platform-search-solr-server-plugin:*</include>
+        <include>ua.net.nlp:morfologik-ukrainian-lt:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>

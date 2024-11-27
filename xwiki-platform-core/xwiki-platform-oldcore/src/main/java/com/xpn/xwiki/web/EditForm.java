@@ -33,8 +33,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.TemporaryAttachmentSessionsManager;
 
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -97,6 +99,8 @@ public class EditForm extends XWikiForm
     private boolean convertSyntax;
 
     private String hidden;
+
+    private String enforceRequiredRights;
     
     private ObjectPolicyType objectPolicy;
 
@@ -129,6 +133,7 @@ public class EditForm extends XWikiForm
         setSyntaxId(request.getParameter("syntaxId"));
         setConvertSyntax(Boolean.valueOf(request.getParameter("convertSyntax")));
         setHidden(request.getParameter("xhidden"));
+        setEnforceRequiredRights(request.getParameter("enforceRequiredRights"));
         setObjectPolicy(request.getParameter("objectPolicy"));
         setUpdateOrCreateMap(request);
         setObjectsToRemove(request.getParameterValues("deletedObjects"));
@@ -355,6 +360,26 @@ public class EditForm extends XWikiForm
     public void setHidden(String hidden)
     {
         this.hidden = hidden;
+    }
+
+    /**
+     * @return the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public String getEnforceRequiredRights()
+    {
+        return this.enforceRequiredRights;
+    }
+
+    /**
+     * @param enforceRequiredRights the enforce required rights flag, see {@link XWikiDocument#isEnforceRequiredRights()}
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(String enforceRequiredRights)
+    {
+        this.enforceRequiredRights = enforceRequiredRights;
     }
 
     /**

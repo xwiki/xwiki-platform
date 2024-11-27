@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -114,26 +115,43 @@ public class DefaultReferenceRenamer implements ReferenceRenamer
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
-        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
     {
         return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
             SUPPORTED_RESOURCE_TYPES_FOR_DOCUMENTS,
             (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
-                currentDocumentReference, oldTarget, newTarget, relative),
-            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
-                currentDocumentReference, relative));
+                currentDocumentReference, oldTarget, newTarget, relative, updatedEntities),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget,
+                newTarget, currentDocumentReference, relative, updatedEntities));
+    }
+
+    @Override
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        DocumentReference oldTarget, DocumentReference newTarget, boolean relative)
+    {
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative,
+            Map.of(oldTarget, newTarget));
+    }
+
+    @Override
+    public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
+        AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative,
+        Map<EntityReference, EntityReference> updatedEntities)
+    {
+        return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
+            SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS,
+            (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
+                currentDocumentReference, oldTarget, newTarget, relative, updatedEntities),
+            reference -> this.resourceReferenceRenamer.updateResourceReference(reference,
+                oldTarget, newTarget, currentDocumentReference, relative, updatedEntities));
     }
 
     @Override
     public boolean renameReferences(Block block, DocumentReference currentDocumentReference,
         AttachmentReference oldTarget, AttachmentReference newTarget, boolean relative)
     {
-        return innerRenameReferences(block, currentDocumentReference, oldTarget, newTarget,
-            SUPPORTED_RESOURCE_TYPES_FOR_ATTACHMENTS,
-            (MacroRefactoring macroRefactoring, MacroBlock macroBlock) -> macroRefactoring.replaceReference(macroBlock,
-                currentDocumentReference, oldTarget, newTarget, relative),
-            reference -> this.resourceReferenceRenamer.updateResourceReference(reference, oldTarget, newTarget,
-                currentDocumentReference, relative));
+        return renameReferences(block, currentDocumentReference, oldTarget, newTarget, relative, Map.of());
     }
 
     private boolean innerRenameReferences(Block block, DocumentReference currentDocumentReference,

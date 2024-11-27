@@ -55,4 +55,16 @@ class AllIT
     class NestedPanelIT extends PanelIT
     {
     }
+
+    @Nested
+    @DisplayName("Application Panels Administration Tests")
+    class NestedApplicationsPanelAdministrationIT extends ApplicationsPanelAdministrationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("New Page Panel Tests")
+    class NestedNewPagePanelIT extends NewPagePanelIT
+    {
+    }
 }

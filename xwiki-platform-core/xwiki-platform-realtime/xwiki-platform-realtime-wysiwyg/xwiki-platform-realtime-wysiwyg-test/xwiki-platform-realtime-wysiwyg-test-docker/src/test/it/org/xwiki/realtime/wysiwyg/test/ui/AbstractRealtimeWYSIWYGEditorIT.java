@@ -19,14 +19,11 @@
  */
 package org.xwiki.realtime.wysiwyg.test.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.xwiki.ckeditor.test.po.CKEditorConfigurationPane;
 import org.xwiki.ckeditor.test.ui.AbstractCKEditorIT;
+import org.xwiki.test.docker.junit5.MultiUserTestUtils;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.ui.TestUtils;
 
@@ -40,40 +37,27 @@ import org.xwiki.test.ui.TestUtils;
 @ExtendWith(RealtimeTestDebugger.class)
 abstract class AbstractRealtimeWYSIWYGEditorIT extends AbstractCKEditorIT
 {
-    protected static String firstTabHandle;
-
     @BeforeAll
     static void beforeAll(TestUtils setup)
     {
-        // Store the ID of the current browser tab because we're going to open new tabs which will have to be closed
-        // after each test, and we need this to avoid closing all tabs.
-        firstTabHandle = setup.getDriver().getWindowHandle();
-
-        // Enable the real-time WYSIWYG editor.
-        setup.loginAsSuperAdmin();
-        CKEditorConfigurationPane ckeditorConfig = CKEditorConfigurationPane.open();
-        List<String> disabledPlugins = new ArrayList<>(ckeditorConfig.getDisabledPlugins());
-        disabledPlugins.remove("xwiki-realtime");
-        ckeditorConfig.setDisabledPlugins(disabledPlugins).clickSave();
-
         // Test with a simple user.
         setup.createUserAndLogin("John", "pass", "editor", "Wysiwyg");
     }
 
     @AfterEach
-    void afterEach(TestUtils setup, TestReference testReference)
+    void afterEach(TestUtils setup, MultiUserTestUtils multiUserSetup, TestReference testReference)
     {
-        // Handle the edit mode leave confirmation modal (when ther are unsaved changes).
+        // Handle the edit mode leave confirmation modal (when there are unsaved changes).
         setup.getDriver().getWindowHandles().forEach(handle -> {
-            setup.getDriver().switchTo().window(handle);
+            multiUserSetup.switchToBrowserTab(handle);
             maybeLeaveEditMode(setup, testReference);
         });
 
-        // Close all tabs except the first one.
-        setup.getDriver().getWindowHandles().stream().filter(handle -> !handle.equals(firstTabHandle))
-            .forEach(handle -> setup.getDriver().switchTo().window(handle).close());
+        multiUserSetup.closeTabs();
+    }
 
-        // Switch back to the first tab.
-        setup.getDriver().switchTo().window(firstTabHandle);
+    protected void loginAsBob(TestUtils setup)
+    {
+        setup.createUserAndLogin("Bob", "pass", "editor", "Wysiwyg");
     }
 }

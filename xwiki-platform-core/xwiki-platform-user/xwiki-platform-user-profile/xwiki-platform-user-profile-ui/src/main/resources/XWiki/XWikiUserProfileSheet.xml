@@ -658,15 +658,6 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
   &lt;/div&gt;
   #if (!$inEditMode)
     &lt;div class='half column'&gt;
-      #set ($isMessageStreamActive = $services.messageStream.isActive())
-      #if ($isMessageStreamActive &amp;&amp; !$isGuest)
-      &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.sendMessage'))&lt;/h1&gt;
-
-          {{messageSender /}}
-
-      &lt;/div&gt;
-      #end
       &lt;div class='userRecentChanges'&gt;
       #if ($xcontext.user == $doc.fullName)
         &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.activity'))&lt;/h2&gt;

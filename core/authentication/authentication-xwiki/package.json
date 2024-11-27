@@ -29,8 +29,12 @@
     "inversify": "6.1.4",
     "js-cookie": "3.0.5"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "devDependencies": {
-    "@types/js-cookie": "3.0.6"
+    "@types/js-cookie": "3.0.6",
+    "reflect-metadata": "0.2.2"
   },
   "publishConfig": {
     "exports": {

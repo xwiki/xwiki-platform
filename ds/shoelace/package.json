@@ -35,9 +35,13 @@
     "inversify": "6.1.4",
     "vue": "3.5.12"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "reflect-metadata": "0.2.2",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

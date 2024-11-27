@@ -33,8 +33,12 @@
     "marked": "15.0.2",
     "marked-base-url": "1.1.6"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "devDependencies": {
     "@types/dompurify": "3.0.5",
+    "reflect-metadata": "0.2.2",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

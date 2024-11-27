@@ -61,10 +61,14 @@
     "vue-router": "4.4.5",
     "yjs": "13.6.20"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "devDependencies": {
     "@types/lodash": "4.17.13",
     "@types/markdown-it": "14.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "reflect-metadata": "0.2.2",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

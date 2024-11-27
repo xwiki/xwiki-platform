@@ -26,6 +26,12 @@
     "@xwiki/cristal-browser-api": "workspace:*",
     "inversify": "6.1.4"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
+  "devDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "publishConfig": {
     "exports": {
       ".": {

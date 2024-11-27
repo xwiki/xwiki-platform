@@ -28,6 +28,12 @@
     "pinia": "2.2.6",
     "vue": "3.5.12"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
+  "devDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "publishConfig": {
     "exports": {
       ".": {

@@ -26,6 +26,12 @@
     "vue": "3.5.12",
     "vue-i18n": "10.0.4"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
+  "devDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "publishConfig": {
     "exports": {
       ".": {

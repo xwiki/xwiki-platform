@@ -27,8 +27,12 @@
     "inversify": "6.1.4",
     "lodash": "4.17.21"
   },
+  "peerDependencies": {
+    "reflect-metadata": "0.2.2"
+  },
   "devDependencies": {
-    "@types/lodash": "4.17.13"
+    "@types/lodash": "4.17.13",
+    "reflect-metadata": "0.2.2"
   },
   "publishConfig": {
     "exports": {

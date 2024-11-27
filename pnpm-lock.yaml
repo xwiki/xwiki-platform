@@ -23,8 +23,8 @@ importers:
         specifier: 9.15.0
         version: 9.15.0
       '@microsoft/tsdoc':
-        specifier: 0.15.0
-        version: 0.15.0
+        specifier: 0.15.1
+        version: 0.15.1
       '@microsoft/tsdoc-config':
         specifier: 0.17.0
         version: 0.17.0
@@ -8046,7 +8046,7 @@ snapshots:
 
   '@microsoft/api-extractor-model@7.29.8(@types/node@22.10.0)':
     dependencies:
-      '@microsoft/tsdoc': 0.15.0
+      '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.0
       '@rushstack/node-core-library': 5.9.0(@types/node@22.10.0)
     transitivePeerDependencies:
@@ -8055,7 +8055,7 @@ snapshots:
   '@microsoft/api-extractor@7.47.11(@types/node@22.10.0)':
     dependencies:
       '@microsoft/api-extractor-model': 7.29.8(@types/node@22.10.0)
-      '@microsoft/tsdoc': 0.15.0
+      '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.0
       '@rushstack/node-core-library': 5.9.0(@types/node@22.10.0)
       '@rushstack/rig-package': 0.5.3

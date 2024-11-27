@@ -35,7 +35,7 @@
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
-    "comlink": "4.4.1",
+    "comlink": "4.4.2",
     "inversify": "6.1.4",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.12",

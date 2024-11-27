@@ -23,7 +23,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "vue": "3.5.12"
+    "vue": "3.5.13"
   },
   "publishConfig": {
     "exports": {

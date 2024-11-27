@@ -340,8 +340,8 @@
       &lt;div class="passwordManagement"&gt;
         &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.security'))&lt;/h2&gt;
         &lt;span class="buttonwrapper"&gt;
-          &lt;button id="changePassword" onclick="location='$doc.getURL('view', 'xpage=passwd')'"&gt;$escapetool.xml(
-            $services.localization.render('platform.core.profile.changePassword'))&lt;/button&gt;
+          &lt;a id="changePassword" href="$doc.getURL('view', 'xpage=passwd')"&gt;$escapetool.xml(
+            $services.localization.render('platform.core.profile.changePassword'))&lt;/a&gt;
         &lt;/span&gt;
       &lt;/div&gt;
     &lt;/div&gt;

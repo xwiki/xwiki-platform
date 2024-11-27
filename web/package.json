@@ -55,7 +55,7 @@
     "inversify": "6.1.4",
     "reflect-metadata": "0.2.2",
     "vite-plugin-dts": "4.3.0",
-    "vite-plugin-inspect": "0.8.7",
+    "vite-plugin-inspect": "0.8.8",
     "vite-plugin-vuetify": "2.0.4",
     "vue-tsc": "2.1.10"
   }

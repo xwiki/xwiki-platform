@@ -120,7 +120,7 @@
     <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.11.0.0</oracle.version>
+    <oracle.version>21.16.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
     <node.version>v20.12.0</node.version>

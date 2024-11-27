@@ -33,6 +33,7 @@
   <description>User Interface extension mechanism for XWiki</description>
   <modules>
     <module>xwiki-platform-uiextension-api</module>
+    <module>xwiki-platform-uiextension-default</module>
     <module>xwiki-platform-uiextension-ui</module>
   </modules>
   <profiles>

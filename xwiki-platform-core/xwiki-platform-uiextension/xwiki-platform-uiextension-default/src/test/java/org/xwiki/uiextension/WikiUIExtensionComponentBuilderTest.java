@@ -19,6 +19,14 @@
  */
 package org.xwiki.uiextension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Locale;
@@ -65,14 +73,6 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @OldcoreTest
 @ComponentList(WikiUIExtension.class)
 class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
@@ -91,9 +91,6 @@ class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 
     @MockComponent
     private RenderingContext renderingContext;
-
-    @MockComponent
-    private ContentParser contentParser;
 
     @MockComponent
     private LoggerConfiguration loggerConfiguration;

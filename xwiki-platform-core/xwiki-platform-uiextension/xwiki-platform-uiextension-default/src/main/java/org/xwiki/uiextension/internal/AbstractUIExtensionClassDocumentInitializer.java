@@ -38,7 +38,7 @@ public abstract class AbstractUIExtensionClassDocumentInitializer extends Abstra
      * @param reference the reference of the document to update. Can be either local or absolute depending if the
      *            document is associated to a specific wiki or not
      */
-    public AbstractUIExtensionClassDocumentInitializer(EntityReference reference)
+    protected AbstractUIExtensionClassDocumentInitializer(EntityReference reference)
     {
         super(reference);
     }

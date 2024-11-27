@@ -37,7 +37,6 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.ContentType;
 @Named(WikiUIExtensionConstants.CLASS_REFERENCE_STRING)
 @Singleton
 public class UIExtensionClassDocumentInitializer extends AbstractUIExtensionClassDocumentInitializer
-    implements WikiUIExtensionConstants
 {
     /**
      * Default constructor.

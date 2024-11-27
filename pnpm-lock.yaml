@@ -26,8 +26,8 @@ importers:
         specifier: 0.15.1
         version: 0.15.1
       '@microsoft/tsdoc-config':
-        specifier: 0.17.0
-        version: 0.17.0
+        specifier: 0.17.1
+        version: 0.17.1
       '@typescript-eslint/eslint-plugin':
         specifier: 8.16.0
         version: 8.16.0(@typescript-eslint/parser@8.16.0(eslint@9.15.0)(typescript@5.6.3))(eslint@9.15.0)(typescript@5.6.3)
@@ -3032,9 +3032,6 @@ packages:
     resolution: {integrity: sha512-lrudfbPub5wzBhymfFtgZKuBvXxoSIAdrvS2UbHjoMT2TjIEddq6Z13pcve7A03BAouw0x8sW8G4txdgfiSwpQ==}
     hasBin: true
 
-  '@microsoft/tsdoc-config@0.17.0':
-    resolution: {integrity: sha512-v/EYRXnCAIHxOHW+Plb6OWuUoMotxTN0GLatnpOb1xq0KuTNw/WI3pamJx/UbsoJP5k9MCw1QxvvhPcF9pH3Zg==}
-
   '@microsoft/tsdoc-config@0.17.1':
     resolution: {integrity: sha512-UtjIFe0C6oYgTnad4q1QP4qXwLhe6tIpNTRStJ2RZEPIkqQPREAwE5spzVxsdn9UaEMUqhh0AqSx3X4nWAKXWw==}
 
@@ -5340,9 +5337,6 @@ packages:
   is-ci@3.0.1:
     resolution: {integrity: sha512-ZYvCgrefwqoQ6yTyYUbQu64HsITZ3NfKX1lzaEYdkTDcfKzzCI/wthRRYKkdjHKFVgNiXKAKm65Zo1pk2as/QQ==}
     hasBin: true
-
-  is-core-module@2.13.1:
-    resolution: {integrity: sha512-hHrIjvZsftOsvKSn2TRYl63zvxsgE0K+0mYMoH6gD4omR5IWB2KynivBQczo3+wF1cCkjzvptnI9Q0sPU66ilw==}
 
   is-core-module@2.15.1:
     resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
@@ -8047,7 +8041,7 @@ snapshots:
   '@microsoft/api-extractor-model@7.29.8(@types/node@22.10.0)':
     dependencies:
       '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.0
+      '@microsoft/tsdoc-config': 0.17.1
       '@rushstack/node-core-library': 5.9.0(@types/node@22.10.0)
     transitivePeerDependencies:
       - '@types/node'
@@ -8056,7 +8050,7 @@ snapshots:
     dependencies:
       '@microsoft/api-extractor-model': 7.29.8(@types/node@22.10.0)
       '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.0
+      '@microsoft/tsdoc-config': 0.17.1
       '@rushstack/node-core-library': 5.9.0(@types/node@22.10.0)
       '@rushstack/rig-package': 0.5.3
       '@rushstack/terminal': 0.14.2(@types/node@22.10.0)
@@ -8069,13 +8063,6 @@ snapshots:
       typescript: 5.4.2
     transitivePeerDependencies:
       - '@types/node'
-
-  '@microsoft/tsdoc-config@0.17.0':
-    dependencies:
-      '@microsoft/tsdoc': 0.15.0
-      ajv: 8.12.0
-      jju: 1.4.0
-      resolve: 1.22.8
 
   '@microsoft/tsdoc-config@0.17.1':
     dependencies:
@@ -10850,10 +10837,6 @@ snapshots:
     dependencies:
       ci-info: 3.9.0
 
-  is-core-module@2.13.1:
-    dependencies:
-      hasown: 2.0.2
-
   is-core-module@2.15.1:
     dependencies:
       hasown: 2.0.2
@@ -11942,7 +11925,7 @@ snapshots:
 
   resolve@1.22.8:
     dependencies:
-      is-core-module: 2.13.1
+      is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 

@@ -42,7 +42,7 @@
     "vue-router": "4.4.5"
   },
   "devDependencies": {
-    "vite-plugin-comlink": "5.0.1",
+    "vite-plugin-comlink": "5.1.0",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

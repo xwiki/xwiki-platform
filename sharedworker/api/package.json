@@ -30,7 +30,7 @@
     "vue": "3.5.12"
   },
   "devDependencies": {
-    "vite-plugin-comlink": "5.0.1",
+    "vite-plugin-comlink": "5.1.0",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

@@ -1887,8 +1887,8 @@ importers:
         version: 3.5.12(typescript@5.6.3)
     devDependencies:
       vite-plugin-comlink:
-        specifier: 5.0.1
-        version: 5.0.1(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0))
+        specifier: 5.1.0
+        version: 5.1.0(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0))
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1939,8 +1939,8 @@ importers:
         version: 4.4.5(vue@3.5.12(typescript@5.6.3))
     devDependencies:
       vite-plugin-comlink:
-        specifier: 5.0.1
-        version: 5.0.1(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0))
+        specifier: 5.1.0
+        version: 5.1.0(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0))
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2088,9 +2088,6 @@ importers:
       inversify:
         specifier: 6.1.4
         version: 6.1.4(reflect-metadata@0.2.2)
-      vite-plugin-comlink:
-        specifier: 5.0.1
-        version: 5.0.1(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0))
       vite-plugin-dts:
         specifier: 4.3.0
         version: 4.3.0(@types/node@22.10.0)(rollup@4.24.0)(typescript@5.6.3)(vite@5.4.10(@types/node@22.10.0))
@@ -6898,8 +6895,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-comlink@5.0.1:
-    resolution: {integrity: sha512-4TGw5+bTg5ROd8N2m9O/y0CoS81g8nyce9EI/eV51i54EJ938lFadXEButhaptJs89l5NY9+TkdjI5jXX4cWOw==}
+  vite-plugin-comlink@5.1.0:
+    resolution: {integrity: sha512-ROKDAITiEasFstFQD3Hyd0F980qLWUsMfx9HvD1z4r/ZyzJf4agWoj5dfOE9pNxSGj3meOw7bmMujTjzR5zxTA==}
     peerDependencies:
       comlink: ^4.3.1
       vite: '>=2.9.6'
@@ -7839,7 +7836,7 @@ snapshots:
   '@eslint/eslintrc@3.1.0':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       espree: 10.2.0
       globals: 14.0.0
       ignore: 5.3.1
@@ -9688,6 +9685,10 @@ snapshots:
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
+
+  debug@4.3.4:
+    dependencies:
+      ms: 2.1.2
 
   debug@4.3.4(supports-color@5.5.0):
     dependencies:
@@ -12590,11 +12591,11 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-comlink@5.0.1(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0)):
+  vite-plugin-comlink@5.1.0(comlink@4.4.2)(vite@5.4.10(@types/node@22.10.0)):
     dependencies:
       comlink: 4.4.2
       json5: 2.2.3
-      magic-string: 0.30.10
+      magic-string: 0.30.12
       source-map: 0.7.4
       vite: 5.4.10(@types/node@22.10.0)
 
@@ -12649,7 +12650,7 @@ snapshots:
   vite-plugin-vuetify@2.0.4(vite@5.4.10(@types/node@22.10.0))(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.4):
     dependencies:
       '@vuetify/loader-shared': 2.0.3(vue@3.5.12(typescript@5.6.3))(vuetify@3.7.4)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4
       upath: 2.0.1
       vite: 5.4.10(@types/node@22.10.0)
       vue: 3.5.12(typescript@5.6.3)

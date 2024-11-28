@@ -198,12 +198,14 @@ async function listChildren(page: string): Promise<Array<string>> {
   const folderPath = resolvePath(page).replace(/\/page.json$/, "");
 
   const children = [];
-  const files = await fs.promises.readdir(folderPath);
+  if (await isDirectory(folderPath)) {
+    const files = await fs.promises.readdir(folderPath);
 
-  for (const file of files) {
-    const path = `${folderPath}/${file}`;
-    if (await isDirectory(path)) {
-      children.push(file);
+    for (const file of files) {
+      const path = `${folderPath}/${file}`;
+      if (await isDirectory(path)) {
+        children.push(file);
+      }
     }
   }
 

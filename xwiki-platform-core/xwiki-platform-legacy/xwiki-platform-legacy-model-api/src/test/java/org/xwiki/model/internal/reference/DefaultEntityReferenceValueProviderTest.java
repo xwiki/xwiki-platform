@@ -49,22 +49,24 @@ public class DefaultEntityReferenceValueProviderTest implements TestConstants
     @BeforeEach
     public void beforeEach()
     {
-        when(this.configuration.getDefaultReferenceValue(EntityType.SPACE)).thenReturn(DEFAULT_SPACE);
-        when(this.configuration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn(DEFAULT_WIKI);
-        when(this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT)).thenReturn(DEFAULT_DOCUMENT);
-        when(this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
-        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE)).thenReturn(DEFAULT_PAGE);
-        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE_ATTACHMENT)).thenReturn(DEFAULT_ATTACHMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.SPACE)).thenReturn(TestConstants.DEFAULT_SPACE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.WIKI)).thenReturn(TestConstants.DEFAULT_WIKI);
+        when(this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT)).thenReturn(TestConstants.DEFAULT_DOCUMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT)).thenReturn(
+            TestConstants.DEFAULT_ATTACHMENT);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE)).thenReturn(TestConstants.DEFAULT_PAGE);
+        when(this.configuration.getDefaultReferenceValue(EntityType.PAGE_ATTACHMENT)).thenReturn(
+            TestConstants.DEFAULT_ATTACHMENT);
     }
 
     @Test
     public void testGetDefaultValue()
     {
-        assertEquals(DEFAULT_WIKI, this.provider.getDefaultValue(EntityType.WIKI));
-        assertEquals(DEFAULT_SPACE, this.provider.getDefaultValue(EntityType.SPACE));
-        assertEquals(DEFAULT_DOCUMENT, this.provider.getDefaultValue(EntityType.DOCUMENT));
-        assertEquals(DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.ATTACHMENT));
-        assertEquals(DEFAULT_PAGE, this.provider.getDefaultValue(EntityType.PAGE));
-        assertEquals(DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.PAGE_ATTACHMENT));
+        assertEquals(TestConstants.DEFAULT_WIKI, this.provider.getDefaultValue(EntityType.WIKI));
+        assertEquals(TestConstants.DEFAULT_SPACE, this.provider.getDefaultValue(EntityType.SPACE));
+        assertEquals(TestConstants.DEFAULT_DOCUMENT, this.provider.getDefaultValue(EntityType.DOCUMENT));
+        assertEquals(TestConstants.DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.ATTACHMENT));
+        assertEquals(TestConstants.DEFAULT_PAGE, this.provider.getDefaultValue(EntityType.PAGE));
+        assertEquals(TestConstants.DEFAULT_ATTACHMENT, this.provider.getDefaultValue(EntityType.PAGE_ATTACHMENT));
     }
 }

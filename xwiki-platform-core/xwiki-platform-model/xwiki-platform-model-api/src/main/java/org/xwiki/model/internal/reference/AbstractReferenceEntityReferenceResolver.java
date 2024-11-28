@@ -102,7 +102,7 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
                 EntityReference newReference = resolveDefaultReference(reference.getParentType(), parameters);
                 normalizedReference = normalizedReference.appendParent(newReference);
                 reference = newReference;
-            } else if (reference.getParent() != null && (types.isEmpty() || reference.getParentType() == null)) {
+            } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but no one is allowed
                 throw new InvalidEntityReferenceException();
             } else {

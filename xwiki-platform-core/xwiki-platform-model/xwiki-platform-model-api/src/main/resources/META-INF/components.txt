@@ -2,7 +2,6 @@ org.xwiki.model.internal.DefaultModelConfiguration
 org.xwiki.model.internal.DefaultModelContext
 org.xwiki.model.internal.reference.DefaultDocumentReferenceProvider
 org.xwiki.model.internal.reference.DefaultEntityReferenceProvider
-org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider
 org.xwiki.model.internal.reference.DefaultPageReferenceProvider
 org.xwiki.model.internal.reference.DefaultReferenceAttachmentReferenceResolver
 org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver

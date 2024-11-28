@@ -37,7 +37,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 
 /**
@@ -138,13 +137,6 @@ public class IntegrationTests
                 will(returnValue("XWiki.UserWithExceptionRetrievingAvatarFile@mockAvatar.png"));
             allowing(mockEntityReferenceSerializer).serialize(userWithExceptionRetrievingAvatarFileReference);
                 will(returnValue("XWiki.UserWithExceptionRetrievingAvatarFile"));
-        }});
-
-        // Entity Reference Serializer Mock
-        final EntityReferenceValueProvider mockEntityReferenceValueProvider =
-            registerMockComponent(componentManager, mockery, EntityReferenceValueProvider.class, "current");
-        mockery.checking(new Expectations() {{
-            allowing(mockEntityReferenceValueProvider).getDefaultValue(EntityType.WIKI); will(returnValue("wiki"));
         }});
     }
 

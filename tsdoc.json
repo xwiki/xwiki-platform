@@ -10,6 +10,8 @@
     "@returns": true,
     "@deprecated": true,
     "@throws": true,
-    "@link": true
+    "@link": true,
+    "@example": true,
+    "@see": true
   }
 }

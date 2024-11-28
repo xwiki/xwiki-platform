@@ -89,6 +89,8 @@ async function createWindow(url: string) {
     },
   });
 
+  win.setMenu(null);
+
   await win.loadURL(url);
 
   return win;

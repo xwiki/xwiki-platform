@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { initializeMenu } from "./menu";
 import { loadFile } from "./reload";
 import { BrowserWindow, app, shell } from "electron";
 import { join } from "node:path";
@@ -34,6 +35,8 @@ async function createWindow() {
       preload: join(app.getAppPath(), "./preload/dist/index.cjs"),
     },
   });
+
+  initializeMenu(browserWindow);
 
   // Uncomment to start electron debugger at startup.
   // browserWindow.webContents.openDevTools();

@@ -82,6 +82,8 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
       // only applied to the store at the end of an action.
       setLoading() {
         this.loading = true;
+        this.document = undefined;
+        this.error = undefined;
       },
       async update(
         documentReference: string,
@@ -150,14 +152,12 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   setCurrentDocument(documentReference: string, revision?: string): void {
-    // this.store.setLoading();
     this.store.update(documentReference, true, revision);
   }
 
   refreshCurrentDocument(): void {
     const documentReference = this.store.lastDocumentReference;
     if (documentReference) {
-      // this.store.setLoading();
       this.store.update(documentReference, false, this.store.lastRevision);
     }
   }

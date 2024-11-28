@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { SpaceReference } from "@xwiki/cristal-model-api";
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 import { Container, inject, injectable } from "inversify";
@@ -70,7 +71,10 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
           navigationTree.push({
             id: treeNode.path,
             label: treeNode.name,
-            location: treeNode.path,
+            location: new SpaceReference(
+              undefined,
+              ...treeNode.path.split("/"),
+            ),
             url: this.cristalApp.getRouter().resolve({
               name: "view",
               params: {

@@ -23,6 +23,7 @@ import { DesignSystem } from "./DesignSystem";
 import { BreadcrumbPageObject } from "./pageObjects/Breadcrumb";
 import { HistoryExtraTabPageObject } from "./pageObjects/HistoryExtraTab";
 import { NavigationTreePageObject } from "./pageObjects/NavigationTree";
+import { SidebarPageObject } from "./pageObjects/Sidebar";
 
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
@@ -109,20 +110,16 @@ configs.forEach(
       );
     });
 
-    test(`[${name}] has navigation tree`, async ({ page, isMobile }) => {
+    test(`[${name}] has navigation tree`, async ({ page }) => {
       await page.goto(localDefaultPage);
 
-      if (isMobile) {
-        const openSidebar = page.locator(".open-sidebar");
-        await openSidebar.nth(0).click();
-      }
-
+      await new SidebarPageObject(page).openSidebar();
       const navigationTreeNodes = await new NavigationTreePageObject(
         page,
         designSystem,
       ).findItems();
 
-      expect(navigationTreeNodes.length).toEqual(3);
+      expect(navigationTreeNodes.length).toEqual(4);
       await expect(navigationTreeNodes[0].getText()).toContainText("Help");
       expect(await navigationTreeNodes[0].getLink()).toEqual(
         "#/Help.WebHome/view",
@@ -136,6 +133,12 @@ configs.forEach(
       );
       expect(await navigationTreeNodes[2].getLink()).toEqual(
         "#/Deep1.WebHome/view",
+      );
+      await expect(navigationTreeNodes[3].getText()).toContainText(
+        "Cristal Wiki",
+      );
+      expect(await navigationTreeNodes[3].getLink()).toEqual(
+        "#/Main.WebHome/view",
       );
 
       await navigationTreeNodes[2].expand();
@@ -169,6 +172,29 @@ configs.forEach(
       // We open a revision and check that the content updated.
       await (await revisions[1].getLink()).click();
       await expect(page.locator("#xwikicontent")).toContainText("Revision 2.1");
+    });
+
+    test(`[${name}] has working editor on new page`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      await new SidebarPageObject(page).openSidebar();
+      await page.locator("#sidebar #new-page-button").nth(0).click();
+
+      const newPageDialogButton = page.getByRole('button', { name: 'Create' }).nth(0);
+
+      // The button can end up unclickable sometimes, due to the speed of the test.
+      // This ensures that it still gets clicked no matter what.
+      await expect(newPageDialogButton).toBeEnabled();
+      await newPageDialogButton.dispatchEvent("click");
+
+      const editorHeader = page.locator(".edit-wrapper .doc-header input").nth(0);
+      const editorContent = page.locator(".edit-wrapper .doc-content p").nth(0);
+      expect(await editorHeader.getAttribute("placeholder")).toEqual("NewPage");
+      expect(editorHeader).toBeEmpty();
+      expect(await editorContent.getAttribute("data-placeholder")).toEqual(
+        "Type '/' to show the available actions"
+      );
+      expect(editorContent).toBeEmpty();
     });
 
     if (offlineDefaultPage) {

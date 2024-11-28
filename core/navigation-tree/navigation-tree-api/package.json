@@ -23,7 +23,8 @@
     "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*"
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*"
   },
   "publishConfig": {
     "exports": {

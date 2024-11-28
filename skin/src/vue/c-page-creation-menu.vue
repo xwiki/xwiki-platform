@@ -19,23 +19,35 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { CIcon } from "@xwiki/cristal-icons";
+import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { defineProps, inject, ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type {
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
 import type { NavigationTreeNode } from "@xwiki/cristal-navigation-tree-api";
 import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
+const referenceSerializer: ModelReferenceSerializer = cristal
+  .getContainer()
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+
 const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
 const location: Ref<string> = ref("");
+var locationReference: SpaceReference | undefined = undefined;
 
 defineProps<{
   currentPage: PageData;
 }>();
 
 function treeNodeClickAction(node: NavigationTreeNode) {
-  location.value = node.location;
+  locationReference = node.location;
+  location.value = referenceSerializer.serialize(locationReference)!;
 }
 
 function updateCurrentPage() {
@@ -43,18 +55,15 @@ function updateCurrentPage() {
 }
 
 function createPage() {
-  var newPage = "";
+  const newDocumentReference = new DocumentReference(
+    name.value,
+    locationReference!,
+  );
 
-  // TODO: Use a page resolver instead when CRISTAL-234 is fixed.
-  const pageResourceSeparator =
-    cristal.getWikiConfig().getType() == "XWiki" ? "." : "/";
-
-  if (location.value) {
-    newPage += location.value + pageResourceSeparator;
-  }
-  newPage += name.value;
-
-  cristal.setCurrentPage(newPage, "edit");
+  cristal.setCurrentPage(
+    referenceSerializer.serialize(newDocumentReference)!,
+    "edit",
+  );
 
   dialogOpen.value = false;
 }

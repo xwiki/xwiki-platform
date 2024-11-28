@@ -19,9 +19,12 @@
  */
 
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
-import { Container, inject, injectable } from "inversify";
+import { Container, inject, injectable, named } from "inversify";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSource,
@@ -34,20 +37,21 @@ import type {
  **/
 @injectable()
 class XWikiNavigationTreeSource implements NavigationTreeSource {
-  private cristalApp: CristalApp;
-  public logger: Logger;
-
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") private readonly logger: Logger,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
     @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
+    @inject<RemoteURLParser>("RemoteURLParser")
+    @named("XWiki")
+    private readonly urlParser: RemoteURLParser,
+    @inject<ModelReferenceSerializer>("ModelReferenceSerializer")
+    @named("XWiki")
+    private readonly referenceSerializer: ModelReferenceSerializer,
   ) {
-    this.logger = logger;
     this.logger.setModule(
       "navigation-tree-xwiki.components.XWikiNavigationTreeSource",
     );
-    this.cristalApp = cristalApp;
   }
 
   async getChildNodes(id?: string): Promise<Array<NavigationTreeNode>> {
@@ -142,21 +146,17 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
         !["attachments", "translations"].includes(treeNode.data.type) &&
         treeNode.a_attr
       ) {
-        const pageId = decodeURIComponent(
-          this.cristalApp
-            .getWikiConfig()
-            .storage.getPageFromViewURL(
-              `${baseXWikiURL}${treeNode.a_attr.href}`,
-            )!,
-        );
+        const documentReference = this.urlParser.parse(
+          `${baseXWikiURL}${treeNode.a_attr.href}`,
+        )! as DocumentReference;
         nodes.push({
           id: treeNode.id,
           label: treeNode.text,
-          location: pageId.replace(/\.WebHome$/, ""),
+          location: documentReference.space!,
           url: this.cristalApp.getRouter().resolve({
             name: "view",
             params: {
-              page: pageId,
+              page: this.referenceSerializer.serialize(documentReference),
             },
           }).href,
           has_children: treeNode.children, //TODO: ignore translations and attachments

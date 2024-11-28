@@ -47,6 +47,7 @@
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
     "avvvatars-vue": "1.1.0",
     "eventemitter3": "5.0.1",

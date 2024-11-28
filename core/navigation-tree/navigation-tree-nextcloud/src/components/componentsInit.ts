@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { SpaceReference } from "@xwiki/cristal-model-api";
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 import { Container, inject, injectable } from "inversify";
@@ -58,14 +59,15 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
 
     const subdirectories = await this.getSubDirectories(currentId);
     for (const d of subdirectories) {
+      const spaces = d.split("/");
       const currentPageData = await this.cristalApp.getPage(d);
       navigationTree.push({
         id: d,
         label:
           currentPageData && currentPageData.name
             ? currentPageData.name
-            : d.split("/").pop()!,
-        location: d,
+            : spaces[spaces.length - 1],
+        location: new SpaceReference(undefined, ...spaces),
         url: this.cristalApp.getRouter().resolve({
           name: "view",
           params: {

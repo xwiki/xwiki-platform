@@ -33,6 +33,7 @@ import { inject, onBeforeMount, ref, watch } from "vue";
 import { VTreeview } from "vuetify/labs/VTreeview";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { SpaceReference } from "@xwiki/cristal-model-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSource,
@@ -45,7 +46,7 @@ type TreeItem = {
   title: string;
   href: string;
   children?: Array<TreeItem>;
-  _location: string;
+  _location: SpaceReference;
 };
 
 type OnClickAction = (node: NavigationTreeNode) => void;
@@ -186,8 +187,9 @@ async function onDocumentUpdate(page: PageData) {
   const parents = treeSource.getParentNodesId(page);
   let currentParent: string | undefined = undefined;
   let currentItems: TreeItem[] | undefined = rootNodes.value;
+  let notFound = false;
 
-  while (currentItems) {
+  currentItemsLoop: while (currentItems && !notFound) {
     for (const i of currentItems.keys()) {
       if (currentItems[i].id == parents[0]) {
         if (parents.length == 1) {
@@ -203,31 +205,35 @@ async function onDocumentUpdate(page: PageData) {
           }
         } else {
           currentParent = currentItems[i].id;
+          if (!currentItems[i].children) {
+            currentItems[i].children = [];
+          }
           currentItems = currentItems[i].children;
           parents.shift();
-          break;
+          continue currentItemsLoop;
         }
       }
     }
+    notFound = true;
+  }
 
-    // New page
-    const newItems = await treeSource.getChildNodes(
-      currentParent ? currentParent : "",
-    );
-    newItemsLoop: for (const newItem of newItems) {
-      for (const i of currentItems!.keys()) {
-        if (newItem.id == currentItems![i].id) {
-          continue newItemsLoop;
-        }
+  // New page
+  const newItems = await treeSource.getChildNodes(
+    currentParent ? currentParent : "",
+  );
+  newItemsLoop: for (const newItem of newItems) {
+    for (const i of currentItems!.keys()) {
+      if (newItem.id == currentItems![i].id) {
+        continue newItemsLoop;
       }
-      currentItems!.push({
-        id: newItem.id,
-        title: newItem.label,
-        href: newItem.url,
-        children: newItem.has_children ? [] : undefined,
-        _location: newItem.location,
-      });
     }
+    currentItems!.push({
+      id: newItem.id,
+      title: newItem.label,
+      href: newItem.url,
+      children: newItem.has_children ? [] : undefined,
+      _location: newItem.location,
+    });
   }
 }
 </script>

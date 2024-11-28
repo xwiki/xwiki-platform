@@ -54,7 +54,11 @@ describe("defaultLocalURLSerializer", () => {
   it("serialize a document reference without a space", () => {
     expect(serializer.serialize(new DocumentReference("Page"))).to.eq("Page");
   });
-  it("serialize a document reference without a space", () => {
-    expect(serializer.serialize(new DocumentReference("Page"))).to.eq("Page");
+  it("serialize a document reference with an empty space", () => {
+    expect(
+      serializer.serialize(
+        new DocumentReference("Page", new SpaceReference(undefined)),
+      ),
+    ).to.eq("Page");
   });
 });

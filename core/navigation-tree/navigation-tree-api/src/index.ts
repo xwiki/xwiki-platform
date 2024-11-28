@@ -19,6 +19,7 @@
  */
 
 import type { PageData } from "@xwiki/cristal-api";
+import type { SpaceReference } from "@xwiki/cristal-model-api";
 
 /**
  * Description of a navigation tree node.
@@ -29,7 +30,7 @@ type NavigationTreeNode = {
   id: string;
   label: string;
   /** the location of the corresponding page on Cristal */
-  location: string;
+  location: SpaceReference;
   url: string;
   has_children: boolean;
 };

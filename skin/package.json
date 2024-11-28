@@ -36,6 +36,8 @@
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-info-actions-api": "workspace:*",
     "@xwiki/cristal-info-actions-ui": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-click-listener": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "@xwiki/cristal-page-actions-ui": "workspace:*",

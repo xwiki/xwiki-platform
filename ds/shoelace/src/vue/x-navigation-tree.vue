@@ -134,7 +134,7 @@ async function onDocumentUpdate(page: PageData) {
         }
       } else {
         parents.shift();
-        if (items.value) {
+        if (items.value && items.value.length > 0) {
           await items.value[i].onDocumentUpdate(parents);
         }
         break;

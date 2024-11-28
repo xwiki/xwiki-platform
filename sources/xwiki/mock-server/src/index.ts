@@ -56,28 +56,53 @@ ${revision ? "Revision " + revision : ""}
 }
 
 app.get("/xwiki/rest/cristal/page", (req: Request, res: Response) => {
-  const page: string = (req.query.page as string) || "Main.WebHome";
-  const revision: string | undefined =
-    (req.query.revision as string) || undefined;
-  const offline = page === "Main.Offline";
   res.appendHeader("Access-Control-Allow-Origin", "*");
 
-  const text = `= Welcome to ${page} =
+  const id: string = req.query.page as string;
+  let page: string = "";
+  let name: string = "";
+  let revision: string | undefined = undefined;
+  let text: string = "";
+  let html: string = "";
+
+  switch (id) {
+    case "Main.WebHome":
+      page = "Main.WebHome";
+      name = "WebHome";
+      revision = (req.query.revision as string) || undefined;
+      text = `= Welcome to ${page} =
 
 XWiki is the best tool to organize your knowledge.
 
 [[XWiki Syntax>>Page2.WebHome]]
 ${revision ? "Revision " + revision : ""}
 }`;
-  const html = getHtml(page, revision, {
-    offline,
-  });
+      html = getHtml(page, revision, { offline: false });
+      break;
+
+    case "Main.Offline":
+      page = "Main.Offline";
+      name = "Offline";
+      html = getHtml(page, revision, { offline: true });
+      break;
+
+    case "Main.NewPage.WebHome":
+      name = "NewPage";
+      break;
+
+    default:
+      page = id;
+      name = "WebHome";
+      html = getHtml(page, revision, { offline: false });
+  }
+
   res.json({
     "@context": "https://schema.org",
     "@type": "CreativeWork",
-    identifier: page,
-    name: "WebHome",
+    identifier: id,
+    name: name,
     headline: page,
+    headlineRaw: page,
     creator: page,
     encodingFormat: "xwiki/2.1",
     text: text,
@@ -185,6 +210,13 @@ app.get("/xwiki/bin/get", (req: Request, res: Response) => {
             children: true,
             data: { type: "document" },
             a_attr: { href: "/xwiki/bin/view/Deep1/" },
+          },
+          {
+            id: "document:xwiki:Main.WebHome",
+            text: "Cristal Wiki",
+            children: false,
+            data: { type: "document" },
+            a_attr: { href: "/xwiki/bin/view/Main/" },
           },
         ]);
         break;

@@ -28,7 +28,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.async.internal.AsyncRendererJobRequest;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
@@ -47,10 +49,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macroasync.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macroasync.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager cm) throws Exception
     {
         cm.registerMockComponent(Environment.class, "default");

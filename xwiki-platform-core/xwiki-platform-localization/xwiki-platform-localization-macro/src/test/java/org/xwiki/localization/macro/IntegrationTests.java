@@ -28,7 +28,9 @@ import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -42,10 +44,10 @@ import static org.mockito.Mockito.when;
  * @since 3.4M2
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macrotranslation.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macrotranslation.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         LocalizationManager localizationManager = componentManager.registerMockComponent(LocalizationManager.class);

@@ -34,7 +34,8 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
@@ -52,11 +53,11 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-public class IntegrationTests implements RenderingTests
+public class IntegrationTests extends RenderingTest
 {
     private final static String WIKI_CONTENT_FILE = "wiki.txt";
 
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         ModelContext modelContext = componentManager.registerMockComponent(ModelContext.class);

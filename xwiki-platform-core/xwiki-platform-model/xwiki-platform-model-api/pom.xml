@@ -35,6 +35,8 @@
     <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
     <!-- Define the old name of this module for extensions using it  -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-model</xwiki.extension.features>
+    <!-- revapi call skipped since there's a legacy module -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -95,6 +97,23 @@
                 org/xwiki/model/reference/EntityReferenceSet.java,
                 org/xwiki/model/script/ModelScriptService.java
               </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/TestConstants.class</include>
+              </includes>
             </configuration>
           </execution>
         </executions>

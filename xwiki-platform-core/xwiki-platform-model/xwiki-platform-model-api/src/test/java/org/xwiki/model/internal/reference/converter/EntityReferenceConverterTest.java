@@ -19,18 +19,18 @@
  */
 package org.xwiki.model.internal.reference.converter;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.properties.converter.Converter;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Validate {@link EntityReferenceConverter} component.
@@ -38,22 +38,17 @@ import static org.junit.Assert.assertNull;
  * @version $Id$
  */
 @AllComponents
-public class EntityReferenceConverterTest
+@ComponentTest
+class EntityReferenceConverterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Converter<EntityReference>> mocker =
-        new MockitoComponentMockingRule<>(EntityReferenceConverter.class);
+    @InjectMockComponents
+    private  EntityReferenceConverter entityReferenceConverter;
 
+    @Inject
     private ConverterManager converterManager;
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.converterManager = this.mocker.getInstance(ConverterManager.class);
-    }
-
     @Test
-    public void convertDocumentFromString()
+    void convertDocumentFromString()
     {
         EntityReference reference;
 
@@ -72,7 +67,7 @@ public class EntityReferenceConverterTest
     }
 
     @Test
-    public void convertSpaceFromString()
+    void convertSpaceFromString()
     {
         EntityReference reference;
 
@@ -84,20 +79,20 @@ public class EntityReferenceConverterTest
     }
 
     @Test
-    public void convertWikiFromString()
+    void convertWikiFromString()
     {
         EntityReference reference = new EntityReference("dev", EntityType.WIKI);
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "wiki:dev"));
     }
 
     @Test
-    public void convertFromNull()
+    void convertFromNull()
     {
         assertNull(this.converterManager.convert(EntityReference.class, null));
     }
 
     @Test
-    public void convertToString()
+    void convertToString()
     {
         EntityReference reference;
 

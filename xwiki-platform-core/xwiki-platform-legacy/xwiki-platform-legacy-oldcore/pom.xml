@@ -70,6 +70,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Legacy oldcore needs some legacy classes from legacy model -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-model-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Legacy oldcore needs some legacy classes from legacy rendering -->
     <dependency>
@@ -77,6 +83,7 @@
       <artifactId>xwiki-rendering-legacy-api</artifactId>
       <version>${rendering.version}</version>
     </dependency>
+
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

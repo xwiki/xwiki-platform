@@ -67,7 +67,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
@@ -467,11 +466,11 @@ public abstract class XWikiAction implements LegacyAction
 
                             // Set the main home page in the main space of the main wiki as the current requested entity
                             // since we cannot set the non existing one as it would generate errors obviously...
-                            EntityReferenceValueProvider valueProvider =
-                                Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            EntityReferenceProvider entityReferenceProvider =
+                                Utils.getComponent(EntityReferenceProvider.class);
+                            DocumentReference phonyDoc =
+                                (DocumentReference) entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT);
+                            xwiki.setPhonyDocument(phonyDoc, context);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),

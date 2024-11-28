@@ -26,7 +26,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -48,9 +49,9 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-public class IntegrationTest implements RenderingTests
+public class IntegrationTest extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         // Since we have a dependency on XWiki Platform Oldcore the Context Component Manager will be found and the

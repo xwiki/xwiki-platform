@@ -22,7 +22,9 @@ package org.xwiki.rendering.macro.script;
 import java.util.Collections;
 
 import org.xwiki.observation.EventListener;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -37,10 +39,10 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macroscript.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macroscript.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager cm) throws Exception
     {
         new JUnit5ScriptMockSetup(cm);

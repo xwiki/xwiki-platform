@@ -203,12 +203,10 @@ export class NextcloudStorage extends AbstractStorage {
     ]);
 
     const fileURL = this.getAttachmentsBasePath(page) + "/" + file.name;
-    const formData = new FormData();
-    formData.append(file.name, file);
     await fetch(fileURL, {
       method: "PUT",
       headers: this.getBaseHeaders(),
-      body: formData,
+      body: file,
     });
     return;
   }

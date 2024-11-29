@@ -31,7 +31,7 @@ define('xwiki-selectize', [
   'xwiki-events-bridge'
 ], function($, Selectize, l10n) {
   var optionTemplate = [
-    '<div class="xwiki-selectize-option" data-value="">',
+    '<div class="xwiki-selectize-option" role="option" aria-selected="false" data-value="">',
       '<span class="xwiki-selectize-option-icon"></span>',
       '<span class="xwiki-selectize-option-label"></span>',
     '</div>'
@@ -203,6 +203,29 @@ define('xwiki-selectize', [
         });
       }
     }
+    let oldOnPositionDropdown = this.selectize.onOptionSelect;
+    this.selectize.onOptionSelect = function(e) {
+      oldOnPositionDropdown.call(this, e);
+      this.get$('dropdown').find('.option').attr('aria-selected','false');
+      // clear selection on all previously selected elements first
+      this.get$('dropdown').find('.selected').attr('aria-selected','true');
+    }
+    let oldSetActiveOption = this.selectize.setActiveOption;
+    this.selectize.setActiveOption = function(option, scroll, animate) {
+      if (this.liveRegion && option) {
+        if (option instanceof jQuery) {
+          this.liveRegion.text(option.text());
+        } else {
+          this.liveRegion.text(option.innerText);
+        }
+      }
+      oldSetActiveOption.call(this, option, scroll, animate);
+    }
+    /* Create a live region to store the value of the currently active option.*/
+    this.selectize.liveRegion = $('<span>');
+    this.selectize.liveRegion.attr('aria-live', 'assertive');
+    this.selectize.liveRegion.addClass('sr-only');
+    this.selectize.get$('input').after(this.selectize.liveRegion);
     setDropDownAlignment(this.selectize);
     if (this.selectize.settings.takeInputWidth) {
       this.selectize.get$('control').width($(this).data('initialWidth'));

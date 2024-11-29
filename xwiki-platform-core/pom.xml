@@ -139,22 +139,7 @@
                  Single justification example:
             -->
 
-            <revapi.differences>
-              <justification>Change in generated class of the REST model to add the
-                enforceRequiredRights property.</justification>
-              <criticality>allowed</criticality>
-              <differences>
-                <item>
-                  <code>java.annotation.attributeValueChanged</code>
-                  <old>class org.xwiki.rest.model.jaxb.Page</old>
-                  <new>class org.xwiki.rest.model.jaxb.Page</new>
-                  <annotationType>javax.xml.bind.annotation.XmlType</annotationType>
-                  <attribute>propOrder</attribute>
-                  <oldValue>{"language", "majorVersion", "minorVersion", "hidden", "created", "creator", "creatorName", "modified", "modifier", "modifierName", "originalMetadataAuthor", "originalMetadataAuthorName", "comment", "content", "clazz", "objects", "attachments", "hierarchy"}</oldValue>
-                  <newValue>{"language", "majorVersion", "minorVersion", "hidden", "enforceRequiredRights", "created", "creator", "creatorName", "modified", "modifier", "modifierName", "originalMetadataAuthor", "originalMetadataAuthorName", "comment", "content", "clazz", "objects", "attachments", "hierarchy"}</newValue>
-                </item>
-              </differences>
-            </revapi.differences>
+            
           </analysisConfiguration>
         </configuration>
       </plugin>

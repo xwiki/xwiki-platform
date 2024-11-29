@@ -299,13 +299,11 @@ export class XWikiStorage extends AbstractStorage {
   }
 
   async saveAttachment(page: string, file: File): Promise<unknown> {
-    const data = new FormData();
-    data.append(file.name, file);
     const response = await fetch(
-      this.buildAttachmentsURL(page) + "/" + file.name,
+      `${this.buildAttachmentsURL(page)}/${file.name}`,
       {
         method: "PUT",
-        body: data,
+        body: file,
         headers: {
           ...(await this.getCredentials()),
           "Content-Type": file.type,

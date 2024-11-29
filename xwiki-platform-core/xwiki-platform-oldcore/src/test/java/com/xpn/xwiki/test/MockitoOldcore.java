@@ -1099,11 +1099,14 @@ public class MockitoOldcore
             when(requiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
             {
                 DocumentReference reference = invocationOnMock.getArgument(0);
-                XWikiDocument document = getSpyXWiki().getDocument(reference.withoutLocale(), getXWikiContext());
-                if (document.isNew()) {
-                    return Optional.empty();
+                if (reference != null) {
+                    XWikiDocument document = getSpyXWiki().getDocument(reference.withoutLocale(), getXWikiContext());
+                    if (!document.isNew()) {
+                        return Optional.of(documentRequiredRightsReader.readRequiredRights(document));
+                    }
                 }
-                return Optional.of(documentRequiredRightsReader.readRequiredRights(document));
+
+                return Optional.empty();
             });
         }
 

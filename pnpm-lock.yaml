@@ -2250,6 +2250,18 @@ importers:
         specifier: 4.5.0
         version: 4.5.0(vue@3.5.13(typescript@5.6.3))
     devDependencies:
+      '@vue/test-utils':
+        specifier: 2.4.6
+        version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../dev/config
+      '@xwiki/cristal-dev-test-utils':
+        specifier: workspace:*
+        version: link:../dev/test-utils
+      vitest:
+        specifier: 2.1.6
+        version: 2.1.6(@types/node@22.10.0)(happy-dom@14.12.0)(tsx@4.19.2)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -3067,9 +3079,6 @@ packages:
 
   '@microsoft/tsdoc-config@0.17.1':
     resolution: {integrity: sha512-UtjIFe0C6oYgTnad4q1QP4qXwLhe6tIpNTRStJ2RZEPIkqQPREAwE5spzVxsdn9UaEMUqhh0AqSx3X4nWAKXWw==}
-
-  '@microsoft/tsdoc@0.15.0':
-    resolution: {integrity: sha512-HZpPoABogPvjeJOdzCOSJsXeL/SMCBgBZMVC3X3d7YYp2gf31MfxhUoYUNwf1ERPJOnQc0wkFn9trqI6ZEdZuA==}
 
   '@microsoft/tsdoc@0.15.1':
     resolution: {integrity: sha512-4aErSrCR/On/e5G2hDP0wjooqDdauzEbIq8hIkIe5pXV0rtWJZvdCEKL0ykZxex+IxIwBp0eGeV48hQN07dXtw==}
@@ -8100,8 +8109,6 @@ snapshots:
       ajv: 8.12.0
       jju: 1.4.0
       resolve: 1.22.8
-
-  '@microsoft/tsdoc@0.15.0': {}
 
   '@microsoft/tsdoc@0.15.1': {}
 

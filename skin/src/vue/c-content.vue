@@ -95,6 +95,10 @@ const title = computed(() => {
   );
 });
 
+const pageExist = computed(() => {
+  return content.value !== undefined;
+});
+
 const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
 watch(
   currentPage,
@@ -220,7 +224,7 @@ onUpdated(() => {
 
     <!-- eslint-disable vue/no-v-html -->
     <div
-      v-if="content !== undefined"
+      v-if="pageExist"
       id="xwikicontent"
       ref="contentRoot"
       class="doc-content"
@@ -233,7 +237,7 @@ onUpdated(() => {
       </p>
     </div>
     <!-- The footer is not displayed in case of unknown page. -->
-    <div v-if="content" class="doc-info-extra">
+    <div v-if="pageExist" class="doc-info-extra">
       <!-- Suspense is mandatory here as extra-tabs is asynchronous -->
       <suspense>
         <extra-tabs></extra-tabs>

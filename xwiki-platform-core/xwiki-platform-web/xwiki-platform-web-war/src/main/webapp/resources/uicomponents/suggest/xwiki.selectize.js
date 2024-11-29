@@ -212,11 +212,13 @@ define('xwiki-selectize', [
     }
     let oldSetActiveOption = this.selectize.setActiveOption;
     this.selectize.setActiveOption = function(option, scroll, animate) {
-      if (this.liveRegion && option) {
+      if (this.liveRegion) {
         if (option instanceof jQuery) {
           this.liveRegion.text(option.text());
-        } else {
+        } else if (option instanceof HTMLElement) {
           this.liveRegion.text(option.innerText);
+        } else {
+          this.liveRegion.text("");
         }
       }
       oldSetActiveOption.call(this, option, scroll, animate);

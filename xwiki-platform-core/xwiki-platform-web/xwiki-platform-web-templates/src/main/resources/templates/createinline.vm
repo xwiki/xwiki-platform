@@ -398,7 +398,12 @@
             <span class='label'>$escapetool.xml($services.localization.render('core.create.pageTitle'))</span>
           </dt>
           <dl>
-            #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
+            ## We are creating a top level space.
+            #if ("$!spaceReference" == '' && $isSpace)
+              #set ($targetDocumentReference = $services.model.createDocumentReference('WebHome', $name))
+            #else
+              #set ($targetDocumentReference = $services.model.createDocumentReference($name, $spaceReference))
+            #end
             #hierarchy($targetDocumentReference)
           </dl>
         #end

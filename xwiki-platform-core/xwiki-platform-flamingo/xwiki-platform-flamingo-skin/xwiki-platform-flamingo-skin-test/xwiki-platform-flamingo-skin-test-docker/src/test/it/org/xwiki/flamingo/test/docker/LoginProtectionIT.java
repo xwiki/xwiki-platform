@@ -46,8 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class LoginProtectionIT
 {
-    private static DocumentReference AUTHENTICATION_CONFIGURATION =
+    private static final DocumentReference AUTHENTICATION_CONFIGURATION =
         new DocumentReference("xwiki", Arrays.asList("XWiki", "Authentication"), "Configuration");
+
+    private static final String USERNAME = "repeatedAuthenticationFailure";
+
+    private static final String PASSWORD = "password";
 
     @BeforeAll
     void setup(TestUtils setup)
@@ -64,6 +68,9 @@ class LoginProtectionIT
     @AfterAll
     void tearDown(TestUtils setup)
     {
+        // Just to be safe reset the session before logging in as super admin to avoid being in a session with login
+        // failures which would block the superadmin user.
+        setup.forceGuestUser();
         setup.loginAsSuperAdmin();
         setup.deletePage(AUTHENTICATION_CONFIGURATION);
     }
@@ -79,43 +86,51 @@ class LoginProtectionIT
         // fixture:
         // create login and fails login with it: we don't want Admin to be blocked for authentication in
         // further tests.
-        String username = testInfo.getTestMethod().get().getName();
-        String password = testInfo.getTestMethod().get().getName();
+        String username2 = USERNAME + "2";
 
         // We don't need to be logged in for that.
         setup.forceGuestUser();
-        setup.createUser(username, password, setup.getBaseURL());
+        setup.createUser(USERNAME, PASSWORD, setup.getBaseURL());
+        setup.createUser(username2, PASSWORD, setup.getBaseURL());
         LoginPage loginPage = LoginPage.gotoPage();
 
         // first wrong auth
-        loginPage.loginAs(username, "foo");
+        loginPage.loginAs(USERNAME, "foo");
         loginPage = new LoginPage();
         assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
         assertFalse(loginPage.hasCaptchaErrorMessage());
 
         // second wrong auth
-        loginPage.loginAs(username, "foo");
+        loginPage.loginAs(USERNAME, "foo");
         loginPage = new LoginPage();
         assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
         assertFalse(loginPage.hasCaptchaErrorMessage());
 
         // third wrong auth: captcha is triggered
-        loginPage.loginAs(username, "foo");
+        loginPage.loginAs(USERNAME, "foo");
         loginPage = new LoginPage();
         assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
         assertTrue(loginPage.hasCaptchaErrorMessage());
         assertTrue(loginPage.hasCaptchaChallenge());
 
         // fourth good auth: captcha is still triggered
-        loginPage.loginAs(username, password);
+        loginPage.loginAs(USERNAME, PASSWORD);
         loginPage = new LoginPage();
         assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
         assertTrue(loginPage.hasCaptchaErrorMessage());
         assertTrue(loginPage.hasCaptchaChallenge());
 
         // trying with another login: captcha is still triggered because it's on the same session
-        loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+        loginPage.loginAs(username2, PASSWORD);
+        loginPage = new LoginPage();
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        assertTrue(loginPage.hasCaptchaErrorMessage());
+        assertTrue(loginPage.hasCaptchaChallenge());
+
+        // Reset the session to verify that we still cannot login.
+        setup.forceGuestUser();
+        loginPage = LoginPage.gotoPage();
+        loginPage.loginAs(USERNAME, PASSWORD);
         loginPage = new LoginPage();
         assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
         assertTrue(loginPage.hasCaptchaErrorMessage());
@@ -134,20 +149,18 @@ class LoginProtectionIT
     @Order(2)
     void canLoginWhenSecurityIsDisabled(TestUtils setup)
     {
-        LoginPage loginPage = LoginPage.gotoPage();
-        loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
-            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
-        loginPage = new LoginPage();
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
-        assertTrue(loginPage.hasCaptchaErrorMessage());
-        assertTrue(loginPage.hasCaptchaChallenge());
-
+        // Clean the session to reset the session protection mechanism.
+        setup.forceGuestUser();
+        setup.loginAsSuperAdmin();
         // We disable the security mechanism
         setup.updateObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass", 0,
             "isAuthenticationSecurityEnabled", false);
 
-        setup.loginAsSuperAdmin();
+        // Verify that we can login again as the user who was previously blocked.
+        setup.forceGuestUser();
+        setup.login(USERNAME, PASSWORD);
+
         setup.gotoPage("Main", "WebHome");
-        assertEquals(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(), setup.getLoggedInUserName());
+        assertEquals(USERNAME, setup.getLoggedInUserName());
     }
 }

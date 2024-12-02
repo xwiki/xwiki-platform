@@ -22,6 +22,7 @@ package org.xwiki.model.reference;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializer;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
@@ -533,7 +533,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 15.5.5
      * @since 14.10.20
      */
-    @Unstable
     public EntityReference removeParameters(boolean recursive)
     {
         EntityReference current;
@@ -687,16 +686,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             .append(this.parameters).toHashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note: The default implementation relies on comparing the string serialization of the 2 entities. It is the
-     * caller's responsibility to make sure that the entities are either first resolved or at least of the same type, in
-     * order for the comparison to actually make sense.
-     * </p>
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(EntityReference reference)
     {
@@ -708,47 +697,71 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             return 0;
         }
 
-        // Generically compare the string serializations of the 2 references.
-        int stringCompareResult = toString().compareTo(reference.toString());
-        if (stringCompareResult != 0) {
-            return stringCompareResult;
-        }
+        List<EntityReference> references = getReversedReferenceChain();
+        Iterator<EntityReference> it = references.iterator();
+        List<EntityReference> otherReferences = reference.getReversedReferenceChain();
+        Iterator<EntityReference> otherIt = otherReferences.iterator();
+        while (it.hasNext() && otherIt.hasNext()) {
+            EntityReference element = it.next();
+            EntityReference otherElement = otherIt.next();
 
-        // If the string serializations are the same, compare the parameters.
-        return compareParameters(reference);
-    }
+            // Compare the names
+            int result = element.getName().compareTo(otherElement.getName());
+            if (result != 0) {
+                return result;
+            }
 
-    /**
-     * Compare parameters of this reference and another reference.
-     *
-     * @param reference the other reference to be compare with
-     * @return 0 if parameters are equals, -1 if this reference has lower parameters, +1 otherwise
-     */
-    @SuppressWarnings("unchecked")
-    private int compareParameters(EntityReference reference)
-    {
-        if (parameters != null && reference.parameters == null) {
-            return 1;
-        }
-
-        if (parameters != null) {
-            for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
-                Object obj = reference.parameters.get(entry.getKey());
-                Object myobj = entry.getValue();
-                if (myobj instanceof Comparable) {
-                    if (obj == null) {
-                        return 1;
-                    }
-
-                    int number = ((Comparable) myobj).compareTo(obj);
-
-                    if (number != 0) {
-                        return number;
-                    }
-                }
+            // Compare the parameters
+            result = compareParameters(element.getParameters(), otherElement.getParameters());
+            if (result != 0) {
+                return result;
             }
         }
 
-        return (reference.parameters == null) ? 0 : -1;
+        return references.size() - otherReferences.size();
+    }
+
+    /**
+     * Compare parameters of two references.
+     *
+     * @param parameters the first parameters to compare
+     * @param otherParameters the other parameters to compare
+     * @return 0 if parameters are equals, -1 if the first parameters are lower, +1 otherwise
+     */
+    private int compareParameters(Map<String, Serializable> parameters, Map<String, Serializable> otherParameters)
+    {
+        for (Map.Entry<String, Serializable> entry : parameters.entrySet()) {
+            Object value = entry.getValue();
+            Object otherValue = otherParameters.get(entry.getKey());
+            int result = compareTo(value, otherValue);
+            if (result != 0) {
+                return result;
+            }
+        }
+
+        return parameters.size() - otherParameters.size();
+    }
+
+    private int compareTo(Object value, Object otherValue)
+    {
+        if (value != otherValue) {
+            if (value == null) {
+                return -1;
+            }
+
+            if (otherValue == null) {
+                return 1;
+            }
+
+            if (value.getClass() == otherValue.getClass() && value instanceof Comparable) {
+                return ((Comparable) value).compareTo(otherValue);
+            }
+
+            if (!value.equals(otherValue)) {
+                return 1;
+            }
+        }
+
+        return 0;
     }
 }

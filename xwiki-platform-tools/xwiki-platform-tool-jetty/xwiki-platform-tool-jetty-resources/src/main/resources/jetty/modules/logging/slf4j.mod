@@ -35,5 +35,5 @@ slf4j
 lib/logging/slf4j-api-${slf4j.version}.jar
 
 [ini]
-slf4j.version?=2.0.13
+slf4j.version?=2.0.16
 jetty.webapp.addHiddenClasses+=,org.slf4j.

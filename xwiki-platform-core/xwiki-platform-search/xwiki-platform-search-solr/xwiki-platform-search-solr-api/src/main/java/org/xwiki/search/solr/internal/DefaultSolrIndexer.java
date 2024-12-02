@@ -19,14 +19,17 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.bridge.internal.DocumentContextExecutor;
@@ -42,6 +45,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.index.IndexException;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
@@ -56,6 +60,7 @@ import org.xwiki.search.solr.internal.job.IndexerRequest;
 import org.xwiki.search.solr.internal.metadata.LengthSolrInputDocument;
 import org.xwiki.search.solr.internal.metadata.SolrMetadataExtractor;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+import org.xwiki.store.ReadyIndicator;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -95,11 +100,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
          * The query used to filter entries to delete.
          */
         public String deleteQuery;
-
         /**
          * The indexing operation to perform.
          */
         public IndexOperation operation;
+
+        /**
+         * The ready indicator to indicate that indexing finished until that point.
+         */
+        private SolrIndexerReadyIndicator readyIndicator;
 
         /**
          * @param indexReference the reference of the entity to index.
@@ -121,6 +130,12 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             this.operation = operation;
         }
 
+        IndexQueueEntry(SolrIndexerReadyIndicator readyIndicator)
+        {
+            this.readyIndicator = readyIndicator;
+            this.operation = IndexOperation.READY_MARKER;
+        }
+
         @Override
         public String toString()
         {
@@ -135,6 +150,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                     break;
                 case STOP:
                     str = "STOP";
+                    break;
+                case READY_MARKER:
+                    str = "READY_MARKER";
                     break;
                 default:
                     str = "";
@@ -168,6 +186,11 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         public IndexOperation operation;
 
         /**
+         * The ready indicator to indicate that indexing finished until that point.
+         */
+        private final SolrIndexerReadyIndicator readyIndicator;
+
+        /**
          * @param reference the reference of the entity to index.
          * @param recurse also apply operation to reference children.
          * @param operation the indexing operation to perform.
@@ -177,6 +200,13 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             this.reference = reference;
             this.recurse = recurse;
             this.operation = operation;
+            this.readyIndicator = null;
+        }
+
+        ResolveQueueEntry(SolrIndexerReadyIndicator readyIndicator)
+        {
+            this.readyIndicator = readyIndicator;
+            this.operation = IndexOperation.READY_MARKER;
         }
     }
 
@@ -193,40 +223,34 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             logger.debug("Start SOLR resolver thread");
 
             while (!Thread.interrupted()) {
-                ResolveQueueEntry queueEntry;
-                try {
-                    queueEntry = resolveQueue.take();
-                } catch (InterruptedException e) {
-                    logger.warn("The SOLR resolve thread has been interrupted", e);
-                    queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
-                }
+                ResolveQueueEntry queueEntry = getQueueEntry();
 
                 if (queueEntry == RESOLVE_QUEUE_ENTRY_STOP) {
                     // Stop the index thread: clear the queue and send the stop signal without blocking.
-                    indexQueue.clear();
-                    indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
+                    stopIndexerThread();
                     break;
                 }
 
                 try {
-                    if (queueEntry.operation == IndexOperation.INDEX) {
-                        Iterable<EntityReference> references;
-                        if (queueEntry.recurse) {
-                            references = solrRefereceResolver.getReferences(queueEntry.reference);
-                        } else {
-                            references = Arrays.asList(queueEntry.reference);
-                        }
+                    switch (queueEntry.operation) {
+                        case READY_MARKER:
+                            queueEntry.readyIndicator.switchToIndexQueue();
+                            DefaultSolrIndexer.this.indexQueue.put(new IndexQueueEntry(queueEntry.readyIndicator));
+                            break;
+                        case INDEX:
+                            Iterable<EntityReference> references = retrieveReferences(queueEntry);
 
-                        for (EntityReference reference : references) {
-                            indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
-                        }
-                    } else {
-                        if (queueEntry.recurse) {
-                            indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
-                                queueEntry.operation));
-                        } else if (queueEntry.reference != null) {
-                            indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
-                        }
+                            for (EntityReference reference : references) {
+                                indexQueue.put(new IndexQueueEntry(reference, queueEntry.operation));
+                            }
+                            break;
+                        default:
+                            if (queueEntry.recurse) {
+                                indexQueue.put(new IndexQueueEntry(solrRefereceResolver.getQuery(queueEntry.reference),
+                                    queueEntry.operation));
+                            } else if (queueEntry.reference != null) {
+                                indexQueue.put(new IndexQueueEntry(queueEntry.reference, queueEntry.operation));
+                            }
                     }
                 } catch (Throwable e) {
                     logger.warn("Failed to apply operation [{}] on root reference [{}]", queueEntry.operation,
@@ -235,6 +259,30 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
             }
 
             logger.debug("Stop SOLR resolver thread");
+        }
+
+        private Iterable<EntityReference> retrieveReferences(ResolveQueueEntry queueEntry) throws SolrIndexerException
+        {
+            Iterable<EntityReference> references;
+            if (queueEntry.recurse) {
+                references = solrRefereceResolver.getReferences(queueEntry.reference);
+            } else {
+                references = Arrays.asList(queueEntry.reference);
+            }
+            return references;
+        }
+
+        private ResolveQueueEntry getQueueEntry()
+        {
+            ResolveQueueEntry queueEntry;
+            try {
+                queueEntry = resolveQueue.take();
+                DefaultSolrIndexer.this.resolveQueueRemovalCounter.incrementAndGet();
+            } catch (InterruptedException e) {
+                logger.warn("The SOLR resolve thread has been interrupted", e);
+                queueEntry = RESOLVE_QUEUE_ENTRY_STOP;
+            }
+            return queueEntry;
         }
     }
 
@@ -322,6 +370,18 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     private Thread resolveThread;
 
     /**
+     * A counter that tracks how many items have been removed from the index queue since the start.
+     * Used to track progress in the index queue.
+     */
+    private final AtomicLong indexQueueRemovalCounter = new AtomicLong();
+
+    /**
+     * A counter that tracks how many items have been removed from the resolve queue since the start.
+     * Used to track progress in the resolve queue.
+     */
+    private final AtomicLong resolveQueueRemovalCounter = new AtomicLong();
+
+    /**
      * Indicate of the component has been disposed.
      */
     private boolean disposed;
@@ -361,14 +421,27 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         // Stop the resolve thread. Clear the queue and send the stop signal without blocking. We know that the resolve
         // queue will remain empty after the clear call because we set the disposed flag above.
-        this.resolveQueue.clear();
+        for (ResolveQueueEntry entry = this.resolveQueue.poll(); entry != null; entry = this.resolveQueue.poll()) {
+            if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
+                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+            }
+        }
         this.resolveQueue.offer(RESOLVE_QUEUE_ENTRY_STOP);
 
         // Stop the index thread. Clear the queue and send the stop signal without blocking. There should be enough
         // space in the index queue before the special stop entry is added as long the the index queue capacity is
         // greater than 1. In the worse case, the clear call will unblock the resolve thread (which was waiting because
         // the index queue was full) and just one entry will be added to the queue before the special stop entry.
-        this.indexQueue.clear();
+        stopIndexerThread();
+    }
+
+    private void stopIndexerThread()
+    {
+        for (IndexQueueEntry entry = this.indexQueue.poll(); entry != null; entry = this.indexQueue.poll()) {
+            if (entry.operation == IndexOperation.READY_MARKER && entry.readyIndicator != null) {
+                entry.readyIndicator.completeExceptionally(new IndexException("Indexing stopped."));
+            }
+        }
         this.indexQueue.offer(INDEX_QUEUE_ENTRY_STOP);
     }
 
@@ -410,6 +483,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         int length = 0;
 
         for (IndexQueueEntry batchEntry = queueEntry; batchEntry != null; batchEntry = this.indexQueue.poll()) {
+            this.indexQueueRemovalCounter.incrementAndGet();
+
             if (batchEntry == INDEX_QUEUE_ENTRY_STOP) {
                 // Discard the current batch and stop the indexing thread.
                 return false;
@@ -424,21 +499,27 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 XWikiContext xcontext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
                 xcontext.setUserReference(indexingUserConfig.getIndexingUserReference());
 
-                if (IndexOperation.INDEX.equals(operation)) {
-                    LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
-                    if (solrDocument != null) {
-                        solrInstance.add(solrDocument);
-                        length += solrDocument.getLength();
-                        ++this.batchSize;
-                    }
-                } else if (IndexOperation.DELETE.equals(operation)) {
-                    if (batchEntry.reference == null) {
-                        solrInstance.deleteByQuery(batchEntry.deleteQuery);
-                    } else {
-                        solrInstance.delete(this.solrRefereceResolver.getId(batchEntry.reference));
-                    }
+                switch (operation) {
+                    case INDEX:
+                        LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
+                        if (solrDocument != null) {
+                            solrInstance.add(solrDocument);
+                            length += solrDocument.getLength();
+                            ++this.batchSize;
+                        }
+                        break;
+                    case DELETE:
+                        applyDeletion(batchEntry);
 
-                    ++this.batchSize;
+                        ++this.batchSize;
+                        break;
+                    case READY_MARKER:
+                        commit();
+                        batchEntry.readyIndicator.complete(null);
+                        length = 0;
+                        break;
+                    default:
+                        // Do nothing.
                 }
             } catch (Throwable e) {
                 this.logger.error("Failed to process entry [{}]", batchEntry, e);
@@ -460,6 +541,15 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         }
 
         return true;
+    }
+
+    private void applyDeletion(IndexQueueEntry queueEntry) throws SolrServerException, IOException, SolrIndexerException
+    {
+        if (queueEntry.reference == null) {
+            solrInstance.deleteByQuery(queueEntry.deleteQuery);
+        } else {
+            solrInstance.delete(this.solrRefereceResolver.getId(queueEntry.reference));
+        }
     }
 
     /**
@@ -596,5 +686,29 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
         } catch (JobException e) {
             throw new SolrIndexerException("Failed to start index job", e);
         }
+    }
+
+    @Override
+    public ReadyIndicator waitReady()
+    {
+        SolrIndexerReadyIndicator readyIndicator = new SolrIndexerReadyIndicator(
+            this.resolveQueueRemovalCounter::getAcquire, this.resolveQueue::size,
+            this.indexQueueRemovalCounter::getAcquire, this.indexQueue::size,
+            this.configuration::getIndexerQueueCapacity
+        );
+
+        if (!this.disposed) {
+            try {
+                this.resolveQueue.put(new ResolveQueueEntry(readyIndicator));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                readyIndicator.completeExceptionally(e);
+            }
+        } else {
+            // The indexer has been stopped and won't become ready again.
+            readyIndicator.completeExceptionally(new SolrIndexerException("The indexer has been disposed"));
+        }
+
+        return readyIndicator;
     }
 }

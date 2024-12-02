@@ -67,7 +67,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.validation.EntityNameValidationConfiguration;
 import org.xwiki.model.validation.EntityNameValidationManager;
@@ -87,7 +86,6 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -252,7 +250,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizeOrReturnKey(String key, Syntax syntax, Object... parameters)
     {
         String result;
@@ -271,7 +268,6 @@ public abstract class XWikiAction implements LegacyAction
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     protected String localizePlainOrReturnKey(String key, Object... parameters)
     {
         return localizeOrReturnKey(key, Syntax.PLAIN_1_0, parameters);
@@ -467,11 +463,11 @@ public abstract class XWikiAction implements LegacyAction
 
                             // Set the main home page in the main space of the main wiki as the current requested entity
                             // since we cannot set the non existing one as it would generate errors obviously...
-                            EntityReferenceValueProvider valueProvider =
-                                Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            EntityReferenceProvider entityReferenceProvider =
+                                Utils.getComponent(EntityReferenceProvider.class);
+                            DocumentReference phonyDoc =
+                                (DocumentReference) entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT);
+                            xwiki.setPhonyDocument(phonyDoc, context);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),

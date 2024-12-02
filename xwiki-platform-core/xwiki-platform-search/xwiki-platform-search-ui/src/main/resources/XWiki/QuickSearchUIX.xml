@@ -136,6 +136,7 @@
       globalSearch.addClass('globalsearch-close');
       globalSearchButton.attr('aria-expanded', 'false');
       globalSearchInput.attr('disabled','');
+      document.fire('xwiki:suggest:collapsed');
     }
 
     // Open the global search when the user click on the global search button

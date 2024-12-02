@@ -20,6 +20,7 @@
 package org.xwiki.attachment.internal.listener;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -31,6 +32,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.RefactoringException;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
+import org.xwiki.refactoring.internal.listener.LinkIndexingWaitingHelper;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.LogLevel;
@@ -79,6 +81,9 @@ class MovedAttachmentListenerTest
     @MockComponent
     private AuthorizationManager authorization;
 
+    @MockComponent
+    private LinkIndexingWaitingHelper linkIndexingHelper;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
@@ -92,6 +97,7 @@ class MovedAttachmentListenerTest
         verifyNoInteractions(this.progressManager);
         verifyNoInteractions(this.modelBridge);
         verifyNoInteractions(this.authorization);
+        verifyNoInteractions(this.linkIndexingHelper);
     }
 
     @Test
@@ -114,6 +120,7 @@ class MovedAttachmentListenerTest
         verify(this.linkRefactoring).update(d1, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
         verify(this.linkRefactoring).update(d2, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
         verify(this.linkRefactoring).update(DOCUMENT_REFERENCE, SOURCE_ATTACHMENT, TARGET_ATTACHMENT);
+        verify(this.linkIndexingHelper).maybeWaitForLinkIndexingWithLog(10, TimeUnit.SECONDS);
         assertEquals(1, this.logCapture.size());
         assertEquals("Updating the back-links for attachment [Attachment wiki:space.page@oldname].",
             this.logCapture.getMessage(0));

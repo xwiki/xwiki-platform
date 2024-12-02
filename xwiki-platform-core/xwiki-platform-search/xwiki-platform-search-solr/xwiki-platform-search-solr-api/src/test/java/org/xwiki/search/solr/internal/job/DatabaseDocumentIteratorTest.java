@@ -65,6 +65,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 class DatabaseDocumentIteratorTest
 {
+    private static final String ORDER_CLAUSE = " order by doc.space, doc.name, doc.language nulls first";
+
     @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -151,7 +153,7 @@ class DatabaseDocumentIteratorTest
 
         when(
             this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                + " order by doc.space, doc.name, doc.language", Query.HQL)).thenReturn(query);
+                                          + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery("", Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;
@@ -199,7 +201,7 @@ class DatabaseDocumentIteratorTest
         String whereClause = " where doc.space = :space and doc.name = :name";
         when(
             this.queryManager.createQuery("select doc.space, doc.name, doc.language, doc.version from XWikiDocument doc"
-                + whereClause + " order by doc.space, doc.name, doc.language", Query.HQL)).thenReturn(query);
+                                          + whereClause + ORDER_CLAUSE, Query.HQL)).thenReturn(query);
         when(this.queryManager.createQuery(whereClause, Query.HQL)).thenReturn(countQuery);
 
         DocumentIterator<String> iterator = this.databaseIterator;

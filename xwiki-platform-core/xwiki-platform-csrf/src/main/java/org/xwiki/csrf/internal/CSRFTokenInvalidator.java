@@ -53,7 +53,7 @@ public class CSRFTokenInvalidator implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Collections.<Event> singletonList(new ActionExecutingEvent("logout"));
+        return Collections.singletonList(new ActionExecutingEvent("logout"));
     }
 
     @Override

@@ -224,11 +224,23 @@
  * Display extension points only if the author of the UIX has the admin right on the wiki.
  *
  * @param $name name of the extension points to display
+ * @param $revert set to get the uixs in revert order
  * @since 7.3RC1
  *#
-#macro(displaySimpleSecureUIX $name)
-  #foreach($uix in $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
-    #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
+#macro(displaySimpleSecureUIX $name $revert)
+  #set ($uixs = $services.uix.getExtensions($name, {'sortByParameter' : 'order'}))
+  #if ($revert)
+    #set ($discard = $collectiontool.reverseModifiable($uixs))
+  #end
+  #foreach($uix in $uixs)
+    ## TODO: Is this check really needed? $services.uix.getExtensions() should already make sure the returned UI
+    ## extensions are safe for the current user (i.e. either registered by the current user at user scope, or registered
+    ## by a wiki administrator at wiki scope or by someone with programming right at global level). This is normally done
+    ## when the UI extesion is registered. Forbidding the current user to use UI extensons registered by themselves at
+    ## user scope seems unnecessary. Moreover, this check seems to be targeted towards UI extensions implemented in wiki
+    ## pages, because for UI extensions implemented in Java it doesn't make sense.
+    #if (!$uix.documentReference || $services.security.authorization.hasAccess('admin', $uix.authorReference,
+        $services.wiki.currentWikiDescriptor.reference))
       $services.rendering.render($uix.execute(), 'html/5.0')
     #end
   #end

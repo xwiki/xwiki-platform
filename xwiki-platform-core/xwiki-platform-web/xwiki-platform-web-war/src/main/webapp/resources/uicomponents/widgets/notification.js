@@ -107,7 +107,9 @@ widgets.Notification = Class.create({
   /** Creates the HTML structure for the notification. */
   createElement : function() {
     if (!this.element) {
-      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type}).update(this.text);
+      // The ARIA role `alert` should give implicit values for `aria-live` and `aria-atomic`.
+      this.element = new Element("div", {"class" : "xnotification xnotification-" + this.type,
+        "role": "alert"}).update(this.text);
       if (this.options.icon) {
         this.element.setStyle({backgroundImage : this.options.icon, paddingLeft : "22px"});
       }

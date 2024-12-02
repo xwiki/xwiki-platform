@@ -1586,6 +1586,9 @@ importers:
       tippy.js:
         specifier: 6.3.7
         version: 6.3.7
+      tiptap-extension-global-drag-handle:
+        specifier: 0.1.16
+        version: 0.1.16
       tiptap-markdown:
         specifier: 0.8.10
         version: 0.8.10(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))
@@ -6790,6 +6793,9 @@ packages:
 
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
+
+  tiptap-extension-global-drag-handle@0.1.16:
+    resolution: {integrity: sha512-Toke8gAgvgmSTmpU5Zome29ywdcIPxVZVkzI3GpUbaX8DF7o2ukyb+g/x5PAwBWQt/E4nhX91QlClo96psSYHQ==}
 
   tiptap-markdown@0.8.10:
     resolution: {integrity: sha512-iDVkR2BjAqkTDtFX0h94yVvE2AihCXlF0Q7RIXSJPRSR5I0PA1TMuAg6FHFpmqTn4tPxJ0by0CK7PUMlnFLGEQ==}
@@ -12342,6 +12348,8 @@ snapshots:
   tippy.js@6.3.7:
     dependencies:
       '@popperjs/core': 2.11.8
+
+  tiptap-extension-global-drag-handle@0.1.16: {}
 
   tiptap-markdown@0.8.10(@tiptap/core@2.10.3(@tiptap/pm@2.10.3)):
     dependencies:

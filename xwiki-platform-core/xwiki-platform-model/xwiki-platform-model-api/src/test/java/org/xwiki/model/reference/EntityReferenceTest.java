@@ -644,7 +644,7 @@ public class EntityReferenceTest
 
         // parent is set, so custom type cannot be set
         spaceReference =
-            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+            new EntityReference(spaceReference, Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER, EntityType.SPACE));
         assertEquals(EntityType.WIKI, spaceReference.getParentType());
 
         // no parent, no custom type, but fallback on first allowed parent type
@@ -653,17 +653,25 @@ public class EntityReferenceTest
 
         // custom type
         spaceReference =
-            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+            new EntityReference(spaceReference, Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER, EntityType.SPACE));
         assertEquals(EntityType.SPACE, spaceReference.getParentType());
 
         // custom type
         spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
-            Map.of(EntityReference.PARENT_TYPE_PARAMETER, "SPACE"));
+            Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER, "SPACE"));
         assertEquals(EntityType.SPACE, spaceReference.getParentType());
 
         // invalid parent type, fallback on first allowed parent type
-        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
-            Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.PAGE));
-        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+        Map<String, Serializable> parametersMap =
+            Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER, EntityType.PAGE);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            new EntityReference(SPACE_NAME, EntityType.SPACE, parametersMap));
+        assertEquals("The parent type [PAGE] does not belong to the allowed parents", exception.getMessage());
+
+        // invalid parent type value.
+        Map<String, Serializable> parametersMap2 = Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER,42);
+        exception = assertThrows(IllegalArgumentException.class, () ->
+            new EntityReference(SPACE_NAME, EntityType.SPACE, parametersMap2));
+        assertEquals("No enum constant org.xwiki.model.EntityType.42", exception.getMessage());
     }
 }

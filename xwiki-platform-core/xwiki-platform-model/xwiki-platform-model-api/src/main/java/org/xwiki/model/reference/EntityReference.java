@@ -48,7 +48,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 17.0.0RC1
      */
     @Unstable
-    public static final String PARENT_TYPE_PARAMETER = "parentType";
+    public static final String FALLBACK_PARENT_TYPE_PARAMETER = "fallbackParentType";
 
     /**
      * Used to provide a nice and readable pretty name for the {@link #toString()} method.
@@ -305,7 +305,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             if (this.parameters == null) {
                 this.parameters = new TreeMap<>();
             }
-            if (PARENT_TYPE_PARAMETER.equals(name)) {
+            if (FALLBACK_PARENT_TYPE_PARAMETER.equals(name)) {
                 setParentTypeParameter(value);
             } else {
                 this.parameters.put(name, value);
@@ -321,14 +321,17 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     private void setParentTypeParameter(Serializable value)
     {
         if (value != null && getParent() == null) {
-            EntityType parentType = null;
+            EntityType parentType;
             if (value instanceof EntityType entityType) {
                 parentType = entityType;
-            } else if (value instanceof String entityTypeString) {
-                parentType = EntityType.valueOf(entityTypeString);
+            } else {
+                parentType = EntityType.valueOf(value.toString());
             }
-            if (parentType != null && getType().getAllowedParents().contains(parentType)) {
-                this.parameters.put(PARENT_TYPE_PARAMETER, parentType);
+            if (getType().getAllowedParents().contains(parentType)) {
+                this.parameters.put(FALLBACK_PARENT_TYPE_PARAMETER, parentType);
+            } else {
+                throw new IllegalArgumentException(
+                    "The parent type [" + parentType + "] does not belong to the allowed parents");
             }
         }
     }
@@ -710,7 +713,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * The parent type information is used by resolvers to identify which part of the base reference should be kept.
      * If the entity reference has a parent (see {@link #getParent()}) then this type should always be the type of
      * the parent. Now if the entity reference doesn't have the parent this value can be given by the
-     * {@link #PARENT_TYPE_PARAMETER} parameter (see {@link #getParameter(String)}), and if none is given it will
+     * {@link #FALLBACK_PARENT_TYPE_PARAMETER} parameter (see {@link #getParameter(String)}), and if none is given it will
      * fall back on first allowed parents (see {@link EntityType#getAllowedParents()} of current type returned by
      * {@link #getType()}.
      * @return the type of the parent to be used for computing the proper base reference in resolvers.
@@ -721,7 +724,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     {
         EntityType result;
         if (getParent() == null) {
-            result = getParameter(PARENT_TYPE_PARAMETER);
+            result = getParameter(FALLBACK_PARENT_TYPE_PARAMETER);
             if (result == null && !getType().getAllowedParents().isEmpty()) {
                 result = getType().getAllowedParents().get(0);
             }

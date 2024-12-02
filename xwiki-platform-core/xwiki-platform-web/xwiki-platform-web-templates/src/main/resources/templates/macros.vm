@@ -953,7 +953,9 @@ $html
 ###    message
 ###
 
-#macro(genericMessage $text $classAffix $iconName $prettyNameKey $isInline)
+### This velocity macro aims at providing an element similar to a XWiki Macro-Message in places where this XWikiMacro 
+### cannot be used.
+#macro(_genericMessage $text $classAffix $iconName $prettyNameKey $isInline)
   <#if($isInline)span#{else}div#end class="box ${classAffix}message">
     <span class="icon-block">$services.icon.renderHTML($iconName)</span>
     <span class="sr-only">$services.localization.render($prettyNameKey)</span>
@@ -961,36 +963,44 @@ $html
   </#if($isInline)span#{else}div#end>
 #end
 
+## Display a block warning message with the content $text.
 #macro(warning $text)
-#genericMessage($text 'warning' 'warning' 'warning')
+#_genericMessage($text 'warning' 'warning' 'warning')
 #end
 
+## Display an inline warning message with the content $text.
 #macro(inlineWarning $text)
-#genericMessage($text 'warning' 'warning' 'warning' true)
+#_genericMessage($text 'warning' 'warning' 'warning' true)
 #end
 
+## Display a block error message with the content $text.  
 #macro(error $text)
-#genericMessage($text 'error' 'exclamation' 'error')
+#_genericMessage($text 'error' 'exclamation' 'error')
 #end
 
+## Display an inline error message with the content $text.
 #macro(inlineError $text)
-  #genericMessage($text 'error' 'exclamation' 'error' true)
+  #_genericMessage($text 'error' 'exclamation' 'error' true)
 #end
 
+## Display a block info message with the content $text.  
 #macro(info $text)
-#genericMessage($text 'info' 'info' 'info')
+#_genericMessage($text 'info' 'info' 'info')
 #end
 
+## Display an inline info message with the content $text.
 #macro(inlineInfo $text)
-  #genericMessage($text 'info' 'info' 'info' true)
+  #_genericMessage($text 'info' 'info' 'info' true)
 #end
 
+## Display a block success message with the content $text.  
 #macro(success $text)
-#genericMessage($text 'success' 'check' 'success')
+#_genericMessage($text 'success' 'check' 'success')
 #end
 
+## Display an inline success message with the content $text.
 #macro(inlineSuccess $text)
-  #genericMessage($text 'success' 'check' 'success' true)
+  #_genericMessage($text 'success' 'check' 'success' true)
 #end
 
 #macro(message $text)

@@ -59,6 +59,8 @@ annotations.action.edit.success=Annotation updated.
 annotations.action.edit.loaderror=Failed:
 annotations.action.edit.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
 
+annotations.action.edit.form.loaderror=Failed: {0}
+
 annotations.action.delete.text=[Delete]
 annotations.action.delete.tooltip=Delete annotation
 annotations.action.delete.confirm=Are you sure you want to delete this annotation?

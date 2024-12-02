@@ -33,12 +33,12 @@ import org.xwiki.component.annotation.Component;
 @Component
 @Named("withparameters")
 @Singleton
-public class WithPatametersSymbolScheme extends DefaultSymbolScheme
+public class WithParametersSymbolScheme extends DefaultSymbolScheme
 {
     /**
      * Customize the initialization of {@link DefaultSymbolScheme}.
      */
-    public WithPatametersSymbolScheme()
+    public WithParametersSymbolScheme()
     {
         super(true);
     }

@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(WithPatametersSymbolScheme.class)
+@ComponentList(WithParametersSymbolScheme.class)
 class WithParametersTest
 {
     @InjectMockComponents

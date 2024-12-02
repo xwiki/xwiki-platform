@@ -60,8 +60,7 @@ class EntityReferenceConverterTest
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:wiki:space.page"));
 
         reference = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("space", EntityType.SPACE,
-                Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE)));
+            new EntityReference("space", EntityType.SPACE));
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:space.page"));
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "space.page"));
 
@@ -78,8 +77,7 @@ class EntityReferenceConverterTest
         reference = new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI));
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:wiki:space"));
 
-        reference = new EntityReference("space", EntityType.SPACE, Map.of(EntityReference.PARENT_TYPE_PARAMETER,
-            EntityType.SPACE));
+        reference = new EntityReference("space", EntityType.SPACE);
         assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:space"));
     }
 

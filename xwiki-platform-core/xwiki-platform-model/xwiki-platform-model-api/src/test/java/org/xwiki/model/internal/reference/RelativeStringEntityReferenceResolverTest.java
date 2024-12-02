@@ -52,9 +52,7 @@ class RelativeStringEntityReferenceResolverTest
 
         reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
         assertNull(reference.extractReference(EntityType.WIKI));
-        EntityReference spaceReference = reference.extractReference(EntityType.SPACE);
-        assertEquals("space", spaceReference.getName());
-        assertEquals(EntityType.SPACE, spaceReference.getParentType());
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         assertEquals("page", reference.getName());
 
         reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);

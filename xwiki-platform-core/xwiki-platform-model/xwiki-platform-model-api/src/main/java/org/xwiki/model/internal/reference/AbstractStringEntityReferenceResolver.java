@@ -406,13 +406,6 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
             } else {
                 return newReference;
             }
-        } else if (reference != null) {
-            EntityReference root = reference.getRoot();
-            if (root.getType() == EntityType.SPACE) {
-                EntityReference newRoot =
-                    new EntityReference(root, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
-                return (reference == root) ? newRoot : reference.replaceParent(root, newRoot);
-            }
         }
 
         return reference;

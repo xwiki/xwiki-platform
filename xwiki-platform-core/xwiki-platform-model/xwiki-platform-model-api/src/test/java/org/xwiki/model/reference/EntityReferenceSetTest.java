@@ -359,7 +359,6 @@ class EntityReferenceSetTest
     {
         excludesSpace("space");
 
-        // FIXME: Assertion is false because the excluded space contains a parentType parameter since it's relative
         assertNotMatches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
         assertNotMatches(new EntityReference("space", EntityType.SPACE));
 

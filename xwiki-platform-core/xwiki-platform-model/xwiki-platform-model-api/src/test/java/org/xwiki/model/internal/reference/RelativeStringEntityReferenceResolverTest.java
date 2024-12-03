@@ -39,13 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class RelativeStringEntityReferenceResolverTest
+class RelativeStringEntityReferenceResolverTest
 {
     @InjectMockComponents
     private RelativeStringEntityReferenceResolver resolver;
 
     @Test
-    public void resolveDocumentReference()
+    void resolveDocumentReference()
     {
         EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
         assertNull(reference);
@@ -62,7 +62,7 @@ public class RelativeStringEntityReferenceResolverTest
     }
 
     @Test
-    public void resolveDocumentReferenceWithBaseReference()
+    void resolveDocumentReferenceWithBaseReference()
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));

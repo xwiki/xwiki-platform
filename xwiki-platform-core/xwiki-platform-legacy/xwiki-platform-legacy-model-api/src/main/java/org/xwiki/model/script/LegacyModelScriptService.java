@@ -33,7 +33,6 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 17.0.0RC1
  */
-@Deprecated(since = "17.0.0RC1")
 @Component
 @Named("model")
 @Singleton

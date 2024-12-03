@@ -22,6 +22,7 @@ import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { createVNode, render } from "vue";
 import type { MacroProvider } from "../api/macroProvider";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { App, Component, VNode } from "vue";
 
 export class ContentTools {
@@ -124,10 +125,7 @@ export class ContentTools {
     return url1;
   }
 
-  public static transformImages(
-    cristal: CristalApp | undefined,
-    element: string,
-  ): void {
+  public static transformImages(cristal: CristalApp, element: string): void {
     const xwikiContentEl = document.getElementById(element);
     if (xwikiContentEl) {
       const transform = function (img: HTMLImageElement | HTMLScriptElement) {
@@ -135,9 +133,14 @@ export class ContentTools {
         if (srcItem) {
           ContentTools.logger?.debug("Found image with url ", srcItem.value);
           if (srcItem.value.indexOf("http") != 0) {
-            const src = cristal
-              ?.getWikiConfig()
-              .storage.getImageURL(cristal.getCurrentPage(), srcItem.value);
+            const storage = cristal
+              .getContainer()
+              .get<StorageProvider>("StorageProvider")
+              .get();
+            const src = storage.getImageURL(
+              cristal.getCurrentPage(),
+              srcItem.value,
+            );
             if (src) {
               img.src = src;
               ContentTools.logger?.debug("Transforming image to url ", img.src);

@@ -25,6 +25,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { ContentTools } from "./contentTools";
 import { inject, ref } from "vue";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 
 let currentContent = "Panel content";
 // TODO get rid of any
@@ -42,9 +43,12 @@ export default {
       logger = cristal.getLogger("skin.vue.panel");
       let panelName = props.panelName;
       logger?.debug("Ready to load panel ", panelName);
-      cristal
-        .getWikiConfig()
-        .storage.getPanelContent(panelName, "", "html")
+      const storage = cristal
+        .getContainer()
+        .get<StorageProvider>("StorageProvider")
+        .get();
+      storage
+        .getPanelContent(panelName, "", "html")
         .then(async (panelData: PageData) => {
           if (panelData.html == "") {
             panelData.html = await cristal.renderContent(
@@ -67,13 +71,13 @@ export default {
     };
   },
   mounted() {
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     logger?.debug("in mounted");
     ContentTools.transformImages(cristal, "panelcontent");
     // ContentTools.transformScripts(cristal);
   },
   updated() {
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     logger?.debug("in updated");
     ContentTools.listenToClicks(this.$el, cristal);
   },

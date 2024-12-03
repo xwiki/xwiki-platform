@@ -36,6 +36,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { ContentTools } from "./contentTools";
 import { defineComponent, inject, ref } from "vue";
 import type { CristalApp, Document, Logger, Storage } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { PropType, Ref } from "vue";
 
 let logger: Logger | null = null;
@@ -50,23 +51,22 @@ export default defineComponent({
     type: { type: String, required: false, default: () => undefined },
   },
   setup(props) {
-    const cristal = inject<CristalApp>("cristal");
-    if (cristal != null && logger == null) {
-      logger = cristal.getLogger("skin.vue.field");
-      logger?.debug("In field template");
-    } else {
-      console.log("Cannot initialize logger in skin.vue.field");
-    }
+    const cristal = inject<CristalApp>("cristal")!;
+    logger = cristal.getLogger("skin.vue.field");
+
     const document: Document = props.document;
     const value = document ? document.get(props.name) : "";
     let htmlFieldValue: string | undefined = "";
     let editFieldValue = ref("");
     editFieldMap.set(props.name, editFieldValue);
     if (props.mode == "edit") {
-      let storage: Storage | undefined = cristal?.getWikiConfig().storage;
+      const storage: Storage = cristal
+        .getContainer()
+        .get<StorageProvider>("StorageProvider")
+        .get();
       logger?.debug("Ready to get edit field", props.name);
       editFieldValue.value = "";
-      storage?.getEditField(document, props.name).then(function (
+      storage.getEditField(document, props.name).then(function (
         editField: string,
       ) {
         editFieldValue.value = editField;
@@ -85,7 +85,7 @@ export default defineComponent({
   },
   mounted() {
     logger?.debug("In field mounted");
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     addedHTMLField.forEach((fieldName) => {
       logger?.debug("Transform image", fieldName);
       ContentTools.transformImages(cristal, fieldName);
@@ -93,7 +93,7 @@ export default defineComponent({
   },
   updated() {
     logger?.debug("In field updated");
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     addedHTMLField.forEach((fieldName) => {
       logger?.debug("Transform image", fieldName);
       ContentTools.transformImages(cristal, fieldName);

@@ -33,6 +33,7 @@
     "@xwiki/cristal-attachments-ui": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-authentication-ui": "workspace:*",
+    "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",
     "@xwiki/cristal-backend-github": "workspace:*",
     "@xwiki/cristal-backend-nextcloud": "workspace:*",

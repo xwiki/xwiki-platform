@@ -24,7 +24,7 @@ import { AttachmentReference } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
 import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
 import { Ref } from "vue";
-import type { CristalApp } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { ModelReferenceSerializerProvider } from "@xwiki/cristal-model-reference-api";
 
 type Id = "attachment-preview";
@@ -95,7 +95,8 @@ class DefaultAttachmentPreview implements AttachmentPreview {
   private readonly refs: StateRefs;
   private readonly store: AttachmentPreviewStore;
   constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<StorageProvider>("StorageProvider")
+    private readonly storageProvider: StorageProvider,
     @inject("ModelReferenceSerializerProvider")
     private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,
   ) {
@@ -108,9 +109,9 @@ class DefaultAttachmentPreview implements AttachmentPreview {
     try {
       const serializer = this.modelReferenceSerializerProvider.get();
       if (serializer) {
-        const attachment = await this.cristalApp
-          .getWikiConfig()
-          .storage.getAttachment(
+        const attachment = await this.storageProvider
+          .get()
+          .getAttachment(
             serializer.serialize(attachmentReference.document)!,
             attachmentReference.name,
           );

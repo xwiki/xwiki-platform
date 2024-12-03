@@ -21,11 +21,11 @@
 import { inject, injectable } from "inversify";
 import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
 import { Ref } from "vue";
-import type { CristalApp } from "@xwiki/cristal-api";
 import type {
   Attachment,
   AttachmentsService,
 } from "@xwiki/cristal-attachments-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 
 type Id = "attachments";
 type State = {
@@ -117,7 +117,8 @@ export class DefaultAttachmentsService implements AttachmentsService {
   private readonly store: AttachmentsStore;
 
   constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<StorageProvider>("StorageProvider")
+    private readonly storageProvider: StorageProvider,
   ) {
     // An internal store is kept to easily provide refs for updatable elements.
     this.store = attachmentsStore();
@@ -147,7 +148,9 @@ export class DefaultAttachmentsService implements AttachmentsService {
   async refresh(page: string): Promise<void> {
     this.store.setLoading();
     try {
-      const attachmentData = await this.getStorage().getAttachments(page);
+      const attachmentData = await this.storageProvider
+        .get()
+        .getAttachments(page);
       if (attachmentData) {
         const { attachments, count } = attachmentData;
         this.store.updateAttachments(
@@ -178,15 +181,10 @@ export class DefaultAttachmentsService implements AttachmentsService {
       }
     }
   }
-
-  private getStorage() {
-    return this.cristalApp.getWikiConfig().storage;
-  }
-
   async upload(page: string, files: File[]): Promise<void> {
     this.store.startUploading();
     try {
-      await this.getStorage().saveAttachments(page, files);
+      await this.storageProvider.get().saveAttachments(page, files);
     } finally {
       this.store.stopUploading();
     }

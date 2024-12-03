@@ -39,6 +39,7 @@ import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { computed, inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   LinkSuggestService,
@@ -86,14 +87,16 @@ const save = async (authors: User[]) => {
     authors.map((author) => author.name).join(", "),
   );
   // TODO: html does not make any sense here.
-  await cristal
-    ?.getWikiConfig()
-    .storage.save(
-      currentPageName.value,
-      editor.value?.storage.markdown.getMarkdown(),
-      title.value,
-      "html",
-    );
+  const storage = cristal
+    .getContainer()
+    .get<StorageProvider>("StorageProvider")
+    .get();
+  await storage.save(
+    currentPageName.value,
+    editor.value?.storage.markdown.getMarkdown(),
+    title.value,
+    "html",
+  );
   // If this save operation just created the document, the current document
   // will be undefined. So we update it.
   if (!currentPage.value) {

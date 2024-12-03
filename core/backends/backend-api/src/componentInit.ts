@@ -18,9 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AbstractStorage } from "./abstractStorage";
-import { ComponentInit } from "./componentInit";
-import type OfflineStorage from "./offlineStorage";
-import type { StorageProvider } from "./storageProvider";
+import { DefaultStorageProvider } from "./defaultStorageProvider";
+import { StorageProvider } from "./storageProvider";
+import { Container } from "inversify";
 
-export { AbstractStorage, ComponentInit, OfflineStorage, StorageProvider };
+export class ComponentInit {
+  constructor(container: Container) {
+    container
+      .bind<StorageProvider>("StorageProvider")
+      .to(DefaultStorageProvider)
+      .inSingletonScope();
+  }
+}

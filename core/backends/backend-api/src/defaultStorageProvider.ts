@@ -18,9 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AbstractStorage } from "./abstractStorage";
-import { ComponentInit } from "./componentInit";
-import type OfflineStorage from "./offlineStorage";
-import type { StorageProvider } from "./storageProvider";
+import { StorageProvider } from "./storageProvider";
+import { Storage } from "@xwiki/cristal-api";
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 
-export { AbstractStorage, ComponentInit, OfflineStorage, StorageProvider };
+/**
+ * Provide the current storage.
+ * @since 0.13
+ */
+@injectable()
+class DefaultStorageProvider implements StorageProvider {
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
+
+  get(): Storage {
+    return this.cristalApp.getWikiConfig().storage;
+  }
+}
+
+export { DefaultStorageProvider };

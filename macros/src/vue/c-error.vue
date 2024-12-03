@@ -24,11 +24,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   </x-alert>
 </template>
 <script lang="ts">
-import { inject } from "vue";
 import { ContentTools } from "@xwiki/cristal-skin";
+import { inject } from "vue";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
-import type { PropType } from "vue";
 import type { MacroData } from "@xwiki/cristal-skin";
+import type { PropType } from "vue";
 
 let logger: Logger | null = null;
 let addedHTMLField: Array<string> = [];
@@ -61,7 +61,7 @@ export default {
   },
   mounted() {
     logger?.debug("In warning mounted");
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     addedHTMLField.forEach((fieldName) => {
       logger?.debug("Transform image", fieldName);
       ContentTools.transformImages(cristal, fieldName);
@@ -69,7 +69,7 @@ export default {
   },
   updated() {
     logger?.debug("In field updated");
-    const cristal = inject<CristalApp>("cristal");
+    const cristal = inject<CristalApp>("cristal")!;
     addedHTMLField.forEach((fieldName) => {
       logger?.debug("Transform image", fieldName);
       ContentTools.transformImages(cristal, fieldName);

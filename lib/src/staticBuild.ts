@@ -23,6 +23,7 @@ import { ComponentInit as AttachmentsDefaultComponentInit } from "@xwiki/cristal
 import { ComponentInit as AttachmentsUIComponentInit } from "@xwiki/cristal-attachments-ui";
 import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
 import { ComponentInit as AuthenticationUIComponentInit } from "@xwiki/cristal-authentication-ui";
+import { ComponentInit as BackendAPIComponentInit } from "@xwiki/cristal-backend-api";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
@@ -96,6 +97,7 @@ export class StaticBuild {
       new AttachmentsDefaultComponentInit(container);
       new UIExtensionDefaultComponentInit(container);
       new AuthenticationUIComponentInit(container);
+      new BackendAPIComponentInit(container);
       new AuthenticationAPIComponentInit(container);
       new LinkSuggestComponentInit(container);
       new XWikiLinkSuggestComponentInit(container);

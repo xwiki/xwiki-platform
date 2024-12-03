@@ -24,6 +24,7 @@ import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   PageHierarchyItem,
@@ -55,9 +56,11 @@ async function deletePage() {
     .get()
     .getPageHierarchy(props.currentPage!);
 
-  const result = await cristal
-    .getWikiConfig()
-    .storage.delete(props.currentPageName);
+  const storage = cristal
+    .getContainer()
+    .get<StorageProvider>("StorageProvider")
+    .get();
+  const result = await storage.delete(props.currentPageName);
   deleteDialogOpen.value = false;
 
   if (result.success) {

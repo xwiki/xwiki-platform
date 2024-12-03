@@ -178,15 +178,15 @@ importers:
 
   core/attachments/attachments-default:
     dependencies:
-      '@xwiki/cristal-api':
-        specifier: workspace:*
-        version: link:../../../api
       '@xwiki/cristal-attachments-api':
         specifier: workspace:*
         version: link:../attachments-api
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../../backends/backend-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
@@ -677,6 +677,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../../backends/backend-api
       '@xwiki/cristal-hierarchy-api':
         specifier: workspace:*
         version: link:../hierarchy-api
@@ -1268,6 +1271,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../../backends/backend-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
@@ -1550,6 +1556,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../../core/backends/backend-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
@@ -1868,6 +1877,9 @@ importers:
       '@xwiki/cristal-authentication-ui':
         specifier: workspace:*
         version: link:../core/authentication/authentication-ui
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../core/backends/backend-api
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../core/backends/backend-dexie
@@ -2192,6 +2204,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../core/backends/backend-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../core/document/document-api

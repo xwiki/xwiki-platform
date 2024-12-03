@@ -18,9 +18,15 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AbstractStorage } from "./abstractStorage";
-import { ComponentInit } from "./componentInit";
-import type OfflineStorage from "./offlineStorage";
-import type { StorageProvider } from "./storageProvider";
+import type { Storage } from "@xwiki/cristal-api";
 
-export { AbstractStorage, ComponentInit, OfflineStorage, StorageProvider };
+/**
+ * Resolves a {@link Storage} based on the current configuration.
+ * @since 0.13
+ */
+export interface StorageProvider {
+  /**
+   * @returns a {@link Storage} based on the current configuration
+   */
+  get(): Storage;
+}

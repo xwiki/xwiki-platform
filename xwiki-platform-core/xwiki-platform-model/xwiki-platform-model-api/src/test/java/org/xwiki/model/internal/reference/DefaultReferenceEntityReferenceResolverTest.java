@@ -328,7 +328,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
         // When the space reference has a parent type parameter of tye space, then it's resolved using the base
         // reference space has parent of it.
         EntityReference relativeSpaceReference = new EntityReference("Space", EntityType.SPACE,
-            Map.of(EntityReference.FALLBACK_PARENT_TYPE_PARAMETER, EntityType.SPACE));
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
 
         EntityReference reference = this.resolver.resolve(relativeSpaceReference, EntityType.SPACE);
         SpaceReference spaceReference = new SpaceReference(DEFAULT_WIKI, List.of(DEFAULT_SPACE, "Space"));

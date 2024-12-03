@@ -18,9 +18,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import messages from "../translations";
 import { CIcon } from "@xwiki/cristal-icons";
 import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { defineProps, inject, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   ModelReferenceSerializer,
@@ -44,6 +46,10 @@ var locationReference: SpaceReference | undefined = undefined;
 defineProps<{
   currentPage: PageData;
 }>();
+
+const { t } = useI18n({
+  messages,
+});
 
 function treeNodeClickAction(node: NavigationTreeNode) {
   locationReference = node.location;
@@ -70,7 +76,11 @@ function createPage() {
 </script>
 
 <template>
-  <x-dialog v-model="dialogOpen" width="auto" title="New Page">
+  <x-dialog
+    v-model="dialogOpen"
+    width="auto"
+    :title="t('page.creation.menu.title')"
+  >
     <template #activator="{ props }">
       <x-btn
         id="new-page-button"
@@ -80,7 +90,7 @@ function createPage() {
         @click="updateCurrentPage"
       >
         <c-icon name="plus" v-bind="props"></c-icon>
-        New Page
+        {{ t("page.creation.menu.button") }}
       </x-btn>
     </template>
     <template #default>
@@ -88,12 +98,12 @@ function createPage() {
         <x-form class="subgrid">
           <x-text-field
             v-model="name"
-            label="Name"
+            :label="t('page.creation.menu.field.name')"
             name="name"
             required
           ></x-text-field>
           <div>
-            <label>Parent Location</label>
+            <label>{{ t("page.creation.menu.field.location") }}</label>
             <div id="new-page-navigation-tree" class="location-box">
               <XNavigationTree
                 :click-action="treeNodeClickAction"
@@ -101,7 +111,7 @@ function createPage() {
               ></XNavigationTree>
               <x-text-field
                 v-model="location"
-                label="Location"
+                :label="t('page.creation.menu.field.location')"
                 name="location"
                 required
               ></x-text-field>
@@ -109,7 +119,9 @@ function createPage() {
           </div>
         </x-form>
       </div>
-      <x-btn slot="footer" @click="createPage">Create</x-btn>
+      <x-btn slot="footer" @click="createPage">{{
+        t("page.creation.menu.submit")
+      }}</x-btn>
     </template>
   </x-dialog>
 </template>

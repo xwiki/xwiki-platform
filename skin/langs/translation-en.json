@@ -1,6 +1,11 @@
 {
   "third": "Third",
   "page.actions.create.label": "Create a new document",
+  "page.creation.menu.button": "New Page",
+  "page.creation.menu.field.location": "Parent location",
+  "page.creation.menu.field.name": "Name",
+  "page.creation.menu.submit": "Create",
+  "page.creation.menu.title": "New Page",
   "information.extraTabs.title": "Information",
   "history.alert.content": "You are currently viewing version {revision} of {pageName}. Edition is disabled.",
   "history.alert.link.label": "Click here to go back to the latest version."

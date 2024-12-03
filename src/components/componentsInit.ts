@@ -23,6 +23,7 @@ import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
@@ -35,22 +36,17 @@ import type {
  **/
 @injectable()
 class XWikiPageHierarchyResolver implements PageHierarchyResolver {
-  private cristalApp: CristalApp;
-  public defaultHierarchyResolver: PageHierarchyResolver;
-  public logger: Logger;
-
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") private readonly logger: Logger,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
     @inject("PageHierarchyResolver")
-    pageHierarchyResolver: PageHierarchyResolver,
+    private readonly defaultHierarchyResolver: PageHierarchyResolver,
     @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
+    @inject<StorageProvider>("StorageProvider")
+    private readonly storageProvider: StorageProvider,
   ) {
-    this.logger = logger;
     this.logger.setModule("storage.components.XWikiPageHierarchyResolver");
-    this.cristalApp = cristalApp;
-    this.defaultHierarchyResolver = pageHierarchyResolver;
   }
 
   async getPageHierarchy(
@@ -87,9 +83,9 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
         (hierarchyItem: { label: string; url: string }) => {
           hierarchy.push({
             label: hierarchyItem.label,
-            pageId: this.cristalApp
-              .getWikiConfig()
-              .storage.getPageFromViewURL(hierarchyItem.url)!,
+            pageId: this.storageProvider
+              .get()
+              .getPageFromViewURL(hierarchyItem.url)!,
             url: hierarchyItem.url,
           });
         },

@@ -43,6 +43,8 @@
   #set($finished = $jobStatus.state.name() == 'FINISHED')
   #if ($finished)
     #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
+      ## Remove when the following issue is resolved:
+      ## TODO XWIKI-22710: Add translations for FilterStreamJobJSON
       #success('Done.')
     #else
       #error('Error has been found during the conversion !')

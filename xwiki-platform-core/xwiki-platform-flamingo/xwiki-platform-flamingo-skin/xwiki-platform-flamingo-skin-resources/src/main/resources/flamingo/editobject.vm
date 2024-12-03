@@ -38,7 +38,7 @@
  * Note that the exact context this content is rendered in is not fixed, using the XWiki macro 
  * would have ended up in unstable behaviour.
  *#
-#macro (warningWithExtraClass $text $extraClass)
+#macro (_warningWithExtraClass $text $extraClass)
 <div class="box warningmessage ${extraClass}">
   <span class="icon-block">$services.icon.renderHTML('warning')</span>
   <span class="sr-only">$services.localization.render('warning')</span>

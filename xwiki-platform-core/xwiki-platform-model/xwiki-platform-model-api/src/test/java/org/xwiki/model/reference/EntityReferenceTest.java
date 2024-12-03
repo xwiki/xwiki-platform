@@ -630,4 +630,48 @@ public class EntityReferenceTest
         assertSame(reference, reference.removeParameters(false));
         assertEquals(parentWithoutParameters, parent.removeParameters(true));
     }
+
+    @Test
+    void getParentType()
+    {
+        // no parent, no custom type, and no fallback for wiki
+        EntityReference wikiReference = new EntityReference(WIKI_NAME, EntityType.WIKI);
+        assertNull(wikiReference.getParentType());
+
+        // parent type
+        EntityReference spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE, wikiReference);
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // parent is set, so custom type cannot be set
+        spaceReference =
+            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // no parent, no custom type, but fallback on first allowed parent type
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE);
+        assertEquals(EntityType.WIKI, spaceReference.getParentType());
+
+        // custom type
+        spaceReference =
+            new EntityReference(spaceReference, Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+        assertEquals(EntityType.SPACE, spaceReference.getParentType());
+
+        // custom type
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, "SPACE"));
+        assertEquals(EntityType.SPACE, spaceReference.getParentType());
+
+        // invalid parent type, fallback on first allowed parent type
+        Map<String, Serializable> parametersMap =
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.PAGE);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            new EntityReference(SPACE_NAME, EntityType.SPACE, parametersMap));
+        assertEquals("The parent type [PAGE] does not belong to the allowed parents", exception.getMessage());
+
+        // invalid parent type value.
+        Map<String, Serializable> parametersMap2 = Map.of(EntityReference.PARENT_TYPE_PARAMETER,42);
+        exception = assertThrows(IllegalArgumentException.class, () ->
+            new EntityReference(SPACE_NAME, EntityType.SPACE, parametersMap2));
+        assertEquals("No enum constant org.xwiki.model.EntityType.42", exception.getMessage());
+    }
 }

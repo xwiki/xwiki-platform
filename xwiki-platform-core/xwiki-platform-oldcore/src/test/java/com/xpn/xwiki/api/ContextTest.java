@@ -73,7 +73,7 @@ class ContextTest
         context.setDisplayMode("edit");
 
         // We verify that the result contains a form input
-        assertEquals("<input size='5' id='space.page_0_prop' value='value' name='space.page_0_prop' " + "type='text'/>",
+        assertEquals("<input size='5' id='space.page_0_prop' aria-label='core.model.xclass.editClassProperty.textAlternative' value='value' name='space.page_0_prop' " + "type='text'/>",
             document.display("prop", xcontext));
 
         assertEquals("edit", context.getDisplayMode());

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -325,7 +326,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             if (value instanceof EntityType entityType) {
                 parentType = entityType;
             } else {
-                parentType = EntityType.valueOf(value.toString());
+                parentType = EntityType.valueOf(value.toString().toUpperCase(Locale.ROOT));
             }
             if (getType().getAllowedParents().contains(parentType)) {
                 this.parameters.put(PARENT_TYPE_PARAMETER, parentType);

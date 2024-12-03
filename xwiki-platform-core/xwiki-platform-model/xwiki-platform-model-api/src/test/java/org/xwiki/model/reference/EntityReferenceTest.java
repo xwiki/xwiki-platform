@@ -673,5 +673,10 @@ public class EntityReferenceTest
         exception = assertThrows(IllegalArgumentException.class, () ->
             new EntityReference(SPACE_NAME, EntityType.SPACE, parametersMap2));
         assertEquals("No enum constant org.xwiki.model.EntityType.42", exception.getMessage());
+
+        // custom type lowercase
+        spaceReference = new EntityReference(SPACE_NAME, EntityType.SPACE,
+            Map.of(EntityReference.PARENT_TYPE_PARAMETER, "space"));
+        assertEquals(EntityType.SPACE, spaceReference.getParentType());
     }
 }

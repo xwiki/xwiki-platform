@@ -21,8 +21,6 @@ package org.xwiki.model.internal.reference.converter;
 
 import javax.inject.Inject;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;

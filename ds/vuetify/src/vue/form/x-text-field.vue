@@ -26,7 +26,12 @@ const rules = computed(() => {
 </script>
 
 <template>
-  <v-text-field :label="label" :name="name" :rules="rules"></v-text-field>
+  <v-text-field
+    :label="label"
+    :name="name"
+    :autofocus="autofocus"
+    :rules="rules"
+  ></v-text-field>
 </template>
 
 <style scoped></style>

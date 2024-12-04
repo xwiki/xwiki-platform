@@ -12,6 +12,7 @@ const input = defineModel<string>();
     :label="label"
     :name="name"
     :required="required"
+    :autofocus.attr="autofocus"
     :value="input"
     type="text"
     @input="input = $event.target.value"

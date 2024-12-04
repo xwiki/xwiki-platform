@@ -19,11 +19,15 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
+import { useTemplateRef } from "vue";
+import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog";
 
 defineProps<{
   title: string;
   width: string | number | undefined;
 }>();
+
+const dialog = useTemplateRef<SlDialog>("dialog");
 
 function click() {
   open.value = true;
@@ -36,7 +40,7 @@ const open = defineModel<boolean>();
     <slot name="activator" />
   </span>
   <sl-dialog
-    v-if="open"
+    ref="dialog"
     :open="open"
     :label="title"
     class="dialog-overview"

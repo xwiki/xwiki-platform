@@ -40,6 +40,7 @@ const referenceSerializer: ModelReferenceSerializer = cristal
 
 const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
+const namePlaceholder: Ref<string> = ref("");
 const location: Ref<string> = ref("");
 var locationReference: SpaceReference | undefined = undefined;
 
@@ -57,12 +58,14 @@ function treeNodeClickAction(node: NavigationTreeNode) {
 }
 
 function updateCurrentPage() {
-  name.value = cristal.getWikiConfig().getNewPageDefaultName();
+  namePlaceholder.value = cristal.getWikiConfig().getNewPageDefaultName();
+  name.value = "";
 }
 
 function createPage() {
+  const newDocumentName = name.value ? name.value : namePlaceholder.value;
   const newDocumentReference = new DocumentReference(
-    name.value,
+    newDocumentName,
     locationReference!,
   );
 
@@ -98,8 +101,10 @@ function createPage() {
         <x-form class="subgrid">
           <x-text-field
             v-model="name"
+            :placeholder="namePlaceholder"
             :label="t('page.creation.menu.field.name')"
             name="name"
+            autofocus
             required
           ></x-text-field>
           <div>

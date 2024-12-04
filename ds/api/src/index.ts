@@ -43,10 +43,19 @@ type TabProps = {
   tabId: string;
 };
 
+/**
+ * Props of the text-field component.
+ * @since 0.9
+ */
 type TextFieldProps = {
   name: string;
   label: string;
   required: boolean;
+  /**
+   * Whether the field should be focused on load or not (default: false).
+   * @since 0.13
+   */
+  autofocus?: boolean;
 };
 
 /**

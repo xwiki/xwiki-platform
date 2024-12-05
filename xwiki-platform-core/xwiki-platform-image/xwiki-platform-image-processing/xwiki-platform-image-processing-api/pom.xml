@@ -29,11 +29,16 @@
   </parent>
   <artifactId>xwiki-platform-image-processing-api</artifactId>
   <name>XWiki Platform - Image - Processing - API</name>
+  <description>General APIs for processing images</description>
   <properties>
     <thumbnailator.version>0.4.20</thumbnailator.version>
     <xwiki.jacoco.instructionRatio>0.22</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-image-api</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Image Processing API</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

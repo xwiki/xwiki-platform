@@ -2287,8 +2287,8 @@ importers:
   sources/xwiki/mock-server:
     dependencies:
       dotenv:
-        specifier: 16.4.5
-        version: 16.4.5
+        specifier: 16.4.7
+        version: 16.4.7
       express:
         specifier: 4.21.1
         version: 4.21.1
@@ -4779,8 +4779,8 @@ packages:
   dotenv-expand@5.1.0:
     resolution: {integrity: sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==}
 
-  dotenv@16.4.5:
-    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+  dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
   dotenv@9.0.2:
@@ -9424,7 +9424,7 @@ snapshots:
       config-file-ts: 0.2.8-rc1
       debug: 4.3.7
       dmg-builder: 25.1.8(electron-builder-squirrel-windows@24.13.3)
-      dotenv: 16.4.5
+      dotenv: 16.4.7
       dotenv-expand: 11.0.6
       ejs: 3.1.9
       electron-builder-squirrel-windows: 24.13.3(dmg-builder@25.1.8)
@@ -10127,11 +10127,11 @@ snapshots:
 
   dotenv-expand@11.0.6:
     dependencies:
-      dotenv: 16.4.5
+      dotenv: 16.4.7
 
   dotenv-expand@5.1.0: {}
 
-  dotenv@16.4.5: {}
+  dotenv@16.4.7: {}
 
   dotenv@9.0.2: {}
 
@@ -11756,7 +11756,7 @@ snapshots:
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
       cliui: 8.0.1
-      dotenv: 16.4.5
+      dotenv: 16.4.7
       dotenv-expand: 11.0.6
       enquirer: 2.3.6
       figures: 3.2.0

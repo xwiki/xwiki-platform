@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * @see XWikiPluginInterface#getName()
      */
     private static final String PLUGIN_NAME = "image";
+
+    private static final String DEFAULT_QUALITY_PARAM = "xwiki.plugin.image.defaultQuality";
 
     /**
      * Cache for already served images.
@@ -120,13 +123,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String imageProcessorHint = context.getWiki().Param("xwiki.plugin.image.processorHint", "thumbnailator");
         this.imageProcessor = Utils.getComponent(ImageProcessor.class, imageProcessorHint);
 
-        String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
+        String defaultQualityParam = context.getWiki().Param(DEFAULT_QUALITY_PARAM);
         if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
-                    + "Using {} as the default image quality.", this.defaultQuality);
+                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality.",
+                    DEFAULT_QUALITY_PARAM, this.defaultQuality);
             }
         }
     }
@@ -219,9 +222,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
                     // Transform the image attachment before is it downloaded.
                     result = downloadImage(attachment, width, height, quality, context);
                 } catch (Exception e) {
-                    LOG.warn(
-                        "Failed to transform image attachment {} for scaling, falling back to original attachment.",
-                        attachment.getFilename());
+                    LOG.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
+                        + "attachment. Root error: [{}]", attachment.getFilename(),
+                        ExceptionUtils.getRootCauseMessage(e));
                     LOG.debug("Full stack trace for image attachment scaling error: ", e);
                 }
             }

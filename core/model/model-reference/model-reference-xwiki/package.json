@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "reflect-metadata": "0.2.2",
-    "vitest": "2.1.7"
+    "vitest": "2.1.8"
   },
   "publishConfig": {
     "exports": {

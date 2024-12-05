@@ -36,10 +36,23 @@ defineProps<{
   </div>
 </template>
 <style scoped>
+.c-sidebar-panel {
+  display: flex;
+  flex-flow: column;
+  gap: var(--cr-spacing-x-small);
+}
+
+.sidebar-content {
+  display: flex;
+  flex-flow: column;
+  gap: var(--cr-spacing-x-small);
+}
+
 .header {
   display: flex;
   flex-flow: row;
 }
+
 .title {
   color: var(--cr-color-neutral-500);
   font-size: var(--cr-font-size-small);

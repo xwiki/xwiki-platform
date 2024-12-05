@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-realtime</artifactId>
-    <version>15.10.15</version>
+    <version>15.10.16-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wiki</artifactId>
   <name>XWiki Platform - Realtime - Wiki - Parent POM</name>

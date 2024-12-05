@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-export-pdf</artifactId>
-    <version>15.10.15-SNAPSHOT</version>
+    <version>15.10.15</version>
   </parent>
   <artifactId>xwiki-platform-export-pdf-default</artifactId>
   <name>XWiki Platform - Export - PDF - Default</name>

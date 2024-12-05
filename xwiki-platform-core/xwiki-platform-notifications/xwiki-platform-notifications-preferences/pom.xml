@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-notifications</artifactId>
-    <version>15.10.15-SNAPSHOT</version>
+    <version>15.10.15</version>
   </parent>
   <artifactId>xwiki-platform-notifications-preferences</artifactId>
   <name>XWiki Platform - Notifications - Preferences - Parent POM</name>

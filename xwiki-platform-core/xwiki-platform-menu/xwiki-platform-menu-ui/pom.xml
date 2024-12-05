@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu</artifactId>
-    <version>15.10.15-SNAPSHOT</version>
+    <version>15.10.15</version>
   </parent>
   <artifactId>xwiki-platform-menu-ui</artifactId>
   <name>XWiki Platform - Menu - UI</name>

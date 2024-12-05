@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mentions</artifactId>
-    <version>15.10.15-SNAPSHOT</version>
+    <version>15.10.15</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-mentions-default</artifactId>

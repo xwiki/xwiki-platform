@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>15.10.15-SNAPSHOT</version>
+    <version>15.10.15</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
   <name>XWiki Platform - Repository - Server API</name>

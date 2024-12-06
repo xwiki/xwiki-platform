@@ -98,7 +98,7 @@ function createPage() {
     </template>
     <template #default>
       <div id="new-page-content" class="grid">
-        <x-form class="subgrid">
+        <x-form class="subgrid" @form-submit="createPage">
           <x-text-field
             v-model="name"
             :placeholder="namePlaceholder"
@@ -122,11 +122,13 @@ function createPage() {
               ></x-text-field>
             </div>
           </div>
+          <!-- This is a hidden button to enable submit events for Vuetify.
+               We do not want to put the other button inside the form, we want
+               to keep it in the footer instead. -->
+          <input type="submit" />
         </x-form>
       </div>
-      <x-btn slot="footer" @click="createPage">{{
-        t("page.creation.menu.submit")
-      }}</x-btn>
+      <x-btn @click="createPage">{{ t("page.creation.menu.submit") }}</x-btn>
     </template>
   </x-dialog>
 </template>
@@ -158,5 +160,9 @@ function createPage() {
   grid-template-columns: subgrid;
   grid-column: 1 / 1;
   gap: 0.5rem;
+}
+
+input[type="submit"] {
+  display: none;
 }
 </style>

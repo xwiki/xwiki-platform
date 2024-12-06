@@ -32,6 +32,8 @@
   --cr-sizes-collapsed-main-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard main main sidebar*/
   --cr-base-font-size: 16px;
   --cr-base-text-color: var(--cr-color-gray-950);
+  --cr-base-link-color: var(--cr-base-text-color);
+  --cr-base-visited-link-color: var(--cr-base-text-color);
 
 
   /*

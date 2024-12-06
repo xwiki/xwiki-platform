@@ -73,14 +73,23 @@ async function upload(files: File[]) {
 </script>
 
 <template>
-  <AttachmentUploadForm
-    ref="attachmentUpload"
-    :is-uploading="isUploading"
-    @files-selected="upload"
-  ></AttachmentUploadForm>
-  <AttachmentsTable
-    :attachments="attachments"
-    :error-message="errorMessage"
-    :is-loading="isLoading"
-  />
+  <div class="attachments">
+    <AttachmentUploadForm
+      ref="attachmentUpload"
+      :is-uploading="isUploading"
+      @files-selected="upload"
+    ></AttachmentUploadForm>
+    <AttachmentsTable
+      :attachments="attachments"
+      :error-message="errorMessage"
+      :is-loading="isLoading"
+    />
+  </div>
 </template>
+<style scoped>
+.attachments {
+  display:flex;
+  flex-flow: column;
+  gap:16px;
+}
+</style>

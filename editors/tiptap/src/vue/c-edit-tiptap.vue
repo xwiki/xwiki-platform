@@ -354,6 +354,11 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   justify-self: center;
 }
 
+:deep(.editor table td),
+:deep(.editor table th) {
+  border: 1px solid var(--cr-color-neutral-300);
+}
+
 /*
  * Collaboration styles.
  *

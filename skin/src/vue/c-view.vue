@@ -245,6 +245,63 @@ TODO: these rules about opening and closing the sidebar should be better organiz
   display: block;
 }
 
+/*LINKS*/
+
+:deep(.content a) {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-weight: var(--cr-font-weight-semibold);
+  text-decoration-color: var(--cr-color-neutral-300);
+  color: var(--cr-base-link-color);
+
+  &:visited {
+    text-decoration-color: var(--cr-color-neutral-300);
+    color: var(--cr-base-visited-link-color);
+  }
+  &:hover {
+    text-decoration-color: var(--cr-color-neutral-500);
+  }
+}
+
+/*TABLE*/
+:deep(table) {
+  border-collapse: collapse;
+  overflow-x: auto;
+  font-size: var(--cr-font-size-small);
+  line-height: var(--cr-line-height-dense);
+  & th,
+  td {
+    text-align: start;
+  }
+  & th {
+    background-color: var(--cr-color-neutral-100);
+    padding: var(--cr-spacing-x-small);
+    font-weight: var(--cr-font-weight-semibold);
+
+    &:first-child {
+      border-top-left-radius: var(--cr-border-radius-large);
+    }
+    &:last-child {
+      border-top-right-radius: var(--cr-border-radius-large);
+    }
+  }
+  & td {
+    padding: var(--cr-spacing-small) var(--cr-spacing-x-small);
+  }
+  tbody {
+    & tr {
+      border-bottom: 1px solid var(--cr-color-neutral-200);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+      & .mobile-column-name {
+        display: none;
+      }
+    }
+  }
+}
+
 /*
 WIKI STYLES
 TODO: Discuss and move them to a more appropriate place
@@ -285,6 +342,28 @@ TODO: Discuss and move them to a more appropriate place
 
   .resize-handle {
     display: none;
+  }
+  :deep(table.mobile-transform) {
+    & thead {
+      & th {
+        display: none;
+      }
+    }
+    & tbody {
+      display: grid;
+      gap: 8px;
+      & tr {
+        display: grid;
+        border: 1px solid var(--cr-color-neutral-200);
+        border-radius: var(--cr-border-radius-medium);
+        & td {
+          & span.mobile-column-name {
+            display: block;
+            font-weight: var(--cr-font-weight-bold);
+          }
+        }
+      }
+    }
   }
 }
 </style>

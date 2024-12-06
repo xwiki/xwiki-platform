@@ -282,39 +282,6 @@ onUpdated(() => {
 :global(.doc-header-inner) {
   padding: 0;
 }
-:global(.doc-content table) {
-  max-width: 100%;
-  width: 100%;
-  border: none;
-  border-collapse: collapse;
-  color: inherit;
-  margin-bottom: var(--cr-spacing-small);
-}
-
-:global(.doc-content table tr) {
-  border-bottom: solid 1px var(--cr-input-border-color);
-}
-
-:global(.doc-content table th) {
-  font-weight: var(--cr-font-weight-bold);
-  text-align: start;
-}
-
-:global(.doc-content table td),
-:global(.doc-content table th) {
-  line-height: var(--cr-line-height-normal);
-  padding: 1rem 1rem;
-}
-
-:global(.doc-content table th p:first-child),
-:global(.doc-content table td p:first-child) {
-  margin-top: 0;
-}
-
-:global(.doc-content table th p:last-child),
-:global(.doc-content table td p:last-child) {
-  margin-bottom: 0;
-}
 
 /*---*/
 

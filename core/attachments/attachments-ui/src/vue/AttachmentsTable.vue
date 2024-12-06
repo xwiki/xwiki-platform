@@ -42,7 +42,7 @@ const hasAuthor = computed(() => {
   <span v-else-if="attachments.length == 0">
     {{ t("attachments.tab.noAttachments") }}
   </span>
-  <table v-else>
+  <table v-else class="mobile-transform">
     <thead>
       <tr>
         <th>{{ t("attachments.tab.table.header.name") }}</th>
@@ -55,25 +55,22 @@ const hasAuthor = computed(() => {
     <tbody>
       <tr v-for="attachment in attachments" :key="attachment.id">
         <td>
+          <span class="mobile-column-name">{{ t("attachments.tab.table.header.name") }}</span>
           <a
             :href="attachment.href"
             @click="attachmentPreview(attachment.href, $event)"
             >{{ attachment.name }}</a
           >
         </td>
-        <td>{{ attachment.mimetype }}</td>
-        <td><file-size :size="attachment.size"></file-size></td>
-        <td><date :date="attachment.date"></date></td>
+        <td>
+          <span class="mobile-column-name">{{ t("attachments.tab.table.header.mimetype") }}</span>{{ attachment.mimetype }}</td>
+        <td><span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><file-size :size="attachment.size"></file-size></td>
+        <td><span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><date :date="attachment.date"></date></td>
         <td v-if="hasAuthor">
+          <span class="mobile-column-name">{{ t("attachments.tab.table.header.author") }}</span>
           <user v-if="attachment.author" :user="attachment.author"></user>
         </td>
       </tr>
     </tbody>
   </table>
 </template>
-
-<style>
-tbody td {
-  padding: 3px;
-}
-</style>

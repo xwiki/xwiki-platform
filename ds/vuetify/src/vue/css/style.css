@@ -35,7 +35,6 @@
   --cr-base-link-color: var(--cr-base-text-color);
   --cr-base-visited-link-color: var(--cr-base-text-color);
 
-
   /*
    * Typography
    */
@@ -84,9 +83,9 @@
   --cr-focus-ring: var(--cr-focus-ring-style) var(--cr-focus-ring-width) var(--cr-focus-ring-color);
   --cr-focus-ring-offset: 1px;
 
-/*
- * Color Primitives
- */
+  /*
+   * Color Primitives
+   */
 
   /* Gray */
   --cr-color-gray-50: hsl(0 0% 97.5%);

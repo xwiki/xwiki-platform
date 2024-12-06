@@ -206,7 +206,9 @@ async function loadEditor(page: PageData | undefined) {
 watch(
   loading,
   (newLoading) => {
-    if (!newLoading) loadEditor(currentPage.value);
+    if (!newLoading) {
+      loadEditor(currentPage.value);
+    }
   },
   { immediate: true },
 );
@@ -262,6 +264,7 @@ watch(
   overflow: hidden;
   justify-content: center;
 }
+
 .content-loading {
   display: flex;
   flex-flow: column;

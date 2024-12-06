@@ -215,8 +215,8 @@ onUpdated(() => {
             }}
             <router-link
               :to="{ name: 'view', params: { page: currentPageName } }"
-              >{{ t("history.alert.link.label") }}</router-link
-            >
+              >{{ t("history.alert.link.label") }}
+            </router-link>
           </x-alert>
         </div>
       </div>
@@ -272,12 +272,15 @@ onUpdated(() => {
   scrollbar-gutter: stable;
   height: 100%;
 }
+
 :global(.content:has(.edit-wrapper)) {
   grid-template-rows: 1fr;
 }
+
 :global(.content > .edit-wrapper) {
   grid-template-rows: auto 1fr;
 }
+
 :global(.doc-content),
 :global(.doc-header-inner) {
   padding: 0;

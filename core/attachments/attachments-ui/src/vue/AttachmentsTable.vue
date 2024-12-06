@@ -55,7 +55,9 @@ const hasAuthor = computed(() => {
     <tbody>
       <tr v-for="attachment in attachments" :key="attachment.id">
         <td>
-          <span class="mobile-column-name">{{ t("attachments.tab.table.header.name") }}</span>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.name") }}
+          </span>
           <a
             :href="attachment.href"
             @click="attachmentPreview(attachment.href, $event)"
@@ -63,11 +65,27 @@ const hasAuthor = computed(() => {
           >
         </td>
         <td>
-          <span class="mobile-column-name">{{ t("attachments.tab.table.header.mimetype") }}</span>{{ attachment.mimetype }}</td>
-        <td><span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><file-size :size="attachment.size"></file-size></td>
-        <td><span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><date :date="attachment.date"></date></td>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.mimetype") }}
+          </span>
+          {{ attachment.mimetype }}
+        </td>
+        <td>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.size") }}
+          </span>
+          <span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><file-size :size="attachment.size"></file-size>
+        </td>
+        <td>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.date") }}
+          </span>
+          <span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><date :date="attachment.date"></date>
+        </td>
         <td v-if="hasAuthor">
-          <span class="mobile-column-name">{{ t("attachments.tab.table.header.author") }}</span>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.author") }}
+          </span>
           <user v-if="attachment.author" :user="attachment.author"></user>
         </td>
       </tr>

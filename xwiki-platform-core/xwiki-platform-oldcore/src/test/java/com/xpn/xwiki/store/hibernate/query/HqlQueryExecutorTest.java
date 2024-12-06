@@ -220,7 +220,7 @@ public class HqlQueryExecutorTest
     {
         org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "bar";
-        Integer[] value = new Integer[] { 1, 2, 3 };
+        Integer[] value = new Integer[] {1, 2, 3};
         this.executor.setNamedParameter(query, name, value);
 
         verify(query).setParameterList(name, value);
@@ -403,7 +403,7 @@ public class HqlQueryExecutorTest
             assertEquals(
                 "The query requires programming right."
                     + " Query statement = [select notallowed.name from NotAllowedTable notallowed]",
-                expected.getMessage());
+                expected.getCause().getMessage());
         }
     }
 
@@ -415,7 +415,7 @@ public class HqlQueryExecutorTest
             fail("Should have thrown an exception here");
         } catch (QueryException expected) {
             assertEquals("The query requires programming right. Query statement = [delete from XWikiDocument as doc]",
-                expected.getMessage());
+                expected.getCause().getMessage());
         }
     }
 
@@ -426,7 +426,8 @@ public class HqlQueryExecutorTest
             executeNamed("somename", false);
             fail("Should have thrown an exception here");
         } catch (QueryException expected) {
-            assertEquals("Named queries requires programming right. Named query = [somename]", expected.getMessage());
+            assertEquals("Named queries requires programming right. Named query = [somename]",
+                expected.getCause().getMessage());
         }
     }
 
@@ -439,7 +440,7 @@ public class HqlQueryExecutorTest
         } catch (QueryException expected) {
             assertEquals(
                 "The query requires programming right. Query statement = [update XWikiDocument set name='name']",
-                expected.getMessage());
+                expected.getCause().getMessage());
         }
     }
 }

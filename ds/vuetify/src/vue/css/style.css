@@ -536,6 +536,12 @@
   --cr-panel-border-color: var(--cr-color-neutral-200);
   --cr-panel-border-width: 1px;
 
+  /* 
+  * Header
+  */
+
+  --cr-panel-background-color: var(--cr-color-neutral-0);
+
   /*
    * Tooltips
    */

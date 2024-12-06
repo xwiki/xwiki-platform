@@ -34,7 +34,7 @@ const list = await infoActionsService.list();
 </script>
 
 <template>
-  <div class="doc-info-actions">
+  <div class="actions">
     <info-action
       v-for="infoAction in list"
       :key="infoAction.id"
@@ -44,7 +44,7 @@ const list = await infoActionsService.list();
 </template>
 
 <style scoped>
-.doc-info-actions {
+.actions {
   display: flex;
   flex-wrap: wrap;
   flex-flow: row;

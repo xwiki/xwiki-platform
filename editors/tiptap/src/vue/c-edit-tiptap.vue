@@ -342,7 +342,11 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   color: var(--cr-color-neutral-500);
   content: attr(data-placeholder);
 }
-
+.doc-header {
+  top: 0;
+  background: var(--cr-color-header-bg);
+  z-index: 1;
+}
 .doc-title {
   max-width: var(--cr-sizes-max-page-width);
   width: 100%;

@@ -165,18 +165,19 @@ onUpdated(() => {
     <div class="doc-header">
       <div class="doc-header-inner">
         <h1 class="doc-title">{{ title }}</h1>
-        <div class="doc-info">
-          <span class="doc-info-user-info">
+        <div class="info-wrapper">
+          <span class="doc-author">
             <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
             User Name edited on 12/12/2024 at 12:00
           </span>
           <!-- TODO: add a way to inject those by extension
-               and provide one for the number of attachments.
-              It must be reactive whenever the attachment store is updated -->
+                 and provide one for the number of attachments.
+                It must be reactive whenever the attachment store is updated -->
           <div class="doc-info-actions">
             <suspense>
               <info-actions></info-actions>
             </suspense>
+
             <div class="doc-page-actions">
               <router-link
                 :to="
@@ -249,10 +250,11 @@ onUpdated(() => {
   </article>
 </template>
 <style scoped>
-.content {
-  padding: 0;
+@container xwCristal (max-width: 600px) {
+  .content {
+    padding-left: 0 var(--cr-spacing-x-small);
+  }
 }
-
 .content-loading {
   display: flex;
   flex-flow: column;
@@ -263,12 +265,15 @@ onUpdated(() => {
 
 /*TABLE STYLES*/
 /*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
+:global(.content) {
+  padding: 0 var(--cr-spacing-2x-large);
+  overflow: auto;
+}
 :global(.content),
 :global(.content > .edit-wrapper) {
   display: grid;
   grid-template-rows: auto auto auto 1fr;
   gap: var(--cr-spacing-small);
-  overflow: auto;
   scrollbar-gutter: stable;
   height: 100%;
 }
@@ -307,76 +312,79 @@ onUpdated(() => {
   display: block;
 }
 
-:global(.doc-header) {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto auto;
-  gap: 0px 0px;
-  grid-template-areas:
-    "title"
-    "info-user";
-  gap: var(--cr-spacing-x-small);
+.doc-header {
   top: 0;
   background: white;
   z-index: 1;
-}
 
-.doc-header-alerts:not(:empty) {
-  margin-top: var(--cr-spacing-x-small);
-}
+  & .doc-header-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: var(--cr-spacing-x-small);
+    grid-auto-flow: row;
+    grid-template-areas:
+      "doc-title"
+      "info-wrapper"
+      "alerts";
 
-.doc-title {
-  grid-area: title;
-  margin: 0;
-  font-size: var(--cr-font-size-2x-large);
-  line-height: var(--cr-font-size-2x-large);
-}
+    & .doc-title {
+      grid-area: doc-title;
+      margin: 0;
+      font-size: var(--cr-font-size-2x-large);
+      line-height: var(--cr-font-size-2x-large);
+      padding-block-start: var(--cr-spacing-small);
+    }
+    & .info-wrapper {
+      grid-area: info-wrapper;
+      display: flex;
+      flex-flow: wrap;
+      gap: var(--cr-spacing-small);
 
-.doc-info {
-  grid-area: info-user;
-  display: flex;
-  flex-flow: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--cr-spacing-small);
-  color: var(--cr-color-neutral-500);
-  font-size: var(--cr-font-size-small);
-  justify-content: space-between;
-}
+      & .doc-author {
+        grid-area: doc-author;
+        margin-inline-end: auto;
+        font-size: var(--cr-font-size-small);
+        color: var(--cr-color-neutral-600);
 
-.avatar {
-  --size: 24px;
-}
+        & .avatar {
+          --size: 24px;
+        }
+      }
 
-.doc-info-actions,
-.doc-page-actions {
-  display: flex;
-  flex-wrap: wrap;
-  flex-flow: row;
-  align-items: center;
-  gap: var(--cr-spacing-2x-small);
-}
+      & .doc-info {
+        grid-area: info-user;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--cr-spacing-small);
+        color: var(--cr-color-neutral-500);
+        font-size: var(--cr-font-size-small);
+        justify-content: space-between;
+      }
+      & .doc-info-actions {
+        display: flex;
+        flex-wrap: wrap;
+        flex-flow: row;
+        align-items: center;
+        gap: var(--cr-spacing-2x-small);
+        justify-self: end;
 
-.doc-info-actions {
-  justify-self: end;
+        & .doc-page-actions {
+          display: flex;
+          flex-wrap: wrap;
+          flex-flow: row;
+          align-items: center;
+          gap: var(--cr-spacing-2x-small);
+        }
+      }
+    }
+  }
+  .doc-header-alerts:not(:empty) {
+    margin-top: var(--cr-spacing-x-small);
+  }
 }
-
-.info-action {
-  display: flex;
-  background-color: var(--cr-color-neutral-100);
-  border-radius: 99px;
-  padding: var(--cr-spacing-2x-small) var(--cr-spacing-2x-small);
-  font-size: var(--cr-font-size-medium);
-  flex-flow: row;
-  gap: var(--cr-spacing-2x-small);
-  align-items: center;
-}
-
-.info-action .cr-icon {
-  line-height: 1.3rem;
-}
-
 .page-header {
   padding: var(--cr-spacing-small) 0;
   display: flex;

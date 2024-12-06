@@ -123,8 +123,8 @@ function onCollapseMainSidebar() {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
-  grid-column-gap: var(--cr-spacing-2x-large);
-  grid-row-gap: 0px;
+  grid-column-gap: 0;
+  grid-row-gap: 0;
   grid-template-areas:
     "main-sidebar wiki-header"
     "main-sidebar main-content"

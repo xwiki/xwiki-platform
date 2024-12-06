@@ -54,6 +54,6 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
   }
 
   override getNewPageDefaultName(): string {
-    return "NewPage.WebHome";
+    return "NewPage";
   }
 }

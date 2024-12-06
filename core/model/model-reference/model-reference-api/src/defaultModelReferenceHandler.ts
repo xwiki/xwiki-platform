@@ -18,20 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ComponentInit } from "./componentInit";
+import { DocumentReference } from "@xwiki/cristal-model-api";
+import { injectable } from "inversify";
 import type { ModelReferenceHandler } from "./modelReferenceHandler";
-import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
-import type { ModelReferenceParser } from "./modelReferenceParser";
-import type { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
-import type { ModelReferenceSerializer } from "./modelReferenceSerializer";
-import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
+import type { SpaceReference } from "@xwiki/cristal-model-api";
 
-export {
-  ComponentInit,
-  type ModelReferenceHandler,
-  type ModelReferenceHandlerProvider,
-  type ModelReferenceParser,
-  type ModelReferenceParserProvider,
-  type ModelReferenceSerializer,
-  type ModelReferenceSerializerProvider,
-};
+/**
+ * Default implementation for {@link ModelReferenceHandler}.
+ *
+ * @since 0.13
+ */
+@injectable()
+class DefaultModelReferenceHandler implements ModelReferenceHandler {
+  createDocumentReference(
+    name: string,
+    space: SpaceReference,
+  ): DocumentReference {
+    return new DocumentReference(name, space);
+  }
+}
+
+export { DefaultModelReferenceHandler };

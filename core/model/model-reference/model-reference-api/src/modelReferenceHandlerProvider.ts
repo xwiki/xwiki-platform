@@ -18,20 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { ComponentInit } from "./componentInit";
-import type { ModelReferenceHandler } from "./modelReferenceHandler";
-import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
-import type { ModelReferenceParser } from "./modelReferenceParser";
-import type { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
-import type { ModelReferenceSerializer } from "./modelReferenceSerializer";
-import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
+import { ModelReferenceHandler } from "./modelReferenceHandler";
 
-export {
-  ComponentInit,
-  type ModelReferenceHandler,
-  type ModelReferenceHandlerProvider,
-  type ModelReferenceParser,
-  type ModelReferenceParserProvider,
-  type ModelReferenceSerializer,
-  type ModelReferenceSerializerProvider,
-};
+/**
+ * A ModelReferenceHandlerProvider returns the expected instance of
+ * {@link ModelReferenceHandler}.
+ *
+ * @since 0.13
+ */
+interface ModelReferenceHandlerProvider {
+  /**
+   * Returns the instance of {@link ModelReferenceHandler} matching the
+   * requested wiki configuration type, or the current one if empty.
+   *
+   * @param type - the wiki configuration type
+   * @returns the instance of model reference handler
+   */
+  get(type?: string): ModelReferenceHandler | undefined;
+}
+
+export { type ModelReferenceHandlerProvider };

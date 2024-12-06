@@ -20,11 +20,13 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import messages from "../translations";
 import { CIcon } from "@xwiki/cristal-icons";
-import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { defineProps, inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { SpaceReference } from "@xwiki/cristal-model-api";
 import type {
+  ModelReferenceHandler,
+  ModelReferenceHandlerProvider,
   ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
@@ -33,6 +35,10 @@ import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
+const referenceHandler: ModelReferenceHandler = cristal
+  .getContainer()
+  .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+  .get()!;
 const referenceSerializer: ModelReferenceSerializer = cristal
   .getContainer()
   .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
@@ -64,7 +70,7 @@ function updateCurrentPage() {
 
 function createPage() {
   const newDocumentName = name.value ? name.value : namePlaceholder.value;
-  const newDocumentReference = new DocumentReference(
+  const newDocumentReference = referenceHandler.createDocumentReference(
     newDocumentName,
     locationReference!,
   );

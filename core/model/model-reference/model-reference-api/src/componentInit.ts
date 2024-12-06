@@ -18,14 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultModelReferenceHandler } from "./defaultModelReferenceHandler";
+import { DefaultModelReferenceHandlerProvider } from "./defaultModelReferenceHandlerProvider";
 import { DefaultModelReferenceParserProvider } from "./defaultModelReferenceParserProvider";
 import { DefaultModelReferenceSerializerProvider } from "./defaultModelReferenceSerializerProvider";
-import { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
-import { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
+import type { ModelReferenceHandler } from "./modelReferenceHandler";
+import type { ModelReferenceHandlerProvider } from "./modelReferenceHandlerProvider";
+import type { ModelReferenceParserProvider } from "./modelReferenceParserProvider";
+import type { ModelReferenceSerializerProvider } from "./modelReferenceSerializerProvider";
 import type { Container } from "inversify";
 
 class ComponentInit {
   constructor(container: Container) {
+    container
+      .bind<ModelReferenceHandler>("ModelReferenceHandler")
+      .to(DefaultModelReferenceHandler)
+      .inSingletonScope()
+      .whenTargetIsDefault();
+    container
+      .bind<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+      .to(DefaultModelReferenceHandlerProvider)
+      .inSingletonScope();
     container
       .bind<ModelReferenceParserProvider>("ModelReferenceParserProvider")
       .to(DefaultModelReferenceParserProvider)

@@ -18,16 +18,20 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
+import { useSlots } from "vue";
+
 defineProps<{
   title: string;
   width: string | number | undefined;
 }>();
 
+const slots = useSlots();
+
 // const innerIsActive = ref(props.isActive);
 </script>
 
 <template>
-  <v-dialog :width="width">
+  <v-dialog :width="width" scrollable>
     <template #activator="{ props }">
       <span v-bind="props">
         <slot name="activator" />
@@ -38,7 +42,16 @@ defineProps<{
         <v-card-text>
           <slot name="default" />
         </v-card-text>
+        <v-card-actions v-if="slots.footer">
+          <slot name="footer" />
+        </v-card-actions>
       </v-card>
     </template>
   </v-dialog>
 </template>
+
+<style scoped>
+:deep(.v-card-actions) {
+  padding: var(--cr-spacing-large);
+}
+</style>

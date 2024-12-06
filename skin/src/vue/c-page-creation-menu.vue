@@ -134,6 +134,8 @@ function createPage() {
           <input type="submit" />
         </x-form>
       </div>
+    </template>
+    <template #footer>
       <x-btn @click="createPage">{{ t("page.creation.menu.submit") }}</x-btn>
     </template>
   </x-dialog>

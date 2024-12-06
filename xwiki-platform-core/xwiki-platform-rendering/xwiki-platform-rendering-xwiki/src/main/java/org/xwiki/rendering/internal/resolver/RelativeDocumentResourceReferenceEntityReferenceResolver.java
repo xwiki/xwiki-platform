@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.resolver;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -37,6 +39,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  *
  * @version $Id$
  * @since 17.0.0RC1
+ * @since 16.10.1
  */
 @Component
 @Named("relative/doc")
@@ -46,6 +49,9 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
 {
     @Inject
     private DocumentReferenceResolver<String> defaultStringDocumentReferenceResolver;
+
+    @Inject
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
 
     /**
      * Default constructor.
@@ -74,17 +80,40 @@ public class RelativeDocumentResourceReferenceEntityReferenceResolver
             this.relativeReferenceResolver.resolve(resourceReference.getReference(), EntityType.DOCUMENT,
                 baseReference);
 
-        EntityReference result = relativeReference;
-        if (relativeReference != null && relativeReference.extractReference(EntityType.WIKI) != null) {
+        DocumentReference reference;
+        if (relativeReference != null && (relativeReference.extractReference(EntityType.SPACE) == null
+            || relativeReference.extractReference(EntityType.WIKI) == null)) {
+            return setDefaultDocument(relativeReference);
+        } else {
             // Resolve the full document reference
             // We don't start from the previously parsed relative reference to not loose "." prefixed reference meaning
-            DocumentReference reference =
+            reference =
                 this.defaultStringDocumentReferenceResolver.resolve(resourceReference.getReference(), baseReference);
-
             // Take care of fallback if needed
-            result = resolveDocumentReference(relativeReference, reference, baseReference);
+            return resolveDocumentReference(relativeReference, reference, baseReference);
+        }
+    }
+
+    private EntityReference setDefaultDocument(EntityReference relativeReference)
+    {
+        String defaultDocumentName =
+            this.defaultReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+
+        EntityReference result;
+        if (!defaultDocumentName.equals(relativeReference.getName())) {
+            EntityReference parentSpace = new EntityReference(relativeReference.getName(), EntityType.SPACE,
+                relativeReference.getParent());
+            result = new EntityReference(defaultDocumentName, EntityType.DOCUMENT, parentSpace);
+        } else {
+            result = relativeReference;
         }
 
+        EntityReference oldSpaceReference = result.extractFirstReference(EntityType.SPACE);
+        if (oldSpaceReference != null) {
+            EntityReference newSpaceReference = new EntityReference(oldSpaceReference,
+                Map.of(EntityReference.PARENT_TYPE_PARAMETER, EntityType.SPACE));
+            result = result.replaceParent(oldSpaceReference, newSpaceReference);
+        }
         return result;
     }
 }

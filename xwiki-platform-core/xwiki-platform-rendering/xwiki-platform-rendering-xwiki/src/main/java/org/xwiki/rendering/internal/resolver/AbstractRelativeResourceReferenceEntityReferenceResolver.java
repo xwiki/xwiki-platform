@@ -35,6 +35,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  *
  * @version $Id$
  * @since 17.0.0RC1
+ * @since 16.10.1
  */
 public abstract class AbstractRelativeResourceReferenceEntityReferenceResolver
     extends AbstractResourceReferenceEntityReferenceResolver

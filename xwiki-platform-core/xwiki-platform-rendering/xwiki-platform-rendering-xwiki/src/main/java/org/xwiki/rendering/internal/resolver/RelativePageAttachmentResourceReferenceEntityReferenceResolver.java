@@ -30,8 +30,8 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * Convert attachment resource reference into entity reference.
  *
  * @version $Id$
- * @since 13.10.5
  * @since 17.0.0RC1
+ * @since 16.10.1
  */
 @Component
 @Named("relative/pageAttach")

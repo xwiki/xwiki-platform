@@ -1,3 +1,4 @@
 org.xwiki.container.internal.DefaultContainer
 org.xwiki.container.internal.DefaultRequestInitializerManager
 org.xwiki.container.internal.DefaultApplicationContextListenerManager
+org.xwiki.container.script.ContainerScriptService

@@ -66,6 +66,6 @@ public class PortletApplicationContext extends AbstractApplicationContext
     {
         // Section PLT.10.3 from the Portlet 1.0 specification says that this should be available.
         // FIXME: why is this using a servlet specifications variable name ? Is that really valid for a portlet ?
-        return (File) this.portletContext.getAttribute("javax.servlet.context.tempdir");
+        return (File) this.portletContext.getAttribute("jakarta.servlet.context.tempdir");
     }
 }

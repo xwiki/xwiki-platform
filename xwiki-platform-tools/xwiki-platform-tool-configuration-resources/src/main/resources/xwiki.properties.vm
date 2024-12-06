@@ -1602,4 +1602,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Default is 10 seconds.
 # diff.xml.dataURI.httpTimeout = 10
 
+#-------------------------------------------------------------------------------------
+# Container
+#-------------------------------------------------------------------------------------
+
+#-# [Since 42.0.0]
+#-# "true" if the relative redirect URLs should be resolved by XWiki instead of the application server.
+#-# 
+#-# Default is "true".
+# container.request.resolveRelativeRedirect=true
+
 $!xwikiPropertiesAdditionalProperties

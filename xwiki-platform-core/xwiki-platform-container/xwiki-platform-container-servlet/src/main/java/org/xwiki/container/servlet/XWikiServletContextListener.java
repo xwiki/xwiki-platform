@@ -19,8 +19,7 @@
  */
 package org.xwiki.container.servlet;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import java.lang.reflect.Method;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +32,28 @@ import org.xwiki.container.servlet.internal.HttpSessionManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.extension.handler.ExtensionInitializer;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.ApplicationStoppedEvent;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+
 /**
  * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  * 
  * @version $Id$
+ * @since 42.0.0
  */
 public class XWikiServletContextListener implements ServletContextListener
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletContextListener.class);
+
     /**
      * Logger to use to log shutdown information (opposite of initialization).
      */
@@ -55,6 +65,11 @@ public class XWikiServletContextListener implements ServletContextListener
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
+        // FIXME: This is ugly, but I could not find any other way to really fully support any character in URL starting
+        // with Jetty 12 EE10
+        // Remove when https://jira.xwiki.org/browse/XWIKI-19167 is fully fixed
+        setDecodeAmbiguousURIs(servletContextEvent);
+
         // Initializes the Embeddable Component Manager
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
 
@@ -63,14 +78,8 @@ public class XWikiServletContextListener implements ServletContextListener
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 
-        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
         // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to declare their components requirements using the @Inject annotation of the xwiki
-        // component manager together with a private class member, for automatic injection by the CM on init.
+        // available in Servlets and Filters.
         servletContextEvent.getServletContext()
             .setAttribute(org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
 
@@ -97,7 +106,8 @@ public class XWikiServletContextListener implements ServletContextListener
         try {
             ServletContainerInitializer containerInitializer =
                 this.componentManager.getInstance(ServletContainerInitializer.class);
-            containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
+            containerInitializer
+                .initializeApplicationContext(JakartaServletBridge.toJavax(servletContextEvent.getServletContext()));
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Application Context", e);
         }
@@ -118,7 +128,7 @@ public class XWikiServletContextListener implements ServletContextListener
             throw new RuntimeException("Failed to initialize installed extensions", e);
         }
 
-        // Register the  HttpSessionManager as a listener.
+        // Register the HttpSessionManager as a listener.
         try {
             HttpSessionManager httpSessionManager = this.componentManager.getInstance(HttpSessionManager.class);
             servletContextEvent.getServletContext().addListener(httpSessionManager);
@@ -172,5 +182,21 @@ public class XWikiServletContextListener implements ServletContextListener
         }
 
         SHUTDOWN_LOGGER.debug("XWiki has been stopped!");
+    }
+
+    private void setDecodeAmbiguousURIs(ServletContextEvent servletContextEvent)
+    {
+        ServletContext servletContext = servletContextEvent.getServletContext();
+        try {
+            Method getContextHandler = servletContext.getClass().getMethod("getContextHandler", null);
+            Object contextHandler = getContextHandler.invoke(servletContext);
+            Method getServletHandler = contextHandler.getClass().getMethod("getServletHandler", null);
+            Object servletHandler = getServletHandler.invoke(contextHandler);
+            Method setDecodeAmbiguousURIs =
+                servletHandler.getClass().getMethod("setDecodeAmbiguousURIs", boolean.class);
+            setDecodeAmbiguousURIs.invoke(servletHandler, true);
+        } catch (Exception e) {
+            LOGGER.debug("Failed to switch the decode ambiguous URS to true", e);
+        }
     }
 }

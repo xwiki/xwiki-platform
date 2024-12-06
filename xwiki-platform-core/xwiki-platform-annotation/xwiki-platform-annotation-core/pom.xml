@@ -85,14 +85,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- To be removed if we stop declaring hibernate validator as oldcore runtime dependency -->
     <dependency>
-      <groupId>org.mortbay.jasper</groupId>
-      <artifactId>apache-el</artifactId>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

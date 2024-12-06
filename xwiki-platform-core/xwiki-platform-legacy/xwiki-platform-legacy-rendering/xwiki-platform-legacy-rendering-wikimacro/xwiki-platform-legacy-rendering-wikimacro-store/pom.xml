@@ -61,6 +61,7 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
     </dependency>
+
     <!-- Test dependencies. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

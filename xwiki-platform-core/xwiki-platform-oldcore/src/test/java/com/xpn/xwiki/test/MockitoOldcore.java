@@ -528,11 +528,11 @@ public class MockitoOldcore
                 // Also note that setting a non null request forces us to set a non null URL as otherwise it would lead
                 // to another NPE...
                 XWikiRequest originalRequest = getXWikiContext().getRequest();
-                if (getXWikiContext().getRequest() == null) {
+                if (originalRequest == null) {
                     getXWikiContext().setRequest(new XWikiServletRequestStub());
                 }
                 URL originalURL = getXWikiContext().getURL();
-                if (getXWikiContext().getURL() == null) {
+                if (originalURL == null) {
                     getXWikiContext().setURL(new URL("http://localhost:8080"));
                 }
                 stubContextProvider.initialize(getXWikiContext());

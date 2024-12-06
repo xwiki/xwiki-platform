@@ -530,6 +530,7 @@ public class SkinAction extends XWikiAction
      * @since 11.3.6
      * @since 10.11.10
      */
+    @Deprecated(since = "42.0.0")
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)
     {
         if (!StringUtils.isBlank(mimetype)) {

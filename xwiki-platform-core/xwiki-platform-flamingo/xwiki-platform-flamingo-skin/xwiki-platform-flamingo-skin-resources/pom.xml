@@ -131,11 +131,11 @@
       <version>5.2.0</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>momentjs</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>moment-jdateformatparser</artifactId>
       <version>1.2.1</version>
     </dependency>
@@ -149,9 +149,15 @@
       <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
       <version>4.17.49</version>
       <exclusions>
+        <!-- We use our own fork of Bootstrap. -->
         <exclusion>
           <groupId>org.webjars</groupId>
           <artifactId>bootstrap</artifactId>
+        </exclusion>
+        <!-- We prefer the org.webjars.npm version. -->
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>momentjs</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

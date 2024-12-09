@@ -2667,8 +2667,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(@types/node@22.10.0)(rollup@4.27.4)(typescript@5.6.3)(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2))
       vite-plugin-inspect:
-        specifier: 0.8.8
-        version: 0.8.8(rollup@4.27.4)(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2))
+        specifier: 0.10.3
+        version: 0.10.3(rollup@4.27.4)(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2))
       vite-plugin-vuetify:
         specifier: 2.0.4
         version: 2.0.4(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2))(vue@3.5.13(typescript@5.6.3))(vuetify@3.7.4)
@@ -7595,12 +7595,12 @@ packages:
       vite:
         optional: true
 
-  vite-plugin-inspect@0.8.8:
-    resolution: {integrity: sha512-aZlBuXsWUPJFmMK92GIv6lH7LrwG2POu4KJ+aEdcqnu92OAf+rhBnfMDQvxIJPEB7hE2t5EyY/PMgf5aDLT8EA==}
+  vite-plugin-inspect@0.10.3:
+    resolution: {integrity: sha512-7scdthVsZLER/IPvqJddS0PeD+gTWqxls4w+Mob7IniJfeCiTn1qeCi4zyXvgKEuCh2CiNsTjoFhovOWxDXTuw==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': '*'
-      vite: ^3.1.0 || ^4.0.0 || ^5.0.0-0
+      vite: ^6.0.0
     peerDependenciesMeta:
       '@nuxt/kit':
         optional: true
@@ -13433,7 +13433,7 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-inspect@0.8.8(rollup@4.27.4)(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2)):
+  vite-plugin-inspect@0.10.3(rollup@4.27.4)(vite@6.0.2(@types/node@22.10.0)(tsx@4.19.2)):
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.3(rollup@4.27.4)

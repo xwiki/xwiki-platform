@@ -55,7 +55,7 @@
   #set ($iconNamePrefix = $request.query.toLowerCase())
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
-      #set($icon = {
+      #set ($icon = {
         'name': $xwikiIcon,
         'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
       })

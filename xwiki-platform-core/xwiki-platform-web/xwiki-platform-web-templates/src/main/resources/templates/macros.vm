@@ -959,7 +959,7 @@ $html
   <#if($isInline)span#{else}div#end class="box ${classAffix}message">
     <span class="icon-block">$services.icon.renderHTML($iconName)</span>
     <span class="sr-only">$services.localization.render($prettyNameKey)</span>
-    $text
+    <p>$text</p>
   </#if($isInline)span#{else}div#end>
 #end
 

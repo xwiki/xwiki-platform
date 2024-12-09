@@ -955,11 +955,13 @@ $html
 
 ### This velocity macro aims at providing an element similar to a XWiki Macro-Message in places where this XWikiMacro 
 ### cannot be used.
-#macro(_genericMessage $text $classAffix $iconName $prettyNameKey $isInline)
-  <#if($isInline)span#{else}div#end class="box ${classAffix}message">
+#macro(_genericMessage $text $classAffix $iconName $prettyNameKey $isInline $extraClass $title)
+  <#if($isInline)span#{else}div#end class="box ${classAffix}message $!{extraClass}">
     <span class="icon-block">$services.icon.renderHTML($iconName)</span>
     <span class="sr-only">$services.localization.render($prettyNameKey)</span>
+    #if("$!title" != "")<div><div class="box-title">$!title</div>#end
     <p>$text</p>
+    #if("$!title" != "")</div>#end
   </#if($isInline)span#{else}div#end>
 #end
 

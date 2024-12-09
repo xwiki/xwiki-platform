@@ -17,16 +17,11 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-##!source.syntax=xwiki/2.1
-{{velocity}}
 #template('job/question/macros.vm')
-{{html clean=false}}
 #questionHeader()
-{{/html}}
 #set ($jobStatus = $job.status)
 #set ($question = $jobStatus.question)
 #define ($warningMessageContent)
-{{html clean=false}}
   <p>$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.explanation"))</p>
   #set ($url = $xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'section=XWiki.Extensions&search=&repo=installed'))
   #set ($link = '<a href="' + $url + '">')
@@ -43,14 +38,9 @@
     </div>
   </div>
   #questionButtons($jobStatus)
-{{/html}}#end
+#end
 
 ## We want to use the XWiki macro here because we need its parameters
-{{warning cssClass='deleteWarningExtensions' title='$escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title"))'}}
-$warningMessageContent
-{{/warning}}
+#_genericMessage("$warningMessageContent", 'warning', 'warning', 'warning', false, 'deleteWarningExtensions', $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title")))
 
-{{html clean=false}}
 #questionFooter()
-{{/html}}
-{{/velocity}}

@@ -59,8 +59,8 @@
         'name': $xwikiIcon,
         'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
       })
-      #if($request.metadata == 'true')
-        #set($discard = $icon.put('metadata', $services.icon.getMetaData($xwikiIcon, $iconTheme)))
+      #if ($request.metadata == 'true')
+        #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
       #end
       #set ($discard = $icons.add($icon))
     #end
@@ -243,8 +243,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
     }
     // For each icon
-    for (var i=0; i &lt; iconList.length; ++i) {
-      let icon = iconList[i];
+    iconList.forEach(icon => {
       // Display the icon
       if (selectedIconName === '' || icon.name.includes(selectedIconName)) {
         var displayer = $(document.createElement('div'));

@@ -55,6 +55,7 @@
     "inversify": "6.1.4",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
+    "vite": "6.0.3",
     "vite-plugin-dts": "4.3.0",
     "vite-plugin-inspect": "0.10.3",
     "vite-plugin-vuetify": "2.0.4",

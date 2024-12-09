@@ -39,6 +39,7 @@
     "@xwiki/cristal-dev-test-utils": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
+    "vite": "6.0.3",
     "vitest": "2.1.8",
     "vue-tsc": "2.1.10"
   },

@@ -23,7 +23,8 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "devDependencies": {
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "vite": "6.0.3"
   },
   "publishConfig": {
     "exports": {

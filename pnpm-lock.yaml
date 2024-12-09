@@ -113,6 +113,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -126,6 +129,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/alerts/alerts-default:
     dependencies:
@@ -148,6 +154,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/alerts/alerts-ui:
     dependencies:
@@ -173,6 +182,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -192,6 +204,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/attachments/attachments-default:
     dependencies:
@@ -229,6 +244,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/attachments/attachments-ui:
     dependencies:
@@ -284,6 +302,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -303,6 +324,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -346,6 +370,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)(happy-dom@14.12.0)
@@ -380,6 +407,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/backends/backend-api:
     dependencies:
@@ -396,6 +426,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/backends/backend-dexie:
     dependencies:
@@ -421,6 +454,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/backends/backend-github:
     dependencies:
@@ -440,6 +476,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -459,6 +498,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/backends/backend-xwiki:
     dependencies:
@@ -487,6 +529,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/browser/browser-api:
     dependencies:
@@ -497,6 +542,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/browser/browser-default:
     dependencies:
@@ -516,6 +564,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/date/date-api:
     dependencies:
@@ -532,6 +583,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/date/date-ui:
     dependencies:
@@ -548,6 +602,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -564,6 +621,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/document/document-default:
     dependencies:
@@ -589,6 +649,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
@@ -608,6 +671,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/extra-tabs/extra-tabs-default:
     dependencies:
@@ -630,6 +696,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/extra-tabs/extra-tabs-ui:
     dependencies:
@@ -646,6 +715,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -668,6 +740,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -681,6 +756,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/hierarchy/hierarchy-default:
     dependencies:
@@ -700,6 +778,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/hierarchy/hierarchy-filesystem:
     dependencies:
@@ -722,6 +803,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/hierarchy/hierarchy-github:
     dependencies:
@@ -741,6 +825,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/hierarchy/hierarchy-nextcloud:
     dependencies:
@@ -763,6 +850,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -791,6 +881,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/history/history-api:
     dependencies:
@@ -804,6 +897,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/history/history-default:
     dependencies:
@@ -823,6 +919,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/history/history-github:
     dependencies:
@@ -845,6 +944,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/history/history-ui:
     dependencies:
@@ -885,6 +987,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -916,6 +1021,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/icons:
     dependencies:
@@ -935,6 +1043,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -948,6 +1059,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/info-actions/info-actions-default:
     dependencies:
@@ -970,6 +1084,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/info-actions/info-actions-ui:
     dependencies:
@@ -1001,6 +1118,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1020,6 +1140,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/link-suggest/link-suggest-nextcloud:
     dependencies:
@@ -1045,6 +1168,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -1064,12 +1190,18 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-api:
     devDependencies:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-click-listener:
     dependencies:
@@ -1098,6 +1230,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-local-url:
     dependencies:
@@ -1114,6 +1249,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)(happy-dom@14.12.0)
@@ -1136,6 +1274,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-reference/model-reference-filesystem:
     dependencies:
@@ -1155,6 +1296,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-reference/model-reference-nextcloud:
     dependencies:
@@ -1174,6 +1318,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-reference/model-reference-xwiki:
     dependencies:
@@ -1193,6 +1340,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)(happy-dom@14.12.0)
@@ -1215,6 +1365,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-remote-url/model-remote-url-filesystem:
     dependencies:
@@ -1234,6 +1387,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-remote-url/model-remote-url-nextcloud:
     dependencies:
@@ -1253,6 +1409,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/model/model-remote-url/model-remote-url-xwiki:
     dependencies:
@@ -1275,6 +1434,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -1288,6 +1450,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-default:
     dependencies:
@@ -1307,6 +1472,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-filesystem:
     dependencies:
@@ -1335,6 +1503,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-github:
     dependencies:
@@ -1360,6 +1531,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-nextcloud:
     dependencies:
@@ -1385,6 +1559,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/navigation-tree/navigation-tree-xwiki:
     dependencies:
@@ -1416,6 +1593,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/page-actions/page-actions-api:
     dependencies:
@@ -1435,6 +1615,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/page-actions/page-actions-default:
     dependencies:
@@ -1457,6 +1640,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/page-actions/page-actions-ui:
     dependencies:
@@ -1497,6 +1683,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1510,6 +1699,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/uiextension/uiextension-default:
     dependencies:
@@ -1532,6 +1724,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   core/uiextension/uiextension-ui:
     dependencies:
@@ -1548,6 +1743,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1567,6 +1765,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1582,12 +1783,18 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   dev/config:
     devDependencies:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   dev/test-utils:
     dependencies:
@@ -1607,12 +1814,18 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   ds/api:
     devDependencies:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   ds/dsfr:
     dependencies:
@@ -1644,6 +1857,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1687,6 +1903,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1733,6 +1952,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1863,6 +2085,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1891,6 +2116,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-main:
     dependencies:
@@ -1910,6 +2138,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-preload:
     dependencies:
@@ -1923,6 +2154,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-renderer:
     dependencies:
@@ -1942,6 +2176,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/browser:
     dependencies:
@@ -1964,6 +2201,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/main:
     dependencies:
@@ -1989,6 +2229,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/preload:
     dependencies:
@@ -2011,6 +2254,9 @@ importers:
       unplugin-auto-expose:
         specifier: 0.2.4
         version: 0.2.4(rollup@4.27.4)
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/renderer:
     dependencies:
@@ -2054,6 +2300,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   electron/storage:
     dependencies:
@@ -2082,6 +2331,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-node:
         specifier: 4.0.0
         version: 4.0.0(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1))
@@ -2101,6 +2353,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   extensions/menubuttons:
     dependencies:
@@ -2123,6 +2378,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2313,6 +2571,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2338,6 +2599,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2369,6 +2633,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   rendering/rendering:
     dependencies:
@@ -2400,6 +2667,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2409,6 +2679,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2425,6 +2698,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-comlink:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1))
@@ -2480,6 +2756,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-comlink:
         specifier: 5.1.0
         version: 5.1.0(comlink@4.4.2)(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1))
@@ -2574,6 +2853,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)(happy-dom@14.12.0)
@@ -2602,6 +2884,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
   web:
     dependencies:
@@ -2663,6 +2948,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vite-plugin-dts:
         specifier: 4.3.0
         version: 4.3.0(@types/node@22.10.1)(rollup@4.27.4)(typescript@5.6.3)(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1))
@@ -2697,6 +2985,9 @@ importers:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)

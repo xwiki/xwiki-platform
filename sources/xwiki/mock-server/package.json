@@ -30,6 +30,7 @@
     "@types/express": "5.0.0",
     "nodemon": "3.1.7",
     "ts-node": "10.9.2",
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "vite": "6.0.3"
   }
 }

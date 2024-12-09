@@ -24,7 +24,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "dotenv": "16.4.7",
-    "express": "4.21.1"
+    "express": "4.21.2"
   },
   "devDependencies": {
     "@types/express": "5.0.0",

@@ -121,7 +121,6 @@
       &lt;p class="invalid-address-message"&gt;
       {{/html}}
        {{error}}
-        {{html clean=false}}
         #if($recips.size() == 1)
           ## The email address given is invalid and will not be sent to.
           $escapetool.xml($services.localization.render('xe.invitation.displayMessage.theAddressIsInvalid'))
@@ -132,9 +131,8 @@
             $escapetool.xml($services.localization.render('xe.invitation.displayMessage.anAddressesIsInvalid'))
           #end
         #end
-        {{/html}}
        {{/error}}
-       {{html clean=false}}
+       {{html wiki=false clean=false}}
       &lt;/p&gt;
     #end
      ## Subject:

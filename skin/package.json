@@ -46,7 +46,7 @@
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-uiextension-ui": "workspace:*",
     "inversify": "6.1.4",
-    "marked": "15.0.2",
+    "marked": "15.0.3",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.13",
     "vue-i18n": "10.0.4",

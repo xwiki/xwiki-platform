@@ -85,6 +85,21 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         }
     }
 
+    @Override
+    protected void getEntities(EntityReference entityReference)
+    {
+        // Perform generic checks that don't depend on the source/destination type.
+
+        EntityReference destination = this.request.getDestination();
+
+        try {
+            checkSourceDestination(entityReference, destination);
+            super.getEntities(entityReference);
+        } catch (InternalCopyOrMoveJobException e) {
+            this.logger.error(e.getMessage());
+        }
+    }
+
     /**
      * If true, we check that the source and destination entityReference are of the same type. And we process them using
      * that information.
@@ -106,7 +121,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         try {
             checkSourceDestination(source, destination);
         } catch (InternalCopyOrMoveJobException e) {
-            this.logger.error(e.getMessage());
             return;
         }
 
@@ -167,36 +181,36 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     protected void putInConcernedEntities(DocumentReference documentReference)
     {
         DocumentReference source = cleanLocale(documentReference);
-        try {
-            EntityReference destination = this.request.getDestination();
-            checkSourceDestination(source, destination);
-            DocumentReference destinationDocumentReference;
-            if (processOnlySameSourceDestinationTypes()) {
-                putInConcernedEntitiesOnlySameSource(source, destination);
-            } else {
-                if (this.request.isDeep() && isSpaceHomeReference(source)) {
-                    visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
-                } else if (destination.getType() == EntityType.SPACE) {
-                    destinationDocumentReference =
-                        new DocumentReference(source.getName(), new SpaceReference(destination));
-                    this.putInConcernedEntities(source, destinationDocumentReference);
-                } else if (destination.getType() == EntityType.DOCUMENT
-                    && isSpaceHomeReference(new DocumentReference(destination))) {
-                    destinationDocumentReference =
-                        new DocumentReference(source.getName(), new SpaceReference(destination.getParent()));
-                    this.putInConcernedEntities(source, destinationDocumentReference);
-                } else if (destination.getType() == EntityType.WIKI) {
-                    visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
-                }
+        EntityReference destination = this.request.getDestination();
+        DocumentReference destinationDocumentReference;
+        if (processOnlySameSourceDestinationTypes()) {
+            putInConcernedEntitiesOnlySameSource(source, destination);
+        } else {
+            if (this.request.isDeep() && isSpaceHomeReference(source)) {
+                visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
+            } else if (destination.getType() == EntityType.SPACE) {
+                destinationDocumentReference =
+                    new DocumentReference(source.getName(), new SpaceReference(destination));
+                this.putInConcernedEntities(source, destinationDocumentReference);
+            } else if (destination.getType() == EntityType.DOCUMENT
+                && isSpaceHomeReference(new DocumentReference(destination))) {
+                destinationDocumentReference =
+                    new DocumentReference(source.getName(), new SpaceReference(destination.getParent()));
+                this.putInConcernedEntities(source, destinationDocumentReference);
+            } else if (destination.getType() == EntityType.WIKI) {
+                visitSpace(source.getLastSpaceReference(), destination, this::putInConcernedEntities);
             }
-        } catch (InternalCopyOrMoveJobException e) {
-            this.logger.debug(e.getMessage());
         }
     }
 
     private void putInConcernedEntitiesOnlySameSource(DocumentReference source, EntityReference destination)
     {
-        DocumentReference destinationDocumentReference = new DocumentReference(destination);
+        DocumentReference destinationDocumentReference;
+        if (destination.getType() == EntityType.SPACE) {
+            destinationDocumentReference = new DocumentReference(source.getName(), new SpaceReference(destination));
+        } else {
+            destinationDocumentReference = new DocumentReference(destination);
+        }
         if (this.request.isDeep() && isSpaceHomeReference(source)) {
             if (isSpaceHomeReference(destinationDocumentReference)) {
                 visitSpace(source.getLastSpaceReference(), destinationDocumentReference.getLastSpaceReference(),

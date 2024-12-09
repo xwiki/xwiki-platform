@@ -22,6 +22,7 @@ package org.xwiki.model.internal.reference;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -69,6 +70,20 @@ class RelativeStringEntityReferenceResolverTest
 
         assertNull(reference.extractReference(EntityType.WIKI));
         assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertNull(reference.extractReference(EntityType.DOCUMENT));
+
+        reference =
+            this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wikiFoo", EntityType.WIKI));
+
+        assertEquals("wikiFoo", reference.extractReference(EntityType.WIKI).getName());
+        assertNull(reference.extractReference(EntityType.SPACE));
+        assertNull(reference.extractReference(EntityType.DOCUMENT));
+
+        reference =
+            this.resolver.resolve("", EntityType.DOCUMENT, new WikiReference("wikiFoo"));
+
+        assertEquals("wikiFoo", reference.extractReference(EntityType.WIKI).getName());
+        assertNull(reference.extractReference(EntityType.SPACE));
         assertNull(reference.extractReference(EntityType.DOCUMENT));
     }
 }

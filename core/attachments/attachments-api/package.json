@@ -26,6 +26,9 @@
     "@xwiki/cristal-model-api": "workspace:*",
     "vue": "3.5.13"
   },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  },
   "publishConfig": {
     "exports": {
       ".": {

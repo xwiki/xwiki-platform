@@ -28,6 +28,7 @@
     "@types/node": "22.10.0",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
+    "typescript": "5.6.3",
     "unplugin-auto-expose": "0.2.4"
   }
 }

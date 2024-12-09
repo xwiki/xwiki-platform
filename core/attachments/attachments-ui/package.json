@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "reflect-metadata": "0.2.2",
+    "typescript": "5.6.3",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

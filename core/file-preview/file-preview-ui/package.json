@@ -28,6 +28,7 @@
     "vue-i18n": "10.0.4"
   },
   "devDependencies": {
+    "typescript": "5.6.3",
     "vue-tsc": "2.1.10"
   },
   "publishConfig": {

@@ -91,8 +91,7 @@
       ### Info about the place to modify the configuration
       ###
       &lt;p&gt;
-        ## TODO: we do not escape this string because we inject some HTML code. We should improve it.
-        #info($services.localization.render('admin.ooserver.options.source', ['&lt;span class="monospace"&gt;xwiki.properties&lt;/span&gt;']))
+        #info($escapetool.html($services.localization.render('admin.ooserver.options.source', ['__VALUE__'])).replaceFirst('__VALUE__', '&lt;span class="monospace"&gt;xwiki.properties&lt;/span&gt;'))
       &lt;/p&gt;
       &lt;dl&gt;
         ###

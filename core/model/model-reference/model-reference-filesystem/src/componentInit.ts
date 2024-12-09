@@ -20,11 +20,11 @@
 
 import { FileSystemModelReferenceParser } from "./filesystemModelReferenceParser";
 import { FileSystemModelReferenceSerializer } from "./filesystemModelReferenceSerializer";
-import {
+import type {
   ModelReferenceParser,
   ModelReferenceSerializer,
 } from "@xwiki/cristal-model-reference-api";
-import { Container } from "inversify";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

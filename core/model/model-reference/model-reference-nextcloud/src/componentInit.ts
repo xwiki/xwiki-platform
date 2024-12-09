@@ -20,11 +20,11 @@
 
 import { NextcloudModelReferenceParser } from "./nextcloudModelReferenceParser";
 import { NextcloudModelReferenceSerializer } from "./nextcloudModelReferenceSerializer";
-import {
+import type {
   ModelReferenceParser,
   ModelReferenceSerializer,
 } from "@xwiki/cristal-model-reference-api";
-import { Container } from "inversify";
+import type { Container } from "inversify";
 
 export class ComponentInit {
   constructor(container: Container) {

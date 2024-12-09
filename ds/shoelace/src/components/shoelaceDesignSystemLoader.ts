@@ -37,11 +37,6 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
     registerAsyncComponent(app, "XImg", () => import("../vue/x-img.vue"));
     registerAsyncComponent(app, "XRow", () => import("../vue/x-row.vue"));
     registerAsyncComponent(app, "XCol", () => import("../vue/x-col.vue"));
-    registerAsyncComponent(
-      app,
-      "XTextField",
-      () => import("../vue/x-textfield.vue"),
-    );
     registerAsyncComponent(app, "XCard", () => import("../vue/x-card.vue"));
     registerAsyncComponent(app, "XAlert", () => import("../vue/x-alert.vue"));
     registerAsyncComponent(

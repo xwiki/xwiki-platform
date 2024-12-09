@@ -1883,8 +1883,8 @@ importers:
         specifier: 7.0.3
         version: 7.0.3
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
       electron-builder:
         specifier: 25.1.8
         version: 25.1.8(electron-builder-squirrel-windows@24.13.3)
@@ -1901,8 +1901,8 @@ importers:
         specifier: 1.7.8
         version: 1.7.8
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
       electron-store:
         specifier: 10.0.0
         version: 10.0.0
@@ -1917,8 +1917,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
     devDependencies:
       typescript:
         specifier: 5.6.3
@@ -1952,8 +1952,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/browser/browser-api
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
       inversify:
         specifier: 6.1.4
         version: 6.1.4(reflect-metadata@0.2.2)
@@ -1977,8 +1977,8 @@ importers:
         specifier: workspace:*
         version: link:../storage
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
     devDependencies:
       '@types/node':
         specifier: 22.10.0
@@ -2064,8 +2064,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/backends/backend-api
       electron:
-        specifier: 33.2.0
-        version: 33.2.0
+        specifier: 33.2.1
+        version: 33.2.1
       inversify:
         specifier: 6.1.4
         version: 6.1.4(reflect-metadata@0.2.2)
@@ -5147,8 +5147,8 @@ packages:
   electron-updater@6.3.9:
     resolution: {integrity: sha512-2PJNONi+iBidkoC5D1nzT9XqsE8Q1X28Fn6xRQhO3YX8qRRyJ3mkV4F1aQsuRnYPqq6Hw+E51y27W75WgDoofw==}
 
-  electron@33.2.0:
-    resolution: {integrity: sha512-PVw1ICAQDPsnnsmpNFX/b1i/49h67pbSPxuIENd9K9WpGO1tsRaQt+K2bmXqTuoMJsbzIc75Ce8zqtuwBPqawA==}
+  electron@33.2.1:
+    resolution: {integrity: sha512-SG/nmSsK9Qg1p6wAW+ZfqU+AV8cmXMTIklUL18NnOKfZLlum4ZsDoVdmmmlL39ZmeCaq27dr7CgslRPahfoVJg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -5679,10 +5679,6 @@ packages:
   globals@15.13.0:
     resolution: {integrity: sha512-49TewVEz0UxZjr1WYYsWpPrhyC/B/pA8Bq0fUmet2n+eR7yn0IvNzNaoBwnK6mdkzcN+se7Ez9zUgULTz2QH4g==}
     engines: {node: '>=18'}
-
-  globalthis@1.0.3:
-    resolution: {integrity: sha512-sFdI5LyBiNTHjRd7cGPWapiHWMOXKyuBNX/cWJ3NfzrZQVa8GI/8cofCl74AOVqq9W5kNmguTIzJ/1s2gyI9wA==}
-    engines: {node: '>= 0.4'}
 
   globalthis@1.0.4:
     resolution: {integrity: sha512-DpLKbNU4WylpxJykQujfCcwYWiV/Jhm50Goo0wrVILAv5jOr9d+H+UR3PhSCD2rCCEIg0uc+G+muBTwD54JhDQ==}
@@ -10642,7 +10638,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@33.2.0:
+  electron@33.2.1:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.16.10
@@ -11387,11 +11383,6 @@ snapshots:
   globals@14.0.0: {}
 
   globals@15.13.0: {}
-
-  globalthis@1.0.3:
-    dependencies:
-      define-properties: 1.2.1
-    optional: true
 
   globalthis@1.0.4:
     dependencies:
@@ -12782,7 +12773,7 @@ snapshots:
     dependencies:
       boolean: 3.2.0
       detect-node: 2.1.0
-      globalthis: 1.0.3
+      globalthis: 1.0.4
       json-stringify-safe: 5.0.1
       semver-compare: 1.0.0
       sprintf-js: 1.1.3

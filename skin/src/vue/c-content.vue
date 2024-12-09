@@ -329,7 +329,7 @@ onUpdated(() => {
       "doc-title"
       "info-wrapper"
       "alerts";
-      margin: 0 auto;
+    margin: 0 auto;
 
     & .doc-title {
       grid-area: doc-title;

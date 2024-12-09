@@ -40,7 +40,6 @@
   #questionButtons($jobStatus)
 #end
 
-## We want to use the XWiki macro here because we need its parameters
 #_genericMessage("$warningMessageContent", 'warning', 'warning', 'warning', false, 'deleteWarningExtensions', $escapetool.xml($services.localization.render("job.question.ExtensionBreakingQuestion.${job.type}.title")))
 
 #questionFooter()

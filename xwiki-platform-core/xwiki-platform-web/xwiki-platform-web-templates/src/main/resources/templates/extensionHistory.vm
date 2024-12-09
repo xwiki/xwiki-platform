@@ -591,8 +591,8 @@
     #template('xwikivars.vm')
   #end
   #if ($request.extensionId && ($request.extensionVersion || $request.extensionVersionConstraint))
-    #handleExtensionRequest()
+    #handleExtensionRequest
   #else
-    #handleExtensionHistoryRequest()
+    #handleExtensionHistoryRequest
   #end
 #end

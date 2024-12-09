@@ -29,7 +29,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "inversify": "6.1.4",
-    "pinia": "2.2.6",
+    "pinia": "2.3.0",
     "vue": "3.5.13"
   },
   "peerDependencies": {

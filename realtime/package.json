@@ -17,7 +17,7 @@
     "build": "tsc --project tsconfig.json &&  esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node",
     "clean": "rimraf dist",
     "dev": "tsx src/index.ts",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "@hocuspocus/server": "2.14.0",

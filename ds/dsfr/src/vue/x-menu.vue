@@ -20,8 +20,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script lang="ts" setup>
 import {
   DsfrNavigation,
-  DsfrNavigationMenu,
   DsfrNavigationItem,
+  DsfrNavigationMenu,
 } from "@gouvminint/vue-dsfr";
 
 defineProps<{

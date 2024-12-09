@@ -17,7 +17,7 @@
     "clean": "rimraf dist",
     "compile": "vite build",
     "electron": "echo 'no task'",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "linux": "echo 'no task'",
     "prepack": "pnpm build",
     "package": "echo 'no task'"

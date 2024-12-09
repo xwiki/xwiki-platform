@@ -19,7 +19,7 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "vue": "3.5.13"

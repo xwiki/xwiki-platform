@@ -88,8 +88,8 @@ async function upload(files: File[]) {
 </template>
 <style scoped>
 .attachments {
-  display:flex;
+  display: flex;
   flex-flow: column;
-  gap:16px;
+  gap: 16px;
 }
 </style>

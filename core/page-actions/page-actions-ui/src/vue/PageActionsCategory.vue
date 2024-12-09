@@ -18,13 +18,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { type Component, type Ref, inject, onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageAction,
   PageActionCategory,
   PageActionService,
 } from "@xwiki/cristal-page-actions-api";
+import type { Component, Ref } from "vue";
 
 const props = defineProps<{
   category: PageActionCategory;

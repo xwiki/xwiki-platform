@@ -19,8 +19,8 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import PageActionsCategory from "./PageActionsCategory.vue";
-import { inject } from "vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
+import { inject } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageActionCategory,

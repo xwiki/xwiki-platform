@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Ref, ref } from "vue";
 import { TextFieldModel } from "@xwiki/cristal-dsapi";
+import { Ref, ref } from "vue";
 
 defineProps<{ isUploading: boolean }>();
 const fileInputValue: Ref<TextFieldModel> = ref();

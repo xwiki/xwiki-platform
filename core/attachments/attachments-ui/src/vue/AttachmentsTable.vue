@@ -74,13 +74,25 @@ const hasAuthor = computed(() => {
           <span class="mobile-column-name">
             {{ t("attachments.tab.table.header.size") }}
           </span>
-          <span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><span class="mobile-column-name">{{ t("attachments.tab.table.header.size") }}</span><file-size :size="attachment.size"></file-size>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.size") }}
+          </span>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.size") }}
+          </span>
+          <file-size :size="attachment.size"></file-size>
         </td>
         <td>
           <span class="mobile-column-name">
             {{ t("attachments.tab.table.header.date") }}
           </span>
-          <span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><span class="mobile-column-name">{{ t("attachments.tab.table.header.date") }}</span><date :date="attachment.date"></date>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.date") }}
+          </span>
+          <span class="mobile-column-name">
+            {{ t("attachments.tab.table.header.date") }}
+          </span>
+          <date :date="attachment.date"></date>
         </td>
         <td v-if="hasAuthor">
           <span class="mobile-column-name">

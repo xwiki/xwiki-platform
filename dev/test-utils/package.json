@@ -18,7 +18,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "inversify": "6.1.4",

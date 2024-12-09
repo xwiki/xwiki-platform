@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",

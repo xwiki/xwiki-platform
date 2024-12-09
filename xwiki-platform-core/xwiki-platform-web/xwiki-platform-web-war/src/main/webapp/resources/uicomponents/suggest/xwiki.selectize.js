@@ -209,7 +209,7 @@ define('xwiki-selectize', [
     }
     // Set the title of the input field.
     this.selectize.get$('control_input').attr('title', $(this).attr('title'));
-    // Set the text alternative of the input field
+    // Set the text alternative of the input field.
     this.selectize.get$('control_input').attr('aria-label', $(this).attr('aria-label'));
   };
 

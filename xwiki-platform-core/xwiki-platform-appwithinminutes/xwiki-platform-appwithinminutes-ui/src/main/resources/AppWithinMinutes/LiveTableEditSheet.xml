@@ -337,9 +337,7 @@
   #updateAndSaveIcon()
   #if ($action == 'save')
     #if ($errorMessage)
-      
-      {{error}}{{html clean="false"}}$errorMessage{{/html}}{/error}}
-      
+      {{error}}$!escapetool.xml($errorMessage){/error}}
     #else
       ## Redirect to view mode.
       $response.sendRedirect($doc.getURL())

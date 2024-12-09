@@ -242,7 +242,7 @@
   #set ($classFullName = $doc.getValue('class'))
   #if ("$!classFullName" == '' || !$xwiki.exists($classFullName))
     {{warning}}
-    $services.icon.render('warning') {{translation key="platform.appwithinminutes.appHomePageMovedWarning"/}}
+    {{translation key="platform.appwithinminutes.appHomePageMovedWarning"/}}
     {{/warning}}
 
   #end

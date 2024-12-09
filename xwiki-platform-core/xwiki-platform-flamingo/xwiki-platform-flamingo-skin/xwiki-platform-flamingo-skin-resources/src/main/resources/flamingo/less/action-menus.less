@@ -45,6 +45,10 @@
       float: left;
       margin-left: @navbar-padding-horizontal;
       margin-right: @navbar-padding-horizontal;
+      /* Without this rule, the left navbar will cause unexpected layout shifts even when it's empty. */
+      &:not(:has(> *)) {
+        margin-top: 0;
+      }  
     }
   }
 }

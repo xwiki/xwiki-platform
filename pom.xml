@@ -423,7 +423,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.13.3</version>
+        <version>1.14.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -469,9 +469,9 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>momentjs</artifactId>
-        <version>2.29.4</version>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>moment</artifactId>
+        <version>2.30.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -480,9 +480,15 @@
         <version>3.1</version>
         <scope>runtime</scope>
         <exclusions>
+          <!-- We use our own fork of Bootstrap. -->
           <exclusion>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
+          </exclusion>
+          <!-- We prefer the org.webjars.npm version. -->
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>momentjs</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1665,6 +1671,26 @@
                   </message>
                   <excludes>
                     <exclude>org.webjars:bootstrap</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure we use the NPM packaging of moment because it includes the modified JavaScript code. -->
+          <execution>
+            <id>enforce-moment-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Please use org.webjars.npm:moment instead of org.webjars:momentjs .
+                  </message>
+                  <excludes>
+                    <exclude>org.webjars:momentjs</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

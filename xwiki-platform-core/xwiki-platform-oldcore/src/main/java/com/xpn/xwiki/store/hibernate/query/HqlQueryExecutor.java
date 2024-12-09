@@ -131,12 +131,23 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected static boolean isSafeSelect(String statementString)
     {
-        return HqlQueryUtils.isShortFormStatement(statementString) || HqlQueryUtils.isSafe(statementString);
+        // An empty statement is safe
+        if (statementString.isEmpty()) {
+            return true;
+        }
+
+        // HqlQueryUtils#isSafe only works with complete statements
+        String completeStatement = toCompleteShortForm(statementString);
+
+        // Parse and validate the statement
+        return HqlQueryUtils.isSafe(completeStatement);
     }
 
     protected void checkAllowed(final Query query) throws QueryException
     {
-        if (query instanceof SecureQuery && ((SecureQuery) query).isCurrentAuthorChecked()) {
+        // Check if the query needs to be validated according to the current author
+        if (query instanceof SecureQuery secureQuery && secureQuery.isCurrentAuthorChecked()) {
+            // Not need to check the details if current author has programming right
             if (!this.authorization.hasAccess(Right.PROGRAM)) {
                 if (query.isNamed() && !getAllowedNamedQueries().contains(query.getStatement())) {
                     throw new QueryException("Named queries requires programming right", query, null);
@@ -152,14 +163,14 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
-        // Make sure the query is allowed in the current context
-        checkAllowed(query);
-
         String oldDatabase = getContext().getWikiId();
         try {
             if (query.getWiki() != null) {
                 getContext().setWikiId(query.getWiki());
             }
+
+            // Make sure the query is allowed. Make sure to do it in the target context.
+            checkAllowed(query);
 
             // Filter the query
             Query filteredQuery = filterQuery(query);
@@ -333,13 +344,18 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected String completeShortFormStatement(String statement)
     {
-        String lcStatement = statement.toLowerCase().trim();
-        if (lcStatement.isEmpty() || lcStatement.startsWith(",") || lcStatement.startsWith("where ")
-            || lcStatement.startsWith("order by ")) {
-            return "select doc.fullName from XWikiDocument doc " + statement.trim();
+        return toCompleteShortForm(statement);
+    }
+
+    private static String toCompleteShortForm(String statement)
+    {
+        String filteredStatement = statement;
+
+        if (statement.isEmpty() || HqlQueryUtils.isShortFormStatement(statement)) {
+            filteredStatement = "select doc.fullName from XWikiDocument doc " + statement.trim();
         }
 
-        return statement;
+        return filteredStatement;
     }
 
     private <T> org.hibernate.query.Query<T> createNamedHibernateQuery(Session session, Query query)

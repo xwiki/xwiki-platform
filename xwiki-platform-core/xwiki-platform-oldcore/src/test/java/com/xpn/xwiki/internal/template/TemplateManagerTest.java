@@ -186,7 +186,7 @@ class TemplateManagerTest
     @Test
     void templateCheatingProtection() throws Exception
     {
-        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
+        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure%5B%5D"));
         when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
             .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
 

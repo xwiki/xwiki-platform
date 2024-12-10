@@ -92,11 +92,8 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         EntityReference destination = this.request.getDestination();
 
-        try {
-            checkSourceDestination(entityReference, destination);
+        if (isSourceDestinationCompatible(entityReference, destination, true)) {
             super.getEntities(entityReference);
-        } catch (InternalCopyOrMoveJobException e) {
-            this.logger.error(e.getMessage());
         }
     }
 
@@ -118,9 +115,8 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
         EntityReference destination = this.request.getDestination();
 
-        try {
-            checkSourceDestination(source, destination);
-        } catch (InternalCopyOrMoveJobException e) {
+        // We already have logged possible problems as part of the call in #getEntities.
+        if (!isSourceDestinationCompatible(source, destination, false)) {
             return;
         }
 
@@ -141,25 +137,32 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         }
     }
 
-    private void checkSourceDestination(EntityReference source, EntityReference destination)
-        throws InternalCopyOrMoveJobException
+    private boolean isSourceDestinationCompatible(EntityReference source, EntityReference destination, boolean log)
     {
+        boolean result = true;
         if (processOnlySameSourceDestinationTypes() && source.getType() != destination.getType()) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("You cannot change the entity type (from [%s] to [%s]).",
+            if (log) {
+                this.logger.error("You cannot change the entity type (from [{}] to [{}]).",
                     source.getType(),
-                    destination.getType()));
+                    destination.getType());
+            }
+            result = false;
         }
 
         if (isDescendantOrSelf(destination, source)) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("Cannot make [%s] a descendant of itself.", source));
+            if (log) {
+                this.logger.error("Cannot make [{}] a descendant of itself.", source);
+            }
+            result = false;
         }
 
         if (source.getParent() != null && source.getParent().equals(destination)) {
-            throw new InternalCopyOrMoveJobException(
-                String.format("Cannot move [%s] into [%s], it's already there.", source, destination));
+            if (log) {
+                this.logger.error("Cannot move [{}] into [{}], it's already there.", source, destination);
+            }
+            result = false;
         }
+        return result;
     }
 
     private boolean isDescendantOrSelf(EntityReference alice, EntityReference bob)

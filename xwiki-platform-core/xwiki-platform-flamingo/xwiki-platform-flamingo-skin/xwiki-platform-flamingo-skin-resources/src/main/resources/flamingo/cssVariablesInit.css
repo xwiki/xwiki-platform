@@ -71,14 +71,15 @@
 "table-border-color": "color"
 })
 :root {
+## Create CSS variables for each colorTheme variable
 #foreach($property in $variables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
 #set($propertyType = $variables.get($property))
 #if($propertyType == 'escapedText')
---$property: "$escapetool.javascript($value)";
+--$property: "$escapetool.javascript($!value)";
 #else
---$property: $value;
+--$property: $!value;
 #end
 #end
 #end

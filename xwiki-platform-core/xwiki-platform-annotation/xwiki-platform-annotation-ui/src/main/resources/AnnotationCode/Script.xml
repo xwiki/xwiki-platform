@@ -1677,6 +1677,12 @@ XWiki.Annotation = Class.create({
           onSuccess: function(response) {
             // display the annotation creation form
             this.fillCreateForm(this.createPanel, response.responseText);
+            // If the WYSIWYG editor used is CKEditor, we make sure its input gets focused as soon as it's loaded
+            // Note that this CKE config is easier than having to handle custom eventListeners.
+            // As of 17.0.0, this does not interfere with the inline editor, so this solution is okay.
+            if(typeof CKEDITOR !== 'undefined') {
+              CKEDITOR.config.startupFocus = true;
+            }
           }.bind(this),
 
           onFailure: function(response) {
@@ -1710,7 +1716,7 @@ XWiki.Annotation = Class.create({
     if (!this.safeUpdate(this.createPanel, panelContent)) {
       return;
     }
-    // set the focus in the first element of type input
+    // set the focus in the first element of type input, useful when not using the WYSIWYG editor CKEditor.
     this.createPanel.select('form').first().focusFirstElement();
     // and add the button observers
     this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));

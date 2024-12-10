@@ -57,7 +57,7 @@ export class BreadcrumbPageObject {
 
   private async findItemsShoelace(): Promise<BreadcrumbSegmentElement[]> {
     return await this.findItemsInternal(
-      "#breadcrumbRoot sl-breadcrumb sl-breadcrumb-item",
+      ".page-header sl-breadcrumb sl-breadcrumb-item",
       (element) => {
         return {
           getText() {
@@ -73,7 +73,7 @@ export class BreadcrumbPageObject {
   }
 
   private async findItemsVuetify(): Promise<BreadcrumbSegmentElement[]> {
-    return await this.findItemsInternal("#breadcrumbRoot li a", (element) => {
+    return await this.findItemsInternal(".page-header .v-breadcrumbs li a", (element) => {
       return {
         getText() {
           return element;

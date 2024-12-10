@@ -102,11 +102,11 @@ configs.forEach(
       expect(breadcrumbItems.length).toEqual(2);
       await expect(breadcrumbItems[0].getText()).toContainText("Home");
       expect(await breadcrumbItems[0].getLink()).toEqual(
-        "http://localhost:15680/xwiki/bin/view/Main/",
+        "#/Main.WebHome/view",
       );
       await expect(breadcrumbItems[1].getText()).toContainText("Main");
       expect(await breadcrumbItems[1].getLink()).toEqual(
-        "http://localhost:15680/xwiki/bin/view/Main/",
+        "#/Main.WebHome/view",
       );
     });
 

@@ -67,7 +67,6 @@ const currentPageName: ComputedRef<string> = computed(() => {
   );
 });
 
-const breadcrumbRoot = ref(undefined);
 const contentRoot = ref(undefined);
 
 const content: ComputedRef<string | undefined> = computed(() => {
@@ -122,10 +121,6 @@ watch(
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");
 
-  if (cristal && breadcrumbRoot.value) {
-    ContentTools.listenToClicks(breadcrumbRoot.value, cristal);
-  }
-
   if (cristal && contentRoot.value) {
     ContentTools.listenToClicks(contentRoot.value, cristal);
     ContentTools.transformMacros(contentRoot.value, cristal);
@@ -148,11 +143,7 @@ onUpdated(() => {
     <alerts-toasts></alerts-toasts>
 
     <div class="page-header">
-      <!-- This div lets us reference an actual HTML element,
-             to be used in `ContentTools.listenToClicks()`. -->
-      <div id="breadcrumbRoot" ref="breadcrumbRoot">
-        <XBreadcrumb class="breadcrumb" :items="breadcrumbItems"></XBreadcrumb>
-      </div>
+      <XBreadcrumb class="breadcrumb" :items="breadcrumbItems"></XBreadcrumb>
       <x-btn circle size="small" variant="primary" color="primary">
         <c-icon
           class="new-page"

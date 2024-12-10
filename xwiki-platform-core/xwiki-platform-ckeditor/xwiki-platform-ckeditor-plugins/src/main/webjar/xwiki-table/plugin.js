@@ -69,10 +69,10 @@
     ['txtBorder', 'txtWidth', 'txtCellSpace', 'txtCellPad'].forEach(function(fieldId) {
       delete infoTab.get(fieldId)['default'];
     });
-    // Set a new default for the Headers value
+    // Set a new default for the Headers value.
     infoTab.get( 'selHeaders' )[ 'default' ] = 'row';
-    // Create a warning message for the accessibility without headers
-    // We navigate the structure of the macro to insert this message exactly next to the header.
+    // Create a warning message for the accessibility without headers.
+    // We navigate the structure of the tab to insert this message exactly next to the header.
     infoTab.elements[0].children[0].children.splice(4, 0, {
       type : 'html',
       html : '<span class="box warningmessage">' + 

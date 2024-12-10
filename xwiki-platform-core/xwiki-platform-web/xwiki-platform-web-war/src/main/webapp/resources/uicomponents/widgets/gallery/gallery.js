@@ -31,12 +31,12 @@ XWiki.Gallery = Class.create({
     );
     this.container.addClassName('xGallery');    
     
-    /* Instead of an arbitrary element to catch focus, we use the index.
-    * This index already stores the current image state, might as well be responsible for providing quick controls and
-    * explanations about these quick controls.
-    * Note that wrapping the image in an interactive container to handle this would have been a good solution too.
-    * However, this wrapping caused the image to overflow the CSS grid vertically when in maximized mode. 
-    * Technically I couldn't find a CSS solution to prevent this, so I decided to make do without wrapping. */
+    // Instead of an arbitrary element to catch focus, we use the index.
+    // This index already stores the current image state, might as well be responsible for providing quick controls and
+    // explanations about these quick controls.
+    // Note that wrapping the image in an interactive container to handle this would have been a good solution too.
+    // However, this wrapping caused the image to overflow the CSS grid vertically when in maximized mode. 
+    // Technically I couldn't find a CSS solution to prevent this, so I decided to make do without wrapping.
     this.focusCatcher = this.container.down('.index');
     this.focusCatcher.observe('keydown', this._onKeyDown.bindAsEventListener(this));
 

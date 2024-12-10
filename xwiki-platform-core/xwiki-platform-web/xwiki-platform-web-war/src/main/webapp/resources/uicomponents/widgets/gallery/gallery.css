@@ -35,7 +35,7 @@
   max-height: 100%;
 }
 
-/* Transparent buttons that should fill the space they've been given on the grid*/
+/* Transparent buttons that should fill the space they've been given on the grid */
 .xGallery .previous, .xGallery .next,
 .xGallery .maximize, .xGallery .minimize {
   background-color: transparent;
@@ -89,12 +89,12 @@
   opacity: 1;
 }
 
-/* Elements on the left of the grid are left aligned*/
+/* Elements on the left of the grid are left aligned */
 .xGallery .index, .xGallery .previous {
   text-align: start;
 }
 
-/* Elements on the right of the grid are right aligned*/
+/* Elements on the right of the grid are right aligned */
 .xGallery .maximize, .xGallery .minimize, .xGallery .next {
   text-align: end;
 }

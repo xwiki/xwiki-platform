@@ -21,8 +21,6 @@ package org.xwiki.security.authservice;
 
 import java.security.Principal;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiAuthService;
@@ -34,7 +32,6 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * @version $Id$
  * @since 15.3RC1
  */
-@Unstable
 public abstract class AbstractXWikiAuthServiceWrapper implements XWikiAuthService
 {
     private final XWikiAuthService service;

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  * are not created at first start only. See also XWIKI-22368.
  *
  * @version $Id$
- * @since 16.7.0RC1
+ * @since 16.7.0
  */
 public class MandatoryDocInitializedTest extends AbstractTest
 {
@@ -43,6 +43,11 @@ public class MandatoryDocInitializedTest extends AbstractTest
 
         // define the pages that should be created at startup
         def startupPages = ["XWiki.XWikiServerXwiki"];
+        
+        // Pages that are completely ignored from the test
+        // SheetClass is initialized in a legacy package: we got it tested from the CI but it's expected that it's
+        // initialized late.
+        def ignoredPages = ["XWiki.SheetClass"];
 
         def dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
         def rb = ManagementFactory.getRuntimeMXBean();
@@ -52,6 +57,11 @@ public class MandatoryDocInitializedTest extends AbstractTest
         for (startupPage in startupPages) {
           startupPageRef.add(services.model.resolveDocument(startupPage));
         }
+        
+        def ignoredPagesRef = [];
+        for (ignoredPage in ignoredPages) {
+          ignoredPagesRef.add(services.model.resolveDocument(ignoredPage));
+        }
 
         def componentManager = services.component.getContextComponentManager();
         def documentInitializersList = componentManager.getInstanceList(MandatoryDocumentInitializer.class);
@@ -60,13 +70,17 @@ public class MandatoryDocInitializedTest extends AbstractTest
         def foundErrorsCreatedBefore = [];
         for (initializer in documentInitializersList) {
           def ref = initializer.getDocumentReference();
-          def classDoc = xwiki.getDocument(ref);
-          def creationDate = classDoc.getCreationDate();
-          def shouldBeBefore = (!startupPageRef.contains(ref));
-          if (shouldBeBefore && creationDate.after(startedSince)) {
-            foundErrorsCreatedAfter.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
-          } else if (!shouldBeBefore && creationDate.before(startedSince)) {
-            foundErrorsCreatedBefore.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
+          // the provided ref might be a local document ref, so we serialize and resolve again to obtain same 
+          // canonical ref
+          if (!ignoredPagesRef.contains(services.model.resolveDocument(services.model.serialize(ref)))) {
+            def classDoc = xwiki.getDocument(ref);
+            def creationDate = classDoc.getCreationDate();
+            def shouldBeBefore = (!startupPageRef.contains(ref));
+            if (shouldBeBefore && creationDate.after(startedSince)) {
+              foundErrorsCreatedAfter.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
+            } else if (!shouldBeBefore && creationDate.before(startedSince)) {
+              foundErrorsCreatedBefore.add(ref.toString() + " ("+dateFormat.format(creationDate)+")");
+            }
           }
         }
 

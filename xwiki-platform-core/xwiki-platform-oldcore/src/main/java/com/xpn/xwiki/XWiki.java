@@ -115,6 +115,7 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.job.Job;
+import org.xwiki.job.JobContext;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.annotation.Serializable;
@@ -151,6 +152,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.refactoring.batch.BatchOperationExecutor;
 import org.xwiki.refactoring.internal.ReferenceUpdater;
+import org.xwiki.refactoring.internal.job.AbstractCopyOrMoveJob;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -1462,7 +1464,7 @@ public class XWiki implements EventListener
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);
                 }
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to initialize mandatory document [{}]", initializer.getDocumentReference(), e);
         }
     }
@@ -4102,7 +4104,7 @@ public class XWiki implements EventListener
 
     public String generateRandomString(int size)
     {
-        return RandomStringUtils.randomAlphanumeric(size);
+        return RandomStringUtils.secure().nextAlphanumeric(size);
     }
 
     public String generateValidationKey(int size)
@@ -4237,9 +4239,6 @@ public class XWiki implements EventListener
 
             saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
 
-            // Now let's add the user to XWiki.XWikiAllGroup
-            setUserDefaultGroup(doc.getFullName(), context);
-
             return 1;
         } catch (Exception e) {
             Object[] args = { "XWiki." + userName };
@@ -4259,7 +4258,26 @@ public class XWiki implements EventListener
         return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
     }
 
-    public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
+    /**
+     * @param documentReference the reference of the user document
+     * @param xcontext the XWiki context
+     * @since 16.7.0
+     */
+    @Unstable
+    public void setUserDefaultGroup(DocumentReference documentReference, XWikiContext xcontext)
+    {
+        WikiReference currentWikiReference = xcontext.getWikiReference();
+
+        try {
+            xcontext.setWikiReference(documentReference.getWikiReference());
+
+            setUserDefaultGroup(getLocalStringEntityReferenceSerializer().serialize(documentReference), xcontext);
+        } finally {
+            xcontext.setWikiReference(currentWikiReference);
+        }
+    }
+
+    public void setUserDefaultGroup(String fullwikiname, XWikiContext context)
     {
         String groupsPreference = isAllGroupImplicit() ? getConfiguration().getProperty("xwiki.users.initialGroups")
             : getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
@@ -4268,7 +4286,13 @@ public class XWiki implements EventListener
             String[] groups = groupsPreference.split(",");
             for (String groupName : groups) {
                 if (StringUtils.isNotBlank(groupName)) {
-                    addUserToGroup(fullwikiname, groupName.trim(), context);
+                    String cleanedGroupName = groupName.trim();
+
+                    try {
+                        addUserToGroup(fullwikiname, cleanedGroupName, context);
+                    } catch (Exception e) {
+                        LOGGER.error("Failed to update group [{}] with member [{}]", cleanedGroupName, fullwikiname, e);
+                    }
                 }
             }
         }
@@ -4279,12 +4303,17 @@ public class XWiki implements EventListener
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         DocumentReference groupClassReference = getGroupClass(context).getDocumentReference();
-        BaseObject memberObject =
-            groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        memberObject.setStringValue("member", userName);
+        // Make sure the user is not already part of the group
+        if (groupDoc.getXObject(groupClassReference, "member", userName,
+            false) == null) {
+            BaseObject memberObject =
+                groupDoc.newXObject(groupClassReference.removeParent(groupClassReference.getWikiReference()), context);
 
-        this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+            memberObject.setStringValue("member", userName);
+
+            saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
+        }
     }
 
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
@@ -4722,7 +4751,6 @@ public class XWiki implements EventListener
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public void deleteDocumentVersions(XWikiDocument document, String version1, String version2,
         boolean triggeredByUser, XWikiContext context) throws XWikiException
     {
@@ -4941,9 +4969,19 @@ public class XWiki implements EventListener
         List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
         XWikiContext context) throws XWikiException
     {
+        // FIXME: that's ugly we should use something else.
+        JobContext jobContext = Utils.getComponent(JobContext.class);
+        Job currentJob = jobContext.getCurrentJob();
+
+        Map<EntityReference, EntityReference> updatedReferences =
+            Map.of(sourceDoc.getDocumentReference(), newDocumentReference);
+        if (currentJob instanceof AbstractCopyOrMoveJob) {
+            updatedReferences = ((AbstractCopyOrMoveJob) currentJob).getSelectedEntities();
+        }
         // Step 1: Refactor the relative links contained in the document to make sure they are relative to the new
         // document's location.
-        getReferenceUpdater().update(newDocumentReference, sourceDoc.getDocumentReference(), newDocumentReference);
+        getReferenceUpdater().update(newDocumentReference, sourceDoc.getDocumentReference(), newDocumentReference,
+            updatedReferences);
 
         // Step 2: For each child document, update its parent reference.
         if (childDocumentReferences != null) {
@@ -7593,7 +7631,6 @@ public class XWiki implements EventListener
      * @since 15.5.3
      * @since 15.8RC1
      */
-    @Unstable
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision,
         boolean triggeredByUser, XWikiContext xcontext) throws XWikiException
     {

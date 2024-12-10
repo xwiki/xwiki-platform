@@ -2,6 +2,7 @@ org.xwiki.officeimporter.internal.ModelBridge
 org.xwiki.officeimporter.internal.builder.DefaultXHTMLOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultXDOMOfficeDocumentBuilder
 org.xwiki.officeimporter.internal.builder.DefaultPresentationBuilder
+org.xwiki.officeimporter.internal.builder.PresentationBuilderConfiguration
 org.xwiki.officeimporter.internal.cleaner.OfficeHTMLCleaner
 org.xwiki.officeimporter.internal.cleaner.WysiwygHTMLCleaner
 org.xwiki.officeimporter.internal.filter.AnchorFilter

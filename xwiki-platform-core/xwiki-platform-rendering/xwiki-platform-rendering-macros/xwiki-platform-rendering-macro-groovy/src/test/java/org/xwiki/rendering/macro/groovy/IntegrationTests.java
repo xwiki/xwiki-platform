@@ -19,18 +19,26 @@
  */
 package org.xwiki.rendering.macro.groovy;
 
+import java.io.File;
+
 import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.junit.runner.RunWith;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
-import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.test.jmock.MockingComponentManager;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.XWikiTempDir;
+import org.xwiki.test.junit5.XWikiTempDirExtension;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -39,30 +47,30 @@ import org.xwiki.test.jmock.MockingComponentManager;
  * @version $Id$
  * @since 3.0RC1
  */
-@RunWith(RenderingTestSuite.class)
-@RenderingTestSuite.Scope(pattern = "macrogroovy.*")
-public class IntegrationTests
+@AllComponents
+@ExtendWith(XWikiTempDirExtension.class)
+@Scope(pattern = "macrogroovy.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTestSuite.Initialized
-    public void initialize(MockingComponentManager componentManager) throws Exception
-    {
-        Mockery mockery = new JUnit4Mockery();
+    @XWikiTempDir
+    private File permanentDir;
 
-        new ScriptMockSetup(mockery, componentManager);
+    @Initialized
+    public void initialize(MockitoComponentManager componentManager) throws Exception
+    {
+        new JUnit5ScriptMockSetup(componentManager);
 
         // Script Context Mock
-        final ScriptContextManager scm = componentManager.registerMockComponent(mockery, ScriptContextManager.class);
-        final SimpleScriptContext scriptContext = new SimpleScriptContext();
+        ScriptContextManager scm = componentManager.registerMockComponent(ScriptContextManager.class);
+        SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
         scriptContext.setAttribute("services", componentManager.getInstance(ScriptServiceManager.class),
             ScriptContext.ENGINE_SCOPE);
+        when(scm.getScriptContext()).thenReturn(scriptContext);
 
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(scm).getScriptContext();
-                will(returnValue(scriptContext));
-            }
-        });
+        // Set up the permanent directory in the target directory (so that it doesn't fall back on a temporary directory
+        // outside the maven build directory (bad practice)
+        StandardEnvironment environment = componentManager.getInstance(Environment.class);
+        environment.setPermanentDirectory(this.permanentDir);
     }
 }

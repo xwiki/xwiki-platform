@@ -443,21 +443,24 @@ public class DefaultNotificationParametersFactory
             && notificationParameters.format == NotificationFormat.ALERT) {
             excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
         }
-        notificationParameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toSet());
 
         enableAllEventTypes(notificationParameters);
 
         String wikis = parameters.get(ParametersKey.WIKIS);
         String pages = parameters.get(ParametersKey.PAGES);
         String spaces = parameters.get(ParametersKey.SPACES);
-        // For legacy reason, we need to consider that by default, in the absence of any watched entity (i.e., wiki, 
-        // space or page), the whole wiki is watched.
-        // Otherwise, only the events matching an explicitly defined filter would be allowed.
+
+        // We check if the parameters contain a location, and we remove ScopeNotificationFilter if it doesn't:
+        // this filter would automatically discard all events not matching a given location.
+        boolean noLocationFilter =
+            (StringUtils.isBlank(wikis) && StringUtils.isBlank(pages) && StringUtils.isBlank(spaces));
+        notificationParameters.filters = notificationFilterManager.getAllFilters(true)
+            .stream()
+            .filter(filter -> !excludedFilters.contains(filter.getName())
+                && (!noLocationFilter || !filter.getName().equals(ScopeNotificationFilter.FILTER_NAME)))
+            .collect(Collectors.toSet());
+
         String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
-        if (StringUtils.isEmpty(wikis) && StringUtils.isEmpty(spaces) && StringUtils.isEmpty(pages)) {
-            wikis = currentWikiId;
-        }
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
 
         if (StringUtils.isEmpty(currentWiki)) {

@@ -82,13 +82,16 @@ rendering.macro.documentTree.parameter.limit.name=Limit
 rendering.macro.documentTree.parameter.limit.description=Die maximale Anzahl der Kindknoten, die beim ersten Aufklappen eines übergeordneten Knotens angezeigt werden sollen. Der Rest der Kindknoten ist über einen "mehr ..."-Link zugänglich. Dieser Parameter dient im Wesentlichen dazu, die Kindknoten zu paginieren und hilft so bei der Skalierung des Baums, wenn die Anzahl der Kindknoten groß ist.
 rendering.macro.documentTree.parameter.exclusions.name=Ausschlüsse
 rendering.macro.documentTree.parameter.exclusions.description=Die Liste der Knoten, die aus dem Baum ausgeschlossen werden sollen. Die Knoten werden durch ihre ID angegeben und durch Komma getrennt.
-
+rendering.macro.children.name=Unterseiten
+rendering.macro.children.description=Zeigt einen Baum von Unterseiten der aktuellen Seite an
 index.documentTree.empty=Keine Seiten gefunden
 index.documentTree.more={0} mehr ...
+index.documentTree.addDocument=Neue Seite...
 
 ## Deprecated translation keys
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Kinddokumente anzeigen
-rendering.macro.documentTree.parameter.showChildDocuments.description=Ob die untergeordneten Dokumente basierend auf dem übergeordneten Feld des Dokuments angezeigt werden sollen.</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Ob die untergeordneten Dokumente basierend auf dem übergeordneten Feld des Dokuments angezeigt werden sollen.
+</content>
 </xwikidoc>

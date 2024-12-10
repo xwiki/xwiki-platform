@@ -28,6 +28,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -123,12 +124,12 @@ public class RealtimeRichTextAreaElement extends RichTextAreaElement
     /**
      * Creates a new realtime rich text area element.
      * 
-     * @param container the element that defines the realtime rich text area
+     * @param editor the CKEditor instance that owns this rich text area
      * @param wait whether to wait or not for the content to be editable
      */
-    public RealtimeRichTextAreaElement(WebElement container, boolean wait)
+    public RealtimeRichTextAreaElement(CKEditor editor, boolean wait)
     {
-        super(container, wait);
+        super(editor, wait);
     }
 
     /**

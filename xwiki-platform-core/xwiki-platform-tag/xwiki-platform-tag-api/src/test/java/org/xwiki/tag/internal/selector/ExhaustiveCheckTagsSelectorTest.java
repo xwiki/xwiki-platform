@@ -327,7 +327,7 @@ class ExhaustiveCheckTagsSelectorTest
             .forEach((key, value) -> when(this.contextualAuthorizationManager.hasAccess(VIEW, key)).thenReturn(value));
         when(this.query.<String>execute()).thenReturn(results);
 
-        assertEquals(expected, this.tagsSelector.getDocumentsWithTag("Tag0", false));
+        assertEquals(expected, this.tagsSelector.getDocumentsWithTag("Tag0", false, false));
     }
 
     private void initializeDocumentReferenceResolver()

@@ -1,3 +1,4 @@
+org.xwiki.crypto.internal.RSACryptoHelper
 org.xwiki.crypto.script.CryptoScriptService
 org.xwiki.crypto.script.RSACryptoScriptService
 org.xwiki.crypto.script.StoreScriptService

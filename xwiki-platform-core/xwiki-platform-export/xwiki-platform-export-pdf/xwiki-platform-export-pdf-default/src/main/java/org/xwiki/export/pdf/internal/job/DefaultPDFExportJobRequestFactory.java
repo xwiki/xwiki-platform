@@ -38,7 +38,6 @@ import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.job.PDFExportJobRequest;
 import org.xwiki.export.pdf.job.PDFExportJobRequestFactory;
-import org.xwiki.model.internal.reference.comparator.DocumentReferenceComparator;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -86,7 +85,8 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
     @Inject
     private PDFExportConfiguration configuration;
 
-    private DocumentReferenceComparator documentReferenceComparator = new DocumentReferenceComparator(true);
+    @Inject
+    private Provider<NavigationTreeDocumentReferenceComparator> documentReferenceComparatorProvider;
 
     @Override
     public PDFExportJobRequest createRequest() throws Exception
@@ -164,7 +164,7 @@ public class DefaultPDFExportJobRequestFactory implements PDFExportJobRequestFac
         request.setWithHeader(!"0".equals(httpRequest.get("pdfheader")));
         request.setWithFooter(!"0".equals(httpRequest.get("pdffooter")));
         request.setDocuments(this.documentSelectionResolver.getSelectedDocuments(true).stream()
-            .sorted(this.documentReferenceComparator).collect(Collectors.toList()));
+            .sorted(this.documentReferenceComparatorProvider.get()).collect(Collectors.toList()));
 
         request.setFileName(xcontext.getDoc().getRenderedTitle(Syntax.PLAIN_1_0, xcontext) + ".pdf");
     }

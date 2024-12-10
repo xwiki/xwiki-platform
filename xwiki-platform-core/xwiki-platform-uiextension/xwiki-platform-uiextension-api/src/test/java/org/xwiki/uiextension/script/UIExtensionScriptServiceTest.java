@@ -19,12 +19,16 @@
  */
 package org.xwiki.uiextension.script;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Provider;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,13 +40,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionFilter;
 import org.xwiki.uiextension.UIExtensionManager;
-import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.uiextension.internal.filter.SortByIdFilter;
-import static org.mockito.Mockito.*;
 
-import org.junit.Assert;
-
-public class UIExtensionScriptServiceTest implements WikiUIExtensionConstants
+public class UIExtensionScriptServiceTest
 {
     private ComponentManager contextComponentManager;
 

@@ -63,6 +63,8 @@ public class HqlQueryUtilsTest
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
         assertFalse(HqlQueryUtils.isSafe("select count(other.*) from OtherTable other"));
+        assertFalse(HqlQueryUtils.isSafe("select doc.fullName from XWikiDocument doc union all select name from OtherTable"));
+        assertFalse(HqlQueryUtils.isSafe("select doc.fullName from XWikiDocument doc where 1<>'1\\'' union select name from OtherTable #'"));
     }
 
     @Test

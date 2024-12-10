@@ -2,10 +2,58 @@
 // Messages
 // --------------------------------------------------
 
-.successmessage, .errormessage, .warningmessage, .infomessage,
-span.successmessage, span.errormessage, span.warningmessage, span.infomessage, 
-span.box { // Used by: Inline boxes and messages
-  padding: floor(@font-size-base * 0.2);
+// Used by: Inline boxes
+span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
+  border: none;
+}
+
+span.box, span.successmessage, span.errormessage, span.warningmessage, span.infomessage {
+  padding: 0 floor(@font-size-base * 0.2);
+  box-shadow: none;
+  & > .icon-block > img {
+    // Style the silk icons
+    margin: 0 .6rem 0 .2rem;
+    vertical-align: sub;
+  }
+
+  & > .icon-block > span.fa {
+    // Style the font awesome icons
+    margin: 0 .6rem 0 .2rem;
+  }
+}
+
+// Used by: message boxes
+div.successmessage, div.errormessage, div.warningmessage, div.infomessage {
+  // In case the structure of the div is not the same as the one from the macro
+  // we do not add those new style rules, in order to not break the looks of the content inside.
+  // The selector below relies on the class introduced in the IconProvider at
+  // the same time as the new style for the message boxes.
+  // This makes it so that this new style will never apply on an older hardcoded box.
+  &:has(>.icon-block) {
+    display: flex;
+    gap: 2rem;
+    justify-content: left;
+    align-items: baseline;
+  }
+  padding: 2rem;
+  border: none;
+  border-left: 4px solid;
+  box-shadow: none;
+  
+  & > .icon-block > img {
+    max-width: unset;
+  }
+
+  & > div > .box-title,
+  & > div > .xwiki-metadata-container[data-xwiki-parameter-name="title"] {
+    font-weight: bold;
+  }
+
+  // Main message content
+  & > div > p,
+  & > div > [data-cke-display-name="$content"] {
+    margin: 0;
+  }
 }
 
 .box, .plainmessage, // Used by: Code Macro, Success Macro, etc.
@@ -27,18 +75,22 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 
 .successmessage {
   .alert-success;
+  border-color: @brand-success;
 }
 
 .errormessage {
   .alert-danger;
+  border-color: @brand-danger;
 }
 
 .warningmessage {
   .alert-warning;
+  border-color: @brand-warning;
 }
 
 .infomessage {
   .alert-info;
+  border-color: @brand-primary;
 }
 
 // --------------------------------------------------

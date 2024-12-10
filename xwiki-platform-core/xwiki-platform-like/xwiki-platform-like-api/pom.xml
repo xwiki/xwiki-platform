@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like</artifactId>
-    <version>16.7.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-like-api</artifactId>
   <name>XWiki Platform - Like - API</name>
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Needs to be installed on root to be able to use Solr Store -->
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
     <!-- Name to display by the Extension Manager -->

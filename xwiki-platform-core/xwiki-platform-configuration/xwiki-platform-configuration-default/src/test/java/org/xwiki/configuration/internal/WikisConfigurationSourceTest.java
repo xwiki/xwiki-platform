@@ -23,28 +23,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.properties.ConverterManager;
-import org.xwiki.rendering.async.AsyncContext;
-import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,34 +48,39 @@ import static org.mockito.Mockito.when;
 @OldcoreTest
 class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    @Mock(answer = Answers.CALLS_REAL_METHODS)
-    private AbstractWikisConfigurationSource wikisConfigSource;
+    public static class TestWikisConfigurationSource extends AbstractWikisConfigurationSource
+    {
+        @Override
+        protected LocalDocumentReference getLocalDocumentReference()
+        {
+            return CONFIG_DOCREF;
+        }
 
-    @MockComponent
-    private Provider<XWikiContext> xcontextProvider;
+        @Override
+        protected LocalDocumentReference getClassReference()
+        {
+            return CONFIG_CLASSREF;
+        }
 
-    @MockComponent
-    private AsyncContext asyncContext;
+        @Override
+        protected String getCacheId()
+        {
+            return "configuration.document.myApp";
+        }
+    }
 
-    @MockComponent
-    private EntityReferenceSerializer<String> referenceSerializer;
+    @InjectMockComponents
+    private TestWikisConfigurationSource wikisConfigSource;
 
-    @MockComponent
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> currentRefDocRefResolver;
+    private static final LocalDocumentReference CONFIG_CLASSREF = new LocalDocumentReference("MyApp", "ConfigClass");
 
-    @MockComponent
-    private ConverterManager converter;
+    private static final LocalDocumentReference CONFIG_DOCREF = new LocalDocumentReference("MyApp", "Config");
 
-    private LocalDocumentReference configClassRef = new LocalDocumentReference("MyApp", "ConfigClass");
+    private static final DocumentReference SUBWIKI_CONFIG_DOCREF =
+        new DocumentReference(CONFIG_DOCREF, new WikiReference(CURRENT_WIKI));
 
-    private LocalDocumentReference configDocRef = new LocalDocumentReference("MyApp", "Config");
-
-    private DocumentReference subWikiConfigDocRef =
-        new DocumentReference(this.configDocRef, new WikiReference("design"));
-
-    private DocumentReference mainWikiConfigDocRef =
-        new DocumentReference(this.configDocRef, new WikiReference("xwiki"));
+    private static final DocumentReference MAINWIKI_CONFIG_DOCREF =
+        new DocumentReference(CONFIG_DOCREF, new WikiReference("xwiki"));
 
     @Override
     protected ConfigurationSource getConfigurationSource()
@@ -99,7 +91,7 @@ class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSour
     @Override
     protected LocalDocumentReference getClassReference()
     {
-        return this.configClassRef;
+        return CONFIG_CLASSREF;
     }
 
     @Override
@@ -108,48 +100,15 @@ class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSour
     {
         super.before();
 
-        when(this.wikisConfigSource.getLocalDocumentReference())
-            .thenReturn(new LocalDocumentReference("MyApp", "Config"));
-        when(this.wikisConfigSource.getClassReference()).thenReturn(this.configClassRef);
-        when(this.wikisConfigSource.getCacheId()).thenReturn("configuration.document.myApp");
-
-        this.wikisConfigSource.wikiManager = this.oldcore.getWikiDescriptorManager();
-        this.wikisConfigSource.xcontextProvider = this.xcontextProvider;
-        this.wikisConfigSource.asyncContext = this.asyncContext;
-        this.wikisConfigSource.referenceSerializer = this.referenceSerializer;
-        this.wikisConfigSource.cache = this.mockCache;
-        this.wikisConfigSource.converter = this.converter;
-
-        when(this.oldcore.getWikiDescriptorManager().getCurrentWikiId()).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return oldcore.getXWikiContext().getWikiId();
-            }
-        });
-        when(this.oldcore.getWikiDescriptorManager().getMainWikiId()).thenReturn("xwiki");
-
-        when(this.referenceSerializer.serialize(this.subWikiConfigDocRef)).thenReturn("design:MyApp.Config");
-        when(this.referenceSerializer.serialize(this.mainWikiConfigDocRef)).thenReturn("xwiki:MyApp.Config");
-
-        when(this.currentRefDocRefResolver.resolve(this.configClassRef, this.subWikiConfigDocRef))
-            .thenReturn(new DocumentReference(this.configClassRef, this.subWikiConfigDocRef.getWikiReference()));
-        when(this.currentRefDocRefResolver.resolve(this.configClassRef, this.mainWikiConfigDocRef))
-            .thenReturn(new DocumentReference(this.configClassRef, this.mainWikiConfigDocRef.getWikiReference()));
-
-        when(this.xcontextProvider.get()).thenReturn(this.oldcore.getXWikiContext());
-        this.oldcore.getXWikiContext().setWikiId("design");
-
-        setStringProperty(this.subWikiConfigDocRef, "color", "blue");
-        setStringProperty(this.mainWikiConfigDocRef, "color", "red");
-        setStringProperty(this.mainWikiConfigDocRef, "enabled", "true");
+        setStringProperty(SUBWIKI_CONFIG_DOCREF, "color", "blue");
+        setStringProperty(MAINWIKI_CONFIG_DOCREF, "color", "red");
+        setStringProperty(MAINWIKI_CONFIG_DOCREF, "enabled", "true");
 
         when(this.mockConverter.convert(Boolean.class, "true")).thenReturn(true);
     }
 
     @Test
-    void containsKey() throws Exception
+    void containsKey()
     {
         assertFalse(this.wikisConfigSource.containsKey("age"));
         assertTrue(this.wikisConfigSource.containsKey("color"));
@@ -157,7 +116,7 @@ class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSour
     }
 
     @Test
-    void getKeys() throws Exception
+    void getKeys()
     {
         assertEquals(Arrays.asList("color", "enabled"), this.wikisConfigSource.getKeys());
     }
@@ -181,10 +140,10 @@ class WikisConfigurationSourceTest extends AbstractTestDocumentConfigurationSour
     {
         assertFalse(this.wikisConfigSource.isEmpty());
 
-        removeConfigObject(this.subWikiConfigDocRef);
+        removeConfigObject(SUBWIKI_CONFIG_DOCREF);
         assertFalse(this.wikisConfigSource.isEmpty());
 
-        removeConfigObject(this.mainWikiConfigDocRef);
+        removeConfigObject(MAINWIKI_CONFIG_DOCREF);
         assertTrue(this.wikisConfigSource.isEmpty());
     }
 }

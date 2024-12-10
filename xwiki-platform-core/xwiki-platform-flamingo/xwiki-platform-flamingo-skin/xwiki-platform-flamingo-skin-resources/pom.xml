@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>16.7.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -117,8 +117,9 @@
       <artifactId>scriptaculous</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-bootstrap</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -130,23 +131,35 @@
       <version>5.2.0</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>momentjs</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>moment-jdateformatparser</artifactId>
       <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>moment-timezone</artifactId>
-      <version>0.5.43</version>
+      <version>0.5.46</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
       <version>4.17.49</version>
+      <exclusions>
+        <!-- We use our own fork of Bootstrap. -->
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>bootstrap</artifactId>
+        </exclusion>
+        <!-- We prefer the org.webjars.npm version. -->
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>momentjs</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -249,13 +262,13 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.webjars</groupId>
-                  <artifactId>bootstrap</artifactId>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-bootstrap</artifactId>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>
                   <includes>
-                    META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/**
+                    META-INF/resources/webjars/xwiki-platform-bootstrap/${project.version}/less/**
                   </includes>
                   <!-- Exclude Bootstrap's default print styles because Bootstrap assumes that paper is always the target
                     paged media, forcing rules that are hard to overwrite (using * selector and !important flag). We

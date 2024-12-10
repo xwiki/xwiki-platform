@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +47,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class ImagePlugin extends XWikiDefaultPlugin
 {
     /**
@@ -62,6 +61,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * @see XWikiPluginInterface#getName()
      */
     private static final String PLUGIN_NAME = "image";
+
+    private static final String DEFAULT_QUALITY_PARAM = "xwiki.plugin.image.defaultQuality";
 
     /**
      * Cache for already served images.
@@ -120,13 +121,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String imageProcessorHint = context.getWiki().Param("xwiki.plugin.image.processorHint", "thumbnailator");
         this.imageProcessor = Utils.getComponent(ImageProcessor.class, imageProcessorHint);
 
-        String defaultQualityParam = context.getWiki().Param("xwiki.plugin.image.defaultQuality");
+        String defaultQualityParam = context.getWiki().Param(DEFAULT_QUALITY_PARAM);
         if (!StringUtils.isBlank(defaultQualityParam)) {
             try {
                 this.defaultQuality = Math.max(0, Math.min(1, Float.parseFloat(defaultQualityParam.trim())));
             } catch (NumberFormatException e) {
-                LOG.warn("Failed to parse xwiki.plugin.image.defaultQuality configuration parameter. "
-                    + "Using {} as the default image quality.", this.defaultQuality);
+                LOG.warn("Failed to parse [{}] configuration parameter. Using [{}] as the default image quality.",
+                    DEFAULT_QUALITY_PARAM, this.defaultQuality);
             }
         }
     }
@@ -176,6 +177,24 @@ public class ImagePlugin extends XWikiDefaultPlugin
         this.imageCache = null;
     }
 
+    private int parseIntIgnoringException(String parameter)
+    {
+        try {
+            return Integer.parseInt(parameter);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private float parseFloatIgnoringException(String parameter)
+    {
+        try {
+            return Float.parseFloat(parameter);
+        } catch (NumberFormatException | NullPointerException e) {
+            return -1;
+        }
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -189,45 +208,26 @@ public class ImagePlugin extends XWikiDefaultPlugin
     @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
-        if (attachment == null || !this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
-            return attachment;
-        }
+        XWikiAttachment result = attachment;
+        if (attachment != null && this.imageProcessor.isMimeTypeSupported(attachment.getMimeType(context))) {
+            int height = parseIntIgnoringException(context.getRequest().getParameter("height"));
+            int width = parseIntIgnoringException(context.getRequest().getParameter("width"));
+            float quality = parseFloatIgnoringException(context.getRequest().getParameter("quality"));
 
-        int height = -1;
-        try {
-            height = Integer.parseInt(context.getRequest().getParameter("height"));
-        } catch (NumberFormatException e) {
-            // Ignore.
+            // If no scaling is needed, return the original image.
+            if (!(height <= 0 && width <= 0 && quality < 0)) {
+                try {
+                    // Transform the image attachment before is it downloaded.
+                    result = downloadImage(attachment, width, height, quality, context);
+                } catch (Exception e) {
+                    LOG.warn("Failed to transform image attachment [{}] for scaling, falling back to original "
+                        + "attachment. Root error: [{}]", attachment.getFilename(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                    LOG.debug("Full stack trace for image attachment scaling error: ", e);
+                }
+            }
         }
-
-        int width = -1;
-        try {
-            width = Integer.parseInt(context.getRequest().getParameter("width"));
-        } catch (NumberFormatException e) {
-            // Ignore.
-        }
-
-        float quality = -1;
-        try {
-            quality = Float.parseFloat(context.getRequest().getParameter("quality"));
-        } catch (NumberFormatException | NullPointerException e) {
-            // Ignore.
-        }
-
-        // If no scaling is needed, return the original image.
-        if (height <= 0 && width <= 0 && quality < 0) {
-            return attachment;
-        }
-
-        try {
-            // Transform the image attachment before is it downloaded.
-            return downloadImage(attachment, width, height, quality, context);
-        } catch (Exception e) {
-            LOG.warn("Failed to transform image attachment {} for scaling, falling back to original attachment.",
-                attachment.getFilename());
-            LOG.debug("Full stack trace for image attachment scaling error: ", e);
-            return attachment;
-        }
+        return result;
     }
 
     /**

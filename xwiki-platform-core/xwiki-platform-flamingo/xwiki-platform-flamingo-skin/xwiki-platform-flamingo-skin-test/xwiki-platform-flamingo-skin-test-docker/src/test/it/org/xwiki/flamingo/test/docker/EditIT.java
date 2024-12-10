@@ -84,7 +84,7 @@ public class EditIT
     @AfterEach
     public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
         // Ensure remaining tabs are properly closed.
         if (setup.getDriver().getWindowHandles().size() > 1) {
@@ -241,8 +241,8 @@ public class EditIT
      * page.
      */
     @Test
-    @IgnoreBrowser(value = "firefox", reason = "Alert handling in Firefox currently isn't working, see also "
-        + "https://jira.xwiki.org/browse/XWIKI-22282")
+    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
+        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {

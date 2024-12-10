@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr-cores</artifactId>
-    <version>16.7.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-core-search</artifactId>
   <packaging>deb</packaging>
@@ -34,5 +34,9 @@
   <properties>
     <debian.xwiki.core>search</debian.xwiki.core>
     <debian.solr.package>xwiki-platform-search-solr-server-core-search</debian.solr.package>
+
+    <!-- The search core used to have a special name and location -->
+    <debian.solr.var.oldsolr8core>${debian.solr.var.data}/xwiki</debian.solr.var.oldsolr8core>
+    <debian.xwiki.var.oldsolr8core>${debian.xwiki.var}/solr-data</debian.xwiki.var.oldsolr8core>
   </properties>
 </project>

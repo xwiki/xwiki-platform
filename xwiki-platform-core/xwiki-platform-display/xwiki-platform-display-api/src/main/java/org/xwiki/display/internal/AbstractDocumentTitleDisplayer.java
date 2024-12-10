@@ -46,7 +46,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -112,7 +112,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     private ConfigurationSource xwikicfg;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     /**
      * Used to get the default document reference, which normally is used to represent the home page of a space.
@@ -177,7 +177,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 String title = rawTitle;
                 // Evaluate the title only if the document is not restricted and its content's author has script
                 // right, otherwise use the raw title.
-                if (!document.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
+                if (!document.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
                     document.getContentAuthorReference(), document.getDocumentReference())) {
                     title = evaluateTitle(document, parameters);
                 }

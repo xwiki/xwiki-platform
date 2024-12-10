@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="ExtensionCode.HomeBrowse" locale="">
+<xwikidoc version="1.5" reference="ExtensionCode.HomeBrowse" locale="">
   <web>ExtensionCode</web>
   <name>HomeBrowse</name>
   <language/>
@@ -37,14 +37,14 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-## Only display the Browse box if the Recommended feature is enabled
+## Only display the Browse box if the Supported feature is enabled
 #if ($useRecommendations)
   (% class="extension-link browse-extension box"%)(((
   (((
-  ## Display All Extensions if we're on the Recommended Extensions page
-  ## Display Recommended Extensions if we're on the All Extensions page
+  ## Display All Extensions if we're on the Supported Extensions page
+  ## Display Supported Extensions if we're on the All Extensions page
   #if (!$isRecommendedView)
-  === #if($services.icon)$services.icon.render('application_view_tile')#end Recommended Extensions ===
+  === #if($services.icon)$services.icon.render('application_view_tile')#end Supported Extensions ===
 
   {{html clean='false'}}
   &lt;form action="$xwiki.getURL('Extension.WebHome')" method='post'&gt;

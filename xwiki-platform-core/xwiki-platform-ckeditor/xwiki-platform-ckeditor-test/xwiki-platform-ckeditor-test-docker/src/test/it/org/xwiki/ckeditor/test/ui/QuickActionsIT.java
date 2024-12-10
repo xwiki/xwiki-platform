@@ -73,6 +73,7 @@ class QuickActionsIT extends AbstractCKEditorIT
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
+        setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
         waitForSolrIndexing(setup, testConfiguration);
 
         createAndLoginStandardUser(setup);
@@ -478,10 +479,9 @@ class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSelected("/toc", "Table of Contents");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        textArea.waitForContentRefresh();
 
-        textArea = editor.getRichTextArea();
-
-        assertSourceEquals("{{toc/}}\n");
+        assertSourceEquals("{{toc/}}\n\n ");
     }
 
     @Test

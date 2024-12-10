@@ -21,7 +21,6 @@ package org.xwiki.localization;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * A helper for {@link LocalizationManager} which get the {@link java.util.Locale} from {@link LocalizationContext} and
@@ -67,7 +66,6 @@ public interface ContextualLocalizationManager
      * @since 15.5RC1
      * @since 14.10.12
      */
-    @Unstable
     default String getTranslation(String key, Syntax targetSyntax, Object... parameters) throws LocalizationException
     {
         return null;

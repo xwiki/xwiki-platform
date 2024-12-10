@@ -20,7 +20,6 @@
 package org.xwiki.template;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component in charge of validating the a requirement for a template.
@@ -39,7 +38,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.1
  */
 @Role
-@Unstable
 public interface TemplateRequirement
 {
     /**

@@ -24,10 +24,11 @@ define('entityResourcePickerTranslationKeys', [], [
 ]);
 
 define('entityResourcePicker', [
-  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'xwiki-tree'
-], function($, $resource, $modal, translations) {
+  'jquery', 'resource', 'modal', 'l10n!entityResourcePicker', 'xwiki-meta', 'xwiki-tree'
+], function($, $resource, $modal, translations, xm) {
   'use strict';
 
+  var createdNodes = {};
   var createTreeElement = function(attributes) {
     return $(document.createElement('div')).attr($.extend({
       'class': 'ckeditor-tree jstree-no-links',
@@ -77,6 +78,42 @@ define('entityResourcePicker', [
         }).on('dblclick', '.jstree-anchor', function(event) {
           if (validateSelection($.jstree.reference(this))) {
             selectButton.click();
+          }
+        }).on('select_node.jstree', function (event, data) {
+          if (data.node.data.type === 'addDocument') {
+            let inst = data.instance;
+            inst.edit(data.node, null, function (node) {
+              // jshint camelcase:false
+              $.jstree.reference(treeElement).deselect_all();
+            });
+          }
+        }).on('xtree.runJob', function (event, promise, action, node, params) {
+          if (action === 'create') {
+            promise.then(function (promiseData) {
+              if (createdNodes[params.id] === undefined) {
+                createdNodes[params.id] = {};
+              }
+              if (promiseData instanceof Array) {
+                let newNode = promiseData[0];
+                createdNodes[params.id][newNode.id] = newNode;
+              }
+            });
+          }
+        }).on('refresh_node.jstree', function (event, data) {
+          let parentNodeId = data.node.id;
+          let nodesToCreate = createdNodes[parentNodeId];
+          if (nodesToCreate) {
+            let tree = $.jstree.reference(treeElement);
+            // jshint camelcase:false
+            let parentNode = tree.get_node(parentNodeId);
+            for (let createdNodeId in nodesToCreate) {
+              // Check that the node is not created already.
+              let createdNode = nodesToCreate[createdNodeId];
+              if (tree.get_node(createdNode.id) === false) {
+                // jshint camelcase:false
+                tree.create_node(parentNode, createdNode, 'last', null);
+              }
+            }
           }
         });
       } else if (openToNodeId) {
@@ -196,7 +233,11 @@ define('entityResourcePicker', [
       language: $('html').attr('lang'),
       showAttachments: false,
       showTranslations: false,
-      showWikis: true
+      showWikis: true,
+      showAddDocument: true,
+      readOnly: false,
+      // jshint camelcase:false
+      form_token: xm.form_token
     })),
     attach: new XWiki.Document('DocumentTree', 'XWiki').getURL('get', $.param({
       outputSyntax: 'plain',
@@ -211,7 +252,8 @@ define('entityResourcePicker', [
       'class': 'entity-resource-picker-modal',
       title: title,
       content: createTreeElement({
-        'data-url': treeURL[resourceType]
+        'data-url': treeURL[resourceType],
+        'data-hasContextMenu': true
       }),
       acceptLabel: translations.get('select')
     });

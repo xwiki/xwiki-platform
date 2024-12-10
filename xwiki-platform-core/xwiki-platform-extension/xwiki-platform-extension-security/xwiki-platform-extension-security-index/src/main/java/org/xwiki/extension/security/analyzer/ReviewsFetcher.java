@@ -22,7 +22,6 @@ package org.xwiki.extension.security.analyzer;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.index.security.review.ReviewsMap;
 import org.xwiki.extension.security.internal.ExtensionSecurityException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Fetches the security vulnerabilities reviews.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.6RC1
  */
-@Unstable
 @Role
 public interface ReviewsFetcher
 {
@@ -39,6 +37,5 @@ public interface ReviewsFetcher
      * @throws ExtensionSecurityException in case of issue when fetching the remote false-positive source
      * @since 15.10.2
      */
-    @Unstable
     ReviewsMap fetch() throws ExtensionSecurityException;
 }

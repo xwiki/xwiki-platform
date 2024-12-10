@@ -406,9 +406,23 @@
       },
       setup: function(data) {
         // Create a link to a new page if the resource reference is not provided.
-        var resourceReference = data.resourceReference || this.getDefaultResourceReference();
-        if (resourceReference.type === 'space' && this.resourceTypes.indexOf('space') < 0 &&
-            this.resourceTypes.indexOf('doc') >= 0) {
+        var resourceReference = data.resourceReference;
+        $(this.getResourcePickerInput().$).prop('disabled', true);
+        if (resourceReference) {
+          this.setDefaultValue(this, resourceReference);
+        } else {
+          let self = this;
+
+          this.getDefaultResourceReference()
+              .done(ref => self.setDefaultValue(self, ref))
+              .fail(function () {
+                self.setDefaultValue(self, self.getDefaultResourceReferenceFallback());
+              });
+        }
+      },
+      setDefaultValue: function(self, resourceReference) {
+        if (resourceReference.type === 'space' && self.resourceTypes.indexOf('space') < 0 &&
+            self.resourceTypes.indexOf('doc') >= 0) {
           // Convert the space resource reference to a document resource reference.
           resourceReference = {
             type: 'doc',
@@ -417,7 +431,47 @@
             reference: resourceReference.reference + '.WebHome'
           };
         }
-        this.setValue(resourceReference);
+        self.setValue(resourceReference);
+        $(self.getResourcePickerInput().$).prop('disabled', false);
+      },
+      getDefaultResourceReference: function() {
+        let self = this;
+        // Compute the default reference by cleaning up the link label.
+        // Fall-back on the empty string if there's no text selection (e.g. if an image is selected).
+        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
+        // Normalize the white space.
+        var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
+        var deferred = $.Deferred();
+        $.post(new XWiki.Document('LinkNameStrategyHelper', 'CKEditor').getURL('get'), {
+          outputSyntax: 'plain',
+          input: defaultReference,
+          base: XWiki.Model.serialize(this.base.getBase())
+        }).done(function(data) {
+          deferred.resolve({
+            reference: data[0].reference,
+            location: data[0].location,
+            type: self.resourceTypes[0],
+            // Make sure the picker doesn't try to resolve the link label as a resource reference.
+            isNew: true
+          });
+        }).fail(function(data) {
+          console.error("Error while loading creation link response", data);
+          deferred.resolve(self.getDefaultResourceReferenceFallback());
+        });
+        return deferred.promise();
+      },
+      getDefaultResourceReferenceFallback: function() {
+        // Compute the default reference by cleaning up the link label.
+        // Fall-back on the empty string if there's no text selection (e.g. if an image is selected).
+        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
+        // Normalize the white space.
+        var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
+        return {
+          type: this.resourceTypes[0],
+          reference: defaultReference,
+          // Make sure the picker doesn't try to resolve the link label as a resource reference.
+          isNew: true
+        };
       },
       commit: function(data) {
         var resourceReference = this.getValue();
@@ -460,19 +514,6 @@
         });
         dialog.getContentElement('info', 'optionsToggle').sync();
         dialog.layout();
-      },
-      getDefaultResourceReference: function() {
-        // Compute the default reference by cleaning up the link label.
-        // Fall-back on the empty string if there's no text selection (e.g. if an image is selected).
-        var linkLabel = this.getDialog().getParentEditor().getSelection().getSelectedText() || '';
-        // Normalize the white space.
-        var defaultReference = linkLabel.trim().replace(/\s+/g, ' ');
-        return {
-          type: this.resourceTypes[0],
-          reference: defaultReference,
-          // Make sure the picker doesn't try to resolve the link label as a resource reference.
-          isNew: true
-        };
       }
     });
   };

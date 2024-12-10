@@ -75,6 +75,10 @@
 #foreach($property in $variables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
+## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
+#if($stringtool.startsWith($!value, '@'))
+#set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
+#end
 #set($propertyType = $variables.get($property))
 #if($propertyType == 'escapedText')
 --$property: "$escapetool.javascript($!value)";

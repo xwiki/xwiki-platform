@@ -165,6 +165,11 @@ public class DocumentTreeElement extends TreeElement
         return getNode(getSpaceNodeId(path));
     }
 
+    public TreeNodeElement getNode(EntityReference entityReference)
+    {
+        return getNode(getNodeId(entityReference));
+    }
+
     /**
      * @param path the path used to locate the document
      * @return the corresponding document node

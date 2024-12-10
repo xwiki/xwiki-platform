@@ -29,7 +29,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-rendering-wikimodel": "workspace:*",
     "dompurify": "3.2.1",
-    "inversify": "6.1.4",
+    "inversify": "6.1.6",
     "marked": "15.0.3",
     "marked-base-url": "1.1.6"
   },

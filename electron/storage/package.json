@@ -30,7 +30,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
-    "inversify": "6.1.4",
+    "inversify": "6.1.6",
     "mime": "4.0.4"
   },
   "peerDependencies": {

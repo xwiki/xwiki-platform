@@ -244,7 +244,10 @@
 #macro (maybeShowDeleteUserWarning $userReference $right)
   #countPagesLastModifiedBy($userReference)
   #if ($pageCount &gt; 0)
-    &lt;div class="box errormessage xform"&gt;
+    {{/html}}
+    
+    {{error cssClass="xform"}}
+      {{html clean="false"}}
       #set ($pageIndexReference = $services.model.createDocumentReference(
         $userReference.wikiReference.name, 'Main', 'AllDocs'))
       #set ($pageIndexURL = $xwiki.getURL($pageIndexReference) + '#|t=alldocs&amp;doc.author=' +
@@ -273,7 +276,10 @@
             [$rightTranslation]))&lt;/span&gt;
         &lt;/dd&gt;
       &lt;/dl&gt;
-    &lt;/div&gt;
+      {{/html}}
+    {{/error}}
+    
+    {{html clean="false"}}
   #end
 #end
 

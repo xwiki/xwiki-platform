@@ -134,13 +134,9 @@
       #if ($includes.contains('renderedChanges'))
         #set ($htmlDiff = $services.diff.html.unified($origdoc.renderedContent, $newdoc.renderedContent))
         #if ($htmlDiff == '')
-          <div class="infomessage">
-            $escapetool.xml($services.localization.render('web.history.changes.noChanges'))
-          </div>
+          #info($escapetool.xml($services.localization.render('web.history.changes.noChanges')))
         #elseif ("$!htmlDiff" == '')
-          <div class="errormessage">
-            $escapetool.xml($services.localization.render('web.history.changes.failedToCompute'))
-          </div>
+          #error($escapetool.xml($services.localization.render('web.history.changes.failedToCompute')))
         #else
           #if (($origdoc.isRestricted() || $newdoc.isRestricted()) && ($services.user.allProperties.type == 'ADVANCED'
             || $stringtool.contains($htmlDiff, 'xwikirenderingerror')))

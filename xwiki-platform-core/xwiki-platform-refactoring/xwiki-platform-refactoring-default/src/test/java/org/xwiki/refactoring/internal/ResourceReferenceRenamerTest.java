@@ -26,6 +26,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -72,10 +73,17 @@ class ResourceReferenceRenamerTest
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @MockComponent
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @MockComponent
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
 
     @MockComponent
     private PageReferenceResolver<EntityReference> defaultReferencePageReferenceResolver;
+
+    @MockComponent
+    @Named("relative")
+    private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -92,16 +100,46 @@ class ResourceReferenceRenamerTest
     }
 
     @Test
-    void updateResourceReferenceRelative()
+    void updateResourceReferenceRelativeOtherWiki()
     {
-        DocumentResourceReference resourceReference = new DocumentResourceReference("xwiki:Main.WebHome");
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Main.WebHome");
         AttachmentReference oldReference =
             new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
+
+        EntityReference relativeReference = new EntityReference("file.txt", EntityType.ATTACHMENT,
+            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI))));
         AttachmentReference newReference =
             new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
         when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
         when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);
+        when(this.compactEntityReferenceSerializer.serialize(oldReference, newReference)).thenReturn("file2.txt");
+
+        assertTrue(this.renamer.updateResourceReference(resourceReference,
+            oldReference,
+            newReference,
+            new DocumentReference("xwiki", "Space", "Page"), true, Map.of()));
+
+        verify(this.defaultEntityReferenceSerializer).serialize(oldReference, newReference);
+    }
+
+    @Test
+    void updateResourceReferenceRelativeSameWiki()
+    {
+        DocumentResourceReference resourceReference = new DocumentResourceReference("Main.WebHome");
+        AttachmentReference oldReference =
+            new AttachmentReference("file.txt", new DocumentReference("wiki", "space", "page"));
+
+        EntityReference relativeReference = new EntityReference("file.txt", EntityType.ATTACHMENT,
+            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE)));
+        AttachmentReference newReference =
+            new AttachmentReference("file2.txt", new DocumentReference("wiki", "space", "page"));
+        when(this.entityReferenceResolver.resolve(resourceReference, null)).thenReturn(oldReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, newReference)).thenReturn(newReference);
+        when(this.entityReferenceResolver.resolve(resourceReference, null, oldReference)).thenReturn(oldReference);
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);
         when(this.compactEntityReferenceSerializer.serialize(oldReference, newReference)).thenReturn("file2.txt");
 
         assertTrue(this.renamer.updateResourceReference(resourceReference,

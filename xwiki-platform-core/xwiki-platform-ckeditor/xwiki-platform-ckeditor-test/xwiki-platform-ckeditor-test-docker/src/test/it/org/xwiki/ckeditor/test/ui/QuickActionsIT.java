@@ -258,7 +258,7 @@ class QuickActionsIT extends AbstractCKEditorIT
         // Write some text
         textArea.sendKeys(TEST_TEXT);
 
-        assertSourceEquals("|" + TEST_TEXT + "| \n| | \n| | \n\n ");
+        assertSourceEquals("|=" + TEST_TEXT + "|= \n| | \n| | \n\n ");
     }
 
     @Test

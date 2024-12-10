@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -32,11 +33,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.NamedQueryDefinition;
 import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -50,6 +53,8 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.query.WrappingQuery;
+import org.xwiki.query.hql.internal.HQLQueryValidator;
+import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -60,11 +65,12 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 
 /**
- * QueryExecutor implementation for Hibernate Store.
+ * {@link QueryExecutor} implementation for Hibernate Store.
  *
  * @version $Id$
  * @since 1.6M1
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component
 @Named("hql")
 @Singleton
@@ -93,7 +99,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    private volatile Set<String> allowedNamedQueries;
+    @Inject
+    private Logger logger;
+
+    private volatile Set<String> safeNamedQueries;
 
     @Override
     public void initialize() throws InitializationException
@@ -103,32 +112,39 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
     }
 
-    private Set<String> getAllowedNamedQueries()
+    private Set<String> getSafeNamedQueries()
     {
-        if (this.allowedNamedQueries == null) {
+        if (this.safeNamedQueries == null) {
             synchronized (this) {
-                if (this.allowedNamedQueries == null) {
-                    this.allowedNamedQueries = new HashSet<>();
+                if (this.safeNamedQueries == null) {
+                    this.safeNamedQueries = new HashSet<>();
 
                     // Gather the list of allowed named queries
                     Collection<NamedQueryDefinition> namedQueries =
                         this.hibernate.getConfigurationMetadata().getNamedQueryDefinitions();
                     for (NamedQueryDefinition definition : namedQueries) {
-                        if (HqlQueryUtils.isSafe(definition.getQuery())) {
-                            this.allowedNamedQueries.add(definition.getName());
+                        try {
+                            if (isSafe(definition.getQuery())) {
+                                this.safeNamedQueries.add(definition.getName());
+                            }
+                        } catch (QueryException e) {
+                            this.logger.warn("Failed to validate named query [{}] with statement [{}]: {}",
+                                definition.getName(), definition.getQuery(), ExceptionUtils.getRootCauseMessage(e));
                         }
                     }
                 }
             }
         }
 
-        return this.allowedNamedQueries;
+        return this.safeNamedQueries;
     }
 
     /**
      * @param statementString the statement to evaluate
      * @return true if the select is allowed for user without PR
+     * @deprecated
      */
+    @Deprecated(since = "17.0.0RC1, 16.10.2, 15.10.16, 16.4.6")
     protected static boolean isSafeSelect(String statementString)
     {
         // An empty statement is safe
@@ -143,17 +159,46 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         return HqlQueryUtils.isSafe(completeStatement);
     }
 
+    private boolean isSafe(String statement) throws QueryException
+    {
+        // An empty statement is safe
+        if (statement.isEmpty()) {
+            return true;
+        }
+
+        // HqlQueryUtils#isSafe only works with complete statements
+        String completeStatement = toCompleteShortForm(statement);
+
+        // Parse and validate the statement
+        ComponentManager componentManager = this.componentManagerProvider.get();
+        try {
+            for (HQLQueryValidator validator : componentManager
+                .<HQLQueryValidator>getInstanceList(HQLQueryValidator.class)) {
+                Optional<Boolean> result = validator.isSafe(completeStatement);
+                if (result.isPresent()) {
+                    return result.get();
+                }
+            }
+        } catch (ComponentLookupException e) {
+            throw new QueryException("Failed to get query statement validators",
+                new DefaultQuery(statement, Query.HQL, this), e);
+        }
+
+        // Assume the statement is safe if no validator says otherwise
+        return true;
+    }
+
     protected void checkAllowed(final Query query) throws QueryException
     {
         // Check if the query needs to be validated according to the current author
         if (query instanceof SecureQuery secureQuery && secureQuery.isCurrentAuthorChecked()) {
             // Not need to check the details if current author has programming right
             if (!this.authorization.hasAccess(Right.PROGRAM)) {
-                if (query.isNamed() && !getAllowedNamedQueries().contains(query.getStatement())) {
+                if (query.isNamed() && !getSafeNamedQueries().contains(query.getStatement())) {
                     throw new QueryException("Named queries requires programming right", query, null);
                 }
 
-                if (!isSafeSelect(query.getStatement())) {
+                if (!isSafe(query.getStatement())) {
                     throw new QueryException("The query requires programming right", query, null);
                 }
             }

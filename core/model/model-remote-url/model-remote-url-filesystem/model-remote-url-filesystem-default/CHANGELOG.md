@@ -1,4 +1,4 @@
-# @xwiki/cristal-model-remote-url-filesystem
+# @xwiki/cristal-model-remote-url-filesystem-default
 
 ## 0.12.0
 

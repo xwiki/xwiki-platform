@@ -36,6 +36,7 @@ packages:
   - "core/model/model-local-url"
   - "core/model/model-reference/*"
   - "core/model/model-remote-url/*"
+  - "core/model/model-remote-url/model-remote-url-filesystem/*"
   - "core/navigation-tree/*"
   - "core/page-actions/*"
   - "core/uiextension/*"

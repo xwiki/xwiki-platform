@@ -19,7 +19,8 @@
  */
 
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
-import { app, ipcMain, shell } from "electron";
+import { protocol as cristalFSProtocol } from "@xwiki/cristal-model-remote-url-filesystem-api";
+import { app, ipcMain, net, protocol, shell } from "electron";
 import mime from "mime";
 import fs from "node:fs";
 import { basename, dirname, join, relative } from "node:path";
@@ -115,7 +116,7 @@ async function readAttachment(
       id: basename(path),
       mimetype,
       reference: basename(path),
-      href: relative(HOME_PATH_FULL, path),
+      href: `${cristalFSProtocol}://${relative(HOME_PATH_FULL, path)}`,
       date: stats.mtime,
       size: stats.size,
       author: undefined,
@@ -223,6 +224,17 @@ async function deletePage(path: string): Promise<void> {
 }
 
 export default function load(): void {
+  protocol.handle(cristalFSProtocol, async (request) => {
+    const path = join(
+      HOME_PATH_FULL,
+      request.url.substring(`${cristalFSProtocol}://`.length),
+    );
+    if (!(await isWithin(HOME_PATH_FULL, path))) {
+      throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
+    }
+    return net.fetch(`file://${path}`);
+  });
+
   ipcMain.handle("resolvePath", (event, { page }) => {
     return resolvePagePath(page);
   });

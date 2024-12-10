@@ -29,6 +29,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
     "inversify": "6.1.4",
     "mime": "4.0.4"
   },

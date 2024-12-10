@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-model-remote-url-filesystem",
+  "name": "@xwiki/cristal-model-remote-url-filesystem-default",
   "version": "0.12.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "core/model-remote-url/model-remote-url-filesystem",
+    "directory": "core/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-default",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
     "inversify": "6.1.4"
   },
   "peerDependencies": {

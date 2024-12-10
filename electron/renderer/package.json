@@ -29,7 +29,7 @@
     "@xwiki/cristal-hierarchy-filesystem": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-model-reference-filesystem": "workspace:*",
-    "@xwiki/cristal-model-remote-url-filesystem": "workspace:*",
+    "@xwiki/cristal-model-remote-url-filesystem-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-filesystem": "workspace:*",
     "inversify": "6.1.4",
     "reflect-metadata": "0.2.2",

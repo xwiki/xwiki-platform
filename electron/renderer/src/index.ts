@@ -25,7 +25,7 @@ import { ComponentInit as ElectronStorageComponentInit } from "@xwiki/cristal-el
 import { ComponentInit as FileSystemPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-filesystem";
 import { CristalAppLoader, loadConfig } from "@xwiki/cristal-lib";
 import { ComponentInit as ModelReferenceFilesystemComponentInit } from "@xwiki/cristal-model-reference-filesystem";
-import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem";
+import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem-default";
 import { ComponentInit as FileSystemNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-filesystem";
 import { Container } from "inversify";
 

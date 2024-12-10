@@ -18,6 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { generateConfig } from "../../../../vite.config";
+/**
+ * Identifier of the custom protocol used to reference resources stored in the filesystem.
+ *
+ * @since 0.13
+ */
+const protocol: string = "cristalfs";
 
-export default generateConfig(import.meta.url);
+export { protocol };

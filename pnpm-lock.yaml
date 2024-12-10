@@ -1369,14 +1369,26 @@ importers:
         specifier: 6.0.3
         version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
 
-  core/model/model-remote-url/model-remote-url-filesystem:
+  core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api:
+    devDependencies:
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-default:
     dependencies:
       '@xwiki/cristal-model-api':
         specifier: workspace:*
-        version: link:../../model-api
+        version: link:../../../model-api
       '@xwiki/cristal-model-remote-url-api':
         specifier: workspace:*
-        version: link:../model-remote-url-api
+        version: link:../../model-remote-url-api
+      '@xwiki/cristal-model-remote-url-filesystem-api':
+        specifier: workspace:*
+        version: link:../model-remote-url-filesystem-api
       inversify:
         specifier: 6.1.4
         version: 6.1.4(reflect-metadata@0.2.2)
@@ -2278,9 +2290,9 @@ importers:
       '@xwiki/cristal-model-reference-filesystem':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-filesystem
-      '@xwiki/cristal-model-remote-url-filesystem':
+      '@xwiki/cristal-model-remote-url-filesystem-default':
         specifier: workspace:*
-        version: link:../../core/model/model-remote-url/model-remote-url-filesystem
+        version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-default
       '@xwiki/cristal-navigation-tree-filesystem':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-filesystem
@@ -2312,6 +2324,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../../core/backends/backend-api
+      '@xwiki/cristal-model-remote-url-filesystem-api':
+        specifier: workspace:*
+        version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api
       electron:
         specifier: 33.2.1
         version: 33.2.1

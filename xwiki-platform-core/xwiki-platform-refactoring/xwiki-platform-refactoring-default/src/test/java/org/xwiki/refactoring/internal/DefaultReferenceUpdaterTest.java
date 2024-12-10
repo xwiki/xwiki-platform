@@ -19,8 +19,6 @@
  */
 package org.xwiki.refactoring.internal;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +38,7 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -117,6 +116,9 @@ class DefaultReferenceUpdaterTest
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
 
     @MockComponent
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @MockComponent
     private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
 
     @MockComponent
@@ -146,6 +148,10 @@ class DefaultReferenceUpdaterTest
 
     @MockComponent
     private JobContext jobContext;
+
+    @MockComponent
+    @Named("relative")
+    private EntityReferenceResolver<ResourceReference> relativeEntityReferenceResolver;
 
     @Mock
     private Job job;
@@ -220,7 +226,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(new ObjectPropertyReference("area", new ObjectReference("areaobject", documentReference)));
 
         when(document.getXObjects())
-            .thenReturn(Collections.singletonMap(documentReference, Collections.singletonList(baseObject)));
+            .thenReturn(Map.of(documentReference, List.of(baseObject)));
 
         when(this.contentParser.parse("areacontent", Syntax.XWIKI_2_1, documentReference)).thenReturn(xdom);
     }
@@ -242,40 +248,58 @@ class DefaultReferenceUpdaterTest
 
         // Setup document content
         ResourceReference docLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock docLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
+        LinkBlock docLinkBlock = new LinkBlock(List.of(), docLinkReference, false);
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(List.of(), spaceLinkReference, false);
         ResourceReference imageReference = new AttachmentResourceReference("attachment.txt");
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
+        ResourceReference absoluteDocLinkResourceReference = new ResourceReference("xwiki:C.WebHome",
+            ResourceType.DOCUMENT);
+        LinkBlock absoluteDocLinkBlock =
+            new LinkBlock(List.of(), absoluteDocLinkResourceReference, false);
         when(newDocument.getXDOM())
-            .thenReturn(new XDOM(Arrays.asList(docLinkBlock, spaceLinkBlock, imageBlock)));
+            .thenReturn(new XDOM(List.of(docLinkBlock, spaceLinkBlock, imageBlock, absoluteDocLinkBlock)));
 
         // Setup object content
         ResourceReference xobjectDocLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock xobjectDocLinkBlock = new LinkBlock(Collections.emptyList(), xobjectDocLinkReference, false);
+        LinkBlock xobjectDocLinkBlock = new LinkBlock(List.of(), xobjectDocLinkReference, false);
         ResourceReference xobjectSpaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock xobjectSpaceLinkBlock =
-            new LinkBlock(Collections.emptyList(), xobjectSpaceLinkReference, false);
+            new LinkBlock(List.of(), xobjectSpaceLinkReference, false);
         ResourceReference xobjectImageReference = new AttachmentResourceReference("attachment.txt");
         ImageBlock xobjectImageBlock = new ImageBlock(xobjectImageReference, false);
         setTextarea(newDocument,
-            new XDOM(Arrays.asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
+            new XDOM(List.of(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
 
         DocumentReference originalDocLinkReference = new DocumentReference("WebHome",
             new SpaceReference("C", oldReference.getLastSpaceReference()));
         DocumentReference absoluteDocLinkReference = new DocumentReference("WebHome", new SpaceReference("wiki", "C"));
+        EntityReference relativeDocLinkReference = new EntityReference("WebHome", EntityType.DOCUMENT,
+            new EntityReference("C", EntityType.SPACE));
         when(this.resourceReferenceResolver.resolve(docLinkReference, null))
+            .thenReturn(absoluteDocLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null))
+            .thenReturn(relativeDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(absoluteDocLinkResourceReference, null))
+            .thenReturn(absoluteDocLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(absoluteDocLinkResourceReference, null, null))
             .thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(absoluteDocLinkResourceReference, null, oldReference))
+            .thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null))
             .thenReturn(absoluteDocLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(xobjectDocLinkReference, null, null))
+            .thenReturn(relativeDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
         when(this.resourceReferenceResolver.resolve(imageReference, null))
             .thenReturn(absoluteTargetAttachment);
         when(this.resourceReferenceResolver.resolve(imageReference, null, oldReference))
             .thenReturn(oldImageTargetAttachment);
+        when(this.relativeEntityReferenceResolver.resolve(imageReference, null, null))
+            .thenReturn(relativeDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("WebHome",
             new SpaceReference("C", newReference.getLastSpaceReference()));
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference))
@@ -284,10 +308,15 @@ class DefaultReferenceUpdaterTest
             .thenReturn(newDocLinkReference);
         when(this.resourceReferenceResolver.resolve(imageReference, null, newReference))
             .thenReturn(newImageTargetAttachment);
+        when(this.resourceReferenceResolver.resolve(absoluteDocLinkResourceReference, null, newReference))
+            .thenReturn(new DocumentReference("WebHome", new SpaceReference("wiki", "E")));
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki", "Z");
+        EntityReference relativeSpaceReference = new EntityReference("Z", EntityType.SPACE);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null))
             .thenReturn(originalSpaceReference);
+        when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
+            .thenReturn(relativeSpaceReference);
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
             .thenReturn(originalSpaceReference);
         when(this.resourceReferenceResolver.resolve(xobjectSpaceLinkReference, null))
@@ -300,12 +329,16 @@ class DefaultReferenceUpdaterTest
             .thenReturn(originalSpaceReference);
 
         when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference)).thenReturn("A.C");
+        when(this.defaultEntityReferenceSerializer.serialize(absoluteDocLinkReference, newReference))
+            .thenReturn("wiki:C.WebHome");
 
         updater.update(newReference, oldReference, newReference);
 
         // Document link block is updated.
         assertEquals("A.C", docLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, docLinkBlock.getReference().getType());
+        assertEquals("wiki:C.WebHome", absoluteDocLinkBlock.getReference().getReference());
+        assertEquals(ResourceType.DOCUMENT, absoluteDocLinkBlock.getReference().getType());
         // Space link block stays the same, since they were on the same wiki.
         assertEquals("Z", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
@@ -339,22 +372,27 @@ class DefaultReferenceUpdaterTest
         when(newDocument.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
-        LinkBlock docLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
+        LinkBlock docLinkBlock = new LinkBlock(List.of(), docLinkReference, false);
 
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(List.of(), spaceLinkReference, false);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.asList(docLinkBlock, spaceLinkBlock));
+            .thenReturn(List.of(docLinkBlock, spaceLinkBlock));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         DocumentReference absoluteDocLinkReference = new DocumentReference("C", new SpaceReference("xwiki", "Main"));
+        EntityReference relativeDocLinkReference = new EntityReference("C", EntityType.DOCUMENT,
+            new EntityReference("B", EntityType.SPACE));
+        EntityReference relativeSpaceLinkReference = new EntityReference("Z", EntityType.SPACE);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null)).thenReturn(absoluteDocLinkReference);
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference))
             .thenReturn(newDocLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null))
+            .thenReturn(relativeDocLinkReference);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki1", "Z");
         SpaceReference absoluteSpaceReference = new SpaceReference("xwiki", "Z");
@@ -364,6 +402,8 @@ class DefaultReferenceUpdaterTest
         SpaceReference newSpaceReference = new SpaceReference("wiki2", "Z");
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, newReference))
             .thenReturn(newSpaceReference);
+        when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
+            .thenReturn(relativeSpaceLinkReference);
 
         when(this.compactEntityReferenceSerializer.serialize(originalDocLinkReference, newReference))
             .thenReturn("wiki1:A.C");
@@ -396,29 +436,49 @@ class DefaultReferenceUpdaterTest
 
         // Setup document content
         ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
-        XDOM xdom = new XDOM(Collections.singletonList(linkBlock));
+        LinkBlock linkBlock = new LinkBlock(List.of(), linkReference, false);
+        ResourceReference absoluteLinkReference = new ResourceReference("xwiki:A.B.WebHome", ResourceType.DOCUMENT);
+        LinkBlock absoluteLinkBlock = new LinkBlock(List.of(), absoluteLinkReference, false);
+        XDOM xdom = new XDOM(List.of(linkBlock, absoluteLinkBlock));
         when(document.getXDOM()).thenReturn(xdom);
 
         // Setup object content
         ResourceReference xobjectLinkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock xobjectLinkBlock = new LinkBlock(Collections.emptyList(), xobjectLinkReference, false);
-        XDOM xobjectXDOM = new XDOM(Collections.singletonList(xobjectLinkBlock));
+        LinkBlock xobjectLinkBlock = new LinkBlock(List.of(), xobjectLinkReference, false);
+        XDOM xobjectXDOM = new XDOM(List.of(xobjectLinkBlock));
         setTextarea(document, xobjectXDOM);
+
+        EntityReference relativeLinkReference = new EntityReference("B", EntityType.DOCUMENT,
+            new EntityReference("A", EntityType.SPACE));
+        EntityReference relativeAbsoluteLinkReference = new EntityReference("WebHome", EntityType.DOCUMENT,
+            new EntityReference("B", EntityType.SPACE, new EntityReference("B", EntityType.SPACE,
+                new EntityReference("xwiki", EntityType.WIKI))));
 
         when(this.resourceReferenceResolver.resolve(linkReference, null)).thenReturn(oldLinkTarget);
         when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference)).thenReturn(oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(absoluteLinkReference, null)).thenReturn(oldLinkTarget);
+        when(this.resourceReferenceResolver.resolve(absoluteLinkReference, null, documentReference))
+            .thenReturn(oldLinkTarget);
         when(this.resourceReferenceResolver.resolve(xobjectLinkReference, null))
             .thenReturn(oldLinkTarget);
         when(this.resourceReferenceResolver.resolve(xobjectLinkReference, null, documentReference))
             .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
+        when(this.relativeEntityReferenceResolver.resolve(xobjectLinkReference,null, null))
+            .thenReturn(relativeLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null))
+            .thenReturn(relativeLinkReference);
+        when(this.relativeEntityReferenceResolver.resolve(absoluteLinkReference, null, null))
+            .thenReturn(relativeAbsoluteLinkReference);
 
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+        when(this.defaultEntityReferenceSerializer.serialize(newLinkTarget, documentReference))
+            .thenReturn("xwiki:X.Y.WebHome");
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
         assertEquals("X.Y", linkBlock.getReference().getReference());
+        assertEquals("xwiki:X.Y.WebHome", absoluteLinkBlock.getReference().getReference());
         assertEquals("X.Y", xobjectLinkBlock.getReference().getReference());
         assertEquals(ResourceType.DOCUMENT, linkBlock.getReference().getType());
         verifyDocumentSave(document, "Renamed back-links.", false, false);
@@ -444,13 +504,17 @@ class DefaultReferenceUpdaterTest
 
         ResourceReference imageReference = new AttachmentResourceReference("A.B@attachment.txt");
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
-        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.asList(imageBlock));
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(List.of(imageBlock));
+
+        EntityReference relativeReference = new EntityReference("attachment.txt", EntityType.ATTACHMENT,
+            new EntityReference("B", EntityType.DOCUMENT, new EntityReference("A", EntityType.SPACE)));
 
         when(this.resourceReferenceResolver.resolve(imageReference, null)).thenReturn(oldImageTargetAttachment);
         when(this.resourceReferenceResolver.resolve(imageReference, null, documentReference))
             .thenReturn(oldImageTargetAttachment);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldImageTargetAttachment))
             .thenReturn(oldImageTarget);
+        when(this.relativeEntityReferenceResolver.resolve(imageReference, null, null)).thenReturn(relativeReference);
 
         when(this.compactEntityReferenceSerializer.serialize(newImageTargetAttachment, documentReference))
             .thenReturn("X.Y@attachment.txt");
@@ -463,7 +527,7 @@ class DefaultReferenceUpdaterTest
     }
 
     @Test
-    public void renameAttachment() throws Exception
+    void renameAttachment() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", "Space", "Page");
         XWikiDocument document = mock(XWikiDocument.class);
@@ -481,14 +545,18 @@ class DefaultReferenceUpdaterTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference linkReference = new AttachmentResourceReference("A.B@attachment.txt");
-        LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
-        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(Arrays.asList(linkBlock));
+        LinkBlock linkBlock = new LinkBlock(List.of(), linkReference, false);
+        when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(List.of(linkBlock));
+
+        EntityReference relativeReference = new EntityReference("attachment.txt", EntityType.ATTACHMENT,
+            new EntityReference("B", EntityType.DOCUMENT, new EntityReference("A", EntityType.SPACE)));
 
         when(this.resourceReferenceResolver.resolve(linkReference, null))
             .thenReturn(oldLinkTargetAttachment);
         when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
             .thenReturn(oldLinkTargetAttachment);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTargetAttachment)).thenReturn(oldLinkTarget);
+        when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null)).thenReturn(relativeReference);
 
         when(this.compactEntityReferenceSerializer.serialize(newLinkTargetAttachment, documentReference))
             .thenReturn("X.Y@attachment.txt");
@@ -517,13 +585,16 @@ class DefaultReferenceUpdaterTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("A.WebHome", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(List.of(), docLinkReference, false);
+        EntityReference relativeReference = new EntityReference("WebHome", EntityType.DOCUMENT,
+            new EntityReference("A", EntityType.SPACE));
 
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(List.of(), spaceLinkReference, false);
+        EntityReference relativeSpaceReference = new EntityReference("A", EntityType.SPACE);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.asList(documentLinkBlock, spaceLinkBlock));
+            .thenReturn(List.of(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null))
@@ -532,6 +603,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.WebHome");
+        when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null)).thenReturn(relativeReference);
 
         // Space link
         SpaceReference spaceReference = oldLinkTarget.getLastSpaceReference();
@@ -542,6 +614,8 @@ class DefaultReferenceUpdaterTest
         when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
+        when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
+            .thenReturn(relativeSpaceReference);
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
@@ -569,13 +643,18 @@ class DefaultReferenceUpdaterTest
         when(document.getXDOM()).thenReturn(xdom);
 
         ResourceReference docLinkReference = new ResourceReference("A.WebHome", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), docLinkReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(List.of(), docLinkReference, false);
+
+        EntityReference relativeReference = new EntityReference("WebHome", EntityType.DOCUMENT,
+            new EntityReference("A", EntityType.SPACE));
 
         ResourceReference spaceLinkReference = new ResourceReference("A", ResourceType.SPACE);
-        LinkBlock spaceLinkBlock = new LinkBlock(Collections.emptyList(), spaceLinkReference, false);
+        LinkBlock spaceLinkBlock = new LinkBlock(List.of(), spaceLinkReference, false);
+
+        EntityReference relativeSpaceReference = new EntityReference("A", EntityType.SPACE);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.asList(documentLinkBlock, spaceLinkBlock));
+            .thenReturn(List.of(documentLinkBlock, spaceLinkBlock));
 
         // Doc link
         when(this.resourceReferenceResolver.resolve(docLinkReference, null))
@@ -584,6 +663,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+        when(this.relativeEntityReferenceResolver.resolve(docLinkReference, null, null)).thenReturn(relativeReference);
 
         // Space link
         SpaceReference spaceReference = oldLinkTarget.getLastSpaceReference();
@@ -594,6 +674,8 @@ class DefaultReferenceUpdaterTest
         when(this.defaultReferenceDocumentReferenceResolver.resolve(spaceReference)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget.getLastSpaceReference(), documentReference))
             .thenReturn("X");
+        when(this.relativeEntityReferenceResolver.resolve(spaceLinkReference, null, null))
+            .thenReturn(relativeSpaceReference);
 
         updater.update(documentReference, oldLinkTarget, newLinkTarget);
 
@@ -638,7 +720,7 @@ class DefaultReferenceUpdaterTest
         displayMacroBlock.setParent(xdom);
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.asList(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
+            .thenReturn(List.of(includeMacroBlock1, includeMacroBlock2, displayMacroBlock));
 
         ResourceReference macroResourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
 
@@ -680,7 +762,7 @@ class DefaultReferenceUpdaterTest
         DocumentReference targetDocument = new DocumentReference("wiki", "Space", "Target");
         AttachmentReference newLinkTarget = new AttachmentReference("newname.txt", targetDocument);
         ResourceReference resourceReference = new ResourceReference("oldname.txt", ResourceType.ATTACHMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), resourceReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(List.of(), resourceReference, false);
 
         XWikiDocument document = mock(XWikiDocument.class);
         XDOM xdom = mock(XDOM.class);
@@ -734,10 +816,12 @@ class DefaultReferenceUpdaterTest
         MacroBlock includeMacroBlock = new MacroBlock("include", includeParameters, false);
 
         ResourceReference resourceReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-        LinkBlock documentLinkBlock = new LinkBlock(Collections.emptyList(), resourceReference, false);
+        LinkBlock documentLinkBlock = new LinkBlock(List.of(), resourceReference, false);
+        EntityReference relativeReference = new EntityReference("B", EntityType.DOCUMENT,
+            new EntityReference("A", EntityType.SPACE));
 
         when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT)))
-            .thenReturn(Arrays.asList(includeMacroBlock, documentLinkBlock));
+            .thenReturn(List.of(includeMacroBlock, documentLinkBlock));
 
         when(this.resourceReferenceResolver.resolve(resourceReference, null))
             .thenReturn(oldLinkTarget);
@@ -745,6 +829,7 @@ class DefaultReferenceUpdaterTest
             .thenReturn(oldLinkTarget);
         when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
         when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+        when(this.relativeEntityReferenceResolver.resolve(resourceReference, null, null)).thenReturn(relativeReference);
 
         MacroRefactoring includeMacroRefactoring =
             componentManager.registerMockComponent(MacroRefactoring.class, "include");
@@ -784,7 +869,7 @@ class DefaultReferenceUpdaterTest
         when(this.xcontext.getWiki().getDocument(baseDocumentReference, this.xcontext)).thenReturn(baseDocument);
         when(baseDocument.getDocumentReference()).thenReturn(baseDocumentReference);
 
-        when(baseDocument.getTranslationLocales(xcontext)).thenReturn(Arrays.asList(Locale.FRENCH, Locale.ENGLISH));
+        when(baseDocument.getTranslationLocales(xcontext)).thenReturn(List.of(Locale.FRENCH, Locale.ENGLISH));
         DocumentReference frenchDocumentReference = new DocumentReference("wiki", "Space", "Page", Locale.FRENCH);
         XWikiDocument frenchDocument = mock(XWikiDocument.class);
         when(baseDocument.getTranslatedDocument(Locale.FRENCH, xcontext)).thenReturn(frenchDocument);
@@ -799,7 +884,7 @@ class DefaultReferenceUpdaterTest
         DocumentReference oldLinkTarget = new DocumentReference("wiki", "A", "B");
         DocumentReference newLinkTarget = new DocumentReference("wiki", "X", "Y");
 
-        List<XWikiDocument> documentsToUpdate = Arrays.asList(baseDocument, frenchDocument, englishDocument);
+        List<XWikiDocument> documentsToUpdate = List.of(baseDocument, frenchDocument, englishDocument);
 
         for (XWikiDocument xWikiDocument : documentsToUpdate) {
             DocumentReference documentReference = xWikiDocument.getDocumentReference();
@@ -808,7 +893,9 @@ class DefaultReferenceUpdaterTest
             when(xWikiDocument.getXDOM()).thenReturn(xdom);
 
             ResourceReference linkReference = new ResourceReference("A.B", ResourceType.DOCUMENT);
-            LinkBlock linkBlock = new LinkBlock(Collections.emptyList(), linkReference, false);
+            EntityReference relativeReference = new EntityReference("B", EntityType.DOCUMENT,
+                new EntityReference("A", EntityType.SPACE));
+            LinkBlock linkBlock = new LinkBlock(List.of(), linkReference, false);
             when(xdom.getBlocks(any(), eq(Block.Axes.DESCENDANT))).thenReturn(List.of(linkBlock));
 
             when(this.resourceReferenceResolver.resolve(linkReference, null))
@@ -816,8 +903,9 @@ class DefaultReferenceUpdaterTest
             when(this.resourceReferenceResolver.resolve(linkReference, null, documentReference))
                 .thenReturn(oldLinkTarget);
             when(this.defaultReferenceDocumentReferenceResolver.resolve(oldLinkTarget)).thenReturn(oldLinkTarget);
-
             when(this.compactEntityReferenceSerializer.serialize(newLinkTarget, documentReference)).thenReturn("X.Y");
+            when(this.relativeEntityReferenceResolver.resolve(linkReference, null, null))
+                .thenReturn(relativeReference);
         }
         updater.update(baseDocumentReference, oldLinkTarget, newLinkTarget);
 

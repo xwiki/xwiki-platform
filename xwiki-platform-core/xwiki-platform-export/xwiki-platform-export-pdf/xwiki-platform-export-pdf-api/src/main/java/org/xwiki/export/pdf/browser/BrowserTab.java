@@ -22,6 +22,8 @@ package org.xwiki.export.pdf.browser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
@@ -36,6 +38,20 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface BrowserTab extends AutoCloseable
 {
+    /**
+     * Sets the extra HTTP headers to use when requesting web pages in this browser tab.
+     * 
+     * @param headers the extra HTTP headers to use when requesting web pages in this browser tab
+     * @since 15.10.16
+     * @since 16.4.6
+     * @since 16.10.2
+     * @since 17.0.0RC1
+     */
+    default void setExtraHTTPHeaders(Map<String, List<String>> headers)
+    {
+        // Do nothing by default.
+    }
+
     /**
      * Navigates to the specified web page, optionally waiting for it to be ready (fully loaded).
      * 

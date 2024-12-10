@@ -26,8 +26,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -56,6 +58,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Unstable
 public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
 {
+    private static final String HTTP_HEADER_FORWARDED = "Forwarded";
+
+    private static final String HTTP_HEADER_FORWARDED_FOR = "X-Forwarded-For";
+
     @Inject
     protected Logger logger;
 
@@ -77,6 +83,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         CookieFilterContext cookieFilterContext = findCookieFilterContext(printPreviewURL, browserTab);
         Cookie[] cookies = getCookies(cookieFilterContext);
         try {
+            browserTab.setExtraHTTPHeaders(getExtraHTTPHeaders(cookieFilterContext));
             if (!browserTab.navigate(cookieFilterContext.getTargetURL(), cookies, true,
                 this.configuration.getPageReadyTimeout())) {
                 throw new IOException("Failed to load the print preview URL: " + cookieFilterContext.getTargetURL());
@@ -182,7 +189,7 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         BrowserTab browserTab)
     {
         Optional<String> browserIPAddress = isFilterRequired ? getBrowserIPAddress(targetURL, browserTab)
-            : Optional.of(StringUtils.defaultString(getRequest().getHeader("X-Forwarded-For")));
+            : Optional.of(StringUtils.defaultString(getRequest().getHeader(HTTP_HEADER_FORWARDED_FOR)));
         return browserIPAddress.map(ip -> new CookieFilterContext()
         {
             @Override
@@ -215,6 +222,38 @@ public abstract class AbstractBrowserPDFPrinter implements PDFPrinter<URL>
         }
 
         return Optional.empty();
+    }
+
+    private Map<String, List<String>> getExtraHTTPHeaders(CookieFilterContext cookieFilterContext)
+    {
+        HttpServletRequest request = getRequest();
+
+        List<String> forwarded = new LinkedList<>();
+        Enumeration<String> forwardedValues = request.getHeaders(HTTP_HEADER_FORWARDED);
+        if (forwardedValues != null) {
+            forwardedValues.asIterator().forEachRemaining(forwarded::add);
+        }
+
+        String forwardedFor = request.getHeader(HTTP_HEADER_FORWARDED_FOR);
+        if (StringUtils.isBlank(forwardedFor)) {
+            forwardedFor = request.getRemoteAddr();
+        }
+
+        String host = request.getHeader("X-Forwarded-Host");
+        if (StringUtils.isBlank(host)) {
+            host = request.getHeader("Host");
+        }
+
+        String protocol = request.getHeader("X-Forwarded-Proto");
+        if (StringUtils.isBlank(protocol)) {
+            protocol = request.getScheme();
+        }
+
+        String lastForwarded = String.format("by=%s;for=%s;host=%s;proto=%s", cookieFilterContext.getBrowserIPAddress(),
+            forwardedFor, host, protocol);
+        forwarded.add(lastForwarded);
+
+        return Map.of(HTTP_HEADER_FORWARDED, forwarded);
     }
 
     @Override

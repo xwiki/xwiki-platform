@@ -477,6 +477,26 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                Those APIs were removed as part of JGroups upgrade to 5.4.0: the APIs have been removed on JGroups
+                side and are directly exposed in XWiki. The original issue for removing them in JGroups was
+                https://issues.redhat.com/browse/JGRP-2783.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.jgroups.Receiver::block() @ org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.jgroups.Receiver::unblock() @ org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

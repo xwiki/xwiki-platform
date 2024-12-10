@@ -773,7 +773,7 @@ class DeletePageIT
         // Verify that a redirect was added and the link was updated.
         viewPage = testUtils.gotoPage(reference);
         assertEquals("New target", this.viewPage.getDocumentTitle());
-        assertEquals("[[Link>>doc:NewTarget.WebHome]]",
+        assertEquals("[[Link>>doc:xwiki:NewTarget.WebHome]]",
             testUtils.rest().<Page>get(backlinkDocumentReference).getContent());
     }
 
@@ -826,7 +826,7 @@ class DeletePageIT
         TestConfiguration testConfiguration) throws Exception
     {
         DocumentReference childReference = new DocumentReference("Child", parentReference.getLastSpaceReference());
-        String childFullName = testUtils.serializeReference(childReference).split(":")[1];
+        String childFullName = testUtils.serializeLocalReference(childReference);
         DocumentReference backlinkDocReference = new DocumentReference("xwiki", "Backlink", "WebHome");
         DocumentReference newTargetReference = new DocumentReference("xwiki", "NewTarget", "WebHome");
 
@@ -836,7 +836,7 @@ class DeletePageIT
         // Create backlinks to the parent and the child page.
         String format = "[[Parent>>doc:%s]] [[Child>>doc:%s]]";
         testUtils.createPage(backlinkDocReference,
-            String.format(format, testUtils.serializeReference(parentReference), childFullName), "Backlink document");
+            String.format(format, testUtils.serializeLocalReference(parentReference), childFullName), "Backlink document");
 
         // Wait for Solr indexing to complete as backlink information from Solr is needed
         new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
@@ -855,7 +855,7 @@ class DeletePageIT
         // Verify that there is no redirect on the child page and backlink was not altered.
         assertEquals(DELETE_SUCCESSFUL, deletingPage.getInfoMessage());
         String newContent =
-            String.format(format, testUtils.serializeReference(newTargetReference).split(":")[1], childFullName);
+            String.format(format, testUtils.serializeLocalReference(newTargetReference), childFullName);
         assertEquals(newContent, testUtils.rest().<Page>get(backlinkDocReference).getContent());
         parentPage = testUtils.gotoPage(parentReference);
         assertEquals("New target", parentPage.getDocumentTitle());

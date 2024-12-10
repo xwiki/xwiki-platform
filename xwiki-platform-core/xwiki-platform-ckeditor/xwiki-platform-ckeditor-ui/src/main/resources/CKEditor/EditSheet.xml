@@ -765,14 +765,19 @@ td.cke_dialog_contents_body {
 
 /**
  * Handle the layout and display of the warning message for headerless tables.
+ * This message is added by the xwiki-table plugin.
  * Some of the default styles are just overridden by the CKEditor reset.
  */
 .cke_dialog_container span.box.warningmessage {
   .alert-warning;
+  /* Default warning boxes are not meant to be used in a strict layout like the one of this table dialog.
+   * We need an extra customization to avoid breaking this layout. */
   white-space: break-spaces;
+  /* By default, the warning is not shown. */
   display: none;
 }
 
+/* When the value of the previous field is the one we want to avoid, we show the warning. */
 .cke_dialog_container tr:has(select [value=""]:checked) + tr span.box.warningmessage {
   display: unset;
 }

@@ -47,9 +47,8 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Author;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -77,7 +76,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
     private AuthorExecutor authorExecutor;
 
     @Inject
-    protected AuthorizationManager authorization;
+    protected DocumentAuthorizationManager authorization;
 
     /**
      * Default constructor.
@@ -169,9 +168,7 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
         }
 
         // Step 5a: if the macro is in an inline context, try converting the included content to inline.
-        if (context.isInline()) {
-            result = (XDOM) (new ParserUtils()).convertToInline(result, true);
-        }
+        maybeConvertToInline(result, context);
 
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
@@ -195,7 +192,8 @@ public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
                 throw new MacroExecutionException("Failed to retrieve the translated version of the document", e);
             }
             if (parameters.getAuthor() == Author.TARGET || parameters.getAuthor() == Author.AUTO && !this.authorization
-                .hasAccess(Right.PROGRAM, translatedDocumentBridge.getContentAuthorReference(), null)) {
+                .hasAccess(Right.PROGRAM, null, translatedDocumentBridge.getContentAuthorReference(),
+                    translatedDocumentBridge.getDocumentReference())) {
                 // Merge the two XDOM before executing the included content so that it's as close as possible to the
                 // expect execution conditions
                 MacroBlock includeMacro = context.getCurrentMacroBlock();

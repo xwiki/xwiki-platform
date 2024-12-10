@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -37,6 +37,7 @@
     <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-jetty-hsqldb</module>
     <module>xwiki-platform-distribution-resources</module>
+    <module>xwiki-platform-distribution-test</module>
     <module>xwiki-platform-distribution-war</module>
     <module>xwiki-platform-distribution-war-dependencies</module>
     <module>xwiki-platform-distribution-war-legacydependencies</module>
@@ -220,12 +221,12 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-webjars-api</artifactId>
-        <version>16.10.0-SNAPSHOT</version>
+        <version>17.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
-        <version>16.10.0-SNAPSHOT</version>
+        <version>17.0.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

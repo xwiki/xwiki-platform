@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Resources</name>
@@ -131,27 +131,33 @@
       <version>5.2.0</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>momentjs</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.webjars</groupId>
+      <groupId>org.webjars.npm</groupId>
       <artifactId>moment-jdateformatparser</artifactId>
       <version>1.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>moment-timezone</artifactId>
-      <version>0.5.43</version>
+      <version>0.5.46</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
       <version>4.17.49</version>
       <exclusions>
+        <!-- We use our own fork of Bootstrap. -->
         <exclusion>
           <groupId>org.webjars</groupId>
           <artifactId>bootstrap</artifactId>
+        </exclusion>
+        <!-- We prefer the org.webjars.npm version. -->
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>momentjs</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

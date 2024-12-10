@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>16.10.0-SNAPSHOT</version>
+  <version>17.0.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -55,14 +55,18 @@
     <tika.version>2.9.2</tika.version>
     <pdfbox.version>2.0.31</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
-    <jetty.server.version>12.0.12</jetty.server.version>
+    <jetty.server.version>12.0.15</jetty.server.version>
     <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
     <!-- Force using the version of slf4j from Jetty dependencies instead of the one set by XWiki. The version used
-         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SF4J used and set the
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of SLF4J used and set the
          version here. -->
-    <jetty.server.slf4j.version>2.0.13</jetty.server.slf4j.version>
-    <netty.version>4.1.114.Final</netty.version>
+    <jetty.server.slf4j.version>2.0.16</jetty.server.slf4j.version>
+    <!-- Force using the version of apache-el from Jetty dependencies instead of the one set by XWiki. The version used
+         by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
+         version here. -->
+    <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
+    <netty.version>4.1.115.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.0</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
@@ -71,16 +75,16 @@
     <lucene.version>9.8.0</lucene.version>
     <jersey.version>2.45</jersey.version>
     <hk2.version>2.6.1</hk2.version>
-    <zookeeper.version>3.9.2</zookeeper.version>
+    <zookeeper.version>3.9.3</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.3</testcontainers.version>
+    <testcontainers.version>1.20.4</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>24.2.6</libreoffice.version>
+    <libreoffice.version>24.2.7</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -108,13 +112,13 @@
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <hsqldb.version>2.7.3</hsqldb.version>
+    <hsqldb.version>2.7.4</hsqldb.version>
     <mysql.groupId>com.mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-j</mysql.artifactId>
     <mysql.version>9.1.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.4.1</mariadb.version>
+    <mariadb.version>3.5.1</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -123,7 +127,7 @@
     <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.15.0.0</oracle.version>
+    <oracle.version>21.16.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
     <node.version>v20.12.0</node.version>
@@ -182,7 +186,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.29.2</version>
+        <version>4.30.0</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -374,46 +378,6 @@
         <artifactId>tika-parser-image-module</artifactId>
         <version>${tika.version}</version>
       </dependency>
-
-      <!-- Rome 1.x is used only in the feed api module -->
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome</artifactId>
-        <version>1.0</version>
-        <exclusions>
-          <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
-          <exclusion>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-          </exclusion>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>rome</groupId>
-        <artifactId>rome-fetcher</artifactId>
-        <version>1.0</version>
-        <!-- Exclude JDOM since Rome depends on jdom:jdom and we want to use org.jdom:jdom -->
-        <exclusions>
-          <exclusion>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-          </exclusion>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
@@ -459,7 +423,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.13.3</version>
+        <version>1.14.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -505,9 +469,9 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>momentjs</artifactId>
-        <version>2.29.4</version>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>moment</artifactId>
+        <version>2.30.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -516,9 +480,15 @@
         <version>3.1</version>
         <scope>runtime</scope>
         <exclusions>
+          <!-- We use our own fork of Bootstrap. -->
           <exclusion>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
+          </exclusion>
+          <!-- We prefer the org.webjars.npm version. -->
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>momentjs</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -621,7 +591,7 @@
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.3.2</version>
+        <version>2.4.0</version>
       </dependency>
 
       <dependency>
@@ -632,7 +602,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.18.1</version>
+        <version>1.18.3</version>
       </dependency>
 
       <!-- PDF -->
@@ -1701,6 +1671,26 @@
                   </message>
                   <excludes>
                     <exclude>org.webjars:bootstrap</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure we use the NPM packaging of moment because it includes the modified JavaScript code. -->
+          <execution>
+            <id>enforce-moment-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Please use org.webjars.npm:moment instead of org.webjars:momentjs .
+                  </message>
+                  <excludes>
+                    <exclude>org.webjars:momentjs</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

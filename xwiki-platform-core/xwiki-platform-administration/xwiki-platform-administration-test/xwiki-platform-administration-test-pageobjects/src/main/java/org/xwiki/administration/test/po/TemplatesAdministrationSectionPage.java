@@ -97,7 +97,9 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
         // To be sure that the form is validated before clicking, wait for the two fields validation messages to be
         // displayed before clicking.
         getDriver().waitUntilCondition(input ->
-            getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_valid")).size() == 2);
+            getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_valid"))
+                .size() == 1 &&
+            getDriver().findElementsWithoutWaiting(By.cssSelector("form .LV_validation_message.LV_invalid")).isEmpty());
 
         // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
         getDriver().addPageNotYetReloadedMarker();

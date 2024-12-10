@@ -22,7 +22,6 @@ package org.xwiki.officeimporter.document;
 import java.io.InputStream;
 
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.stability.Unstable;
 
 /**
  * An artifact for an office document.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.8
  * @since 15.3RC1
  */
-@Unstable
 public interface OfficeDocumentArtifact
 {
     /**

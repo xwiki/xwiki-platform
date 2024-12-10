@@ -1,0 +1,4 @@
+org.xwiki.uiextension.internal.UIExtensionClassDocumentInitializer
+org.xwiki.uiextension.internal.UIExtensionRequiredRightsAnalyzer
+org.xwiki.uiextension.internal.WikiUIExtension
+org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder

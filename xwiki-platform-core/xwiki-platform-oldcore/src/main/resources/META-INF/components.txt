@@ -77,13 +77,11 @@ com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerialize
 com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentDocumentReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider
-com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetPagePageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider
-com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
@@ -280,4 +278,9 @@ org.xwiki.security.authservice.script.AuthServiceScriptService
 org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.authentication.LoginLinkUIExtension
+org.xwiki.internal.authentication.RegisterLinkUIExtension
 org.xwiki.internal.document.DocumentOverrideListener
+org.xwiki.internal.document.DocumentRequiredRightsReader
+org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer
+org.xwiki.internal.document.DefaultSimpleDocumentCache

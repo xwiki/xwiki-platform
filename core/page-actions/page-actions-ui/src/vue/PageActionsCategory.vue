@@ -18,14 +18,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { inject, onMounted, ref } from "vue";
+import { inject, onMounted, ref, shallowRef } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type {
   PageAction,
   PageActionCategory,
   PageActionService,
 } from "@xwiki/cristal-page-actions-api";
-import type { Component, Ref } from "vue";
+import type { Component, Ref, ShallowRef } from "vue";
 
 const props = defineProps<{
   category: PageActionCategory;
@@ -39,13 +39,14 @@ const actionService: PageActionService = cristal
   .getContainer()
   .get<PageActionService>("PageActionService")!;
 
-const actions: Ref<{ action: PageAction; component: Component }[]> = ref([]);
+const actions: Ref<{ action: PageAction; component: ShallowRef<Component> }[]> =
+  ref([]);
 
 onMounted(async () => {
   for (const currAction of actionService.list(props.category.id)) {
     actions.value.push({
       action: currAction,
-      component: await currAction.component(),
+      component: shallowRef(await currAction.component()),
     });
   }
 });

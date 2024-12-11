@@ -1,1 +1,4 @@
-{}
+{
+    "vuetify.file.input.mandatory": "Pflichtfeld",
+    "vuetify.text.input.mandatory": "Pflichtfeld"
+}

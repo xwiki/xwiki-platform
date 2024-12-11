@@ -27,6 +27,9 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-hierarchy-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
+    "@xwiki/cristal-model-reference-api": "workspace:*",
+    "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-xwiki-utils": "workspace:*",
     "inversify": "6.2.0"
   },

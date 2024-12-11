@@ -20,7 +20,7 @@
 
 import { name } from "@xwiki/cristal-hierarchy-api";
 import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
-import { Container, inject, injectable } from "inversify";
+import { Container, inject, injectable, named } from "inversify";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
@@ -28,6 +28,9 @@ import type {
   PageHierarchyItem,
   PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 
 /**
  * Implementation of PageHierarchyResolver for the XWiki backend.
@@ -42,9 +45,15 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
     @inject("PageHierarchyResolver")
     private readonly defaultHierarchyResolver: PageHierarchyResolver,
     @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
-    private authenticationManagerProvider: AuthenticationManagerProvider,
+    private readonly authenticationManagerProvider: AuthenticationManagerProvider,
     @inject<StorageProvider>("StorageProvider")
     private readonly storageProvider: StorageProvider,
+    @inject<RemoteURLParser>("RemoteURLParser")
+    @named("XWiki")
+    private readonly urlParser: RemoteURLParser,
+    @inject<ModelReferenceSerializer>("ModelReferenceSerializer")
+    @named("XWiki")
+    private readonly referenceSerializer: ModelReferenceSerializer,
   ) {
     this.logger.setModule("storage.components.XWikiPageHierarchyResolver");
   }
@@ -80,21 +89,32 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
       const jsonResponse = await response.json();
       const hierarchy: Array<PageHierarchyItem> = [];
       jsonResponse.hierarchy.items.forEach(
-        (hierarchyItem: { label: string; url: string }) => {
-          hierarchy.push({
-            label: hierarchyItem.label,
-            pageId: this.storageProvider
-              .get()
-              .getPageFromViewURL(hierarchyItem.url)!,
-            url: hierarchyItem.url,
-          });
+        (hierarchyItem: { label: string; url: string; type: string }) => {
+          // If a document item is not terminal (i.e., WebHome) we exclude it.
+          if (
+            hierarchyItem.type != "document" ||
+            !hierarchyItem.url.endsWith("/")
+          ) {
+            hierarchy.push({
+              label: hierarchyItem.label,
+              pageId: this.storageProvider
+                .get()
+                .getPageFromViewURL(hierarchyItem.url)!,
+              url: this.cristalApp.getRouter().resolve({
+                name: "view",
+                params: {
+                  page: this.referenceSerializer.serialize(
+                    this.urlParser.parse(
+                      hierarchyItem.url,
+                    )! as DocumentReference,
+                  ),
+                },
+              }).href,
+            });
+          }
         },
       );
       hierarchy[0].label = "Home";
-      // If the last item is not terminal (i.e., WebHome) we exclude it.
-      if (hierarchy[hierarchy.length - 1].url.endsWith("/")) {
-        hierarchy.pop();
-      }
       return hierarchy;
     } catch (error) {
       this.logger.error(error);

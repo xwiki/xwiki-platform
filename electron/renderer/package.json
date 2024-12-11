@@ -16,11 +16,7 @@
     "build": "pnpm compile",
     "clean": "rimraf dist",
     "compile": "vite build",
-    "electron": "echo 'no task'",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "linux": "echo 'no task'",
-    "prepack": "pnpm build",
-    "package": "echo 'no task'"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",

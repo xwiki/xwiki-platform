@@ -5,7 +5,7 @@
 #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
 #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
 ## List of all the variables available to customize directly in the Flamingo theme editor.
-#set($variables = {
+#set($colorThemeVariables = {
 "text-color": "color",
 "body-bg": "color",
 "xwiki-page-content-bg" : "color",
@@ -72,14 +72,16 @@
 })
 :root {
 ## Create CSS variables for each colorTheme variable
-#foreach($property in $variables.keySet())
+#foreach($property in $colorThemeVariables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
 ## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
 #if($stringtool.startsWith($!value, '@'))
 #set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
 #end
-#set($propertyType = $variables.get($property))
+#set($propertyType = $colorThemeVariables.get($property))
+## For now we just use only `string` variables, because it's the easiest to setup and because it's 100% compatible with 
+## LESS variables. We could use extra info on the variable types to use @property syntax later.
 #if($propertyType == 'escapedText')
 --$property: "$escapetool.javascript($!value)";
 #else
@@ -87,4 +89,7 @@
 #end
 #end
 #end
+## On the short term, this is the best solution. There's quite a few difficult variable sets in there, and we don't want
+## to have to rewrite all of them in CSS.
+$services.lesscss.compileSkinFile('variables.less', true)
 }

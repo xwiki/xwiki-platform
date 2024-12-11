@@ -61,4 +61,14 @@ describe("defaultLocalURLSerializer", () => {
       ),
     ).to.eq("Page");
   });
+  it("serialize a document reference with special characters", () => {
+    expect(
+      serializer.serialize(
+        new DocumentReference(
+          "Page 0.1\\2",
+          new SpaceReference(new WikiReference("wiki"), "S1.1", "S2\\1"),
+        ),
+      ),
+    ).to.eq("wiki:S1\\.1.S2\\\\1.Page 0\\.1\\\\2");
+  });
 });

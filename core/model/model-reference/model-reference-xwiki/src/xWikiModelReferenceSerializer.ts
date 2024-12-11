@@ -31,6 +31,13 @@ import { injectable } from "inversify";
 
 @injectable()
 export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
+  private escapeSegment(segment: string): string {
+    // Dots in XWiki references separate segments, so when inside a segment
+    // they need to be escaped with a '\'. At the same time, using '\' as an
+    // escape character means it needs to be escaped as well.
+    return segment.replace(/(\.|\\)/g, "\\$1");
+  }
+
   serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
       return undefined;
@@ -43,7 +50,7 @@ export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
       case SPACE: {
         const spaceReference = reference as SpaceReference;
         const wiki = this.serialize(spaceReference.wiki);
-        const spaces = spaceReference.names.join(".");
+        const spaces = spaceReference.names.map(this.escapeSegment).join(".");
         if (wiki === undefined) {
           return spaces;
         } else {
@@ -53,7 +60,7 @@ export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
       case DOCUMENT: {
         const documentReference = reference as DocumentReference;
         const spaces = this.serialize(documentReference.space);
-        const name = documentReference.name;
+        const name = this.escapeSegment(documentReference.name);
         if (spaces === undefined || spaces == "") {
           return name;
         } else {

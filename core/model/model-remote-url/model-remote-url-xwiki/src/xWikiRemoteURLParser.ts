@@ -44,10 +44,12 @@ class XWikiRemoteURLParser implements RemoteURLParser {
     const baseURL = new URL(baseURLstr);
     const url = new URL(urlStr);
 
-    const endPath = decodeURIComponent(
-      url.pathname.replace(baseURL.pathname, ""),
-    );
-    let segments = endPath.split("/");
+    const endPath = decodeURI(url.pathname.replace(baseURL.pathname, ""));
+    // Using decodeURI will not decode '/' characters inside a segment, so we
+    // do it manually.
+    let segments = endPath
+      .split("/")
+      .map((segment) => segment.replace(/%2F/g, "/"));
     if (segments[0] === "") {
       segments = segments.slice(1);
     }

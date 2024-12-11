@@ -31,7 +31,7 @@
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "inversify": "6.2.0",
     "vue": "3.5.13",
-    "vue-i18n": "10.0.4"
+    "vue-i18n": "10.0.5"
   },
   "devDependencies": {
     "@vue/test-utils": "2.4.6",

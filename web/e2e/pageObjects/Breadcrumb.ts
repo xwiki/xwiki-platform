@@ -31,9 +31,14 @@ export interface BreadcrumbSegmentElement {
   getText(): Locator;
 
   /**
+   * @returns the segment link
+   */
+  getLink(): Locator;
+
+  /**
    * @returns the href value of the segment link
    */
-  getLink(): Promise<string>;
+  getLinkTarget(): Promise<string>;
 }
 
 /**
@@ -57,15 +62,17 @@ export class BreadcrumbPageObject {
 
   private async findItemsShoelace(): Promise<BreadcrumbSegmentElement[]> {
     return await this.findItemsInternal(
-      "#breadcrumbRoot sl-breadcrumb sl-breadcrumb-item",
+      ".page-header sl-breadcrumb sl-breadcrumb-item",
       (element) => {
         return {
           getText() {
             return element;
           },
-          async getLink() {
-            const link = element.locator(".breadcrumb-item__label--link");
-            return (await link.getAttribute("href"))!;
+          getLink() {
+            return element.locator(".breadcrumb-item__label--link");
+          },
+          async getLinkTarget() {
+            return (await this.getLink().getAttribute("href"))!;
           },
         };
       },
@@ -73,13 +80,16 @@ export class BreadcrumbPageObject {
   }
 
   private async findItemsVuetify(): Promise<BreadcrumbSegmentElement[]> {
-    return await this.findItemsInternal("#breadcrumbRoot li a", (element) => {
+    return await this.findItemsInternal(".page-header .v-breadcrumbs li a", (element) => {
       return {
         getText() {
           return element;
         },
-        async getLink() {
-          return (await element.getAttribute("href"))!;
+        getLink() {
+          return element;
+        },
+        async getLinkTarget() {
+          return (await this.getLink().getAttribute("href"))!;
         },
       };
     });

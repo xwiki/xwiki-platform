@@ -31,9 +31,14 @@ export interface NavigationTreeNode {
   getText(): Locator;
 
   /**
+   * @returns the node link
+   */
+  getLink(): Locator;
+
+  /**
    * @returns the href value of the node link
    */
-  getLink(): Promise<string>;
+  getLinkTarget(): Promise<string>;
 
   /**
    * @returns the children of the node
@@ -78,8 +83,11 @@ export class NavigationTreePageObject {
       getText() {
         return label;
       },
-      async getLink() {
-        return (await label.getAttribute("href"))!;
+      getLink() {
+        return label;
+      },
+      async getLinkTarget() {
+        return (await this.getLink().getAttribute("href"))!;
       },
       async getChildren() {
         return await NavigationTreePageObject.findItemsInternal(
@@ -99,8 +107,11 @@ export class NavigationTreePageObject {
       getText() {
         return label;
       },
-      async getLink() {
-        return (await label.getAttribute("href"))!;
+      getLink() {
+        return label;
+      },
+      async getLinkTarget() {
+        return (await this.getLink().getAttribute("href"))!;
       },
       async getChildren() {
         return await NavigationTreePageObject.findItemsInternal(

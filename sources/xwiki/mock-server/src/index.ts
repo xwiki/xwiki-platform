@@ -154,6 +154,38 @@ app.get(
 );
 
 app.get(
+  "/xwiki/rest/wikis/xwiki/spaces/Deep1/pages/Deep2",
+  (req: Request, res: Response) => {
+    res.appendHeader("Access-Control-Allow-Origin", "*");
+
+    res.json({
+      hierarchy: {
+        items: [
+          {
+            label: "xwiki",
+            name: "xwiki",
+            type: "wiki",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Main/`,
+          },
+          {
+            label: "Deep1",
+            name: "Deep1",
+            type: "space",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Deep1/`,
+          },
+          {
+            label: "Deep2",
+            name: "Deep2",
+            type: "document",
+            url: `${req.protocol}://${req.headers.host}/xwiki/bin/view/Deep1/Deep2`,
+          },
+        ],
+      },
+    });
+  },
+);
+
+app.get(
   "/xwiki/rest/wikis/xwiki/spaces/Main/pages/WebHome/history",
   (_req: Request, res: Response) => {
     res.appendHeader("Access-Control-Allow-Origin", "*");

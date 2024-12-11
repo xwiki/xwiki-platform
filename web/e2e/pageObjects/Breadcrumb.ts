@@ -31,9 +31,14 @@ export interface BreadcrumbSegmentElement {
   getText(): Locator;
 
   /**
+   * @returns the segment link
+   */
+  getLink(): Locator;
+
+  /**
    * @returns the href value of the segment link
    */
-  getLink(): Promise<string>;
+  getLinkTarget(): Promise<string>;
 }
 
 /**
@@ -63,9 +68,11 @@ export class BreadcrumbPageObject {
           getText() {
             return element;
           },
-          async getLink() {
-            const link = element.locator(".breadcrumb-item__label--link");
-            return (await link.getAttribute("href"))!;
+          getLink() {
+            return element.locator(".breadcrumb-item__label--link");
+          },
+          async getLinkTarget() {
+            return (await this.getLink().getAttribute("href"))!;
           },
         };
       },
@@ -78,8 +85,11 @@ export class BreadcrumbPageObject {
         getText() {
           return element;
         },
-        async getLink() {
-          return (await element.getAttribute("href"))!;
+        getLink() {
+          return element;
+        },
+        async getLinkTarget() {
+          return (await this.getLink().getAttribute("href"))!;
         },
       };
     });

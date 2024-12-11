@@ -101,11 +101,11 @@ configs.forEach(
 
       expect(breadcrumbItems.length).toEqual(2);
       await expect(breadcrumbItems[0].getText()).toContainText("Home");
-      expect(await breadcrumbItems[0].getLink()).toEqual(
+      expect(await breadcrumbItems[0].getLinkTarget()).toEqual(
         "#/Main.WebHome/view",
       );
       await expect(breadcrumbItems[1].getText()).toContainText("Main");
-      expect(await breadcrumbItems[1].getLink()).toEqual(
+      expect(await breadcrumbItems[1].getLinkTarget()).toEqual(
         "#/Main.WebHome/view",
       );
     });
@@ -121,23 +121,23 @@ configs.forEach(
 
       expect(navigationTreeNodes.length).toEqual(4);
       await expect(navigationTreeNodes[0].getText()).toContainText("Help");
-      expect(await navigationTreeNodes[0].getLink()).toEqual(
+      expect(await navigationTreeNodes[0].getLinkTarget()).toEqual(
         "#/Help.WebHome/view",
       );
       await expect(navigationTreeNodes[1].getText()).toContainText(
         "Terminal Page",
       );
-      expect(await navigationTreeNodes[1].getLink()).toEqual("#/Terminal/view");
+      expect(await navigationTreeNodes[1].getLinkTarget()).toEqual("#/Terminal/view");
       await expect(navigationTreeNodes[2].getText()).toContainText(
         "Deep Page Root",
       );
-      expect(await navigationTreeNodes[2].getLink()).toEqual(
+      expect(await navigationTreeNodes[2].getLinkTarget()).toEqual(
         "#/Deep1.WebHome/view",
       );
       await expect(navigationTreeNodes[3].getText()).toContainText(
         "Cristal Wiki",
       );
-      expect(await navigationTreeNodes[3].getLink()).toEqual(
+      expect(await navigationTreeNodes[3].getLinkTarget()).toEqual(
         "#/Main.WebHome/view",
       );
 
@@ -145,7 +145,7 @@ configs.forEach(
       const children = await navigationTreeNodes[2].getChildren();
       expect(children.length).toEqual(1);
       await expect(children[0].getText()).toContainText("Deep Page Leaf");
-      expect(await children[0].getLink()).toEqual("#/Deep1.Deep2/view");
+      expect(await children[0].getLinkTarget()).toEqual("#/Deep1.Deep2/view");
     });
 
     test(`[${name}] has working history`, async ({ page }) => {
@@ -195,6 +195,42 @@ configs.forEach(
         "Type '/' to show the available actions"
       );
       expect(editorContent).toBeEmpty();
+    });
+
+
+    test(`[${name}] has working navigation`, async ({ page }) => {
+      await page.goto(localDefaultPage);
+
+      const sidebar = new SidebarPageObject(page);
+      await sidebar.openSidebar();
+      const navigationTreeNodes = await new NavigationTreePageObject(
+        page,
+        designSystem,
+      ).findItems();
+
+      expect(await navigationTreeNodes[2].getLinkTarget()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+      await navigationTreeNodes[2].expand();
+      const children = await navigationTreeNodes[2].getChildren();
+      expect(await children[0].getLinkTarget()).toEqual("#/Deep1.Deep2/view");
+
+      // We navigate to Deep1.Deep2 through the Navigation Tree.
+      await children[0].getLink().click();
+      expect(page.url()).toMatch(/#\/Deep1\.Deep2\/view$/);
+      await sidebar.hideSidebar();
+
+      const breadcrumbItems = await new BreadcrumbPageObject(
+        page,
+        designSystem,
+      ).findItems();
+      expect(await breadcrumbItems[1].getLinkTarget()).toEqual(
+        "#/Deep1.WebHome/view",
+      );
+
+      // We navigate to Deep1.WebHome through the Breadcrumb.
+      await breadcrumbItems[1].getLink().click();
+      expect(page.url()).toMatch(/#\/Deep1\.WebHome\/view$/);
     });
 
     if (offlineDefaultPage) {

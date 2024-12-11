@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -53,8 +52,7 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryParameter;
 import org.xwiki.query.SecureQuery;
 import org.xwiki.query.WrappingQuery;
-import org.xwiki.query.hql.internal.HQLQueryValidator;
-import org.xwiki.query.internal.DefaultQuery;
+import org.xwiki.query.hql.internal.HQLStatementValidator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -63,6 +61,7 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * {@link QueryExecutor} implementation for Hibernate Store.
@@ -100,6 +99,9 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
+    private HQLStatementValidator queryValidator;
+
+    @Inject
     private Logger logger;
 
     private volatile Set<String> safeNamedQueries;
@@ -117,21 +119,23 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         if (this.safeNamedQueries == null) {
             synchronized (this) {
                 if (this.safeNamedQueries == null) {
-                    this.safeNamedQueries = new HashSet<>();
+                    Set<String> safeQueries = new HashSet<>();
 
                     // Gather the list of allowed named queries
                     Collection<NamedQueryDefinition> namedQueries =
                         this.hibernate.getConfigurationMetadata().getNamedQueryDefinitions();
                     for (NamedQueryDefinition definition : namedQueries) {
                         try {
-                            if (isSafe(definition.getQuery())) {
-                                this.safeNamedQueries.add(definition.getName());
+                            if (this.queryValidator.isSafe(definition.getQuery())) {
+                                safeQueries.add(definition.getName());
                             }
                         } catch (QueryException e) {
                             this.logger.warn("Failed to validate named query [{}] with statement [{}]: {}",
                                 definition.getName(), definition.getQuery(), ExceptionUtils.getRootCauseMessage(e));
                         }
                     }
+
+                    this.safeNamedQueries = safeQueries;
                 }
             }
         }
@@ -140,52 +144,20 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     }
 
     /**
-     * @param statementString the statement to evaluate
+     * @param statement the statement to evaluate
      * @return true if the select is allowed for user without PR
      * @deprecated
      */
     @Deprecated(since = "17.0.0RC1, 16.10.2, 15.10.16, 16.4.6")
-    protected static boolean isSafeSelect(String statementString)
+    protected static boolean isSafeSelect(String statement)
     {
-        // An empty statement is safe
-        if (statementString.isEmpty()) {
-            return true;
-        }
+        HQLStatementValidator validator = Utils.getComponent(HQLStatementValidator.class);
 
-        // HqlQueryUtils#isSafe only works with complete statements
-        String completeStatement = toCompleteShortForm(statementString);
-
-        // Parse and validate the statement
-        return HqlQueryUtils.isSafe(completeStatement);
-    }
-
-    private boolean isSafe(String statement) throws QueryException
-    {
-        // An empty statement is safe
-        if (statement.isEmpty()) {
-            return true;
-        }
-
-        // HqlQueryUtils#isSafe only works with complete statements
-        String completeStatement = toCompleteShortForm(statement);
-
-        // Parse and validate the statement
-        ComponentManager componentManager = this.componentManagerProvider.get();
         try {
-            for (HQLQueryValidator validator : componentManager
-                .<HQLQueryValidator>getInstanceList(HQLQueryValidator.class)) {
-                Optional<Boolean> result = validator.isSafe(completeStatement);
-                if (result.isPresent()) {
-                    return result.get();
-                }
-            }
-        } catch (ComponentLookupException e) {
-            throw new QueryException("Failed to get query statement validators",
-                new DefaultQuery(statement, Query.HQL, this), e);
+            return validator.isSafe(statement);
+        } catch (QueryException e) {
+            return false;
         }
-
-        // Assume the statement is safe if no validator says otherwise
-        return true;
     }
 
     protected void checkAllowed(final Query query) throws QueryException
@@ -198,7 +170,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                     throw new QueryException("Named queries requires programming right", query, null);
                 }
 
-                if (!isSafe(query.getStatement())) {
+                if (!this.queryValidator.isSafe(query.getStatement())) {
                     throw new QueryException("The query requires programming right", query, null);
                 }
             }
@@ -245,17 +217,13 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected Query filterQuery(Query query)
     {
         Query filteredQuery = query;
+
+        // Named queries are not filtered
         if (!filteredQuery.isNamed()) {
-            // For non-named queries, convert the short form into long form before we apply the filters.
-            filteredQuery = new WrappingQuery(filteredQuery)
-            {
-                @Override
-                public String getStatement()
-                {
-                    // handle short queries
-                    return completeShortFormStatement(getWrappedQuery().getStatement());
-                }
-            };
+            // Make sure to work with the complete form of the query
+            filteredQuery = HqlQueryUtils.toCompleteQuery(filteredQuery);
+
+            // Execute filters
             filteredQuery = filterQuery(filteredQuery, Query.HQL);
         }
 
@@ -389,18 +357,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected String completeShortFormStatement(String statement)
     {
-        return toCompleteShortForm(statement);
-    }
-
-    private static String toCompleteShortForm(String statement)
-    {
-        String filteredStatement = statement;
-
-        if (statement.isEmpty() || HqlQueryUtils.isShortFormStatement(statement)) {
-            filteredStatement = "select doc.fullName from XWikiDocument doc " + statement.trim();
-        }
-
-        return filteredStatement;
+        return HqlQueryUtils.toCompleteStatement(statement);
     }
 
     private <T> org.hibernate.query.Query<T> createNamedHibernateQuery(Session session, Query query)

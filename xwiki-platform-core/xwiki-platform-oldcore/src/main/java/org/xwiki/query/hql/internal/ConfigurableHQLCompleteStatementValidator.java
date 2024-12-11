@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,12 +32,13 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * A validator which can be configured.
+ * A validator which can be configured. This validator is executer before the default one using component priorities
  * 
  * @version $Id$
  * @since 17.0.0RC1
@@ -47,7 +49,8 @@ import org.xwiki.configuration.ConfigurationSource;
 @Component
 @Singleton
 @Named("configuration")
-public class ConfigurableHQLQueryValidator implements HQLQueryValidator, Initializable
+@Priority(ComponentDescriptor.DEFAULT_PRIORITY - 100)
+public class ConfigurableHQLCompleteStatementValidator implements HQLCompleteStatementValidator, Initializable
 {
     @Inject
     @Named("xwikiproperties")

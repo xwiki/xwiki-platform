@@ -886,16 +886,16 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# [Since 16.10.2]
 #-# [Since 15.10.16]
 #-# [Since 16.4.6]
-#-# While HQL queries executed by users without programming right are validated. It's sometimes necessary to
+#-# While HQL queries executed by users without programming right are already validated, it's sometimes necessary to
 #-# customize the behavior of the standard validator because it might be too strict (or not strict enough).
-#-# The following properties allows to give a list of (Java) regular expression.
-#-# In case both safe and unsafe patterns match the query, the priority goes to considering it unsafe.
+#-# The following properties allow giving a list of (Java) regular expressions.
+#-# In case both safe and unsafe patterns match the query, the priority goes to the unsafe pattern.
 #-#
 # query.hql.unsafe=.*some native syntax.*
-#-# 
+#-#
 #-# Note: be very careful to not use too large regular expression when adding a safe pattern as it could introduce a vulnerability.
-#-# 
-# query.hql.safe=select pro1, prop2 from CustomTable
+#-#
+# query.hql.safe=select prop1, prop2 from CustomTable
 # query.hql.safe=select\\s+((prop1|prop2|prop3)\\s*,?\\s*)+\\s+from MyCustomTable
 
 #-------------------------------------------------------------------------------------

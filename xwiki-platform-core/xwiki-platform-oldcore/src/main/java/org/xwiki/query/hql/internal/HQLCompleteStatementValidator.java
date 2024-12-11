@@ -21,14 +21,11 @@ package org.xwiki.query.hql.internal;
 
 import java.util.Optional;
 
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-
-import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.query.QueryException;
 
 /**
- * A HQL validator which relies on {@link HqlQueryUtils#isSafe(String)}.
+ * A component in charge of validating a passed HQL statement.
  * 
  * @version $Id$
  * @since 17.0.0RC1
@@ -36,13 +33,14 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
  * @since 15.10.16
  * @since 16.4.6
  */
-@Component
-@Singleton
-public class DefaultHQLQueryValidator implements HQLQueryValidator
+@Role
+public interface HQLCompleteStatementValidator
 {
-    @Override
-    public Optional<Boolean> isSafe(String statement)
-    {
-        return Optional.of(HqlQueryUtils.isSafe(statement));
-    }
+    /**
+     * @param statement the HQL statement to validate
+     * @return {@link Boolean#TRUE} if the passed query is safe, {@link Boolean#FALSE} if it's not and
+     *         {@link Optional#empty()} if unknown.
+     * @throws QueryException when failing the validate the query
+     */
+    Optional<Boolean> isSafe(String statement) throws QueryException;
 }

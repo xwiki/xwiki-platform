@@ -22,6 +22,7 @@ package org.xwiki.query.hql.internal;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.query.QueryException;
 
 /**
  * A component in charge of validating a passed HQL statement.
@@ -33,12 +34,13 @@ import org.xwiki.component.annotation.Role;
  * @since 16.4.6
  */
 @Role
-public interface HQLQueryValidator
+public interface HQLStatementValidator
 {
     /**
      * @param statement the HQL statement to validate
-     * @return {@link Boolean#TRUE} if the passed statement is safe, {@link Boolean#FALSE} is it's not and
-     *         {@link Optional#empty()} otherwise.
+     * @return {@link Boolean#TRUE} if the passed query is safe, {@link Boolean#FALSE} if it's not and
+     *         {@link Optional#empty()} if unknown.
+     * @throws QueryException when failing the validate the query
      */
-    Optional<Boolean> isSafe(String statement);
+    boolean isSafe(String statement) throws QueryException;
 }

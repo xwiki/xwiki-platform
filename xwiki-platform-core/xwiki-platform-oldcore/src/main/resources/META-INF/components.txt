@@ -285,5 +285,6 @@ org.xwiki.internal.document.DocumentOverrideListener
 org.xwiki.internal.document.DocumentRequiredRightsReader
 org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer
 org.xwiki.internal.document.DefaultSimpleDocumentCache
-org.xwiki.query.hql.internal.ConfigurableHQLQueryValidator
-org.xwiki.query.hql.internal.DefaultHQLQueryValidator
+org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator
+org.xwiki.query.hql.internal.DefaultHQLStatementValidator
+org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator

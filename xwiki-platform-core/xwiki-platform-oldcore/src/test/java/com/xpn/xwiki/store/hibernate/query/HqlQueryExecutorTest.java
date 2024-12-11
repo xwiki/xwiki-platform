@@ -44,8 +44,8 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.WrappingQuery;
-import org.xwiki.query.hql.internal.DefaultHQLQueryValidator;
-import org.xwiki.query.hql.internal.HQLQueryValidator;
+import org.xwiki.query.hql.internal.DefaultHQLStatementValidator;
+import org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -77,14 +77,14 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList(DefaultHQLQueryValidator.class)
+@ComponentList({DefaultHQLStatementValidator.class, StandardHQLCompleteStatementValidator.class})
 class HqlQueryExecutorTest
 {
     @InjectMockComponents
     private HqlQueryExecutor executor;
 
     @InjectMockComponents
-    private DefaultHQLQueryValidator defaultQueryValidator;
+    private DefaultHQLStatementValidator defaultQueryValidator;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
@@ -124,9 +124,6 @@ class HqlQueryExecutorTest
         });
 
         this.hasProgrammingRight = true;
-
-        when(this.contextComponentMannager.getInstanceList(HQLQueryValidator.class))
-            .thenReturn(List.of(this.defaultQueryValidator));
 
         // Actual Hibernate query
 

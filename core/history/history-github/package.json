@@ -26,7 +26,7 @@
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-history-api": "workspace:*",
-    "inversify": "6.1.4"
+    "inversify": "6.1.6"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

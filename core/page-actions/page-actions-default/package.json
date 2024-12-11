@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-page-actions-api": "workspace:*",
-    "inversify": "6.1.4",
+    "inversify": "6.1.6",
     "lodash": "4.17.21"
   },
   "peerDependencies": {

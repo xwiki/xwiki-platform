@@ -26,7 +26,7 @@
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",
     "dexie": "4.0.10",
-    "inversify": "6.1.6"
+    "inversify": "6.2.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

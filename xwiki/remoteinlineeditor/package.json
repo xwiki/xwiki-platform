@@ -28,7 +28,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "vue": "3.5.13"
   },
   "peerDependencies": {

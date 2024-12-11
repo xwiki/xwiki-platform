@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-history-api": "workspace:*",
     "@xwiki/cristal-xwiki-utils": "workspace:*",
-    "inversify": "6.1.6"
+    "inversify": "6.2.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

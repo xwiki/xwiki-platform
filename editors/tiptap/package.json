@@ -52,7 +52,7 @@
     "@xwiki/cristal-skin": "workspace:*",
     "avvvatars-vue": "1.1.0",
     "eventemitter3": "5.0.1",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "lodash": "4.17.21",
     "markdown-it": "14.1.0",
     "pinia": "2.3.0",

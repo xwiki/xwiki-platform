@@ -28,7 +28,7 @@
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "pinia": "2.3.0",
     "vue": "3.5.13"
   },

@@ -25,7 +25,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "xml-escape": "1.1.0"
   },
   "peerDependencies": {

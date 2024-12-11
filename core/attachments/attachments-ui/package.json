@@ -33,7 +33,7 @@
     "@xwiki/cristal-model-click-listener": "workspace:*",
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "vue": "3.5.13",
     "vue-i18n": "10.0.4",
     "vue-router": "4.5.0"

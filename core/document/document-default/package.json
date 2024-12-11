@@ -24,7 +24,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "pinia": "2.3.0",
     "vue": "3.5.13"
   },

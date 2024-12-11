@@ -52,7 +52,7 @@
     "@types/node": "22.10.1",
     "@vitejs/plugin-vue": "5.2.1",
     "globals": "15.13.0",
-    "inversify": "6.1.6",
+    "inversify": "6.2.0",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3",

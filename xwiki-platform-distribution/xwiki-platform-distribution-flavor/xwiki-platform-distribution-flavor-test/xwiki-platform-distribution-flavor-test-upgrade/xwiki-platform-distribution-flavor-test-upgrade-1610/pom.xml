@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
-    <upgradetest.previousflavor.version>16.10</upgradetest.previousflavor.version>
+    <upgradetest.previousflavor.version>16.10.0</upgradetest.previousflavor.version>
   </properties>
   <dependencies>
     <dependency>
@@ -42,7 +42,7 @@
            https://issues.apache.org/jira/browse/MRELEASE-799, causing "The artifact (...) requires a different
            version (...) than what is found (...) for the expression (upgradetest.previousflavor.version) in the
            project (...)" otherwise, when using the release plugin -->
-      <version>16.10</version>
+      <version>16.10.0</version>
       <type>zip</type>
       <scope>test</scope>
     </dependency>

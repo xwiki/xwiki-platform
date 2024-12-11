@@ -15,14 +15,11 @@
   },
   "main": "./main/dist/index.cjs",
   "scripts": {
+    "build:linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir",
+    "build:mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir",
+    "build:win": "electron-builder --win nsis --config .electron-builder.config.js --dir",
     "clean": "rimraf dist",
-    "electron": "cross-env MODE=production electron-builder build --config .electron-builder.config.js --dir --config.asar=false",
-    "linux": "electron-builder --linux deb tar.gz --config .electron-builder.config.js --dir --config.asar=true",
-    "mac": "electron-builder --mac dmg --config .electron-builder.config.js --dir --config.asar=false",
-    "prepackage": "cross-env MODE=production electron-builder -mwl --config .electron-builder.config.js --dir --config.asar=false",
-    "package": "pnpm prepackage && mkdir -p dist/@cristal && pnpm linux",
-    "start": "electron .",
-    "win": "electron-builder --win nsis --config .electron-builder.config.js --dir --config.asar=false"
+    "start": "electron ."
   },
   "dependencies": {
     "@xwiki/cristal-electron-storage": "workspace:*",

@@ -1,0 +1,71 @@
+name: Electron Build for all platforms
+
+on:
+  push:
+
+permissions: write-all
+
+jobs:
+  electron-prepare:
+    runs-on: ubuntu-latest
+    # Cleanup the release note artifacts before building new ones. Otherwise, the action-gh-release step fails because
+    # an artifact already exists.
+    steps:
+      - uses: liudonghua123/delete-release-action@v1
+        with:
+          release_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  electron-linux:
+    runs-on: ubuntu-latest
+    needs: electron-prepare
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4.1.0
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run --filter @xwiki/cristal-electron build:linux
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            electron/dist/cristal-*.tar.gz
+            electron/dist/cristal-*.deb
+          tag_name: ${{ github.ref }}
+          draft: true
+  electron-mac:
+    runs-on: macos-latest
+    needs: electron-prepare
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4.1.0
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run --filter @xwiki/cristal-electron build:mac
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: electron/dist/cristal-*.dmg
+          tag_name: ${{ github.ref }}
+          draft: true
+  electron-win:
+    runs-on: windows-latest
+    needs: electron-prepare
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4.1.0
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install
+      - run: pnpm run build
+      - run: pnpm run --filter @xwiki/cristal-electron build:win
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: electron/dist/cristal-*.exe
+          tag_name: ${{ github.ref }}
+          draft: true

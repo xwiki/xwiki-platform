@@ -23,9 +23,8 @@
     "dev": "vite dev",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
     "prepack": "pnpm build",
-    "prepare": "mkdir -p ./dist/apps && ln -fs ../../../extension-manager/dist/ dist/apps/extension-manager && ln -fs ../../../extension-menubuttons/dist/ dist/apps/extension-menubuttons && ln -fs ../../../skin/dist/ dist/apps/skin && ln -fs ../../../dsvuetify/dist/ dist/apps/dsvuetify && ln -fs ../../../storage/dist/ dist/apps/storage && ln -fs ../../../wikimodel/dist dist/apps/wikimodel && ln -fs ../../../dsfr/dist dist/apps/dsfr && ln -fs ../../../dsshoelace/dist dist/apps/dsshoelace",
-    "quickstart": "pnpm run build --scope @xwiki/cristal-app && pnpm prepare && NODE_ENV=production node src/server.js",
-    "start": "pnpm run build && pnpm prepare && NODE_ENV=production node src/server.js",
+    "quickstart": "pnpm run build --scope @xwiki/cristal-app && NODE_ENV=production node src/server.js",
+    "start": "pnpm run build && NODE_ENV=production node src/server.js",
     "start:e2e:xwiki": "pnpm run -C ../sources/xwiki/mock-server dev",
     "test:e2e": "playwright test"
   },

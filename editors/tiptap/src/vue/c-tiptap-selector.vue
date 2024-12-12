@@ -104,32 +104,35 @@ const { down, up, enter, index } = listNavigation(
 
 <style scoped>
 .category-title {
-  font-style: italic;
+  font-family: var(--cr-font-sans);
+  font-size: var(--cr-font-size-2x-small);
+  font-weight: var(--cr-font-weight-bold);
+  color: var(--cr-color-neutral-500);
+  text-transform: uppercase;
+  padding: var(--cr-spacing-small);
 }
 
 .items {
-  position: relative;
+  display: grid;
   border-radius: var(--cr-tooltip-border-radius);
   background: white; /* TODO: define a global variable for background color */
   overflow: hidden auto;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.1),
-    0 10px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--cr-color-neutral-200);
+  box-shadow: var(--cr-shadow-x-large);
   max-height: 300px;
 }
 
 .item {
   display: block;
-  width: 100%;
   text-align: start;
   background: transparent;
   border: none;
-  padding: 0.2rem 0.5rem;
-}
+  padding: var(--cr-spacing-small) var(--cr-spacing-small);
 
-.item.is-selected,
-.item:hover {
-  color: var(--cr-color-neutral-500);
-  background: var(--cr-color-neutral-100);
+  &:hover,
+  &.is-selected {
+    background-color: var(--cr-color-neutral-100);
+    cursor: pointer;
+  }
 }
 </style>

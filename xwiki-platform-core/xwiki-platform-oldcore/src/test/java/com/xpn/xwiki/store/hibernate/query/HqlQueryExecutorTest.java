@@ -38,13 +38,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.WrappingQuery;
+import org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator;
 import org.xwiki.query.hql.internal.DefaultHQLStatementValidator;
+import org.xwiki.query.hql.internal.HQLCompleteStatementValidator;
 import org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -77,14 +80,18 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({DefaultHQLStatementValidator.class, StandardHQLCompleteStatementValidator.class})
+@ComponentList({DefaultHQLStatementValidator.class, StandardHQLCompleteStatementValidator.class,
+    ConfigurableHQLCompleteStatementValidator.class})
 class HqlQueryExecutorTest
 {
     @InjectMockComponents
     private HqlQueryExecutor executor;
 
     @InjectMockComponents
-    private DefaultHQLStatementValidator defaultQueryValidator;
+    private DefaultHQLStatementValidator defaultValidator;
+
+    @InjectMockComponents
+    private ConfigurableHQLCompleteStatementValidator configurableValidator;
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
@@ -99,6 +106,10 @@ class HqlQueryExecutorTest
     private Execution execution;
 
     @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiproperties;
+
+    @MockComponent
     @Named("context")
     private ComponentManager contextComponentMannager;
 
@@ -109,6 +120,11 @@ class HqlQueryExecutorTest
     {
         when(this.hibernateStore.getConfiguration()).thenReturn(new Configuration());
         when(this.hibernateStore.getConfigurationMetadata()).thenReturn(mock(Metadata.class));
+
+        when(this.xwikiproperties.getProperty("query.hql.safe", List.class))
+            .thenReturn(List.of("select normallynotallowed from XWikiDocument as doc where 1=\\d+"));
+        when(this.xwikiproperties.getProperty("query.hql.unsafe", List.class))
+            .thenReturn(List.of("select name from XWikiDocument as doc where 1=\\d+"));
     }
 
     @BeforeEach
@@ -124,6 +140,10 @@ class HqlQueryExecutorTest
         });
 
         this.hasProgrammingRight = true;
+
+        when(this.contextComponentMannager
+            .<HQLCompleteStatementValidator>getInstanceList(HQLCompleteStatementValidator.class))
+                .thenReturn(List.of(configurableValidator));
 
         // Actual Hibernate query
 
@@ -383,7 +403,6 @@ class HqlQueryExecutorTest
     void executeCompleteHQLQueryWithProgrammingRights() throws QueryException
     {
         execute("select u from XWikiDocument as doc", true);
-
     }
 
     @Test
@@ -402,6 +421,12 @@ class HqlQueryExecutorTest
     void executeShortFromHQLQueryWithoutProgrammingRights() throws QueryException
     {
         execute(", BaseObject as obj", false);
+    }
+
+    @Test
+    void executeWhenOverwrittenAllowedSelect() throws Exception
+    {
+        execute("select normallynotallowed from XWikiDocument as doc where 1=42", false);
     }
 
     // Not allowed
@@ -453,6 +478,19 @@ class HqlQueryExecutorTest
         } catch (QueryException expected) {
             assertEquals(
                 "The query requires programming right. Query statement = [update XWikiDocument set name='name']",
+                expected.getCause().getMessage());
+        }
+    }
+
+    @Test
+    void executeWhenOverwrittenUnsafeSelect() throws Exception
+    {
+        try {
+            execute("select name from XWikiDocument as doc where 1=42", false);
+        } catch (QueryException expected) {
+            assertEquals(
+                "The query requires programming right."
+                    + " Query statement = [select name from XWikiDocument as doc where 1=42]",
                 expected.getCause().getMessage());
         }
     }

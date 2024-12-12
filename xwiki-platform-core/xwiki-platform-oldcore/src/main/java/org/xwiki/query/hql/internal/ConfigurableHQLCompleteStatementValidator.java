@@ -74,14 +74,19 @@ public class ConfigurableHQLCompleteStatementValidator implements HQLCompleteSta
     {
         List<String> patternStrings = this.configuration.getProperty(key, List.class);
 
-        List<Pattern> patterns = new ArrayList<>(patternStrings.size());
-        for (String patternString : patternStrings) {
-            try {
-                patterns.add(Pattern.compile(patternString));
-            } catch (Exception e) {
-                this.logger.warn("Failed to parse pattern [{}] for configuration [{}]: {}", patternString, key,
-                    ExceptionUtils.getRootCauseMessage(e));
+        List<Pattern> patterns;
+        if (patternStrings != null) {
+            patterns = new ArrayList<>(patternStrings.size());
+            for (String patternString : patternStrings) {
+                try {
+                    patterns.add(Pattern.compile(patternString));
+                } catch (Exception e) {
+                    this.logger.warn("Failed to parse pattern [{}] for configuration [{}]: {}", patternString, key,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
             }
+        } else {
+            patterns = List.of();
         }
 
         return patterns;

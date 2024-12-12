@@ -50,9 +50,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
  * 
  * @version $Id$
- * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
-@Deprecated
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {
     /**

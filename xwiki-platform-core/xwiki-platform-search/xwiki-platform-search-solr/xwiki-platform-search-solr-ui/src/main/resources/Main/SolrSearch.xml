@@ -716,7 +716,6 @@ a.search-result-highlightAll:after {
   color: $theme.titleColor;
   cursor: pointer;
   line-height: 1.4em;
-  margin: 0 .2em;
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -758,12 +757,16 @@ a.search-result-highlightAll:after {
 .search-facet-body li {
   display: flex;
   flex-wrap: wrap;
-  padding: .1em .2em;
+  padding: .1em 0;
 }
 
 .search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
   background: transparent;
   transition: background-color .2s ease-in-out;
+  /* We overwrite the default xs-button style to make sure the icon is properly aligned on the right of the element. 
+     By default there is a 5px padding on each side. */
+  padding-right: 0;
+  padding-left: 10px;
 }
 
 .search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
@@ -845,8 +848,12 @@ body.content.preference-underlining-only-inline-links #xwikicontent .search-face
 }
 
 .search-facet-body .itemCount {
-  padding: .1em 0;
+  padding: .2em;
   margin-left: auto;
+  background-color: $theme.highlightColor;
+  border-radius: 7px; /* Same value as @border-radius-base from Flamingo. */
+  font-size: 0.8em;
+  align-self: center;
 }
 
 @media (max-width: 768px) {

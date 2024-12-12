@@ -8,5 +8,6 @@
   "page.creation.menu.title": "New Page",
   "information.extraTabs.title": "Information",
   "history.alert.content": "You are currently viewing version {revision} of {pageName}. Edition is disabled.",
-  "history.alert.link.label": "Click here to go back to the latest version."
+  "history.alert.link.label": "Click here to go back to the latest version.",
+  "article.loading": "Loading..."
 }

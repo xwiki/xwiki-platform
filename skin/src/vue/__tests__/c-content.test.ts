@@ -108,6 +108,7 @@ function mountCComponent(params: {
       stubs: {
         CContent: false,
         Suspense: false,
+        CArticle: false,
         UIX: true,
         XBtn: true,
         XAvatar: true,
@@ -146,7 +147,7 @@ describe("c-context", () => {
 
   it("display a loading message", () => {
     const component = mountCComponent({ isLoading: true });
-    expect(component.find("h3").text()).eq("Loading");
+    expect(component.find("h3").text()).eq("article.loading");
   });
 
   it("display an error message", () => {

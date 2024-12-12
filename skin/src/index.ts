@@ -23,6 +23,7 @@ import { DefaultMacroData } from "./components/defaultMacroData";
 import { DefaultSkinManager } from "./components/defaultSkinManager";
 import DefaultUIXTemplateProvider from "./components/defaultUIXTemplateProvider";
 import DefaultVueTemplateProvider from "./components/defaultVueTemplateProvider";
+import CArticle from "./vue/c-article.vue";
 import CTemplate from "./vue/c-template.vue";
 import { ContentTools } from "./vue/contentTools";
 import type { MacroData } from "./api/macroData";
@@ -37,6 +38,7 @@ export type {
   VueTemplateProvider,
 };
 export {
+  CArticle,
   CTemplate,
   ComponentInit,
   ContentTools,

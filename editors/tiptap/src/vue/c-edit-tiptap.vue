@@ -36,6 +36,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
+import { CArticle } from "@xwiki/cristal-skin";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { computed, inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -215,75 +216,48 @@ watch(
 </script>
 
 <template>
-  <div v-if="loading" class="content-loading">
-    <span class="load-spinner"></span>
-    <h3>Loading</h3>
-  </div>
-  <div v-else-if="error" class="editor-error">
-    <!-- TODO: provide a better error reporting. -->
-    {{ error }}
-  </div>
-  <div v-show="!loading && !error" class="edit-wrapper">
-    <div class="doc-header">
-      <div class="doc-header-inner">
-        <input
-          v-model="title"
-          type="text"
-          :placeholder="titlePlaceholder"
-          class="doc-title"
-        />
-        <c-tiptap-bubble-menu
-          v-if="editor"
-          :editor="editor"
-        ></c-tiptap-bubble-menu>
-      </div>
-    </div>
-    <editor-content :editor="editor" class="doc-content editor" />
-    <form class="pagemenu" @submit="submit">
-      <div class="pagemenu-status">
-        <c-connection-status
-          v-if="editor"
-          :provider="editor.storage.cristalCollaborationKit.provider"
-        ></c-connection-status>
-        <c-save-status
-          v-if="editor"
-          :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
-        ></c-save-status>
-      </div>
-      <div class="pagemenu-actions">
-        <x-btn size="small" variant="primary" @click="submit">Close</x-btn>
-      </div>
-    </form>
-  </div>
+  <c-article
+    :loading="loading"
+    :error="error"
+    :current-page="currentPage"
+    :page-exist="true"
+    before-u-i-x-p-id="edit.before"
+    after-u-i-x-p-id="edit.after"
+  >
+    <template #title>
+      <input
+        v-model="title"
+        type="text"
+        :placeholder="titlePlaceholder"
+        class="doc-title"
+      />
+    </template>
+    <template #default>
+      <c-tiptap-bubble-menu
+        v-if="editor"
+        :editor="editor"
+      ></c-tiptap-bubble-menu>
+      <editor-content :editor="editor" class="doc-content editor" />
+      <form class="pagemenu" @submit="submit">
+        <div class="pagemenu-status">
+          <c-connection-status
+            v-if="editor"
+            :provider="editor.storage.cristalCollaborationKit.provider"
+          ></c-connection-status>
+          <c-save-status
+            v-if="editor"
+            :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
+          ></c-save-status>
+        </div>
+        <div class="pagemenu-actions">
+          <x-btn size="small" variant="primary" @click="submit">Close</x-btn>
+        </div>
+      </form>
+    </template>
+  </c-article>
 </template>
 
 <style scoped>
-.content {
-  display: grid;
-  grid-template-rows: 56px auto auto 1fr;
-  overflow: hidden;
-  justify-content: center;
-}
-
-.content-loading {
-  display: flex;
-  flex-flow: column;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-}
-
-.content-loading svg {
-  width: 64px;
-  height: 64px;
-}
-
-.content-loading h3 {
-  padding: 0;
-  margin: 0;
-  color: var(--cr-color-neutral-500);
-}
-
 .pagemenu {
   position: sticky;
   bottom: 0;
@@ -341,15 +315,6 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   width: 100%;
   color: var(--cr-color-neutral-500);
   content: attr(data-placeholder);
-}
-
-.doc-header {
-  top: 0;
-  background: var(--cr-color-header-bg);
-  z-index: 1;
-  & .doc-header-inner {
-    margin: 0 auto;
-  }
 }
 
 .doc-title {

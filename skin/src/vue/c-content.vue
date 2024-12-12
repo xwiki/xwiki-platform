@@ -18,27 +18,19 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
+import CArticle from "./c-article.vue";
 import { ContentTools } from "./contentTools";
-import xavatarImg from "../images/no-one.svg";
 import messages from "../translations";
-import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
 import { PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
-import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
-import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { marked } from "marked";
-import { computed, inject, onUpdated, ref, watch } from "vue";
+import { computed, inject, onUpdated, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
-import type {
-  PageHierarchyItem,
-  PageHierarchyResolverProvider,
-} from "@xwiki/cristal-hierarchy-api";
 import type { ComputedRef, Ref } from "vue";
 
 const { t } = useI18n({
@@ -46,8 +38,6 @@ const { t } = useI18n({
 });
 
 const route = useRoute();
-
-const avImg = xavatarImg;
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const documentService = cristal
@@ -98,26 +88,6 @@ const pageExist = computed(() => {
   return content.value !== undefined;
 });
 
-const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
-watch(
-  currentPage,
-  async (p) => {
-    if (p) {
-      try {
-        breadcrumbItems.value = await cristal
-          .getContainer()
-          .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
-          .get()
-          .getPageHierarchy(p);
-      } catch (e) {
-        console.error(e);
-        breadcrumbItems.value = [];
-      }
-    }
-  },
-  { immediate: true },
-);
-
 onUpdated(() => {
   ContentTools.transformImages(cristal, "xwikicontent");
 
@@ -128,283 +98,90 @@ onUpdated(() => {
 });
 </script>
 <template>
-  <div v-if="loading" class="content-loading">
-    <!-- TODO: improve loading UI. -->
-    <span class="load-spinner"></span>
-    <h3>Loading</h3>
-  </div>
-  <div v-else-if="error" class="content-error">
-    <!-- TODO: improve error reporting. -->
-    {{ error }}
-  </div>
-  <article v-else id="content" ref="root" class="content">
-    <UIX uixname="content.before" />
-
-    <alerts-toasts></alerts-toasts>
-
-    <div class="page-header">
-      <XBreadcrumb class="breadcrumb" :items="breadcrumbItems"></XBreadcrumb>
-      <x-btn circle size="small" variant="primary" color="primary">
-        <c-icon
-          class="new-page"
-          name="plus"
-          :label="t('page.actions.create.label')"
-        ></c-icon>
-      </x-btn>
-    </div>
-
-    <div class="doc-header">
-      <div class="doc-header-inner">
-        <h1 class="doc-title">{{ title }}</h1>
-        <div class="info-wrapper">
-          <span class="doc-author">
-            <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
-            User Name edited on 12/12/2024 at 12:00
-          </span>
-          <!-- TODO: add a way to inject those by extension
-                 and provide one for the number of attachments.
-                It must be reactive whenever the attachment store is updated -->
-          <div class="doc-info-actions">
-            <suspense>
-              <info-actions></info-actions>
-            </suspense>
-
-            <div class="doc-page-actions">
-              <router-link
-                :to="
-                  currentPageRevision
-                    ? ''
-                    : {
-                        name: 'edit',
-                        params: { page: currentPageName },
-                      }
-                "
-              >
-                <x-btn
-                  size="small"
-                  :disabled="currentPageRevision !== undefined"
-                >
-                  <c-icon name="pencil" :size="Size.Small"></c-icon>
-                  Edit
-                </x-btn>
-              </router-link>
-              <page-actions
-                :current-page="currentPage"
-                :current-page-name="currentPageName"
-                :disabled="currentPageRevision !== undefined"
-              ></page-actions>
-            </div>
-          </div>
-        </div>
-        <div class="doc-header-alerts">
-          <!-- Indicate that the page displayed is not the current version. -->
-          <x-alert v-if="currentPageRevision !== undefined" type="warning">
-            {{
-              t("history.alert.content", {
-                revision: currentPageRevision,
-                pageName: currentPageName,
-              })
-            }}
-            <router-link
-              :to="{ name: 'view', params: { page: currentPageName } }"
-              >{{ t("history.alert.link.label") }}
-            </router-link>
-          </x-alert>
-        </div>
+  <c-article
+    :loading="loading"
+    :error="error"
+    :current-page="currentPage"
+    :page-exist="pageExist"
+    before-u-i-x-p-id="content.before"
+    after-u-i-x-p-id="content.after"
+  >
+    <template #title>
+      <h1 class="doc-title">{{ title }}</h1>
+    </template>
+    <template #doc-page-actions>
+      <div class="doc-page-actions">
+        <router-link
+          :to="
+            currentPageRevision
+              ? ''
+              : { name: 'edit', params: { page: currentPageName } }
+          "
+        >
+          <x-btn size="small" :disabled="currentPageRevision !== undefined">
+            <c-icon name="pencil" :size="Size.Small"></c-icon>
+            Edit
+          </x-btn>
+        </router-link>
+        <page-actions
+          :current-page="currentPage"
+          :current-page-name="currentPageName"
+          :disabled="currentPageRevision !== undefined"
+        ></page-actions>
       </div>
-    </div>
-
-    <!-- eslint-disable vue/no-v-html -->
-    <div
-      v-if="pageExist"
-      id="xwikicontent"
-      ref="contentRoot"
-      class="doc-content"
-      v-html="content"
-    ></div>
-    <div v-else class="doc-content unknown-page">
-      <p>
-        The requested page could not be found. You can edit the page to create
-        it.
-      </p>
-    </div>
-    <!-- The footer is not displayed in case of unknown page. -->
-    <div v-if="pageExist" class="doc-info-extra">
-      <!-- Suspense is mandatory here as extra-tabs is asynchronous -->
-      <suspense>
-        <extra-tabs></extra-tabs>
-      </suspense>
-    </div>
-    <suspense>
-      <u-i-extensions uix-name="content.after"></u-i-extensions>
-    </suspense>
-  </article>
+    </template>
+    <template #doc-header-alerts>
+      <!-- Indicate that the page displayed is not the current version. -->
+      <x-alert v-if="currentPageRevision !== undefined" type="warning">
+        {{
+          t("history.alert.content", {
+            revision: currentPageRevision,
+            pageName: currentPageName,
+          })
+        }}
+        <router-link :to="{ name: 'view', params: { page: currentPageName } }"
+          >{{ t("history.alert.link.label") }}
+        </router-link>
+      </x-alert>
+    </template>
+    <template #default>
+      <!-- eslint-disable vue/no-v-html -->
+      <div
+        v-if="pageExist"
+        id="xwikicontent"
+        ref="contentRoot"
+        class="doc-content"
+        v-html="content"
+      ></div>
+      <div v-else class="doc-content unknown-page">
+        <p>
+          The requested page could not be found. You can edit the page to create
+          it.
+        </p>
+      </div>
+    </template>
+  </c-article>
 </template>
 <style scoped>
-@container xwCristal (max-width: 600px) {
-  .content {
-    padding-left: 0 var(--cr-spacing-x-small);
-  }
-}
-
-.content-loading {
-  display: flex;
-  flex-flow: column;
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-}
-
-/*TABLE STYLES*/
-/*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
-:global(.content) {
-  padding: 0 var(--cr-spacing-2x-large);
-  overflow: auto;
-}
-
-:global(.content),
-:global(.content > .edit-wrapper) {
-  display: grid;
-  grid-template-rows: auto auto auto 1fr;
-  gap: var(--cr-spacing-small);
-  scrollbar-gutter: stable;
-  height: 100%;
-}
-
-:global(.content:has(.edit-wrapper)) {
-  grid-template-rows: 1fr;
-}
-
-:global(.content > .edit-wrapper) {
-  grid-template-rows: auto 1fr;
-}
-
-:global(.doc-content),
-:global(.doc-header-inner) {
+.doc-content {
   padding: 0;
+}
+
+.doc-title {
+  grid-area: doc-title;
+  margin: 0;
+  font-size: var(--cr-font-size-2x-large);
+  line-height: var(--cr-font-size-2x-large);
+  padding-block-start: var(--cr-spacing-small);
+}
+
+.doc-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  flex-flow: row;
+  align-items: center;
+  gap: var(--cr-spacing-2x-small);
 }
 
 /*---*/
-
-.content-loading svg {
-  width: 64px;
-  height: 64px;
-}
-
-.content-loading h3 {
-  padding: 0;
-  margin: 0;
-  color: var(--cr-color-neutral-500);
-}
-
-.edit-icon {
-  font-size: 14px;
-}
-
-.new-page {
-  display: block;
-}
-
-.doc-header {
-  top: 0;
-  background: white;
-  z-index: 1;
-
-  & .doc-header-inner {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    gap: var(--cr-spacing-x-small);
-    grid-auto-flow: row;
-    grid-template-areas:
-      "doc-title"
-      "info-wrapper"
-      "alerts";
-    margin: 0 auto;
-
-    & .doc-title {
-      grid-area: doc-title;
-      margin: 0;
-      font-size: var(--cr-font-size-2x-large);
-      line-height: var(--cr-font-size-2x-large);
-      padding-block-start: var(--cr-spacing-small);
-    }
-
-    & .info-wrapper {
-      grid-area: info-wrapper;
-      display: flex;
-      flex-flow: wrap;
-      gap: var(--cr-spacing-small);
-
-      & .doc-author {
-        grid-area: doc-author;
-        margin-inline-end: auto;
-        font-size: var(--cr-font-size-small);
-        color: var(--cr-color-neutral-600);
-
-        & .avatar {
-          --size: 24px;
-        }
-      }
-
-      & .doc-info {
-        grid-area: info-user;
-        display: flex;
-        flex-flow: row;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--cr-spacing-small);
-        color: var(--cr-color-neutral-500);
-        font-size: var(--cr-font-size-small);
-        justify-content: space-between;
-      }
-
-      & .doc-info-actions {
-        display: flex;
-        flex-wrap: wrap;
-        flex-flow: row;
-        align-items: center;
-        gap: var(--cr-spacing-2x-small);
-        justify-self: end;
-
-        & .doc-page-actions {
-          display: flex;
-          flex-wrap: wrap;
-          flex-flow: row;
-          align-items: center;
-          gap: var(--cr-spacing-2x-small);
-        }
-      }
-    }
-  }
-
-  .doc-header-alerts:not(:empty) {
-    margin-top: var(--cr-spacing-x-small);
-  }
-}
-
-.page-header {
-  padding: var(--cr-spacing-small) 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cr-spacing-medium);
-  align-items: center;
-  flex-flow: row;
-}
-
-.inner-content {
-  display: flex;
-  flex-flow: column;
-  flex-basis: auto;
-  overflow: auto;
-}
-
-.doc-info-extra {
-  &.floating {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    box-shadow: var(--cr-shadow-small);
-  }
-}
 </style>

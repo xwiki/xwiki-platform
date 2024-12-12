@@ -66,10 +66,6 @@ export default {
 };
 </script>
 <template>
-  <article id="edit" ref="root" class="content">
-    <UIX uixname="edit.before" />
-    <component :is="component" />
-    <UIX uixname="edit.after" />
-  </article>
+  <component :is="component" />
 </template>
 <style></style>

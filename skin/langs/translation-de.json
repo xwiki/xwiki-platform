@@ -1,0 +1,12 @@
+{
+    "page.creation.menu.button": "Neue Seite",
+    "information.extraTabs.title": "Information",
+    "page.creation.menu.field.name": "Name",
+    "third": "Dritte",
+    "page.creation.menu.title": "Neue Seite",
+    "page.actions.create.label": "Erstelle ein neues Dokument",
+    "page.creation.menu.field.location": "Übergeordneter Speicherort",
+    "history.alert.content": "Du siehst gerade Version {revision} von {pageName}. Die Bearbeitung ist deaktiviert.",
+    "history.alert.link.label": "Klicke hier, um zur neuesten Version zurückzukehren.",
+    "page.creation.menu.submit": "Erstellen"
+}

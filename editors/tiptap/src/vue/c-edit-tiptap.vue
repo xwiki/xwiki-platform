@@ -347,6 +347,9 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   top: 0;
   background: var(--cr-color-header-bg);
   z-index: 1;
+  & .doc-header-inner {
+    margin:0 auto;
+  }
 }
 
 .doc-title {

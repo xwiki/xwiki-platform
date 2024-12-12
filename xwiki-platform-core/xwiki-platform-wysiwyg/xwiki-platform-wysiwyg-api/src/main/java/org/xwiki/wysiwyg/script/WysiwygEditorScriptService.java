@@ -203,7 +203,7 @@ public class WysiwygEditorScriptService implements ScriptService
             // If the source reference is not set, do a best effort by using the security doc reference (i.e. the
             // current document reference since most of the time the content comes from the current document.
             // However, callers of this method are expected to provide a non-null source reference for more accurate
-            // results. We do this because the main caller of this method is the CKEditor extension and it needs to
+            // results. We do this because the main caller of this method is the KEditor extension and it needs to
             // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
             // signature was added) and for simplicity reasons is currently passing null.
             // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this

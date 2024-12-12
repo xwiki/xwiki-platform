@@ -358,7 +358,10 @@
   #if ($mode == 'edit' || $mode == 'create')
     ## We use displayEdit and not display('edit') because we want the input field name to be just the property name
     ## (without the "DocumentReference_objectNumber_" prefix).
-    $annotatedDocument.displayEdit($annotationProperty, '', $annotationObject)
+    #set( $editDisplay = $annotatedDocument.displayEdit($annotationProperty, '', $annotationObject))
+    ## We want to make sure the editor focuses this input on load. By default, this is a textarea.
+    #set($editDisplay = $stringtool.replace("$editDisplay", '&lt;textarea', '&lt;textarea data-focusOnLoad="true"', 1))
+    $editDisplay
   #else
     ## We use display('view') and not displayView because we want the property value to be evaluated in the context of
     ## the annotated document (i.e. isolated), not the current document.

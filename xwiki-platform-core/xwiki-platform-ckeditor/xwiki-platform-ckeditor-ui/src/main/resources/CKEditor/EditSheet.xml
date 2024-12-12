@@ -218,9 +218,11 @@ define('xwiki-ckeditor', [
     }
 
     var uploadDisabled = element.hasAttribute('data-upload-disabled');
+    var focusOnLoad = element.hasAttribute('data-focusOnLoad');
 
     var config = {
       filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
+      startupFocus: focusOnLoad ? '' : true,
       height: $(element).height(),
       // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,

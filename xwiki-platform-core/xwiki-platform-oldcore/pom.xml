@@ -871,7 +871,6 @@
                 **/web/ExportAction.java,
                 **/web/ExportURLFactory.java,
                 **/web/HomePageRedirectServlet.java,
-                **/web/ImportAction.java,
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,

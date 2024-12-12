@@ -26,7 +26,7 @@
 
 /**
  * @type {() => import("electron-builder").Configuration}
- * @see https://www.electron.build/configuration/configuration
+ * @see https://www.electron.build/configuration
  */
 module.exports = async function () {
   const { getVersion } = await import("./version/getVersion.mjs");

@@ -20,44 +20,21 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.UUID;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterException;
-import org.xwiki.filter.event.model.WikiDocumentFilter;
-import org.xwiki.filter.input.BeanInputFilterStream;
-import org.xwiki.filter.input.BeanInputFilterStreamFactory;
-import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
-import org.xwiki.filter.instance.output.InstanceOutputProperties;
-import org.xwiki.filter.output.BeanOutputFilterStream;
-import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
-import org.xwiki.filter.output.OutputFilterStreamFactory;
-import org.xwiki.filter.type.FilterStreamType;
-import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.internal.filter.Importer;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
-import org.xwiki.logging.LoggerManager;
-import org.xwiki.logging.event.LogEvent;
-import org.xwiki.logging.event.LoggerListener;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.xar.XarException;
 import org.xwiki.xar.XarPackage;
 
@@ -65,11 +42,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XARImportedEvent;
-import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSource;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -82,7 +56,9 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class ImportAction extends XWikiAction
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
+    private static final String TEMPLATE_ADMIN = "admin";
+
+    private static final String TEMPLATE_IMPORTED = "imported";
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -102,7 +78,7 @@ public class ImportAction extends XWikiAction
             }
 
             if (name == null) {
-                return "admin";
+                return TEMPLATE_ADMIN;
             }
 
             if ("getPackageInfos".equals(action)) {
@@ -140,9 +116,9 @@ public class ImportAction extends XWikiAction
                 // If the import is done from an AJAX request we don't want to return a whole HTML page,
                 // instead we return "inline" the list of imported documents,
                 // evaluating imported.vm template.
-                return "imported";
+                return TEMPLATE_IMPORTED;
             } else {
-                return "admin";
+                return TEMPLATE_ADMIN;
             }
         }
 
@@ -183,14 +159,21 @@ public class ImportAction extends XWikiAction
     private void importPackageFilterStream(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, FilterException
     {
+        // Define the data source to import
+        @SuppressWarnings("resource")
+        InputSource source = new XWikiAttachmentContentInputSource(packFile.getAttachmentContent(context));
+
+        // Get the history handling stategy
+        String historyStrategy = request.getParameter("historyStrategy");
+
+        // Get the backup switch value
+        boolean importAsBackup = StringUtils.equals(request.getParameter("importAsBackup"), "true");
+
+        // Configure pages to import
+        EntityReferenceSet entities;
         String[] pages = request.getParameterValues("pages");
-
-        XARInputProperties xarProperties = new XARInputProperties();
-        DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
-        instanceProperties.setSaveComment("Imported from XAR");
-
         if (pages != null) {
-            EntityReferenceSet entities = new EntityReferenceSet();
+            entities = new EntityReferenceSet();
 
             EntityReferenceResolver<String> resolver =
                 Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
@@ -207,116 +190,11 @@ public class ImportAction extends XWikiAction
                     }
                 }
             }
-
-            xarProperties.setEntities(entities);
-        }
-
-        // Set the appropriate strategy to handle versions
-        if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
-            instanceProperties.setPreviousDeleted(true);
-            instanceProperties.setVersionPreserved(false);
-            xarProperties.setWithHistory(false);
-        } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
-            instanceProperties.setPreviousDeleted(true);
-            instanceProperties.setVersionPreserved(true);
-            xarProperties.setWithHistory(true);
         } else {
-            instanceProperties.setPreviousDeleted(false);
-            instanceProperties.setVersionPreserved(false);
-            xarProperties.setWithHistory(false);
+            entities = null;
         }
 
-        // Set the backup pack option
-        if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
-            instanceProperties.setAuthorPreserved(true);
-        } else {
-            instanceProperties.setAuthorPreserved(false);
-        }
-
-        BeanInputFilterStreamFactory<XARInputProperties> xarFilterStreamFactory =
-            Utils.getComponent((Type) InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
-        BeanInputFilterStream<XARInputProperties> xarFilterStream =
-            xarFilterStreamFactory.createInputFilterStream(xarProperties);
-
-        BeanOutputFilterStreamFactory<InstanceOutputProperties> instanceFilterStreamFactory =
-            Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
-        BeanOutputFilterStream<InstanceOutputProperties> instanceFilterStream =
-            instanceFilterStreamFactory.createOutputFilterStream(instanceProperties);
-
-        // Notify all the listeners about import
-        ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
-        InputSource source = new XWikiAttachmentContentInputSource(packFile.getAttachmentContent(context));
-        xarProperties.setSource(source);
-
-        // Setup log
-        xarProperties.setVerbose(true);
-        instanceProperties.setVerbose(true);
-        instanceProperties.setStoppedWhenSaveFail(false);
-        LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
-        LogQueue logger = new LogQueue();
-        if (loggerManager != null) {
-            // Isolate log
-            loggerManager.pushLogListener(new LoggerListener(UUID.randomUUID().toString(), logger));
-        }
-
-        observation.notify(new XARImportingEvent(), null, context);
-
-        try {
-            xarFilterStream.read(instanceFilterStream.getFilter());
-
-            xarFilterStream.close();
-            instanceFilterStream.close();
-        } finally {
-            if (loggerManager != null) {
-                // Stop isolating log
-                loggerManager.popLogListener();
-            }
-
-            // Print the import log
-            if (LOGGER.isDebugEnabled()) {
-                logger.log(LOGGER);
-            } else {
-                // TODO: remove when the UI show the log properly
-                for (LogEvent logEvent : logger.getLogsFrom(LogLevel.ERROR)) {
-                    logEvent.log(LOGGER);
-                }
-            }
-
-            // Make sure to free any resource use by the input source in case the input filter does not do it
-            source.close();
-
-            observation.notify(new XARImportedEvent(), null, context);
-        }
-
-        // Generate import report
-        // Emulate old packager report (for retro compatibility)
-        Package oldImporter = new Package();
-        if (logger.containLogsFrom(LogLevel.ERROR)) {
-            context.put("install_status", DocumentInfo.INSTALL_ERROR);
-        } else {
-            context.put("install_status", DocumentInfo.INSTALL_OK);
-        }
-        EntityReferenceSerializer<String> serializer =
-            Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        for (LogEvent log : logger) {
-            Marker marker = log.getMarker();
-            if (marker != null) {
-                if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
-                    || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
-                    oldImporter.getInstalled(context)
-                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
-                } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
-                    oldImporter.getSkipped(context)
-                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
-                } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
-                    Object entity = log.getArgumentArray()[0];
-                    if (entity != null) {
-                        oldImporter.getErrors(context).add(entity instanceof EntityReference
-                            ? serializer.serialize((EntityReference) log.getArgumentArray()[0]) : entity.toString());
-                    }
-                }
-            }
-        }
+        // Execute the import
+        Utils.getComponent(Importer.class).importXAR(source, entities, historyStrategy, importAsBackup, context);
     }
 }

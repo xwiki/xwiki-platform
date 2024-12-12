@@ -280,6 +280,7 @@ org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
 org.xwiki.internal.authentication.LoginLinkUIExtension
 org.xwiki.internal.authentication.RegisterLinkUIExtension
+org.xwiki.internal.filter.Importer
 org.xwiki.internal.document.DocumentOverrideListener
 org.xwiki.internal.document.DocumentRequiredRightsReader
 org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer

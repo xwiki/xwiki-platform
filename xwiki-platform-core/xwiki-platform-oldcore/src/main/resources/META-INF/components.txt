@@ -281,3 +281,6 @@ org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
 org.xwiki.internal.filter.Importer
 org.xwiki.internal.document.DocumentOverrideListener
+org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator
+org.xwiki.query.hql.internal.DefaultHQLStatementValidator
+org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator

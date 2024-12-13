@@ -187,10 +187,10 @@ configs.forEach(
       await expect(newPageDialogButton).toBeEnabled();
       await newPageDialogButton.dispatchEvent("click");
 
-      const editorHeader = page.locator(".edit-wrapper .doc-header input").nth(0);
-      const editorContent = page.locator(".edit-wrapper .doc-content p").nth(0);
+      const editorHeader = page.locator(".content .doc-header input").nth(0);
+      const editorContent = page.locator(".content .doc-content p").nth(0);
       expect(await editorHeader.getAttribute("placeholder")).toEqual("NewPage");
-      expect(editorHeader).toBeEmpty();
+      await expect(editorHeader).toBeEmpty();
       expect(await editorContent.getAttribute("data-placeholder")).toEqual(
         "Type '/' to show the available actions"
       );

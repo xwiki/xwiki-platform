@@ -26,27 +26,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.hibernate.Session;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.NamedSQLQueryDefinition;
 import org.hibernate.query.NativeQuery;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.WrappingQuery;
+import org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator;
+import org.xwiki.query.hql.internal.DefaultHQLStatementValidator;
+import org.xwiki.query.hql.internal.HQLCompleteStatementValidator;
+import org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator;
 import org.xwiki.query.internal.DefaultQuery;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.AfterComponent;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -54,9 +64,9 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,34 +79,57 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class HqlQueryExecutorTest
+@ComponentTest
+@ComponentList({DefaultHQLStatementValidator.class, StandardHQLCompleteStatementValidator.class,
+    ConfigurableHQLCompleteStatementValidator.class})
+class HqlQueryExecutorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<HqlQueryExecutor> mocker =
-        new MockitoComponentMockingRule<>(HqlQueryExecutor.class);
+    @InjectMockComponents
+    private HqlQueryExecutor executor;
 
+    @InjectMockComponents
+    private DefaultHQLStatementValidator defaultValidator;
+
+    @InjectMockComponents
+    private ConfigurableHQLCompleteStatementValidator configurableValidator;
+
+    @MockComponent
     private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private XWikiHibernateStore store;
+
+    @MockComponent
+    private HibernateStore hibernateStore;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiproperties;
+
+    @MockComponent
+    @Named("context")
+    private ComponentManager contextComponentMannager;
 
     private boolean hasProgrammingRight;
 
-    /**
-     * The component under test.
-     */
-    private HqlQueryExecutor executor;
-
-    private XWikiHibernateStore store;
-
-    @Before
-    public void before() throws Exception
+    @AfterComponent
+    public void afterComponent()
     {
-        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
-        when(hibernateStore.getConfiguration()).thenReturn(new Configuration());
-        Metadata metadata = mock(Metadata.class);
-        when(hibernateStore.getConfigurationMetadata()).thenReturn(metadata);
+        when(this.hibernateStore.getConfiguration()).thenReturn(new Configuration());
+        when(this.hibernateStore.getConfigurationMetadata()).thenReturn(mock(Metadata.class));
 
-        this.executor = this.mocker.getComponentUnderTest();
-        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
+        when(this.xwikiproperties.getProperty("query.hql.safe", List.class))
+            .thenReturn(List.of("select normallynotallowed from XWikiDocument as doc where 1=\\d+"));
+        when(this.xwikiproperties.getProperty("query.hql.unsafe", List.class))
+            .thenReturn(List.of("select name from XWikiDocument as doc where 1=\\d+"));
+    }
 
+    @BeforeEach
+    public void beforeEach() throws Exception
+    {
         when(this.authorization.hasAccess(Right.PROGRAM)).then(new Answer<Boolean>()
         {
             @Override
@@ -108,19 +141,21 @@ public class HqlQueryExecutorTest
 
         this.hasProgrammingRight = true;
 
+        when(this.contextComponentMannager
+            .<HQLCompleteStatementValidator>getInstanceList(HQLCompleteStatementValidator.class))
+                .thenReturn(List.of(configurableValidator));
+
         // Actual Hibernate query
 
-        Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
         XWikiContext xwikiContext = mock(XWikiContext.class);
         when(executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xwikiContext);
         when(xwikiContext.getWikiId()).thenReturn("currentwikid");
 
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(xwiki);
-        this.store = mock(XWikiHibernateStore.class);
-        when(xwiki.getHibernateStore()).thenReturn(store);
+        when(xwiki.getHibernateStore()).thenReturn(this.store);
     }
 
     private void execute(String statement, Boolean withProgrammingRights) throws QueryException
@@ -150,20 +185,20 @@ public class HqlQueryExecutorTest
     // Tests
 
     @Test
-    public void completeShortStatementWhenEmpty()
+    void completeShortStatementWhenEmpty()
     {
         assertEquals("select doc.fullName from XWikiDocument doc ", this.executor.completeShortFormStatement(""));
     }
 
     @Test
-    public void completeShortStatementStartingWithWhere()
+    void completeShortStatementStartingWithWhere()
     {
         assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
             this.executor.completeShortFormStatement("where doc.author='XWiki.Admin'"));
     }
 
     @Test
-    public void completeShortStatementStartingWithFrom()
+    void completeShortStatementStartingWithFrom()
     {
         assertEquals(
             "select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
@@ -173,28 +208,28 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void completeShortStatementStartingWithOrderBy()
+    void completeShortStatementStartingWithOrderBy()
     {
         assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
             this.executor.completeShortFormStatement("order by doc.date desc"));
     }
 
     @Test
-    public void completeShortStatementPassingAnAlreadyCompleteQuery()
+    void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
         assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc", this.executor
             .completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 
     @Test
-    public void completeShortStatementPassingAQueryOnSomethingElseThanADocument()
+    void completeShortStatementPassingAQueryOnSomethingElseThanADocument()
     {
         assertEquals("select lock.docId from XWikiLock as lock ",
             this.executor.completeShortFormStatement("select lock.docId from XWikiLock as lock "));
     }
 
     @Test
-    public void setNamedParameter()
+    void setNamedParameter()
     {
         org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "abc";
@@ -205,7 +240,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void setNamedParameterList()
+    void setNamedParameterList()
     {
         org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "foo";
@@ -216,7 +251,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void setNamedParameterArray()
+    void setNamedParameterArray()
     {
         org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "bar";
@@ -227,7 +262,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void populateParameters()
+    void populateParameters()
     {
         org.hibernate.query.Query hquery = mock(org.hibernate.query.Query.class);
         Query query = mock(Query.class);
@@ -253,7 +288,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void executeWhenStoreException() throws Exception
+    void executeWhenStoreException() throws Exception
     {
         XWikiException exception = mock(XWikiException.class);
         when(exception.getMessage()).thenReturn("nestedmessage");
@@ -272,7 +307,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void createNamedNativeHibernateQuery() throws Exception
+    void createNamedNativeHibernateQuery() throws Exception
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
 
@@ -294,8 +329,7 @@ public class HqlQueryExecutorTest
         when(definition.getResultSetRef()).thenReturn("someResultSet");
         when(definition.getName()).thenReturn(query.getStatement());
 
-        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
-        when(hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
+        when(this.hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
             .thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
@@ -304,7 +338,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void createHibernateQueryWhenFilter() throws Exception
+    void createHibernateQueryWhenFilter() throws Exception
     {
         Session session = mock(Session.class);
 
@@ -332,7 +366,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void createHibernateQueryAutomaticallyAddEscapeLikeParametersFilterWhenQueryParameter() throws Exception
+    void createHibernateQueryAutomaticallyAddEscapeLikeParametersFilterWhenQueryParameter() throws Exception
     {
         Session session = mock(Session.class);
         DefaultQuery query = new DefaultQuery("where space like :space", Query.HQL, this.executor);
@@ -342,8 +376,7 @@ public class HqlQueryExecutorTest
         when(filter.filterStatement(anyString(), anyString())).then(returnsFirstArg());
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
-        ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
-        when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
+        when(this.contextComponentMannager.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
         when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.query.Query.class));
 
@@ -355,46 +388,51 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void executeShortWhereHQLQueryWithProgrammingRights() throws QueryException
+    void executeShortWhereHQLQueryWithProgrammingRights() throws QueryException
     {
         execute("where doc.space='Main'", true);
     }
 
     @Test
-    public void executeShortFromHQLQueryWithProgrammingRights() throws QueryException
+    void executeShortFromHQLQueryWithProgrammingRights() throws QueryException
     {
         execute(", BaseObject as obj", true);
     }
 
     @Test
-    public void executeCompleteHQLQueryWithProgrammingRights() throws QueryException
+    void executeCompleteHQLQueryWithProgrammingRights() throws QueryException
     {
         execute("select u from XWikiDocument as doc", true);
-
     }
 
     @Test
-    public void executeNamedQueryWithProgrammingRights() throws QueryException
+    void executeNamedQueryWithProgrammingRights() throws QueryException
     {
         executeNamed("somename", true);
     }
 
     @Test
-    public void executeShortWhereHQLQueryWithoutProgrammingRights() throws QueryException
+    void executeShortWhereHQLQueryWithoutProgrammingRights() throws QueryException
     {
         execute("where doc.space='Main'", false);
     }
 
     @Test
-    public void executeShortFromHQLQueryWithoutProgrammingRights() throws QueryException
+    void executeShortFromHQLQueryWithoutProgrammingRights() throws QueryException
     {
         execute(", BaseObject as obj", false);
+    }
+
+    @Test
+    void executeWhenOverwrittenAllowedSelect() throws Exception
+    {
+        execute("select normallynotallowed from XWikiDocument as doc where 1=42", false);
     }
 
     // Not allowed
 
     @Test
-    public void executeWhenNotAllowedSelect() throws Exception
+    void executeWhenNotAllowedSelect() throws Exception
     {
         try {
             execute("select notallowed.name from NotAllowedTable notallowed", false);
@@ -408,7 +446,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void executeDeleteWithoutProgrammingRight() throws Exception
+    void executeDeleteWithoutProgrammingRight() throws Exception
     {
         try {
             execute("delete from XWikiDocument as doc", false);
@@ -420,7 +458,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void executeNamedQueryWithoutProgrammingRight() throws Exception
+    void executeNamedQueryWithoutProgrammingRight() throws Exception
     {
         try {
             executeNamed("somename", false);
@@ -432,7 +470,7 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    public void executeUpdateWithoutProgrammingRight() throws Exception
+    void executeUpdateWithoutProgrammingRight() throws Exception
     {
         try {
             execute("update XWikiDocument set name='name'", false);
@@ -440,6 +478,19 @@ public class HqlQueryExecutorTest
         } catch (QueryException expected) {
             assertEquals(
                 "The query requires programming right. Query statement = [update XWikiDocument set name='name']",
+                expected.getCause().getMessage());
+        }
+    }
+
+    @Test
+    void executeWhenOverwrittenUnsafeSelect() throws Exception
+    {
+        try {
+            execute("select name from XWikiDocument as doc where 1=42", false);
+        } catch (QueryException expected) {
+            assertEquals(
+                "The query requires programming right."
+                    + " Query statement = [select name from XWikiDocument as doc where 1=42]",
                 expected.getCause().getMessage());
         }
     }

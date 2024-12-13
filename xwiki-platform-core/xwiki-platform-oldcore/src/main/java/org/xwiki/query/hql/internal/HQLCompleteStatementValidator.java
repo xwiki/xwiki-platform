@@ -26,6 +26,10 @@ import org.xwiki.query.QueryException;
 
 /**
  * A component in charge of validating a passed HQL statement.
+ * <p>
+ * Note that since the {@code standard} validator always gives an answer, any extra validator must have a priority value
+ * lower than the default one ({@link org.xwiki.component.descriptor.ComponentDescriptor#DEFAULT_PRIORITY} to have a
+ * chance to be called.
  * 
  * @version $Id$
  * @since 17.0.0RC1

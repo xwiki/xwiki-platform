@@ -29,8 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.phase.Initializable;
@@ -48,16 +46,13 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 @Component
 @Singleton
-@Named("configuration")
+@Named("configurable")
 @Priority(ComponentDescriptor.DEFAULT_PRIORITY - 100)
 public class ConfigurableHQLCompleteStatementValidator implements HQLCompleteStatementValidator, Initializable
 {
     @Inject
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
-
-    @Inject
-    private Logger logger;
 
     private List<Pattern> unsafe;
 
@@ -70,7 +65,7 @@ public class ConfigurableHQLCompleteStatementValidator implements HQLCompleteSta
         this.safe = getPatterns("query.hql.safe");
     }
 
-    private List<Pattern> getPatterns(String key)
+    private List<Pattern> getPatterns(String key) throws InitializationException
     {
         List<String> patternStrings = this.configuration.getProperty(key, List.class);
 
@@ -81,8 +76,8 @@ public class ConfigurableHQLCompleteStatementValidator implements HQLCompleteSta
                 try {
                     patterns.add(Pattern.compile(patternString));
                 } catch (Exception e) {
-                    this.logger.warn("Failed to parse pattern [{}] for configuration [{}]: {}", patternString, key,
-                        ExceptionUtils.getRootCauseMessage(e));
+                    throw new InitializationException(
+                        String.format("Failed to parse pattern [%s] for configuration [%s]", patternString, key), e);
                 }
             }
         } else {

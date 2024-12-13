@@ -143,8 +143,11 @@ class AutoSaver extends EventEmitter {
     }
   }
 
-  async save(): Promise<void> {
-    const authors = this.getAuthors();
+  /**
+   * @param providedAuthors - provide a set of user when manually triggering this save.
+   */
+  async save(providedAuthors?: User[]): Promise<void> {
+    const authors = providedAuthors ?? this.getAuthors();
     if (authors.length == 0) {
       console.debug("Nothing to save.");
       return;

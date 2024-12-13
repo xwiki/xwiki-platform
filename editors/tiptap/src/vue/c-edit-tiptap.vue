@@ -37,6 +37,7 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { CArticle } from "@xwiki/cristal-skin";
+import { debounce } from "lodash";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { computed, inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -212,6 +213,21 @@ watch(
     }
   },
   { immediate: true },
+);
+
+// Trigger a save whenever the title is edited.
+// Otherwise, the title will not be updated unless the content is updated too.
+watch(
+  title,
+  debounce(
+    async () =>
+      await editor.value?.storage.cristalCollaborationKit.autoSaver.save([
+        {
+          name: currentUser.name,
+        },
+      ]),
+    500,
+  ),
 );
 </script>
 

@@ -21,7 +21,7 @@
     "@xwiki/cristal-electron-authentication-xwiki-preload": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "22.10.1",
+    "@types/node": "22.10.2",
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "typescript": "5.6.3",

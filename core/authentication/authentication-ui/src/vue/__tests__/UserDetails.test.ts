@@ -112,6 +112,6 @@ describe("UserDetails", () => {
     // to assert the rendered content.
     await flushPromises();
 
-    expect(userDetails.text()).eq("userDetails.error");
+    expect(userDetails.find("span").text()).eq("userDetails.error");
   });
 });

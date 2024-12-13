@@ -139,9 +139,14 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
       },
     };
 
-    await axios.post(logoutUrl, {}, data);
-    Cookies.remove(this.getTokenTypeCookieKey());
-    Cookies.remove(this.getAccessTokenCookieKey());
+    try {
+      await axios.post(logoutUrl, {}, data);
+    } catch (e) {
+      console.error("Failed to log out on the remote server", e);
+    } finally {
+      Cookies.remove(this.getTokenTypeCookieKey());
+      Cookies.remove(this.getAccessTokenCookieKey());
+    }
   }
 
   async getAuthorizationHeader(): Promise<string | undefined> {

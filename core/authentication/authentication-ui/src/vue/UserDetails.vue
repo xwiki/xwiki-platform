@@ -51,9 +51,9 @@ function logout() {
     <i18n-t keypath="userDescription" tag="span">
       <a :href="profile">{{ name }}</a>
     </i18n-t>
-    <br />
-    <br />
-    <x-btn variant="danger" @click.prevent="logout">{{ t("logout") }}</x-btn>
   </template>
   <span v-else>{{ t("userDetails.error") }}</span>
+  <br />
+  <br />
+  <x-btn variant="danger" @click.prevent="logout">{{ t("logout") }}</x-btn>
 </template>

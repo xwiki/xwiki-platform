@@ -39,7 +39,7 @@ importers:
         version: 5.2.1(vite@6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.6.3))
       '@vitest/coverage-v8':
         specifier: 2.1.8
-        version: 2.1.8(vitest@2.1.8(@types/node@22.10.2)(happy-dom@14.12.0))
+        version: 2.1.8(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))
       concurrently:
         specifier: 9.1.0
         version: 9.1.0
@@ -64,6 +64,9 @@ importers:
       eslint-plugin-vue:
         specifier: 9.32.0
         version: 9.32.0(eslint@9.16.0)
+      happy-dom:
+        specifier: 15.11.7
+        version: 15.11.7
       nx:
         specifier: 20.2.2
         version: 20.2.2
@@ -87,7 +90,7 @@ importers:
         version: 4.3.0(@types/node@22.10.2)(rollup@4.27.4)(typescript@5.6.3)(vite@6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1))
       vitest:
         specifier: 2.1.8
-        version: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+        version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
       vue-eslint-parser:
         specifier: 9.4.3
         version: 9.4.3(eslint@9.16.0)
@@ -375,7 +378,7 @@ importers:
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
-        version: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+        version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -1263,7 +1266,7 @@ importers:
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
-        version: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+        version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
 
   core/model/model-reference/model-reference-api:
     dependencies:
@@ -1354,7 +1357,7 @@ importers:
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
-        version: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+        version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
 
   core/model/model-remote-url/model-remote-url-api:
     dependencies:
@@ -2882,7 +2885,7 @@ importers:
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
       vitest:
         specifier: 2.1.8
-        version: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+        version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -5989,9 +5992,9 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  happy-dom@14.12.0:
-    resolution: {integrity: sha512-dHcnlGFY2o2CdxfuYpqwSrBrpj/Kuzv4u4f3TU5yHW1GL24dKij4pv1BRjXnXc3uWo8qsCbToF9weaDsm/He8A==}
-    engines: {node: '>=16.0.0'}
+  happy-dom@15.11.7:
+    resolution: {integrity: sha512-KyrFvnl+J9US63TEzwoiJOQzZBJY7KgBushJA8X61DMbNsH+2ONkDuLDnCnwUiPTF42tLoEmrPyoqbenVA5zrg==}
+    engines: {node: '>=18.0.0'}
 
   has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
@@ -9748,7 +9751,7 @@ snapshots:
       vite: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
       vue: 3.5.13(typescript@5.6.3)
 
-  '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@types/node@22.10.2)(happy-dom@14.12.0))':
+  '@vitest/coverage-v8@2.1.8(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -9762,7 +9765,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.8(@types/node@22.10.2)(happy-dom@14.12.0)
+      vitest: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -11691,12 +11694,11 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  happy-dom@14.12.0:
+  happy-dom@15.11.7:
     dependencies:
       entities: 4.5.0
       webidl-conversions: 7.0.0
       whatwg-mimetype: 3.0.0
-    optional: true
 
   has-bigints@1.0.2: {}
 
@@ -13754,7 +13756,7 @@ snapshots:
       tsx: 4.19.2
       yaml: 2.6.1
 
-  vitest@2.1.8(@types/node@22.10.2)(happy-dom@14.12.0):
+  vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7):
     dependencies:
       '@vitest/expect': 2.1.8
       '@vitest/mocker': 2.1.8(vite@5.4.11(@types/node@22.10.2))
@@ -13778,7 +13780,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.10.2
-      happy-dom: 14.12.0
+      happy-dom: 15.11.7
     transitivePeerDependencies:
       - less
       - lightningcss
@@ -13857,15 +13859,13 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  webidl-conversions@7.0.0:
-    optional: true
+  webidl-conversions@7.0.0: {}
 
   webpack-sources@3.2.3: {}
 
   webpack-virtual-modules@0.6.1: {}
 
-  whatwg-mimetype@3.0.0:
-    optional: true
+  whatwg-mimetype@3.0.0: {}
 
   when-exit@2.1.3: {}
 

@@ -26,7 +26,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@shoelace-style/shoelace": "2.19.0",
+    "@shoelace-style/shoelace": "2.19.1",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",

@@ -32,6 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.query.Query;
+import org.xwiki.query.WrappingQuery;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -342,5 +344,51 @@ public final class HqlQueryUtils
 
             convertedString = builder.toString();
         }
+    }
+
+    /**
+     * @param statement a potentially short form statement to complete
+     * @return a complete version of the input {@link Query} (or the {@link Query} as is if it's already complete)
+     * @since 17.0.0RC1
+     * @since 16.10.2
+     * @since 15.10.16
+     * @since 16.4.6
+     */
+    public static String toCompleteStatement(String statement)
+    {
+        String completeStatement = statement;
+
+        if (StringUtils.isEmpty(statement) || isShortFormStatement(statement)) {
+            completeStatement = "select doc.fullName from XWikiDocument doc " + statement.trim();
+        }
+
+        return completeStatement;
+    }
+
+    /**
+     * @param query a potentially short form query to complete
+     * @return a complete version of the input {@link Query} (or the {@link Query} as is if it's already complete)
+     * @since 17.0.0RC1
+     * @since 16.10.2
+     * @since 15.10.16
+     * @since 16.4.6
+     */
+    public static Query toCompleteQuery(Query query)
+    {
+        Query completeQuery = query;
+
+        String completeStatement = toCompleteStatement(query.getStatement());
+        if (completeStatement != query.getStatement()) {
+            completeQuery = new WrappingQuery(query)
+            {
+                @Override
+                public String getStatement()
+                {
+                    return completeStatement;
+                }
+            };
+        }
+
+        return completeQuery;
     }
 }

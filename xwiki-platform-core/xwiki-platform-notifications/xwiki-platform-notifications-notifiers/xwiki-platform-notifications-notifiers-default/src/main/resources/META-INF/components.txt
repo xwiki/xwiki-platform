@@ -6,6 +6,7 @@ org.xwiki.notifications.notifiers.internal.UserEventManager
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayer
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerComponentBuilder
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerDocumentInitializer
+org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerRequiredRightAnalyzer
 org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.notifiers.internal.email.DefaultPeriodicMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.EmailTemplateRenderer

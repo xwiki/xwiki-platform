@@ -50,7 +50,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link XObjectDisplayerProvider}.
+ * Unit tests for {@link BaseCollectionBlockSupplierProvider}.
  * 
  * @version $Id$
  */
@@ -62,14 +62,14 @@ import static org.mockito.Mockito.when;
     PlainTextBlockParser.class,
     PlainTextStreamParser.class
 })
-class XObjectDisplayerProviderTest
+class BaseCollectionBlockSupplierProviderTest
 {
     @Inject
     @Named("event/1.0")
     private BlockRenderer eventRenderer;
 
     @InjectMockComponents
-    private XObjectDisplayerProvider provider;
+    private BaseCollectionBlockSupplierProvider provider;
 
     @Test
     void getWithNormalProperties()

@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.FormatBlock;
@@ -39,20 +40,24 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.listener.Format;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
- * Provider for a displayer for an XObject.
+ * Provider for a displayer for an XObject or XClass.
  *
  * @version $Id$
- * @since 15.9RC1
+ * @since 15.10.16
+ * @since 16.4.7
+ * @since 16.10.2
  */
 @Component
 @Singleton
-public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<BaseObject>
+public class BaseCollectionBlockSupplierProvider
+    extends AbstractBlockSupplierProvider<BaseCollection<? extends EntityReference>>
 {
     @Inject
     private Provider<XWikiContext> xWikiContextProvider;
@@ -61,7 +66,7 @@ public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<Base
     private ContextualLocalizationManager contextualLocalizationManager;
 
     @Override
-    public Supplier<Block> get(BaseObject object, Object... parameters)
+    public Supplier<Block> get(BaseCollection<? extends EntityReference> object, Object... parameters)
     {
         // Get and thereby store the values that require a context, so we can be sure we get them in the context of
         // the document that has the object.
@@ -81,9 +86,15 @@ public class XObjectDisplayerProvider extends AbstractBlockSupplierProvider<Base
             })
             .collect(Collectors.toList());
 
-        List<PropertyDisplay> deprecatedPropertyNamesValues = xClass.getDeprecatedObjectProperties(object).stream()
-            .map(p -> new PropertyDisplay(p.getName(), null, p.getValue().toString(), false))
-            .collect(Collectors.toList());
+        List<PropertyDisplay> deprecatedPropertyNamesValues;
+
+        if (object instanceof BaseObject baseObject) {
+            deprecatedPropertyNamesValues = xClass.getDeprecatedObjectProperties(baseObject).stream()
+                .map(p -> new PropertyDisplay(p.getName(), null, p.getValue().toString(), false))
+                .collect(Collectors.toList());
+        } else {
+            deprecatedPropertyNamesValues = List.of();
+        }
 
         Translation removedPropertiesMessage =
             this.contextualLocalizationManager.getTranslation("core.editors.object.removeDeprecatedProperties.info");

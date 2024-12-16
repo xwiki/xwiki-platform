@@ -93,6 +93,7 @@ const attachmentsStore: AttachmentsStoreDefinition = defineStore<
       } else {
         this.unknownPage = true;
         this.attachments = [];
+        this.count = 0;
       }
     },
     setError(error: string) {

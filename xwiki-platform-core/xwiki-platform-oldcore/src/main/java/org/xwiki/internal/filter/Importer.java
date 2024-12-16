@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.xwiki.component.annotation.Component;
@@ -120,51 +121,55 @@ public class Importer
         xarProperties.setVerbose(true);
         instanceProperties.setVerbose(true);
         instanceProperties.setStoppedWhenSaveFail(false);
-        LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
-        LogQueue importLogger = new LogQueue();
-        if (loggerManager != null) {
-            // Isolate log
-            loggerManager.pushLogListener(new LoggerListener(UUID.randomUUID().toString(), importLogger));
-        }
 
-        // Create the streams
-        BeanInputFilterStream<XARInputProperties> xarFilterStream = createXARFilterStream(xarProperties);
-        BeanOutputFilterStream<InstanceOutputProperties> instanceFilterStream =
-            createInstanceFilterStream(instanceProperties);
-
-        // Notify listeners about import beginning
-        this.observation.notify(new XARImportingEvent(), null, context);
-
-        try {
-            xarFilterStream.read(instanceFilterStream.getFilter());
-
-            xarFilterStream.close();
-            instanceFilterStream.close();
-        } finally {
+        try (LogQueue importLogger = new LogQueue()) {
+            LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
             if (loggerManager != null) {
-                // Stop isolating log
-                loggerManager.popLogListener();
+                // Isolate log
+                loggerManager.pushLogListener(new LoggerListener(UUID.randomUUID().toString(), importLogger));
             }
 
-            // Print the import log
-            if (this.logger.isDebugEnabled()) {
-                importLogger.log(this.logger);
-            } else {
-                // TODO: remove when the UI show the log properly
-                for (LogEvent logEvent : importLogger.getLogsFrom(LogLevel.ERROR)) {
-                    logEvent.log(this.logger);
+            // Create the streams
+            BeanInputFilterStream<XARInputProperties> xarFilterStream = createXARFilterStream(xarProperties);
+            BeanOutputFilterStream<InstanceOutputProperties> instanceFilterStream =
+                createInstanceFilterStream(instanceProperties);
+
+            // Notify listeners about import beginning
+            this.observation.notify(new XARImportingEvent(), null, context);
+
+            try {
+                xarFilterStream.read(instanceFilterStream.getFilter());
+
+                xarFilterStream.close();
+                instanceFilterStream.close();
+            } finally {
+                if (loggerManager != null) {
+                    // Stop isolating log
+                    loggerManager.popLogListener();
                 }
+
+                // Print the import log
+                if (this.logger.isDebugEnabled()) {
+                    importLogger.log(this.logger);
+                } else {
+                    // TODO: remove when the UI show the log properly
+                    for (LogEvent logEvent : importLogger.getLogsFrom(LogLevel.ERROR)) {
+                        logEvent.log(this.logger);
+                    }
+                }
+
+                // Make sure to free any resource use by the input source in case the input filter does not do it
+                source.close();
+
+                // Notify listeners about import end
+                this.observation.notify(new XARImportedEvent(), null, context);
             }
 
-            // Make sure to free any resource use by the input source in case the input filter does not do it
-            source.close();
-
-            // Notify listeners about import end
-            this.observation.notify(new XARImportedEvent(), null, context);
+            // Generate import report
+            generateReport(importLogger, context);
+        } catch (Exception e) {
+            this.logger.warn("Failed to close the log queue: {}", ExceptionUtils.getRootCauseMessage(e));
         }
-
-        // Generate import report
-        generateReport(importLogger, context);
     }
 
     private BeanInputFilterStream<XARInputProperties> createXARFilterStream(XARInputProperties xarProperties)

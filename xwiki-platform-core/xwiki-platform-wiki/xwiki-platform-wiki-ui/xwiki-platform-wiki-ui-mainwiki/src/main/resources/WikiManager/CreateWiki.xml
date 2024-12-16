@@ -562,7 +562,7 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
   #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
-  {{html}}
+  {{html clean="false"}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
     &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
@@ -583,15 +583,21 @@
       &lt;/div&gt;
       #end
       #set($hasErrors = $status.logTail.hasLogLevel('ERROR'))
-      &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
-      &lt;/p&gt;
-      &lt;p class="warningmessage box #if(!$hasErrors || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
-      &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
-      &lt;/p&gt;
+      {{/html}}
+      
+      {{success cssClass="successMessage #if($status.error || $state != 'FINISHED')hidden#end"}}
+        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+      {{/success}}
+      
+      {{warning cssClass="errorlogMessage #if(!$hasErrors || $state != 'FINISHED')hidden#end"}}
+        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+      {{/warning}}
+      
+      {{error cssClass="errorMessage #if(!$status.error || $state != 'FINISHED')hidden#end"}}
+        {{html}}$services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"]){{/html}}
+      {{/error}}
+      
+      {{html clean="false"}}
     &lt;/div&gt;
     ## Log
     #template('logging_macros.vm')
@@ -660,18 +666,20 @@
     #end
   #else
     #set($wikiId = $request.wikiId)
-    {{html}}
+    {{html clean="false"}}
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
       &lt;div class="wizard-body"&gt;
+      {{/html}}
         #if($request.deleteOk)
-          &lt;p class="successmessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
+          {{success}}
+            {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
+          {{/success}}
         #else
-          &lt;p class="errormessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
+          {{error}}
+            {{html}}$services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"]){{/html}}
+          {{/error}}
         #end
+        {{html clean="false"}}
       &lt;/div&gt;
       &lt;/form&gt;
     {{/html}}
@@ -1126,13 +1134,13 @@ XWiki.WikiCreationStatusBar = Class.create({
       $('ui-progress').addClassName('hidden');
       // We need to know if we have error
       if (response.error.length &gt; 0) {
-        $('errorMessage').removeClassName('hidden');
+        $('.errorMessage').removeClassName('hidden');
         $('cleanUp').removeClassName('hidden');
       } else {
         // Success
-        $('successMessage').removeClassName('hidden');
+        $('.successMessage').removeClassName('hidden');
         if (response.hasErrorLog) {
-          $('errorlogMessage').removeClassName('hidden');
+          $('.errorlogMessage').removeClassName('hidden');
           $('cleanUp').removeClassName('hidden');
         }
         $('finalize').removeClassName('hidden');

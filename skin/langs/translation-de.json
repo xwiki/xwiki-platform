@@ -8,5 +8,6 @@
     "page.creation.menu.field.location": "Übergeordneter Speicherort",
     "history.alert.content": "Du siehst gerade Version {revision} von {pageName}. Die Bearbeitung ist deaktiviert.",
     "history.alert.link.label": "Klicke hier, um zur neuesten Version zurückzukehren.",
-    "page.creation.menu.submit": "Erstellen"
+    "page.creation.menu.submit": "Erstellen",
+    "article.loading": "Lädt..."
 }

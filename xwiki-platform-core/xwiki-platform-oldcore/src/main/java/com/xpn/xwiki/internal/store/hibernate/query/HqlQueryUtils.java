@@ -378,7 +378,10 @@ public final class HqlQueryUtils
         Query completeQuery = query;
 
         String completeStatement = toCompleteStatement(query.getStatement());
-        if (completeStatement != query.getStatement()) {
+        // Check of toCompleteStatement returned a different String (which means it completed it)
+        @SuppressWarnings("java:S4973")
+        boolean isCompleted = completeStatement != query.getStatement();
+        if (isCompleted) {
             completeQuery = new WrappingQuery(query)
             {
                 @Override

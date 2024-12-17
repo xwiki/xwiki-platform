@@ -44,15 +44,13 @@
     ## We are editing the class so the content must be read from / written to the template document.
     #set ($name = 'templateContent')
     #set ($editedDocument = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template"))
-    ## Don't load the WYSIWYG editor when editing the class, because it's too heavy.
-    #set ($useWysiwygEditor = false)
   #else
     ## We are editing an application entry so the content must be read from / written to the current document.
     #set ($name = 'content')
     #set ($editedDocument = $tdoc)
-    ## Use the preferred content editor.
-    #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   #end
+  ## Use the preferred content editor.
+  #set ($useWysiwygEditor = $xwiki.getUserPreference('editor') == 'Wysiwyg')
   {{html clean="false"}}
   #if (!$useWysiwygEditor)
     &lt;div id="xwikieditcontentinner"&gt;

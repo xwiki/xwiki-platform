@@ -47,14 +47,20 @@ class WikiManagerRestIT
     @Order(1)
     void testCreateWiki(TestUtils setup) throws Exception
     {
+        setup.createUser("CreateWikiTest", "CreateWikiTestPWD", null);
+        setup.login("CreateWikiTest", "CreateWikiTestPWD");
         String wikiId = "foo";
 
         Wiki wiki = new Wiki();
         wiki.setId(wikiId);
+        wiki.setName("test");
+        wiki.setName("Some description");
+        PostMethod postMethod = setup.rest().executePost(WikiManagerREST.class, wiki);
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, postMethod.getStatusCode());
 
         // Need admin right to create a wiki
         setup.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
-        PostMethod postMethod = setup.rest().executePost(WikiManagerREST.class, wiki);
+        postMethod = setup.rest().executePost(WikiManagerREST.class, wiki);
         assertEquals(HttpStatus.SC_CREATED, postMethod.getStatusCode());
 
         try (InputStream stream = postMethod.getResponseBodyAsStream()) {

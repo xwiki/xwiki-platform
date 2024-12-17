@@ -33,7 +33,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageAttachmentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -549,7 +548,6 @@ public interface DocumentAccessBridge
      * @since 14.10.8
      * @since 15.3RC1
      */
-    @Unstable
     default void setAttachmentContent(AttachmentReference attachmentReference, InputStream attachmentData)
         throws Exception
     {

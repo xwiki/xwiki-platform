@@ -40,23 +40,13 @@
 
 {{velocity output="false"}}
 #macro (display4Cards $cards)
-  &lt;div class="row"&gt;
+  &lt;ul class="card-list"&gt;
     #foreach ($card in $cards)
-      ## See http://getbootstrap.com/css/#grid-responsive-resets .
-      #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 2 == 0)
-        &lt;div class="clearfix visible-sm-block "&gt;&lt;/div&gt;
-      #end
-      #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 3 == 0)
-        &lt;div class="clearfix visible-md-block"&gt;&lt;/div&gt;
-      #end
-      #if ($foreach.index &gt; 0 &amp;&amp; $foreach.index % 4 == 0)
-        &lt;div class="clearfix visible-lg-block"&gt;&lt;/div&gt;
-      #end
-      &lt;div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"&gt;
+      &lt;li class='card'&gt;
         #helpExampleCard($card)
-      &lt;/div&gt;
+      &lt;/li&gt;
     #end
-  &lt;/div&gt;
+  &lt;/ul&gt;
 #end
 
 #set ($howToCards = [{

@@ -44,8 +44,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skinx.internal.async.SkinExtensionAsync;
 import org.xwiki.test.LogLevel;
@@ -116,7 +116,7 @@ class CssSkinExtensionPluginTest
     private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -205,9 +205,9 @@ class CssSkinExtensionPluginTest
         when(ext2.getAuthorReference()).thenReturn(author);
         when(ext3.getAuthorReference()).thenReturn(author);
 
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, author, referenceExt1)).thenReturn(true);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, author, referenceExt2)).thenReturn(false);
-        when(this.authorizationManager.hasAccess(Right.PROGRAM, author, referenceExt3)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt1)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt2)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.PROGRAM, null, author, referenceExt3)).thenReturn(true);
 
         when(this.entityReferenceSerializer.serialize(referenceExt1)).thenReturn("extension1");
         when(this.entityReferenceSerializer.serialize(referenceExt3)).thenReturn("extension3");
@@ -255,7 +255,8 @@ class CssSkinExtensionPluginTest
 
         DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "Foo");
         when(document.getAuthorReference()).thenReturn(userReference);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(true);
 
         this.skinExtensionPlugin.use(resource, parameters, context);
         String className = CssSkinExtensionPlugin.class.getCanonicalName();
@@ -269,7 +270,8 @@ class CssSkinExtensionPluginTest
         expectedParameters.put(resource, parameters);
 
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference);
         verify(this.skinExtensionAsync).use("ssx", resource, parameters);
 
         String resource2 = "MySpace.MyOtherSSXPage";
@@ -286,7 +288,8 @@ class CssSkinExtensionPluginTest
 
         DocumentReference userReference2 = new DocumentReference("xwiki", "XWiki", "Bar");
         when(document2.getAuthorReference()).thenReturn(userReference2);
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2)).thenReturn(false);
 
         this.skinExtensionPlugin.use(resource2, parameters2, context);
         resources = (Set<String>) context.get(className);
@@ -294,14 +297,16 @@ class CssSkinExtensionPluginTest
         parametersMap =
             (Map<String, Map<String, Object>>) context.get(className + "_parameters");
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.authorizationManager).hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2);
         verify(this.skinExtensionAsync, never()).use("ssx", resource2, parameters2);
 
         assertEquals(1, this.logCapture.size());
         assertEquals("Extensions present in [MySpace.MyOtherSSXPage] ignored because of lack of script right "
             + "from the author.", this.logCapture.getMessage(0));
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference2, documentReference2)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2,
+            documentReference2)).thenReturn(true);
         this.skinExtensionPlugin.use(resource2, parameters2, context);
 
         Set<String> expectedSet = new HashSet<>();
@@ -314,7 +319,8 @@ class CssSkinExtensionPluginTest
         parametersMap =
             (Map<String, Map<String, Object>>) context.get(className + "_parameters");
         assertEquals(expectedParameters, parametersMap);
-        verify(this.authorizationManager, times(2)).hasAccess(Right.SCRIPT, userReference2, documentReference2);
+        verify(this.authorizationManager, times(2))
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference2, documentReference2);
         verify(this.skinExtensionAsync).use("ssx", resource2, null);
 
         parameters2 = Collections.singletonMap("buzValue", 42);
@@ -373,15 +379,18 @@ class CssSkinExtensionPluginTest
         when(currentDoc.getDocumentReference()).thenReturn(documentReference);
         when(currentDoc.getAuthorReference()).thenReturn(userReference);
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(false);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(false);
         assertFalse(this.skinExtensionPlugin.hasPageExtensions(context));
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, userReference, documentReference);
+        verify(this.authorizationManager)
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference);
 
         assertEquals(1, this.logCapture.size());
         assertEquals("Extensions present in [xwiki:MySpace.SomePage] ignored because of lack of script right "
             + "from the author.", this.logCapture.getMessage(0));
 
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, userReference, documentReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, userReference, documentReference))
+            .thenReturn(true);
         assertTrue(this.skinExtensionPlugin.hasPageExtensions(context));
     }
 }

@@ -19,102 +19,76 @@
  */
 package org.xwiki.annotation.content;
 
-import static org.junit.Assert.assertEquals;
+import java.util.stream.Stream;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer;
+import org.xwiki.annotation.internal.content.filter.WhiteSpaceFilter;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.of;
 
 /**
- * Tests the {@link org.xwiki.annotation.internal.content.SpaceNormalizerContentAlterer}.
+ * Tests the {@link SpaceNormalizerContentAlterer}.
  *
  * @version $Id$
  * @since 2.3M1
  */
-@RunWith(Parameterized.class)
-public class SpaceNormalizerContentAltererTest extends AbstractComponentTestCase
+@ComponentTest
+@ComponentList({ WhiteSpaceFilter.class })
+class SpaceNormalizerContentAltererTest
 {
-    /**
-     * The initial String to alter.
-     */
-    private String initial;
-
-    /**
-     * The expected altered string.
-     */
-    private String altered;
-
     /**
      * The content alterer to test.
      */
-    private ContentAlterer alterer;
+    @InjectMockComponents
+    private SpaceNormalizerContentAlterer alterer;
 
-    /**
-     * @param initial the original string
-     * @param altered the altered string after being whitespace filtered
-     */
-    public SpaceNormalizerContentAltererTest(String initial, String altered)
+    public static Stream<Arguments> filteringSource()
     {
-        this.initial = initial;
-        this.altered = altered;
-    }
+        return Stream.of(
+            // unbreakable space
+            of("not\u00A0to be", "not to be"),
+            // tabs
+            of("to be or not\tto be", "to be or not to be"),
+            // commas, signs with regular spaces
+            of("roses, see I in her cheeks;", "roses, see I in her cheeks;"),
+            // new lines
+            of("eyes nothing\nlike the sun", "eyes nothing like the sun"),
+            // new line carriage return
+            of("eyes\n\rnothing", "eyes nothing"),
+            // multiple spaces one after the other
+            of("roses, see I   in her cheeks;", "roses, see I in her cheeks;"),
+            of("roses, see I\u00A0  in her cheeks;", "roses, see I in her cheeks;"),
+            of("roses, see I\n  \n in her cheeks;", "roses, see I in her cheeks;"),
+            // trim
+            of(" roses, see I in her cheeks; ", "roses, see I in her cheeks;"),
+            of("\n\n\nroses, see I in her cheeks;", "roses, see I in her cheeks;"),
+            of("roses, see I in her cheeks;\n\n", "roses, see I in her cheeks;"),
+            // starting or ending with a non-breakable space
+            of("\u00A0roses, see I in her cheeks;", "roses, see I in her cheeks;"),
+            of("roses, see I in her cheeks;\u00A0", "roses, see I in her cheeks;"),
 
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        alterer = getComponentManager().getInstance(ContentAlterer.class, "space-normalizer");
-    }
-
-    /**
-     * @return list of corpus files to instantiate tests for
-     */
-    @Parameters
-    public static Collection<String[]> data()
-    {
-        Collection<String[]> params = new ArrayList<String[]>();
-        // unbreakable space
-        params.add(new String[] {"not\u00A0to be", "not to be"});
-        // tabs
-        params.add(new String[] {"to be or not\tto be", "to be or not to be"});
-        // commas, signs with regular spaces
-        params.add(new String[] {"roses, see I in her cheeks;", "roses, see I in her cheeks;"});
-        // new lines
-        params.add(new String[] {"eyes nothing\nlike the sun", "eyes nothing like the sun"});
-        // new line carriage return
-        params.add(new String[] {"eyes\n\rnothing", "eyes nothing"});
-        // multiple spaces one after the other
-        params.add(new String[] {"roses, see I   in her cheeks;", "roses, see I in her cheeks;"});
-        params.add(new String[] {"roses, see I\u00A0  in her cheeks;", "roses, see I in her cheeks;"});
-        params.add(new String[] {"roses, see I\n  \n in her cheeks;", "roses, see I in her cheeks;"});
-        // trim
-        params.add(new String[] {" roses, see I in her cheeks; ", "roses, see I in her cheeks;"});
-        params.add(new String[] {"\n\n\nroses, see I in her cheeks;", "roses, see I in her cheeks;"});
-        params.add(new String[] {"roses, see I in her cheeks;\n\n", "roses, see I in her cheeks;"});
-        // starting or ending with a non-breakable space
-        params.add(new String[] {"\u00A0roses, see I in her cheeks;", "roses, see I in her cheeks;"});
-        params.add(new String[] {"roses, see I in her cheeks;\u00A0", "roses, see I in her cheeks;"});
-
-        // empty string should stay empty string
-        params.add(new String[] {"", ""});
-        // spaces only string should become empty string
-        params.add(new String[] {" \t\n", ""});
-
-        return params;
+            // empty string should stay empty string
+            of("", ""),
+            // spaces only string should become empty string
+            of(" \t\n", "")
+        );
     }
 
     /**
      * Tests that the content alterer filters correctly the characters out of the Strings.
      */
-    @Test
-    public void testFiltering()
+    @ParameterizedTest
+    @MethodSource("filteringSource")
+    public void filtering(String initial, String altered)
     {
-        AlteredContent alteredContent = alterer.alter(initial);
+        AlteredContent alteredContent = this.alterer.alter(initial);
         assertEquals(altered, alteredContent.getContent().toString());
     }
 

@@ -77,6 +77,9 @@ public class ResetPasswordCompletePage extends ViewPage
     public void setPasswordConfirmation(String newPasswordConfirmation)
     {
         this.newPasswordConfirmationField.sendKeys(newPasswordConfirmation);
+        getDriver().waitUntilCondition(
+            driver -> !this.newPasswordConfirmationField.getAttribute("class").isEmpty()
+        );
     }
 
     public ResetPasswordCompletePage clickSave()

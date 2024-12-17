@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -101,5 +102,16 @@ class XWikiWebSocketRequestStubTest
         when(handshakeRequest.isUserInRole("tester")).thenReturn(true);
         assertFalse(stub.isUserInRole("developer"));
         assertTrue(stub.isUserInRole("tester"));
+    }
+
+    @Test
+    void staleRequest()
+    {
+        HandshakeRequest handshakeRequest = mock(HandshakeRequest.class);
+        when(handshakeRequest.isUserInRole(anyString())).thenThrow(new RuntimeException("Stale request"));
+
+        XWikiWebSocketRequestStub stub = new XWikiWebSocketRequestStub(handshakeRequest);
+
+        assertFalse(stub.isUserInRole("admin"));
     }
 }

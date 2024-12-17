@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
 
 /**
  * The content of a template.
@@ -93,7 +92,6 @@ public interface TemplateContent
      * @since 15.0RC1
      * @since 14.10.1
      */
-    @Unstable
     default Collection<String> getPropertyNames()
     {
         return Collections.emptyList();

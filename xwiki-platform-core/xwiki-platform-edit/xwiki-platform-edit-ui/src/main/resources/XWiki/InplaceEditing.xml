@@ -499,11 +499,9 @@ define('editInPlace', [
     return editInPlace({
       lockFailed: function() {
         // Revert the changes done on #xwikicontent.
-        $('#xwikicontent').removeAttr('tabindex').children(':header').children('.edit_section').removeClass('hidden');
+        $('#xwikicontent').children(':header').children('.edit_section').removeClass('hidden');
       },
       afterEdit: function() {
-        // We don't need the tabindex attribute anymore now that the content is editable.
-        $('#xwikicontent').removeAttr('tabindex');
         if (sectionId) {
           // Select the heading of the specified section.
           $('#xwikicontent &gt; #' + $.escapeSelector(sectionId)).each(function() {
@@ -1214,8 +1212,15 @@ require(['jquery'], function($) {
       // Return the id of the edited section.
       return $(event.target).closest(':header').attr('id');
     },
-    edit: function(editInPlace, sectionId) {
-      return editInPlace.editSection(sectionId);
+    edit: async function(editInPlace, sectionId) {
+      try {
+        return await editInPlace.editSection(sectionId);
+      } finally {
+        // We have to remove the tabindex attribute ourselves because CKEditor restores at the end the attributes it
+        // finds on the editable element before initialization (and we're setting the tab index above before loading the
+        // editor).
+        $('#xwikicontent').removeAttr('tabindex');
+      }
     }
   }, onInPlaceEditing);
 

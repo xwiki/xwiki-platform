@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>16.4.6-SNAPSHOT</version>
+    <version>16.4.6</version>
   </parent>
   <artifactId>xwiki-platform-tool-provision-plugin</artifactId>
   <name>XWiki Platform - Tools - Provision</name>

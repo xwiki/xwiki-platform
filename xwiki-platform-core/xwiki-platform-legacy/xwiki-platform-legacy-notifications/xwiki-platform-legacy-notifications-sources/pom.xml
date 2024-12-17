@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy-notifications</artifactId>
-    <version>16.4.6-SNAPSHOT</version>
+    <version>16.4.6</version>
   </parent>
   <artifactId>xwiki-platform-legacy-notifications-sources</artifactId>
   <name>XWiki Platform - Legacy - Notifications - Sources</name>

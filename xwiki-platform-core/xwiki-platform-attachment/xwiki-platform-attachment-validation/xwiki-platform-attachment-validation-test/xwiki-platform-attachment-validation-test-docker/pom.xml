@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-attachment-validation-test</artifactId>
-    <version>16.4.6-SNAPSHOT</version>
+    <version>16.4.6</version>
   </parent>
   <artifactId>xwiki-platform-attachment-validation-test-docker</artifactId>
   <name>XWiki Platform - Attachment - Validation - Tests - Functional Tests in Docker</name>

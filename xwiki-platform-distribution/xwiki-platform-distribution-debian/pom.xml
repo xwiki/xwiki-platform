@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>16.4.6-SNAPSHOT</version>
+    <version>16.4.6</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian</artifactId>
   <name>XWiki Platform - Distribution - Debian</name>
@@ -70,7 +70,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-resources</artifactId>
-      <version>16.4.6-SNAPSHOT</version>
+      <version>16.4.6</version>
     </dependency>
   </dependencies>
   <build>

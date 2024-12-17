@@ -49,4 +49,8 @@ export class AttachmentsInfoAction implements InfoAction {
       page || this.cristalApp.getCurrentPage(),
     );
   }
+
+  async enabled(): Promise<boolean> {
+    return true;
+  }
 }

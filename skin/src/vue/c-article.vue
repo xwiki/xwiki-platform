@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import xavatarImg from "../images/no-one.svg";
 import messages from "../translations";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
 import { PageData } from "@xwiki/cristal-api";
 import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
-import { CIcon } from "@xwiki/cristal-icons";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { Ref, inject, ref, watch } from "vue";
@@ -15,7 +13,6 @@ import type {
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
 
-const avImg = xavatarImg;
 const { t } = useI18n({
   messages,
 });
@@ -68,13 +65,6 @@ watch(
 
     <div class="page-header">
       <XBreadcrumb class="breadcrumb" :items="breadcrumbItems"></XBreadcrumb>
-      <x-btn circle size="small" variant="primary" color="primary">
-        <c-icon
-          class="new-page"
-          name="plus"
-          :label="t('page.actions.create.label')"
-        ></c-icon>
-      </x-btn>
     </div>
 
     <div class="doc-header">
@@ -82,8 +72,7 @@ watch(
         <slot name="title"></slot>
         <div class="info-wrapper">
           <span class="doc-author">
-            <x-avatar class="avatar" :image="avImg" size="2rem"></x-avatar>
-            User Name edited on 12/12/2024 at 12:00
+            <!-- Add last edition information (CRISTAL-371). -->
           </span>
           <!-- TODO: add a way to inject those by extension
                  and provide one for the number of attachments.

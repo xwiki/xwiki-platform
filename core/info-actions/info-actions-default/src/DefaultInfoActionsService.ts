@@ -26,7 +26,7 @@ import { injectable, multiInject } from "inversify";
 import { sortBy } from "lodash";
 
 /**
- * Default implementation of InfoActionsService. Returns the list of available
+ * Default implementation of InfoActionsService. Returns the list of enabled
  * info action components sorted by ascending order.
  *
  * @since 0.9
@@ -36,6 +36,12 @@ export class DefaultInfoActionsService implements InfoActionsService {
   constructor(@multiInject("InfoAction") private infoActions: InfoAction[]) {}
 
   async list(): Promise<InfoAction[]> {
-    return sortBy(this.infoActions, ["order"]);
+    const enabledInfoActions: boolean[] = await Promise.all(
+      this.infoActions.map(async (tab) => tab.enabled()),
+    );
+    return sortBy(
+      this.infoActions.filter((_, i) => enabledInfoActions[i]),
+      ["order"],
+    );
   }
 }

@@ -38,6 +38,12 @@ interface InfoAction {
    * @since 0.10
    */
   refresh?(page?: string): Promise<void>;
+
+  /**
+   * Compute whether the InfoAction should be displayed or not.
+   * @since 0.13
+   */
+  enabled(): Promise<boolean>;
 }
 
 /**

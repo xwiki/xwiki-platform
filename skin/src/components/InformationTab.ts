@@ -40,6 +40,11 @@ class InformationExtraTab extends AbstractExtraTab {
   async panel(): Promise<Component> {
     return InformationTab;
   }
+
+  override async enabled(): Promise<boolean> {
+    // TODO: Fix CRISTAL-372 to enable it.
+    return false;
+  }
 }
 
 export { InformationExtraTab };

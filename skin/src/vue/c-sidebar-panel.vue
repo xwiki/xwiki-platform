@@ -18,8 +18,6 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
-import { CIcon, Size } from "@xwiki/cristal-icons";
-
 defineProps<{
   name: string;
 }>();
@@ -28,7 +26,6 @@ defineProps<{
   <div class="c-sidebar-panel">
     <div class="header">
       <span class="title">{{ name }}</span>
-      <c-icon name="list-nested" :size="Size.Small"></c-icon>
     </div>
     <div class="sidebar-content">
       <slot></slot>

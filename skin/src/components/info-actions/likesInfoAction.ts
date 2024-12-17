@@ -31,4 +31,9 @@ export class LikesInfoAction implements InfoAction {
   async counter() {
     return ref(99);
   }
+
+  async enabled(): Promise<boolean> {
+    // TODO: Fix CRISTAL-370 to enable it.
+    return false;
+  }
 }

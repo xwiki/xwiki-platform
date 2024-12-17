@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-transformations</artifactId>
-    <version>16.4.6</version>
+    <version>16.4.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-transformation-icon</artifactId>
   <name>XWiki Platform - Rendering - Transformations - Icon</name>

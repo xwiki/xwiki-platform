@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.6</version>
+    <version>16.4.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-attachment</artifactId>
   <name>XWiki Platform - Attachment - Parent POM</name>

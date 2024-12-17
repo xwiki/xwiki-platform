@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user</artifactId>
-    <version>16.4.6</version>
+    <version>16.4.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-user-script</artifactId>
   <name>XWiki Platform - User - Script</name>

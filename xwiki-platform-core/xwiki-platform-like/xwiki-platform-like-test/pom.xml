@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-like</artifactId>
-    <version>16.4.6</version>
+    <version>16.4.7-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-like-test</artifactId>
   <name>XWiki Platform - Like - Test - Parent POM</name>

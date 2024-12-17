@@ -153,6 +153,7 @@ widgets.Notification = Class.create({
       this.timer = null;
     }
     notification.show();
+    return notification;
   }
 });
 

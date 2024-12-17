@@ -37,7 +37,8 @@ define('xwiki-realtime-loader', [
   }
 
   let module = {
-    isForced: window.location.href.indexOf('force=1') >= 0
+    isForced: window.location.href.indexOf('force=1') >= 0,
+    connectionStatusNotification: new XWiki.widgets.Notification('', '', {inactive: true}),
   },
 
   // FIXME: The real-time JavaScript code is not loaded anymore on the "lock" page so this code is not really used. We
@@ -499,26 +500,6 @@ define('xwiki-realtime-loader', [
     }
   },
 
-  displayWsWarning = function(isError) {
-    const $after = getBoxPosition();
-    if (unload || warningVisible || !$after.length) {
-      return;
-    }
-    warningVisible = true;
-    const type = isError ? 'errormessage' : 'warningmessage';
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-warning xwiki-realtime-box box ' + type
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.wsError).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.wsErrorInfo).appendTo($warning);
-    if (module.isForced) {
-      $('<br/>').appendTo($warning);
-      $('<span></span>').text(Messages.wsErrorConflicts).appendTo($warning);
-    }
-  },
-
   hideWarning = function() {
     warningVisible = false;
     $('.xwiki-realtime-warning').remove();
@@ -541,48 +522,6 @@ define('xwiki-realtime-loader', [
         }));
       }
     }
-  },
-
-  connectingVisible = false,
-  displayConnecting = function() {
-    const $after = getBoxPosition();
-    if (unload || connectingVisible || !$after.length) {
-      return;
-    }
-    connectingVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-connecting xwiki-realtime-box box infomessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.connectingBox).appendTo($warning);
-  },
-
-  hideConnecting = function() {
-    warningVisible = false;
-    $('.xwiki-realtime-connecting').remove();
-    resize();
-  },
-
-  wsErrorVisible = false,
-  displayWsError = function() {
-    const $after = getBoxPosition();
-    if (unload || wsErrorVisible || !$after.length) {
-      return;
-    }
-    wsErrorVisible = true;
-    const $warning = $('<div></div>', {
-      'class': 'xwiki-realtime-disconnected xwiki-realtime-box box errormessage'
-    }).insertAfter($after);
-    scrollToBox($warning);
-    $('<strong></strong>').text(Messages.connectionLost).appendTo($warning);
-    $('<br/>').appendTo($warning);
-    $('<span></span>').text(Messages.connectionLostInfo).appendTo($warning);
-  },
-
-  hideWsError = function() {
-    wsErrorVisible = false;
-    $('.xwiki-realtime-disconnected').remove();
-    resize();
   },
 
   tryParse = function(message) {
@@ -743,16 +682,28 @@ define('xwiki-realtime-loader', [
       }
     });
     // On reconnect, join the "all" channel again.
-    network.on('reconnect', () => {
+    network.on('reconnect', async () => {
       hideWarning();
-      hideWsError();
+      module.connectionStatusNotification = module.connectionStatusNotification.replace(
+        new XWiki.widgets.Notification(Messages.connectingBox, 'inprogress'));
       module.ready = joinAllUsers();
+      try {
+        await module.ready;
+        module.connectionStatusNotification.hide();
+      } catch (error) {
+        module.connectionStatusNotification = module.connectionStatusNotification.replace(
+          new XWiki.widgets.Notification(Messages.wsError, 'error'));
+        console.error(error);
+      }
     });
     network.on('disconnect', () => {
-      if (RealtimeContext.getRealtimeEditedFields().length) {
-        displayWsError();
-      } else if (Object.keys(RealtimeContext.instances).length) {
-        displayWsWarning();
+      if (Object.keys(RealtimeContext.instances).length) {
+        let message = Messages.connectionLost;
+        if (RealtimeContext.getRealtimeEditedFields().length) {
+          message += ' ' + Messages.connectionLostInfo;
+        }
+        module.connectionStatusNotification = module.connectionStatusNotification.replace(
+          new XWiki.widgets.Notification(message, 'warning'));
       }
     });
     return network;
@@ -776,12 +727,6 @@ define('xwiki-realtime-loader', [
       // Then join the new channel.
       module.ready = joinAllUsers();
     }
-  },
-
-  onError = error => {
-    allRt.error = true;
-    displayWsWarning();
-    console.error(error);
   },
 
   beforeLaunchRealtime = function(realtimeContext) {
@@ -818,17 +763,19 @@ define('xwiki-realtime-loader', [
     },
 
     whenReady: async function(callback) {
-      displayConnecting();
-      maybeRejoinAllUsers();
+      hideWarning();
+      module.connectionStatusNotification = module.connectionStatusNotification.replace(
+        new XWiki.widgets.Notification(Messages.connectingBox, 'inprogress'));
       try {
+        maybeRejoinAllUsers();
         await module.ready;
+        module.connectionStatusNotification.hide();
         callback(true);
       } catch (error) {
-        hideWarning();
-        onError(error);
+        module.connectionStatusNotification = module.connectionStatusNotification.replace(
+          new XWiki.widgets.Notification(Messages.wsError, 'error'));
+        console.error(error);
         callback(false);
-      } finally {
-        hideConnecting();
       }
     },
 

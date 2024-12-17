@@ -357,7 +357,7 @@
 #macro(displayAnnotationProperty $annotatedDocument $annotationObject $annotationProperty $mode)
   #if ($mode == 'edit' || $mode == 'create')
     ## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
-    #set( $startupFocus = true)
+    #set ($startupFocus = true)
     ## We use displayEdit and not display('edit') because we want the input field name to be just the property name
     ## (without the "DocumentReference_objectNumber_" prefix).
     $annotatedDocument.displayEdit($annotationProperty, '', $annotationObject)

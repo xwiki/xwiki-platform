@@ -83,6 +83,8 @@ export class DefaultCristalApp implements CristalApp {
   public isElectron: boolean;
   public availableConfigurations: Map<string, WikiConfig>;
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   constructor(
     @inject("ExtensionManager") extensionManager: ExtensionManager,
     @inject("SkinManager") skinManager: SkinManager,
@@ -232,6 +234,8 @@ export class DefaultCristalApp implements CristalApp {
    * content is allowed. When undefinied, default to true.
    * @since 0.8
    */
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async loadPage(options?: { requeue: boolean }): Promise<void> {
     try {
       this.logger?.debug("Loading page", this.page.name);
@@ -392,6 +396,8 @@ export class DefaultCristalApp implements CristalApp {
     return page;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async run(): Promise<void> {
     this.logger?.debug("Before vue");
 

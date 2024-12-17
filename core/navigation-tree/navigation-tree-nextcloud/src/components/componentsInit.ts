@@ -81,6 +81,8 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   private async getSubDirectories(directory: string): Promise<Array<string>> {
     const subdirectories: Array<string> = [];
     try {

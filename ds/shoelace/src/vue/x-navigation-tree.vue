@@ -120,6 +120,8 @@ async function onDocumentDelete(page: PageData) {
   }
 }
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function onDocumentUpdate(page: PageData) {
   const parents = treeSource.getParentNodesId(page);
 

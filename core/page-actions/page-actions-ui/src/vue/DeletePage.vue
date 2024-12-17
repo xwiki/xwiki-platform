@@ -49,6 +49,8 @@ const documentService = cristal
   .get<DocumentService>("DocumentService");
 const deleteDialogOpen: Ref<boolean> = ref(false);
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function deletePage() {
   const hierarchy: Array<PageHierarchyItem> = await cristal
     .getContainer()

@@ -27,6 +27,8 @@ import type { PageData } from "@xwiki/cristal-api";
  * @returns the parents nodes ids
  * @since 0.10
  **/
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 export function getParentNodesIdFromPath(page?: PageData): Array<string> {
   const result: Array<string> = [];
   if (page) {

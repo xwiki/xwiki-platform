@@ -84,6 +84,8 @@ export class WrappingOfflineStorage implements WrappingStorage {
     return this.storage.getImageURL(page, image);
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async getPageContent(
     page: string,
     syntax: string,
@@ -151,6 +153,8 @@ export class WrappingOfflineStorage implements WrappingStorage {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async updatePageContent(
     page: string,
     syntax: string,

@@ -69,6 +69,8 @@ import { ComponentInit as UIExtensionDefaultComponentInit } from "@xwiki/cristal
 import type { Container } from "inversify";
 
 export class StaticBuild {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public static init(
     container: Container,
     forceStaticBuild: boolean,

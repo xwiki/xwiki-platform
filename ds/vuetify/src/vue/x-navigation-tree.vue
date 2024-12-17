@@ -90,6 +90,8 @@ onBeforeMount(async () => {
 
 watch(() => props.currentPage, expandTree);
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function expandTree() {
   if (props.currentPage && !isExpanding) {
     isExpanding = true;
@@ -160,6 +162,8 @@ function clearSelection() {
   }
 }
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function onDocumentDelete(page: PageData) {
   const parents = treeSource.getParentNodesId(page);
   let currentItems: TreeItem[] | undefined = rootNodes.value;
@@ -179,6 +183,8 @@ async function onDocumentDelete(page: PageData) {
   }
 }
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function onDocumentUpdate(page: PageData) {
   const parents = treeSource.getParentNodesId(page);
   let currentParent: string | undefined = undefined;

@@ -25,6 +25,8 @@ import type { App } from "vue";
 
 @injectable()
 export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   loadDesignSystem(app: App): void {
     registerAsyncComponent(app, "XLoad", () => import("../vue/x-load.vue"));
     registerAsyncComponent(app, "XAvatar", () => import("../vue/x-avatar.vue"));

@@ -34,6 +34,8 @@ class XWikiRemoteURLParser implements RemoteURLParser {
     @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
   ) {}
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   parse(urlStr: string): EntityReference {
     const baseURLstr = this.cristalApp.getWikiConfig().baseURL;
     if (!urlStr.startsWith(baseURLstr)) {

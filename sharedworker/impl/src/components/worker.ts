@@ -89,6 +89,8 @@ export class Worker implements MyWorker {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async handleQueueItem(page: string): Promise<void> {
     console.log("Handling queue item code ready to process", page);
 
@@ -142,6 +144,8 @@ export class Worker implements MyWorker {
     return this.queue.length;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public getWikiConfig(configName: string): WikiConfig | undefined {
     const wikiConfigObject = this.configMap.get(configName);
     if (wikiConfigObject == null) {
@@ -191,6 +195,8 @@ export class Worker implements MyWorker {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async initialize(): Promise<void> {
     console.log("Starting initialize");
     const extensionList: Array<string> = ["storage"];

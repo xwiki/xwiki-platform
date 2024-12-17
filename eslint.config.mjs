@@ -77,6 +77,7 @@ export default [
       "import/group-exports": "error",
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
       curly: "error",
+      "max-statements": "error",
     },
   },
   {

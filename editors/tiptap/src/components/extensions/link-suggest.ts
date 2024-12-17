@@ -97,10 +97,11 @@ function loadLinkSuggest(
 /**
  * Build a function returning an array of link suggestions from a string.
  * @param linkSuggest - the link suggestion service to use
- * @param wikiConfig - the wiki configuration to use
  */
 function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
   // Return an array of suggestions from a query
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   return async function ({
     query,
   }: {
@@ -186,6 +187,8 @@ function renderItems(
 
         return false;
       },
+      // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+      // eslint-disable-next-line max-statements
       onStart(props: {
         items: LinkSuggestionActionDescriptor[];
         editor: Editor;

@@ -65,6 +65,8 @@ class DefaultClickListener implements ClickListener {
     );
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   handleURL(url: string, href?: string): void {
     const remoteURLParser = this.remoteURLParserProvider.get()!;
     const modelReferenceSerializer =

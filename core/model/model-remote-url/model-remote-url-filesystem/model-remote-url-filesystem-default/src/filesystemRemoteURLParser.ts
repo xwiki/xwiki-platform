@@ -30,6 +30,8 @@ import { injectable } from "inversify";
 
 @injectable()
 class FileSystemRemoteURLParser implements RemoteURLParser {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   parse(urlStr: string): EntityReference | undefined {
     const startWithFilesystemProtocol = urlStr.startsWith(`${protocol}://`);
     if (!startWithFilesystemProtocol && urlStr.includes("://")) {

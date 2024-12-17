@@ -45,6 +45,8 @@ export class CristalLoader {
     return logger;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async loadExtensionManager(
     staticExtensionManager: boolean,
   ): Promise<void> {
@@ -84,6 +86,8 @@ export class CristalLoader {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async loadExtensions(
     staticExtensionManager: boolean,
     staticBuild: boolean,

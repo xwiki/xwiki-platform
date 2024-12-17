@@ -76,6 +76,8 @@ export class GitHubStorage extends AbstractStorage {
     return "" + hash;
   };
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getPageContent(
     page: string,
     syntax: string,

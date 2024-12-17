@@ -28,6 +28,8 @@ import type { App } from "vue";
 
 @injectable()
 export class DSFRDesignSystemLoader implements DesignSystemLoader {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   loadDesignSystem(app: App): void {
     // Loading specific components from DSFR
     app.use(VueDsfr);

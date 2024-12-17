@@ -23,6 +23,8 @@ import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 describe("x-alert", () => {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   it("has a description", () => {
     const xAlert = shallowMount(XAlert, {
       props: {

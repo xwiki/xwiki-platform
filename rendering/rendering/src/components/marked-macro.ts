@@ -45,6 +45,8 @@ const macro: TokenizerExtension | RendererExtension = {
   start(this: TokenizerThis, src: string) {
     return src.match(startReg)?.index;
   },
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   tokenizer(src: string): Tokens.Generic | undefined {
     const lines = src.split(/\n/);
     let endReg = null;

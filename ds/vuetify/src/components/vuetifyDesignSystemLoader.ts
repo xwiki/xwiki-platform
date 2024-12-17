@@ -33,6 +33,8 @@ import type { App } from "vue";
 
 @injectable()
 export class VuetifyDesignSystemLoader implements DesignSystemLoader {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   loadDesignSystem(app: App): void {
     /*
         // Manuel importing to reduce build size

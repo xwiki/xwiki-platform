@@ -30,6 +30,8 @@ import type { PageHierarchyItem } from "@xwiki/cristal-hierarchy-api";
  * @returns the page hierarchy
  * @since 0.10
  **/
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 export async function getPageHierarchyFromPath(
   pageData: PageData,
   cristalApp: CristalApp,

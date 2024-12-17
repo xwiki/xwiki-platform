@@ -68,6 +68,8 @@ export class DefaultExtensionManager
     this.remoteExtensionDefaultEntryFile = remoteExtensionDefaultEntryFile;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async loadExtension(
     extensionName: string,
     container: Container,

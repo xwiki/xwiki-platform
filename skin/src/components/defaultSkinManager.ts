@@ -44,6 +44,8 @@ export class DefaultSkinManager implements SkinManager {
   public templates: Map<string, Component>;
   public designSystem: string = "";
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   constructor() {
     this.templates = new Map<string, Component>();
     this.templates.set("view", View);

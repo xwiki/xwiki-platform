@@ -37,6 +37,8 @@ export abstract class DefaultMacroProvider
     return "vue";
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   parseParameters(element: HTMLElement): MacroData {
     const macroData = new DefaultMacroData();
     const attrs = element.getAttributeNames();

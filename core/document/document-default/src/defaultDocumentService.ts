@@ -85,6 +85,8 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
         this.document = undefined;
         this.error = undefined;
       },
+      // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+      // eslint-disable-next-line max-statements
       async update(
         documentReference: string,
         requeue: boolean,

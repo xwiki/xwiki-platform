@@ -263,6 +263,8 @@ export class ContentTools {
    *     \<!--[CDATA[This is a warning message]]--\>
    *   \</pre\>
    */
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public static transformMacros(
     element: HTMLElement,
     cristal: CristalApp,

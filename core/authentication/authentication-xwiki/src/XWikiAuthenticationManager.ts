@@ -45,6 +45,8 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
 
   private readonly accessTokenCookieKeyPrefix = "accessToken";
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   start(): void {
     const config = this.cristalApp.getWikiConfig();
     const authorizationUrl = new URL(`${config.baseURL}/oidc/authorization`);
@@ -71,6 +73,8 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
     window.location.href = authorizationUrl.toString();
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async callback(): Promise<void> {
     const href = new URL(window.location.href);
     const code = href.searchParams.get("code");

@@ -58,6 +58,8 @@ class CristalAppLoader extends CristalLoader {
     super(extensionList);
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async loadApp<T>(
     config: { [s: string]: T },
     isElectron: boolean,
@@ -114,6 +116,8 @@ class CristalAppLoader extends CristalLoader {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   public async launchApp(
     forceStaticMode: boolean,
     loadConfig: () => Promise<Record<string, Primitive>>,

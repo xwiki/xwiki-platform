@@ -37,6 +37,8 @@ export class NextcloudLinkSuggestService implements LinkSuggestService {
     @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
   ) {}
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getLinks(query: string): Promise<Link[]> {
     const baseRestURL = this.cristalApp
       .getWikiConfig()

@@ -146,6 +146,8 @@ class AutoSaver extends EventEmitter {
   /**
    * @param providedAuthors - provide a set of user when manually triggering this save.
    */
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async save(providedAuthors?: User[]): Promise<void> {
     const authors = providedAuthors ?? this.getAuthors();
     if (authors.length == 0) {

@@ -33,6 +33,8 @@ export default {
       logger = cristal.getLogger("skin.vue.editor");
     }
   },
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   data() {
     logger?.debug("Editor UIX components are ", comps);
     if (!comps || comps.length == 0) {

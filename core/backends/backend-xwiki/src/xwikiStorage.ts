@@ -123,6 +123,8 @@ export class XWikiStorage extends AbstractStorage {
     return imageURL;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getPageContent(
     page: string,
     syntax: string,
@@ -219,6 +221,8 @@ export class XWikiStorage extends AbstractStorage {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getPanelContent(panel: string, contextPage: string): Promise<PageData> {
     const url =
       this.wikiConfig.baseURL +
@@ -239,6 +243,8 @@ export class XWikiStorage extends AbstractStorage {
     return panelContentData;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getEditField(document: Document, fieldName: string): Promise<string> {
     // http://localhost:15680/xwiki/bin/get/Blog/BlogIntroduction?xpage=display&mode=edit&property=Blog.BlogPostClass.category
     // http://localhost:15680/xwiki/bin/get/Help/Applications/Movies/Modern%20Times?xpage=display&mode=edit&property=Help.Applications.Movies.Code.MoviesClass%5B0%5D.staticList1&type=object&language=

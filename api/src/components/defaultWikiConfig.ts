@@ -102,6 +102,8 @@ export class DefaultWikiConfig implements WikiConfig {
     this.designSystem = configObject.designSystem;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   setupOfflineStorage(): void {
     this.logger.debug("Checking offline storage");
     if (this.offline && this.cristal) {

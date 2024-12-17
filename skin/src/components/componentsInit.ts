@@ -38,6 +38,8 @@ import type { Container } from "inversify";
 export default class ComponentInit {
   logger: Logger;
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   constructor(container: Container) {
     this.logger = container.get<Logger>("Logger");
     this.logger.setModule("skin.components.componentsInit");

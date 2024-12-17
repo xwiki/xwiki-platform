@@ -49,6 +49,8 @@ class XWikiPageRevisionManager implements PageRevisionManager {
     this.logger.setModule("history.xwiki.XWikiPageRevisionManager");
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getRevisions(
     pageData: PageData,
     limit?: number,
@@ -135,6 +137,8 @@ class XWikiPageRevisionManager implements PageRevisionManager {
     }
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   private async getUserName(userId: string): Promise<UserDetails> {
     const restApiUrl =
       getRestSpacesApiUrl(this.cristalApp.getWikiConfig(), userId) +

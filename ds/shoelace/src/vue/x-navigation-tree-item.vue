@@ -86,6 +86,8 @@ async function lazyLoadChildren() {
   current.value?.removeAttribute("lazy");
 }
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function expandTree(nodesToExpand: string[]) {
   if (nodesToExpand[0] == props.node.id) {
     if (nodesToExpand.length > 1) {
@@ -128,6 +130,8 @@ function onDocumentDelete(parents: string[]) {
   }
 }
 
+// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+// eslint-disable-next-line max-statements
 async function onDocumentUpdate(parents: string[]) {
   for (const i of nodes.value.keys()) {
     if (nodes.value[i].id == parents[0]) {

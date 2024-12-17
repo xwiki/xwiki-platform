@@ -33,6 +33,8 @@ import { injectable } from "inversify";
 export class FileSystemModelReferenceSerializer
   implements ModelReferenceSerializer
 {
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   serialize(reference?: EntityReference): string | undefined {
     if (!reference) {
       return undefined;

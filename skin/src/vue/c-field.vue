@@ -50,6 +50,8 @@ export default defineComponent({
     mode: { type: String, required: true },
     type: { type: String, required: false, default: () => undefined },
   },
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   setup(props) {
     const cristal = inject<CristalApp>("cristal")!;
     logger = cristal.getLogger("skin.vue.field");

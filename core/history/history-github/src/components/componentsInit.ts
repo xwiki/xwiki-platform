@@ -42,6 +42,8 @@ class GitHubPageRevisionManager implements PageRevisionManager {
     this.logger.setModule("history-github.GitHubPageRevisionManager");
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getRevisions(pageData: PageData): Promise<Array<PageRevision>> {
     const revisions: Array<PageRevision> = [];
     if (pageData) {

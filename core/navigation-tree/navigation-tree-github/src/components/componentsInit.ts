@@ -49,6 +49,8 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
     this.cristalApp = cristalApp;
   }
 
+  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
+  // eslint-disable-next-line max-statements
   async getChildNodes(id?: string): Promise<Array<NavigationTreeNode>> {
     const currentId = id ? id : "";
     const navigationTree: Array<NavigationTreeNode> = [];

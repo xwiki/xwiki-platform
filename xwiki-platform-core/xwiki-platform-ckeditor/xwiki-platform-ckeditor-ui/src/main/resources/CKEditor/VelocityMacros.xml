@@ -206,11 +206,11 @@
   #if ($source.restricted == 'true' &amp;&amp; !$services.security.authorization.hasAccess('edit', $source.documentReference))
     #set ($parameters.attributes.data-upload-disabled = 'true')
   #end
-  ## We use the velocity template context to convey the focusOnLoad parameter to our specificCKEditor.
-  #if($focusOnLoad)
-    #set ($parameters.attributes.data-focus-on-load = 'true')
+  ## We use the velocity template context to convey the startupFocus parameter to CKEditor.
+  #if($startupFocus)
+    #set ($parameters.attributes.data-startup-focus = 'true')
     ## We make sure to clear this context so that it doesn't interfere with CKEditors opened later.
-    #set ($focusOnLoad = 'false')
+    #set ($startupFocus = false)
   #end
   ##
   &lt;textarea

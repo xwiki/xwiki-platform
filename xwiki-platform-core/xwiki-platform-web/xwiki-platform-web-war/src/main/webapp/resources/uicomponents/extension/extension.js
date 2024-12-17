@@ -498,8 +498,8 @@ XWiki.ExtensionBehaviour = Class.create({
         // Remove the unknown icon.
         dependency.removeChild(dependency.childNodes[1]);
         // Add the load icon
-        let loadPath = '$xwiki.getSkinFile("icons/xwiki/spinner.gif")';
-        let loadIcon = '<img  src="'+ loadPath + '" alt=""/>';
+        const loadPath = '$xwiki.getSkinFile("icons/xwiki/spinner.gif")';
+        const loadIcon = '<img  src="'+ loadPath + '" alt=""/>';
         dependency.update(loadIcon + dependency.innerHTML);
       },
       onSuccess : function(response) {

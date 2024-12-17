@@ -57,7 +57,9 @@ export class XWiki21ToHTMLConverter implements Converter {
   }
 
   public async convert(source: string): Promise<string> {
-    if (source == undefined) return "";
+    if (source == undefined) {
+      return "";
+    }
 
     return this.wikimodel.parse(source);
   }

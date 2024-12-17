@@ -138,10 +138,14 @@ export class CristalLoader {
 
     if (pathname.startsWith("/")) {
       const i1 = pathname.indexOf("/", 1);
-      if (i1 != -1) configName = pathname.substring(1, i1);
+      if (i1 != -1) {
+        configName = pathname.substring(1, i1);
+      }
     }
 
-    if (configName == null || configName == "") configName = "XWiki";
+    if (configName == null || configName == "") {
+      configName = "XWiki";
+    }
 
     return configName;
   }

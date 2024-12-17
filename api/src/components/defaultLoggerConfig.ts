@@ -48,7 +48,9 @@ export class DefaultLoggerConfig implements LoggerConfig {
         if (key.startsWith(module)) {
           const currentLevel = this.computedConfig.get(key);
           if (currentLevel == null || (nbLevel && nbLevel > currentLevel)) {
-            if (nbLevel) this.computedConfig.set(key, nbLevel);
+            if (nbLevel) {
+              this.computedConfig.set(key, nbLevel);
+            }
           }
         }
       });
@@ -60,14 +62,19 @@ export class DefaultLoggerConfig implements LoggerConfig {
 
   getLevel(module: string): string {
     let level = this.config.get(module);
-    if (!level) level = this.defaultLevel;
+    if (!level) {
+      level = this.defaultLevel;
+    }
     return level;
   }
 
   getLevelId(level: string): number {
     const nbLevel = this.levels.get(level);
-    if (!nbLevel) return 10;
-    else return nbLevel;
+    if (!nbLevel) {
+      return 10;
+    } else {
+      return nbLevel;
+    }
   }
 
   setDefaultLevel(level: string): void {
@@ -80,8 +87,9 @@ export class DefaultLoggerConfig implements LoggerConfig {
   }
 
   getDefaultLevelId(): number {
-    if (this.defaultLevelId) return this.defaultLevelId;
-    else {
+    if (this.defaultLevelId) {
+      return this.defaultLevelId;
+    } else {
       this.defaultLevelId = this.getLevelId(this.defaultLevel);
       return this.defaultLevelId;
     }
@@ -89,22 +97,30 @@ export class DefaultLoggerConfig implements LoggerConfig {
 
   hasLevel(module: string, level: string): boolean {
     let nbLevel = this.computedConfig.get(module);
-    if (!nbLevel) nbLevel = this.getDefaultLevelId();
+    if (!nbLevel) {
+      nbLevel = this.getDefaultLevelId();
+    }
     const demandedLevel = this.getLevelId(level);
 
     if (demandedLevel) {
-      if (nbLevel >= demandedLevel) return true;
+      if (nbLevel >= demandedLevel) {
+        return true;
+      }
     }
     return false;
   }
 
   hasLevelId(module: string, levelId: number): boolean {
     let nbLevel = this.computedConfig.get(module);
-    if (!nbLevel) nbLevel = this.getDefaultLevelId();
+    if (!nbLevel) {
+      nbLevel = this.getDefaultLevelId();
+    }
     const demandedLevel = levelId;
 
     if (demandedLevel) {
-      if (nbLevel >= demandedLevel) return true;
+      if (nbLevel >= demandedLevel) {
+        return true;
+      }
     }
     return false;
   }

@@ -124,7 +124,10 @@ export default class DefaultQueueWorker implements QueueWorker {
 
   public async getQueueSize(): Promise<number> {
     console.log("worker Calling getQueueSize");
-    if (this.workerInstance == null) return -1;
-    else return await this.workerInstance.getQueueSize();
+    if (this.workerInstance == null) {
+      return -1;
+    } else {
+      return await this.workerInstance.getQueueSize();
+    }
   }
 }

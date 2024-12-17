@@ -1,13 +1,13 @@
+import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import eslintPluginImport from "eslint-plugin-import";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintPluginTsdoc from "eslint-plugin-tsdoc";
+import pluginVue from "eslint-plugin-vue";
 import parser from "vue-eslint-parser";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-import pluginVue from "eslint-plugin-vue";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import eslintPluginTsdoc from "eslint-plugin-tsdoc";
-import eslintPluginImport from "eslint-plugin-import";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,6 +76,7 @@ export default [
       "import/export": "error",
       "import/group-exports": "error",
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+      curly: "error",
     },
   },
   {

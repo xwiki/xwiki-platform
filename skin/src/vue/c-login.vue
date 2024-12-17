@@ -44,8 +44,12 @@ export default {
     let names: Array<string> = displayname.split(/[\s-]/);
     if (names.length > 0) {
       initials += names[0][0].toUpperCase();
-      if (names.length > 1) initials += names[1][0].toUpperCase();
-      if (names.length > 2) initials += names[2][0].toUpperCase();
+      if (names.length > 1) {
+        initials += names[1][0].toUpperCase();
+      }
+      if (names.length > 2) {
+        initials += names[2][0].toUpperCase();
+      }
     }
     return { initials: initials, displayname: displayname, progressValue: 0 };
   },

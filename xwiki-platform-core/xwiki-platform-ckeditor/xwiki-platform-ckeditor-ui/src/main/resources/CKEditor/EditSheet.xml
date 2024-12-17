@@ -69,10 +69,6 @@
         'cols': 80
       }
     })
-    #if($focusOnLoad)
-      #set ($discard = $parameters.attributes.put('focusOnLoad', 'true'))
-      #set($focusOnLoad = false)
-    #end
     #ckeditor($parameters)
   &lt;/div&gt;
   {{/html}}

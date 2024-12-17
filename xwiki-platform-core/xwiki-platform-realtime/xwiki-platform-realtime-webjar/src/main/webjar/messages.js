@@ -52,7 +52,6 @@ define('xwiki-realtime-messages', {
     'conflictsWarningSuggestion',
     'conflictsWarningInfoLink',
     'wsError',
-    'wsErrorInfo',
     'wsErrorConflicts',
     'connectingBox',
     'connectionLost',

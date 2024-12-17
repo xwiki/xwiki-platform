@@ -39,7 +39,7 @@
   <content>{{velocity}}
 #if ($type == 'edit')
   #set ($className = $object.getxWikiClass().name)
-  #set ($id = $escapetool.xml("${prefix}${name}"))
+  #set ($id = "${prefix}${name}")
   #if ($doc.fullName == $className)
     ## We are editing the class so the content must be read from / written to the template document.
     #set ($name = 'templateContent')
@@ -58,7 +58,7 @@
       #set ($toolBar = "#template('simpleedittoolbar.vm')")
       $!toolBar.replace('{{', '&amp;#123;&amp;#123;')
       ## Display a simple textarea.
-      &lt;textarea id="$id" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
+      &lt;textarea id="$escapetool.xml($id)" cols="80" rows="25" name="$name"&gt;$escapetool.xml($editedDocument.content)&lt;/textarea&gt;
   #end
   #if ($useWysiwygEditor)
     $!services.edit.syntaxContent.wysiwyg($editedDocument.content, $editedDocument.syntax, {

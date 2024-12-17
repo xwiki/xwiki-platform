@@ -140,7 +140,7 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
         editInput.attr('id', editInput.attr('name'));
       }
       // Bind the label to the newly generated edit input
-      editableProperty.find('label').attr('for',editInput.attr('id'));
+      editableProperty.find('label').attr('for', editInput.attr('id'));
     }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
       return Promise.reject();

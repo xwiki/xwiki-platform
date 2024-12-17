@@ -69,6 +69,10 @@
         'cols': 80
       }
     })
+    #if($focusOnLoad)
+      #set ($discard = $parameters.attributes.put('focusOnLoad', 'true'))
+      #set($focusOnLoad = false)
+    #end
     #ckeditor($parameters)
   &lt;/div&gt;
   {{/html}}
@@ -218,11 +222,11 @@ define('xwiki-ckeditor', [
     }
 
     var uploadDisabled = element.hasAttribute('data-upload-disabled');
-    var focusOnLoad = element.hasAttribute('data-focusOnLoad');
+    var focusOnLoad = element.hasAttribute('data-focus-on-load');
 
     var config = {
       filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
-      startupFocus: focusOnLoad ? '' : true,
+      startupFocus: focusOnLoad,
       height: $(element).height(),
       // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,

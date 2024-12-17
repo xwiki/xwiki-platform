@@ -211,7 +211,7 @@ class SubWikiIT
         assertEquals(
             String.format("[[%s]]%n[[%s]]%n[[%s]]",
                 setup.serializeReference(movedPageReference),
-                setup.serializeLocalReference(Alice2Reference),
+                setup.serializeReference(Alice2Reference),
                 setup.serializeReference(newBobPage)), wikiEditPage.getContent());
 
         deleteSubWiki(setup);

@@ -66,7 +66,7 @@
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
          version here. -->
     <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
-    <netty.version>4.1.115.Final</netty.version>
+    <netty.version>4.1.116.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.1</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>

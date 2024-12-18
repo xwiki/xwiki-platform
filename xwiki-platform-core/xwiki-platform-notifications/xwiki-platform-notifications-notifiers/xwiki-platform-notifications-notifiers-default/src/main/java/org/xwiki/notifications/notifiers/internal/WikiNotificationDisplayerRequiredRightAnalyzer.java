@@ -19,7 +19,6 @@
  */
 package org.xwiki.notifications.notifiers.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,8 +29,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
-import org.xwiki.platform.security.requiredrights.internal.provider.BlockSupplierProvider;
-import org.xwiki.velocity.internal.util.VelocityDetector;
+import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.internal.analyzer.ObjectPropertyRequiredRightAnalyzer;
 
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -39,6 +38,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * {@link RequiredRightAnalyzer} for wiki notification displayers.
  *
  * @version $Id$
+ * @since 15.10.16
+ * @since 16.4.7
+ * @since 16.10.2
  */
 @Component
 @Named(WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME)
@@ -46,38 +48,12 @@ import com.xpn.xwiki.objects.BaseObject;
 public class WikiNotificationDisplayerRequiredRightAnalyzer implements RequiredRightAnalyzer<BaseObject>
 {
     @Inject
-    @Named("translation")
-    private BlockSupplierProvider<String> translationMessageSupplierProvider;
-
-    @Inject
-    private BlockSupplierProvider<BaseObject> baseObjectBlockSupplierProvider;
-
-    @Inject
-    private VelocityDetector velocityDetector;
+    private ObjectPropertyRequiredRightAnalyzer objectPropertyRequiredRightAnalyzer;
 
     @Override
-    public List<RequiredRightAnalysisResult> analyze(BaseObject object)
+    public List<RequiredRightAnalysisResult> analyze(BaseObject object) throws RequiredRightsException
     {
-        List<RequiredRightAnalysisResult> result = new ArrayList<>();
-
-        if (object != null) {
-            String template =
-                object.getStringValue(WikiNotificationDisplayerDocumentInitializer.NOTIFICATION_TEMPLATE);
-            if (this.velocityDetector.containsVelocityScript(template)) {
-                result.add(new RequiredRightAnalysisResult(object.getReference(),
-                    this.translationMessageSupplierProvider.get(
-                        "notifications.notifiers.wikiNotificationDisplayerRequiredRightWithScript"),
-                    this.baseObjectBlockSupplierProvider.get(object),
-                    List.of(RequiredRight.WIKI_ADMIN, RequiredRight.MAYBE_PROGRAM)));
-            } else {
-                result.add(new RequiredRightAnalysisResult(object.getReference(),
-                    this.translationMessageSupplierProvider.get(
-                        "notifications.notifiers.wikiNotificationDisplayerRequiredRight"),
-                    this.baseObjectBlockSupplierProvider.get(object),
-                    List.of(RequiredRight.WIKI_ADMIN)));
-            }
-        }
-
-        return result;
+        return this.objectPropertyRequiredRightAnalyzer.analyzeAllPropertiesAndAddObjectResult(object,
+            RequiredRight.WIKI_ADMIN, "notifications.notifiers.wikiNotificationDisplayerRequiredRights");
     }
 }

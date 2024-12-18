@@ -131,6 +131,8 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
       ["data", "children"],
       ["compact", "true"],
       ["offset", offset.toString()],
+      ["showTranslations", "false"],
+      ["showAttachments", "false"],
     ]).toString();
 
     const response = await fetch(navigationTreeRequestUrl, { headers });
@@ -165,7 +167,7 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
               page: this.referenceSerializer.serialize(documentReference),
             },
           }).href,
-          has_children: treeNode.children, //TODO: ignore translations and attachments
+          has_children: treeNode.children,
         });
       }
     }

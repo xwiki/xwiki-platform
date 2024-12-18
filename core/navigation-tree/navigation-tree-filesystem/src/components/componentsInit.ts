@@ -75,7 +75,10 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
               page: id,
             },
           }).href,
-          has_children: true, // TODO: Detect empty folders.
+          has_children:
+            (await fileSystemStorage.listChildren(id)).filter(
+              (c: string) => c != "attachments",
+            ).length > 0,
         });
       }
     }

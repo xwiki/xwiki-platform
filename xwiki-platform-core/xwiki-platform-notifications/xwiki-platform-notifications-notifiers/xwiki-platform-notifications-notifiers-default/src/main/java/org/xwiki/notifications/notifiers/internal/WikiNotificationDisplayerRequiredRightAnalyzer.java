@@ -38,6 +38,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * {@link RequiredRightAnalyzer} for wiki notification displayers.
  *
  * @version $Id$
+ * @since 15.10.16
+ * @since 16.4.7
+ * @since 16.10.2
  */
 @Component
 @Named(WikiNotificationDisplayerDocumentInitializer.XCLASS_NAME)

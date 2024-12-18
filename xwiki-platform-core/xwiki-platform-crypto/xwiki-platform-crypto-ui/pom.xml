@@ -24,17 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>16.10.2-SNAPSHOT</version>
+    <artifactId>xwiki-platform-crypto</artifactId>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-crypto</artifactId>
-  <name>XWiki Platform - Cryptographic Services - Parent POM</name>
-  <description>XWiki Platform - Cryptographic Services</description>
-  <packaging>pom</packaging>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-crypto-script</module>
-    <module>xwiki-platform-crypto-store</module>
-    <module>xwiki-platform-crypto-ui</module>
-  </modules>
+  <artifactId>xwiki-platform-crypto-ui</artifactId>
+  <name>XWiki Platform - Cryptographic Services - UI</name>
+  <packaging>xar</packaging>
+  <description>UI for Cryptographic Services (contains technical pages)</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Cryptographic Services Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-crypto-store-wiki</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

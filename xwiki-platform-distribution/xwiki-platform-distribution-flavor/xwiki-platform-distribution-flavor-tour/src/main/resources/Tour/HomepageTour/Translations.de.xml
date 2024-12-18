@@ -52,15 +52,16 @@ tour.homepageTour.pageContent.title=Seiteninhalt
 tour.homepageTour.pageContent.contentA=Dies ist der Ort, an dem der Inhalt der aktuellen Seite angezeigt wird.
 tour.homepageTour.pageContent.contentB=Bearbeiten Sie diese Seite, um Tabellen, Listen, Makros und Strukturen hinzuzufügen, um Ihr Wissen zu organisieren.
 tour.homepageTour.pageMenu.title=Seitenmenü
-tour.homepageTour.pageMenu.contentA=Dieses Menü enthält seitenbezogene Aktionen. Mit den entsprechenden Rechten können Sie Seiten bearbeiten, erstellen, verwalten oder löschen.
-tour.homepageTour.pageMenu.contentB=Die Schaltfläche {0} zeigt weitere Aktionen wie Export, Drucken und Teilen an.
+tour.homepageTour.pageMenu.contentA=Dieses Menü enthält seitenbezogene Aktionen. Mit den entsprechenden Rechten kann man Seiten bearbeiten, erstellen, beobachten und mehr.
+tour.homepageTour.pageMenu.contentB=Die Schaltfläche {0} zeigt weitere Aktionen wie Verwalten, Kopieren/Verschieben/Umbenennen/Löschen, Exportieren, Drucken, Kommentieren und Teilen an.
 tour.homepageTour.pageTabs.title=Seitenregisterkarten
 tour.homepageTour.pageTabs.contentA=Kommentare sind eine gute Möglichkeit für Benutzer, den Inhalt der Seite zu diskutieren.
 tour.homepageTour.pageTabs.contentB=Sie können auch Dateien anhängen, Seitenversionen vergleichen oder Seiteninformationen anzeigen.
 tour.homepageTour.header.title=Kopfzeile
-tour.homepageTour.header.contentA=Sie können nach Inhalten suchen, nach Seitenänderungen suchen oder auf Ihr Benutzerprofil zugreifen.
+tour.homepageTour.header.contentA=Du kannst nach Inhalten suchen, Benachrichtigungen einsehen oder auf das Benutzerprofil zugreifen.
 tour.homepageTour.header.contentB=Die Schaltfläche {0} öffnet eine Schublade, die Wiki-bezogene Aktionen wie Administration und Indizes enthält.
 tour.homepageTour.tourComplete.title=Tour abgeschlossen
 tour.homepageTour.tourComplete.contentA=Damit ist Ihre Tour über die Benutzeroberfläche und die grundlegenden Funktionalitäten von XWiki abgeschlossen.
-tour.homepageTour.tourComplete.contentB=Weitere Informationen zu den einzelnen Funktionen finden Sie in der {0}Dokumentation{1}.</content>
+tour.homepageTour.tourComplete.contentB=Weitere Informationen zu den einzelnen Funktionen finden Sie in der {0}Dokumentation{1}.
+</content>
 </xwikidoc>

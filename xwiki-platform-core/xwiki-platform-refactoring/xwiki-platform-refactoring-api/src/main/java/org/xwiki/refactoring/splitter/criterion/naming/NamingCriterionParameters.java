@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for {@link NamingCriterion}.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.2
  * @since 15.0RC1
  */
-@Unstable
 public class NamingCriterionParameters
 {
     private static final String PARAM_BASE_DOCUMENT_REFERENCE = "baseDocumentReference";

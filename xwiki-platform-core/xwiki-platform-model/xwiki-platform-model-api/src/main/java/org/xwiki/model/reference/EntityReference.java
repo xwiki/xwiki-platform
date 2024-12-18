@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,6 +44,13 @@ import org.xwiki.stability.Unstable;
  */
 public class EntityReference implements Serializable, Cloneable, Comparable<EntityReference>
 {
+    /**
+     * See {@link #getParentType()}.
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public static final String PARENT_TYPE_PARAMETER = "parentType";
+
     /**
      * Used to provide a nice and readable pretty name for the {@link #toString()} method.
      */
@@ -118,7 +126,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
         setName(reference.name);
         setType(reference.type);
-        setParameters(reference.parameters);
         if (reference.parent == null) {
             if (oldReference == null) {
                 setParent(newReference);
@@ -131,6 +138,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         } else {
             setParent(new EntityReference(reference.parent, oldReference, newReference));
         }
+        setParameters(reference.parameters);
     }
 
     /**
@@ -191,7 +199,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Clone an EntityReference, but use the specified paramaters.
+     * Clone an EntityReference, but use the specified parameters.
      *
      * @param reference the reference to clone
      * @param parameters parameters for this reference, may be null
@@ -298,11 +306,33 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             if (this.parameters == null) {
                 this.parameters = new TreeMap<>();
             }
-            this.parameters.put(name, value);
+            if (PARENT_TYPE_PARAMETER.equals(name)) {
+                setParentTypeParameter(value);
+            } else {
+                this.parameters.put(name, value);
+            }
         } else if (parameters != null) {
             this.parameters.remove(name);
-            if (this.parameters.size() == 0) {
+            if (this.parameters.isEmpty()) {
                 this.parameters = null;
+            }
+        }
+    }
+
+    private void setParentTypeParameter(Serializable value)
+    {
+        if (value != null && getParent() == null) {
+            EntityType parentType;
+            if (value instanceof EntityType entityType) {
+                parentType = entityType;
+            } else {
+                parentType = EntityType.valueOf(value.toString().toUpperCase(Locale.ROOT));
+            }
+            if (getType().getAllowedParents().contains(parentType)) {
+                this.parameters.put(PARENT_TYPE_PARAMETER, parentType);
+            } else {
+                throw new IllegalArgumentException(
+                    "The parent type [" + parentType + "] does not belong to the allowed parents");
             }
         }
     }
@@ -534,7 +564,6 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * @since 15.5.5
      * @since 14.10.20
      */
-    @Unstable
     public EntityReference removeParameters(boolean recursive)
     {
         EntityReference current;
@@ -679,6 +708,31 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
         return name.equals(otherReference.name) && type.equals(otherReference.type)
             && (parameters == null ? otherReference.parameters == null : parameters.equals(otherReference.parameters));
+    }
+
+    /**
+     * The parent type information is used by resolvers to identify which part of the base reference should be kept.
+     * If the entity reference has a parent (see {@link #getParent()}) then this type should always be the type of
+     * the parent. Now if the entity reference doesn't have the parent this value can be given by the
+     * {@link #PARENT_TYPE_PARAMETER} parameter (see {@link #getParameter(String)}), and if none is given it will
+     * fall back on first allowed parents (see {@link EntityType#getAllowedParents()} of current type returned by
+     * {@link #getType()}.
+     * @return the type of the parent to be used for computing the proper base reference in resolvers.
+     * @since 17.0.0RC1
+     */
+    @Unstable
+    public EntityType getParentType()
+    {
+        EntityType result;
+        if (getParent() == null) {
+            result = getParameter(PARENT_TYPE_PARAMETER);
+            if (result == null && !getType().getAllowedParents().isEmpty()) {
+                result = getType().getAllowedParents().get(0);
+            }
+        } else {
+            result = getParent().getType();
+        }
+        return result;
     }
 
     @Override

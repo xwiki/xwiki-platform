@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-uiextension</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-test</artifactId>
   <name>XWiki Platform - UI Extension Extension - Functional Tests</name>
@@ -48,7 +48,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <artifactId>xwiki-platform-uiextension-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Required since the content of the UI extensions used in the tests is written in velocity -->

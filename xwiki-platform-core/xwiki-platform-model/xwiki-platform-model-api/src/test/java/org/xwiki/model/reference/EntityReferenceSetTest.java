@@ -21,16 +21,16 @@ package org.xwiki.model.reference;
 
 import java.util.Locale;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link EntityReferenceSet}.
@@ -40,11 +40,11 @@ import static org.junit.Assert.assertTrue;
 @ComponentList({
     DefaultSymbolScheme.class
 })
-public class EntityReferenceSetTest
+@ComponentTest
+class EntityReferenceSetTest
 {
-    @Rule
-    public MockitoComponentMockingRule<RelativeStringEntityReferenceResolver> resolverMocker =
-        new MockitoComponentMockingRule<>(RelativeStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private RelativeStringEntityReferenceResolver resolver;
 
     private EntityReferenceSet set = new EntityReferenceSet();
 
@@ -60,12 +60,12 @@ public class EntityReferenceSetTest
 
     private void assertMatches(String reference, EntityType type) throws Exception
     {
-        assertMatches(this.resolverMocker.getComponentUnderTest().resolve(reference, type));
+        assertMatches(this.resolver.resolve(reference, type));
     }
 
     private void assertNotMatches(String reference, EntityType type) throws Exception
     {
-        assertNotMatches(this.resolverMocker.getComponentUnderTest().resolve(reference, type));
+        assertNotMatches(this.resolver.resolve(reference, type));
     }
 
     private void assertMatchesWiki(String reference) throws Exception
@@ -107,7 +107,7 @@ public class EntityReferenceSetTest
 
     private void includes(String reference, EntityType type) throws Exception
     {
-        includes(this.resolverMocker.getComponentUnderTest().resolve(reference, type));
+        includes(this.resolver.resolve(reference, type));
     }
 
     private void includesWiki(String reference) throws Exception
@@ -134,7 +134,7 @@ public class EntityReferenceSetTest
 
     private void excludes(String reference, EntityType type) throws Exception
     {
-        excludes(this.resolverMocker.getComponentUnderTest().resolve(reference, type));
+        excludes(this.resolver.resolve(reference, type));
     }
 
     private void excludesWiki(String reference) throws Exception
@@ -155,7 +155,7 @@ public class EntityReferenceSetTest
     // Tests
 
     @Test
-    public void includeWiki() throws Exception
+    void includeWiki() throws Exception
     {
         includesWiki("wiki");
 
@@ -175,7 +175,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeSpace() throws Exception
+    void includeSpace() throws Exception
     {
         includesSpace("wiki:space");
 
@@ -194,7 +194,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeNestedSpace() throws Exception
+    void includeNestedSpace() throws Exception
     {
         includesSpace("wiki:space.nested");
 
@@ -218,7 +218,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includePartialOnlySpace() throws Exception
+    void includePartialOnlySpace() throws Exception
     {
         includesSpace("space");
 
@@ -230,7 +230,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeDocument() throws Exception
+    void includeDocument() throws Exception
     {
         includesDocument("wiki:space.document");
 
@@ -242,7 +242,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeLocalDocumentLocale()
+    void includeLocalDocumentLocale()
     {
         includes(new LocalDocumentReference("space", "document", Locale.ROOT));
 
@@ -261,7 +261,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeDocumentInNestedSpace() throws Exception
+    void includeDocumentInNestedSpace() throws Exception
     {
         includesDocument("wiki:space.nestedspace.document");
 
@@ -276,7 +276,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeDocumentsInNestedSpacesWithShortAfterLong() throws Exception
+    void includeDocumentsInNestedSpacesWithShortAfterLong() throws Exception
     {
         includesDocument("wiki:space.nestedspace.document");
         includesDocument("wiki:space.document");
@@ -292,7 +292,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeDocumentsInNestedSpacesWithLongAfterShort() throws Exception
+    void includeDocumentsInNestedSpacesWithLongAfterShort() throws Exception
     {
         includesDocument("wiki:space.document");
         includesDocument("wiki:space.nestedspace.document");
@@ -308,7 +308,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void excludeWiki() throws Exception
+    void excludeWiki() throws Exception
     {
         excludesWiki("wiki");
 
@@ -328,7 +328,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void excludeSpace() throws Exception
+    void excludeSpace() throws Exception
     {
         excludesSpace("wiki:space");
 
@@ -340,7 +340,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void excludeNestedSpace() throws Exception
+    void excludeNestedSpace() throws Exception
     {
         excludesSpace("wiki:space.nested");
 
@@ -355,7 +355,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void excludePartial() throws Exception
+    void excludePartial() throws Exception
     {
         excludesSpace("space");
 
@@ -367,7 +367,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void includeLocale()
+    void includeLocale()
     {
         includes(new DocumentReference("wiki", "space", "document", Locale.ENGLISH));
 
@@ -387,7 +387,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void excludeLocale()
+    void excludeLocale()
     {
         excludes(new DocumentReference("wiki", "space", "document", Locale.ENGLISH));
 

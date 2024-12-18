@@ -38,6 +38,7 @@ import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.internal.velocity.XWikiVelocityManager;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
@@ -307,7 +308,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     TemplateContext.class,
     VelocityTemplateEvaluator.class,
     TemplateAsyncRenderer.class,
-    DefaultCacheControl.class
+    DefaultCacheControl.class,
+
+    // Required rights (needed for Document/Object API)
+    DocumentRequiredRightsReader.class
 })
 @Inherited
 @XWikiDocumentFilterUtilsComponentList

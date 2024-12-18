@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -496,7 +495,6 @@ public class XWikiDocumentArchive
      * @since 14.10.12
      * @since 15.5RC1
      */
-    @Unstable
     public Version getNextFullVersion(Version ver)
     {
         if (this.fullVersions.contains(ver)) {

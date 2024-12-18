@@ -63,6 +63,14 @@ public class HqlQueryUtilsTest
             .isSafe("select doc.name, ot.field from XWikiDocument doc, XWikiSpace space, OtherTable as ot"));
         assertFalse(HqlQueryUtils.isSafe("select count(*) from OtherTable"));
         assertFalse(HqlQueryUtils.isSafe("select count(other.*) from OtherTable other"));
+        assertFalse(
+            HqlQueryUtils.isSafe("select doc.fullName from XWikiDocument doc union all select name from OtherTable"));
+        assertFalse(HqlQueryUtils
+            .isSafe("select doc.fullName from XWikiDocument doc where 1<>'1\\'' union select name from OtherTable #'"));
+        assertFalse(HqlQueryUtils.isSafe(
+            "select doc.fullName from XWikiDocument doc where $$='$$=concat( chr( 61 ),(chr( 39 )) ) ;select 1 -- comment'"));
+        assertFalse(HqlQueryUtils.isSafe(
+            "select doc.fullName from XWikiDocument doc where NVL(TO_CHAR(DBMS_XMLGEN.getxml('select 1 where 1337>1')),'1')!='1'"));
     }
 
     @Test

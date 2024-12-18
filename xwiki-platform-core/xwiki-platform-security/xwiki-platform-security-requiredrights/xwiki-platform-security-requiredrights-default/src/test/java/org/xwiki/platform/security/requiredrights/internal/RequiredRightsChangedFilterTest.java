@@ -32,10 +32,9 @@ import org.mockito.Mock;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -73,7 +72,7 @@ class RequiredRightsChangedFilterTest
     private RequiredRightsChangedFilter filter;
 
     @MockComponent
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -124,10 +123,9 @@ class RequiredRightsChangedFilterTest
     {
         DocumentReference documentReference = new DocumentReference("xwiki", "Space", "Page");
         ObjectReference objectReference = new ObjectReference("XWiki.XObj", documentReference);
-        WikiReference wikiReference = documentReference.getWikiReference();
-        when(this.authorizationManager.hasAccess(SCRIPT, CURRENT_USER_REFERENCE, wikiReference)).thenReturn(true);
-        when(this.authorizationManager.hasAccess(SCRIPT, EFFECTIVE_METADATA_REFERENCE, wikiReference)).thenReturn(
-            false);
+        when(this.authorizationManager.hasAccess(SCRIPT, WIKI, CURRENT_USER_REFERENCE, documentReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(SCRIPT, WIKI, EFFECTIVE_METADATA_REFERENCE, documentReference))
+            .thenReturn(false);
 
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, WIKI, false));
         RequiredRightAnalysisResult requiredRightAnalysisResult =
@@ -142,8 +140,10 @@ class RequiredRightsChangedFilterTest
     void filterTooFewRights()
     {
         DocumentReference entityReference = new DocumentReference("xwiki", "Space", "Page");
-        when(this.authorizationManager.hasAccess(SCRIPT, CURRENT_USER_REFERENCE, entityReference)).thenReturn(false);
-        when(this.authorizationManager.hasAccess(SCRIPT, CONTENT_AUTHOR_REFERENCE, entityReference)).thenReturn(true);
+        when(this.authorizationManager.hasAccess(SCRIPT, DOCUMENT, CURRENT_USER_REFERENCE, entityReference))
+            .thenReturn(false);
+        when(this.authorizationManager.hasAccess(SCRIPT, DOCUMENT, CONTENT_AUTHOR_REFERENCE, entityReference))
+            .thenReturn(true);
 
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, DOCUMENT, false));
         RequiredRightAnalysisResult requiredRightAnalysisResult =
@@ -162,9 +162,9 @@ class RequiredRightsChangedFilterTest
     void filterSameRights(boolean currentUserHasAccess, boolean contentAuthorHasAccess)
     {
         DocumentReference entityReference = new DocumentReference("xwiki", "Space", "Page");
-        when(this.authorizationManager.hasAccess(SCRIPT, CURRENT_USER_REFERENCE, entityReference))
+        when(this.authorizationManager.hasAccess(SCRIPT, DOCUMENT, CURRENT_USER_REFERENCE, entityReference))
             .thenReturn(currentUserHasAccess);
-        when(this.authorizationManager.hasAccess(SCRIPT, CONTENT_AUTHOR_REFERENCE, entityReference))
+        when(this.authorizationManager.hasAccess(SCRIPT, DOCUMENT, CONTENT_AUTHOR_REFERENCE, entityReference))
             .thenReturn(contentAuthorHasAccess);
 
         List<RequiredRight> requiredRights = List.of(new RequiredRight(SCRIPT, DOCUMENT, false));

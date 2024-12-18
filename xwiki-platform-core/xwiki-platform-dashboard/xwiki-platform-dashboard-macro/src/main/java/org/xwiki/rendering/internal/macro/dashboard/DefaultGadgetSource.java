@@ -52,7 +52,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -120,7 +120,7 @@ public class DefaultGadgetSource implements GadgetSource
     private JobProgressManager progress;
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     /**
      * Prepare the parser to parse the title and content of the gadget into blocks.
@@ -199,7 +199,9 @@ public class DefaultGadgetSource implements GadgetSource
                 String gadgetTitle;
 
                 XWikiDocument ownerDocument = xObject.getOwnerDocument();
-                if (this.authorizationManager.hasAccess(Right.SCRIPT, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference())) {
+                if (!ownerDocument.isRestricted() && this.authorizationManager.hasAccess(Right.SCRIPT,
+                    EntityType.DOCUMENT, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference()))
+                {
                     gadgetTitle =
                         this.evaluateVelocityTitle(velocityContext, velocityEngine, key, title, ownerDocument);
                 } else {

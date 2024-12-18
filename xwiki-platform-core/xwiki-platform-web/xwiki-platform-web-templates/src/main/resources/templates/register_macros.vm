@@ -19,7 +19,7 @@
 ## ---------------------------------------------------------------------------
 ## Defines what server generated error messages should look like
 ## The error message when a field is entered incorrectly
-#set ($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
+#set ($failureMessageParams = {'class': 'LV_invalid'})
 ## 'LV_validation_message LV_invalid' depends on this:
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 ##
@@ -114,8 +114,12 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  *
  * @param $fields The array of fields to use for generating HTML code.
  * @param $request The request that is made by submitting the form.
+ * @param $isOnlyBlock Whether the fields are the only block of the form
  *#
-#macro (generateHtml, $fields, $request)
+#macro (generateHtml, $fields, $request, $isOnlyBlock)
+  #if(!$isOnlyBlock)
+    #set($isOnlyBlock = 'true')
+  #end
   ## Put the same values back into the fields (if is there any problem with a field from the request that is made).
   #getParams($fields, $request)
   <dl>
@@ -158,12 +162,67 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #end
         #end
         />
-        #if ($field.error)
-          <span ##
-          #foreach ($entry in $failureMessageParams.entrySet())
-            $entry.key="$entry.value" ##
+        ## We initialize the validation messages containers.
+        ## Since the improvements for XWIKI-22121, we want icons in there. It's way easier to define those in the
+        ## template directly.
+        ## We want to match each use of this template to each of the `add` method for the live validation object.
+        ## If there's not already a container, the livevalidation will create it itself. However, this fallback will not
+        ## support icons.
+        #define ($validationContainer)
+          ## Add the proper classes to the validation string if it's a failure on initialisation
+          #if ($field.error &&
+            $field.error == $!validation.failureMessage &&
+            $!failureMessageParams.get("class")!='')
+            #set($extraValidationClass = $extraValidationClass + ' ' + $!failureMessageParams.get("class"))
+          #elseif ($field.params.value)
+            #set($extraValidationClass = $extraValidationClass + ' LV_valid')##
           #end
-          >$field.error</span>
+          <span class="LV_validation_message $extraValidationClass" aria-live="polite" ##
+            ## Add the proper attributes to the validation string if it's a failure on initialisation
+            #if ($field.error &&
+              $field.error == $!validation.failureMessage)
+              #foreach ($entry in $failureMessageParams.entrySet())
+                #if ($entry.key!='class')
+                  $entry.key="$entry.value" ##
+                #end
+              #end
+            #end>
+            <span class="LV_validation_message_valid_icon">$services.icon.renderHTML('accept')</span> ##
+            <span class="LV_validation_message_invalid_icon">$services.icon.renderHTML('cross')</span> ##
+            ## Add the proper content to the validation string if it's a failure on initialisation
+            ## If it's a regex validation, we also want to make sure to keep it shown at all times, we still put the
+            ## message. Note that the class displaying the state of this validation will change though.
+            #if($field.error && $field.error == $!validation.failureMessage ||
+              $!extraValidationClass.toString().contains('regex'))
+              $!validation.failureMessage
+            #end
+          </span>
+        #end
+        #set($extraValidationClass = '')
+        #if ($field.validate.mandatory)
+          #set($extraValidationClass = 'mandatory')
+          #set($validation = $field.validate.mandatory)
+          $validationContainer
+        #end
+        #if ($field.validate.mustMatch)
+          #set($extraValidationClass = 'must-match')
+          #set($validation = $field.validate.mustMatch)
+          $validationContainer
+        #end
+        #if ($field.validate.programmaticValidation)
+          #set($extraValidationClass = 'programmatic-validation')
+          #set($validation = $field.validate.programmaticValidation)
+          $validationContainer
+        #end
+        #if ($field.validate.regex)
+          #set($extraValidationClass = 'regex')
+          #set($validation = $field.validate.regex)
+          $validationContainer
+        #end
+        #foreach ($regex in $field.validate.regexes)
+          #set($extraValidationClass = 'regex-'+ $foreach.count)
+          #set($validation = $regex)
+          $validationContainer
         #end
         </dd>
       #end
@@ -172,8 +231,10 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #end
   #end
   </dl>
-  <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
-  #generateJavascript($fields)
+  #if ($isOnlyBlock == 'true')
+    <input type="hidden" name="form_token" value="$services.csrf.getToken()" />
+    #generateJavascript($fields)
+  #end
 #end
 ##
 #macro (validateRegexJS $regex $fieldName)
@@ -190,7 +251,12 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($failMessage = $regex.failureMessage)
   #end
   #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
-    ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+    ## We assume here that the field uses either `regex` or `regexes`, not both at the same time.
+    #if(!$validate.regex)
+      ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex-'+ $foreach.count});
+    #else
+      ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage", identifier: 'regex'});
+    #end
   #end
 #end
 #*
@@ -225,15 +291,23 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         #if ($validate.mandatory)
           #set ($mandatory = $validate.mandatory)
           #if ($mandatory.failureMessage && !$mandatory.noscript)
-            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage"});
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage", identifier: 'mandatory'});
           #end
         #end
         ##
         #if ($validate.mustMatch)
           #set ($mustMatch = $validate.mustMatch)
           #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
-            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0], 
-              failureMessage: "$!mustMatch.failureMessage"});
+            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0],
+              failureMessage: "$!mustMatch.failureMessage", identifier: 'must-match'});
+            // We want to update the validation status of the field when its mustmatch field is updated.
+            // We use the 'blur' event, which is the same as the one used to trigger validation in
+            // livevalidation_prototype.js 
+            $$("input[name=$!mustMatch.name]")[0].on("blur", function() {
+              // Somehow in this context I couldn't get the 'trigger' function from jquery to work
+              // so instead we trigger the event with native javascript.
+              $$("input[name=$!fieldName]")[0].dispatchEvent(new Event("blur"));
+            });
           #end
         #end
         ##

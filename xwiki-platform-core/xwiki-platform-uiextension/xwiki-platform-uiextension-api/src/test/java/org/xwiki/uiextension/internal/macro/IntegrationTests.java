@@ -19,26 +19,22 @@
  */
 package org.xwiki.uiextension.internal.macro;
 
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.query.QueryManager;
-import org.xwiki.refactoring.internal.ModelBridge;
-import org.xwiki.refactoring.internal.ReferenceUpdater;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.template.TemplateManager;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
-
-import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -47,10 +43,9 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @AllComponents
-@ComponentList(TestEnvironment.class)
-public class IntegrationTests implements RenderingTests
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         // Replace the environment by a test compatible one
@@ -59,10 +54,6 @@ public class IntegrationTests implements RenderingTests
         // For performance reasons we mock some components to avoid having to draw all oldcore components
 
         // Some components we don't really use and which trigger a lot of dependencies
-        componentManager.registerMockComponent(TemplateManager.class);
-        componentManager.registerMockComponent(ModelBridge.class);
-        componentManager.registerMockComponent(QueryManager.class);
-        componentManager.registerMockComponent(ReferenceUpdater.class);
         componentManager.registerMockComponent(AuthorizationManager.class);
         componentManager.registerMockComponent(ContextualAuthorizationManager.class);
 

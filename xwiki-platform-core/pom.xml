@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -138,10 +138,365 @@
 
                  Single justification example:
             -->
-            
-            
-            
-            
+            <revapi.differences>
+              <justification>
+                For security reasons, it is necessary to drop the dependency on version 1 of ROME. Unfortunately, this
+                dependency is exposed in APIs. As these APIs should mainly be used by scripts and the new version
+                provides largely identical classes only with other package names, in practice this shouldn't cause any
+                real breakage.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter int com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator::compare(===com.sun.syndication.feed.synd.SyndEntry===, com.sun.syndication.feed.synd.SyndEntry)</old>
+                  <new>parameter int com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator::compare(===com.rometools.rome.feed.synd.SyndEntry===, com.rometools.rome.feed.synd.SyndEntry)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter int com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator::compare(com.sun.syndication.feed.synd.SyndEntry, ===com.sun.syndication.feed.synd.SyndEntry===)</old>
+                  <new>parameter int com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator::compare(com.rometools.rome.feed.synd.SyndEntry, ===com.rometools.rome.feed.synd.SyndEntry===)</new>
+                  <parameterIndex>1</parameterIndex>
+                </item>
+                <item>
+                  <code>java.class.noLongerImplementsInterface</code>
+                  <old>class com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator</old>
+                  <new>class com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator</new>
+                  <interface>java.util.Comparator&lt;com.sun.syndication.feed.synd.SyndEntry&gt;</interface>
+                </item>
+                <item>
+                  <code>java.class.superTypeTypeParametersChanged</code>
+                  <old>class com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator</old>
+                  <new>class com.xpn.xwiki.plugin.feed.FeedPlugin.SyndEntryComparator</new>
+                  <oldSuperType>java.util.Comparator&lt;com.sun.syndication.feed.synd.SyndEntry&gt;</oldSuperType>
+                  <newSuperType>java.util.Comparator&lt;com.rometools.rome.feed.synd.SyndEntry&gt;</newSuperType>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(com.xpn.xwiki.XWikiContext)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(com.xpn.xwiki.XWikiContext)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, boolean, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, boolean, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySource, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedEntry(com.xpn.xwiki.XWikiContext)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedEntry(com.xpn.xwiki.XWikiContext)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedForce(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedForce(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedImage(com.xpn.xwiki.XWikiContext)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedImage(com.xpn.xwiki.XWikiContext)</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter java.lang.String com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedOutput(===com.sun.syndication.feed.synd.SyndFeed===, java.lang.String, com.xpn.xwiki.XWikiContext)</old>
+                  <new>parameter java.lang.String com.xpn.xwiki.plugin.feed.FeedPlugin::getFeedOutput(===com.rometools.rome.feed.synd.SyndFeed===, java.lang.String, com.xpn.xwiki.XWikiContext)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, boolean, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPlugin::getFeeds(java.lang.String, boolean, boolean, com.xpn.xwiki.XWikiContext) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.util.List&lt;java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.util.List&lt;java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.lang.String, int, int)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.lang.String, int, int)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getArticleFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.util.List&lt;java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.util.List&lt;java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int, java.lang.String, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getBlogFeed(java.lang.String, int, int, java.lang.String, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getDefaultFeedImage()</old>
+                  <new>method com.rometools.rome.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getDefaultFeedImage()</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getDocumentFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed()</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed()</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, boolean) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, boolean) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, boolean, boolean) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, boolean, boolean) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.util.List&lt;java.lang.Object&gt;, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeed(java.lang.String, int, int, com.xpn.xwiki.plugin.feed.SyndEntrySourceApi, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedEntry()</old>
+                  <new>method com.rometools.rome.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedEntry()</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedImage()</old>
+                  <new>method com.rometools.rome.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedImage()</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedImage(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndImage com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedImage(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter java.lang.String com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedOutput(===com.sun.syndication.feed.synd.SyndFeed===, java.lang.String)</old>
+                  <new>parameter java.lang.String com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeedOutput(===com.rometools.rome.feed.synd.SyndFeed===, java.lang.String)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String, boolean) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String, boolean) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String, boolean, boolean) throws java.io.IOException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getFeeds(java.lang.String, boolean, boolean) throws java.io.IOException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.util.List&lt;java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.util.List&lt;java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.util.List&lt;java.lang.Object&gt;, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.lang.String, int, int)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.lang.String, int, int)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndFeed com.xpn.xwiki.plugin.feed.FeedPluginApi::getWebFeed(java.lang.String, int, int, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndContent com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::getDescription(com.xpn.xwiki.api.Document, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>method com.rometools.rome.feed.synd.SyndContent com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::getDescription(com.xpn.xwiki.api.Document, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndContent com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::getSyndContent(java.lang.String, java.lang.String)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndContent com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::getSyndContent(java.lang.String, java.lang.String)</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter void com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::source(===com.sun.syndication.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>parameter void com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::source(===com.rometools.rome.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter void com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::sourceDocument(===com.sun.syndication.feed.synd.SyndEntry===, com.xpn.xwiki.api.Document, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>parameter void com.xpn.xwiki.plugin.feed.SyndEntryDocumentSource::sourceDocument(===com.rometools.rome.feed.synd.SyndEntry===, com.xpn.xwiki.api.Document, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter void com.xpn.xwiki.plugin.feed.SyndEntrySource::source(===com.sun.syndication.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                  <new>parameter void com.xpn.xwiki.plugin.feed.SyndEntrySource::source(===com.rometools.rome.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(java.lang.Object)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(java.lang.Object)</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter boolean com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(===com.sun.syndication.feed.synd.SyndEntry===, java.lang.Object)</old>
+                  <new>parameter boolean com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(===com.rometools.rome.feed.synd.SyndEntry===, java.lang.Object)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.method.returnTypeChanged</code>
+                  <old>method com.sun.syndication.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>method com.rometools.rome.feed.synd.SyndEntry com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                </item>
+                <item>
+                  <code>java.method.parameterTypeChanged</code>
+                  <old>parameter boolean com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(===com.sun.syndication.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</old>
+                  <new>parameter boolean com.xpn.xwiki.plugin.feed.SyndEntrySourceApi::source(===com.rometools.rome.feed.synd.SyndEntry===, java.lang.Object, java.util.Map&lt;java.lang.String, java.lang.Object&gt;)</new>
+                  <parameterIndex>0</parameterIndex>
+                </item>
+                <item>
+                  <code>java.class.removed</code>
+                  <old>class com.xpn.xwiki.plugin.feed.XWikiFeedFetcher</old>
+                  <justification>
+                    It seems like a mistake to expose XWikiFeedFetcher as an API. The concept of feed fetching has
+                    been removed from ROME 2, and staying on ROME 1 is no option from a security perspective. The
+                    implementation has been completely changed, and the class has been made internal as existing uses
+                    would most likely be broken, anyway. We're not aware of any code using this class outside the Feed
+                    API.
+                  </justification>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>
+                Those APIs were removed as part of JGroups upgrade to 5.4.0: the APIs have been removed on JGroups
+                side and are directly exposed in XWiki. The original issue for removing them in JGroups was
+                https://issues.redhat.com/browse/JGRP-2783.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.jgroups.Receiver::block() @ org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.method.removed</code>
+                  <old>method void org.jgroups.Receiver::unblock() @ org.xwiki.observation.remote.jgroups.JGroupsReceiver</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

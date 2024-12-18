@@ -70,7 +70,7 @@
       'main': 'scriptaculous'
     }, {
       'name': 'moment',
-      'location': $stringtool.removeEnd($services.webjars.url('momentjs', ''), '/'),
+      'location': $stringtool.removeEnd($services.webjars.url('org.webjars.npm:moment', ''), '/'),
       'main': 'min/moment.min'
     }
   ],
@@ -81,7 +81,7 @@
     'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
     'jquery-migrate': "#removeJsSuffix($services.webjars.url($jqueryMigrateId, ""dist/jquery-migrate${jsExtension}""))",
     'jsTree': "#removeJsSuffix($services.webjars.url('jstree', ""jstree${jsExtension}""))",
-    'moment-jdateformatparser': $services.webjars.url('moment-jdateformatparser', 'moment-jdateformatparser.min'),
+    'moment-jdateformatparser': $services.webjars.url('org.webjars.npm:moment-jdateformatparser', 'moment-jdateformatparser.min'),
     'moment-timezone': $services.webjars.url('org.webjars.npm:moment-timezone', 'builds/moment-timezone-with-data.min'),
     'prototype': "#removeJsSuffix($services.webjars.url('prototype', 'prototype.js'))",
     'selectize': "#removeJsSuffix($services.webjars.url('selectize.js', ""js/standalone/selectize${jsExtension}""))",

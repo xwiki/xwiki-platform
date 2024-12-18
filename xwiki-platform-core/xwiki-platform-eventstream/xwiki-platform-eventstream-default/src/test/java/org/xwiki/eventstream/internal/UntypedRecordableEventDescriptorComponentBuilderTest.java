@@ -26,11 +26,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.wiki.WikiComponent;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -39,6 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -59,7 +62,7 @@ public class UntypedRecordableEventDescriptorComponentBuilderTest
 
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     private DocumentReference event1;
     private DocumentReference event2;
@@ -71,7 +74,7 @@ public class UntypedRecordableEventDescriptorComponentBuilderTest
         queryManager = mocker.registerMockComponent(QueryManager.class);
         modelBridge = mocker.registerMockComponent(ModelBridge.class);
         documentReferenceResolver = mocker.registerMockComponent(DocumentReferenceResolver.class);
-        authorizationManager = mocker.registerMockComponent(AuthorizationManager.class);
+        authorizationManager = mocker.registerMockComponent(DocumentAuthorizationManager.class);
 
         Query query = mock(Query.class);
         when(queryManager.createQuery(any(), any())).thenReturn(query);
@@ -104,10 +107,12 @@ public class UntypedRecordableEventDescriptorComponentBuilderTest
         when(parentDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Ensure that the user rights are correctly checked
-        when(this.authorizationManager.hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.authorizationManager.hasAccess(any(), any(), any(), any())).thenReturn(true);
 
         List<WikiComponent> result = this.mocker.getComponentUnderTest().buildComponents(baseObject);
 
         assertEquals(1, result.size());
+
+        verify(this.authorizationManager).hasAccess(Right.ADMIN, EntityType.WIKI, null, documentReference);
     }
 }

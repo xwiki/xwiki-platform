@@ -23,6 +23,8 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.refactoring.event.DocumentCopiedEvent;
 import org.xwiki.refactoring.event.DocumentCopyingEvent;
 import org.xwiki.refactoring.event.EntitiesCopiedEvent;
@@ -47,33 +49,6 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     }
 
     @Override
-    protected void runInternal() throws Exception
-    {
-        this.progressManager.pushLevelProgress(3, this);
-
-        try {
-            this.progressManager.startStep(this);
-            EntitiesCopyingEvent entitiesCopyingEvent = new EntitiesCopyingEvent();
-            this.observationManager.notify(entitiesCopyingEvent, this, this.getRequest());
-            if (entitiesCopyingEvent.isCanceled()) {
-                return;
-            }
-            this.progressManager.endStep(this);
-
-            this.progressManager.startStep(this);
-            super.runInternal();
-            this.progressManager.endStep(this);
-
-            this.progressManager.startStep(this);
-            EntitiesCopiedEvent entitiesCopiedEvent = new EntitiesCopiedEvent();
-            this.observationManager.notify(entitiesCopiedEvent, this, this.getRequest());
-            this.progressManager.endStep(this);
-        } finally {
-            this.progressManager.popLevelProgress(this);
-        }
-    }
-
-    @Override
     protected void performRefactoring(DocumentReference sourceReference, DocumentReference targetReference)
     {
         DocumentCopyingEvent documentCopyingEvent = new DocumentCopyingEvent(sourceReference, targetReference);
@@ -89,5 +64,17 @@ public class CopyJob extends AbstractCopyOrMoveJob<CopyRequest>
     protected boolean atomicOperation(DocumentReference source, DocumentReference target)
     {
         return this.modelBridge.copy(source, target);
+    }
+
+    @Override
+    protected BeginFoldEvent createBeginEvent()
+    {
+        return new EntitiesCopyingEvent();
+    }
+
+    @Override
+    protected EndFoldEvent createEndEvent()
+    {
+        return new EntitiesCopiedEvent();
     }
 }

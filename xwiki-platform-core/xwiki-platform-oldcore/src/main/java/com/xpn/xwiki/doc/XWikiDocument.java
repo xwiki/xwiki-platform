@@ -81,6 +81,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.cache.CacheControl;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -216,7 +217,7 @@ import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class XWikiDocument implements DocumentModelBridge, Cloneable
+public class XWikiDocument implements DocumentModelBridge, Cloneable, DisposableCacheValue
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
 
@@ -518,6 +519,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private Syntax syntax;
 
     /**
+     * If required rights that can be defined in a {@code XWiki.RequiredRightClass} shall be enforced. For
+     * backwards-compatibility reasons, this is {@code false} by default.
+     * @since 16.10.0RC1
+     */
+    private boolean enforceRequiredRights = false;
+
+    /**
      * Is latest modification a minor edit.
      */
     private boolean isMinorEdit = false;
@@ -629,6 +637,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     // Caching
     private boolean fromCache = false;
+
+    private boolean cached;
 
     private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
 
@@ -833,6 +843,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         init(reference);
+    }
+
+    @Override
+    public void dispose() throws Exception
+    {
+        setCached(false);
     }
 
     /**
@@ -4090,11 +4106,42 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return displayForm(resolveClassReference(className), context);
     }
 
+    /**
+     * Indicate if this {@link XWikiDocument} is currently in the document, implying that it's potentially shared with
+     * several threads.
+     * 
+     * @return true if this {@link XWikiDocument} is in the document cache
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public boolean isCached()
+    {
+        return this.cached;
+    }
+
+    /**
+     * @param cached true if this {@link XWikiDocument} is in the document cache
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setCached(boolean cached)
+    {
+        this.cached = cached;
+    }
+
+    /**
+     * @deprecated use {@link #isCached()} instead
+     */
+    @Deprecated(since = "16.10.0RC1")
     public boolean isFromCache()
     {
         return this.fromCache;
     }
 
+    /**
+     * @deprecated use {@link #setCached(boolean)} instead
+     */
+    @Deprecated(since = "16.10.0RC1")
     public void setFromCache(boolean fromCache)
     {
         this.fromCache = fromCache;
@@ -4148,6 +4195,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Read the hidden checkbox from the form
         if (eform.getHidden() != null) {
             setHidden("1".equals(eform.getHidden()));
+        }
+
+        // Read the enforce required rights flag from the form
+        if (eform.getEnforceRequiredRights() != null) {
+            setEnforceRequiredRights("1".equals(eform.getEnforceRequiredRights()));
         }
     }
 
@@ -4497,6 +4549,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setMinorEdit(document.isMinorEdit());
         setSyntax(document.getSyntax());
         setHidden(document.isHidden());
+        setEnforceRequiredRights(document.isEnforceRequiredRights());
 
         cloneXObjects(document);
         cloneAttachments(document);
@@ -4580,6 +4633,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
             doc.setRestricted(isRestricted());
+            doc.setEnforceRequiredRights(isEnforceRequiredRights());
 
             if (this.xClass != null) {
                 doc.setXClass(this.xClass.clone());
@@ -4875,6 +4929,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         if (isHidden() != otherDocument.isHidden()) {
+            return false;
+        }
+
+        if (isEnforceRequiredRights() != otherDocument.isEnforceRequiredRights()) {
             return false;
         }
 
@@ -7044,6 +7102,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
         }
 
+        if (fromDoc.isEnforceRequiredRights() != toDoc.isEnforceRequiredRights()) {
+            list.add(new MetaDataDiff("enforceRequiredRights", fromDoc.isEnforceRequiredRights(),
+                toDoc.isEnforceRequiredRights()));
+        }
+
         return list;
     }
 
@@ -7658,6 +7721,32 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         setSyntax(syntax);
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public boolean isEnforceRequiredRights()
+    {
+        return this.enforceRequiredRights;
+    }
+
+    /**
+     * @param enforceRequiredRights if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't use
+     * more rights than defined in the object
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    public void setEnforceRequiredRights(boolean enforceRequiredRights)
+    {
+        this.enforceRequiredRights = enforceRequiredRights;
+
+        setContentDirty(true);
     }
 
     public Vector<BaseObject> getComments(boolean asc)
@@ -9330,6 +9419,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             modified = true;
         }
 
+        if (isEnforceRequiredRights() != document.isEnforceRequiredRights()) {
+            setEnforceRequiredRights(document.isEnforceRequiredRights());
+            modified = true;
+        }
+
         // /////////////////////////////////
         // XObjects
 
@@ -9512,7 +9606,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 15.2RC1
      */
     @Override
-    @Unstable
     public boolean isRestricted()
     {
         return this.restricted;
@@ -9528,7 +9621,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 14.10.7
      * @since 15.2RC1
      */
-    @Unstable
     public void setRestricted(boolean restricted)
     {
         this.restricted = restricted;

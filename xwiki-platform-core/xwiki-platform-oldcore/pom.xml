@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>16.10.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -216,6 +216,12 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-svgrasterizer</artifactId>
+    </dependency>
+
+    <!-- Guava, currently only used in SimpleDocumentCache -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
 
     <!-- Misc -->
@@ -574,6 +580,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- The Login and Register links are injected as UI extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->
@@ -874,7 +887,6 @@
                 **/web/ExportAction.java,
                 **/web/ExportURLFactory.java,
                 **/web/HomePageRedirectServlet.java,
-                **/web/ImportAction.java,
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,

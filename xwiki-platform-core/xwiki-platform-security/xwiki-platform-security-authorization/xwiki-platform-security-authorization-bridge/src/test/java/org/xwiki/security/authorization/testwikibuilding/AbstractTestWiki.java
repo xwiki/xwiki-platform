@@ -260,12 +260,14 @@ public abstract class AbstractTestWiki
                            String name = attributes.getValue("name");
                            String creator = attributes.getValue("creator");
                            String alt = attributes.getValue("alt");
+                           boolean enforceRequiredRights =
+                               Boolean.parseBoolean(attributes.getValue("enforceRequiredRights"));
 
                            if (creator == null) {
                                creator = "XWiki.Admin";
                            }
 
-                           HasAcl document = currentSpace.addDocument(name, creator, alt);
+                           HasAcl document = currentSpace.addDocument(name, creator, enforceRequiredRights, alt);
                            currentRightsHolder.push(document);
                        }
 
@@ -309,7 +311,20 @@ public abstract class AbstractTestWiki
                        public void addRight(HasAcl rightsHolder, String name, String type) {
                            rightsHolder.addDenyGroup(name, type);
                        }
-                   });
+                   })
+                .declare("requiredRight", new AbstractElementBuilder()
+                {
+                    @Override
+                    public void startElement(Attributes attributes)
+                    {
+                        HasAcl rightsHolder = AbstractTestWiki.this.currentRightsHolder.peek();
+                        if (rightsHolder instanceof HasRequiredRights hasRequiredRights) {
+                            String type = attributes.getValue("type");
+                            String scope = attributes.getValue("scope");
+                            hasRequiredRights.addRequiredRight(type, scope != null ? scope : "document");
+                        }
+                    }
+                });
 
         }
 

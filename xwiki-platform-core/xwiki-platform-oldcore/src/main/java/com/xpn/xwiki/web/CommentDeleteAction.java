@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -32,10 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.store.TemporaryAttachmentSessionsManager;
-import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,24 +40,18 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Action used to remove a comment from a page, requires comment right but not edit right.
+ * Note that this class is largely inspired by ObjectRemoveAction and Comment
  *
  * @version $Id$
- * @since 16.1.0RC1
+ * @since 17.0.0RC1
  */
 @Component
 @Named("commentdelete")
 @Singleton
 public class CommentDeleteAction extends XWikiAction
 {
+    private static final String FAIL_MESSAGE = "failed";
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentDeleteAction.class);
-    @Inject
-    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
-
-    @Inject
-    private TemporaryAttachmentSessionsManager temporaryAttachmentSessionsManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
@@ -150,8 +139,7 @@ public class CommentDeleteAction extends XWikiAction
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.setContentType("text/plain");
             try {
-                response.getWriter().write("failed");
-                response.setContentLength(6);
+                response.getWriter().print(FAIL_MESSAGE);
             } catch (IOException e) {
                 LOGGER.error("Failed to send error response to AJAX comment delete request.", e);
             }

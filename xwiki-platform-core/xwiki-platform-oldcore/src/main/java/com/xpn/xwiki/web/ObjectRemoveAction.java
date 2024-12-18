@@ -27,6 +27,8 @@ import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -41,6 +43,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class ObjectRemoveAction extends XWikiAction
 {
+    private static final String FAIL_MESSAGE = "failed";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectRemoveAction.class);
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -124,9 +128,9 @@ public class ObjectRemoveAction extends XWikiAction
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.setContentType("text/plain");
             try {
-                response.getWriter().write("failed");
-                response.setContentLength(6);
+                response.getWriter().print(FAIL_MESSAGE);
             } catch (IOException e) {
+                LOGGER.error("Failed to send error response to AJAX comment delete request.", e);
             }
             return null;
         } else {

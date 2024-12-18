@@ -33,8 +33,8 @@
   --cr-sizes-collapsed-main-sidebar-width: 32px; /*The width of the bar that gets shown containing the menu button to reopen the standard main main sidebar*/
   --cr-base-font-size: 16px;
   --cr-base-text-color: var(--cr-color-gray-950);
-  --cr-base-link-color: var(--cr-base-text-color);
-  --cr-base-visited-link-color: var(--cr-base-text-color);
+  --cr-base-link-color: var(--cr-color-sky-700);
+  --cr-base-visited-link-color: var(--cr-color-blue-700);
 
   /*
    * Typography
@@ -218,17 +218,17 @@
   --cr-color-cyan-950: var(--sl-color-cyan-950);
 
   /* Sky */
-  --cr-color-sky-50: var(--cr-color-sky-50);
-  --cr-color-sky-100: var(--cr-color-sky-100);
-  --cr-color-sky-200: var(--cr-color-sky-200);
-  --cr-color-sky-300: var(--cr-color-sky-300);
-  --cr-color-sky-400: var(--cr-color-sky-400);
-  --cr-color-sky-500: var(--cr-color-sky-500);
-  --cr-color-sky-600: var(--cr-color-sky-600);
-  --cr-color-sky-700: var(--cr-color-sky-700);
-  --cr-color-sky-800: var(--cr-color-sky-800);
-  --cr-color-sky-900: var(--cr-color-sky-900);
-  --cr-color-sky-950: var(--cr-color-sky-950);
+  --cr-color-sky-50: var(--sl-color-sky-50);
+  --cr-color-sky-100: var(--sl-color-sky-100);
+  --cr-color-sky-200: var(--sl-color-sky-200);
+  --cr-color-sky-300: var(--sl-color-sky-300);
+  --cr-color-sky-400: var(--sl-color-sky-400);
+  --cr-color-sky-500: var(--sl-color-sky-500);
+  --cr-color-sky-600: var(--sl-color-sky-600);
+  --cr-color-sky-700: var(--sl-color-sky-700);
+  --cr-color-sky-800: var(--sl-color-sky-800);
+  --cr-color-sky-900: var(--sl-color-sky-900);
+  --cr-color-sky-950: var(--sl-color-sky-950);
 
   /* Blue */
   --cr-color-blue-50: var(--sl-color-blue-50);

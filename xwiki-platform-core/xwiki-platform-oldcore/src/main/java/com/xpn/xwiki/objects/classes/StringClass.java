@@ -111,6 +111,11 @@ public class StringClass extends PropertyClass
         input.setID(prefix + name);
         input.setSize(getSize());
         input.setDisabled(isDisabled());
+        /* This is a text alternative fallback to explain what the input is about. 
+         If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
+         */
+        input.addAttribute("aria-label", localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
+            this.getTranslatedPrettyName(context)));
 
         if (isPicker()) {
             displayPickerEdit(input);

@@ -22,10 +22,6 @@
     "clean": "rimraf dist",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
-  "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
-    "inversify": "6.2.0"
-  },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"
   },

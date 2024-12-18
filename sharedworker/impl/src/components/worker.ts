@@ -22,7 +22,7 @@ import "reflect-metadata";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";
 import { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
-import { ComponentInit as AuthenticationAPIComponentInit } from "@xwiki/cristal-authentication-api";
+import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
@@ -225,7 +225,7 @@ export class Worker implements MyWorker {
     new GithubBackendComponentInit(cristalLoader.container);
     new NextcloudBackendComponentInit(cristalLoader.container);
     new XWikiBackendComponentInit(cristalLoader.container);
-    new AuthenticationAPIComponentInit(cristalLoader.container);
+    new AuthenticationDefaultComponentInit(cristalLoader.container);
     console.log("Loading storage components");
     this.initialized = true;
     console.log("Finished initialize");

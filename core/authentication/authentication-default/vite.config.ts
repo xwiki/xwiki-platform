@@ -18,35 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Document } from "./document";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
+import { generateConfig } from "../../../vite.config";
 
-export interface PageData {
-  id: string;
-  name: string;
-  source: string;
-  syntax: string;
-  html: string;
-  headline: string;
-  headlineRaw: string;
-  document: Document;
-  css: Array<string>;
-  js: Array<string>;
-  version: string | undefined;
-  /**
-   * Date of the last modification of this page.
-   * @since 0.13
-   */
-  lastModificationDate: Date | undefined;
-  /**
-   * Name of the last user to edit this page.
-   * @since 0.13
-   */
-  lastAuthor: UserDetails | undefined;
-
-  // TODO: remove any
-  toObject(): any; // eslint-disable-line
-
-  // TODO: remove any
-  fromObject(object: any): void; // eslint-disable-line
-}
+export default generateConfig(import.meta.url);

@@ -2,9 +2,11 @@
 import messages from "../translations";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
 import { PageData } from "@xwiki/cristal-api";
+import { Date } from "@xwiki/cristal-date-ui";
 import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
+import { User } from "@xwiki/cristal-user-ui";
 import { Ref, inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp } from "@xwiki/cristal-api";
@@ -72,7 +74,29 @@ watch(
         <slot name="title"></slot>
         <div class="info-wrapper">
           <span class="doc-author">
-            <!-- Add last edition information (CRISTAL-371). -->
+            <i18n-t
+              v-if="
+                currentPage?.lastAuthor && currentPage?.lastModificationDate
+              "
+              keypath="page.edited.details.user"
+              tag="span"
+            >
+              <template #date>
+                <date :date="currentPage?.lastModificationDate!" />
+              </template>
+              <template #user>
+                <user :user="currentPage?.lastAuthor" />
+              </template>
+            </i18n-t>
+            <i18n-t
+              v-else-if="currentPage?.lastModificationDate"
+              keypath="page.edited.details"
+              tag="span"
+            >
+              <template #date>
+                <date :date="currentPage?.lastModificationDate!" />
+              </template>
+            </i18n-t>
           </span>
           <!-- TODO: add a way to inject those by extension
                  and provide one for the number of attachments.
@@ -179,6 +203,7 @@ watch(
         margin-inline-end: auto;
         font-size: var(--cr-font-size-small);
         color: var(--cr-color-neutral-600);
+        align-self: center;
 
         & .avatar {
           --size: 24px;

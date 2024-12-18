@@ -6,6 +6,8 @@
   "page.creation.menu.field.name": "Name",
   "page.creation.menu.submit": "Create",
   "page.creation.menu.title": "New Page",
+  "page.edited.details": "Edited on {date}",
+  "page.edited.details.user": "{user} edited on {date}",
   "information.extraTabs.title": "Information",
   "history.alert.content": "You are currently viewing version {revision} of {pageName}. Edition is disabled.",
   "history.alert.link.label": "Click here to go back to the latest version.",

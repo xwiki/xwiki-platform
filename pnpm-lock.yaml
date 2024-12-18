@@ -97,6 +97,9 @@ importers:
 
   api:
     dependencies:
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../core/authentication/authentication-api
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
@@ -313,10 +316,25 @@ importers:
         version: 2.1.10(typescript@5.6.3)
 
   core/authentication/authentication-api:
+    devDependencies:
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/authentication/authentication-default:
     dependencies:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../authentication-api
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
@@ -488,6 +506,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-api
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
@@ -2426,6 +2447,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../core/authentication/authentication-api
+      '@xwiki/cristal-authentication-default':
+        specifier: workspace:*
+        version: link:../core/authentication/authentication-default
       '@xwiki/cristal-authentication-ui':
         specifier: workspace:*
         version: link:../core/authentication/authentication-ui
@@ -2734,9 +2758,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
-      '@xwiki/cristal-authentication-api':
+      '@xwiki/cristal-authentication-default':
         specifier: workspace:*
-        version: link:../../core/authentication/authentication-api
+        version: link:../../core/authentication/authentication-default
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../../core/backends/backend-dexie
@@ -2801,6 +2825,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../core/backends/backend-api
+      '@xwiki/cristal-date-ui':
+        specifier: workspace:*
+        version: link:../core/date/date-ui
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../core/document/document-api
@@ -2843,6 +2870,9 @@ importers:
       '@xwiki/cristal-uiextension-ui':
         specifier: workspace:*
         version: link:../core/uiextension/uiextension-ui
+      '@xwiki/cristal-user-ui':
+        specifier: workspace:*
+        version: link:../core/user/user-ui
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
@@ -3683,10 +3713,6 @@ packages:
 
   '@eslint/eslintrc@3.2.0':
     resolution: {integrity: sha512-grOjVNN8P3hjJn/eIETF1wwd12DdnwFDoyceUJLYYdkpbwq3nLi+4fqrTAONx7XDALqlL220wC/RHSC/QTI/0w==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@eslint/js@9.16.0':
-    resolution: {integrity: sha512-tw2HxzQkrbeuvyj1tG2Yqq+0H9wGoI2IMk4EOsQeX+vmd75FtJAzf+gTA69WF+baUKRYQ3x2kbLE08js5OsTVg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/js@9.17.0':
@@ -8911,8 +8937,6 @@ snapshots:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
-
-  '@eslint/js@9.16.0': {}
 
   '@eslint/js@9.17.0': {}
 

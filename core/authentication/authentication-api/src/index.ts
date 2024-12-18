@@ -18,24 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultAuthenticationManagerProvider } from "./defaultAuthenticationManagerProvider";
-import { Container } from "inversify";
 import type { AuthenticationManager } from "./authenticationManager";
 import type { AuthenticationManagerProvider } from "./authenticationManagerProvider";
 import type { UserDetails } from "./userDetails";
 
-class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<AuthenticationManagerProvider>("AuthenticationManagerProvider")
-      .to(DefaultAuthenticationManagerProvider)
-      .inSingletonScope();
-  }
-}
-
-export {
-  AuthenticationManager,
-  AuthenticationManagerProvider,
-  ComponentInit,
-  UserDetails,
-};
+export { AuthenticationManager, AuthenticationManagerProvider, UserDetails };

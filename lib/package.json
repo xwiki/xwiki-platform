@@ -32,6 +32,7 @@
     "@xwiki/cristal-attachments-default": "workspace:*",
     "@xwiki/cristal-attachments-ui": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
+    "@xwiki/cristal-authentication-default": "workspace:*",
     "@xwiki/cristal-authentication-ui": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",

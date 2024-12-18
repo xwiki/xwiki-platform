@@ -293,9 +293,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
                 ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("object", new com.xpn.xwiki.api.Object(object, context), ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("type", type, ScriptContext.ENGINE_SCOPE);
-            /* This is a text alternative fallback to explain what the input is about. 
-             If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
-             */
+            // This is a text alternative fallback to explain what the input is about. 
+            // If the input has already been labelled in another way, this fallback will be ignored by Assistive Techs.
             scontext.setAttribute("aria-label",
                 localizePlainOrKey("core.model.xclass.editClassProperty.textAlternative",
                     this.getTranslatedPrettyName(context)), ScriptContext.ENGINE_SCOPE);

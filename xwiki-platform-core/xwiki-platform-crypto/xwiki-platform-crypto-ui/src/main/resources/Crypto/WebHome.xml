@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,21 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>16.4.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-crypto</artifactId>
-  <name>XWiki Platform - Cryptographic Services - Parent POM</name>
-  <description>XWiki Platform - Cryptographic Services</description>
-  <packaging>pom</packaging>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-crypto-script</module>
-    <module>xwiki-platform-crypto-store</module>
-    <module>xwiki-platform-crypto-ui</module>
-  </modules>
-</project>
+<xwikidoc version="1.6" reference="Crypto.WebHome" locale="">
+  <web>Crypto</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Crypto.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>Contains technical pages related to the Crypto API (private key, certificate, etc).</content>
+</xwikidoc>

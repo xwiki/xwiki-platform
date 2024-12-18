@@ -280,6 +280,13 @@
       <type>xar</type>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-crypto-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>

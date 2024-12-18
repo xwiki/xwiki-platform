@@ -25,15 +25,19 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-image-processing</artifactId>
-    <version>16.9.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-image-processing-plugin</artifactId>
   <name>XWiki Platform - Image - Processing - Plugin</name>
-  <description>Deprecated Image plugin</description>
+  <description>Server-side resize of downloaded images</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-image-plugin</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Image Processing Plugin</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>api</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>
@@ -41,7 +45,6 @@
       <artifactId>xwiki-platform-image-processing-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
@@ -52,7 +55,6 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

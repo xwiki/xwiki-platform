@@ -19,15 +19,12 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.xwiki.job.Job;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -36,8 +33,12 @@ import org.xwiki.refactoring.event.DocumentCopyingEvent;
 import org.xwiki.refactoring.event.EntitiesCopiedEvent;
 import org.xwiki.refactoring.event.EntitiesCopyingEvent;
 import org.xwiki.refactoring.job.CopyRequest;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import ch.qos.logback.classic.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -51,21 +52,22 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
-public class CopyJobTest extends AbstractEntityJobTest
+@ComponentTest
+class CopyJobTest extends AbstractEntityJobTest
 {
-    @Rule
-    public MockitoComponentMockingRule<Job> mocker = new MockitoComponentMockingRule<Job>(CopyJob.class);
+    @InjectMockComponents
+    private CopyJob copyJob;
 
     @Override
-    protected MockitoComponentMockingRule<Job> getMocker()
+    protected Job getJob()
     {
-        return this.mocker;
+        return this.copyJob;
     }
 
     private CopyRequest createRequest(EntityReference source, EntityReference destination)
     {
         CopyRequest request = new CopyRequest();
-        request.setEntityReferences(Arrays.asList(source));
+        request.setEntityReferences(List.of(source));
         request.setDestination(destination);
         request.setCheckRights(false);
         request.setCheckAuthorRights(false);
@@ -74,7 +76,7 @@ public class CopyJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void copyDocumentThrowErrorInCaseOfDocuments() throws Throwable
+    void copyDocumentThrowErrorInCaseOfDocuments() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
@@ -84,12 +86,12 @@ public class CopyJobTest extends AbstractEntityJobTest
 
         CopyRequest request = this.createRequest(sourceReference, copyReference);
         run(request);
-        verify(this.mocker.getMockedLogger()).error("Unsupported destination entity type [{}] for a document.",
-            EntityType.DOCUMENT);
+        assertEquals("Unsupported destination entity type [DOCUMENT] for a document.", getLogCapture().getMessage(0));
+        assertEquals(Level.ERROR, getLogCapture().getLogEvent(0).getLevel());
     }
 
     @Test
-    public void copyDocument() throws Throwable
+    void copyDocument() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "Space", "Foo");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
@@ -99,7 +101,7 @@ public class CopyJobTest extends AbstractEntityJobTest
         when(this.modelBridge.copy(sourceReference, copyDestination)).thenReturn(true);
 
         CopyRequest request = this.createRequest(sourceReference, copyReference);
-        Map<String, String> parameters = Collections.singletonMap("foo", "bar");
+        Map<String, String> parameters = Map.of("foo", "bar");
         request.setEntityParameters(sourceReference, parameters);
         Job job = run(request);
 
@@ -109,14 +111,13 @@ public class CopyJobTest extends AbstractEntityJobTest
 
         verify(this.modelBridge).copy(sourceReference, copyDestination);
         verify(this.modelBridge, never()).delete(any(DocumentReference.class));
-        verify(this.mocker.getMockedLogger(), never()).error(any());
-
         verify(this.observationManager).notify(new DocumentCopiedEvent(sourceReference, copyDestination), job, request);
         verify(this.observationManager).notify(any(EntitiesCopiedEvent.class), same(job), same(request));
+        assertEquals(0, getLogCapture().size());
     }
 
     @Test
-    public void cancelEntitiesCopyingEvent() throws Throwable
+    void cancelEntitiesCopyingEvent() throws Throwable
     {
         DocumentReference sourceReference = new DocumentReference("wiki", "One", "Page");
         when(this.modelBridge.exists(sourceReference)).thenReturn(true);
@@ -142,7 +143,7 @@ public class CopyJobTest extends AbstractEntityJobTest
     }
 
     @Test
-    public void cancelDocumentCopyingEvent() throws Throwable
+    void cancelDocumentCopyingEvent() throws Throwable
     {
         SpaceReference sourceReference = new SpaceReference("wiki", "Source");
         DocumentReference aliceReference = new DocumentReference("Alice", sourceReference);
@@ -150,7 +151,7 @@ public class CopyJobTest extends AbstractEntityJobTest
         DocumentReference bobReference = new DocumentReference("Bob", sourceReference);
         when(this.modelBridge.exists(bobReference)).thenReturn(true);
         when(this.modelBridge.getDocumentReferences(sourceReference))
-            .thenReturn(Arrays.asList(aliceReference, bobReference));
+            .thenReturn(List.of(aliceReference, bobReference));
 
         SpaceReference destinationReference = new SpaceReference("wiki", "Destination");
         DocumentReference copyAliceReference =

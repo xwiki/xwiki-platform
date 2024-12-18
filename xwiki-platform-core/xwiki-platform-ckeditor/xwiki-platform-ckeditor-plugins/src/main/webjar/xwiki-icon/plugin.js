@@ -43,17 +43,14 @@
         feed: function (opts, callback) {
           require(['xwiki-iconService'], function (iconService) {
             iconService.getIconThemes().then(function (iconThemes) {
-              // Retreive the list of available icons.
-              iconService.getIcons(iconThemes.currentIconTheme).then(function (icons) {
-                callback(icons
-                  .filter(icon => icon.name.toLowerCase().startsWith(opts.query.toLowerCase()))
-                  .map(icon => ({
-                    id: icon.name,
-                    label: icon.name,
-                    imgSrc: icon.metadata.url,
-                    iconClass: icon.metadata.cssClass
-                  }))
-                );
+              // Retreive the list of available icons from the current icon theme that match the query.
+              iconService.getIcons(iconThemes.currentIconTheme, opts.query).then(function (icons) {
+                callback(icons.map(icon => ({
+                  id: icon.name,
+                  label: icon.name,
+                  imgSrc: icon.metadata.url,
+                  iconClass: icon.metadata.cssClass
+                })));
               }).catch(function () {
               editor.showNotification(editor.localization.get('xwiki-icon.iconsFetchFailed'), 'warning', 5000);
             });

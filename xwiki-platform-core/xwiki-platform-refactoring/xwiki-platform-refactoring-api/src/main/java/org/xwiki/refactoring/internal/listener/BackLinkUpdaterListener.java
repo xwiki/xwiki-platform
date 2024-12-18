@@ -19,6 +19,7 @@
  */
 package org.xwiki.refactoring.internal.listener;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -117,7 +118,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
 
         DocumentReference newTarget = request.getNewBacklinkTargets().get(deletedEvent.getDocumentReference());
         if (request.isUpdateLinks() && newTarget != null) {
-            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit);
+            updateBackLinks(deletedEvent.getDocumentReference(), newTarget, canEdit, Map.of());
         }
     }
 
@@ -127,20 +128,24 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
         Predicate<EntityReference> canEdit =
             entityReference -> this.authorization.hasAccess(Right.EDIT, entityReference);
 
+        Map<EntityReference, EntityReference> updatedEntities = Map.of();
         if (source instanceof MoveJob) {
             MoveRequest request = (MoveRequest) data;
             updateLinks = request.isUpdateLinks();
             // Check access rights taking into account the move request.
             canEdit = entityReference -> ((MoveJob) source).hasAccess(Right.EDIT, entityReference);
+            updatedEntities = ((MoveJob) source).getSelectedEntities();
         }
 
         if (updateLinks) {
             DocumentRenamedEvent renameEvent = (DocumentRenamedEvent) event;
-            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit);
+            updateBackLinks(renameEvent.getSourceReference(), renameEvent.getTargetReference(), canEdit,
+                updatedEntities);
         }
     }
 
-    private void updateBackLinks(DocumentReference source, DocumentReference target, Predicate<EntityReference> canEdit)
+    private void updateBackLinks(DocumentReference source, DocumentReference target,
+        Predicate<EntityReference> canEdit, Map<EntityReference, EntityReference> updatedEntities)
         throws RefactoringException
     {
         this.logger.info("Updating the back-links for document [{}].", source);
@@ -157,7 +162,7 @@ public class BackLinkUpdaterListener extends AbstractLocalEventListener
             for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
                 this.progressManager.startStep(this);
                 if (canEdit.test(backlinkDocumentReference)) {
-                    this.updater.update(backlinkDocumentReference, source, target);
+                    this.updater.update(backlinkDocumentReference, source, target, updatedEntities);
                 }
                 this.progressManager.endStep(this);
             }

@@ -35,7 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.user.UserReferenceSerializer;
 
@@ -57,7 +57,7 @@ public class RequiredRightsChangedFilter
     private static final Set<EntityType> OBJECT_ENTITY_TYPES = Set.of(OBJECT, OBJECT_PROPERTY);
 
     @Inject
-    private AuthorizationManager authorizationManager;
+    private DocumentAuthorizationManager authorizationManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -89,7 +89,8 @@ public class RequiredRightsChangedFilter
             for (RequiredRight requiredRight : analysis.getRequiredRights()) {
                 Right right = requiredRight.getRight();
                 EntityType entityType = requiredRight.getEntityType();
-                EntityReference entityReference = analyzedEntityReference.extractReference(entityType);
+                EntityReference documentEntityReference = analyzedEntityReference.extractReference(EntityType.DOCUMENT);
+                DocumentReference documentReference = new DocumentReference(documentEntityReference);
                 DocumentReference authorReference;
                 if (OBJECT_ENTITY_TYPES.contains(analyzedEntityReference.getType())) {
                     authorReference = effectiveMetadataAuthorReference;
@@ -97,8 +98,10 @@ public class RequiredRightsChangedFilter
                     authorReference = contentAuthorReference;
                 }
                 if (!Objects.equals(userReference, authorReference)) {
-                    boolean currentUserHasAccess = hasAccess(right, userReference, entityReference);
-                    boolean authorHasAccess = hasAccess(right, authorReference, entityReference);
+                    boolean currentUserHasAccess = this.authorizationManager.hasAccess(right, entityType, userReference,
+                        documentReference);
+                    boolean authorHasAccess = this.authorizationManager.hasAccess(right, entityType, authorReference,
+                        documentReference);
                     if (currentUserHasAccess != authorHasAccess) {
                         requiredRightsChangedResult.add(analysis, right, currentUserHasAccess,
                             requiredRight.isManualReviewNeeded());
@@ -108,10 +111,5 @@ public class RequiredRightsChangedFilter
         }
 
         return requiredRightsChangedResult;
-    }
-
-    private boolean hasAccess(Right right, DocumentReference userReference, EntityReference extractedEntityReference)
-    {
-        return this.authorizationManager.hasAccess(right, userReference, extractedEntityReference);
     }
 }

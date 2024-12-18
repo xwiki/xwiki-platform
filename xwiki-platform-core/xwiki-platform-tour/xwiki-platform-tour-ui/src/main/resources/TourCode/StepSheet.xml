@@ -78,11 +78,11 @@
           &lt;select id="stepOrderSelect"&gt;
             #if ($nbSteps &gt; 0)
               #foreach($i in [0..$mathtool.sub($nbSteps, 1)])
-                &lt;option value="$i" #if ($vobj.getProperty('order').value == $i) selected #end &gt;$mathtool.add($i, 1)&lt;/option&gt;
+                &lt;option value="$i" #if ($vobj.getProperty('order').value == $i) selected #end &gt;$i&lt;/option&gt;
               #end
             #end
             #if ($isNewStep)
-              &lt;option value="$nbSteps" selected &gt;$mathtool.add($nbSteps, 1)&lt;/option&gt;
+              &lt;option value="$nbSteps" selected &gt;$nbSteps&lt;/option&gt;
             #end
           &lt;/select&gt;
         &lt;/dd&gt;

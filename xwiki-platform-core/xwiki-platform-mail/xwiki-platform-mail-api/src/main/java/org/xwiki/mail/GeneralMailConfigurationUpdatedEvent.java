@@ -24,7 +24,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.observation.event.Event;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event triggered after the general mail configuration has been changed.
@@ -43,7 +42,6 @@ import org.xwiki.stability.Unstable;
  * @since 15.7RC1
  * @version $Id$
  */
-@Unstable
 public class GeneralMailConfigurationUpdatedEvent implements Event
 {
     private String wikiId;

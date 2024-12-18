@@ -31,6 +31,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -352,6 +353,12 @@ public class XWikiUser
                     ACTIVE_PROPERTY, activeFlag);
                 UserReference userReference =
                     getDocumentReferenceUserReferenceResolver().resolve(context.getUserReference());
+                // If there's no current user (ie if it's guest), then make the save as the new user for consistency
+                // since the user creation and other changes made to the user profile are currently done under the
+                // name of the new user.
+                if (GuestUserReference.INSTANCE.equals(userReference)) {
+                    userReference = getDocumentReferenceUserReferenceResolver().resolve(userdoc.getDocumentReference());
+                }
                 userdoc.getAuthors().setOriginalMetadataAuthor(userReference);
                 context.getWiki().saveDocument(userdoc,
                     localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);

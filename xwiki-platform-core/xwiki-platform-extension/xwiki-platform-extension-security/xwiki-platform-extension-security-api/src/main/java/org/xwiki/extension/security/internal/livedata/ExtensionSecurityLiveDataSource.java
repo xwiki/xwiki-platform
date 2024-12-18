@@ -29,7 +29,7 @@ import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
 import org.xwiki.livedata.LiveDataSource;
 
 /**
- * Live Data source for the {@code extensionSecurity}.
+ * Live Data source for the Extensions Security Vulnerabilities Application, listing all vulnerabilities.
  *
  * @version $Id$
  * @since 15.5RC1

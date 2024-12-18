@@ -19,6 +19,10 @@
  */
 package org.xwiki.export.pdf.test.ui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,11 +58,8 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.test.ui.po.SuggestInputElement;
 import org.xwiki.test.ui.po.ViewPage;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for PDF export.
@@ -296,7 +297,8 @@ class PDFExportIT
         setup.createPage(testReference, "", "").createPage().createPageFromTemplate("My cool template", null, null,
             "XWiki.PDFExport.TemplateProvider");
         PDFTemplateEditPage templateEditPage = new PDFTemplateEditPage();
-        templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: "));
+        templateEditPage.setCover(templateEditPage.getCover().replace("<h1>", "<h1>Book: ").replace("</p>",
+            "</p>\n<p>$escapetool.xml($tdoc.externalURL)</p>"));
         templateEditPage
             .setTableOfContents(templateEditPage.getTableOfContents().replace("core.pdf.tableOfContents", "Chapters"));
         templateEditPage.setHeader(templateEditPage.getHeader().replaceFirst("<span ", "Chapter: <span "));
@@ -306,9 +308,11 @@ class PDFExportIT
         // Register the template in the PDF export administration section.
         setup.loginAsSuperAdmin();
         PDFExportAdministrationSectionPage adminSection = PDFExportAdministrationSectionPage.gotoPage();
-        adminSection.getTemplatesInput().sendKeys("my cool").waitForSuggestions()
-            .selectByVisibleText("My cool template");
-        adminSection.clickSave();
+        SuggestInputElement templatesInput = adminSection.getTemplatesInput();
+        if (!StringUtils.join(templatesInput.getValues(), ",").contains("My cool template")) {
+            templatesInput.sendKeys("my cool").waitForSuggestions().selectByVisibleText("My cool template");
+            adminSection.clickSave();
+        }
 
         // We also have to give script rights to the template author because it was created based on the default one
         // which contains scripts.
@@ -320,6 +324,7 @@ class PDFExportIT
         PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(new ViewPage());
         exportOptions.getTemplateSelect().selectByVisibleText("My cool template");
 
+        String currentURL = setup.getDriver().getCurrentUrl().replaceAll("/WebHome.*", "/");
         try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
             // Verify that the custom PDF template was used.
 
@@ -329,6 +334,7 @@ class PDFExportIT
             // Verify the custom cover page.
             String coverPageText = pdf.getTextFromPage(0);
             assertTrue(coverPageText.contains("Book: Parent"), "Unexpected cover page text: " + coverPageText);
+            assertTrue(coverPageText.contains(currentURL), "Unexpected cover page text: " + coverPageText);
 
             // Verify the custom table of contents page.
             String tocPageText = pdf.getTextFromPage(1);
@@ -679,8 +685,15 @@ class PDFExportIT
                     .contains("Results 1 - 2 out of 2 per page of 15\nPage Location Date Last Author Actions\nlive\n"),
                 "Unexpected content: " + content);
             // Verify the results and the order.
-            int childIndex = content.indexOf("Child PDFExportITLiveTable\nChild");
-            int parentIndex = content.indexOf("WebHome PDFExportITLiveTable");
+            // Depending on the screen width the text from the live table cells might be wrapped on multiple lines,
+            // which translates to new lines in the PDF text as well. For this reason we need to do the lookup ignoring
+            // line endings. Moreover, we normally get a space character between the text from two adjacent cells, but
+            // even this is not always consistent, so we need to ignore spaces also.
+            String contentWithoutWhitespace = content.replaceAll("\\s+", "");
+            int childIndex =
+                contentWithoutWhitespace.indexOf(/* Page */ "Child" + /* Location */ "PDFExportITLiveTable" + "Child");
+            int parentIndex =
+                contentWithoutWhitespace.indexOf(/* Page */ "WebHome" + /* Location */ "PDFExportITLiveTable");
             assertTrue(childIndex < parentIndex, "Unexpected content: " + content);
         }
     }
@@ -1181,6 +1194,34 @@ class PDFExportIT
 
     @Test
     @Order(26)
+    void pinnedChildPages(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage =
+            setup.gotoPage(new LocalDocumentReference(Arrays.asList("PDFExportIT", "PinnedPages"), "WebHome"));
+
+        ExportTreeModal exportTreeModal = ExportTreeModal.open(viewPage, "PDF");
+        // Include the child pages in the export because we want to verify that the order of the child pages in the
+        // generated PDF matches the order of the child pages in the navigation tree (tree page picker).
+        exportTreeModal.getPageTree().getNode("document:xwiki:PDFExportIT.PinnedPages.WebHome").deselect().select();
+        exportTreeModal.export();
+
+        try (PDFDocument pdf = export(new PDFExportOptionsModal(), testConfiguration)) {
+            // We should have 10 pages: cover page, table of contents and 8 content pages, one for each wiki page
+            // included in the export.
+            assertEquals(10, pdf.getNumberOfPages());
+
+            // Verify the order of the exported wiki pages in the table of contents.
+            String tocText = pdf.getTextFromPage(1);
+            assertTrue(
+                tocText.contains(
+                    "Table of Contents\nPinnedPages\nBob\nAssignments\nProfile\nCarol\nAlice\nProfile\nAssignments\n"),
+                "Unexpected table of contents: " + tocText);
+        }
+    }
+
+    @Test
+    @Order(27)
     void pageTranslations(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {

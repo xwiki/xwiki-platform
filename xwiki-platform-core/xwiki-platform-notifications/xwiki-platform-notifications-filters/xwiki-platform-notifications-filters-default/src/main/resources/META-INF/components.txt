@@ -22,6 +22,7 @@ org.xwiki.notifications.filters.internal.UserAddedEventListener
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayer
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerComponentBuilder
 org.xwiki.notifications.filters.internal.WikiNotificationFilterDisplayerDocumentInitializer
+org.xwiki.notifications.filters.internal.XWikiNotificationFilterDisplayerRequiredRightAnalyzer
 org.xwiki.notifications.filters.migration.R140401000XWIKI15460DataMigration
 org.xwiki.notifications.filters.migration.R151002000XWIKI21448DataMigration
 org.xwiki.notifications.filters.migration.R160300000XWIKI17243DataMigration

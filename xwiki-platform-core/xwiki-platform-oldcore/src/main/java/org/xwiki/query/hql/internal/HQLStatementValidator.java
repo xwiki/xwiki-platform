@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,18 +16,31 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.query.hql.internal;
 
-<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.1.0 https://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>develocity-maven-extension</artifactId>
-    <version>1.23</version>
-  </extension>
-  <extension>
-    <groupId>com.gradle</groupId>
-    <artifactId>common-custom-user-data-maven-extension</artifactId>
-    <version>2.0.1</version>
-  </extension>
-</extensions>
+import java.util.Optional;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.query.QueryException;
+
+/**
+ * A component in charge of validating a passed HQL statement.
+ * 
+ * @version $Id$
+ * @since 17.0.0RC1
+ * @since 16.10.2
+ * @since 15.10.16
+ * @since 16.4.6
+ */
+@Role
+public interface HQLStatementValidator
+{
+    /**
+     * @param statement the HQL statement to validate
+     * @return {@link Boolean#TRUE} if the passed query is safe, {@link Boolean#FALSE} if it's not and
+     *         {@link Optional#empty()} if unknown.
+     * @throws QueryException when failing the validate the query
+     */
+    boolean isSafe(String statement) throws QueryException;
+}

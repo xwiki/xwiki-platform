@@ -17,50 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.security.internal.livedata;
+package org.xwiki.query.hql.internal;
 
-import javax.inject.Inject;
+import java.util.Optional;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.livedata.LiveDataEntryStore;
-import org.xwiki.livedata.LiveDataPropertyDescriptorStore;
-import org.xwiki.livedata.LiveDataSource;
+
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 
 /**
- * Live Data source for the Extensions Security Vulnerabilities Application, listing all vulnerabilities.
- *
+ * A HQL validator which relies on {@link HqlQueryUtils#isSafe(String)}.
+ * 
  * @version $Id$
- * @since 15.5RC1
+ * @since 17.0.0RC1
+ * @since 16.10.2
+ * @since 15.10.16
+ * @since 16.4.6
  */
 @Component
 @Singleton
-@Named(ExtensionSecurityLiveDataSource.ID)
-public class ExtensionSecurityLiveDataSource implements LiveDataSource
+@Named("standard")
+public class StandardHQLCompleteStatementValidator implements HQLCompleteStatementValidator
 {
-    /**
-     * The extension security live data source id.
-     */
-    public static final String ID = "extensionSecurity";
-
-    @Inject
-    @Named(ID)
-    private LiveDataEntryStore entryStore;
-
-    @Inject
-    @Named(ID)
-    private LiveDataPropertyDescriptorStore propertyStore;
-
     @Override
-    public LiveDataEntryStore getEntries()
+    public Optional<Boolean> isSafe(String statement)
     {
-        return this.entryStore;
-    }
-
-    @Override
-    public LiveDataPropertyDescriptorStore getProperties()
-    {
-        return this.propertyStore;
+        return Optional.of(HqlQueryUtils.isSafe(statement));
     }
 }

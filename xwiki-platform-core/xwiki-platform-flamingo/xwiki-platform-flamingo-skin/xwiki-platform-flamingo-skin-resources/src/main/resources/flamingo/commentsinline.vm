@@ -165,6 +165,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   ## This variable should be true only for an authenticate user that matches the comment author.
   ## We don't allow guests to be edit or delete comments because we can't know if they are the comment author.
   #set ($isUserComment = $commentAuthor != '' && $services.model.resolveDocument($commentAuthor, 'user') == $xcontext.userReference)
+  #set ($hasCommentEditionRight = $hasAdmin || $isUserComment)
   <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#largeUserAvatar($commentAuthor)#{else}#mediumUserAvatar($commentAuthor)#end</div>
     <div class="commentheader">
@@ -177,14 +178,14 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <div class="btn-group commenttools">
       #if($xwiki.hasAccessLevel('comment'))
         <a class="commentreply btn btn-default btn-xs" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.icon.renderHTML('comment')</a></span>
-        #if($hasAdmin || $isUserComment)
+        #if($hasCommentEditionRight)
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$doc.getURL('view')")" title="$services.localization.render('core.viewers.comments.edit')">$services.icon.renderHTML('pencil')</a>
         #end
       #end
       <a class="permalink btn btn-default btn-xs" data-toggle="modal" data-target="#permalinkModal" rel="nofollow"
         href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}"
         title="$services.localization.render('core.viewers.comments.permalink')">$services.icon.renderHTML('link')</a>
-      #if ($hasAdmin || $isUserComment)
+        #if ($hasCommentEditionRight)
         ## If a remote URL is provided, content will be loaded into .modal-content because of bootstrap.
         ## By providing an anchor this behavior is stoped, without altering the URL functionality.
         #set ($queryString = $escapetool.url({

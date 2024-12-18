@@ -28,6 +28,8 @@ import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -52,6 +54,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class CommentDeleteAction extends XWikiAction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentDeleteAction.class);
     @Inject
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
@@ -150,6 +153,7 @@ public class CommentDeleteAction extends XWikiAction
                 response.getWriter().write("failed");
                 response.setContentLength(6);
             } catch (IOException e) {
+                LOGGER.error("Failed to send error response to AJAX comment delete request.", e);
             }
             return null;
         } else {

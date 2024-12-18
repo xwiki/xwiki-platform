@@ -7,6 +7,7 @@ org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultMacroBlockRe
 org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultMacroRequiredRightReporter
 org.xwiki.platform.security.requiredrights.internal.analyzer.DefaultObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.XDOMRequiredRightAnalyzer
+org.xwiki.platform.security.requiredrights.internal.analyzer.ObjectPropertyRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.PDFClassObjectRequiredRightsAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.RequiredRightObjectRequiredRightAnalyzer
 org.xwiki.platform.security.requiredrights.internal.analyzer.PropertyClassRequiredRightAnalyzer

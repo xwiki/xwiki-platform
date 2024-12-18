@@ -38,15 +38,13 @@
   <hidden>true</hidden>
   <content>solr.admin.title=Administração da Busca Solr
 solr.admin.submit=Aplicar
-### Missing: solr.admin.error.action={0} failed:
+solr.admin.error.action={0} falhou:
 solr.admin.error.notallowed=Não é permitido para você executar essa ação.
 solr.admin.error.norights=Privilégios de administrador sãoo necessários para acessar essa seção.
-### Missing: solr.admin.success.action={0} successfully triggered.
-
+solr.admin.success.action={0} acionado com sucesso.
 solr.admin.status.title=Status
 solr.admin.status.queueSize.label=Tamanho da Fila
-solr.admin.status.queueSize.hint=O número de entidades que deixarão de ser indexadas, reindexadas ou excluídas do índice
-
+solr.admin.status.queueSize.hint=O número de entidades que ainda serão indexadas, reindexadas ou excluídas do índice (dependendo da ação executada).
 solr.admin.indexing.title=Indexando
 solr.admin.indexing.action.label=Ação
 solr.admin.indexing.action.hint=A ação para ser realizada no índice.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=O wiki cujos documentos serão afetados pela açã
 solr.admin.indexing.wiki.select_farm=Toda a fazenda
 solr.admin.indexing.query.label=Requisição personalizada
 solr.admin.indexing.query.hint=Requisição opcional para limitar os documentos que serão afetados pela ação selecionada no índice.
-
-### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-
+solr.admin.info.affectedDocuments=Documentos afetados no índice:
 solr.sortBy=Ordenado por\:
 solr.sortBy.score=Relevância
 solr.sortBy.title_sort=Título
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Data de Envio
 solr.sortBy.attauthor_display_sort=Enviado por
 solr.sortOrder.asc=Ascendente
 solr.sortOrder.desc=Descendente
-
 solr.options=Mostrar\:
 solr.options.highlight=Destacar
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
-### Missing: solr.options.facet=Facets
+solr.options.highlight.title=Exibir um extrato do que foi correspondido em cada resultado
+solr.options.facet=Facetas
 solr.options.facet.title=Permite aplicar mais filtros ao resultado
-
 solr.result.language=Linguagem
-### Missing: solr.result.locatedIn=Located in
+solr.result.locatedIn=Localizado em
 solr.result.author=Modificado por "{0}" em "{1}"
 solr.result.mediaType=Arquivo do tipo "{0}"
 solr.result.uploadedBy=Enviado por {0} em {1} ({2})
 solr.result.highlightAll=Realçar todos encontrados
-
 solr.facets.title=Refine sua busca
 solr.facets.hint=Selecione uma categoria e ative os filtros nos resultados atuais
 solr.facets.resetAll=Reinicie tudo
@@ -93,12 +86,10 @@ solr.facets.expandAll=Expandir tudo
 solr.facets.collapseAll=Destruir tudo
 solr.facets.emptyValue=Valor Vazio
 solr.facets.moreValues=restantes
-
 solr.filterBy.type.document=Documento
 solr.filterBy.type.attachment=Anexo
 solr.filterBy.type.object=Objeto
 solr.filterBy.type.object_property=Propriedade do objeto
-
 solr.filterBy.fileType.image=Imagem
 solr.filterBy.fileType.audio=Áudio
 solr.filterBy.fileType.video=Vídeo
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Icone
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Arquivo Binário
-
 solr.facet.date.today=Hoje
 solr.facet.date.last7Days=Últimos 7 dias
 solr.facet.date.last30Days=Últimos 30 dias
@@ -131,7 +121,6 @@ solr.facet.date.between=De {0} até {1}
 solr.facet.date.after=Após {0}
 solr.facet.date.before=Antes {0}
 solr.facet.date.any=Qualquer data
-
 solr.facet.size.tiny=Muito Pequeno
 solr.facet.size.small=Pequeno
 solr.facet.size.medium=Médio
@@ -140,15 +129,14 @@ solr.facet.size.between=Entre {0} e {1}
 solr.facet.size.lessThan=Menor que {0}
 solr.facet.size.moreThan=Maior que {0}
 solr.facet.size.any=Qualquer Tamanho
-
 solr.field.type=Tipo Resultado
 solr.field.locale=Linguagem
 solr.field.locale.emptyValue=Sem Linguagem
-### Missing: solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
+solr.field.locale.emptyValue.hint=Alguns documentos não possuem um idioma definido porque contêm scripts (que não são escritos em um idioma natural) ou constituem a interface do usuário que é exibida no idioma atual (como esta página).
 solr.field.wiki=Wiki
-### Missing: solr.field.spaces=Location
+solr.field.spaces=Localização
 solr.field.space_exact=Espaço
-### Missing: solr.field.space_facet=Location
+solr.field.space_facet=Localização
 solr.field.name=Página
 solr.field.name_exact=Página
 solr.field.title=Título
@@ -173,9 +161,8 @@ solr.field.attauthor=Enviado por
 solr.field.attauthor_display=Enviado por
 solr.field.attdate=Data Envio
 solr.field.attsize=Tamanho Arquivo
-
-### Missing: solr.uix.docdoesnotexist.title=Were you looking for one of the following pages instead?
-### Missing: solr.uix.attachmentdoesnotexist.title=Were you looking for one of the following attachments instead?
+solr.uix.docdoesnotexist.title=Você estava procurando uma das páginas a seguir?
+solr.uix.attachmentdoesnotexist.title=Você estava procurando um dos seguintes anexos?
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -187,5 +174,6 @@ solr.result.location=Localizado em "{0}" &gt;&gt; "{1}" &gt;&gt; "{2}"
 solr.field.space=Espaço
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

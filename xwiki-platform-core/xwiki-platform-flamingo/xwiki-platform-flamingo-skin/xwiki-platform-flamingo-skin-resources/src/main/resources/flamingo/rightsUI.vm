@@ -129,7 +129,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #end
   #end
 #end
-#set ($r = [])
+#set ($guestRights = [])
 #foreach ($i in [0..$maxlevel])
   #set ($value = 0)
   #if ($allowWins.contains($i))
@@ -145,7 +145,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       #set ($value = 1)
     #end
   #end
-  #set ($discard = $r.add($value))
+  #set ($discard = $guestRights.add($value))
 #end
 
 <div id="xwikieditcontent">
@@ -205,18 +205,16 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #end
               #end
             </tr>
-            <tr id="unregistered">
-              ## Rights for guests, statically displayed outside the livetable
-              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
-              #foreach ($i in [0..$maxlevel])
-                #if ($currentAllowed[$i])
-                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
-                #end
-              #end
-            </tr>
             <tr id="usersandgroupstable-filters">
               ## Users/groups filter
-              <td><label for="name">$services.localization.render('rightsmanager.searchfilter')</label><input id="name" name="name" type="text"/>
+              ## We split the column amount in between the two objects as evenly as possible.
+              ## This way we can make sure both element have enough space to display correctly.
+              #set ($colsp = ($maxlevel+2)/2)
+              <td colspan="$colsp">
+                <label for="name">$services.localization.render('rightsmanager.searchfilter')</label>
+                <input id="name" name="name" type="text"/>
+              </td>
+              <td colspan="$colsp">
                 #if(!$xcontext.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
                   <div id="usersandgroupstable-filters-scope">
@@ -230,9 +228,17 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
                 #else
                   <input type="hidden" name="wiki" value="local"/>
                 #end
-                #set ($colsp = $maxlevel + 1)
+                <input type="hidden" name="clsname" value="$escapetool.xml($clsname)" />
               </td>
-              <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+            </tr>
+            <tr id="unregistered">
+              ## Rights for guests, statically displayed outside the livetable
+              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
+              #foreach ($i in [0..$maxlevel])
+                #if ($currentAllowed[$i])
+                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #end
+              #end
             </tr>
           </thead>
           ## Livetable placeholder, will be filled in from Javascript
@@ -257,30 +263,26 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
         #if ("$!auth_view" == '1')
-          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($view_alt = 'yes')
+          #set ($view_checked = 'checked')
         #else
-          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($view_alt = 'no')
+          #set ($view_checked = '')
         #end
         <dt>
           <label for="authenticate_view">
-            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
+            <input type="checkbox" id="authenticate_view" $view_checked/>
             $services.localization.render('authenticate_view')
           </label>
           <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
         </dt>
         #set ($auth_edit = $targetDocument.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
         #if ("$!auth_edit" == '1')
-          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($edit_alt = 'yes')
+          #set ($edit_checked = 'checked')
         #else
-          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($edit_alt = 'no')
+          #set ($edit_checked = '')
         #end
         <dt>
           <label for="authenticate_edit">
-            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
+            <input type="checkbox" id="authenticate_edit" $edit_checked/>
             $services.localization.render('authenticate_edit')
           </label>
           <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
@@ -294,16 +296,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           #set ($guest_comment_requires_captcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0))
         #end
         #if($guest_comment_requires_captcha == 1)
-          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-          #set ($guest_comment_requires_captcha_alt = 'yes')
+          #set ($captcha_checked = 'checked')
         #else
-          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-          #set ($guest_comment_requires_captcha_alt = 'no')
+          #set ($captcha_checked = '')
         #end
         <dt>
           <label for="guest_comment_requires_captcha">
-            <input type="image" id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt"
-                src="$guest_comment_requires_captcha_icon" class="icon" />
+            <input type="checkbox" id="guest_comment_requires_captcha" $captcha_checked/>
             $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
           </label>
         </dt>
@@ -330,11 +329,10 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 
   function startup() {
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-
-    #if ($isWorkspace)
-      window.groupScopeIndex = 0;
-      hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
-    #end
+      #if ($isWorkspace)
+        window.groupScopeIndex = 0;
+        hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
+      #end
 
       window.activeRights = [#foreach($i in [0..$maxlevel])#if ($currentAllowed[$i])"$levelsRights.get($i)",#end#end];
       window.saveUrl = "$saveUrl";
@@ -347,11 +345,11 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       // the callback function is called from LiveTable with 3 arguments
       var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
-    #foreach($i in [0..$maxlevel])
-      #if ($currentAllowed[$i])
-        var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+      #foreach($i in [0..$maxlevel])
+        #if ($currentAllowed[$i])
+          var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, $guestRights.get($i));
+        #end
       #end
-    #end
       Event.observe(window, 'load', function() {
         if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {
           $('unregistered').addClassName('hidden');
@@ -359,13 +357,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
           $('unregistered').removeClassName('hidden');
         }
       });
-    #if("$!editor" == 'globaladmin' && $isStandardRights)
-      Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-      Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-    #end
-    #if($guest_comment_captcha_prop && $isStandardRights)
-      Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
-    #end
+      #if("$!editor" == 'globaladmin' && $isStandardRights)
+        Event.observe($('authenticate_view'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_view'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+        Event.observe($('authenticate_edit'), 'click', setBooleanPropertyFromLiveCheckbox($('authenticate_edit'), '$xwiki.getURL('XWiki.XWikiPreferences', 'save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      #end
+      #if($guest_comment_captcha_prop && $isStandardRights)
+        Event.observe($('guest_comment_requires_captcha'), 'click', setBooleanPropertyFromLiveCheckbox($('guest_comment_requires_captcha'), '$targetDocument.getURL('save', "form_token=$!{services.csrf.getToken()}")', 'XWiki.XWikiPreferences', 0));
+      #end
       return true;
     }
     return false;

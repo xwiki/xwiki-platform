@@ -142,6 +142,8 @@
 
       uploadButton.on('click', function (event) {
         event.preventDefault();
+        
+        const buttonElement = $(this);
 
         const uploadedFile = element.find("input[type='file']").prop('files')[0];
 
@@ -155,8 +157,7 @@
           element.addClass('loading');
           imageSelector.createLoader(uploadedFile, {
             onSuccess: function (entityReference) {
-              imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)],
-                element);
+              imageSelector.updateSelectedImageReferences([XWiki.Model.serialize(entityReference)], buttonElement);
               element.removeClass('loading');
               new XWiki.widgets.Notification(translations.get('modal.fileUpload.success'), 'done');
             },
@@ -174,6 +175,15 @@
     }
 
     init($(document).find('.image-selector'));
+    
+    /* Make sure the input is emptied whenever we reload the image selection modal. */
+    $(document).on('shown.bs.modal', function () {
+      let fileInput = $(document).find('.image-selector').find("input[type='file']");
+      if (fileInput.prop('files').length &gt; 0) { 
+        fileInput.val(''); 
+        $(document).find('.image-selector').find(".upload form input.button").prop("disabled", true);
+      }
+    });
 
     $(document).on('xwiki:dom:updated', (event, data) =&gt; {
       data.elements.forEach(element =&gt; init($(element)));

@@ -163,6 +163,7 @@ CKEDITOR.editorConfig = function(config) {
       'xwiki-macro',
       'xwiki-maximize',
       'xwiki-office',
+      'xwiki-realtime',
       'xwiki-save',
       'xwiki-selection',
       'xwiki-slash',
@@ -302,6 +303,7 @@ CKEDITOR.editorConfig = function(config) {
       },
       'xwiki-macro': {label: 'xwiki-toolbar.otherMacros'}
     },
+    versionCheck: false,
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters
       // in-line using nested editables, depending on the macro content / parameter type.

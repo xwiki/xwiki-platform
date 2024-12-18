@@ -21,13 +21,13 @@
 
   .navbar-nav {
     float: right;
+
     &.navbar-left > li {
       float: left;
     }
-    // Should be explicitly defined as "&.navbar-right > li", but leaving this implicit (i.e. as it was)
-    // in order to not increase specificity and break any customizations
-    > li {
-      float: right;
+
+    &.navbar-right {
+      display: flex;
     }
   }
   .navbar-form {
@@ -45,6 +45,10 @@
       float: left;
       margin-left: @navbar-padding-horizontal;
       margin-right: @navbar-padding-horizontal;
+      /* Without this rule, the left navbar will cause unexpected layout shifts even when it's empty. */
+      &:not(:has(> *)) {
+        margin-top: 0;
+      }  
     }
   }
 }
@@ -79,6 +83,16 @@
     }
   }
 }
+// Authentication buttons ========================================================
+// Reduce the spacing between both items if there's both
+li:has(#tmLogin) + li #tmRegister {
+  padding-right: 8px;
+}
+li:has(+ li #tmRegister) #tmLogin {
+  padding-left: 8px;
+}
+
+// Quick search ========================================================
 
 #globalsearch {
   display: flex;
@@ -121,8 +135,7 @@
     border-radius: 0;
     border: 0;
     min-width: 0;
-    transform-origin: 100% 50%;
-    transition: transform 300ms ease-in-out;
+    transition: width 300ms ease-in-out, padding 300ms ease-in-out;
     width: 200px; // we need to set a width in pixels otherwise the transition is not applied nicely
   }
 
@@ -144,7 +157,14 @@
     }
     // The input has no width (it's hidden basically, but we need to set the width to 0 to have the nice transition)
     & + #headerglobalsearchinput { // we need to be that specific to be applied
-      transform: scaleX(0);
+      width: 0;
+      padding: 0;
+    }
+
+    // Hides the search result when the focus is not on the search field.
+    & ~ .searchSuggest {
+      opacity: 0;
+      max-height: 0;
     }
   }
 }

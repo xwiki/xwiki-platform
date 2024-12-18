@@ -22,8 +22,8 @@ package org.xwiki.notifications;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +32,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.DocumentEventType;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -105,7 +104,6 @@ public class CompositeEvent
      * @param event the event to add
      * @since 15.5RC1
      */
-    @Unstable
     public void add(Event event)
     {
         events.add(event);
@@ -173,7 +171,9 @@ public class CompositeEvent
      */
     public Set<DocumentReference> getUsers()
     {
-        Set<DocumentReference> users = new HashSet();
+        // Use a linked hash set to follow the order in which events were added:
+        // this avoids problems when testing
+        Set<DocumentReference> users = new LinkedHashSet<>();
         for (Event event : events) {
             users.add(event.getUser());
         }

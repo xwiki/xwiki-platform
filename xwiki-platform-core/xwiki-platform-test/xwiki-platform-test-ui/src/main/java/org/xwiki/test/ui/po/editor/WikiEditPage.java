@@ -51,9 +51,6 @@ public class WikiEditPage extends PreviewableEditPage
     @FindBy(id = "editParentTrigger")
     private WebElement editParentTrigger;
 
-    @FindBy(id = "content")
-    private WebElement contentText;
-
     @FindBy(name = "minorEdit")
     private WebElement minorEditCheckBox;
 
@@ -62,6 +59,9 @@ public class WikiEditPage extends PreviewableEditPage
 
     @FindBy(className = "modal-popup")
     private WebElement modal;
+
+    @FindBy(id = "content")
+    protected WebElement contentText;
 
     /**
      * Go to the passed page in wiki edit mode.

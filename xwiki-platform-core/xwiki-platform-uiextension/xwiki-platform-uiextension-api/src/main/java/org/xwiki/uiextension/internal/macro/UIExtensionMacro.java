@@ -37,6 +37,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.uiextension.UIExtension;
 import org.xwiki.uiextension.UIExtensionManager;
+import org.xwiki.uiextension.macro.UIExtensionMacroParameters;
 
 /**
  * Insert UI extensions.

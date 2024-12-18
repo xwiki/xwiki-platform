@@ -200,6 +200,7 @@
       "panel-header-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
+      "breadcrumb-link-color": "color",
       "breadcrumb-separator": "escapedText",
       "table-bg": "color",
       "table-bg-hover": "color",
@@ -265,9 +266,10 @@
   ## from an orangish yellow to complete brown. Instead, we change the text color to black.
   @btn-warning-color:                   #000;
   ## The boxes should have enough contrast by default, we make it lighter than bootstrap.
-  @state-danger-bg:                     #f8ecec;
-  @state-success-bg:                    #e5f3df;
-  @state-info-bg:                       #e1f1f9;
+  ## @alert-warning-bg default value from bootstrap does not pose contrast issues, so we don't override it.
+  @alert-danger-bg:                     #f8ecec;
+  @alert-success-bg:                    #e5f3df;
+  @alert-info-bg:                       #e1f1f9;
   ## We override the @brand-danger value from bootstrap as it does not pass contrast checks on #fff
   @brand-danger:                        #cc3333;
 #end

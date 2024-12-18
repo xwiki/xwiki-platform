@@ -1,5 +1,11 @@
 #template('colorThemeInit.vm')
 
+.dashboard-edit {
+  display: flex;
+  flex-direction: column;
+  gap: .2em;
+}
+
 /* panels style gadget settings (forced in inline mode) */
 .panels .gadget .gadget-title, .dashboard-edit .gadget .gadget-title {
   font-size: 0.8em;
@@ -56,14 +62,6 @@
   width: 16px;
 }
 
-.gadget-actions .remove.action {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-
-.gadget-actions .edit.action {
-  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')");
-}
-
 .gadget-actions .edit.action.loading,
 .dashboard-edit .addgadget.loading {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
@@ -95,19 +93,17 @@
   cursor: move;
 }
 
+.dashboard-edit .containeradd {
+  display: flex;
+  justify-content: end;
+  gap: .2rem;
+}
+
 /* Add button decoration */
 .dashboard-edit .addgadget, .dashboard-edit .addcontainer {
-  background: url($xwiki.getSkinFile("icons/silk/add.png")) no-repeat 3px center $theme.menuAddEntryBackgroundColor;
-  border-radius: 7px;
-  color: $theme.menuAddEntryLinkColor;
-  cursor: pointer;
-  float: right;
-  font-size: 83.3%;
-  line-height: 1.6em;
-  margin-left: 5px;
-  margin-top: 20px;
-  min-height: 16px;
-  padding: 3px 6px 3px 22px;
+  display: flex;
+  align-items: baseline;
+  gap: .5em;
 }
 
 /* Hide gadget title, when wider than gadget width */

@@ -19,15 +19,26 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * Interface for manipulate document history.
@@ -46,6 +57,87 @@ public interface XWikiVersioningStoreInterface
     void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException;
 
     Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException;
+
+    private boolean matchCriteria(XWikiRCSNodeInfo nodeinfo, RevisionCriteria criteria)
+    {
+        // Author matching
+        if (criteria.getAuthor().isEmpty() || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
+            // Date range matching
+            Date versionDate = nodeinfo.getDate();
+            return (versionDate.after(criteria.getMinDate()) && versionDate.before(criteria.getMaxDate()));
+        }
+        return false;
+    }
+
+    default Collection<String> filterVersions(XWikiDocumentArchive archive, RevisionCriteria criteria)
+    {
+        List<String> results = new ArrayList<>();
+
+        List<XWikiRCSNodeInfo> nodes = new ArrayList<>(archive.getNodes());
+        Collections.reverse(nodes);
+
+        Iterator<XWikiRCSNodeInfo> nodesIterator = nodes.iterator();
+        if (!nodesIterator.hasNext()) {
+            return List.of();
+        }
+
+        XWikiRCSNodeInfo nodeinfo = nodesIterator.next();
+        XWikiRCSNodeInfo nextNodeinfo;
+
+        while (nodesIterator.hasNext()) {
+            nextNodeinfo =nodesIterator.next();
+
+            // Minor/Major version matching
+            if ((criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit())
+                && (matchCriteria(nodeinfo, criteria)))
+            {
+                results.add(nodeinfo.getVersion().toString());
+            }
+            nodeinfo = nextNodeinfo;
+        }
+
+        if (matchCriteria(nodeinfo, criteria)) {
+            results.add(nodeinfo.getVersion().toString());
+        }
+
+        return criteria.getRange().subList(results);
+    }
+
+    /**
+     * Gets versions from a given document matching criteria like author, minimum creation date, etc.
+     *
+     * @param doc the document
+     * @param criteria criteria used to match versions
+     * @param context the XWiki context
+     * @return the matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    default Collection<Version> getXWikiDocVersions(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
+        return filterVersions(getXWikiDocumentArchive(doc, context), criteria).stream()
+            .map(Version::new)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets the number of versions from a given document matching criteria like author, minimum creation date, etc.
+     *
+     * @param doc the document
+     * @param criteria criteria used to match versions
+     * @param context the XWiki context
+     * @return the number of matching versions
+     * @since 15.10.8
+     * @since 16.2.0RC1
+     */
+    @Unstable
+    default long getXWikiDocVersionsCount(XWikiDocument doc, RevisionCriteria criteria, XWikiContext context)
+        throws XWikiException
+    {
+        return filterVersions(getXWikiDocumentArchive(doc, context), criteria).size();
+    }
 
     XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;
 

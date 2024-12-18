@@ -25,14 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-livedata</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-livedata-api</artifactId>
   <name>XWiki Platform - Live Data - API</name>
   <properties>
     <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data API</xwiki.extension.name>
   </properties>

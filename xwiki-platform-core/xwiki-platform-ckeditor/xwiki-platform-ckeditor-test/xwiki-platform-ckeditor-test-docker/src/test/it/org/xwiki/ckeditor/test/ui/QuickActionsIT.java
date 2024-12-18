@@ -59,7 +59,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
     },
     resolveExtraJARs = true
 )
-public class QuickActionsIT extends AbstractCKEditorIT
+class QuickActionsIT extends AbstractCKEditorIT
 {
     /**
      * Test string that will be inserted to check formatting.
@@ -73,6 +73,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
     {
         // Wait for Solr indexing to complete as the link search is based on Solr indexation.
         setup.loginAsSuperAdmin();
+        setup.setWikiPreference("iconTheme",  "IconThemes.Silk");
         waitForSolrIndexing(setup, testConfiguration);
 
         createAndLoginStandardUser(setup);
@@ -92,7 +93,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(1)
-    void heading1AndParagraph() throws Exception
+    void heading1AndParagraph()
     {
         // Switch to another style
         textArea.sendKeys("/hea");
@@ -121,7 +122,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(2)
-    void heading2() throws Exception
+    void heading2()
     {
         textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -139,7 +140,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(3)
-    void heading3() throws Exception
+    void heading3()
     {
         textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -157,7 +158,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(4)
-    void heading4() throws Exception
+    void heading4()
     {
         textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -175,7 +176,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
     
     @Test
     @Order(5)
-    void heading5() throws Exception
+    void heading5()
     {
         textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -193,7 +194,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(6)
-    void heading6() throws Exception
+    void heading6()
     {
         textArea.sendKeys("/hea");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -211,7 +212,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
     
     @Test
     @Order(7)
-    void bulletedList() throws Exception
+    void bulletedList()
     {
         textArea.sendKeys("/bu");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -227,7 +228,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(8)
-    void numberedList() throws Exception
+    void numberedList()
     {
         textArea.sendKeys("/nu");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -243,7 +244,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(9)
-    void table() throws Exception
+    void table()
     {
         textArea.sendKeys("/tab");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -262,7 +263,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(10)
-    void blockQuote() throws Exception
+    void blockQuote()
     {
         textArea.sendKeys("/quo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -278,7 +279,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(11)
-    void infoBox() throws Exception
+    void infoBox()
     {
         textArea.sendKeys("/inf");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -287,17 +288,16 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my info message");
 
-        assertSourceEquals("{{info}}\nmy info message\n{{/info}}\n\n ");
+        assertSourceEquals("{{info}}\nmy info message\n{{/info}}");
     }
 
     @Test
     @Order(12)
-    void successBox() throws Exception
+    void successBox()
     {
         textArea.sendKeys("/suc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -306,17 +306,16 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my success message");
 
-        assertSourceEquals("{{success}}\nmy success message\n{{/success}}\n\n ");
+        assertSourceEquals("{{success}}\nmy success message\n{{/success}}");
     }
 
     @Test
     @Order(13)
-    void warningBox() throws Exception
+    void warningBox()
     {
         textArea.sendKeys("/war");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -325,17 +324,16 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my warning message");
 
-        assertSourceEquals("{{warning}}\nmy warning message\n{{/warning}}\n\n ");
+        assertSourceEquals("{{warning}}\nmy warning message\n{{/warning}}");
     }
 
     @Test
     @Order(14)
-    void errorBox() throws Exception
+    void errorBox()
     {
         textArea.sendKeys("/err");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -344,17 +342,16 @@ public class QuickActionsIT extends AbstractCKEditorIT
         qa.waitForItemSubmitted();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
         // Delete the default message text.
         textArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END), Keys.BACK_SPACE);
         textArea.sendKeys("my error message");
 
-        assertSourceEquals("{{error}}\nmy error message\n{{/error}}\n\n ");
+        assertSourceEquals("{{error}}\nmy error message\n{{/error}}");
     }
 
     @Test
     @Order(15)
-    void divider() throws Exception
+    void divider()
     {
         textArea.sendKeys("/div");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -367,7 +364,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(16)
-    void link() throws Exception
+    void link()
     {
         textArea.sendKeys("/lin");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -386,7 +383,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(17)
-    void image() throws Exception
+    void image()
     {
         textArea.sendKeys("/im");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -400,7 +397,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(18)
-    void mention() throws Exception
+    void mention()
     {
         textArea.sendKeys("/men");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -422,7 +419,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(19)
-    void emoji() throws Exception
+    void emoji()
     {
         textArea.sendKeys("/emo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -439,7 +436,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(20)
-    void include() throws Exception
+    void include()
     {
         textArea.sendKeys("/inc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -451,14 +448,13 @@ public class QuickActionsIT extends AbstractCKEditorIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{include/}}");
     }
 
     @Test
     @Order(21)
-    void code() throws Exception
+    void code()
     {
         textArea.sendKeys("/cod");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -470,30 +466,27 @@ public class QuickActionsIT extends AbstractCKEditorIT
         new MacroDialogEditModal().waitUntilReady().clickSubmit();
 
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{code language=\"none\"}}{{/code}}");
     }
 
     @Test
     @Order(22)
-    void toc() throws Exception
+    void toc()
     {
         textArea.sendKeys("/toc");
         AutocompleteDropdown qa = new AutocompleteDropdown();
         qa.waitForItemSelected("/toc", "Table of Contents");
         textArea.sendKeys(Keys.ENTER);
         qa.waitForItemSubmitted();
+        textArea.waitForContentRefresh();
 
-        textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
-
-        assertSourceEquals("{{toc/}}\n");
+        assertSourceEquals("{{toc/}}\n\n ");
     }
 
     @Test
     @Order(23)
-    void find() throws Exception
+    void find()
     {
         textArea.sendKeys("/fin");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -507,7 +500,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
     
     @Test
     @Order(24)
-    void emojiClickTriggersDropDown(TestUtils setup) throws Exception
+    void emojiClickTriggersDropDown(TestUtils setup)
     {
         textArea.sendKeys("/emo");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -530,7 +523,7 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
     @Test
     @Order(25)
-    void icon() throws Exception
+    void icon()
     {
         textArea.sendKeys("/icon");
         AutocompleteDropdown qa = new AutocompleteDropdown();
@@ -546,8 +539,49 @@ public class QuickActionsIT extends AbstractCKEditorIT
 
         // We wait for the editor to update because the icon quick action is using a macro.
         textArea = editor.getRichTextArea();
-        textArea.waitUntilContentEditable();
 
         assertSourceEquals("{{displayIcon name=\"wiki\"/}} ");
+    }
+
+    @Test
+    @Order(26)
+    void infoBoxInline()
+    {
+        // Type some text in a paragraph.
+        textArea.sendKeys("before after");
+        // Place the caret between the typed words.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT, Keys.RIGHT));
+        textArea.sendKeys(" /inf");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/inf", "Info Box");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded after a macro is inserted.
+        textArea = editor.getRichTextArea();
+
+        // Note that we didn't modify the default info message because inline macros are not editable in-place.
+        assertSourceEquals("before {{info}}Type your information message here.{{/info}} after");
+    }
+
+    @Test
+    @Order(27)
+    void velocityInline()
+    {
+        // Type some text in a paragraph.
+        textArea.sendKeys("one two");
+        // Place the caret between the typed words.
+        textArea.sendKeys(Keys.chord(Keys.CONTROL, Keys.LEFT, Keys.LEFT, Keys.RIGHT));
+        textArea.sendKeys(" /velo");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/velo", "Velocity");
+        textArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // The content is reloaded after a macro is inserted.
+        textArea = editor.getRichTextArea();
+
+        // Note that we didn't modify the default info message because inline macros are not editable in-place.
+        assertSourceEquals("one {{velocity}} {{/velocity}} two");
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-solr-all</artifactId>
   <packaging>deb</packaging>
@@ -34,40 +34,40 @@
   <properties>
     <data.path>${project.build.directory}/data</data.path>
 
-    <debian.package>xwiki-solr-all</debian.package>
+    <debian.package>xwiki-solr9-all</debian.package>
 
-    <debian.solr.description>
+    <debian.description>
  XWiki is a free wiki software platform written in Java with a design emphasis
  on extensibility.
  .
  Trigger the installation of all the Solr cores of XWiki Standard.
-    </debian.solr.description>
+    </debian.description>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-debian-solr-events</artifactId>
+      <artifactId>xwiki-platform-distribution-debian-solr-core-events</artifactId>
       <version>${project.version}</version>
       <type>deb</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-debian-solr-search</artifactId>
+      <artifactId>xwiki-platform-distribution-debian-solr-core-search</artifactId>
       <version>${project.version}</version>
       <type>deb</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-debian-solr-ratings</artifactId>
+      <artifactId>xwiki-platform-distribution-debian-solr-core-ratings</artifactId>
       <version>${project.version}</version>
       <type>deb</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-distribution-debian-solr-extension_index</artifactId>
+      <artifactId>xwiki-platform-distribution-debian-solr-core-extension_index</artifactId>
       <version>${project.version}</version>
       <type>deb</type>
       <scope>runtime</scope>

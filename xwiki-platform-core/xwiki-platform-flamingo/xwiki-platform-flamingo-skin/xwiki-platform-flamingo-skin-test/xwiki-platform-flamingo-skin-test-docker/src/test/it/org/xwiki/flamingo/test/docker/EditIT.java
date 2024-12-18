@@ -43,6 +43,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker;
 import org.xwiki.test.ui.po.DocumentSyntaxPicker.SyntaxConversionConfirmationModal;
@@ -83,7 +84,7 @@ public class EditIT
     @AfterEach
     public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
 
         // Ensure remaining tabs are properly closed.
         if (setup.getDriver().getWindowHandles().size() > 1) {
@@ -240,6 +241,8 @@ public class EditIT
      * page.
      */
     @Test
+    @IgnoreBrowser(value = "chrome", reason = "Alert handling in Chrome currently isn't working, see also "
+        + "https://jira.xwiki.org/browse/XWIKI-22533")
     @Order(6)
     public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
@@ -677,7 +680,7 @@ public class EditIT
 
         wikiEditPageTab1.setContent(
               "First line."
-            + "\nSecond line."
+            + "\n<script>alert('Second line.')</script>"
             + "\nLine N°4"
             + "\nFifth line."
             + "\n6th line."
@@ -690,9 +693,9 @@ public class EditIT
         assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
         assertEquals(Arrays.asList("@@ -1,6 +1,6 @@",
             " First line.",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             " Fifth line.",
             "-<del>Six</del>th line.",
@@ -705,9 +708,9 @@ public class EditIT
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
             " First line.",
             "@@ -2,2 +2,2 @@",
-            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>L</del>i<del>n</del>e <del>N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
-            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>&lt;scr</ins>i<ins>pt&gt;al</ins>e<ins>rt('Second</ins> <ins>line.')&lt;/script&gt;</ins>",
             "+<ins>L</ins>ine<ins> N°4</ins>",
             "[Conflict Resolution]",
             "@@ -4,1 +4,1 @@",
@@ -727,7 +730,7 @@ public class EditIT
 
         assertEquals(Conflict.DecisionType.CURRENT, conflict.getCurrentDecision());
         assertFalse(conflict.isDecisionChangeEmpty());
-        assertEquals("Second line.\nLine N°4", conflict.getDecisionChange());
+        assertEquals("<script>alert('Second line.')</script>\nLine N°4", conflict.getDecisionChange());
         conflict.setDecision(Conflict.DecisionType.PREVIOUS);
         assertFalse(conflict.isDecisionChangeEmpty());
         assertEquals("Second line.\nThird line.", conflict.getDecisionChange());

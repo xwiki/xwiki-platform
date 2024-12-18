@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-crypto</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-crypto-script</artifactId>
@@ -33,7 +33,6 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Script Service for the Cryptographic API</xwiki.extension.name>
-    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

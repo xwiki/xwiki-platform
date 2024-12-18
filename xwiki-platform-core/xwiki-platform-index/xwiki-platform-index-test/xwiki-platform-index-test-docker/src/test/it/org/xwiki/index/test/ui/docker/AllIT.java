@@ -57,8 +57,8 @@ public class AllIT
     }
 
     @Nested
-    @DisplayName("Spaces UI")
-    class NestedSpacesIT extends SpacesIT
+    @DisplayName("Pinned Pages UI")
+    class NestedPinnedPagesIT extends PinnedPagesIT
     {
     }
 }

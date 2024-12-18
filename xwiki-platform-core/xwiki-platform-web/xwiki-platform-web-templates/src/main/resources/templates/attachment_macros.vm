@@ -213,7 +213,7 @@
       #set ($deleteURL = $xwiki.getURL($attachment.getReference(), 'delattachment', $queryString))
       <a class="actiondelete action" title="$escapetool.xml($services.localization.render(
           'core.viewers.attachments.delete.title', [$attachment.filename]))" href="$escapetool.xml($deleteURL)">
-        <span class="action-icon">$services.icon.renderHTML('cross')</span><span class="action-label">$escapetool.xml(
+        <span class="action-icon text-danger">$services.icon.renderHTML('trash')</span><span class="action-label">$escapetool.xml(
           $services.localization.render('core.viewers.attachments.delete'))
         </span>
       </a>
@@ -229,7 +229,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close" data-dismiss="modal">$services.icon.renderHTML('cross')</button>
           <div class="modal-title">$services.localization.render('core.viewers.attachments.delete')</div>
         </div>
         <div class="modal-body">

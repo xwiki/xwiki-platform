@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define the various configuration options for registration.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 15.10RC1
  */
-@Unstable
 @Role
 public interface RegistrationConfiguration
 {
@@ -58,7 +56,7 @@ public interface RegistrationConfiguration
         /**
          * When one symbol character is mandatory.
          */
-        ONE_SYMBOL_CHARACTER(".*(_\\W)+.*"),
+        ONE_SYMBOL_CHARACTER(".*[_\\W]+.*"),
 
         /**
          * When one number character is mandatory.

@@ -172,7 +172,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     // Create the popover
     var popover = $('&lt;div class="popover-content"&gt;#tr("tour.popover.show.hint")&lt;/div&gt;').appendTo(buttonContainer);
     // Create the button that will start the tour again
-    var button = $($jsontool.serialize("&lt;button id='tourResume' class='btn btn-default btn-xs'&gt;$services.icon.renderHTML('info') #tr('tour.popover.show')&lt;/button&gt;")).appendTo(buttonContainer);
+    const button = $('&lt;button id=\'tourResume\' class=\'btn btn-default btn-xs\'&gt;&lt;/button&gt;')
+      .html("$escapetool.javascript($services.icon.renderHTML('info')) #tr('tour.popover.show')")
+      .appendTo(buttonContainer);
 
     if (showPopover) {
       buttonContainer.addClass('opened');
@@ -212,7 +214,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
                  + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
                  + '  &lt;h2 class="popover-title"&gt;&lt;/h2&gt;\n'
                  + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
-                 + '  &lt;div class="popover-navigation row"&gt;\n'
+                 + '  &lt;div class="popover-navigation"&gt;\n'
                  + '    &lt;div class="col-xs-6 text-left"&gt;\n';
     if (step.prev &gt; -1) {
       template  += '      &lt;a class="btn btn-default btn-sm" href="#" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
@@ -603,6 +605,11 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   position: absolute;
   top: 3px;
   right: 5px;
+}
+
+.popover[class*="tour-"] .popover-navigation:not(.row) {
+  padding-right: 0;
+  padding-left: 0;
 }
 </code>
     </property>

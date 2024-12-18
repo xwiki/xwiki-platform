@@ -23,15 +23,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotation</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-ui</artifactId>
   <name>XWiki Platform - Annotations - UI</name>
   <packaging>xar</packaging>
-  <description>Annotations application for XWiki, to provide interface for the core annotations feature.</description>
+  <description>Add annotations to wiki pages</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Annotation Application</xwiki.extension.name>
+    <!-- Category for the Extension Manager -->
+    <xwiki.extension.category>application</xwiki.extension.category>
   </properties>
   <dependencies>
     <dependency>

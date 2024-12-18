@@ -67,6 +67,7 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -106,6 +107,10 @@ class DisplayMacroTest
     // Make sure to not load the standard AuthorizationManager which trigger too many things
     @MockComponent
     private AuthorizationManager authorizationManager;
+
+    // Mock DocumentAuthorizationManager as otherwise the document display cannot be loaded
+    @MockComponent
+    private DocumentAuthorizationManager documentAuthorizationManager;
 
     @MockComponent
     private ContextualAuthorizationManager contextualAuthorizationManager;
@@ -373,7 +378,7 @@ class DisplayMacroTest
         parameters.setSection("unknown");
 
         Throwable exception = assertThrows(MacroExecutionException.class,
-            () -> runDisplayMacro(parameters, "content", false));
+            () -> runDisplayMacro(parameters, "content"));
         assertEquals("Cannot find section [unknown] in document [wiki:Space.DisplayedPage]", exception.getMessage());
     }
 
@@ -465,12 +470,54 @@ class DisplayMacroTest
         BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
     }
 
+    @Test
+    void executeInInlineContextWithInlineContent() throws Exception
+    {
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            onWord [content]
+            endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("document");
+
+        List<Block> blocks = runDisplayMacro(parameters, "content", true);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeInInlineContextWithNonInlineContent() throws Exception
+    {
+        String expected = """
+            beginDocument
+            beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            beginParagraph
+            onWord [first]
+            endParagraph
+            beginParagraph
+            onWord [second]
+            endParagraph
+            endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage][syntax]=[XWiki 2.0]]
+            endDocument""";
+
+        DisplayMacroParameters parameters = new DisplayMacroParameters();
+        parameters.setReference("document");
+
+        List<Block> blocks = runDisplayMacro(parameters, "first\n\nsecond", true);
+
+        BlockAssert.assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
     {
         MacroTransformationContext context = new MacroTransformationContext();
-        MacroBlock displayMacro =
+        context.setInline(isInline);
+        MacroBlock macroBlock =
             new MacroBlock("display", Collections.singletonMap("reference", documentName), isInline);
-        context.setCurrentMacroBlock(displayMacro);
+        context.setCurrentMacroBlock(macroBlock);
         return context;
     }
 
@@ -499,7 +546,7 @@ class DisplayMacroTest
         when(this.dab.getTranslatedDocumentInstance(this.displayedDocument)).thenReturn(this.displayedDocument);
         when(this.displayedDocument.getDocumentReference()).thenReturn(displayedDocumentReference);
         when(this.displayedDocument.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
-        when(this.displayedDocument.getXDOM()).thenReturn(getXDOM(displayedContent));
+        when(this.displayedDocument.getPreparedXDOM()).thenReturn(getXDOM(displayedContent));
         when(this.displayedDocument.getRealLanguage()).thenReturn("");
     }
 
@@ -524,12 +571,13 @@ class DisplayMacroTest
         return runDisplayMacro(new DisplayMacroParameters(), displayedContent);
     }
 
-    private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent) throws Exception
+    private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent)
+        throws Exception
     {
-        return runDisplayMacro(parameters, displayedContent, true);
+        return runDisplayMacro(parameters, displayedContent, false);
     }
 
-    private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent, boolean pushpopMock)
+    private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent, boolean isInline)
         throws Exception
     {
         DocumentReference displayedDocumentReference = new DocumentReference("wiki", "Space", "DisplayedPage");
@@ -541,7 +589,7 @@ class DisplayMacroTest
         // Create a Macro transformation context with the Macro transformation object defined so that the display
         // macro can transform displayed page which is using a new context.
         MacroTransformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
-        MacroTransformationContext macroContext = createMacroTransformationContext(displayedDocStringRef, false);
+        MacroTransformationContext macroContext = createMacroTransformationContext(displayedDocStringRef, isInline);
         macroContext.setId("wiki:Space.DisplayingPage");
         macroContext.setTransformation(macroTransformation);
 

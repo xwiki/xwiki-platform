@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.jsoup.nodes.Document;
@@ -32,7 +33,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.xwiki.administration.api.ConfigurableObjectEvaluator;
+import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
+import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
 import org.xwiki.localization.macro.internal.TranslationMacro;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
@@ -41,6 +46,7 @@ import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationC
 import org.xwiki.rendering.internal.macro.message.ErrorMessageMacro;
 import org.xwiki.rendering.internal.macro.message.WarningMessageMacro;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.test.annotation.ComponentList;
@@ -51,10 +57,13 @@ import org.xwiki.test.page.XWikiSyntax21ComponentList;
 import org.xwiki.user.UserReferenceComponentList;
 import org.xwiki.user.internal.converter.DocumentUserReferenceConverter;
 import org.xwiki.user.internal.document.DocumentUserReference;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -62,6 +71,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -81,7 +93,10 @@ import static org.mockito.Mockito.when;
     ErrorMessageMacro.class,
     WarningMessageMacro.class,
     DocumentUserReferenceConverter.class,
-    DocumentReferenceConverter.class
+    DocumentReferenceConverter.class,
+    DefaultObjectEvaluator.class,
+    VelocityObjectPropertyEvaluator.class,
+    ConfigurableObjectEvaluator.class
 })
 class ConfigurableClassPageTest extends PageTest
 {
@@ -100,6 +115,8 @@ class ConfigurableClassPageTest extends PageTest
 
     private static final String MY_SECTION_SERIALIZED = "XWiki.]],{{noscript /}}";
 
+    private static final String CONFIG_CLASS_NAME = "TestClass";
+
     private static final String WEB_HOME = "WebHome";
 
     @Mock
@@ -107,6 +124,10 @@ class ConfigurableClassPageTest extends PageTest
 
     @Mock
     private ScriptQuery query;
+
+    private AuthorExecutor authorExecutor;
+
+    private VelocityEngine velocityEngine;
 
     @BeforeEach
     void setUp() throws Exception
@@ -122,6 +143,21 @@ class ConfigurableClassPageTest extends PageTest
         when(this.query.setOffset(anyInt())).thenReturn(this.query);
         when(this.query.bindValues(any(Map.class))).thenReturn(this.query);
         when(this.query.bindValues(any(List.class))).thenReturn(this.query);
+
+        this.authorExecutor = this.componentManager.registerMockComponent(AuthorExecutor.class, true);
+
+        // Spy Velocity Engine.
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
+        this.velocityEngine = velocityManager.getVelocityEngine();
+        this.velocityEngine = spy(this.velocityEngine);
+        velocityManager = spy(velocityManager);
+        this.componentManager.registerComponent(VelocityManager.class, velocityManager);
+        when(velocityManager.getVelocityEngine()).thenReturn(this.velocityEngine);
+
+        when(this.authorExecutor.call(any(), any(), any())).thenAnswer(invocation -> {
+            Callable<?> callable = invocation.getArgument(0);
+            return callable.call();
+        });
     }
 
     @Test
@@ -167,27 +203,51 @@ class ConfigurableClassPageTest extends PageTest
         when(this.oldcore.getMockRightService()
             .hasAccessLevel(eq("edit"), any(), any(), any())).thenReturn(true);
 
+        DocumentReference configClassRef = new DocumentReference("xwiki", SPACE_NAME, CONFIG_CLASS_NAME);
+        XWikiDocument configClassDoc = new XWikiDocument(configClassRef);
+        BaseClass configClass = new BaseClass();
+        configClass.addTextField("test", "Test", 10);
+        configClassDoc.setXClass(configClass);
+        this.xwiki.saveDocument(configClassDoc, this.context);
+
         XWikiDocument mySectionDoc = new XWikiDocument(MY_SECTION);
+        BaseObject configObject = mySectionDoc.newXObject(configClassRef, this.context);
         BaseObject object = mySectionDoc.newXObject(CONFIGURABLE_CLASS, this.context);
         object.setStringValue("displayInCategory", "other");
         object.setStringValue("displayInSection", "other");
+        object.setStringValue("configurationClass", SPACE_NAME + "." + CONFIG_CLASS_NAME);
         String originalHeading = "$appName {{noscript /}}";
         object.setStringValue("heading", originalHeading);
+        String originalLinkPrefix = "\"prefix/$appName/{{noscript /}}/";
+        object.setStringValue("linkPrefix", originalLinkPrefix);
         object.set("scope", "WIKI+ALL_SPACES", this.context);
         DocumentReference userReference = new DocumentReference(WIKI_NAME, SPACE_NAME, "Admin");
         mySectionDoc.getAuthors().setEffectiveMetadataAuthor(new DocumentUserReference(userReference, true));
         this.xwiki.saveDocument(mySectionDoc, this.context);
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.SCRIPT,
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
             userReference, mySectionDoc.getDocumentReference())).thenReturn(hasScript);
 
         Document htmlPage = renderHTMLPage(CONFIGURABLE_CLASS);
-        String expected;
+        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            userReference, MY_SECTION);
+
+        String expectedHeading;
+        String expectedLink;
         if (hasScript) {
-            expected = String.format("%s {{noscript /}}", MY_SECTION_SERIALIZED);
+            expectedHeading = String.format("%s {{noscript /}}", MY_SECTION_SERIALIZED);
+            expectedLink = String.format("\"prefix/%s/{{noscript /}}/test", MY_SECTION_SERIALIZED);
+            verify(this.authorExecutor).call(any(), eq(userReference), eq(MY_SECTION));
+            verify(this.velocityEngine).evaluate(any(), any(), any(), eq(originalHeading));
+            verify(this.velocityEngine).evaluate(any(), any(), any(), eq(originalLinkPrefix));
         } else {
-            expected = originalHeading;
+            expectedHeading = originalHeading;
+            expectedLink = originalLinkPrefix + "test";
+            verify(this.velocityEngine, never()).evaluate(any(), any(), any(), eq(originalHeading));
+            verify(this.velocityEngine, never()).evaluate(any(), any(), any(), eq(originalLinkPrefix));
         }
-        assertEquals(expected, htmlPage.selectFirst("h2").text());
+
+        assertEquals(expectedHeading, Objects.requireNonNull(htmlPage.selectFirst("h2")).text());
+        assertEquals(expectedLink, Objects.requireNonNull(htmlPage.selectFirst("a")).attr("href"));
     }
 
     @Test

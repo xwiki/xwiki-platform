@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-realtime-wysiwyg</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-realtime-wysiwyg-ui</artifactId>
   <name>XWiki Platform - Realtime - WYSIWYG - UI</name>
@@ -34,16 +34,12 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Realtime WYSIWYG Editor</xwiki.extension.name>
+    <!-- Replaces the old Realtime WYSIWYG Editor from XWiki Contrib -->
+    <xwiki.extension.features>
+      calebjamesdelisle:rtwysiwyg
+    </xwiki.extension.features>
   </properties>
   <dependencies>
-    <!-- The realtime WYSIWYG editor is currently based on CKEditor. -->
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-ckeditor-ui</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>xwiki-platform-realtime-ui</artifactId>

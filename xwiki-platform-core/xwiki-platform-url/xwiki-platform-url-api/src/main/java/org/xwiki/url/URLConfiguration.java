@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the URL module.
@@ -85,7 +84,6 @@ public interface URLConfiguration
      * @since 14.10.4
      * @since 15.0
      */
-    @Unstable
     default List<String> getTrustedSchemes()
     {
         return List.of("http", "https", "ftp");

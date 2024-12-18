@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.stability.Unstable;
 
 /**
  * Fetch a content to highlight based on its reference.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 14.10.2
  */
 @Role
-@Unstable
 public interface CodeMacroSourceFactory
 {
     /**

@@ -48,9 +48,29 @@ public class CKEditorToolBar extends BaseElement
         this.container = findContainer(editor);
     }
 
+    /**
+     * Click the numbered list action, by first unfolding the list menu and selecting the numbered list item.
+     *
+     * @since 15.10.9
+     * @since 16.3.0RC1
+     */
+    public void clickNumberedList()
+    {
+        clickButton("lists");
+        WebElement subMenuFrame = getDriver().findElement(By.cssSelector("iframe.cke_panel_frame"));
+
+        try {
+            getDriver().switchTo().frame(subMenuFrame);
+            getDriver().findElement(By.className("cke_menubutton__toolbar_numberedlist")).click();
+        } finally {
+            getDriver().switchTo().parentFrame();
+        }
+    }
+
     protected WebElement findContainer(CKEditor editor)
     {
-        return getDriver().findElementWithoutWaiting(editor.getContainer(), By.className("cke_top"));
+        return (WebElement) getDriver().executeScript("return CKEDITOR.instances[arguments[0]].ui.space('top').$;",
+            editor.getName());
     }
 
     /**
@@ -120,6 +140,20 @@ public class CKEditorToolBar extends BaseElement
     public boolean canToggleSourceMode()
     {
         return hasButton("source", sourceButton -> sourceButton.isDisplayed() && sourceButton.isEnabled());
+    }
+
+    /**
+     * Opens the table properties dialog to insert a new table.
+     *
+     * @return the page object to interact with the table properties dialog
+     * @since 16.8.0RC1
+     * @since 16.4.4
+     * @since 15.10.13
+     */
+    public TablePropertiesDialog insertTable()
+    {
+        clickButton("table");
+        return new TablePropertiesDialog();
     }
 
     /**

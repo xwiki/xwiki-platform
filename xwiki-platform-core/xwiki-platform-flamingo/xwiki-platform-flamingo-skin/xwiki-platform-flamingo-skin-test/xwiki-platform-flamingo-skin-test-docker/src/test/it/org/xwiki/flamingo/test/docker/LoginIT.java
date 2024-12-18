@@ -198,6 +198,6 @@ class LoginIT
         assertEquals("some content", viewPage.getContent());
 
         // Since we got a CSRF warning, we expect it to be in the logs too.
-        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed, token:");
+        logCaptureConfiguration.registerExpected("Secret CSRF token verification failed");
     }
 }

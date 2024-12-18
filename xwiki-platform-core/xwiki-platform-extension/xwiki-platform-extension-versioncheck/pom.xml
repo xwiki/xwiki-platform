@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension</artifactId>
-        <version>16.1.0-SNAPSHOT</version>
+        <version>17.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-extension-versioncheck</artifactId>
     <name>XWiki Platform - Extension - Version Check</name>

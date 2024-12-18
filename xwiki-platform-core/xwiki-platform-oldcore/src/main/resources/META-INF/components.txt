@@ -77,13 +77,11 @@ com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerialize
 com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentDocumentReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider
-com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentEntityUserAndGroupEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetDocumentDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentGetPagePageReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider
-com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
@@ -160,7 +158,9 @@ com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.internal.user.MyPersistentLoginManagerProvider
 com.xpn.xwiki.internal.user.UserAuthenticatedEventNotifier
+com.xpn.xwiki.internal.user.UserCreatedEventListener
 com.xpn.xwiki.internal.velocity.DefaultVelocityEvaluator
+org.xwiki.internal.web.EffectiveAuthorSetterListener
 org.xwiki.internal.web.GetDocExistValidator
 org.xwiki.internal.web.ViewDocExistValidator
 com.xpn.xwiki.objects.meta.BooleanMetaClass
@@ -279,4 +279,13 @@ org.xwiki.security.authservice.script.AuthServiceScriptService
 org.xwiki.model.validation.edit.XWikiDocumentLockEditConfirmationChecker
 org.xwiki.evaluation.internal.DefaultObjectEvaluator
 org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator
+org.xwiki.internal.authentication.LoginLinkUIExtension
+org.xwiki.internal.authentication.RegisterLinkUIExtension
+org.xwiki.internal.filter.Importer
 org.xwiki.internal.document.DocumentOverrideListener
+org.xwiki.internal.document.DocumentRequiredRightsReader
+org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer
+org.xwiki.internal.document.DefaultSimpleDocumentCache
+org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator
+org.xwiki.query.hql.internal.DefaultHQLStatementValidator
+org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator

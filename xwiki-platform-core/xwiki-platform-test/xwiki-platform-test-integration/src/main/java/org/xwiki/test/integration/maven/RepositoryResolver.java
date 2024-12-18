@@ -144,13 +144,13 @@ public class RepositoryResolver
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWiki = new RemoteRepository.Builder(
-            "xwiki", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public")
+            "xwiki", DEFAULT_REPO_TYPE, "https://nexus-snapshots.xwiki.org/repository/public-proxy")
             .setPolicy(REPOSITORY_POLICY)
             .build();
         RemoteRepository mavenXWikiSnapshot = new RemoteRepository.Builder(
             // Note: we make sure to use the same id as the one used my Maven in the hope to have more up to date
             // metadata (in maven-metadata-xwiki-snapshots.xml).
-            "xwiki-snapshots", DEFAULT_REPO_TYPE, "https://nexus.xwiki.org/nexus/content/groups/public-snapshots/")
+            "xwiki-snapshots", DEFAULT_REPO_TYPE, "https://nexus-snapshots.xwiki.org/repository/snapshots/")
             .setPolicy(REPOSITORY_POLICY)
             .build();
 

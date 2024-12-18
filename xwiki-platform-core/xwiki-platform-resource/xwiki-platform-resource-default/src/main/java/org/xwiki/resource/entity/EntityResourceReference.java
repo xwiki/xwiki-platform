@@ -27,7 +27,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -83,7 +82,6 @@ public class EntityResourceReference extends AbstractResourceReference
      * @param anchor the anchor
      * @since 15.4RC1
      */
-    @Unstable
     public EntityResourceReference(EntityReference entityReference, EntityResourceAction action, String anchor)
     {
         setType(TYPE);
@@ -128,7 +126,6 @@ public class EntityResourceReference extends AbstractResourceReference
      * @return the anchor
      * @since 15.4RC1
      */
-    @Unstable
     public String getAnchor()
     {
         return this.anchor;
@@ -138,7 +135,6 @@ public class EntityResourceReference extends AbstractResourceReference
      * @param anchor the anchor
      * @since 15.4RC1
      */
-    @Unstable
     public void setAnchor(String anchor)
     {
         this.anchor = anchor;

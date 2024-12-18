@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>16.1.0-SNAPSHOT</version>
+    <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-upgrade</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade</name>
@@ -67,10 +67,12 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-1610</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1510</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1410</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1310</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1210</module>
+    <module>xwiki-platform-distribution-flavor-test-upgrade-1210-custom</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1110</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-1011</module>
     <module>xwiki-platform-distribution-flavor-test-upgrade-911</module>

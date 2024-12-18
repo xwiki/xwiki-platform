@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @since 12.10
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LiveDataLayoutDescriptor extends BaseDescriptor
+public class LiveDataLayoutDescriptor extends BaseDescriptor implements InitializableLiveDataElement
 {
     private String name;
 
@@ -90,9 +90,7 @@ public class LiveDataLayoutDescriptor extends BaseDescriptor
         this.icon = icon;
     }
 
-    /**
-     * Prevent {@code null} values where it's possible.
-     */
+    @Override
     public void initialize()
     {
         if (this.icon == null) {

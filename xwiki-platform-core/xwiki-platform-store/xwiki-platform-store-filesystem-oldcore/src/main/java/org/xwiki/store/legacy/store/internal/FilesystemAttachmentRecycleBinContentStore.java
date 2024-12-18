@@ -39,6 +39,7 @@ import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.filesystem.internal.StoreFileUtils;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.serialization.Serializer;
@@ -48,11 +49,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachmentContent;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.store.AttachmentRecycleBinContentStore;
-import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 
 /**
- * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
+ * Implementation of {@link AttachmentRecycleBinContentStore} for filesystem storage.
  *
  * @version $Id$
  * @since 9.9RC1
@@ -194,7 +194,11 @@ public class FilesystemAttachmentRecycleBinContentStore implements AttachmentRec
             lock.readLock().unlock();
         }
 
-        final File contentFile = provider.getAttachmentContentFile();
+        File contentFile = provider.getAttachmentContentFile();
+
+        // Support links
+        contentFile = StoreFileUtils.resolve(contentFile, true);
+
         attachment.setAttachment_content(new FilesystemAttachmentContent(contentFile, attachment));
         attachment.setContentStore(FileSystemStoreUtils.HINT);
 

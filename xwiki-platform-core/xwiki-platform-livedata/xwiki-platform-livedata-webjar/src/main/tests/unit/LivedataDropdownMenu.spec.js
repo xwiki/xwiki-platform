@@ -56,12 +56,13 @@ function initWrapper() {
 
 // Since the <li> elements does not have distinguishing attributes, we look for the layout items by looking at the
 // elements located after the second separator (class dropdown-header).
+// The lis passed here are both group lis and item lis. Group lis contain a title and their own item lis.
 function findSecondDropdownHeaderIndex(lis) {
   var dropdownHeadersCptr = 0;
   var liIdx = 0;
   for (; liIdx < lis.length; liIdx++) {
     const li = lis.at(liIdx);
-    if (li.classes().includes('dropdown-header')) {
+    if (li.findAll('.dropdown-header').length > 0) {
       dropdownHeadersCptr++;
     }
     if (dropdownHeadersCptr >= 2) {

@@ -57,7 +57,7 @@ import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.WithParametersStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.WithParametersStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.WithPatametersSymbolScheme;
+import org.xwiki.model.internal.reference.WithParametersSymbolScheme;
 import org.xwiki.model.internal.reference.WithTypeAndParametersStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.WithTypeStringEntityReferenceSerializer;
 import org.xwiki.test.annotation.ComponentList;
@@ -169,7 +169,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     UserAndGroupEntityReferenceResolver.class,
     WithParametersStringEntityReferenceResolver.class,
     WithParametersStringEntityReferenceSerializer.class,
-    WithPatametersSymbolScheme.class,
+    WithParametersSymbolScheme.class,
     WithTypeAndParametersStringEntityReferenceSerializer.class,
     WithTypeStringEntityReferenceSerializer.class,
 

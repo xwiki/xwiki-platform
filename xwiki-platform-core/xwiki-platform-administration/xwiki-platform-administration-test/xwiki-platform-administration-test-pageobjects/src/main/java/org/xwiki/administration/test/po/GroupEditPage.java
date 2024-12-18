@@ -20,12 +20,16 @@
 
 package org.xwiki.administration.test.po;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.livedata.test.po.LiveDataElement;
+import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -36,11 +40,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  */
 public class GroupEditPage extends InlinePage
 {
-    private static final String MEMBER_ACTION_XPATH_FORMAT =
-        "//table[@id = 'groupusers']//td[contains(@class, 'member') and normalize-space(.) = '%s']"
-            + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
-
-    LiveTableElement membersLiveTable = new LiveTableElement("groupusers");
+    private final LiveDataElement membersLiveData = new LiveDataElement("groupusers");
 
     @FindBy(id = "addMembers")
     private WebElement addMemberButton;
@@ -50,6 +50,8 @@ public class GroupEditPage extends InlinePage
 
     @FindBy(id = "userInput")
     private WebElement userInput;
+
+    private TableLayoutElement tableLayout;
 
     public void clickAddMemberButton()
     {
@@ -89,16 +91,23 @@ public class GroupEditPage extends InlinePage
     public GroupEditPage removeMembers(String... members)
     {
         for (String member : members) {
-            getDriver().findElementWithoutWaiting(By.xpath(String.format(MEMBER_ACTION_XPATH_FORMAT, member, "delete")))
-                .click();
-            waitForNotificationSuccessMessage("Done");
+            int index = 1;
+            for (WebElement row : getMembersTable().getRows()) {
+                if (Objects.equals(getRowUserName(row), member)) {
+                    getMembersTable().clickAction(index, "delete");
+                    // Wait for the confirmation message before moving to the next member.
+                    waitForNotificationSuccessMessage("Member successfully removed from group");
+                    break;
+                }
+                index++;
+            }
         }
         return this;
     }
 
     public void filterMembers(String member)
     {
-        membersLiveTable.filterColumn("xwiki-livetable-groupusers-filter-1", member);
+        this.membersLiveData.getTableLayout().filterColumn("Member", member);
     }
 
     /**
@@ -107,13 +116,33 @@ public class GroupEditPage extends InlinePage
     public static GroupEditPage gotoPage(DocumentReference groupReference)
     {
         getUtil().gotoPage(groupReference, "edit");
-        GroupEditPage groupEditPage = new GroupEditPage();
-        groupEditPage.getMembersTable().waitUntilReady();
-        return groupEditPage;
+        return new GroupEditPage();
     }
 
-    public LiveTableElement getMembersTable()
+    public TableLayoutElement getMembersTable()
     {
-        return membersLiveTable;
+        if (this.tableLayout == null) {
+            this.tableLayout = this.membersLiveData.getTableLayout();
+        }
+        return this.tableLayout;
+    }
+
+    private static String getRowUserName(WebElement row)
+    {
+        List<WebElement> elements =
+            row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .user-name"));
+        String rowUserName;
+        if (elements.isEmpty()) {
+            elements =
+                row.findElements(By.cssSelector("[data-livedata-property-id=\"member\"] .group-name"));
+            if (elements.isEmpty()) {
+                rowUserName = null;
+            } else {
+                rowUserName = elements.get(0).getText();
+            }
+        } else {
+            rowUserName = elements.get(0).getText();
+        }
+        return rowUserName;
     }
 }

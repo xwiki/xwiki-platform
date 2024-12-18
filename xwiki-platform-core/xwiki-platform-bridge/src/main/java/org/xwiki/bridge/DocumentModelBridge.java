@@ -121,15 +121,48 @@ public interface DocumentModelBridge
     String getTitle();
 
     /**
+     * @return the prepared version of the title (for example in case of Velocity the compiled VelocityTemplate
+     *         instance)
+     * @since 16.3.0RC1
+     */
+    default Object getPreparedTitle()
+    {
+        return null;
+    }
+
+    /**
+     * @param preparedTitle the prepared version of the title (for example in case of Velocity the compiled
+     *            VelocityTemplate instance)
+     * @since 16.3.0RC1
+     */
+    default void setPreparedTitle(Object preparedTitle)
+    {
+        
+    }
+
+    /**
      * @return a string identifying the current version of this document
      */
     String getVersion();
 
     /**
+     * Return a cloned version of the document content as {@link XDOM}.
+     * 
      * @return the XDOM for the document
      * @since 3.0M3
      */
     XDOM getXDOM();
+
+    /**
+     * Return a cloned and prepared version of the document content as {@link XDOM}.
+     * 
+     * @return the prepared version of the XDOM
+     * @since 16.3.0RC1
+     */
+    default XDOM getPreparedXDOM()
+    {
+        return getXDOM();
+    }
 
     /**
      * @return the document's content author user reference
@@ -183,8 +216,19 @@ public interface DocumentModelBridge
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     default boolean isRestricted()
+    {
+        return false;
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default boolean isEnforceRequiredRights()
     {
         return false;
     }

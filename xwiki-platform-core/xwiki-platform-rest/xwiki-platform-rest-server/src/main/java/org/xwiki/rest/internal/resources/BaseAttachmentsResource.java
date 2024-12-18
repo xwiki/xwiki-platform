@@ -56,6 +56,9 @@ import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -113,6 +116,9 @@ public class BaseAttachmentsResource extends XWikiResource
     }
 
     @Inject
+    protected ContextualAuthorizationManager authorization;
+
+    @Inject
     private ModelFactory modelFactory;
 
     @Inject
@@ -126,6 +132,10 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
@@ -152,7 +162,11 @@ public class BaseAttachmentsResource extends XWikiResource
 
             List<Object> queryResults = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
             attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
+                // Apply passed filters
                 .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
+                // Filter out attachments the current user is not allowed to see
+                .filter(a -> authorization.hasAccess(Right.VIEW, a.getReference()))
+                // Convert XWikiAttachment to REST Attachment
                 .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
                 .toList());
         } catch (QueryException e) {
@@ -160,7 +174,7 @@ public class BaseAttachmentsResource extends XWikiResource
         } finally {
             xcontext.setWikiId(database);
         }
-
+        
         return attachments;
     }
 
@@ -411,7 +425,11 @@ public class BaseAttachmentsResource extends XWikiResource
                 String.format("Failed to instantiate a [%s] component.", AttachmentValidator.class.getName()), e);
         }
 
-        // Set the document author.
+        // Set the document creator / author.
+        if (document.isNew()) {
+            document.getAuthors()
+                .setCreator(this.documentReferenceUserReferenceResolver.resolve(xcontext.getUserReference()));
+        }
         document.setAuthorReference(xcontext.getUserReference());
 
         // Calculate and store the attachment media type.

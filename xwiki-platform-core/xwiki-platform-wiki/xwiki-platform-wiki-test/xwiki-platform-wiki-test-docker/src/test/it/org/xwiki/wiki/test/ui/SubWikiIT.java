@@ -19,8 +19,6 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.livedata.test.po.TableLayoutElement;
@@ -33,8 +31,6 @@ import org.xwiki.test.docker.junit5.ExtensionOverride;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
-import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
 import org.xwiki.test.ui.po.RenamePage;
@@ -116,18 +112,27 @@ class SubWikiIT
 
         // Ensure that the page does not exist before the test.
         setup.rest().delete(mainWikiLinkPage);
-
-        String space = testReference.getSpaceReferences()
-            .stream().map(SpaceReference::getName).collect(Collectors.joining("."));
-
         // The page that will be moved.
-        setup.createPage(testReference, "Some content", "My Page");
+        // We'll check moving a hierarchy with relative links
+        setup.createPage(testReference, "[[Alice]]\n[[Bob]]\n[[Eve]]", "Test relative links");
+        SpaceReference rootSpaceReference = testReference.getLastSpaceReference();
+        SpaceReference aliceSpace = new SpaceReference("Alice", rootSpaceReference);
+        DocumentReference alicePage = new DocumentReference("WebHome", aliceSpace);
+        setup.createPage(alicePage, "Alice page", "Alice");
+        SpaceReference bobSpace = new SpaceReference("Bob", rootSpaceReference);
+        DocumentReference bobPage = new DocumentReference("WebHome", bobSpace);
+        setup.createPage(bobPage, "[[Alice]]",
+            "Alice");
 
-        // For checking the link update.
-        setup.createPage(mainWikiLinkPage, String.format("[[%s.WebHome]]", space));
+        // For checking the link update in an external page.
+        setup.createPage(mainWikiLinkPage,
+            String.format("[[%s]]%n[[%s]]%n[[%s]]",
+                setup.serializeLocalReference(testReference),
+                setup.serializeLocalReference(alicePage),
+                setup.serializeLocalReference(bobPage)));
 
         // Wait for the Solr indexing to be completed before moving the page
-        new SolrTestUtils(setup, computedHostURL(testConfiguration)).waitEmptyQueue();
+        new SolrTestUtils(setup, testConfiguration.getServletEngine()).waitEmptyQueue();
 
         // Move the page to subwiki.
         ViewPage viewPage = setup.gotoPage(testReference);
@@ -139,26 +144,77 @@ class SubWikiIT
         // Ensure the move has been properly done.
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         DocumentReference movedPageReference = testReference.setWikiReference(new WikiReference(SUBWIKI_NAME));
+        SpaceReference newRootSpace = movedPageReference.getLastSpaceReference();
         assertTrue(setup.rest().exists(movedPageReference));
         viewPage = renameStatusPage.gotoNewPage();
         assertEquals(
             String.format("/%s/%s/%s", SUBWIKI_NAME, testReference.getLastSpaceReference().extractFirstReference(
-                EntityType.SPACE).getName(), "My Page"), viewPage.getBreadcrumbContent());
-        assertEquals("Some content", viewPage.getContent());
+                EntityType.SPACE).getName(), "Test relative links"), viewPage.getBreadcrumbContent());
+        WikiEditPage wikiEditPage = viewPage.editWiki();
+        assertEquals("[[Alice]]\n[[Bob]]\n[[Eve]]", wikiEditPage.getContent());
+
+        SpaceReference newBobSpace = new SpaceReference("Bob", newRootSpace);
+        DocumentReference newBobPage = new DocumentReference("WebHome", newBobSpace);
+        wikiEditPage = WikiEditPage.gotoPage(newBobPage);
+        assertEquals("[[Alice]]", wikiEditPage.getContent());
+
+        SpaceReference newAliceSpace = new SpaceReference("Alice", newRootSpace);
+        DocumentReference newAliceReference = new DocumentReference("WebHome", newAliceSpace);
 
         // Check the link is updated.
         viewPage = setup.gotoPage(mainWikiLinkPage);
-        WikiEditPage wikiEditPage = viewPage.editWiki();
-        assertEquals(String.format("[[subwiki:%s.WebHome]]", space), wikiEditPage.getContent());
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(
+            String.format("[[%s]]%n[[%s]]%n[[%s]]",
+                setup.serializeReference(movedPageReference),
+                setup.serializeReference(newAliceReference),
+                setup.serializeReference(newBobPage)), wikiEditPage.getContent());
+
+
+        viewPage = setup.gotoPage(newAliceReference);
+        renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setName("Alice2");
+        renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+
+        SpaceReference Alice2Space = new SpaceReference("Alice2", newRootSpace);
+        DocumentReference newrootPage = new DocumentReference("WebHome", newRootSpace);
+        DocumentReference Alice2Reference = new DocumentReference("WebHome", Alice2Space);
+        wikiEditPage = WikiEditPage.gotoPage(newrootPage);
+        String serializedlocalAlice2Reference = setup.serializeLocalReference(Alice2Reference);
+        assertEquals(String.format("[[%s]]%n[[Bob]]%n[[Eve]]", serializedlocalAlice2Reference),
+            wikiEditPage.getContent());
+        wikiEditPage.setContent(String.format("[[Alice2]]%n[[%s]]%n[[Bob]]%n[[Eve]]",serializedlocalAlice2Reference));
+        wikiEditPage.clickSaveAndView();
+
+        viewPage = setup.gotoPage(mainWikiLinkPage);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(
+            String.format("[[%s]]%n[[%s]]%n[[%s]]",
+                setup.serializeReference(movedPageReference),
+                setup.serializeReference(Alice2Reference),
+                setup.serializeReference(newBobPage)), wikiEditPage.getContent());
+
+        viewPage = setup.gotoPage(Alice2Reference);
+        renamePage = viewPage.rename();
+        renamePage.getDocumentPicker().setWiki("xwiki");
+        renameStatusPage = renamePage.clickRenameButton().waitUntilFinished();
+        assertEquals("Done.", renameStatusPage.getInfoMessage());
+
+        Alice2Reference = Alice2Reference.setWikiReference(new WikiReference("xwiki"));
+        String serializedAliceReference = setup.serializeReference(Alice2Reference);
+        wikiEditPage = WikiEditPage.gotoPage(newrootPage);
+        assertEquals(String.format("[[%1$s]]%n[[%1$s]]%n[[Bob]]%n[[Eve]]", serializedAliceReference),
+            wikiEditPage.getContent());
+        viewPage = setup.gotoPage(mainWikiLinkPage);
+        wikiEditPage = viewPage.editWiki();
+        assertEquals(
+            String.format("[[%s]]%n[[%s]]%n[[%s]]",
+                setup.serializeReference(movedPageReference),
+                setup.serializeReference(Alice2Reference),
+                setup.serializeReference(newBobPage)), wikiEditPage.getContent());
 
         deleteSubWiki(setup);
-    }
-
-    private String computedHostURL(TestConfiguration testConfiguration)
-    {
-        ServletEngine servletEngine = testConfiguration.getServletEngine();
-        return String.format("http://%s:%d%s", servletEngine.getIP(), servletEngine.getPort(),
-            XWikiExecutor.DEFAULT_CONTEXT);
     }
 
     /**

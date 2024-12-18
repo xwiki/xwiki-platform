@@ -717,20 +717,9 @@ a.search-result-highlightAll:after {
   cursor: pointer;
   line-height: 1.4em;
   margin: 0 .2em;
-}
-
-.search-facet-header:after {
-  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
-  border-top: 1px dotted $theme.borderColor;
-  clear: both;
-  content: "";
-  display: block;
-  height: 0;
-  margin: 2.45em 0 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
 }
 
 .search-facet:last-of-type .search-facet-header:after {
@@ -761,11 +750,7 @@ a.search-result-highlightAll:after {
 
 .search-facet .search-facet-header .facet-toggler, button.facet-value-toggler {
   background: transparent;
-  float: right;
-}
-
-button.facet-value-toggler:not(:active) {
-  color: $theme.btn-primary-color;
+  transition: background-color .2s ease-in-out;
 }
 
 .search-facet .search-facet-header .facet-toggler:active, button.facet-value-toggler:active {
@@ -818,7 +803,18 @@ button.facet-value-toggler:not(:active) {
   white-space: nowrap;
 }
 
+/* Override the default style for links in content. */
+body.content.preference-underlining-only-inline-links #xwikicontent .search-facet-body .itemName,
+body.content.preference-underlining-only-inline-links #xwikicontent .search-facet-body .more {
+  text-decoration: none;
+  /* Make sure we don't take over the default behaviour on hover with too much specificity. */
+  &amp;:hover, &amp;:focus {
+    text-decoration: underline;
+  }
+}
+
 .search-facet-body .itemName,
+.search-facet-body .facet-value-toggler,
 .search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;

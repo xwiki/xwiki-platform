@@ -65,6 +65,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -87,6 +88,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.model.jaxb.Property;
@@ -186,6 +188,8 @@ public class TestUtils
      * @since 9.5RC1
      */
     public static final int[] STATUS_ACCEPTED = new int[] { Status.ACCEPTED.getStatusCode() };
+
+    private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static PersistentTestContext context;
 
@@ -1074,6 +1078,16 @@ public class TestUtils
     }
 
     /**
+     * @since 16.8.0RC1
+     * @since 16.4.5
+     * @since 15.10.14
+     */
+    public String serializeLocalReference(EntityReference reference)
+    {
+        return localReferenceSerializer.serialize(reference);
+    }
+
+    /**
      * Accesses the URL to delete the specified space.
      *
      * @param space the name of the space to delete
@@ -1187,7 +1201,10 @@ public class TestUtils
         if (locale != null) {
             queryString += "&language=" + locale;
         }
-        return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
+        EntityReference wikiReference = reference.extractReference(EntityType.WIKI);
+        String wikiName = (wikiReference != null) ? wikiReference.getName() : null;
+        return getURL(wikiName, action, extractListFromReference(reference).toArray(new String[] {}), queryString,
+        fragment);
     }
 
     /**
@@ -1206,12 +1223,48 @@ public class TestUtils
      */
     public String executeWiki(String wikiContent, Syntax wikiSyntax) throws Exception
     {
+        return executeWiki(wikiContent, wikiSyntax, null);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWikiPlain(String wikiContent, Syntax wikiSyntax) throws Exception
+    {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("outputSyntax", "plain");
+
+        return executeWiki(wikiContent, wikiSyntax, queryParameters);
+    }
+
+    /**
+     * @since 16.4.0RC1
+     * @since 15.10.11
+     * @since 14.10.22
+     */
+    public String executeWiki(String wikiContent, Syntax wikiSyntax, Map<String, String> queryParameters) throws Exception
+    {
         LocalDocumentReference reference =
             new LocalDocumentReference(List.of("Test", "Execute"), UUID.randomUUID().toString());
 
-        rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        // Remember the current credentials
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
 
-        return executeAndGetBodyAsString(reference, null);
+        try {
+            // Make sure the page is saved with superadmin author
+            setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
+
+            // Save the page with the content to execute
+            rest().savePage(reference, wikiContent, wikiSyntax.toIdString(), null, null);
+        } finally {
+            // Restore initial credentials
+            setDefaultCredentials(currentCredentials);
+        }
+
+        // Execute the content and return the result
+        return executeAndGetBodyAsString(reference, queryParameters);
     }
 
     /**
@@ -1302,7 +1355,13 @@ public class TestUtils
      */
     public String getBaseBinURL(String wiki)
     {
-        return getBaseURL() + ((StringUtils.isEmpty(wiki) || wiki.equals("xwiki")) ? "bin/" : "wiki/" + wiki + '/');
+        String wikiName = MAIN_WIKI_NAME;
+        if (!StringUtils.isEmpty(wiki)) {
+            wikiName = wiki;
+        } else if (!StringUtils.isEmpty(this.currentWiki)) {
+            wikiName = this.currentWiki;
+        }
+        return getBaseURL() + (wikiName.equals(MAIN_WIKI_NAME) ? "bin/" : "wiki/" + wikiName + '/');
     }
 
     /**
@@ -1310,7 +1369,7 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString)
     {
-        return getURL(action, path, queryString, null);
+        return getURL(null, action, path, queryString, null);
     }
 
     /**
@@ -1318,7 +1377,17 @@ public class TestUtils
      */
     public String getURL(String action, String[] path, String queryString, String fragment)
     {
-        StringBuilder builder = new StringBuilder(getBaseBinURL());
+        return getURL(null, action, path, queryString, fragment);
+    }
+
+    /**
+     * @since 16.10.0RC1
+     * @since 15.10.14
+     * @since 16.4.6
+     */
+    public String getURL(String wikiName, String action, String[] path, String queryString, String fragment)
+    {
+        StringBuilder builder = new StringBuilder(getBaseBinURL(wikiName));
 
         if (!StringUtils.isEmpty(action)) {
             builder.append(action).append('/');
@@ -1444,6 +1513,20 @@ public class TestUtils
             return "";
         }
         return this.secretToken;
+    }
+
+    /**
+     * Sets the secret token used for CSRF protection. Use this method to restore a token that was previously saved. If
+     * you want to cache the current token you should use {@link #recacheSecretToken()} instead.
+     *
+     * @param secretToken the new secret token to use
+     * @since 15.10.12
+     * @since 16.4.1
+     * @since 16.6.0RC1
+     */
+    public void setSecretToken(String secretToken)
+    {
+        this.secretToken = secretToken;
     }
 
     /**
@@ -2486,82 +2569,61 @@ public class TestUtils
             RestTestUtils.urlPrefix = newURLPrefix;
         }
 
-        private String toSpaceElement(Iterable<?> spaces)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            for (Object space : spaces) {
-                if (builder.length() > 0) {
-                    builder.append("/spaces/");
-                }
-
-                if (space instanceof EntityReference) {
-                    builder.append(((EntityReference) space).getName());
-                } else {
-                    builder.append(space.toString());
-                }
-            }
-
-            return builder.toString();
-        }
-
-        private String toSpaceElement(String spaceReference)
-        {
-            return toSpaceElement(
-                relativeReferenceResolver.resolve(spaceReference, EntityType.SPACE).getReversedReferenceChain());
-        }
-
         protected Object[] toElements(Page page)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
-            if (page.getWiki() != null) {
-                elements.add(page.getWiki());
-            } else {
-                elements.add(this.testUtils.getCurrentWiki());
-            }
-
-            // Add spaces
-            elements.add(toSpaceElement(page.getSpace()));
-
-            // Add name
-            elements.add(page.getName());
-
-            // Add translation
+            // Get locale
+            Locale locale;
             if (StringUtils.isNotEmpty(page.getLanguage())) {
-                elements.add(page.getLanguage());
+                locale = LocaleUtils.toLocale(page.getLanguage());
+            } else {
+                locale = null;
             }
 
-            return elements.toArray();
+            // Wiki
+            WikiReference wikiReference;
+            if (page.getWiki() != null) {
+                wikiReference = new WikiReference(page.getWiki());
+            } else {
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
+            }
+
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(page.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
+
+            // Document
+            DocumentReference documentReference = new DocumentReference(page.getName(), spaceReference, locale);
+
+            return toElements(documentReference);
         }
 
         public Object[] toElements(org.xwiki.rest.model.jaxb.Object obj, boolean onlyDocument)
         {
-            List<Object> elements = new ArrayList<>();
-
-            // Add wiki
+            // Wiki
+            WikiReference wikiReference;
             if (obj.getWiki() != null) {
-                elements.add(obj.getWiki());
+                wikiReference = new WikiReference(obj.getWiki());
             } else {
-                elements.add(this.testUtils.getCurrentWiki());
+                wikiReference = new WikiReference(this.testUtils.getCurrentWiki());
             }
 
-            // Add spaces
-            elements.add(toSpaceElement(obj.getSpace()));
+            // Spaces
+            SpaceReference spaceReference = new SpaceReference(relativeReferenceResolver
+                .resolve(obj.getSpace(), EntityType.SPACE).replaceParent(null, wikiReference));
 
-            // Add name
-            elements.add(obj.getPageName());
+            // Document
+            DocumentReference documentReference = new DocumentReference(obj.getPageName(), spaceReference);
 
-            if (!onlyDocument) {
-                // Add class
-                elements.add(obj.getClassName());
-
-                // Add number
-                elements.add(obj.getNumber());
+            // Object
+            EntityReference finalReference;
+            if (onlyDocument) {
+                finalReference = documentReference;
+            } else {
+                String objectName = obj.getClassName() + '[' + obj.getNumber() + ']';
+                finalReference = new ObjectReference(objectName, documentReference);
             }
 
-            return elements.toArray();
+            return toElements(finalReference);
         }
 
         public Object[] toElements(EntityReference reference)
@@ -2908,15 +2970,34 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams) throws Exception
+        {
+            return get(reference, queryParams, true);
+        }
+
+        /**
          * Return object model of the passed reference or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(EntityReference reference, boolean failIfNotFound) throws Exception
         {
+            return get(reference, Map.of(), failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(EntityReference reference, Map<String, Object[]> queryParams, boolean failIfNotFound)
+            throws Exception
+        {
             Class<?> resource = getResourceAPI(reference);
 
-            return get(resource, reference, failIfNotFound);
+            return get(resource, queryParams, reference, failIfNotFound);
         }
 
         /**
@@ -2944,13 +3025,32 @@ public class TestUtils
         }
 
         /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference) throws Exception
+        {
+            return get(resourceURI, queryParams, reference, true);
+        }
+
+        /**
          * Return object model of the passed reference with the passed resource URI or null if none could be found.
          * 
          * @since 8.0M1
          */
         public <T> T get(Object resourceURI, EntityReference reference, boolean failIfNotFound) throws Exception
         {
-            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, reference), false,
+            return get(resourceURI, Map.of(), reference, failIfNotFound);
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public <T> T get(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference,
+            boolean failIfNotFound) throws Exception
+        {
+            GetMethod getMethod = assertStatusCodes(executeGet(resourceURI, queryParams, reference), false,
                 failIfNotFound ? STATUS_OK : STATUS_OK_NOT_FOUND);
 
             if (getMethod.getStatusCode() == Status.NOT_FOUND.getStatusCode()) {
@@ -3030,6 +3130,16 @@ public class TestUtils
         public GetMethod executeGet(Object resourceURI, EntityReference reference) throws Exception
         {
             return executeGet(resourceURI, toElements(reference));
+        }
+
+        /**
+         * @since 16.2.0RC1
+         * @since 15.10.8
+         */
+        public GetMethod executeGet(Object resourceURI, Map<String, Object[]> queryParams, EntityReference reference)
+            throws Exception
+        {
+            return executeGet(resourceURI, queryParams, toElements(reference));
         }
 
         public GetMethod executeGet(Object resourceUri, Object... elements) throws Exception

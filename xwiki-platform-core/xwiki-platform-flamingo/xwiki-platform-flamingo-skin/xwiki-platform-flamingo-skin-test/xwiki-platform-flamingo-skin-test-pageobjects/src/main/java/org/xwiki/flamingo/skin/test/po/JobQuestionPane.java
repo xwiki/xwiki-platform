@@ -115,6 +115,19 @@ public class JobQuestionPane extends BaseElement
     }
 
     /**
+     * Click on the button with the given name and value.
+     *
+     * @param name the name of the button
+     * @param value the value of the button
+     * @return the status page
+     */
+    public CopyOrRenameOrDeleteStatusPage clickButton(String name, String value)
+    {
+        this.questionPane.findElement(By.cssSelector("button[name='" + name + "'][value='" + value + "']")).click();
+        return new CopyOrRenameOrDeleteStatusPage();
+    }
+
+    /**
      * @return true if the current job is blocked by another one.
      */
     public boolean isBlockedJob()

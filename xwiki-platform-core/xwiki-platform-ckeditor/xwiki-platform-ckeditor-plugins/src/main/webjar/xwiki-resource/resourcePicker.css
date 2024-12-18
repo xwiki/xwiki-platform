@@ -19,7 +19,8 @@
  */
 #template('colorThemeInit.vm')
 
-/* We need to redefine this class to have better priority than the CKEditor CSS reset. */
+/* We need to redefine this class to have better priority than the CKEditor CSS reset. 
+Without this higher priority redefinition, the elements with this class are still shown. */
 .resourcePicker .sr-only {
   position: absolute;
   width: 1px;

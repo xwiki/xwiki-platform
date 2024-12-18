@@ -31,7 +31,7 @@
     "@xwiki/cristal-backend-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-filesystem-api": "workspace:*",
     "inversify": "6.2.0",
-    "mime": "4.0.4"
+    "mime": "4.0.6"
   },
   "peerDependencies": {
     "electron": "33.2.1",

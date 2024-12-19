@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.ContentSheet" locale="">
+<xwikidoc version="1.6" reference="CKEditor.ContentSheet" locale="">
   <web>CKEditor</web>
   <name>ContentSheet</name>
   <language/>
@@ -62,7 +62,7 @@
   &lt;html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.locale.toLanguageTag()" xml:lang="$xcontext.locale.toLanguageTag()"&gt;
     &lt;head&gt;
       &lt;meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" /&gt;
-      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the 
+      ## Add HTML tags inside the page's head element, provided by UI Extensions implementing the
       ## "org.xwiki.platform.html.head" Extension Point. This extension point is also used in XWiki.XWikiPreferences
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.html.head', {'sortByParameter' : 'order'}))
         $services.rendering.render($uix.execute(), 'xhtml/1.0')

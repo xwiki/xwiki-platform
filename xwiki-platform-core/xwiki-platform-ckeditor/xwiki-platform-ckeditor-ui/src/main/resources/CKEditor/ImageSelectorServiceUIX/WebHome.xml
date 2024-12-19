@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.ImageSelectorServiceUIX.WebHome" locale="">
+<xwikidoc version="1.6" reference="CKEditor.ImageSelectorServiceUIX.WebHome" locale="">
   <web>CKEditor.ImageSelectorServiceUIX</web>
   <name>WebHome</name>
   <language/>

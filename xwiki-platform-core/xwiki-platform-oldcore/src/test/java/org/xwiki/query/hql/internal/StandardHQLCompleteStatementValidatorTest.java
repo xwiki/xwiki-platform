@@ -64,6 +64,8 @@ public class StandardHQLCompleteStatementValidatorTest
         assertSafe("select count(*) from XWikiAttachment");
 
         assertSafe("select name from XWikiDocument where lower(name)='name'");
+
+        assertSafe("select doc.fullName from XWikiDocument doc where doc.name = :name");
     }
 
     @Test

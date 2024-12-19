@@ -163,15 +163,22 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected void checkAllowed(final Query query) throws QueryException
     {
         // Check if the query needs to be validated according to the current author
-        if (query instanceof SecureQuery secureQuery && secureQuery.isCurrentAuthorChecked()) {
+        if (query instanceof SecureQuery) {
+            checkAllowed((SecureQuery) query);
+        }
+    }
+
+    private void checkAllowed(SecureQuery secureQuery) throws QueryException
+    {
+        if (secureQuery.isCurrentAuthorChecked()) {
             // Not need to check the details if current author has programming right
             if (!this.authorization.hasAccess(Right.PROGRAM)) {
-                if (query.isNamed() && !getSafeNamedQueries().contains(query.getStatement())) {
-                    throw new QueryException("Named queries requires programming right", query, null);
+                if (secureQuery.isNamed() && !getSafeNamedQueries().contains(secureQuery.getStatement())) {
+                    throw new QueryException("Named queries requires programming right", secureQuery, null);
                 }
 
-                if (!this.queryValidator.isSafe(query.getStatement())) {
-                    throw new QueryException("The query requires programming right", query, null);
+                if (!this.queryValidator.isSafe(secureQuery.getStatement())) {
+                    throw new QueryException("The query requires programming right", secureQuery, null);
                 }
             }
         }

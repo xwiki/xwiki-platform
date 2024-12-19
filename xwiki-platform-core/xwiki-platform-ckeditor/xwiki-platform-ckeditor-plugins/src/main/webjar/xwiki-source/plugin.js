@@ -67,7 +67,6 @@
         // sure relative references within the edited content are properly resolved and serialized.
         htmlConverter: editor.config.sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
-          outputSyntax: 'plain',
           language: editor.getContentLocale(),
           formToken: document.documentElement.dataset.xwikiFormToken || ''
         }))

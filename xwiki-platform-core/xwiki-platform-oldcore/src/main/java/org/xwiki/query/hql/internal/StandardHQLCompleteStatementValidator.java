@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.xwiki.query.hql.internal;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +39,7 @@ import net.sf.jsqlparser.parser.Node;
 import net.sf.jsqlparser.parser.SimpleNode;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
@@ -72,6 +72,7 @@ import net.sf.jsqlparser.util.validation.feature.FeaturesAllowed;
 @Component
 @Singleton
 @Named("standard")
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 public class StandardHQLCompleteStatementValidator implements HQLCompleteStatementValidator
 {
     private static final String ID = "id";
@@ -209,17 +210,29 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     }
 
     @Override
-    public Optional<Boolean> isSafe(String statement)
+    public Optional<Boolean> isSafe(String statementString)
     {
+        FeaturesAllowed allowedFeatures = new FeaturesAllowed("xwiki");
+
+        // Allow SELECT related features
+        allowedFeatures.add(FeaturesAllowed.SELECT.getFeatures());
+
+        // Allow JDBC related features
+        allowedFeatures.add(FeaturesAllowed.JDBC.getFeatures());
+
+        // Allow expressions
+        allowedFeatures.add(FeaturesAllowed.EXPRESSIONS.getFeatures());
+
         // Parse the statement and make sure it contains SELECT related features
-        Validation validation = new Validation(List.of(FeaturesAllowed.SELECT), statement);
+        Validation validation = new Validation(List.of(allowedFeatures), statementString);
         List<ValidationError> errors = validation.validate();
 
         // Check some other custom rules
         if (errors.isEmpty()) {
             Statements statements = validation.getParsedStatements();
 
-            if (statements.getStatements().get(0) instanceof Select select && isSelectSafe(select)) {
+            Statement statement = statements.getStatements().get(0);
+            if (statement instanceof Select && isSelectSafe((Select) statement)) {
                 return Optional.of(true);
             }
         }
@@ -231,8 +244,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     {
         SelectBody selectBody = select.getSelectBody();
 
-        if (selectBody instanceof PlainSelect plainSelect) {
-            return isNodeSafe(plainSelect.getASTNode());
+        if (selectBody instanceof PlainSelect) {
+            return isNodeSafe(((PlainSelect) selectBody).getASTNode());
         }
 
         return false;
@@ -254,16 +267,17 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isNodeSafe(Node node)
     {
-        if (node instanceof SimpleNode simpleNode) {
+        if (node instanceof SimpleNode) {
             // Check if the node is a function
-            if (simpleNode.jjtGetValue() instanceof Function function) {
+            Object value = ((SimpleNode) node).jjtGetValue();
+            if (value instanceof Function) {
                 // Check if the function is allowed
-                if (!isFunctionSafe(function)) {
+                if (!isFunctionSafe((Function) value)) {
                     return false;
                 }
-            } else if (simpleNode.jjtGetValue() instanceof PlainSelect plainSelect) {
+            } else if (value instanceof PlainSelect) {
                 // Check if the select is safe
-                if (!isPlainSelectSafe(plainSelect)) {
+                if (!isPlainSelectSafe((PlainSelect) value)) {
                     return false;
                 }
             }
@@ -316,8 +330,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
      */
     private boolean isSelectItemAllowed(SelectItem selectItem, Map<String, String> tables)
     {
-        if (selectItem instanceof SelectExpressionItem selectExpressionItem) {
-            return isSelectExpressionAllowed(selectExpressionItem.getExpression(), tables);
+        if (selectItem instanceof SelectExpressionItem) {
+            return isSelectExpressionAllowed(((SelectExpressionItem) selectItem).getExpression(), tables);
         }
 
         // TODO: we could support more select items

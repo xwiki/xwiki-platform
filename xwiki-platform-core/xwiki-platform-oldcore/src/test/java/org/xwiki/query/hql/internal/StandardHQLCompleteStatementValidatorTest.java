@@ -58,12 +58,14 @@ public class StandardHQLCompleteStatementValidatorTest
         assertSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str");
 
         assertSafe("select count(*) from XWikiSpace");
+        assertSafe("select COUNT(*) from XWikiSpace");
         assertSafe("select count(space.*) from XWikiSpace space");
 
         assertSafe("select attachment.filename from XWikiAttachment attachment");
         assertSafe("select count(*) from XWikiAttachment");
 
         assertSafe("select name from XWikiDocument where lower(name)='name'");
+        assertSafe("select name from XWikiDocument where LOWER(name)='name'");
 
         assertSafe("select doc.fullName from XWikiDocument doc where doc.name = :name");
     }

@@ -9,5 +9,7 @@
     "history.alert.content": "Du siehst gerade Version {revision} von {pageName}. Die Bearbeitung ist deaktiviert.",
     "history.alert.link.label": "Klicke hier, um zur neuesten Version zurückzukehren.",
     "page.creation.menu.submit": "Erstellen",
-    "article.loading": "Lädt..."
+    "article.loading": "Lädt...",
+    "page.edited.details.user": "{user} bearbeitete am {date}",
+    "page.edited.details": "Bearbeitet am {date}"
 }

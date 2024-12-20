@@ -295,7 +295,7 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isFunctionSafe(Function function)
     {
-        return ALLOWED_FUNCTIONS.contains(function.getName());
+        return ALLOWED_FUNCTIONS.contains(function.getName().toLowerCase());
     }
 
     private Map<String, String> getTables(PlainSelect plainSelect)

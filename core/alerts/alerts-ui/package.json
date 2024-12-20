@@ -26,7 +26,8 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "6.2.0",
-    "vue": "3.5.13"
+    "vue": "3.5.13",
+    "vue-i18n": "10.0.5"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

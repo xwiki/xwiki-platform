@@ -74,6 +74,8 @@ open.value = true;
       @click="action.callback"
       >{{ action.name }}</x-btn
     >
+    <br v-if="details" />
+    <small v-if="details">{{ details }}</small>
     <slot />
   </sl-alert>
 </template>

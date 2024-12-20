@@ -18,7 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script setup lang="ts">
+import messages from "../translations";
 import { inject } from "vue";
+import { useI18n } from "vue-i18n";
 import type { Alert, AlertsService } from "@xwiki/cristal-alerts-api";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { Ref } from "vue";
@@ -29,6 +31,10 @@ const alertsService = cristal
   .get<AlertsService>("AlertsService")!;
 
 const alerts: Ref<Alert[]> = alertsService.list();
+
+const { t } = useI18n({
+  messages,
+});
 </script>
 
 <template>
@@ -39,6 +45,11 @@ const alerts: Ref<Alert[]> = alertsService.list();
       closable
       :type="alert.type"
       :description="alert.message"
+      :details="
+        alert.duplicatesCount > 0
+          ? t('alerts.more', { n: alert.duplicatesCount })
+          : undefined
+      "
       :actions="alert.actions"
       @update:model-value="
         (open: boolean) => {

@@ -22,8 +22,9 @@ import "reflect-metadata";
 import { XWikiStorage } from "../xwikiStorage";
 import { DefaultLogger } from "@xwiki/cristal-api";
 import { describe, expect, it } from "vitest";
+import { mock } from "vitest-mock-extended";
+import type { AlertsServiceProvider } from "@xwiki/cristal-alerts-api";
 import type { WikiConfig } from "@xwiki/cristal-api";
-
 import type {
   AuthenticationManager,
   AuthenticationManagerProvider,
@@ -45,6 +46,7 @@ describe("getPageFromViewURL", () => {
   const xwikiStorage: XWikiStorage = new XWikiStorage(
     new DefaultLogger(),
     new MockAuthenticationManagerProvider(),
+    mock<AlertsServiceProvider>(),
   );
   xwikiStorage.setWikiConfig(wikiConfig);
   it("regular identifier", () => {

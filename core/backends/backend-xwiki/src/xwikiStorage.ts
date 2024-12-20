@@ -29,6 +29,7 @@ import {
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
 import { inject, injectable } from "inversify";
+import type { AlertsServiceProvider } from "@xwiki/cristal-alerts-api";
 import type { Logger } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 
@@ -67,6 +68,8 @@ export class XWikiStorage extends AbstractStorage {
     @inject<Logger>("Logger") logger: Logger,
     @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
+    @inject<AlertsServiceProvider>("AlertsServiceProvider")
+    private readonly alertsServiceProvider: AlertsServiceProvider,
   ) {
     super(logger, "storage.components.xwikiStorage");
   }
@@ -136,10 +139,22 @@ export class XWikiStorage extends AbstractStorage {
     }
     const url = this.getPageRestURL(page, syntax, revision);
     this.logger?.debug("XWiki Loading url", url);
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        ...(await this.getCredentials()),
+      },
+    });
     let json;
     try {
       json = await response.json();
+      if (!response.ok) {
+        // TODO: Fix CRISTAL-383
+        this.alertsServiceProvider
+          .get()
+          .error(`Could not load page ${page}. Reason: ${json.error}`);
+        return undefined;
+      }
     } catch {
       // Return undefined in case of missing page.
       return undefined;

@@ -144,6 +144,9 @@ importers:
       '@xwiki/cristal-alerts-api':
         specifier: workspace:*
         version: link:../alerts-api
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
@@ -181,6 +184,9 @@ importers:
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.6.3)
+      vue-i18n:
+        specifier: 10.0.5
+        version: 10.0.5(vue@3.5.13(typescript@5.6.3))
     devDependencies:
       reflect-metadata:
         specifier: 0.2.2
@@ -528,6 +534,9 @@ importers:
 
   core/backends/backend-xwiki:
     dependencies:
+      '@xwiki/cristal-alerts-api':
+        specifier: workspace:*
+        version: link:../../alerts/alerts-api
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
@@ -556,6 +565,9 @@ importers:
       vite:
         specifier: 6.0.3
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+      vitest-mock-extended:
+        specifier: 2.0.2
+        version: 2.0.2(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))
 
   core/browser/browser-api:
     dependencies:
@@ -7757,6 +7769,14 @@ packages:
     peerDependencies:
       typescript: '>=4.2.0'
 
+  ts-essentials@10.0.3:
+    resolution: {integrity: sha512-/FrVAZ76JLTWxJOERk04fm8hYENDo0PWSP3YLQKxevLwWtxemGcl5JJEzN4iqfDlRve0ckyfFaOBu4xbNH/wZw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
     hasBin: true
@@ -8046,6 +8066,12 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  vitest-mock-extended@2.0.2:
+    resolution: {integrity: sha512-n3MBqVITKyclZ0n0y66hkT4UiiEYFQn9tteAnIxT0MPz1Z8nFcPUG3Cf0cZOyoPOj/cq6Ab1XFw2lM/qM5EDWQ==}
+    peerDependencies:
+      typescript: 3.x || 4.x || 5.x
+      vitest: '>=2.0.0'
 
   vitest@2.1.8:
     resolution: {integrity: sha512-1vBKTZskHw/aosXqQUlVWWlGUxSJR8YtiyZDJAFeW2kPAeX6S3Sool0mjspO+kXLuxVWlEDDowBAeqeAQefqLQ==}
@@ -13601,6 +13627,10 @@ snapshots:
     dependencies:
       typescript: 5.6.3
 
+  ts-essentials@10.0.3(typescript@5.6.3):
+    optionalDependencies:
+      typescript: 5.6.3
+
   ts-node@10.9.2(@types/node@22.10.2)(typescript@5.6.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
@@ -13897,6 +13927,12 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.19.2
       yaml: 2.6.1
+
+  vitest-mock-extended@2.0.2(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)):
+    dependencies:
+      ts-essentials: 10.0.3(typescript@5.6.3)
+      typescript: 5.6.3
+      vitest: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
 
   vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7):
     dependencies:

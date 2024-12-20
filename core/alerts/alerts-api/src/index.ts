@@ -31,6 +31,11 @@ interface Alert {
   type: Type;
   message: string;
   actions?: Action[];
+  /**
+   * Number of times this specific alert has already been created.
+   * @since 0.13
+   */
+  duplicatesCount: number;
 }
 
 /**
@@ -80,4 +85,17 @@ interface AlertsService {
   dismiss(id: number): void;
 }
 
-export type { Action, Alert, AlertsService, Type };
+/**
+ * Helper to resolve an instance of {@link AlertsService} lazily.
+ *
+ * @since 0.13
+ */
+interface AlertsServiceProvider {
+  /**
+   * Get an instance of {@link AlertsService}.
+   * @returns the instance wanted
+   */
+  get(): AlertsService;
+}
+
+export type { Action, Alert, AlertsService, AlertsServiceProvider, Type };

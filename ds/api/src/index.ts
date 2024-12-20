@@ -87,6 +87,11 @@ type AlertProps = {
   description: string;
   actions?: [{ name: string; callback: () => void }];
   closable?: boolean;
+  /**
+   * Other (less important) data to show in the alert.
+   * @since 0.13
+   */
+  details?: string;
 };
 
 export type {

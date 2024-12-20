@@ -22,6 +22,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
+    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-alerts-api": "workspace:*",
     "inversify": "6.2.0",
     "pinia": "2.3.0",

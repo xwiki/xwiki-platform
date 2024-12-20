@@ -18,23 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DefaultAlertsService } from "./defaultAlertsService";
-import { DefaultAlertsServiceProvider } from "./defaultAlertsServiceProvider";
-import { Container } from "inversify";
-import type {
-  AlertsService,
-  AlertsServiceProvider,
-} from "@xwiki/cristal-alerts-api";
+import en from "../langs/translation-en.json";
+import fr from "../langs/translation-fr.json";
 
-export class ComponentInit {
-  constructor(container: Container) {
-    container
-      .bind<AlertsService>("AlertsService")
-      .to(DefaultAlertsService)
-      .inSingletonScope();
-    container
-      .bind<AlertsServiceProvider>("AlertsServiceProvider")
-      .to(DefaultAlertsServiceProvider)
-      .inSingletonScope();
-  }
-}
+const translations: Record<string, Record<string, string>> = {
+  en,
+  fr,
+};
+export default translations;

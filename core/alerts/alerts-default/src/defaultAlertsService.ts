@@ -62,12 +62,20 @@ const alertsStore: AlertsStoreDefinition = defineStore<
   },
   actions: {
     createAlert(type: AlertType, message: string, actions?: Action[]) {
-      this.alerts.push({
-        id: this.id++,
-        type: type,
-        message: message,
-        actions: actions,
-      });
+      const foundAlert = this.alerts.find(
+        (a) => a.type == type && a.message == message && a.actions == actions,
+      );
+      if (foundAlert) {
+        foundAlert.duplicatesCount++;
+      } else {
+        this.alerts.push({
+          id: this.id++,
+          type: type,
+          message: message,
+          actions: actions,
+          duplicatesCount: 0,
+        });
+      }
     },
     deleteAlert(id: number) {
       for (const i of this.alerts.keys()) {

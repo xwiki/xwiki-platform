@@ -516,8 +516,6 @@ export class DefaultCristalApp implements CristalApp {
 
     // WikiModel ready
     await this.preloadConverters();
-
-    this.loadPage();
   }
 
   getMenuEntries(): Array<string> {

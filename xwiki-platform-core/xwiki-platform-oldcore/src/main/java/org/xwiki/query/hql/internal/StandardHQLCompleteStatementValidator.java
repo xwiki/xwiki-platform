@@ -318,8 +318,8 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private void addFromItem(FromItem item, Map<String, String> tables)
     {
-        if (item instanceof Table table) {
-            String tableName = table.getName();
+        if (item instanceof Table) {
+            String tableName = ((Table) item).getName();
             tables.put(item.getAlias() != null ? item.getAlias().getName() : tableName, tableName);
         }
     }
@@ -341,8 +341,9 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
 
     private boolean isAllowedAllTableColumns(ExpressionList parameters, Map<String, String> tables)
     {
-        return parameters.getExpressions().get(0) instanceof AllTableColumns allTableColumns
-            && isTableAllowed(getTableName(allTableColumns.getTable(), tables));
+        Expression expression = parameters.getExpressions().get(0);
+        return expression instanceof AllTableColumns
+            && isTableAllowed(getTableName(((AllTableColumns) expression).getTable(), tables));
     }
 
     private boolean isAllowedAllColumns(ExpressionList parameters, Map<String, String> tables)
@@ -361,12 +362,12 @@ public class StandardHQLCompleteStatementValidator implements HQLCompleteStateme
     {
         boolean safe = false;
 
-        if (expression instanceof Column column) {
-            if (isColumnAllowed(column, tables)) {
+        if (expression instanceof Column) {
+            if (isColumnAllowed(((Column) expression), tables)) {
                 safe = true;
             }
-        } else if (expression instanceof Function function) {
-            safe = isSelectFunctionSafe(function, tables);
+        } else if (expression instanceof Function) {
+            safe = isSelectFunctionSafe(((Function) expression), tables);
         }
 
         return safe;

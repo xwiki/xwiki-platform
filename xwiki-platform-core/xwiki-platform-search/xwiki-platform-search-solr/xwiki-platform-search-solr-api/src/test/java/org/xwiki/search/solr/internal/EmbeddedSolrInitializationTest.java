@@ -19,10 +19,13 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -208,5 +211,34 @@ class EmbeddedSolrInitializationTest
         when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString())).thenReturn(newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
+    }
+    
+    /**
+     * This looks for a regression where the file.seperator on windows was not properly escaped. 
+     * in the ""xwiki\store\solr\search\core.properties" file. 
+     */
+    @Test
+    void testCacheHomeProperlyEscapedOnWindows() throws Exception {
+        String newHome = new File(this.permanentDirectory, "doesNotExist").getAbsolutePath();
+        when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString())).thenReturn(newHome);
+        
+        Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
+        EmbeddedSolr implementation = ((EmbeddedSolr) instance);
+        CoreContainer container = implementation.getContainer();
+        SolrCore core = container.getCore(container.getLoadedCoreNames().get(0));
+        File coreBaseDirectory = new File(container.getSolrHome(), core.getName());       
+        
+        File file = new File(coreBaseDirectory,"core.properties");
+        assertTrue(file.exists(), "Couldn't find solr cache properties file: "+file.toString());
+        Properties properties = new Properties();
+        try( BufferedReader in = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8)); ){
+        	properties.load(in);
+        }
+        String dataDir = properties.getProperty("DataDir");
+        assertNotNull(dataDir, "DataDir property from properties file was null: "+file.toString());
+        String fileSeperator = System.getProperty("file.separator");
+        assertTrue(dataDir.contains(fileSeperator),"File seperators were not escaped properly in the "
+        		+ "cache path!: \""+dataDir+"\" does not contain '"+fileSeperator+"'!");
+        
     }
 }

@@ -19,16 +19,19 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -88,6 +91,10 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private static final String SCHEMA_PATH = "conf/managed-schema.xml";
 
     private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
+    
+    private static final String CORE_PROPERTIES_FILENAME = "core.properties";
+    
+    private static final String DATA_DIR_PROPERTY = "DataDir";
 
     /**
      * Solr configuration.
@@ -443,7 +450,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
                 if (entry.isDirectory()) {
                     Files.createDirectories(targetPath);
                 } else if ((force != null && force.contains(entry.getName())) || (!Files.exists(targetPath)
-                    && (!skipCoreProperties || !entry.getName().equals("core.properties")))) {
+                    && (!skipCoreProperties || !entry.getName().equals(CORE_PROPERTIES_FILENAME)))) {
                     FileUtils.copyInputStreamToFile(CloseShieldInputStream.wrap(zstream), targetPath.toFile());
                 }
             }
@@ -463,9 +470,26 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private void createCacheCore(Path corePath, String solrCoreName) throws IOException
     {
         // Indicate the path of the data
-        Path dataPath = getCacheCoreDataDir(corePath, solrCoreName);
-        FileUtils.write(corePath.resolve("core.properties").toFile(), "dataDir=" + dataPath, StandardCharsets.UTF_8,
-            true);
+        Path dataDir = getCacheCoreDataDir(corePath, solrCoreName);
+        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
+        Properties coreProperties = new Properties();
+        // we used to append this property to this file.
+        // I'm not sure any other properties are ever in here, but jic let's be passive
+        // So I load the existing file if it exists, and add my property.
+        if(corePropertiesFile.exists()) 
+        {
+        	try(BufferedReader in = new BufferedReader(new FileReader(corePropertiesFile, StandardCharsets.UTF_8)) )
+        	{
+        		coreProperties.load(in);
+        	}
+        }
+        coreProperties.setProperty(DATA_DIR_PROPERTY, dataDir.toString());
+        // Normally we write using the Apache Commons FileUtils, but this is a properties file. 
+        // Use the standard library Properties class writes it in the proper format.
+        try(PrintWriter out = new PrintWriter(corePropertiesFile, StandardCharsets.UTF_8); )
+        {
+        	coreProperties.store(out, "");
+        }
     }
 
     private Path getCacheCoreDataDir(Path corePath, String solrCoreName)

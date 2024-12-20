@@ -234,8 +234,8 @@ class EmbeddedSolrInitializationTest
         try( BufferedReader in = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8)); ){
         	properties.load(in);
         }
-        String dataDir = properties.getProperty("DataDir");
-        assertNotNull(dataDir, "DataDir property from properties file was null: "+file.toString());
+        String dataDir = properties.getProperty("dataDir");
+        assertNotNull(dataDir, "dataDir property from properties file was null: "+file.toString());
         String fileSeperator = System.getProperty("file.separator");
         assertTrue(dataDir.contains(fileSeperator),"File seperators were not escaped properly in the "
         		+ "cache path!: \""+dataDir+"\" does not contain '"+fileSeperator+"'!");

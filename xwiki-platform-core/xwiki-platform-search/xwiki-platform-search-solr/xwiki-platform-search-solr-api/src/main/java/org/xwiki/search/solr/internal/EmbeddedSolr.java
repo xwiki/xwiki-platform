@@ -94,7 +94,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     
     private static final String CORE_PROPERTIES_FILENAME = "core.properties";
     
-    private static final String DATA_DIR_PROPERTY = "DataDir";
+    private static final String DATA_DIR_PROPERTY = "dataDir";
 
     /**
      * Solr configuration.

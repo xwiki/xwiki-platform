@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define('xwiki-realtime-wikiEditor', [
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -30,7 +29,7 @@ define('xwiki-realtime-wikiEditor', [
   'jquery'
 ], function(
   /* jshint maxparams:false */
-  ErrorBox, Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
+  Toolbar, ChainPadNetflux, UserData, TextCursor, Interface, Saver, ChainPad, Crypto, $
 ) {
   'use strict';
 
@@ -310,7 +309,7 @@ define('xwiki-realtime-wikiEditor', [
           }
         },
 
-        onAbort: function(info, reason, debug) {
+        onAbort: function() {
           console.log('Aborting the session!');
           module.chainpad.abort();
           module.leaveChannel();
@@ -319,9 +318,6 @@ define('xwiki-realtime-wikiEditor', [
           toolbar.failed();
           toolbar.toolbar.remove();
           userData.stop?.();
-          if (reason || debug) {
-            ErrorBox.show(reason || 'disconnected', debug);
-          }
         },
 
         beforeReconnecting: function (callback) {
@@ -332,14 +328,14 @@ define('xwiki-realtime-wikiEditor', [
 
         onConnectionChange: function(info) {
           console.log('Connection status: ' + info.state);
-          toolbar.failed();
+          initializing = true;
           if (info.state) {
-            ErrorBox.hide();
-            initializing = true;
+            // Reconnecting.
             toolbar.reconnecting(info.myId);
           } else {
+            // Disconnected.
+            toolbar.failed();
             module.setEditable(false);
-            ErrorBox.show('disconnected');
           }
         }
       };

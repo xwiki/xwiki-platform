@@ -23,11 +23,10 @@ define('xwiki-realtime-loader', [
   'xwiki-realtime-config',
   'xwiki-realtime-document',
   'xwiki-l10n!xwiki-realtime-messages',
-  'xwiki-realtime-errorBox',
   'xwiki-events-bridge'
 ], function(
   /* jshint maxparams:false */
-  $, xm, realtimeConfig, doc, Messages, ErrorBox
+  $, xm, realtimeConfig, doc, Messages
 ) {
   'use strict';
 
@@ -613,7 +612,8 @@ define('xwiki-realtime-loader', [
     const state = data.state;
     allRt.request(state);
     if (state === -1) {
-      ErrorBox.show('unavailable');
+      module.connectionStatusNotification = module.connectionStatusNotification.replace(
+        new XWiki.widgets.Notification(Messages.connectionLost, 'error'));
     } else if (state === 0) {
       // Rejected
       $('.realtime-buttons').data('modal')?.closeDialog();
@@ -796,8 +796,9 @@ define('xwiki-realtime-loader', [
         const realtimeContext = new RealtimeContext(info);
         const keys = await realtimeContext.updateChannels();
         if (!keys[info.type] || !keys.events || !keys.userdata) {
-          ErrorBox.show('unavailable');
-          const error = new Error('You are not allowed to create a new realtime session for that document.');
+          module.connectionStatusNotification = module.connectionStatusNotification.replace(
+            new XWiki.widgets.Notification(Messages.forbidden, 'error'));
+          const error = new Error(Messages.forbidden);
           console.error(error);
           throw error;
         } else if (Object.keys(keys.active).length && !keys[info.type + '_users']) {

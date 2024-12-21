@@ -21,7 +21,6 @@ define('xwiki-realtime-wysiwyg', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -33,8 +32,8 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  ChainPad, Crypto, Patches
+  $, realtimeConfig, Messages, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto,
+  Patches
 ) {
   'use strict';
 
@@ -268,7 +267,7 @@ define('xwiki-realtime-wysiwyg', [
           try {
             return this._editor.getOutputHTML();
           } catch (e) {
-            this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
+            this._editor.showNotification(Messages['editor.getContentFailed'], 'warning');
             return null;
           }
         },
@@ -382,8 +381,7 @@ define('xwiki-realtime-wysiwyg', [
         onLocal: this._onLocal.bind(this),
         onRemote: this._onRemote.bind(this),
         onConnectionChange: this._onConnectionChange.bind(this),
-        beforeReconnecting: this._beforeReconnecting.bind(this),
-        onAbort: this._onAbort.bind(this),
+        beforeReconnecting: this._beforeReconnecting.bind(this)
       };
     }
 
@@ -556,7 +554,7 @@ define('xwiki-realtime-wysiwyg', [
       });
     }
 
-    _onAbort(info, reason, debug) {
+    _onAbort() {
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         // We already left the realtime session.
         return;
@@ -573,11 +571,11 @@ define('xwiki-realtime-wysiwyg', [
       this._realtimeContext.setRealtimeEnabled(false);
 
       // Stop the autosave (and leave the events Netflux channel associated with the edited document).
-      this._saver.stop();
+      this._saver?.stop();
 
       // Remove the realtime toolbar.
-      this._connection.toolbar.failed();
-      this._connection.toolbar.toolbar.remove();
+      this._connection.toolbar?.failed();
+      this._connection.toolbar?.toolbar.remove();
 
       // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
       this._connection.userData.stop?.();
@@ -594,10 +592,6 @@ define('xwiki-realtime-wysiwyg', [
       this._connection = {
         status: ConnectionStatus.DISCONNECTED
       };
-
-      if (reason || debug) {
-        ErrorBox.show(reason || 'disconnected', debug);
-      }
     }
 
     _onLock() {

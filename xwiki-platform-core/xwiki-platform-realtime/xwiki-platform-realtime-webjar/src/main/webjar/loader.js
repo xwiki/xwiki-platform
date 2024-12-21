@@ -696,8 +696,12 @@ define('xwiki-realtime-loader', [
         console.error(error);
       }
     });
+    let expectedDisconnect = false;
+    window.addEventListener('beforeunload', () => {
+      expectedDisconnect = true;
+    });
     network.on('disconnect', () => {
-      if (Object.keys(RealtimeContext.instances).length) {
+      if (!expectedDisconnect && Object.keys(RealtimeContext.instances).length) {
         let message = Messages.connectionLost;
         if (RealtimeContext.getRealtimeEditedFields().length) {
           message += ' ' + Messages.connectionLostInfo;

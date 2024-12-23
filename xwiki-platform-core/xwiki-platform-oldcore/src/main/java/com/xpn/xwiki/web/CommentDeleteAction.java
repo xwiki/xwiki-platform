@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -38,9 +39,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+
 /**
- * Action used to remove a comment from a page, requires comment right but not edit right.
- * Note that this class is largely inspired by ObjectRemoveAction and Comment
+ * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
+ * largely inspired by ObjectRemoveAction and Comment
  *
  * @version $Id$
  * @since 17.0.0RC1
@@ -51,7 +56,11 @@ import com.xpn.xwiki.objects.BaseObject;
 public class CommentDeleteAction extends XWikiAction
 {
     private static final String FAIL_MESSAGE = "failed";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentDeleteAction.class);
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
 
     @Override
     protected Class<? extends XWikiForm> getFormClass()
@@ -69,21 +78,23 @@ public class CommentDeleteAction extends XWikiAction
         String attributeName = "message";
         if (StringUtils.isBlank(className)) {
             getCurrentScriptContext().setAttribute(attributeName,
-                    localizePlainOrReturnKey("platform.core.action.commentRemove.noClassnameSpecified"),
-                    ScriptContext.ENGINE_SCOPE);
+                localizePlainOrReturnKey("platform.core.action.commentRemove.noClassnameSpecified"),
+                ScriptContext.ENGINE_SCOPE);
         } else if (classId < 0) {
             getCurrentScriptContext().setAttribute(attributeName,
-                    localizePlainOrReturnKey("platform.core.action.commentRemove.noCommentSpecified"),
-                    ScriptContext.ENGINE_SCOPE);
+                localizePlainOrReturnKey("platform.core.action.commentRemove.noCommentSpecified"),
+                ScriptContext.ENGINE_SCOPE);
         } else {
-            obj = doc.getObject(className, classId);
+            // Comment class reference
+            DocumentReference commentClass = new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE,
+                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+            obj = doc.getXObject(commentClass, classId);
             if (obj == null) {
                 getCurrentScriptContext().setAttribute(attributeName,
-                        localizePlainOrReturnKey("platform.core.action.commentRemove.invalidComment"),
-                        ScriptContext.ENGINE_SCOPE);
+                    localizePlainOrReturnKey("platform.core.action.commentRemove.invalidComment"),
+                    ScriptContext.ENGINE_SCOPE);
             }
         }
-
         return obj;
     }
 
@@ -110,8 +121,9 @@ public class CommentDeleteAction extends XWikiAction
             return true;
         }
 
-        doc.removeObject(obj);
-        doc.setAuthorReference(userReference);
+        doc.removeXObject(obj);
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
         String changeComment = localizePlainOrReturnKey("core.comment.deleteComment");
 

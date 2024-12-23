@@ -130,6 +130,7 @@ async function readPage(
         lastAuthor: { name: os.userInfo().username },
         lastModificationDate: new Date(pageStats.mtimeMs),
         id: relative(HOME_PATH_FULL, dirname(path)),
+        canEdit: true,
       },
     };
   } else {

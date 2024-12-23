@@ -81,6 +81,7 @@ export class NextcloudStorage extends AbstractStorage {
           headlineRaw: json.name,
           lastAuthor: lastAuthor,
           lastModificationDate: lastModificationDate,
+          canEdit: true,
         };
       } else {
         return undefined;

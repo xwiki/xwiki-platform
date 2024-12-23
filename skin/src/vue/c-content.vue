@@ -99,16 +99,13 @@ onUpdated(() => {
     </template>
     <template #doc-page-actions>
       <div class="doc-page-actions">
+        <!-- We need to enable the edit button when the page does not exist,
+             or when it exists and is editable by the current user. -->
         <router-link
-          v-if="!currentPageRevision && currentPage?.canEdit"
+          v-if="!currentPageRevision && (!currentPage || currentPage?.canEdit)"
           :to="{ name: 'edit', params: { page: currentPageName } }"
         >
-          <x-btn
-            size="small"
-            :disabled="
-              currentPageRevision !== undefined || !currentPage?.canEdit
-            "
-          >
+          <x-btn size="small">
             <c-icon name="pencil" :size="Size.Small"></c-icon>
             Edit
           </x-btn>

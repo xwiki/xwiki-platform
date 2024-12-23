@@ -105,6 +105,7 @@ export class GitHubStorage extends AbstractStorage {
     pageContentData.syntax = "md";
     pageContentData.css = [];
     pageContentData.version = this.hashCode(content);
+    pageContentData.canEdit = false;
     return pageContentData;
   }
 

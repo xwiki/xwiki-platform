@@ -19,6 +19,7 @@
  */
 
 import type { PageData } from "@xwiki/cristal-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type { Ref } from "vue";
 
 /**
@@ -36,6 +37,20 @@ interface DocumentService {
    * @returns the reference to the current document, the current document changes when setCurrentDocument is called
    */
   getCurrentDocument(): Ref<PageData | undefined>;
+
+  /**
+   * Returns a reference the document reference for the current document.
+   *
+   * @since 0.13
+   */
+  getCurrentDocumentReference(): Ref<DocumentReference | undefined>;
+
+  /**
+   * Returns a serialized string of {@link getCurrentDocumentReference}.
+   *
+   * @since 0.13
+   */
+  getCurrentDocumentReferenceString(): Ref<string | undefined>;
 
   /**
    * @returns the revision of the current document, or undefined if it's the last one

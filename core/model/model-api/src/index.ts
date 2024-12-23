@@ -69,10 +69,16 @@ class DocumentReference implements EntityReference {
   type: EntityType = EntityType.DOCUMENT;
   space?: SpaceReference;
   name: string;
+  /**
+   * Indicates whether the current document reference is terminal.
+   * @since 0.13
+   */
+  terminal: boolean;
 
-  constructor(name: string, space?: SpaceReference) {
+  constructor(name: string, space?: SpaceReference, terminal?: boolean) {
     this.space = space;
     this.name = name;
+    this.terminal = terminal ?? false;
   }
 }
 

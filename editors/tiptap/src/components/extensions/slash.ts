@@ -159,6 +159,24 @@ function getCodeBlockAction(): ActionDescriptor {
   };
 }
 
+function getImageAction(): ActionDescriptor {
+  return {
+    title: "Image",
+    icon: "image",
+    hint: "Image",
+    command({ editor, range }) {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .insertContent({
+          type: "imageInsert",
+        })
+        .run();
+    },
+  };
+}
+
 function getAllActions(): ActionCategoryDescriptor[] {
   const getHeadingActions = [1, 2, 3, 4, 5, 6].map((level) =>
     getHeadingAction(level),
@@ -174,6 +192,7 @@ function getAllActions(): ActionCategoryDescriptor[] {
         getTableAction(),
         getBlockquoteAction(),
         getCodeBlockAction(),
+        getImageAction(),
       ],
     },
   ];

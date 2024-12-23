@@ -1,0 +1,40 @@
+{
+  "name": "@xwiki/cristal-authentication-nextcloud",
+  "version": "0.12.0",
+  "license": "LGPL 2.1",
+  "author": "XWiki Org Community <contact@xwiki.org>",
+  "homepage": "https://cristal.xwiki.org/",
+  "repository": {
+    "type": "git",
+    "directory": "/core/authentication/authentication-nextcloud",
+    "url": "https://github.com/xwiki-contrib/cristal/"
+  },
+  "bugs": {
+    "url": "https://jira.xwiki.org/projects/CRISTAL/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json && vite build",
+    "clean": "rimraf dist",
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3",
+    "vite": "6.0.3"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/index.es.js",
+        "require": "./dist/index.umd.js",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.es.js",
+    "types": "./dist/index.d.ts"
+  }
+}

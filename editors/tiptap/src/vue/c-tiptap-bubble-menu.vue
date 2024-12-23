@@ -20,16 +20,22 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import CTiptapLinkEdit from "./c-tiptap-link-edit.vue";
 import getMenuActions, {
-  BubbleMenuAction,
-  getLinkAction,
+  ElementType,
 } from "../components/extensions/bubble-menu";
+import { getLinkAction } from "../components/extensions/bubble-menu/text-actions";
 import { isTextSelection } from "@tiptap/core";
 import { ResolvedPos } from "@tiptap/pm/model";
-import { EditorState } from "@tiptap/pm/state";
+import {
+  EditorState,
+  NodeSelection,
+  Selection,
+  SelectionRange,
+} from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
-import { BubbleMenu, Range } from "@tiptap/vue-3";
+import { BubbleMenu } from "@tiptap/vue-3";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { ComputedRef, Ref, computed, ref, shallowRef } from "vue";
+import type { BubbleMenuAction } from "../components/extensions/bubble-menu/BubbleMenuAction";
 import type { Editor } from "@tiptap/core";
 import type { Component } from "vue";
 
@@ -37,9 +43,12 @@ const props = defineProps<{
   editor: Editor;
 }>();
 
-const actions: ComputedRef<BubbleMenuAction[]> = computed(() =>
-  getMenuActions(props.editor),
-);
+const actions: ComputedRef<BubbleMenuAction[]> = computed(() => {
+  const elementType = isImageFromSelection(props.editor.state.selection)
+    ? ElementType.IMAGE
+    : ElementType.TEXT;
+  return getMenuActions(props.editor, elementType);
+});
 
 const additionalComponent: Ref<Component | undefined> = shallowRef();
 
@@ -47,7 +56,7 @@ const additionalComponentProps: Ref<
   | {
       action: BubbleMenuAction;
       editor: Editor;
-      range: Range;
+      range: SelectionRange;
       url: string;
       isAmbiguous: boolean;
     }
@@ -144,6 +153,12 @@ function closeAdditionalComponent() {
   additionalComponentProps.value = undefined;
 }
 
+function isImageFromSelection(selection: Selection): boolean {
+  return (
+    selection instanceof NodeSelection && selection.node?.type.name == "image"
+  );
+}
+
 /*
  * Compute whether the bubble menu must be shown, either because the selection
  * is empty and inside a link element, or because
@@ -168,13 +183,13 @@ const shouldShow = ({
   // Doubleclick an empty paragraph returns a node size of 2.
   // So we check also for an empty text size.
   const isEmptyTextBlock =
-    !doc.textBetween(from, to).length && isTextSelection(state.selection);
+    doc.textBetween(from, to).length == 0 || !isTextSelection(selection);
 
   const hasEditorFocus = view.hasFocus();
 
   const isLink =
-    state.selection.$head.marks().find((m) => m.type.name == "link") !==
-    undefined;
+    selection.$head.marks().find((m) => m.type.name == "link") !== undefined;
+  const isImage = isImageFromSelection(selection);
 
   // Don't show if the editor is not editable or don't have focus.
   if (!editor.isEditable || !hasEditorFocus) {
@@ -183,7 +198,11 @@ const shouldShow = ({
 
   // Show if the selection is not empty and the selection is not an empty text
   // block, or it the selection is empty but inside a link.
-  return (!emptySelection && !isEmptyTextBlock) || (emptySelection && isLink);
+  return (
+    (!emptySelection && !isEmptyTextBlock) ||
+    isImage ||
+    (emptySelection && isLink)
+  );
 };
 
 const linkAction = getLinkAction(props.editor);
@@ -224,9 +243,8 @@ const linkAction = getLinkAction(props.editor);
     ></CTiptapLinkEdit>
 
     <!--
-    It is possible for an action to provide an additional component.
-    This is useful if the action needs some additional actions (e.g., the link
-    action requires a link value).
+    It is possible for an action to provide an additional component. This is useful if the node or mark needs some
+    additional actions (e.g., the link action requires a link value).
     -->
     <template
       v-if="

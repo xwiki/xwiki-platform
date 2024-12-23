@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { EntityType } from "@xwiki/cristal-model-api";
 import { inject, injectable } from "inversify";
 import { Store, StoreDefinition, defineStore, storeToRefs } from "pinia";
 import { Ref } from "vue";
@@ -26,6 +27,11 @@ import type {
   DocumentChange,
   DocumentService,
 } from "@xwiki/cristal-document-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
 
 type Id = "document";
 type State = {
@@ -42,8 +48,16 @@ type State = {
 type WrappedRefs<Type> = {
   readonly [Property in keyof Type]: Ref<Type[Property]>;
 };
-type StateRefs = WrappedRefs<State>;
-type Getters = Record<string, never>;
+type StateRefs = WrappedRefs<
+  State & {
+    documentReference: DocumentReference | undefined;
+    documentReferenceString: string | undefined;
+  }
+>;
+type Getters = {
+  documentReference(): DocumentReference | undefined;
+  documentReferenceString(): string | undefined;
+};
 type Actions = {
   /**
    * Switch the loading state to true;
@@ -66,6 +80,13 @@ type DocumentStoreDefinition = StoreDefinition<Id, State, Getters, Actions>;
 type DocumentStore = Store<Id, State, Getters, Actions>;
 
 function createStore(cristal: CristalApp): DocumentStoreDefinition {
+  const modelReferenceParserProvider = cristal
+    .getContainer()
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider");
+  const modelReferenceSerializerProvider = cristal
+    .getContainer()
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider");
+
   return defineStore<Id, State, Getters, Actions>("document", {
     state() {
       return {
@@ -76,6 +97,21 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
         loading: false,
         error: undefined,
       };
+    },
+    getters: {
+      documentReference() {
+        return modelReferenceParserProvider
+          .get()
+          ?.parse(
+            this.lastDocumentReference ?? "",
+            EntityType.DOCUMENT,
+          ) as DocumentReference;
+      },
+      documentReferenceString(): string | undefined {
+        return modelReferenceSerializerProvider
+          .get()
+          ?.serialize(this.documentReference);
+      },
     },
     actions: {
       // Loading must be in its own separate action because action changes are
@@ -141,6 +177,14 @@ export class DefaultDocumentService implements DocumentService {
     return this.refs.document;
   }
 
+  getCurrentDocumentReference(): Ref<DocumentReference | undefined> {
+    return this.refs.documentReference;
+  }
+
+  getCurrentDocumentReferenceString(): Ref<string | undefined> {
+    return this.refs.documentReferenceString;
+  }
+
   getCurrentDocumentRevision(): Ref<string | undefined> {
     return this.refs.revision;
   }
@@ -154,7 +198,9 @@ export class DefaultDocumentService implements DocumentService {
   }
 
   setCurrentDocument(documentReference: string, revision?: string): void {
-    this.store.update(documentReference, true, revision);
+    if (this.store) {
+      this.store.update(documentReference, true, revision);
+    }
   }
 
   refreshCurrentDocument(): void {

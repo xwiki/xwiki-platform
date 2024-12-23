@@ -19,10 +19,13 @@
  */
 
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import { LinkType } from "@xwiki/cristal-link-suggest-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { protocol as cristalFSProtocol } from "@xwiki/cristal-model-remote-url-filesystem-api";
 import { app, ipcMain, net, protocol, shell } from "electron";
 import mime from "mime";
 import fs from "node:fs";
+import { readdir } from "node:fs/promises";
 import os from "node:os";
 import { basename, dirname, join, relative } from "node:path";
 
@@ -41,6 +44,7 @@ function resolvePagePath(page: string): string {
 function resolveAttachmentsPath(page: string): string {
   return resolvePath(page, "attachments");
 }
+
 function resolveAttachmentPath(page: string, filename: string): string {
   return resolvePath(page, "attachments", filename);
 }
@@ -54,6 +58,38 @@ async function isFile(path: string) {
   }
   return stat?.isFile();
 }
+
+function hasMimetype(path: string, mimetype: string) {
+  const mimetypeFile = mime.getType(path);
+  if (!mimetypeFile) {
+    return false;
+  }
+
+  const [p1, p2] = mimetypeFile.split("/");
+  const [q1, q2] = mimetype.split("/");
+  return (q1 == "*" || q1 == p1) && (q2 == "*" || q2 == p2);
+}
+
+async function isAttachment(path: string, mimetype?: string) {
+  if (!(await isFile(path))) {
+    return false;
+  }
+
+  const isInAttachmentsDirectory = basename(dirname(path)) == "attachments";
+  if (isInAttachmentsDirectory && mimetype) {
+    return hasMimetype(path, mimetype);
+  }
+  return isInAttachmentsDirectory;
+}
+
+async function isPage(path: string) {
+  if (!(await isFile(path))) {
+    return false;
+  }
+
+  return basename(path) == "page.json";
+}
+
 async function isDirectory(path: string) {
   let stat = undefined;
   try {
@@ -73,7 +109,9 @@ async function pathExists(path: string) {
   return true;
 }
 
-async function readPage(path: string): Promise<PageData | undefined> {
+async function readPage(
+  path: string,
+): Promise<{ type: EntityType.DOCUMENT; value: PageData } | undefined> {
   if (!(await isWithin(HOME_PATH_FULL, path))) {
     throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
   }
@@ -86,9 +124,13 @@ async function readPage(path: string): Promise<PageData | undefined> {
       parse.name = basename(dirname(path));
     }
     return {
-      ...parse,
-      lastAuthor: { name: os.userInfo().username },
-      lastModificationDate: new Date(pageStats.mtimeMs),
+      type: EntityType.DOCUMENT,
+      value: {
+        ...parse,
+        lastAuthor: { name: os.userInfo().username },
+        lastModificationDate: new Date(pageStats.mtimeMs),
+        id: relative(HOME_PATH_FULL, dirname(path)),
+      },
     };
   } else {
     return undefined;
@@ -102,12 +144,14 @@ async function readAttachments(
     throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
   }
   if (await isDirectory(path)) {
-    const pageContent = await fs.promises.readdir(path);
+    const attachments = await fs.promises.readdir(path);
     return (
       await Promise.all(
-        pageContent.map((attachment) => readAttachment(join(path, attachment))),
+        attachments.map((attachment) => readAttachment(join(path, attachment))),
       )
-    ).filter((it) => it !== undefined);
+    )
+      .filter((it) => it !== undefined)
+      .map((it) => it.value);
   } else {
     return undefined;
   }
@@ -115,7 +159,7 @@ async function readAttachments(
 
 async function readAttachment(
   path: string,
-): Promise<PageAttachment | undefined> {
+): Promise<{ type: EntityType.ATTACHMENT; value: PageAttachment } | undefined> {
   if (!(await isWithin(HOME_PATH_FULL, path))) {
     throw new Error(`[${path}] is not in in [${HOME_PATH_FULL}]`);
   }
@@ -124,13 +168,16 @@ async function readAttachment(
     const stats = await fs.promises.stat(path);
     const mimetype = mime.getType(path) || "";
     return {
-      id: basename(path),
-      mimetype,
-      reference: basename(path),
-      href: `${cristalFSProtocol}://${relative(HOME_PATH_FULL, path)}`,
-      date: stats.mtime,
-      size: stats.size,
-      author: undefined,
+      type: EntityType.ATTACHMENT,
+      value: {
+        id: basename(path),
+        mimetype,
+        reference: relative(HOME_PATH_FULL, path),
+        href: `${cristalFSProtocol}://${relative(HOME_PATH_FULL, path)}`,
+        date: stats.mtime,
+        size: stats.size,
+        author: undefined,
+      },
     };
   } else {
     return undefined;
@@ -187,7 +234,7 @@ async function savePage(
   // Set the flag to w+ so that the file is created if it does not already
   // exist, or fully replaced when it does.
   await fs.promises.writeFile(path, newJSON, { flag: "w+" });
-  return readPage(path);
+  return (await readPage(path))?.value;
 }
 
 async function saveAttachment(path: string, filePath: string) {
@@ -236,6 +283,59 @@ async function deletePage(path: string): Promise<void> {
   await shell.trashItem(path.replace(/\/page.json$/, ""));
 }
 
+async function asyncFilter<T>(arr: T[], predicate: (i: T) => Promise<boolean>) {
+  // First compute the async result for each element
+  const results = await Promise.all(arr.map(predicate));
+
+  // The filter out on the async results, retrieving the async results by index
+  return arr.filter((_v, index) => results[index]);
+}
+
+async function search(
+  query: string,
+  type?: LinkType,
+  mimetype?: string,
+): Promise<
+  (
+    | { type: EntityType.ATTACHMENT; value: PageAttachment }
+    | { type: EntityType.DOCUMENT; value: PageData }
+  )[]
+> {
+  const attachments = (await readdir(HOME_PATH_FULL, { recursive: true })).map(
+    (it) => join(HOME_PATH_FULL, it),
+  );
+  const allEntities = await asyncFilter(attachments, async (path: string) => {
+    if (type == LinkType.ATTACHMENT) {
+      return isAttachment(path, mimetype);
+    } else if (type == LinkType.PAGE) {
+      return isPage(path);
+    } else {
+      return (await isAttachment(path, mimetype)) || (await isPage(path)); // TODO: filter out
+    }
+  });
+
+  const searchedEntities = await asyncFilter(allEntities, async (it) => {
+    if (await isAttachment(it)) {
+      return basename(it).includes(query);
+    } else if (await isPage(it)) {
+      return basename(dirname(it)).includes(query);
+    } else {
+      return false;
+    }
+  });
+  return (
+    await Promise.all(
+      searchedEntities.map(async (it) => {
+        if (await isPage(it)) {
+          return readPage(it);
+        } else {
+          return readAttachment(it);
+        }
+      }),
+    )
+  ).filter((it) => it !== undefined);
+}
+
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 export default function load(): void {
@@ -256,14 +356,14 @@ export default function load(): void {
   ipcMain.handle("resolveAttachmentsPath", (event, { page }) => {
     return resolveAttachmentsPath(page);
   });
-  ipcMain.handle("readPage", (event, { path }) => {
-    return readPage(path);
+  ipcMain.handle("readPage", async (event, { path }) => {
+    return (await readPage(path))?.value;
   });
   ipcMain.handle("readAttachments", (event, { path }) => {
     return readAttachments(path);
   });
-  ipcMain.handle("readAttachment", (event, { path }) => {
-    return readAttachment(path);
+  ipcMain.handle("readAttachment", async (event, { path }) => {
+    return (await readAttachment(path))?.value;
   });
   ipcMain.handle("savePage", (event, { path, content, title }) => {
     return savePage(path, content, title);
@@ -279,5 +379,8 @@ export default function load(): void {
   });
   ipcMain.handle("deletePage", (event, { path }) => {
     return deletePage(path);
+  });
+  ipcMain.handle("search", (event, { query, type, mimetype }) => {
+    return search(query, type, mimetype);
   });
 }

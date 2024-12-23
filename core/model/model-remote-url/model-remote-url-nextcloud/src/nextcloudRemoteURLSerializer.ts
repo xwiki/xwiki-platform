@@ -18,13 +18,48 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { USERNAME } from "@xwiki/cristal-authentication-nextcloud";
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 class NextcloudRemoteURLSerializer implements RemoteURLSerializer {
-  serialize(): string | undefined {
-    throw new Error("to be implemented ");
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
+
+  serialize(reference?: EntityReference): string | undefined {
+    if (!reference) {
+      return undefined;
+    }
+    switch (reference.type) {
+      case EntityType.WIKI:
+        throw new Error("Not implemented");
+      case EntityType.SPACE:
+        throw new Error("Not implemented");
+      case EntityType.DOCUMENT: {
+        const documentReference = reference as DocumentReference;
+        const spaces = documentReference.space?.names.join("/");
+        return `${this.getBaseRestURL()}/${USERNAME}/.cristal/${spaces}/${documentReference.name}`;
+      }
+      case EntityType.ATTACHMENT: {
+        const attachmentReference = reference as AttachmentReference;
+        const documentReference = attachmentReference.document;
+        const spaces = documentReference.space?.names.map(encodeURI).join("/");
+        return `${this.getBaseRestURL()}/${USERNAME}/.cristal/${spaces}/${documentReference.name}/attachments/${attachmentReference.name}`;
+      }
+    }
+  }
+
+  private getBaseRestURL() {
+    return this.cristalApp.getWikiConfig().baseRestURL;
   }
 }
 

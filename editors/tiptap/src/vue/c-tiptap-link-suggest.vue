@@ -19,13 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import { listNavigation } from "./list-navigation-helper";
-import {
-  LinkSuggestionActionDescriptor,
-  LinkType,
-} from "../components/extensions/link-suggest";
+import { LinkSuggestionActionDescriptor } from "../components/extensions/link-suggest";
 import linkSuggestStore from "../stores/link-suggest-store";
 import { SuggestionProps } from "@tiptap/suggestion";
-import { CIcon, Size } from "@xwiki/cristal-icons";
+import { LinkSuggestItem } from "@xwiki/cristal-tiptap-link-suggest-ui";
 import { storeToRefs } from "pinia";
 import tippy, { GetReferenceClientRect, Instance, Props } from "tippy.js";
 import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from "vue";
@@ -148,22 +145,10 @@ defineExpose({
           :class="['item', index - 1 == linkIndex ? 'is-selected' : '']"
           @click="apply(linkIndex + 1)"
         >
-          <c-icon
-            class="icon-type"
-            :size="Size.Small"
-            :name="link.type == LinkType.PAGE ? 'file-earmark' : 'paperclip'"
-          />
-          {{ link.title }}
-          <XBreadcrumb
-            :items="
-              link.segments.map((segment) => {
-                return { label: segment };
-              })
-            "
-          ></XBreadcrumb>
+          <link-suggest-item :link="link"></link-suggest-item>
         </button>
       </template>
-      <span v-else class="information"> No suggestion service available </span>
+      <span v-else class="information">No suggestion service available</span>
     </div>
   </div>
 </template>

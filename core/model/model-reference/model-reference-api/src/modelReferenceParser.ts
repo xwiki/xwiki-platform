@@ -18,12 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityReference } from "@xwiki/cristal-model-api";
+import { EntityReference, EntityType } from "@xwiki/cristal-model-api";
 
 /**
  * @since 0.12
  */
 interface ModelReferenceParser {
-  parser(reference: string): EntityReference;
+  /**
+   * @param reference - an entity reference
+   * @param type - (since 0.13) an optional type, helping to remove ambiguity when parsing the reference
+   */
+  parse(reference: string, type?: EntityType): EntityReference;
 }
 export type { ModelReferenceParser };

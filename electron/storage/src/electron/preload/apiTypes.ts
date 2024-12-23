@@ -19,6 +19,8 @@
  */
 
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import { LinkType } from "@xwiki/cristal-link-suggest-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 
 export interface APITypes {
   resolvePath(page: string): Promise<string>;
@@ -40,4 +42,22 @@ export interface APITypes {
   listChildren(page: string): Promise<Array<string>>;
 
   deletePage(path: string): Promise<void>;
+
+  /**
+   *
+   * @param query - search query
+   * @param type - the type of attach
+   * @param mimetype - the expected mimetype, only applied for attachments
+   * @since 0.13
+   */
+  search(
+    query: string,
+    type?: LinkType,
+    mimetype?: string,
+  ): Promise<
+    (
+      | { type: EntityType.ATTACHMENT; value: PageAttachment }
+      | { type: EntityType.DOCUMENT; value: PageData }
+    )[]
+  >;
 }

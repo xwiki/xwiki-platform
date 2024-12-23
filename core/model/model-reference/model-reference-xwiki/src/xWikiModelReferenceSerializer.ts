@@ -73,7 +73,7 @@ export class XWikiModelReferenceSerializer implements ModelReferenceSerializer {
         const attachmentReference = reference as AttachmentReference;
         const document = this.serialize(attachmentReference.document);
         const name = attachmentReference.name;
-        return `${document}@${name}`;
+        return `attach:${document}@${name}`;
       }
       default:
         throw new Error(`Unknown reference type [${type}]`);

@@ -18,13 +18,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { EntityReference } from "@xwiki/cristal-model-api";
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { injectable } from "inversify";
 
 @injectable()
 export class NextcloudModelReferenceParser implements ModelReferenceParser {
-  parser(): EntityReference {
-    throw new Error("Method not implemented.");
+  parse(reference: string): EntityReference {
+    let segments = reference.split("/");
+    if (segments[0] == "") {
+      segments = segments.slice(1);
+    }
+    if (segments[segments.length - 2] == "attachments") {
+      return new AttachmentReference(
+        segments[segments.length - 1],
+        new DocumentReference(
+          segments[segments.length - 3],
+          new SpaceReference(
+            undefined,
+            ...segments.slice(0, segments.length - 3),
+          ),
+        ),
+      );
+    } else {
+      return new DocumentReference(
+        segments[segments.length - 1],
+        new SpaceReference(
+          undefined,
+          ...segments.slice(0, segments.length - 1),
+        ),
+      );
+    }
   }
 }

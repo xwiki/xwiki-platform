@@ -24,6 +24,7 @@
     "@xwiki/cristal-electron-storage": "workspace:*",
     "@xwiki/cristal-hierarchy-filesystem": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
+    "@xwiki/cristal-link-suggest-filesystem": "workspace:*",
     "@xwiki/cristal-model-reference-filesystem": "workspace:*",
     "@xwiki/cristal-model-remote-url-filesystem-default": "workspace:*",
     "@xwiki/cristal-navigation-tree-filesystem": "workspace:*",

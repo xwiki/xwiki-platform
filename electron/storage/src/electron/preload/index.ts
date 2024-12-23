@@ -20,6 +20,8 @@
 
 import { APITypes } from "./apiTypes";
 import { PageAttachment, PageData } from "@xwiki/cristal-api";
+import { LinkType } from "@xwiki/cristal-link-suggest-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 const api: APITypes = {
@@ -58,6 +60,18 @@ const api: APITypes = {
   },
   deletePage(path: string): Promise<void> {
     return ipcRenderer.invoke("deletePage", { path });
+  },
+  search(
+    query: string,
+    type?: LinkType,
+    mimetype?: string,
+  ): Promise<
+    (
+      | { type: EntityType.ATTACHMENT; value: PageAttachment }
+      | { type: EntityType.DOCUMENT; value: PageData }
+    )[]
+  > {
+    return ipcRenderer.invoke("search", { query, type, mimetype });
   },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

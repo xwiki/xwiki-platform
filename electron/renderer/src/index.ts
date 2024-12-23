@@ -24,6 +24,7 @@ import { ComponentInit as XWikiAuthenticationComponentInit } from "@xwiki/crista
 import { ComponentInit as ElectronStorageComponentInit } from "@xwiki/cristal-electron-storage";
 import { ComponentInit as FileSystemPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-filesystem";
 import { CristalAppLoader, loadConfig } from "@xwiki/cristal-lib";
+import { ComponentInit as FileSystemLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-filesystem";
 import { ComponentInit as ModelReferenceFilesystemComponentInit } from "@xwiki/cristal-model-reference-filesystem";
 import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem-default";
 import { ComponentInit as FileSystemNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-filesystem";
@@ -52,5 +53,6 @@ CristalAppLoader.init(
     new XWikiAuthenticationComponentInit(container);
     new ModelReferenceFilesystemComponentInit(container);
     new ModelRemoteURLFilesystemComponentInit(container);
+    new FileSystemLinkSuggestComponentInit(container);
   },
 );

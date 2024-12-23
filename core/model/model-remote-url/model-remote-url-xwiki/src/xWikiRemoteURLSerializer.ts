@@ -18,13 +18,59 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
 import { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 class XWikiRemoteURLSerializer implements RemoteURLSerializer {
-  serialize(): string | undefined {
-    throw new Error("to be implemented ");
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
+
+  serialize(reference?: EntityReference): string | undefined {
+    if (!reference) {
+      return undefined;
+    }
+    switch (reference.type) {
+      case EntityType.WIKI:
+        throw new Error("Not implemented");
+      case EntityType.SPACE:
+        throw new Error("Not implemented");
+      case EntityType.DOCUMENT: {
+        return this.serializeDocument(reference);
+      }
+      case EntityType.ATTACHMENT: {
+        return this.serializeAttachment(reference);
+      }
+    }
+  }
+
+  private serializeAttachment(reference: EntityReference) {
+    const baseURL = this.cristalApp.getWikiConfig().baseURL;
+    const attachmentReference = reference as AttachmentReference;
+    const documentReference = attachmentReference.document;
+    const spaces = documentReference.space?.names.map(encodeURI).join("/");
+    return `${baseURL}/bin/download/${spaces}/${encodeURI(documentReference.name)}/${encodeURI(
+      attachmentReference.name,
+    )}`;
+  }
+
+  private serializeDocument(reference: EntityReference) {
+    const baseURL = this.cristalApp.getWikiConfig().baseURL;
+    const documentReference = reference as DocumentReference;
+    const spaces = documentReference.space?.names.map(encodeURI).join("/");
+    if (documentReference.name == "WebHome") {
+      return `${baseURL}/bin/view/${spaces}/`;
+    } else {
+      return `${baseURL}/bin/view/${spaces}/${encodeURI(documentReference.name)}`;
+    }
   }
 }
 

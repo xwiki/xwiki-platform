@@ -19,38 +19,56 @@
  */
 
 import Link from "@tiptap/extension-link";
+import { EntityReference } from "@xwiki/cristal-model-api";
+import { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
+import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 import type { Mark } from "@tiptap/pm/model";
 
 /**
- * Extends the default tiptap extension link with custom markdown serializion
+ * Extends the default tiptap extension link with custom Markdown serialization
  * rules to handle internal links.
  */
-export default Link.extend({
-  addStorage() {
-    return {
-      markdown: {
-        serialize: {
-          open(state: unknown, mark: Mark) {
-            return mark.attrs.class?.includes("internal-link")
-              ? "[["
-              : // TODO: replace with a call to the default spec.
-                "[";
+export default function initLinkExtension(
+  serializer: ModelReferenceSerializer,
+  parser: RemoteURLParser,
+) {
+  function parseLink(mark: Mark): EntityReference | undefined {
+    try {
+      return parser.parse(mark.attrs.href as string);
+    } catch {
+      return undefined;
+    }
+  }
+
+  return Link.extend({
+    addStorage() {
+      return {
+        markdown: {
+          serialize: {
+            open(state: unknown, mark: Mark) {
+              const reference = parseLink(mark);
+              if (reference) {
+                return "[[";
+              } else {
+                return "[";
+              }
+            },
+            close: function (state: unknown, mark: Mark) {
+              if (parseLink(mark)) {
+                return `|${serializer.serialize(parser.parse(mark.attrs.href))}]]`;
+              } else {
+                // TODO: replace with a call to the default spec.
+                return `](${mark.attrs.href.replace(/[()"]/g, "\\$&")}${
+                  mark.attrs.title
+                    ? ` "${mark.attrs.title.replace(/"/g, '\\"')}"`
+                    : ""
+                })`;
+              }
+            },
+            mixable: true,
           },
-          close: function (state: unknown, mark: Mark) {
-            if (mark.attrs.class?.includes("internal-link")) {
-              return `|${mark.attrs.href}]]`;
-            } else {
-              // TODO: replace with a call to the default spec.
-              return `](${mark.attrs.href.replace(/[()"]/g, "\\$&")}${
-                mark.attrs.title
-                  ? ` "${mark.attrs.title.replace(/"/g, '\\"')}"`
-                  : ""
-              })`;
-            }
-          },
-          mixable: true,
         },
-      },
-    };
-  },
-});
+      };
+    },
+  });
+}

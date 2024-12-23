@@ -3,6 +3,8 @@ import messages from "../translations";
 import { Attachment } from "@xwiki/cristal-attachments-api";
 import { Date } from "@xwiki/cristal-date-ui";
 import { FileSize } from "@xwiki/cristal-file-preview-ui";
+import { AttachmentReference, EntityType } from "@xwiki/cristal-model-api";
+import { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 import { User } from "@xwiki/cristal-user-ui";
 import { computed, inject } from "vue";
 import { useI18n } from "vue-i18n";
@@ -21,6 +23,10 @@ const props = defineProps<{
 
 const cristal = inject<CristalApp>("cristal")!;
 const listener = cristal.getContainer().get<ClickListener>("ClickListener");
+const modelReferenceParser = cristal
+  .getContainer()
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
 
 function attachmentPreview(url: string, event: Event) {
   event.preventDefault();
@@ -35,6 +41,19 @@ const hasAuthor = computed(() => {
       .length > 0
   );
 });
+
+function attachmentName(name: string) {
+  try {
+    return (
+      modelReferenceParser.parse(
+        name,
+        EntityType.ATTACHMENT,
+      ) as AttachmentReference
+    ).name;
+  } catch {
+    return "";
+  }
+}
 </script>
 <template>
   <span v-if="isLoading">{{ t("attachments.tab.loading") }}</span>
@@ -61,8 +80,9 @@ const hasAuthor = computed(() => {
           <a
             :href="attachment.href"
             @click="attachmentPreview(attachment.href, $event)"
-            >{{ attachment.name }}</a
           >
+            {{ attachmentName(attachment.name) }}
+          </a>
         </td>
         <td>
           <span class="mobile-column-name">

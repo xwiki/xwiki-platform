@@ -24,14 +24,11 @@ import {
   PageAttachment,
   PageData,
 } from "@xwiki/cristal-api";
+import { PASSWORD, USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { inject, injectable } from "inversify";
 import type { Logger } from "@xwiki/cristal-api";
 import type { UserDetails } from "@xwiki/cristal-authentication-api";
-
-// TODO: To be replaced by an actual authentication with CRISTAL-267
-const USERNAME = "test";
-const PASSWORD = "test";
 
 /**
  * Access Nextcloud storage through http.

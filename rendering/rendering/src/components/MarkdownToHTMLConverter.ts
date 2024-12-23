@@ -26,6 +26,11 @@ import { baseUrl } from "marked-base-url";
 import type { Converter } from "../api/converter";
 import type { Logger, WikiConfig } from "@xwiki/cristal-api";
 
+/**
+ * @deprecated use \@xwiki/cristal-markdown-api and \@xwiki/cristal-markdown-default instead, the macro parsing
+ * implemented using marked should be migrated from marked to markdown-it. We move to markdown-it because it is easier
+ * to integrate with tiptap.
+ */
 @injectable()
 export class MarkdownToHTMLConverter implements Converter {
   public static converterName = "md_html";

@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { PASSWORD, USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import { SpaceReference } from "@xwiki/cristal-model-api";
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
@@ -27,10 +28,6 @@ import type {
   NavigationTreeNode,
   NavigationTreeSource,
 } from "@xwiki/cristal-navigation-tree-api";
-
-// TODO: To be replaced by an actual authentication with CRISTAL-267
-const USERNAME = "test";
-const PASSWORD = "test";
 
 /**
  * Implementation of NavigationTreeSource for the Nextcloud backend.

@@ -24,15 +24,20 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
-    "inversify": "6.2.0"
+    "inversify": "6.2.0",
+    "lodash": "4.17.21"
   },
   "devDependencies": {
+    "@types/lodash": "4.17.13",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3",
-    "vitest": "2.1.8"
+    "vitest": "2.1.8",
+    "vitest-mock-extended": "2.0.2",
+    "vue": "3.5.13"
   },
   "publishConfig": {
     "exports": {

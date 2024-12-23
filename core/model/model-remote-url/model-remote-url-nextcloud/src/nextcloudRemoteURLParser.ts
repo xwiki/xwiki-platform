@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import {
   AttachmentReference,
   DocumentReference,
@@ -25,14 +26,43 @@ import {
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 class NextcloudRemoteURLParser implements RemoteURLParser {
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
+
   parse(urlStr: string): EntityReference | undefined {
-    if (urlStr.includes("://")) {
+    const baseRestURL = this.getWikiConfig().baseRestURL;
+    if (urlStr.includes("://") && !urlStr.startsWith(baseRestURL)) {
       return undefined;
     }
+    urlStr = urlStr.replace(`${baseRestURL}/${USERNAME}/.cristal/`, "");
+    const segments = this.computeSegments(urlStr);
+
+    if (
+      segments.length >= 3 &&
+      segments[segments.length - 2] == "attachments"
+    ) {
+      return new AttachmentReference(
+        segments[segments.length - 1],
+        this.buildDocumentReference(
+          segments[segments.length - 3],
+          segments.splice(0, segments.length - 3),
+        ),
+      );
+    } else {
+      return this.buildDocumentReference(
+        segments[segments.length - 1],
+        segments.splice(0, segments.length - 1),
+      );
+    }
+  }
+
+  private computeSegments(urlStr: string) {
     let segments = decodeURIComponent(urlStr).split("/");
     if (segments[0] === "" || segments[0] === ".") {
       segments = segments.slice(1);
@@ -41,30 +71,21 @@ class NextcloudRemoteURLParser implements RemoteURLParser {
     if (segments[segments.length - 1] === "") {
       segments = segments.slice(0, segments.length - 1);
     }
+    return segments;
+  }
 
-    if (
-      segments.length >= 3 &&
-      segments[segments.length - 2] == "attachments"
-    ) {
-      return new AttachmentReference(
-        segments[segments.length - 1],
-        new DocumentReference(
-          segments[segments.length - 3],
-          new SpaceReference(
-            undefined,
-            ...segments.splice(0, segments.length - 3),
-          ),
-        ),
-      );
-    } else {
-      return new DocumentReference(
-        segments[segments.length - 1],
-        new SpaceReference(
-          undefined,
-          ...segments.splice(0, segments.length - 1),
-        ),
-      );
-    }
+  private buildDocumentReference(
+    documentReferenceName: string,
+    spaces: string[],
+  ) {
+    return new DocumentReference(
+      documentReferenceName,
+      new SpaceReference(undefined, ...spaces),
+    );
+  }
+
+  private getWikiConfig() {
+    return this.cristalApp.getWikiConfig();
   }
 }
 

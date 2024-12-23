@@ -27,7 +27,7 @@ import {
 } from "@xwiki/cristal-model-api";
 import { describe, expect, it } from "vitest";
 
-describe("defaultLocalURLSerializer", () => {
+describe("xWikiLocalURLSerializer", () => {
   const serializer = new XWikiModelReferenceSerializer();
   it("serialize a wiki", () => {
     expect(serializer.serialize(new WikiReference("wiki"))).to.eq("wiki");

@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*",
     "vue": "3.5.13"
   },
   "devDependencies": {

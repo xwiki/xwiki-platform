@@ -24,9 +24,8 @@ import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import { Slash } from "../components/extensions/slash";
 import { CollaborationKit, User } from "../extensions/collaboration";
-import Link from "../extensions/link";
-import Markdown from "../extensions/markdown";
-import Image from "@tiptap/extension-image";
+import initLinkExtension from "../extensions/link";
+import initMarkdown from "../extensions/markdown";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
@@ -36,20 +35,34 @@ import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
+import {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializer,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
+import {
+  RemoteURLParser,
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/cristal-model-remote-url-api";
 import { CArticle } from "@xwiki/cristal-skin";
+import {
+  ImageInsertNode,
+  initTiptapImage,
+} from "@xwiki/cristal-tiptap-extension-image";
+import { Container } from "inversify";
 import { debounce } from "lodash";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
-import { computed, inject, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { inject, ref, watch } from "vue";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
-import type { ComputedRef, Ref } from "vue";
+import type { Markdown } from "tiptap-markdown";
+import type { Ref } from "vue";
 
-const route = useRoute();
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
 const documentService = cristal
@@ -66,16 +79,12 @@ const content = ref("");
 const title = ref("");
 const titlePlaceholder = ref("");
 
-const currentPageName: ComputedRef<string> = computed(() => {
-  // TODO: define a proper abstraction.
-  return (
-    (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
-  );
-});
+const currentPageName: Ref<string | undefined> =
+  documentService.getCurrentDocumentReferenceString();
 
 const viewRouterParams = {
   name: "view",
-  params: { page: currentPageName.value },
+  params: { page: currentPageName.value ?? "" },
 };
 const view = () => {
   // Destroy the editor instance.
@@ -94,7 +103,7 @@ const save = async (authors: User[]) => {
     .get<StorageProvider>("StorageProvider")
     .get();
   await storage.save(
-    currentPageName.value,
+    currentPageName.value ?? "",
     editor.value?.storage.markdown.getMarkdown(),
     title.value,
     "html",
@@ -102,7 +111,7 @@ const save = async (authors: User[]) => {
   // If this save operation just created the document, the current document
   // will be undefined. So we update it.
   if (!currentPage.value) {
-    documentService.setCurrentDocument(currentPageName.value);
+    documentService.setCurrentDocument(currentPageName.value ?? "");
   }
   documentService.notifyDocumentChange("update", currentPage.value!);
 };
@@ -146,6 +155,81 @@ const currentUser = {
 
 let editor: Ref<Editor | undefined> = ref(undefined);
 
+function editorInit(
+  container: Container,
+  linkSuggest: LinkSuggestService | undefined,
+  MarkdownExtension: typeof Markdown,
+  realtimeURL: string | undefined,
+  serializer: ModelReferenceSerializer,
+  parser: RemoteURLParser,
+) {
+  return new Editor({
+    content: content.value || "",
+    extensions: [
+      GlobalDragHandle,
+      StarterKit.configure({
+        // Disable the default history in order to use Collaboration's history management so that users undo / redo
+        // only their own changes.
+        history: false,
+      }),
+      Placeholder.configure({
+        placeholder: "Type '/' to show the available actions",
+      }),
+      ImageInsertNode,
+      initTiptapImage(serializer, parser).configure({ inline: true }),
+      Table,
+      TableRow,
+      TableHeader,
+      TableCell,
+      Slash,
+      // TODO: I did it that way for simplicity but this should really be
+      // moved to an actual inversify component.
+      loadLinkSuggest(cristal.getSkinManager(), container, linkSuggest),
+      MarkdownExtension.configure({
+        html: true,
+      }),
+      initLinkExtension(serializer, parser).configure({
+        openOnClick: "whenNotEditable",
+        // TODO: the protocols should be injected by extension.
+        protocols: ["http", "https", "cristalfs"],
+      }),
+      CollaborationKit.configure({
+        channel: currentPageName.value,
+        user: currentUser,
+        saveCallback: save,
+        baseUrl: realtimeURL,
+      }),
+    ],
+  });
+}
+
+function loadComponentsFromLoadEditor() {
+  const container = cristal.getContainer();
+  const linkSuggest = container
+    .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
+    .get();
+  const modelReferenceParser = container
+    .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    .get()!;
+  const remoteURLSerialize = container
+    .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    .get()!;
+  const remoteURLParser = container
+    .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+    .get()!;
+  const modelReferenceSerializer = container
+    .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+    .get()!;
+  return {
+    container,
+    linkSuggest,
+    modelReferenceParser,
+    remoteURLSerialize,
+    remoteURLParser,
+    modelReferenceSerializer,
+  };
+}
+
 async function loadEditor(page: PageData | undefined) {
   // Push the content to the document.
   // TODO: move to a components based implementation
@@ -153,55 +237,31 @@ async function loadEditor(page: PageData | undefined) {
     content.value =
       page?.syntax == "markdown/1.2" ? page?.source : page?.html || "";
     title.value = page?.headlineRaw || "";
-    titlePlaceholder.value = page?.name || currentPageName.value;
-
-    const linkSuggestServiceProvider = cristal
-      .getContainer()
-      .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider");
-    const linkSuggest: LinkSuggestService | undefined =
-      linkSuggestServiceProvider.get();
+    titlePlaceholder.value = page?.name ?? currentPageName.value ?? "";
+    const {
+      container,
+      linkSuggest,
+      modelReferenceParser,
+      remoteURLSerialize,
+      remoteURLParser,
+      modelReferenceSerializer,
+    } = loadComponentsFromLoadEditor();
 
     const realtimeURL = cristal.getWikiConfig().realtimeURL;
 
-    editor.value = new Editor({
-      content: content.value || "",
-      extensions: [
-        GlobalDragHandle,
-        StarterKit.configure({
-          // Disable the default history in order to use Collaboration's history management so that users undo / redo
-          // only their own changes.
-          history: false,
-        }),
-        Placeholder.configure({
-          placeholder: "Type '/' to show the available actions",
-        }),
-        Image,
-        Table,
-        TableRow,
-        TableHeader,
-        TableCell,
-        Slash,
-        // TODO: I did it that way for simplicity but this should really be
-        // moved to an actual inversify component.
-        loadLinkSuggest(
-          cristal.getSkinManager(),
-          cristal.getContainer(),
-          linkSuggest,
-        ),
-        Markdown.configure({
-          html: true,
-        }),
-        Link.configure({
-          openOnClick: "whenNotEditable",
-        }),
-        CollaborationKit.configure({
-          channel: currentPageName.value,
-          user: currentUser,
-          saveCallback: save,
-          baseUrl: realtimeURL,
-        }),
-      ],
-    });
+    const MarkdownExtension = initMarkdown(
+      modelReferenceParser,
+      remoteURLSerialize,
+    );
+
+    editor.value = editorInit(
+      container,
+      linkSuggest,
+      MarkdownExtension,
+      realtimeURL,
+      modelReferenceSerializer,
+      remoteURLParser,
+    );
   }
 }
 
@@ -406,6 +466,11 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   height: 1.5rem;
   z-index: 50;
   cursor: grab;
+}
+
+/* Allow to disable drag handle for a sub-part of the dom. */
+.edit :deep(.no-drag-handle .drag-handle) {
+  display: none;
 }
 
 .editor :deep(.drag-handle:active) {

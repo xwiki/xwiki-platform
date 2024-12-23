@@ -23,6 +23,7 @@ import AttachmentsTable from "./AttachmentsTable.vue";
 import { AlertsService } from "@xwiki/cristal-alerts-api";
 import { CristalApp } from "@xwiki/cristal-api";
 import { AttachmentsService } from "@xwiki/cristal-attachments-api";
+import { DocumentService } from "@xwiki/cristal-document-api";
 import { inject, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -31,6 +32,10 @@ const attachmentsService = cristal
   .getContainer()
   .get<AttachmentsService>("AttachmentsService")!;
 
+const documentService = cristal
+  .getContainer()
+  .get<DocumentService>("DocumentService")!;
+
 const attachments = attachmentsService.list();
 const isLoading = attachmentsService.isLoading();
 const errorMessage = attachmentsService.getError();
@@ -38,14 +43,14 @@ const isUploading = attachmentsService.isUploading();
 
 // Watch for route change to refresh the tab when a user visits a new page.
 const route = useRoute();
+
+function getCurrentPageReference() {
+  return documentService.getCurrentDocumentReferenceString().value ?? "";
+}
+
 watch(
   () => route.params.page,
-  () =>
-    attachmentsService.refresh(
-      (route.params.page as string) ||
-        cristal.getCurrentPage() ||
-        "Main.WebHome",
-    ),
+  () => attachmentsService.refresh(getCurrentPageReference()),
   { immediate: true },
 );
 
@@ -57,12 +62,7 @@ const alertsService = cristal
 
 async function upload(files: File[]) {
   try {
-    await attachmentsService.upload(
-      (route.params.page as string) ||
-        cristal.getCurrentPage() ||
-        ("Main.WebHome" as string),
-      files,
-    );
+    await attachmentsService.upload(getCurrentPageReference(), files);
     attachmentUpload.value?.reset();
   } catch (e) {
     if (e instanceof Error) {

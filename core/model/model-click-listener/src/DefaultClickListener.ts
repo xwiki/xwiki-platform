@@ -85,6 +85,9 @@ class DefaultClickListener implements ClickListener {
         }
       } else {
         console.debug(`[${url}] is not a valid xwiki entity link`);
+        if (href) {
+          this.legacyHandleURL(href);
+        }
       }
     } catch (e) {
       console.log(

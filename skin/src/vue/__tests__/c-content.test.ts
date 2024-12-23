@@ -27,9 +27,14 @@ import {
   wrapInSuspense,
 } from "@xwiki/cristal-dev-test-utils";
 import { DocumentService } from "@xwiki/cristal-document-api";
-import { PageHierarchyResolverProvider } from "@xwiki/cristal-hierarchy-api";
+import {
+  PageHierarchyResolver,
+  PageHierarchyResolverProvider,
+} from "@xwiki/cristal-hierarchy-api";
+import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { Container } from "inversify";
+import { DeepPartial } from "ts-essentials";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
@@ -47,14 +52,18 @@ function mountCComponent(params: {
 
   const container = new Container();
 
-  const mockDoumentService = makeInjectable(
-    class {
+  const mockDocumentService = makeInjectable(
+    class MockDocumentService implements DeepPartial<DocumentService> {
       isLoading() {
         return ref(isLoading);
       }
 
       getError() {
-        return ref(error);
+        if (error) {
+          return ref<Error>(new Error(error));
+        } else {
+          return ref<undefined>();
+        }
       }
 
       getCurrentDocument() {
@@ -64,15 +73,20 @@ function mountCComponent(params: {
       getCurrentDocumentRevision() {
         return ref(undefined);
       }
+
+      getCurrentDocumentReferenceString() {
+        return ref("The.Page.Reference");
+      }
     },
   );
 
   const pageHierarchyResolver = vi.fn().mockImplementation(() => {
-    return {
-      getPageHierarchy() {
-        return Promise.resolve([]);
+    const newVar: DeepPartial<PageHierarchyResolver> = {
+      async getPageHierarchy() {
+        return [];
       },
     };
+    return newVar;
   });
 
   const pageHierarchyResolverProvider = vi.fn().mockImplementation(() => {
@@ -83,7 +97,7 @@ function mountCComponent(params: {
     };
   });
 
-  container.bind<DocumentService>("DocumentService").to(mockDoumentService);
+  container.bind<DocumentService>("DocumentService").to(mockDocumentService);
   container
     .bind<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
     .to(makeInjectable(pageHierarchyResolverProvider));
@@ -96,6 +110,10 @@ function mountCComponent(params: {
       }),
     ),
   );
+  class MockMarkdownRenderer implements DeepPartial<MarkdownRenderer> {}
+  container
+    .bind<MarkdownRenderer>("MarkdownRenderer")
+    .to(makeInjectable(vi.fn().mockImplementation(() => MockMarkdownRenderer)));
 
   return mount(wrapInSuspense(CContent, {}), {
     provide: {
@@ -117,6 +135,7 @@ function mountCComponent(params: {
         RouterLink: true,
         XAlert: true,
         XBreadcrumb: true,
+        "i18n-t": true,
       },
     },
   });
@@ -155,7 +174,9 @@ describe("c-context", () => {
   it("display an error message", () => {
     const errorMessage = "ErrorMessage";
     const component = mountCComponent({ error: errorMessage });
-    expect(component.find(".content-error").text()).eq(errorMessage);
+    expect(component.find(".content-error").text()).eq(
+      `Error: ${errorMessage}`,
+    );
   });
 
   it("display page with empty content", () => {

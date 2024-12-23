@@ -29,6 +29,12 @@ import Suggestion from "@tiptap/suggestion";
 import { Editor, Extension, Range } from "@tiptap/vue-3";
 import { SkinManager } from "@xwiki/cristal-api";
 import { Link } from "@xwiki/cristal-link-suggest-api";
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
+import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { Container } from "inversify";
 import { createPinia } from "pinia";
 import { App, createApp } from "vue";
@@ -66,6 +72,7 @@ function loadLinkSuggest(
   skinManager: SkinManager,
   container: Container,
   linkSuggest?: LinkSuggestService,
+  modelReferenceParser?: ModelReferenceParser,
 ) {
   return Extension.create({
     name: "link-suggest",
@@ -77,7 +84,7 @@ function loadLinkSuggest(
             // props.command({ editor, range, props });
             // TODO: probably unused?
           },
-          items: getSuggestionItems(linkSuggest),
+          items: getSuggestionItems(linkSuggest, modelReferenceParser),
           render: renderItems(skinManager, container, linkSuggest),
         },
       };
@@ -98,7 +105,10 @@ function loadLinkSuggest(
  * Build a function returning an array of link suggestions from a string.
  * @param linkSuggest - the link suggestion service to use
  */
-function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
+function initSuggestionsService(
+  linkSuggest?: LinkSuggestService,
+  modelReferenceParser?: ModelReferenceParser,
+) {
   // Return an array of suggestions from a query
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
@@ -129,7 +139,19 @@ function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
       .map((link) => {
         // FIXME: relate to link management is reference management, here too we
         // need to think me precisely of the architecture we want for this.
-        const segments = link.reference.split(/\./);
+        const entityReference = modelReferenceParser?.parse(link.reference);
+
+        let documentReference;
+        if (entityReference?.type == EntityType.ATTACHMENT) {
+          documentReference = (entityReference as AttachmentReference).document;
+        } else {
+          documentReference = entityReference as DocumentReference;
+        }
+        const segments = documentReference.space?.names.slice(0) ?? [];
+        // TODO: replace with an actual construction of segments from a reference
+        if (documentReference.terminal) {
+          segments.push(documentReference.name);
+        }
         return {
           title: link.label,
           segments,
@@ -146,8 +168,11 @@ function initSuggestionsService(linkSuggest: LinkSuggestService | undefined) {
  * extension initialization of the link-suggest extension
  * @param linkSuggest - the link suggestion service to use
  */
-function getSuggestionItems(linkSuggest?: LinkSuggestService) {
-  return initSuggestionsService(linkSuggest);
+function getSuggestionItems(
+  linkSuggest?: LinkSuggestService,
+  modelReferenceParser?: ModelReferenceParser,
+) {
+  return initSuggestionsService(linkSuggest, modelReferenceParser);
 }
 
 function renderItems(

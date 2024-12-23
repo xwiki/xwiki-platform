@@ -25,24 +25,21 @@ import { PageData } from "@xwiki/cristal-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { PageActions } from "@xwiki/cristal-page-actions-ui";
-import { marked } from "marked";
 import { computed, inject, onUpdated, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
 import type { ComputedRef, Ref } from "vue";
 
 const { t } = useI18n({
   messages,
 });
 
-const route = useRoute();
-
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
-const documentService = cristal
-  .getContainer()
-  .get<DocumentService>(documentServiceName);
+const container = cristal.getContainer();
+const documentService = container.get<DocumentService>(documentServiceName);
+const markdownRenderer = container.get<MarkdownRenderer>("MarkdownRenderer");
 
 const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
@@ -50,12 +47,7 @@ const currentPage: Ref<PageData | undefined> =
   documentService.getCurrentDocument();
 const currentPageRevision: Ref<string | undefined> =
   documentService.getCurrentDocumentRevision();
-const currentPageName: ComputedRef<string> = computed(() => {
-  // TODO: define a proper abstraction.
-  return (
-    (route.params.page as string) || cristal.getCurrentPage() || "Main.WebHome"
-  );
-});
+const currentPageName = documentService.getCurrentDocumentReferenceString();
 
 const contentRoot = ref(undefined);
 
@@ -65,11 +57,7 @@ const content: ComputedRef<string | undefined> = computed(() => {
     if (cpn.html && cpn.html.trim() !== "") {
       return cpn.html as string;
     } else if (cpn.source) {
-      // TODO: currently blindly convert the content to markdown.
-      console.log("marked", marked, cpn.source);
-      const parse = marked.parse(cpn.source);
-      console.log("parse", parse);
-      return parse as string;
+      return markdownRenderer.render(cpn.source);
     } else {
       return "";
     }
@@ -125,7 +113,7 @@ onUpdated(() => {
         </router-link>
         <page-actions
           :current-page="currentPage"
-          :current-page-name="currentPageName"
+          :current-page-name="currentPageName ?? ''"
           :disabled="currentPageRevision !== undefined"
         ></page-actions>
       </div>
@@ -165,6 +153,11 @@ onUpdated(() => {
 <style scoped>
 .doc-content {
   padding: 0;
+}
+
+:global(.doc-content img) {
+  max-width: 100%;
+  height: auto;
 }
 
 .doc-title {

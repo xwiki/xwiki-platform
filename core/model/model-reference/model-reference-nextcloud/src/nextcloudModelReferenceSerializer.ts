@@ -52,7 +52,7 @@ export class NextcloudModelReferenceSerializer
         const documentReference = reference as DocumentReference;
         const spaces = this.serialize(documentReference.space);
         const name = documentReference.name;
-        if (spaces === undefined) {
+        if (spaces === undefined || spaces == "") {
           return name;
         } else {
           return `${spaces}/${name}`;

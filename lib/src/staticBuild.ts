@@ -49,6 +49,7 @@ import { ComponentInit as LinkSuggestComponentInit } from "@xwiki/cristal-link-s
 import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
 import { ComponentInit as XWikiLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-xwiki";
 import { ComponentInit as MacrosComponentInit } from "@xwiki/cristal-macros";
+import { ComponentInit as MarkdownDefaultComponentInit } from "@xwiki/cristal-markdown-default";
 import { ComponentInit as ClickListenerComponentInit } from "@xwiki/cristal-model-click-listener";
 import { ComponentInit as ModelReferenceAPIComponentInit } from "@xwiki/cristal-model-reference-api";
 import { ComponentInit as ModelReferenceNextcloudComponentInit } from "@xwiki/cristal-model-reference-nextcloud";
@@ -128,6 +129,7 @@ export class StaticBuild {
       new ModelReferenceNextcloudComponentInit(container);
       new ModelReferenceXWikiComponentInit(container);
       new DateAPIComponentInit(container);
+      new MarkdownDefaultComponentInit(container);
     }
     if (additionalComponents) {
       additionalComponents(container);

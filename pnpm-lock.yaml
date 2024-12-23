@@ -274,6 +274,9 @@ importers:
       '@xwiki/cristal-date-ui':
         specifier: workspace:*
         version: link:../../date/date-ui
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
       '@xwiki/cristal-dsapi':
         specifier: workspace:*
         version: link:../../../ds/api
@@ -286,9 +289,15 @@ importers:
       '@xwiki/cristal-info-actions-api':
         specifier: workspace:*
         version: link:../../info-actions/info-actions-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       '@xwiki/cristal-model-click-listener':
         specifier: workspace:*
         version: link:../../model/model-click-listener
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
       '@xwiki/cristal-uiextension-api':
         specifier: workspace:*
         version: link:../../uiextension/uiextension-api
@@ -348,6 +357,15 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/authentication/authentication-nextcloud:
+    devDependencies:
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -515,6 +533,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../../authentication/authentication-api
+      '@xwiki/cristal-authentication-nextcloud':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-nextcloud
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
@@ -650,6 +671,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.6.3)
@@ -669,6 +693,12 @@ importers:
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../document-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
@@ -1194,6 +1224,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-authentication-nextcloud':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-nextcloud
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
@@ -1222,13 +1255,69 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-api
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../link-suggest-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
     devDependencies:
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/markdown/markdown-api:
+    dependencies:
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
+    devDependencies:
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/markdown/markdown-default:
+    dependencies:
+      '@xwiki/cristal-markdown-api':
+        specifier: workspace:*
+        version: link:../markdown-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
+      inversify:
+        specifier: 6.2.0
+        version: 6.2.0(reflect-metadata@0.2.2)
+      markdown-it:
+        specifier: 14.1.0
+        version: 14.1.0
+    devDependencies:
+      '@types/markdown-it':
+        specifier: 14.1.2
+        version: 14.1.2
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1369,6 +1458,9 @@ importers:
 
   core/model/model-reference/model-reference-xwiki:
     dependencies:
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../../document/document-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model-api
@@ -1378,7 +1470,13 @@ importers:
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
     devDependencies:
+      '@types/lodash':
+        specifier: 4.17.13
+        version: 4.17.13
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -1391,6 +1489,12 @@ importers:
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
+      vitest-mock-extended:
+        specifier: 2.0.2
+        version: 2.0.2(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.6.3)
 
   core/model/model-remote-url/model-remote-url-api:
     dependencies:
@@ -1450,6 +1554,12 @@ importers:
 
   core/model/model-remote-url/model-remote-url-nextcloud:
     dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../../api
+      '@xwiki/cristal-authentication-nextcloud':
+        specifier: workspace:*
+        version: link:../../../authentication/authentication-nextcloud
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model-api
@@ -1597,6 +1707,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
+      '@xwiki/cristal-authentication-nextcloud':
+        specifier: workspace:*
+        version: link:../../authentication/authentication-nextcloud
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../model/model-api
@@ -1743,6 +1856,92 @@ importers:
       vite:
         specifier: 6.0.3
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+      vue-tsc:
+        specifier: 2.1.10
+        version: 2.1.10(typescript@5.6.3)
+
+  core/tiptap-extensions/tiptap-extension-image:
+    dependencies:
+      '@tiptap/extension-image':
+        specifier: 2.10.3
+        version: 2.10.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))
+      '@tiptap/pm':
+        specifier: 2.10.3
+        version: 2.10.3
+      '@tiptap/vue-3':
+        specifier: 2.10.3
+        version: 2.10.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))(@tiptap/pm@2.10.3)(vue@3.5.13(typescript@5.6.3))
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-attachments-api':
+        specifier: workspace:*
+        version: link:../../attachments/attachments-api
+      '@xwiki/cristal-document-api':
+        specifier: workspace:*
+        version: link:../../document/document-api
+      '@xwiki/cristal-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../link-suggest/link-suggest-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../model/model-remote-url/model-remote-url-api
+      '@xwiki/cristal-tiptap-link-suggest-ui':
+        specifier: workspace:*
+        version: link:../tiptap-link-suggest-ui
+      lodash:
+        specifier: 4.17.21
+        version: 4.17.21
+      prosemirror-markdown:
+        specifier: 1.13.1
+        version: 1.13.1
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      vue-tippy:
+        specifier: 6.5.0
+        version: 6.5.0(vue@3.5.13(typescript@5.6.3))
+      vue3-draggable-resizable:
+        specifier: 1.6.5
+        version: 1.6.5
+    devDependencies:
+      '@tiptap/core':
+        specifier: 2.10.3
+        version: 2.10.3(@tiptap/pm@2.10.3)
+      '@types/lodash':
+        specifier: 4.17.13
+        version: 4.17.13
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.6.3)
+      vue-tsc:
+        specifier: 2.1.10
+        version: 2.1.10(typescript@5.6.3)
+
+  core/tiptap-extensions/tiptap-link-suggest-ui:
+    dependencies:
+      '@tiptap/core':
+        specifier: 2.10.3
+        version: 2.10.3(@tiptap/pm@2.10.3)
+      '@xwiki/cristal-icons':
+        specifier: workspace:*
+        version: link:../../icons
+      '@xwiki/cristal-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../link-suggest/link-suggest-api
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+    devDependencies:
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.6.3)
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -2033,9 +2232,6 @@ importers:
       '@tiptap/extension-heading':
         specifier: 2.10.3
         version: 2.10.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))
-      '@tiptap/extension-image':
-        specifier: 2.10.3
-        version: 2.10.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))
       '@tiptap/extension-link':
         specifier: 2.10.3
         version: 2.10.3(@tiptap/core@2.10.3(@tiptap/pm@2.10.3))(@tiptap/pm@2.10.3)
@@ -2081,12 +2277,27 @@ importers:
       '@xwiki/cristal-link-suggest-api':
         specifier: workspace:*
         version: link:../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-markdown-default':
+        specifier: workspace:*
+        version: link:../../core/markdown/markdown-default
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../core/model/model-api
       '@xwiki/cristal-model-reference-api':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../core/model/model-remote-url/model-remote-url-api
       '@xwiki/cristal-skin':
         specifier: workspace:*
         version: link:../../skin
+      '@xwiki/cristal-tiptap-extension-image':
+        specifier: workspace:*
+        version: link:../../core/tiptap-extensions/tiptap-extension-image
+      '@xwiki/cristal-tiptap-link-suggest-ui':
+        specifier: workspace:*
+        version: link:../../core/tiptap-extensions/tiptap-link-suggest-ui
       avvvatars-vue:
         specifier: 1.1.0
         version: 1.1.0(patch_hash=usix32k57inq7lu5l5hlwk33gm)(vue@3.5.13(typescript@5.6.3))
@@ -2120,9 +2331,6 @@ importers:
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.6.3)
-      vue-router:
-        specifier: 4.5.0
-        version: 4.5.0(vue@3.5.13(typescript@5.6.3))
       yjs:
         specifier: 13.6.20
         version: 13.6.20
@@ -2259,6 +2467,37 @@ importers:
         specifier: 6.0.3
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
 
+  electron/link-suggest/link-suggest-filesystem:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../../core/model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../../core/model/model-reference/model-reference-api
+      '@xwiki/cristal-model-remote-url-api':
+        specifier: workspace:*
+        version: link:../../../core/model/model-remote-url/model-remote-url-api
+      inversify:
+        specifier: 6.2.0
+        version: 6.2.0(reflect-metadata@0.2.2)
+    devDependencies:
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+      vite:
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+
   electron/main:
     dependencies:
       '@xwiki/cristal-browser-electron':
@@ -2326,6 +2565,9 @@ importers:
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../../lib
+      '@xwiki/cristal-link-suggest-filesystem':
+        specifier: workspace:*
+        version: link:../link-suggest/link-suggest-filesystem
       '@xwiki/cristal-model-reference-filesystem':
         specifier: workspace:*
         version: link:../../core/model/model-reference/model-reference-filesystem
@@ -2363,6 +2605,12 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../../core/backends/backend-api
+      '@xwiki/cristal-link-suggest-api':
+        specifier: workspace:*
+        version: link:../../core/link-suggest/link-suggest-api
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../core/model/model-api
       '@xwiki/cristal-model-remote-url-filesystem-api':
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api
@@ -2552,6 +2800,9 @@ importers:
       '@xwiki/cristal-macros':
         specifier: workspace:*
         version: link:../macros
+      '@xwiki/cristal-markdown-default':
+        specifier: workspace:*
+        version: link:../core/markdown/markdown-default
       '@xwiki/cristal-model-click-listener':
         specifier: workspace:*
         version: link:../core/model/model-click-listener
@@ -2861,6 +3112,9 @@ importers:
       '@xwiki/cristal-info-actions-ui':
         specifier: workspace:*
         version: link:../core/info-actions/info-actions-ui
+      '@xwiki/cristal-markdown-api':
+        specifier: workspace:*
+        version: link:../core/markdown/markdown-api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../core/model/model-api
@@ -2888,9 +3142,6 @@ importers:
       inversify:
         specifier: 6.2.0
         version: 6.2.0(reflect-metadata@0.2.2)
-      marked:
-        specifier: 15.0.4
-        version: 15.0.4
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2913,6 +3164,9 @@ importers:
       '@xwiki/cristal-dev-test-utils':
         specifier: workspace:*
         version: link:../dev/test-utils
+      ts-essentials:
+        specifier: 10.0.3
+        version: 10.0.3(typescript@5.6.3)
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -2922,6 +3176,9 @@ importers:
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.2)(happy-dom@15.11.7)
+      vitest-mock-extended:
+        specifier: 2.0.2
+        version: 2.0.2(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))
       vue-tsc:
         specifier: 2.1.10
         version: 2.1.10(typescript@5.6.3)
@@ -3118,11 +3375,6 @@ packages:
 
   '@babel/parser@7.24.4':
     resolution: {integrity: sha512-zTvEBcghmeBma9QIGunWevvBAp4/Qu9Bdq+2k0Ot4fVMD6v3dsC9WOcRSKk7tRRyBM/53yKMJko9xOatGQAwSg==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
-  '@babel/parser@7.25.7':
-    resolution: {integrity: sha512-aZn7ETtQsjjGG5HruveUK06cU3Hljuhd9Iojm4M8WWv3wLE6OkE5PWbDUkItmMgegmccaITudyuW5RPYrYlgWw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -4634,14 +4886,8 @@ packages:
   '@volar/typescript@2.4.8':
     resolution: {integrity: sha512-6xkIYJ5xxghVBhVywMoPMidDDAFT1OoQeXwa27HSgJ6AiIKRe61RXLoik+14Z7r0JvnblXVsjsRLmCr42SGzqg==}
 
-  '@vue/compiler-core@3.5.12':
-    resolution: {integrity: sha512-ISyBTRMmMYagUxhcpyEH0hpXRd/KqDU4ymofPgl2XAkY9ZhQ+h0ovEZJIiPop13UmR/54oA2cgMDjgroRelaEw==}
-
   '@vue/compiler-core@3.5.13':
     resolution: {integrity: sha512-oOdAkwqUfW1WqpwSYJce06wvt6HljgY3fGeM9NcVA1HaYOij3mZG9Rkysn0OHuyUAGMbEbARIpsG+LPVlBJ5/Q==}
-
-  '@vue/compiler-dom@3.5.12':
-    resolution: {integrity: sha512-9G6PbJ03uwxLHKQ3P42cMTi85lDRvGLB2rSGOiQqtXELat6uI4n8cNz9yjfVHRPIu+MsK6TE418Giruvgptckg==}
 
   '@vue/compiler-dom@3.5.13':
     resolution: {integrity: sha512-ZOJ46sMOKUjO3e94wPdCzQ6P1Lx/vhp2RSvfaab88Ajexs0AHeV0uasYhi99WPaogmBlRHNRuly8xV75cNTMDA==}
@@ -4687,9 +4933,6 @@ packages:
     resolution: {integrity: sha512-wAi4IRJV/2SAW3htkTlB+dHeRmpTiVIK1OGLWV1yeStVSebSQQOwGwIq0D3ZIoBj2C2qpgz5+vX9iEBkTdk5YA==}
     peerDependencies:
       vue: 3.5.13
-
-  '@vue/shared@3.5.12':
-    resolution: {integrity: sha512-L2RPSAwUFbgZH20etwrXyVyCBu9OxRSi8T/38QsvnkJyvq2LufW2lDCOzm7t/U9C1mkhJGWYfCuFBCmIuNivrg==}
 
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
@@ -7192,9 +7435,6 @@ packages:
   prosemirror-keymap@1.2.2:
     resolution: {integrity: sha512-EAlXoksqC6Vbocqc0GtzCruZEzYgrn+iiGnNjsJsH4mrnIGex4qbLdWWNza3AW5W36ZRrlBID0eM6bdKH4OStQ==}
 
-  prosemirror-markdown@1.12.0:
-    resolution: {integrity: sha512-6F5HS8Z0HDYiS2VQDZzfZP6A0s/I0gbkJy8NCzzDMtcsz3qrfqyroMMeoSjAmOhDITyon11NbXSzztfKi+frSQ==}
-
   prosemirror-markdown@1.13.1:
     resolution: {integrity: sha512-Sl+oMfMtAjWtlcZoj/5L/Q39MpEnVZ840Xo330WJWUvgyhNmLBLN7MsHn07s53nG/KImevWHSE6fEj4q/GihHw==}
 
@@ -8143,11 +8383,19 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
+  vue-tippy@6.5.0:
+    resolution: {integrity: sha512-U44UDETTLuZWZGosagslEwgimWQdt1JVSxfWStVPnVdeqo2jo9X5zW3SB04k7JaTFosdgrDhFsUDrd6n42Nh7Q==}
+    peerDependencies:
+      vue: ^3.2.0
+
   vue-tsc@2.1.10:
     resolution: {integrity: sha512-RBNSfaaRHcN5uqVqJSZh++Gy/YUzryuv9u1aFWhsammDJXNtUiJMNoJ747lZcQ68wUQFx6E73y4FY3D8E7FGMA==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue3-draggable-resizable@1.6.5:
+    resolution: {integrity: sha512-31142E31fGNnq3HKqvmFLSsqIbhck7TyGuQWhUKrDw6DOcGAuRx4ddRjaxvT6fe7dgeKH53qAh+i0ZlWtPLl2g==}
 
   vue@3.5.13:
     resolution: {integrity: sha512-wmeiSMxkZCSc+PM2w2VRsOYAZC8GdipNFRTsLSfodVqI9mbejKeXEGr8SckuLnrQPGe3oJN5c3K0vpoU9q/wCQ==}
@@ -8392,10 +8640,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.24.0
 
-  '@babel/parser@7.25.7':
-    dependencies:
-      '@babel/types': 7.26.3
-
   '@babel/parser@7.26.3':
     dependencies:
       '@babel/types': 7.26.3
@@ -8407,7 +8651,7 @@ snapshots:
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.24.2
-      '@babel/parser': 7.24.4
+      '@babel/parser': 7.26.3
       '@babel/types': 7.24.0
 
   '@babel/traverse@7.23.7':
@@ -9933,14 +10177,6 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
-  '@vue/compiler-core@3.5.12':
-    dependencies:
-      '@babel/parser': 7.26.3
-      '@vue/shared': 3.5.12
-      entities: 4.5.0
-      estree-walker: 2.0.2
-      source-map-js: 1.2.1
-
   '@vue/compiler-core@3.5.13':
     dependencies:
       '@babel/parser': 7.26.3
@@ -9949,11 +10185,6 @@ snapshots:
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
-  '@vue/compiler-dom@3.5.12':
-    dependencies:
-      '@vue/compiler-core': 3.5.12
-      '@vue/shared': 3.5.12
-
   '@vue/compiler-dom@3.5.13':
     dependencies:
       '@vue/compiler-core': 3.5.13
@@ -9961,7 +10192,7 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.13':
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.26.3
       '@vue/compiler-core': 3.5.13
       '@vue/compiler-dom': 3.5.13
       '@vue/compiler-ssr': 3.5.13
@@ -9986,9 +10217,9 @@ snapshots:
   '@vue/language-core@2.1.10(typescript@5.6.3)':
     dependencies:
       '@volar/language-core': 2.4.8
-      '@vue/compiler-dom': 3.5.12
+      '@vue/compiler-dom': 3.5.13
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.12
+      '@vue/shared': 3.5.13
       alien-signals: 0.2.0
       minimatch: 9.0.4
       muggle-string: 0.4.1
@@ -10030,8 +10261,6 @@ snapshots:
       '@vue/compiler-ssr': 3.5.13
       '@vue/shared': 3.5.13
       vue: 3.5.13(typescript@5.6.3)
-
-  '@vue/shared@3.5.12': {}
 
   '@vue/shared@3.5.13': {}
 
@@ -12958,11 +13187,6 @@ snapshots:
       prosemirror-state: 1.4.3
       w3c-keyname: 2.2.8
 
-  prosemirror-markdown@1.12.0:
-    dependencies:
-      markdown-it: 14.1.0
-      prosemirror-model: 1.23.0
-
   prosemirror-markdown@1.13.1:
     dependencies:
       '@types/markdown-it': 14.1.2
@@ -13591,7 +13815,7 @@ snapshots:
       '@types/markdown-it': 13.0.8
       markdown-it: 14.1.0
       markdown-it-task-lists: 2.1.1
-      prosemirror-markdown: 1.12.0
+      prosemirror-markdown: 1.13.1
 
   tmp-promise@3.0.3:
     dependencies:
@@ -14007,12 +14231,19 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.6.3)
 
+  vue-tippy@6.5.0(vue@3.5.13(typescript@5.6.3)):
+    dependencies:
+      tippy.js: 6.3.7
+      vue: 3.5.13(typescript@5.6.3)
+
   vue-tsc@2.1.10(typescript@5.6.3):
     dependencies:
       '@volar/typescript': 2.4.8
       '@vue/language-core': 2.1.10(typescript@5.6.3)
       semver: 7.6.3
       typescript: 5.6.3
+
+  vue3-draggable-resizable@1.6.5: {}
 
   vue@3.5.13(typescript@5.6.3):
     dependencies:

@@ -73,7 +73,7 @@
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.45</jersey.version>
+    <jersey.version>2.46</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.3</zookeeper.version>
 
@@ -84,7 +84,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>24.2.7</libreoffice.version>
+    <libreoffice.version>24.8.4</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -423,7 +423,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.14.0</version>
+        <version>1.14.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>

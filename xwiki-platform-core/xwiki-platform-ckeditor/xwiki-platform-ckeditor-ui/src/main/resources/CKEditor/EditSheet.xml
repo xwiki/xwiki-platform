@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.EditSheet" locale="">
+<xwikidoc version="1.6" reference="CKEditor.EditSheet" locale="">
   <web>CKEditor</web>
   <name>EditSheet</name>
   <language/>
@@ -36,44 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="CKEditor.VelocityMacros"/}}
-
-{{velocity}}
-#if ($doc.fullName == 'CKEditor.EditSheet')
-  This is a sheet for editing the document content using [[CKEditor&gt;&gt;http://ckeditor.com/]].
-#else
-  {{html clean="false"}}
-  ## Include the auto-save styles.
-  #set ($discard = $xwiki.ssfx.use('js/xwiki/editors/autosave.css', true))
-  #if ("$!request.section" != '')
-    &lt;div class="hidden"&gt;
-      &lt;input type="hidden" name="section" value="$!escapetool.xml($request.section)"/&gt;
-    &lt;/div&gt;
-  #end
-  &lt;div class="row"&gt;
-    &lt;div class="cke-editMeta col-xs-12 col-md-7"&gt;
-      ## Add support for editing the page title (which is not available by default in Inline Form edit mode).
-      #set ($editor = 'wiki')
-      #template('editmeta.vm')
-      #set ($editor = 'inline')
-    &lt;/div&gt;
-  &lt;/div&gt;
-  ## The xwikieditcontent id is needed for the auto-save feature.
-  &lt;div id="xwikieditcontent" data-autosave="true"&gt;
-    #set ($parameters = {
-      'content': $tdoc.content,
-      'attributes': {
-        'id': 'content',
-        'name': 'content',
-        'rows': 25,
-        'cols': 80
-      }
-    })
-    #ckeditor($parameters)
-  &lt;/div&gt;
-  {{/html}}
-#end
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>CKEditor.EditSheet</name>
     <number>0</number>
@@ -796,8 +759,6 @@ a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki
 a.cke_button.cke_button__xwiki-macro-edit &gt; span.cke_button_icon.cke_button__xwiki-macro-edit_icon,
 a.cke_button.cke_button__xwiki-link-open &gt; span.cke_button_icon.cke_button__xwiki-link-open_icon,
 a.cke_button.cke_button__insert &gt; span.cke_button_icon.cke_button__insert_icon {
-  /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
-  background-image: none !important;
   font-family: 'Glyphicons Halflings';
   position: relative;
   top: 1px;
@@ -903,12 +864,6 @@ ul.cke_autocomplete_panel {
   max-height: 64px;
   max-width: 64px;
   vertical-align: text-top;
-}
-/* The image still takes some space in IE11 even if there's no source specified. Let's make sure it's hidden.
-  See CKEDITOR-389: Missing space in the suggestions that appear while using the autocomplete function on IE 11 */
-.ckeditor-autocomplete-item-preview-wrapper img[src=""],
-.ckeditor-autocomplete-item-icon-wrapper img[src=""] {
-  display: none;
 }
 .ckeditor-autocomplete-item-label {
   /* Push the shortcut to the right edge of the item. */
@@ -1046,14 +1001,14 @@ body[data-maximized="true"] {
  * The default border color from CKEditor is quite lacking on contrast.
  */
 .cke_editable.cke_show_borders table.cke_show_border,
-.cke_editable.cke_show_borders table.cke_show_border > tr > th,
-.cke_editable.cke_show_borders table.cke_show_border > tr > td,
-.cke_editable.cke_show_borders table.cke_show_border > thead > tr > th,
-.cke_editable.cke_show_borders table.cke_show_border > thead > tr > td,
-.cke_editable.cke_show_borders table.cke_show_border > tbody > tr > th,
-.cke_editable.cke_show_borders table.cke_show_border > tbody > tr > td,
-.cke_editable.cke_show_borders table.cke_show_border > tfoot > tr > th,
-.cke_editable.cke_show_borders table.cke_show_border > tfoot > tr > td {
+.cke_editable.cke_show_borders table.cke_show_border &gt; tr &gt; th,
+.cke_editable.cke_show_borders table.cke_show_border &gt; tr &gt; td,
+.cke_editable.cke_show_borders table.cke_show_border &gt; thead &gt; tr &gt; th,
+.cke_editable.cke_show_borders table.cke_show_border &gt; thead &gt; tr &gt; td,
+.cke_editable.cke_show_borders table.cke_show_border &gt; tbody &gt; tr &gt; th,
+.cke_editable.cke_show_borders table.cke_show_border &gt; tbody &gt; tr &gt; td,
+.cke_editable.cke_show_borders table.cke_show_border &gt; tfoot &gt; tr &gt; th,
+.cke_editable.cke_show_borders table.cke_show_border &gt; tfoot &gt; tr &gt; td {
   border-color: @table-border-color;
   border-style: solid;
 }</code>
@@ -1111,7 +1066,7 @@ body[data-maximized="true"] {
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1253,7 +1208,7 @@ path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1395,7 +1350,7 @@ path=$services.webjars.url('org.webjars.npm:fuse.js', 'dist/fuse.basic.min.js')<
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1537,7 +1492,7 @@ path=$services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1679,7 +1634,7 @@ path=$services.webjars.url('org.webjars.npm:fast-diff', 'diff')</parameters>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>
@@ -1822,7 +1777,7 @@ exports=CKEDITOR</parameters>
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

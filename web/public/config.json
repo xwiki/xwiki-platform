@@ -7,7 +7,8 @@
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "XWikiOffline": {
     "name": "XWikiOffline",
@@ -17,7 +18,8 @@
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "XWikiSSR": {
     "name": "XWikiSSR",
@@ -27,7 +29,8 @@
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "XWikiDSFR": {
     "name": "XWikiDSFR",
@@ -37,7 +40,8 @@
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "dsfr"
+    "designSystem": "dsfr",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "XWikiSL": {
     "name": "XWikiSL",
@@ -47,7 +51,8 @@
     "baseURL": "https://cristal.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "shoelace"
+    "designSystem": "shoelace",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "Localhost": {
     "name": "Localhost",
@@ -57,7 +62,8 @@
     "baseURL": "http://localhost:15680/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "LocalhostSL": {
     "name": "LocalhostSL",
@@ -67,7 +73,8 @@
     "baseURL": "http://localhost:15680/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "shoelace"
+    "designSystem": "shoelace",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "LocalhostDSFR": {
     "name": "LocalhostDSFR",
@@ -77,7 +84,8 @@
     "baseURL": "http://localhost:15680/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "dsfr"
+    "designSystem": "dsfr",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "LocalhostOffline": {
     "name": "LocalhostOffline",
@@ -87,7 +95,8 @@
     "baseURL": "http://localhost:15680/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "GitHub": {
     "name": "GitHub",
@@ -97,7 +106,8 @@
     "baseURL": "https://github.com/ldubost/test/tree/master/",
     "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
     "homePage": "README.md",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "GitHubOffline": {
     "name": "GitHubOffline",
@@ -107,7 +117,8 @@
     "baseURL": "https://github.com/ldubost/test/tree/master/",
     "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
     "homePage": "README.md",
-    "designSystem": "vuetify"
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "GitHubSL": {
     "name": "GitHubSL",
@@ -117,7 +128,8 @@
     "baseURL": "https://github.com/ldubost/test/tree/master/",
     "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
     "homePage": "README.md",
-    "designSystem": "shoelace"
+    "designSystem": "shoelace",
+    "realtimeURL": "http://localhost:15681/collaboration"
   },
   "Nextcloud": {
     "name": "Nextcloud",
@@ -127,6 +139,7 @@
     "baseURL": "http://localhost:9292/",
     "baseRestURL": "http://localhost:9292/remote.php/dav/files",
     "designSystem": "shoelace",
-    "homePage": "home"
+    "homePage": "home",
+    "realtimeURL": "http://localhost:15681/collaboration"
   }
 }

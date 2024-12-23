@@ -103,7 +103,7 @@ export const CollaborationKit = Extension.create<CollaborationKitOptions>({
 
     this.storage.provider = new TiptapCollabProvider({
       // See server.js from @xwiki/cristal-web
-      baseUrl: this.options.baseUrl || "http://localhost:15681/collaboration",
+      baseUrl: this.options.baseUrl,
       name: this.options.channel,
       // The Y.Doc that is synchronized between editing users.
       document: ydoc,

@@ -79,6 +79,8 @@ const content = ref("");
 const title = ref("");
 const titlePlaceholder = ref("");
 
+const hasRealtime = cristal.getWikiConfig().realtimeURL != undefined;
+
 const currentPageName: Ref<string | undefined> =
   documentService.getCurrentDocumentReferenceString();
 
@@ -97,6 +99,7 @@ const save = async (authors: User[]) => {
     "Saving changes made by: ",
     authors.map((author) => author.name).join(", "),
   );
+
   // TODO: html does not make any sense here.
   const storage = cristal
     .getContainer()
@@ -116,7 +119,15 @@ const save = async (authors: User[]) => {
   documentService.notifyDocumentChange("update", currentPage.value!);
 };
 const submit = async () => {
-  await editor.value?.storage.cristalCollaborationKit.autoSaver.save();
+  if (!hasRealtime) {
+    await save([
+      {
+        name: currentUser.name,
+      },
+    ]);
+  } else {
+    await editor.value?.storage.cristalCollaborationKit.autoSaver.save();
+  }
   view();
 };
 
@@ -155,6 +166,14 @@ const currentUser = {
 
 let editor: Ref<Editor | undefined> = ref(undefined);
 
+const debounced = debounce(() => {
+  save([
+    {
+      name: currentUser.name,
+    },
+  ]);
+}, 500);
+
 function editorInit(
   container: Container,
   linkSuggest: LinkSuggestService | undefined,
@@ -163,6 +182,17 @@ function editorInit(
   serializer: ModelReferenceSerializer,
   parser: RemoteURLParser,
 ) {
+  const realtimeExtension = [];
+  if (hasRealtime) {
+    realtimeExtension.push(
+      CollaborationKit.configure({
+        channel: currentPageName.value,
+        user: currentUser,
+        saveCallback: save,
+        baseUrl: realtimeURL,
+      }),
+    );
+  }
   return new Editor({
     content: content.value || "",
     extensions: [
@@ -193,13 +223,13 @@ function editorInit(
         // TODO: the protocols should be injected by extension.
         protocols: ["http", "https", "cristalfs"],
       }),
-      CollaborationKit.configure({
-        channel: currentPageName.value,
-        user: currentUser,
-        saveCallback: save,
-        baseUrl: realtimeURL,
-      }),
+      ...realtimeExtension,
     ],
+    onUpdate() {
+      if (!hasRealtime) {
+        debounced();
+      }
+    },
   });
 }
 
@@ -279,15 +309,17 @@ watch(
 // Otherwise, the title will not be updated unless the content is updated too.
 watch(
   title,
-  debounce(
-    async () =>
-      await editor.value?.storage.cristalCollaborationKit.autoSaver.save([
-        {
-          name: currentUser.name,
-        },
-      ]),
-    500,
-  ),
+  debounce(async () => {
+    if (hasRealtime) {
+      return await editor.value?.storage.cristalCollaborationKit.autoSaver.save(
+        [
+          {
+            name: currentUser.name,
+          },
+        ],
+      );
+    }
+  }, 500),
 );
 </script>
 
@@ -317,11 +349,11 @@ watch(
       <form class="pagemenu" @submit="submit">
         <div class="pagemenu-status">
           <c-connection-status
-            v-if="editor"
+            v-if="editor && hasRealtime"
             :provider="editor.storage.cristalCollaborationKit.provider"
           ></c-connection-status>
           <c-save-status
-            v-if="editor"
+            v-if="editor && hasRealtime"
             :auto-saver="editor.storage.cristalCollaborationKit.autoSaver"
           ></c-save-status>
         </div>

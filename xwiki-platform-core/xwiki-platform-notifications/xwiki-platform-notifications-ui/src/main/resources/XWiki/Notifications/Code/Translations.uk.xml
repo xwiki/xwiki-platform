@@ -233,9 +233,57 @@ notifications.switches.tooltip.space=Спостерігати за батькі�
 notifications.switches.tooltip.wiki=Спостерігати за цією вікі
 notifications.switches.changeStatusError=Не вдалося змінити статус сповіщень.
 
-## Used to indicate where deprecated keys start
-#@deprecatedstart
+## Watch button and modal
 
+notifications.watch.button.title=Поточні налаштування сповіщень для цієї сторінки: {0} – натисніть, щоб змінити
+notifications.watch.button.status.notset=Не встановлено
+notifications.watch.button.status.followed=Відстежуваний
+notifications.watch.button.status.blocked=Заблокований
+notifications.watch.button.status.custom=Спеціальний
+notifications.watch.modal.title=Налаштування сповіщень для цієї сторінки
+notifications.watch.modal.description.options=Ви можете змінити поточні налаштування сповіщень за допомогою таких параметрів: 
+notifications.watch.modal.description.ancestoroption=Ви можете перейти до {0} і змінити налаштування сповіщень там або безпосередньо застосувати налаштування на поточній сторінці з такими параметрами: 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Налаштування перегляду сторінок, за якими слідкуєте
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=Ви стежите за цією сторінкою: ви отримаєте сповіщення про це.
+notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Налаштування перегляду батьківських сторінок, за якими слідкуєте
+notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Ви стежите за цією сторінкою через батьківську сторінку в ієрархії: ви отримаєте сповіщення про це.
+notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Налаштування перегляду дочірніх сторінок, за якими слідкуєте
+notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Ви стежите за цією сторінкою та її дочірніми сторінками: ви отримаєте сповіщення про це.
+notifications.watch.modal.title.NOT_SET=Не встановлено налаштування стеження
+notifications.watch.modal.description.NOT_SET=Ви ще не налаштували жодних параметрів спостереження цієї сторінки, тому ви не стежите за цією сторінкою: ви не отримаєте сповіщення про це.
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Blocked page watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Blocked page by parent watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Blocked page and children watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page and its children: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.CUSTOM=Custom watch settings
+### Missing: notifications.watch.modal.description.CUSTOM=You are using custom notification settings for this page: you might be following or blocking specific events for the page or you might target only specific channels for the notifications. We invite you to review your notification settings from your profile.
+### Missing: notifications.watch.modal.option.watchpage.title=Follow current page
+### Missing: notifications.watch.modal.option.watchpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.watchspace.title=Follow current page and its children
+### Missing: notifications.watch.modal.option.watchspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.watchwiki.title=Follow entire wiki
+### Missing: notifications.watch.modal.option.watchwiki.hint=This option doesn't only impact current page or space: you will receive notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.blockpage.title=Block current page
+### Missing: notifications.watch.modal.option.blockpage.hint=You will block any notifications for that page only.
+### Missing: notifications.watch.modal.option.blockspace.title=Block current page and its children
+### Missing: notifications.watch.modal.option.blockspace.hint=You will block any notifications for that page and all of its children.
+### Missing: notifications.watch.modal.option.unwatchpage.title=Unfollow current page
+### Missing: notifications.watch.modal.option.unwatchpage.hint=You will stop receiving notifications for that page only.
+### Missing: notifications.watch.modal.option.unwatchspace.title=Unfollow current page and its children
+### Missing: notifications.watch.modal.option.unwatchspace.hint=You will stop receiving notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unwatchwiki.title=Unfollow entire wiki
+### Missing: notifications.watch.modal.option.unwatchwiki.hint=This option doesn't only impact current page or space: you will stop receiving notifications for any page in the wiki.
+### Missing: notifications.watch.modal.option.unblockpage.title=Unblock current page
+### Missing: notifications.watch.modal.option.unblockpage.hint=You will receive notifications for that page only.
+### Missing: notifications.watch.modal.option.unblockspace.title=Unblock current page and its children
+### Missing: notifications.watch.modal.option.unblockspace.hint=You will receive notifications for that page and its children.
+### Missing: notifications.watch.modal.option.unblockwiki.title=Unblock entire wiki
+### Missing: notifications.watch.modal.option.unblockwiki.hint=This option doesn't only impact current page or space: you will stop ignoring notifications for any page in the wiki.
+### Missing: notifications.watch.modal.close=Close without saving
+### Missing: notifications.watch.modal.savechanges=Save changes
+### Missing: notifications.watch.modal.gotosettings=Manage all notifications settings
 ## until 13.2RC1
 notifications.settings.filters.preferences.title=Фільтри
 notifications.settings.filters.preferences.hint=Створіть фільтри, щоб точніше контролювати, коли активні події мають ініціювати сповіщення.

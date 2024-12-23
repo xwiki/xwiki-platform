@@ -38,6 +38,7 @@ export class DefaultPageData implements PageData {
   headlineRaw: string = "";
   lastModificationDate: Date | undefined;
   lastAuthor: UserDetails | undefined;
+  canEdit: boolean = true;
 
   public constructor(
     id: string = "",

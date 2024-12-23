@@ -43,6 +43,11 @@ export interface PageData {
    * @since 0.13
    */
   lastAuthor: UserDetails | undefined;
+  /**
+   * Indicate if the current user can edit this page.
+   * @since 0.13
+   */
+  canEdit: boolean;
 
   // TODO: remove any
   toObject(): any; // eslint-disable-line

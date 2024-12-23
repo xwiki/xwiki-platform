@@ -100,13 +100,15 @@ onUpdated(() => {
     <template #doc-page-actions>
       <div class="doc-page-actions">
         <router-link
-          :to="
-            currentPageRevision
-              ? ''
-              : { name: 'edit', params: { page: currentPageName } }
-          "
+          v-if="!currentPageRevision && currentPage?.canEdit"
+          :to="{ name: 'edit', params: { page: currentPageName } }"
         >
-          <x-btn size="small" :disabled="currentPageRevision !== undefined">
+          <x-btn
+            size="small"
+            :disabled="
+              currentPageRevision !== undefined || !currentPage?.canEdit
+            "
+          >
             <c-icon name="pencil" :size="Size.Small"></c-icon>
             Edit
           </x-btn>
@@ -114,7 +116,7 @@ onUpdated(() => {
         <page-actions
           :current-page="currentPage"
           :current-page-name="currentPageName ?? ''"
-          :disabled="currentPageRevision !== undefined"
+          :disabled="currentPageRevision !== undefined || !currentPage?.canEdit"
         ></page-actions>
       </div>
     </template>

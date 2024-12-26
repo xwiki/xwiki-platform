@@ -93,7 +93,7 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
                 // Execute the import
                 this.importer.importXAR(source, null, historyStrategy, backup == Boolean.TRUE, getXWikiContext());
             } catch (Exception e) {
-                throw new WebApplicationException("Failed to import the XAR package", e);
+                throw new WebApplicationException(e);
             } finally {
                 xwikiContext.setWikiReference(currentWiki);
             }

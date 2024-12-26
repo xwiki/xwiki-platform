@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>16.10.2-SNAPSHOT</version>
+    <version>16.10.2</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
   <name>XWiki Platform - Rendering - Macro - Velocity</name>

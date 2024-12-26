@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-store-merge</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>16.10.2</version>
+    <version>16.10.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

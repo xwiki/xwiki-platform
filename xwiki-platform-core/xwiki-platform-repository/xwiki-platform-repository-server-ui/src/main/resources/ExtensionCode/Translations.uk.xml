@@ -58,10 +58,10 @@ repository.support.createsupporter=Зареєструватися
 repository.supporter.sheet.description=Ця сторінка керує тим, як сторінки ExtensionSupporter відображаються як у режимі перегляду, так і в режимі редагування.
 repository.supporter.sheet.noObject=На поточній сторінці відсутній очікуваний об'єкт ExtensionSupporter.
 repository.supporter.sheet.createplan=Додати
-### Missing: repository.supporter.sheet.plans=Plans
+repository.supporter.sheet.plans=Рівні
 ### Missing: ExtensionCode.ExtensionSupporterClass_emptyvalue=
 ExtensionCode.ExtensionSupporterClass_doc.title=Назва
-### Missing: ExtensionCode.ExtensionSupporterClass_summary=Summary
+ExtensionCode.ExtensionSupporterClass_summary=Опис
 ExtensionCode.ExtensionSupporterClass_url=URL
 ExtensionCode.ExtensionSupporterClass_email=Електронна пошта
 ExtensionCode.ExtensionSupporterClass_content=Подробиці
@@ -72,11 +72,11 @@ repository.supportplan.sheet.description=Ця сторінка керує тим
 repository.supportplan.sheet.noObject=На поточній сторінці відсутній очікуваний об'єкт ExtensionSupportPlan.
 ### Missing: ExtensionCode.ExtensionSupportPlanClass_emptyvalue=
 ExtensionCode.ExtensionSupportPlanClass_doc.title=Назва
-### Missing: ExtensionCode.ExtensionSupportPlanClass_supporter=Supporter
-### Missing: ExtensionCode.ExtensionSupportPlanClass_summary=Summary
+ExtensionCode.ExtensionSupportPlanClass_supporter=Підтримка
+ExtensionCode.ExtensionSupportPlanClass_summary=Опис
 ExtensionCode.ExtensionSupportPlanClass_url=URL
 ExtensionCode.ExtensionSupportPlanClass_content=Подробиці
 ExtensionCode.ExtensionSupportPlanClass_active=Активний
-### Missing: ExtensionCode.ExtensionSupportPlanClass_paying=Paying
+ExtensionCode.ExtensionSupportPlanClass_paying=Платна
 </content>
 </xwikidoc>

@@ -69,6 +69,8 @@ tour.popover.show.hint=You can restart the tour by clicking this button at anyti
 # Steps
 TourCode.StepClass_order=Order
 TourCode.StepClass_element=Element (CSS selector that identify an element)
+    TourCode.StepClass_element.hint=CSS selector that identifies an element. Escape special CSS characters with a
+    backslash.
 TourCode.StepClass_title=Title
 TourCode.StepClass_content=Content
 TourCode.StepClass_backdrop=Backdrop

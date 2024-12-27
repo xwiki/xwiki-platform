@@ -89,7 +89,12 @@
       &lt;/dl&gt;
     #else
       &lt;dl&gt;
-        &lt;dt&gt;&lt;label #if($isEditing)for="TourCode.StepClass_0_${prop.name}"#end&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;&lt;/dt&gt;
+    &lt;dt&gt;&lt;label #if($isEditing)for="TourCode.StepClass_0_${prop.name}"#end&gt;$services.localization.render("${class.name}_${prop.name}")&lt;/label&gt;
+    ## Add a hint for the field if there's one defined in the translations.
+    #if($!services.localization.render("${class.name}_${prop.name}.hint") != "${class.name}_${prop.name}.hint")##
+    &lt;span class='xHint'&gt;$!services.localization.render("${class.name}_${prop.name}.hint")&lt;/span&gt;##
+    #end##
+    &lt;/dt&gt;
         &lt;dd&gt;$vobj.get($prop.getName())&lt;/dd&gt;
       &lt;/dl&gt;
     #end

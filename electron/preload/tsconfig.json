@@ -8,11 +8,18 @@
     "skipLibCheck": true,
     "strict": true,
     "isolatedModules": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src"],
-  "exclude": ["**/*.spec.ts", "**/*.test.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }

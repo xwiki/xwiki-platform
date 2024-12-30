@@ -1,9 +1,19 @@
 {
-    "compilerOptions": {
-        "rootDir" : "src",
-        "outDir" : "dist",
-        "resolveJsonModule": true
-    },
-    "extends": "./../tsconfig.json",
-    "include": ["src", "./src/index.ts", "./src/index.html", "./src/**/*", "components.d.ts" ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "resolveJsonModule": true
+  },
+  "extends": "./../tsconfig.json",
+  "include": [
+    "src",
+    "./src/index.ts",
+    "./src/index.html",
+    "./src/**/*",
+    "components.d.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }

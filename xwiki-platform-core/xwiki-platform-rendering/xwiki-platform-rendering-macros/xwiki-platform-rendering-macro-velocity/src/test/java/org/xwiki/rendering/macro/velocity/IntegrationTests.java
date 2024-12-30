@@ -25,7 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.XWikiTempDirExtension;
@@ -40,13 +42,13 @@ import org.xwiki.test.mockito.MockitoComponentManager;
  */
 @AllComponents
 @ExtendWith(XWikiTempDirExtension.class)
-@RenderingTests.Scope(pattern = "macrovelocity.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macrovelocity.*")
+public class IntegrationTests extends RenderingTest
 {
     @XWikiTempDir
     private File permanentDir;
 
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         new JUnit5ScriptMockSetup(componentManager);

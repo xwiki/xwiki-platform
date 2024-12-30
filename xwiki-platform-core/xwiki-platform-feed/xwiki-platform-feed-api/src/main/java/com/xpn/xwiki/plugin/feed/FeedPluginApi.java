@@ -43,10 +43,13 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
 
     private static final Map<String, Object> BLOG_FIELDS_MAPPING;
 
+    private static final String DESCRIPTION = "description";
+    private static final String TITLE = "title";
+
     public static final String FEED_PLUGIN_EXCEPTION = "FeedPluginException";
 
     static {
-        BLOG_FIELDS_MAPPING = new HashMap<String, Object>();
+        BLOG_FIELDS_MAPPING = new HashMap<>();
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_TITLE, "Blog.BlogPostClass_title");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "Blog.BlogPostClass_content");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
@@ -294,7 +297,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      */
     public SyndEntrySourceApi getSyndEntryArticleSource(Map<String, Object> params)
     {
-        Map<String, Object> defParams = new HashMap<String, Object>();
+        Map<String, Object> defParams = new HashMap<>();
         defParams.put(SyndEntryDocumentSource.FIELD_TITLE, "XWiki.ArticleClass_title");
         defParams.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "XWiki.ArticleClass_content");
         defParams.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "XWiki.ArticleClass_category");
@@ -433,7 +436,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      */
     public SyndFeed getWebFeed(List<Object> list)
     {
-        Map<String, Object> metadata = new HashMap<String, Object>();
+        Map<String, Object> metadata = new HashMap<>();
         return getWebFeed(list, metadata);
     }
 
@@ -489,7 +492,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
 
     /**
      * Creates a new feed from the result of an HQL query, using the default strategy for converting articles in feed
-     * entries. By articles we mean any document containing a <code>XWiki.ArticleClass</code> object.
+     * entries. By articles, we mean any document containing a <code>XWiki.ArticleClass</code> object.
      * 
      * @param query the HQL query used for retrieving the articles
      * @param count the maximum number of articles to retrieve
@@ -516,7 +519,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      */
     public SyndFeed getWebFeed(String query, int count, int start)
     {
-        Map<String, Object> metadata = new HashMap<String, Object>();
+        Map<String, Object> metadata = new HashMap<>();
         return getWebFeed(query, count, start, metadata);
     }
 
@@ -531,7 +534,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
      */
     public SyndFeed getBlogFeed(String query, int count, int start)
     {
-        return getBlogFeed(query, count, start, Collections.<String, Object> emptyMap());
+        return getBlogFeed(query, count, start, Collections.emptyMap());
     }
 
     /**
@@ -576,11 +579,11 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
 
     /**
      * Creates a new feed from a list of articles, using the default strategy for converting articles in feed entries,
-     * filling in the feed meta data. By articles we mean any document containing an <code>XWiki.ArticleClass</code>
+     * filling in the feed metadata. By articles, we mean any document containing an <code>XWiki.ArticleClass</code>
      * object.
      * 
      * @param list a list of articles
-     * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
+     * @param metadata feed metadata (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      * @see com.xpn.xwiki.api.Document
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
@@ -592,22 +595,21 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         return getFeed(list, getSyndEntryArticleSource(), params, metadata);
     }
 
-    private static boolean keyHasValue(Map<String, Object> map, String key, Object defaultValue)
+    private static boolean keyHasNoValue(Map<String, Object> map, String key)
     {
         Object value = map.get(key);
-        return value != null && !value.equals(defaultValue);
+        return value == null || value.equals("");
     }
 
     private Map<String, Object> fillWebFeedMetadata(Map<String, Object> metadata)
     {
         // these strings should be taken from a resource bundle
         String title = "Feed for document changes";
-        String description = title;
-        if (!keyHasValue(metadata, "title", "")) {
-            metadata.put("title", title);
+        if (keyHasNoValue(metadata, TITLE)) {
+            metadata.put(TITLE, title);
         }
-        if (!keyHasValue(metadata, "description", "")) {
-            metadata.put("description", description);
+        if (keyHasNoValue(metadata, DESCRIPTION)) {
+            metadata.put(DESCRIPTION, title);
         }
         return metadata;
     }
@@ -615,16 +617,15 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
     private Map<String, Object> fillBlogFeedMetadata(Map<String, Object> metadata)
     {
         // Make sure that we don't have an immutable Map
-        Map<String, Object> result = new HashMap<String, Object>(metadata);
+        Map<String, Object> result = new HashMap<>(metadata);
 
         // these strings should be taken from a resource bundle
         String title = "Personal Wiki Blog";
-        String description = title;
-        if (!keyHasValue(result, "title", "")) {
-            result.put("title", title);
+        if (keyHasNoValue(result, TITLE)) {
+            result.put(TITLE, title);
         }
-        if (!keyHasValue(result, "description", "")) {
-            result.put("description", description);
+        if (keyHasNoValue(result, DESCRIPTION)) {
+            result.put(DESCRIPTION, title);
         }
         return result;
     }
@@ -747,7 +748,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         if (query == null) {
             query = "where 1=1 order by doc.date desc";
         }
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         SyndFeed webFeed = getDocumentFeed(query, count, start, params, fillWebFeedMetadata(metadata));
         if (webFeed != null) {
             webFeed.setImage(getDefaultFeedImage());
@@ -788,7 +789,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         if (query == null) {
             XWikiRequest request = getXWikiContext().getRequest();
             String category = request.getParameter("category");
-            if (category == null || category.equals("")) {
+            if (category == null || category.isEmpty()) {
                 query =
                     ", BaseObject as obj where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME
                         + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' order by doc.creationDate desc";
@@ -801,16 +802,16 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
             }
         }
         Map<String, Object> params = Collections.emptyMap();
-        Map<String, Object> blogMappings = null;
+        Map<String, Object> blogMappings;
         if (blogPostClassName == null) {
             blogMappings = BLOG_FIELDS_MAPPING;
         } else {
-            blogMappings = new HashMap<String, Object>();
+            blogMappings = new HashMap<>();
             blogMappings.put(SyndEntryDocumentSource.FIELD_TITLE, blogPostClassName + "_title");
             blogMappings.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, blogPostClassName + "_content");
             blogMappings.put(SyndEntryDocumentSource.FIELD_CATEGORIES, blogPostClassName + "_category");
             blogMappings.put(SyndEntryDocumentSource.FIELD_PUBLISHED_DATE, blogPostClassName + "_publishDate");
-            blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, Integer.valueOf(400));
+            blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, 400);
         }
         SyndFeed blogFeed =
             getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), blogMappings),
@@ -952,7 +953,6 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         Map<String, Object> metadata, String type)
     {
         SyndFeed feed = getBlogFeed(query, count, start, blogPostClassName, metadata);
-        String ret = getFeedOutput(feed, type);
-        return ret;
+        return getFeedOutput(feed, type);
     }
 }

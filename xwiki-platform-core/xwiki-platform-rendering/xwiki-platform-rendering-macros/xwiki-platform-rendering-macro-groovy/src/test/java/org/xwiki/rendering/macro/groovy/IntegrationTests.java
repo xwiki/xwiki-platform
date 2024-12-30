@@ -28,7 +28,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.test.annotation.AllComponents;
@@ -47,13 +49,13 @@ import static org.mockito.Mockito.when;
  */
 @AllComponents
 @ExtendWith(XWikiTempDirExtension.class)
-@RenderingTests.Scope(pattern = "macrogroovy.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macrogroovy.*")
+public class IntegrationTests extends RenderingTest
 {
     @XWikiTempDir
     private File permanentDir;
 
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         new JUnit5ScriptMockSetup(componentManager);

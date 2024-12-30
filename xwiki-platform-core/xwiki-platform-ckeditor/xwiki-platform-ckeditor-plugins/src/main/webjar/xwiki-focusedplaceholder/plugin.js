@@ -129,7 +129,8 @@
       });
 
       function maybeUpdateFocusedPlaceholder(editor) {
-        const oldFocusedEmptyBlock = editor.editable()?.findOne("[" + ATTRIBUTE_NAME + "]");
+        const editable = editor.editable();
+        const oldFocusedEmptyBlock = editable?.findOne("[" + ATTRIBUTE_NAME + "]");
         const newFocusedEmptyBlock = getFocusedEmptyBlock(editor);
         if (newFocusedEmptyBlock !== oldFocusedEmptyBlock) {
           // The placeholder update shouldn't generate a separate entry in the editing history. Instead, we want to
@@ -137,10 +138,27 @@
           // placeholder update.
           editor.fire('lockSnapshot');
           oldFocusedEmptyBlock?.removeAttribute(ATTRIBUTE_NAME);
-          newFocusedEmptyBlock?.setAttribute(ATTRIBUTE_NAME, getPlaceholderContent(newFocusedEmptyBlock?.getName()));
+          let placeholderContent = editor.config.editorplaceholder;
+          if (newFocusedEmptyBlock) {
+            placeholderContent = getPlaceholderContent(newFocusedEmptyBlock.getName());
+            newFocusedEmptyBlock.setAttribute(ATTRIBUTE_NAME, placeholderContent);
+          }
+          if (editable?.isInline()) {
+            editable.setAttribute('aria-placeholder', placeholderContent);
+          }
           editor.fire('unlockSnapshot');
         }
       }
+
+      editor.on('beforeDestroy', function() {
+        var editable = editor.editable();
+        if (editable?.isInline()) {
+          editable.removeAttributes([
+            'aria-readonly',
+            'aria-placeholder'
+          ]);
+        }
+      });
 
       /**
        * Checks if the editor is focused and the element that has the caret is empty.

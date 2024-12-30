@@ -66,14 +66,14 @@
          by jetty is referenced in its mod files. When upgrading Jetty, check the version of apache-el used and set the
          version here. -->
     <jetty.server.apache-el.version>9.0.96</jetty.server.apache-el.version>
-    <netty.version>4.1.115.Final</netty.version>
+    <netty.version>4.1.116.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
-    <dockerJava.version>3.4.0</dockerJava.version>
+    <dockerJava.version>3.4.1</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
     <solr.major.version>9</solr.major.version>
     <solr.version>9.4.1</solr.version>
     <lucene.version>9.8.0</lucene.version>
-    <jersey.version>2.45</jersey.version>
+    <jersey.version>2.46</jersey.version>
     <hk2.version>2.6.1</hk2.version>
     <zookeeper.version>3.9.3</zookeeper.version>
 
@@ -84,7 +84,7 @@
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
          (e.g. 7.2.7).
     -->
-    <libreoffice.version>24.2.7</libreoffice.version>
+    <libreoffice.version>24.8.4</libreoffice.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -127,7 +127,7 @@
     <pgsql.version>42.7.4</pgsql.version>
     <oracle.groupId>com.oracle.database.jdbc</oracle.groupId>
     <oracle.artifactId>ojdbc11</oracle.artifactId>
-    <oracle.version>21.15.0.0</oracle.version>
+    <oracle.version>21.16.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
     <node.version>v20.12.0</node.version>
@@ -423,7 +423,7 @@
       <dependency>
         <groupId>org.webjars</groupId>
         <artifactId>jquery-ui</artifactId>
-        <version>1.13.3</version>
+        <version>1.14.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -469,9 +469,9 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.webjars</groupId>
-        <artifactId>momentjs</artifactId>
-        <version>2.29.4</version>
+        <groupId>org.webjars.npm</groupId>
+        <artifactId>moment</artifactId>
+        <version>2.30.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -480,9 +480,15 @@
         <version>3.1</version>
         <scope>runtime</scope>
         <exclusions>
+          <!-- We use our own fork of Bootstrap. -->
           <exclusion>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
+          </exclusion>
+          <!-- We prefer the org.webjars.npm version. -->
+          <exclusion>
+            <groupId>org.webjars</groupId>
+            <artifactId>momentjs</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -572,17 +578,6 @@
       </dependency>
 
       <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna</artifactId>
-        <version>5.15.0</version>
-      </dependency>
-      <dependency>
-        <groupId>net.java.dev.jna</groupId>
-        <artifactId>jna-platform</artifactId>
-        <version>5.15.0</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
         <version>2.4.0</version>
@@ -596,7 +591,7 @@
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
-        <version>1.18.1</version>
+        <version>1.18.3</version>
       </dependency>
 
       <!-- PDF -->
@@ -1665,6 +1660,26 @@
                   </message>
                   <excludes>
                     <exclude>org.webjars:bootstrap</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+          <!-- Make sure we use the NPM packaging of moment because it includes the modified JavaScript code. -->
+          <execution>
+            <id>enforce-moment-platform</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>
+                    Please use org.webjars.npm:moment instead of org.webjars:momentjs .
+                  </message>
+                  <excludes>
+                    <exclude>org.webjars:momentjs</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

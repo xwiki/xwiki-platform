@@ -37,6 +37,7 @@
     <module>xwiki-platform-distribution-flavor</module>
     <module>xwiki-platform-distribution-jetty-hsqldb</module>
     <module>xwiki-platform-distribution-resources</module>
+    <module>xwiki-platform-distribution-test</module>
     <module>xwiki-platform-distribution-war</module>
     <module>xwiki-platform-distribution-war-dependencies</module>
     <module>xwiki-platform-distribution-war-legacydependencies</module>

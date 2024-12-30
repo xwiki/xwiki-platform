@@ -522,13 +522,22 @@
     return {
       id: 'optionsToggle',
       type: 'html',
-      html: '<div class="linkOptionsToggle">' +
+      html: '<button class="linkOptionsToggle" type="button">' +
               '<label class="cke_dialog_ui_labeled_label">' +
                 '<span class="arrow arrow-right"></span> ' +
                 CKEDITOR.tools.htmlEncode(editor.localization.get('xwiki-link.options')) +
               '</label>' +
-            '</div>',
+            '</button>',
       onLoad: function() {
+        // Since we do not (and cannot without deeper changes) use the 'button' type, 
+        // we need to add this element explicitely to the Dialog focus list.
+        // We need to hardcode the position since we do not have access to the setupFocus function to reorder the list
+        // relative to native tab order.
+        // The four elements before this button are: display link, page selection *3
+        this.getDialog().addFocusable(this.getElement() , 4);
+        // Without this, the keyboard press on this focusable element will trigger the click twice...
+        this.getElement().removeAllListeners();
+        // We use the CKEDITOR.dom.element event utilities. This `on` is not related to JQuery.
         this.getElement().on('click', this.toggleLinkOptions, this);
       },
       toggleLinkOptions: function(event) {

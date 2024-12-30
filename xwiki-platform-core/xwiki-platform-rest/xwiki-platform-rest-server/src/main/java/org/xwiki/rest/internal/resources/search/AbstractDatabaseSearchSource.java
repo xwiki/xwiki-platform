@@ -63,6 +63,7 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
     protected Provider<XWikiContext> xcontextProvider;
 
     @Inject
+    @Named("secure")
     protected QueryManager queryManager;
 
     @Inject

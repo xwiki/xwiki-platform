@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.Registration" locale="">
+<xwikidoc version="1.6" reference="XWiki.Registration" locale="">
   <web>XWiki</web>
   <name>Registration</name>
   <language/>
@@ -511,7 +511,7 @@
     <mimetype>image/svg+xml</mimetype>
     <charset>UTF-8</charset>
     <author>xwiki:XWiki.Admin</author>
-    <version>1.2</version>
+    <version>1.1</version>
     <comment/>
     <content>PHN2ZyBkYXRhLW5hbWU9IkxheWVyIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjY4MC44Mzg1OCIgaGVpZ2h0PSI1ODQuMjMyMDciIHZpZXdCb3g9IjAgMCA2ODAuODM4NTggNTg0LjIzMjA3IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+PHBhdGggaWQ9ImI5Y2NhZTVhLWZmZGQtNGY1Yy05YzFlLTA1YWY5ZjBmMzM3Mi0xNzciIGRhdGEtbmFtZT0iUGF0aCA0MzgiIGQ9Ik0zMTAuNzA1NjksNjk0LjAyODE4YTI0LjIxNDU5LDI0LjIxNDU5LDAsMCwwLDIzLjM4MjY5LTQuMTE4NzdjOC4xODk3Ny02Ljg3NDQxLDEwLjc1OC0xOC4xOTYsMTIuODQ2Ny0yOC42ODE5MWw2LjE3OTczLTMxLjAxNjU3LTEyLjkzNzcsOC45MDgzN2MtOS4zMDQ2NSw2LjQwNjQxLTE4LjgxODI2LDEzLjAxODY2LTI1LjI2MDExLDIyLjI5Nzg1cy05LjI1MjIzLDIxLjk0NzA3LTQuMDc3OTIsMzEuOTg4IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTZlNmU2Ii8+PHBhdGggaWQ9ImY0YWQxZDA2LWJkMDMtNGNlZC1hNWM0LWMxOWE2NWFiNGVlNS0xNzgiIGRhdGEtbmFtZT0iUGF0aCA0MzkiIGQ9Ik0zMTIuNzAzNCw3MzMuNzM4NzRjLTEuNjI4MzktMTEuODYzNjgtMy4zMDM4Mi0yMy44ODA3OC0yLjE1ODg0LTM1Ljg3MTY3LDEuMDE0NjctMTAuNjQ5MzIsNC4yNjM3My0yMS4wNDg4MSwxMC44NzgzMS0yOS41NzkzOGE0OS4yMDU5Miw0OS4yMDU5MiwwLDAsMSwxMi42MjQ2Ni0xMS40NDAzOWMxLjI2MjE1LS43OTY0OCwyLjQyNDA5LDEuMjAzNTQsMS4xNjczMywxLjk5N2E0Ni43Nzk0OSw0Ni43Nzk0OSwwLDAsMC0xOC41MDQ0NiwyMi4zMjU2MmMtNC4wMjg1NywxMC4yNDYwNy00LjY3NTQ1LDIxLjQxNTgyLTMuOTgxNTQsMzIuMzAwMy40MTk0NCw2LjU4MjE4LDEuMzEwNzQsMTMuMTIxMiwyLjIwNTg4LDE5LjY1MjUxYTEuMTk4MTcsMS4xOTgxNywwLDAsMS0uODA4LDEuNDIyNTEsMS4xNjM0OCwxLjE2MzQ4LDAsMCwxLTEuNDIyNTMtLjgwOFoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiNmMmYyZjIiLz48cGF0aCBpZD0iYmFmNzg1ZjgtYjRjNi00MmNmLTg1YmQtOGExNjAzNzg0NWY3LTE3OSIgZGF0YS1uYW1lPSJQYXRoIDQ0MiIgZD0iTTMyNC40MjQ0Myw3MTQuNzAyMjlhMTcuODI1MTMsMTcuODI1MTMsMCwwLDAsMTUuNTMxNDEsOC4wMTg2MmM3Ljg2NDQtLjM3MzE4LDE0LjQxODA2LTUuODU5NzMsMjAuMzE3MTMtMTEuMDcwMjdsMTcuNDUyLTE1LjQwODgtMTEuNTQ5ODctLjU1MjgxYy04LjMwNjE5LS4zOTc4NC0xNi44MjY3Mi0uNzcxLTI0LjczODEzLDEuNzkzMzhzLTE1LjIwNzU4LDguNzI2MzktMTYuNjU0LDE2LjkxNTQxIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTZlNmU2Ii8+PHBhdGggaWQ9ImExNGU0MzMwLTcxMjUtNGUwMy1hODU2LWQ2NDUzYzM0ZjZjYy0xODAiIGRhdGEtbmFtZT0iUGF0aCA0NDMiIGQ9Ik0zMDguMTAwNDIsNzQwLjU1ODQzYzcuODM5NzItMTMuODcxNDIsMTYuOTMyMzQtMjkuMjg3OTQsMzMuMTgwOC0zNC4yMTU1MmEzNy4wMjYwOSwzNy4wMjYwOSwwLDAsMSwxMy45NTU0NS0xLjQ0MWMxLjQ4MTg5LjEyOCwxLjExMTc5LDIuNDExNzQtLjM2NywyLjI4NDU0YTM0LjM5ODMzLDM0LjM5ODMzLDAsMCwwLTIyLjI3MTY0LDUuODkyMTVjLTYuMjc5OTQsNC4yNzQ1My0xMS4xNjk3NSwxMC4yMTc1NS0xNS4zMDc4MSwxNi41MTkwNy0yLjUzNTExLDMuODYwNTEtNC44MDU3Niw3Ljg4NDQ1LTcuMDc2NDIsMTEuOTAzQzMwOS40ODgyNCw3NDIuNzg1MTMsMzA3LjM2NjQxLDc0MS44NTc1OSwzMDguMTAwNDIsNzQwLjU1ODQzWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iI2YyZjJmMiIvPjxwYXRoIGlkPSJhYzIwYTEwNi03ZWI4LTRhNDUtODgzNS02NzRlZjNiZjMyMjItMTgxIiBkYXRhLW5hbWU9IlBhdGggMTQxIiBkPSJNOTM1LjM5NTcsNTY5LjMxNjU0SDUwMy4xODA5MmE1LjAzMDE0LDUuMDMwMTQsMCwwLDEtNS4wMjM1OS01LjAyMzU5VjE2Mi45MDc1NGE1LjAzMDE3LDUuMDMwMTcsMCwwLDEsNS4wMjM1OS01LjAyMzU4SDkzNS4zOTU3YTUuMDMwMTcsNS4wMzAxNywwLDAsMSw1LjAyMzU5LDUuMDIzNThWNTY0LjI5MmE1LjAyOTIyLDUuMDI5MjIsMCwwLDEtNS4wMjM1OSw1LjAyMzU5WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGlkPSJhODg3ODA3OS1jN2NkLTQwNmYtYTQzNC04YjE1YjkxNGI5YjQtMTgyIiBkYXRhLW5hbWU9IlBhdGggMTQxIiBkPSJNOTM1LjM5NTcsNTY5LjMxNjU0SDUwMy4xODA5MmE1LjAzMDE0LDUuMDMwMTQsMCwwLDEtNS4wMjM1OS01LjAyMzU5VjE2Mi45MDc1NGE1LjAzMDE3LDUuMDMwMTcsMCwwLDEsNS4wMjM1OS01LjAyMzU4SDkzNS4zOTU3YTUuMDMwMTcsNS4wMzAxNywwLDAsMSw1LjAyMzU5LDUuMDIzNThWNTY0LjI5MmE1LjAyOTIyLDUuMDI5MjIsMCwwLDEtNS4wMjM1OSw1LjAyMzU5Wk01MDMuMTgwOTIsMTU5Ljg4OTQ0YTMuMDE4MDgsMy4wMTgwOCwwLDAsMC0zLjAxMTUyLDMuMDExNTFWNTY0LjI5MmEzLjAxODA4LDMuMDE4MDgsMCwwLDAsMy4wMTE1MiwzLjAxMTUySDkzNS4zOTU3YTMuMDE3MTcsMy4wMTcxNywwLDAsMCwzLjAxMTUzLTMuMDExNTJWMTYyLjkwNzU0YTMuMDE4MDksMy4wMTgwOSwwLDAsMC0zLjAxMTUzLTMuMDExNTFaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjY2FjYWNhIi8+PHBhdGggaWQ9ImFmNjRmOTYxLWU5YTItNGM1My1hMzMzLTUwNjBjN2Y4NTBkMi0xODMiIGRhdGEtbmFtZT0iUGF0aCAxNDIiIGQ9Ik03MDcuNDEwMjMsMjYyLjE4NTI4YTMuNDEwNTMsMy40MTA1MywwLDAsMCwwLDYuODIxMDVIODk0LjU1MzA1YTMuNDEwNTMsMy40MTA1MywwLDAsMCwwLTYuODIxMDVaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTRlNGU0Ii8+PHBhdGggaWQ9ImJhYWQ0Y2ZiLTE1OGQtNDQzOS05Y2MzLTIyNDc1YmY0N2IyMi0xODQiIGRhdGEtbmFtZT0iUGF0aCAxNDMiIGQ9Ik03MDcuNDEwMjMsMjgyLjY1MDM3YTMuNDEwNTQsMy40MTA1NCwwLDAsMCwwLDYuODIxMDZoOTUuNTQwMTlhMy40MTA1NCwzLjQxMDU0LDAsMCwwLDAtNi44MjEwNloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiNlNGU0ZTQiLz48cGF0aCBpZD0iZjM0NTYyNzktOTFlNS00OWFkLWFhNDMtOTgzOGIyNmZiNmNhLTE4NSIgZGF0YS1uYW1lPSJQYXRoIDE0MiIgZD0iTTU0My44NDE0NiwzOTIuNzA0NmEzLjQxMDU0LDMuNDEwNTQsMCwwLDAsMCw2LjgyMTA2aDM1MC44OTM3YTMuNDEwNTQsMy40MTA1NCwwLDAsMCwwLTYuODIxMDZaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTRlNGU0Ii8+PHBhdGggaWQ9ImEzMjg4YWRmLTQ5ZjgtNDg1Zi04YWU5LTFlNGYxYTEzZDg0OS0xODYiIGRhdGEtbmFtZT0iUGF0aCAxNDMiIGQ9Ik01NDMuODQxNDYsNDEzLjE2OTdhMy40MTA1NCwzLjQxMDU0LDAsMCwwLDAsNi44MjEwNkg4MDMuMTMyNTRhMy40MTA1NCwzLjQxMDU0LDAsMCwwLDAtNi44MjEwNloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiNlNGU0ZTQiLz48cGF0aCBpZD0iZTYzYTViNDgtNWE3ZC00MGEyLWI5YjAtNmFkZWMzMjYzNDhhLTE4NyIgZGF0YS1uYW1lPSJQYXRoIDE0MiIgZD0iTTU0My44NDE0Niw0MzMuMTcxNzdhMy40MTA1NCwzLjQxMDU0LDAsMCwwLDAsNi44MjEwNmgzNTAuODkzN2EzLjQxMDU0LDMuNDEwNTQsMCwwLDAsMC02LjgyMTA2WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iI2U0ZTRlNCIvPjxwYXRoIGlkPSJhMWM2NjliNC1kZmMzLTRjZmEtYTdiZS02NmI3MTM5OTg0NGQtMTg4IiBkYXRhLW5hbWU9IlBhdGggMTQzIiBkPSJNNTQzLjg0MTQ2LDQ1My42MzY4N2EzLjQxMDU0LDMuNDEwNTQsMCwwLDAsMCw2LjgyMTA2SDgwMy4xMzI1NGEzLjQxMDU0LDMuNDEwNTQsMCwwLDAsMC02LjgyMTA2WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iI2U0ZTRlNCIvPjxwYXRoIGlkPSJiZmVjNTBkMS1mZmIxLTRkZTYtYTllZi1hMTA4NWU0MGUwMTYtMTg5IiBkYXRhLW5hbWU9IlBhdGggMTQyIiBkPSJNNTQzLjg0MTQ2LDQ3NC4xNzE3N2EzLjQxMDU0LDMuNDEwNTQsMCwwLDAsMCw2LjgyMTA2aDM1MC44OTM3YTMuNDEwNTQsMy40MTA1NCwwLDAsMCwwLTYuODIxMDZaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTRlNGU0Ii8+PHBhdGggaWQ9ImJjOTY5NmVjLWVjOTktNDFkNS05MTE2LTNhZDk3MzdhMzhhYy0xOTAiIGRhdGEtbmFtZT0iUGF0aCAxNDMiIGQ9Ik01NDMuODQxNDYsNDk0LjYzNjg3YTMuNDEwNTQsMy40MTA1NCwwLDAsMCwwLDYuODIxMDZIODAzLjEzMjU0YTMuNDEwNTQsMy40MTA1NCwwLDAsMCwwLTYuODIxMDZaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjZTRlNGU0Ii8+PHBhdGggZD0iTTU5OS40MTk0MywzMjQuODI4MTJhNDksNDksMCwxLDEsNDguOTk5NTItNDlBNDkuMDU1NjcsNDkuMDU1NjcsMCwwLDEsNTk5LjQxOTQzLDMyNC44MjgxMloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiMzZTc5YmMiLz48cGF0aCBkPSJNNDUwLjY3ODMzLDUxMC4xMDA0MWExMi4yNDc1NCwxMi4yNDc1NCwwLDAsMC0xNC45NTMtMTEuMzYyMzFsLTE2LjE5NjQxLTIyLjgyNTIxLTE2LjI3MTM4LDYuNDU5NDUsMjMuMzI1MTksMzEuOTEyMzdhMTIuMzEzOTIsMTIuMzEzOTIsMCwwLDAsMjQuMDk1NTktNC4xODQzWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iI2EwNjE2YSIvPjxwYXRoIGQ9Ik00MTkuMTEyMTEsNTA4LjQwODg4bC00OS4wMDc3NC02My41Nzc3N0wzODguNDY3MTQsMzg3LjEyYzEuMzQ1NjMtMTQuNTA5MzYsMTAuNDI1LTE4LjU2MDg5LDEwLjgxMTM1LTE4LjcyNjQ1bC41ODkzLS4yNTI4MSwxNS45NzksNDIuNjExOS0xMS43MzIzNSwzMS4yODYyNSwyOC43OTY3MSw0OC40MzE5WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iIzNmM2Q1NiIvPjxwYXRoIGQ9Ik01ODkuMzA3OTQsMzEyLjQxOTkzYTEyLjI0NzU4LDEyLjI0NzU4LDAsMCwwLTEwLjE3MjE5LDE1Ljc4NjcybC0yMS41MDQ2MywxNy45MTI2OSw3LjY5ODE2LDE1LjcyMzI2LDMwLjAxMzQzLTI1LjcyMjcyYTEyLjMxMzkyLDEyLjMxMzkyLDAsMCwwLTYuMDM0NzctMjMuNjk5OTVaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjU5LjU4MDcxIC0xNTcuODgzOTYpIiBmaWxsPSIjYTA2MTZhIi8+PHBhdGggZD0iTTU5MC4wNjIwNiwzNDQuMDIyNDRsLTU5LjU5ODM1LDUzLjc3NjY1LTU4Ljk1ODE1LTEzLjg0NTc4Yy0xNC41Ny0uMjE5NzktMTkuMzExMzYtOC45NTg3LTE5LjUwNjI5LTkuMzMxMTNsLS4yOTc2MS0uNTY4LDQxLjI0ODktMTkuMjI1NzgsMzIuMDk5Nyw5LjI3ODI4LDQ2LjA2MDQ2LTMyLjQ1NTA5WiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iIzNmM2Q1NiIvPjxwb2x5Z29uIHBvaW50cz0iMjI3LjI0OCA1NjguNDM3IDI0My4yNjEgNTY4LjQzNiAyNTAuODc4IDUwNi42NzIgMjI3LjI0NSA1MDYuNjczIDIyNy4yNDggNTY4LjQzNyIgZmlsbD0iI2EwNjE2YSIvPjxwYXRoIGQ9Ik00ODMuMzk3MzMsNzIxLjc0NDc2aDUwLjMyNjE0YTAsMCwwLDAsMSwwLDBWNzQxLjE4OWEwLDAsMCwwLDEsMCwwaC0zNi4yMDdhMTQuMTE5MTQsMTQuMTE5MTQsMCwwLDEtMTQuMTE5MTQtMTQuMTE5MTR2LTUuMzI1MDVBMCwwLDAsMCwxLDQ4My4zOTczMyw3MjEuNzQ0NzZaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NTcuNTczNDggMTMwNS4wMjY1NCkgcm90YXRlKDE3OS45OTczOCkiIGZpbGw9IiMyZjJlNDEiLz48cG9seWdvbiBwb2ludHM9IjE2My4yNDcgNTY4LjQzNyAxNzkuMjYgNTY4LjQzNiAxODYuODc4IDUwNi42NzIgMTYzLjI0NSA1MDYuNjczIDE2My4yNDcgNTY4LjQzNyIgZmlsbD0iI2EwNjE2YSIvPjxwYXRoIGQ9Ik00MTkuMzk3LDcyMS43NDQ3Nkg0NjkuNzIzMWEwLDAsMCwwLDEsMCwwVjc0MS4xODlhMCwwLDAsMCwxLDAsMGgtMzYuMjA3QTE0LjExOTE0LDE0LjExOTE0LDAsMCwxLDQxOS4zOTcsNzI3LjA2OTgxdi01LjMyNTA1YTAsMCwwLDAsMSwwLDBaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2MjkuNTcyNzMgMTMwNS4wMjk0Nikgcm90YXRlKDE3OS45OTczOCkiIGZpbGw9IiMyZjJlNDEiLz48cG9seWdvbiBwb2ludHM9IjE1Ny41NTIgMzQyLjk5MSAxNTguODU4IDQzNC40MiAxNjAuMTY1IDU1NC41ODQgMTg4Ljg5OSA1NTEuOTcyIDIwMy4yNjcgMzg2LjA5NCAyMjEuNTUzIDU1MS45NzIgMjUxLjIxOCA1NTEuOTcyIDI1NC4yMDYgMzg0Ljc4OCAyNDMuNzU3IDM0OC4yMTYgMTU3LjU1MiAzNDIuOTkxIiBmaWxsPSIjMmYyZTQxIi8+PHBhdGggZD0iTTQ3My4zNzQxNyw1MTMuMTUzMWMtMzEuMjY1MzMuMDAyMzktNjAuMDQ0NzEtMTQuMTQ4MzktNjAuNDMzMTktMTQuMzQyNjNsLS4zMjI3My0uMTYxMzYtMi42MjM3My02Mi45NjYzN2MtLjc2MDgyLTIuMjI1MDktMTUuNzQyNjMtNDYuMTMwOTEtMTguMjgtNjAuMDg2MjUtMi41NzA4My0xNC4xMzg4MiwzNC42ODg0Mi0yNi41NDc0MiwzOS4yMTMtMjcuOTk4NTNsMS4wMjY3OC0xMS4zNzQwNSw0MS43NTM2Ni00LjQ5OTE4LDUuMjkyLDE0LjU1MzYsMTQuOTc5NDIsNS42MTY4YTcuNDA5MjQsNy40MDkyNCwwLDAsMSw0LjU5MjEyLDguNzA0M2wtOC4zMjUzOSwzMy44NTYxOSwyMC4zMzMyNSwxMTIuMDEyNjYtNC4zNzc1NS4xODk0NkM0OTUuNzA5LDUxMS4zOTY1OCw0ODQuMzg0MjUsNTEzLjE1MjUsNDczLjM3NDE3LDUxMy4xNTMxWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTI1OS41ODA3MSAtMTU3Ljg4Mzk2KSIgZmlsbD0iIzNmM2Q1NiIvPjxjaXJjbGUgY3g9IjQ1NC40NjczOCIgY3k9IjI5NC40NTk2NSIgcj0iMzAuMDYyODQiIHRyYW5zZm9ybT0ibWF0cml4KDAuODc3NDUsIC0wLjQ3OTY2LCAwLjQ3OTY2LCAwLjg3NzQ1LCAtMzQ1LjEyODI0LCA5Ni4xOTAzNykiIGZpbGw9IiNhMDYxNmEiLz48cGF0aCBkPSJNNDMwLjExNjYsMzIzLjU2MTMyYzUuNzI5MjYsNi4xMDI4OSwxNi4zNjkyNywyLjgyNjcyLDE3LjExNTgtNS41MTA2OWExMC4wNzE1MywxMC4wNzE1MywwLDAsMC0uMDEyNjgtMS45NDUyM2MtLjM4NTQ0LTMuNjkzMTEtMi41MTktNy4wNDYtMi4wMDgtMTAuOTQ1NDJhNS43Mzk3NCw1LjczOTc0LDAsMCwxLDEuMDUwNDYtMi42ODdjNC41NjU0OC02LjExMzU5LDE1LjI4MjYzLDIuNzM0NDQsMTkuNTkxMzgtMi44LDIuNjQyLTMuMzkzNTktLjQ2MzY0LTguNzM2NjQsMS41NjM4MS0xMi41Mjk1NiwyLjY3NTkxLTUuMDA2LDEwLjYwMTgzLTIuNTM2NTQsMTUuNTcyMjItNS4yNzgwOSw1LjUzMDE3LTMuMDUwMzIsNS4xOTk0LTExLjUzNTE3LDEuNTU5MDctMTYuNjk2MS00LjQzOTU1LTYuMjk0LTEyLjIyMzQ4LTkuNjUyNDEtMTkuOTEwNDQtMTAuMTM2NDNzLTE1LjMyMDk0LDEuNTkzOTQtMjIuNDk3NCw0LjM5MDY5Yy04LjE1MzkyLDMuMTc3NjctMTYuMjM5NjksNy41NjkyNS0yMS4yNTc0OSwxNC43MzktNi4xMDIxOCw4LjcxOTE5LTYuNjg5NDIsMjAuNDQxMzItMy42Mzc2LDMwLjYzNjc3QzQxOS4xMDIyMiwzMTEuMDAxMyw0MjUuNDM4MDUsMzE4LjU3NzY2LDQzMC4xMTY2LDMyMy41NjEzMloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiMyZjJlNDEiLz48cGF0aCBkPSJNNjQxLjU4MDcxLDc0MS45NjI2aC0zODFhMSwxLDAsMCwxLDAtMmgzODFhMSwxLDAsMCwxLDAsMloiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiNjYWNhY2EiLz48cGF0aCBkPSJNNTk2LjU4OTg0LDI5NC4zMzU0NWEzLjQ4OCwzLjQ4OCwwLDAsMS0yLjM4MTM0LS45MzU1NWwtMTYuMTU3MjMtMTUuMDA3MzJhMy40OTk5NCwzLjQ5OTk0LDAsMCwxLDQuNzYzNjctNS4xMjg5MWwxMy42ODU1NSwxMi43MTE5MiwyNy4wNzY2Ni0yNy4wNzYxOGEzLjUsMy41LDAsMSwxLDQuOTQ5MjIsNC45NTAybC0yOS40NjA5NCwyOS40NjA5NEEzLjQ5Mjc1LDMuNDkyNzUsMCwwLDEsNTk2LjU4OTg0LDI5NC4zMzU0NVoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yNTkuNTgwNzEgLTE1Ny44ODM5NikiIGZpbGw9IiNmZmYiLz48L3N2Zz4=</content>
     <filesize>8462</filesize>
@@ -790,111 +790,6 @@
     </property>
     <property>
       <users>XWiki.XWikiGuest</users>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Registration</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>5f751597-be0d-4010-ad85-57f4b6c4bd18</guid>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>1</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <disabled>0</disabled>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>5</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <property>
-      <content>{{velocity}}{{html clean="false"}}
-## If xredirect is not set
-#if (!$request.xredirect)
-  ## Define redirect URL value using current document relative request URL
-  #set($redirectURL = $escapetool.url($xwiki.relativeRequestURL))
-## If xredirect is already set
-#else
-  ## Reuse the current value in the login link
-  #set($redirectURL = $escapetool.url($request.xredirect))
-#end
-#if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference)
-&lt;li&gt;
-  &lt;a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$redirectURL&amp;loginLink=1")" id="tmLogin" rel="nofollow"&gt;$escapetool.xml($services.localization.render('login'))&lt;/a&gt;
-&lt;/li&gt;
-#end
-#if ($xcontext.user == 'XWiki.XWikiGuest' &amp;&amp; !$xcontext.inactiveUserReference &amp;&amp; $xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-&lt;li&gt;
-&lt;a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$redirectURL")" id="tmRegister" rel="nofollow"&gt;$escapetool.xml($services.localization.render('register'))&lt;/a&gt;
-&lt;/li&gt;
-#end
-{{/html}}{{/velocity}}</content>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.topmenu.right</extensionPointId>
-    </property>
-    <property>
-      <name>org.xwiki.plaform.registration</name>
-    </property>
-    <property>
-      <parameters>order=40000</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

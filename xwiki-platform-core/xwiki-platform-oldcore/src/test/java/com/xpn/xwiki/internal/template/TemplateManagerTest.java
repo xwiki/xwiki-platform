@@ -40,6 +40,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -103,6 +104,7 @@ class TemplateManagerTest
         this.componentManager.registerMockComponent(TransformationManager.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(AuthorizationManager.class);
         this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         this.authorizationMock = this.componentManager.registerMockComponent(DocumentAuthorizationManager.class);
@@ -184,7 +186,7 @@ class TemplateManagerTest
     @Test
     void templateCheatingProtection() throws Exception
     {
-        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure[]"));
+        when(this.environmentMock.getResource("/templates/../secure[]")).thenReturn(new URL("file://secure%5B%5D"));
         when(this.environmentMock.getResourceAsStream("/templates/../template[]"))
             .thenReturn(new ByteArrayInputStream("source".getBytes("UTF8")));
 

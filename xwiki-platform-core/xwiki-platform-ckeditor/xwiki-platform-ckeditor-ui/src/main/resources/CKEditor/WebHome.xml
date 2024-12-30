@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.WebHome" locale="">
+<xwikidoc version="1.6" reference="CKEditor.WebHome" locale="">
   <web>CKEditor</web>
   <name>WebHome</name>
   <language/>
@@ -39,5 +39,5 @@
   <content>Adds support for editing wiki pages using [[CKEditor&gt;&gt;http://ckeditor.com/]].
 
 * [[Documentation Page&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration]]
-* [[Issue Tracker&gt;&gt;http://jira.xwiki.org/browse/CKEDITOR]]</content>
+* [[Issue Tracker&gt;&gt;https://jira.xwiki.org/issues/?jql=project%20%3D%20XWIKI%20AND%20component%20%3D%20CKEditor]]</content>
 </xwikidoc>

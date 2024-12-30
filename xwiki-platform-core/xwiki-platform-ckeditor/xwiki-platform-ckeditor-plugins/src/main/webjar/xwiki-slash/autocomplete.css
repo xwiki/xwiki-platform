@@ -18,10 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/* We hide images in the autocomplete dropdowns that do not have any source.
+/* We hide completely icons in the CKEditor autocomplete items that are not used and therefore empty.
   This is especially important for assistive tech users (regular users cannot see the image if there's no source).
   Note that this extra style is required because the itemTemplate feature of CKEditor autocomplete 
-  is not powerful enough to support our specific usecase. */
+  is not powerful enough to support our specific usecase. 
+  since 16.10.3
+  */
 .ckeditor-autocomplete-item-head {
   & img[src=""],
   & img:not([src]),

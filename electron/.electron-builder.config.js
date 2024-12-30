@@ -35,7 +35,6 @@ module.exports = async function () {
     asar: true,
     appId: "org.xwiki.cristal",
     productName: "cristal",
-    artifactName: "${productName}-${version}-${arch}.${ext}",
     directories: {
       output: "dist",
       buildResources: "buildResources",
@@ -47,14 +46,19 @@ module.exports = async function () {
 
     // Specify linux target just for disabling snap compilation
     linux: {
-      target: "deb",
+      artifactName: "${productName}-${version}-linux-${arch}.${ext}",
+      executableName: "cristal",
       category: "Application",
     },
     mac: {
+      artifactName: "${productName}-${version}-mac-${arch}.${ext}",
+      executableName: "cristal",
       target: "dmg",
       category: "Application",
     },
     win: {
+      artifactName: "${productName}-${version}-win-${arch}.${ext}",
+      executableName: "cristal",
       target: "nsis",
     },
   };

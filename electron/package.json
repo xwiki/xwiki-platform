@@ -15,9 +15,9 @@
   },
   "main": "./main/dist/index.cjs",
   "scripts": {
-    "build:linux": "electron-builder --linux deb tar.gz --x64 --config .electron-builder.config.js --dir",
+    "build:linux": "electron-builder --linux snap deb rpm AppImage --x64 --config .electron-builder.config.js --dir",
     "build:mac": "electron-builder --mac dmg --x64 --arm64 --config .electron-builder.config.js --dir",
-    "build:win": "electron-builder --win nsis --ia32 --x64 --config .electron-builder.config.js --dir",
+    "build:win": "electron-builder --win nsis msi --x64 --ia32 --config .electron-builder.config.js --dir",
     "clean": "rimraf dist",
     "start": "electron ."
   },

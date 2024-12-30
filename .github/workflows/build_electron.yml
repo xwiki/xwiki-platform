@@ -37,8 +37,9 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            electron/dist/cristal-*.tar.gz
-            electron/dist/cristal-*.deb
+            electron/dist/cristal-*.*
+            electron/dist/latest.yml
+            electron/dist/latest-linux.yml
           tag_name: ${{ github.ref }}
           draft: true
   electron-mac:
@@ -72,6 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: softprops/action-gh-release@v2
         with:
-          files: electron/dist/cristal-*.exe
+          files: electron/dist/cristal-*.*
           tag_name: ${{ github.ref }}
           draft: true

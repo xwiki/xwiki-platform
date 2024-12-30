@@ -1710,7 +1710,7 @@ XWiki.Annotation = Class.create({
     if (!this.safeUpdate(this.createPanel, panelContent)) {
       return;
     }
-    // set the focus in the first element of type input, useful when not using the WYSIWYG editor CKEditor.
+    // Set the focus in the first element of type input, useful when not using the WYSIWYG editor CKEditor.
     this.createPanel.select('form').first().focusFirstElement();
     // and add the button observers
     this.createPanel.down('input[type=submit]').observe('click', this.onAnnotationAdd.bindAsEventListener(this));

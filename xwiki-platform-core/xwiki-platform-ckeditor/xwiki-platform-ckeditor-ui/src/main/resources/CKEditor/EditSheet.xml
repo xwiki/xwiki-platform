@@ -185,7 +185,7 @@ define('xwiki-ckeditor', [
 
     var config = {
       filebrowserUploadUrl: uploadDisabled ? '' : getUploadURL(sourceDocument, 'filebrowser'),
-      startupFocus: startupFocus,
+      startupFocus,
       height: $(element).height(),
       // Used to resolve and serialize relative references. Also used to make HTTP requests with the right context.
       sourceDocument: sourceDocument,

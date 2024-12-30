@@ -34,8 +34,8 @@ module.exports = async function () {
   return {
     asar: true,
     appId: "org.xwiki.cristal",
-    productName: 'cristal',
-    artifactName: '${productName}-${version}.${ext}',
+    productName: "cristal",
+    artifactName: "${productName}-${version}-${arch}.${ext}",
     directories: {
       output: "dist",
       buildResources: "buildResources",

@@ -231,13 +231,13 @@ notifications.switches.changeStatusError=无法更改通知的状态。
 
 ## Watch button and modal
 
-notifications.watch.button.title=此页面的当前通知设置：{0}- 单击以更改它
+notifications.watch.button.title=此页面的通知设置：{0}- 单击以更改它
 notifications.watch.button.status.notset=没有设置
 notifications.watch.button.status.followed=已关注
 notifications.watch.button.status.blocked=已屏蔽
 notifications.watch.button.status.custom=自定义关注
 notifications.watch.modal.title=此页面的通知设置
-notifications.watch.modal.description.options=您可以使用以下选项更改当前通知设置: 
+notifications.watch.modal.description.options=您可以使用以下选项更改通知设置: 
 notifications.watch.modal.description.ancestoroption=您可以转到 {0} 并在那里修改通知设置，也可以使用以下选项直接在当前页面上应用设置： 
 notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=关注页面的通知设置
 notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=您正在关注此页面：您将收到它的通知。

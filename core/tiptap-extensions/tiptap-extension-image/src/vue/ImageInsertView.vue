@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import messages from "../translations";
 import { NodeViewWrapper } from "@tiptap/vue-3";
 import { CristalApp } from "@xwiki/cristal-api";
 import { AttachmentsService } from "@xwiki/cristal-attachments-api";
@@ -17,9 +18,14 @@ import { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api
 import { LinkSuggestItem } from "@xwiki/cristal-tiptap-link-suggest-ui";
 import { debounce } from "lodash";
 import { Ref, inject, ref, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { Tippy } from "vue-tippy";
 import type { NodeViewProps } from "@tiptap/vue-3";
 import "@tiptap/extension-image";
+
+const { t } = useI18n({
+  messages,
+});
 
 const cristal = inject<CristalApp>("cristal")!;
 const attachmentsService = cristal
@@ -165,16 +171,20 @@ async function fileSelected() {
     >
       <template #default>
         <div ref="newImage" class="image-insert-view">
-          Upload or select and attachment.
+          {{ t("tiptap.image.insertView.uploadOrSelect") }}
         </div>
       </template>
 
       <template #content>
         <div class="image-insert-view-content no-drag-handle">
-          <div v-if="loading">Loading...</div>
+          <div v-if="loading">
+            {{ t("tiptap.image.insertView.loading") }}
+          </div>
           <ul v-else>
             <li class="item">
-              <x-btn @click="triggerUpload">Upload</x-btn>
+              <x-btn @click="triggerUpload">
+                {{ t("tiptap.image.insertView.upload") }}
+              </x-btn>
               <input
                 v-show="false"
                 ref="fileUpload"
@@ -188,16 +198,18 @@ async function fileSelected() {
                 ref="imageNameQueryInput"
                 v-model="imageNameQuery"
                 type="text"
-                placeholder="Image name or image URL"
+                :placeholder="t('tiptap.image.insertView.search.placeholder')"
                 @keydown.enter="insertTextAsLink"
               />
             </li>
-            <li v-if="linksSearchLoading" class="item">Loading...</li>
+            <li v-if="linksSearchLoading" class="item">
+              {{ t("tiptap.image.insertView.loading") }}
+            </li>
             <li v-else-if="linksSearchError" class="item">
               {{ linksSearchError }}
             </li>
             <li v-else-if="links.length == 0 && imageNameQuery" class="item">
-              {{ links }}
+              {{ t("tiptap.image.insertView.noResults") }}
             </li>
             <template v-else>
               <!-- factorize with c-tiptap-link-suggest -->

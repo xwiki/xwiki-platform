@@ -116,7 +116,7 @@ function onResize({ w: wp, h: hp }: { w: number; h: number }) {
       {{ imageLoadingError }}
     </div>
     <div v-else class="image-container" :style="computedStyle">
-      <!-- Resizing is currently deactivated as no backend supportit -->
+      <!-- Resizing is currently deactivated as no backend supports it -->
       <vue3-draggable-resizable
         v-model:active="isActive"
         :parent="true"

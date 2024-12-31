@@ -1,0 +1,7 @@
+{
+  "tiptap.image.insertView.loading": "Loading...",
+  "tiptap.image.insertView.upload": "Upload",
+  "tiptap.image.insertView.uploadOrSelect": "Upload or select and attachment.",
+  "tiptap.image.insertView.noResults": "No results",
+  "tiptap.image.insertView.search.placeholder": "Image name or image URL"
+}

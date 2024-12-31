@@ -64,7 +64,6 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -86,7 +85,9 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authentication.UserUnauthenticatedEvent;
 import org.xwiki.store.UnexpectedException;
+import org.xwiki.user.UserReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -175,6 +176,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Inject
+    @Named("document")
+    private UserReferenceSerializer<DocumentReference> userReferenceSerializer;
 
     @Inject
     private ComponentManager componentManager;
@@ -2055,7 +2060,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         this.observationManager.addListener(new EventListener()
         {
-            private final Event ev = new ActionExecutingEvent();
+            private static final List<Event> EVENT_LIST = List.of(new UserUnauthenticatedEvent());
 
             @Override
             public String getName()
@@ -2066,17 +2071,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             @Override
             public List<Event> getEvents()
             {
-                return Collections.<Event>singletonList(this.ev);
+                return EVENT_LIST;
             }
 
             @Override
             public void onEvent(Event event, Object source, Object data)
             {
-                if ("logout".equals(((ActionExecutingEvent) event).getActionName())) {
-                    final XWikiContext ctx = (XWikiContext) data;
-                    if (ctx.getUserReference() != null) {
-                        releaseAllLocksForCurrentUser(ctx);
-                    }
+                UserUnauthenticatedEvent userUnauthenticatedEvent = (UserUnauthenticatedEvent) event;
+                if (userUnauthenticatedEvent.getUserReference() != null) {
+                    DocumentReference userDoc = XWikiHibernateStore.this.userReferenceSerializer.serialize(
+                        userUnauthenticatedEvent.getUserReference());
+                    releaseAllLocksForUser(userDoc, (XWikiContext) data);
                 }
             }
         });
@@ -2084,18 +2089,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Release all of the locks held by the currently logged in user.
-     *
-     * @param ctx the XWikiContext, used to start the connection and get the user name.
      */
-    private void releaseAllLocksForCurrentUser(final XWikiContext ctx)
+    private void releaseAllLocksForUser(final DocumentReference userDoc, final XWikiContext context)
     {
         try {
-            executeWrite(ctx, session -> {
+            executeWrite(context, session -> {
                 final Query query = session.createQuery("delete from XWikiLock as lock where lock.userName=:userName");
                 // Using deprecated getUser() because this is how locks are created.
                 // It would be a maintainibility disaster to use different code paths
                 // for calculating names when creating and removing.
-                query.setParameter("userName", ctx.getUser());
+                query.setParameter("userName", this.compactWikiEntityReferenceSerializer.serialize(userDoc));
                 query.executeUpdate();
 
                 return null;
@@ -2103,22 +2106,25 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (Exception e) {
             String msg = "Error while deleting active locks held by user.";
             try {
-                this.endTransaction(ctx, false);
+                this.endTransaction(context, false);
             } catch (Exception utoh) {
                 msg += " Failed to commit OR rollback [" + utoh.getMessage() + "]";
             }
             throw new UnexpectedException(msg, e);
         }
 
-        // If we're in a non-main wiki & the user is global,
-        // switch to the global wiki and delete locks held there.
-        if (!ctx.isMainWiki() && ctx.isMainWiki(ctx.getUserReference().getWikiReference().getName())) {
-            final String cdb = ctx.getWikiId();
+        if (this.wikiDescriptorManager.isMainWiki(userDoc.getWikiReference().getName())) {
             try {
-                ctx.setWikiId(ctx.getMainXWiki());
-                this.releaseAllLocksForCurrentUser(ctx);
-            } finally {
-                ctx.setWikiId(cdb);
+                String currentWiki = context.getWikiId();
+                for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
+                    if (!currentWiki.equals(wikiId)) {
+                        context.setWikiReference(new WikiReference(wikiId));
+                        this.releaseAllLocksForUser(userDoc, context);
+                        context.setWikiReference(new WikiReference(currentWiki));
+                    }
+                }
+            } catch (WikiManagerException e) {
+                this.logger.error("Error for getting list of wikis to release locks for user [{}]", userDoc, e);
             }
         }
     }

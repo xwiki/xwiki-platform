@@ -778,6 +778,12 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.6.3)
     devDependencies:
+      '@vue/test-utils':
+        specifier: 2.4.6
+        version: 2.4.6
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -787,6 +793,9 @@ importers:
       vite:
         specifier: 6.0.3
         version: 6.0.3(@types/node@22.10.2)(tsx@4.19.2)(yaml@2.6.1)
+      vitest-mock-extended:
+        specifier: 2.0.2
+        version: 2.0.2(typescript@5.6.3)(vitest@2.1.8(@types/node@22.10.2)(happy-dom@15.11.7))
 
   core/extra-tabs/extra-tabs-api:
     dependencies:

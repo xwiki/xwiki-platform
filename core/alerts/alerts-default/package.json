@@ -19,11 +19,12 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-alerts-api": "workspace:*",
+    "@xwiki/cristal-api": "workspace:*",
     "inversify": "6.2.0",
     "pinia": "2.3.0",
     "vue": "3.5.13"
@@ -32,6 +33,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3"

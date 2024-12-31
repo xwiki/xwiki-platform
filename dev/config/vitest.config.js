@@ -24,5 +24,6 @@ export default defineConfig({
   test: {
     reporters: ["junit"],
     outputFile: "unit-tests.xml",
+    passWithNoTests: true,
   },
 });

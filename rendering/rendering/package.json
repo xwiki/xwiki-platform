@@ -22,7 +22,8 @@
     "clean": "rimraf dist",
     "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build"
+    "prepack": "pnpm build",
+    "test": "vitest --run"
   },
   "types": "dist/index.d.ts",
   "dependencies": {
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@types/dompurify": "3.2.0",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3",

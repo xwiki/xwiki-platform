@@ -19,7 +19,8 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "vue-tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@tiptap/extension-image": "2.10.3",
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@tiptap/core": "2.10.3",
     "@types/lodash": "4.17.13",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "vue": "3.5.13",
     "vue-tsc": "2.1.10"
   },

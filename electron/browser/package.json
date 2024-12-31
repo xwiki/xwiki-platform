@@ -22,7 +22,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "clean": "rimraf dist",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -34,6 +35,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3"

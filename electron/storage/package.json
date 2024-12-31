@@ -24,7 +24,8 @@
     "clean": "rimraf dist",
     "compile": "tsc --project tsconfig.json --noEmit && vite build && vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build"
+    "prepack": "pnpm build",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@types/node": "22.10.2",
+    "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
     "vite": "6.0.3",

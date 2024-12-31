@@ -400,6 +400,10 @@ watch(
   background: var(--cr-color-neutral-100);
 }
 
+:deep(.ProseMirror-selectednode:has(.image-container)) {
+  display: inline-block;
+}
+
 :deep(.ProseMirror) {
   outline: none;
   max-width: var(--cr-sizes-max-page-width);

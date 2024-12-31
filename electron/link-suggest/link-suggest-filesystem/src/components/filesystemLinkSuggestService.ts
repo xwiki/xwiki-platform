@@ -24,10 +24,7 @@ import {
   LinkType,
 } from "@xwiki/cristal-link-suggest-api";
 import { EntityType } from "@xwiki/cristal-model-api";
-import { inject, injectable } from "inversify";
-import type { CristalApp } from "@xwiki/cristal-api";
-import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
+import { injectable } from "inversify";
 
 declare const fileSystemStorage: {
   search(
@@ -49,20 +46,6 @@ declare const fileSystemStorage: {
  */
 @injectable()
 export class FilesystemLinkSuggestService implements LinkSuggestService {
-  constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
-    @inject<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
-  ) {
-    console.log(
-      this.cristalApp,
-      this.remoteURLSerializerProvider,
-      this.modelReferenceParserProvider,
-    );
-  }
-
   async getLinks(
     query: string,
     type?: LinkType,

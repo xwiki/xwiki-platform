@@ -180,7 +180,7 @@ async function fileSelected() {
           <div v-if="loading">
             {{ t("tiptap.image.insertView.loading") }}
           </div>
-          <ul v-else>
+          <ul v-else class="item-group">
             <li class="item">
               <x-btn @click="triggerUpload">
                 {{ t("tiptap.image.insertView.upload") }}
@@ -241,7 +241,7 @@ async function fileSelected() {
 }
 
 .image-insert-view-content {
-  padding: 0;
+  padding: var(--cr-spacing-x-small) var(--cr-spacing-x-small);
   position: relative;
   border-radius: var(--cr-tooltip-border-radius);
   background: white;
@@ -250,7 +250,7 @@ async function fileSelected() {
     0 0 0 1px rgba(0, 0, 0, 0.1),
     0 10px 20px rgba(0, 0, 0, 0.1);
   max-height: 300px;
-  width: 300px;
+  width: auto;
 }
 
 .image-insert-view-content input {
@@ -259,6 +259,11 @@ async function fileSelected() {
 
 .image-insert-view-content ul {
   list-style: none;
+}
+
+.image-insert-view-content .item-group {
+  overflow: auto;
+  padding: 0;
 }
 
 .image-insert-view-content .item {

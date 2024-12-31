@@ -122,9 +122,6 @@ export function parseInternalLinks(
               const contentToken = new state.Token("text", "", 0);
               contentToken.content = text || reference;
               const closeToken = new state.Token("link_close", "a", -1);
-              // This is useful for the serializer, who is going to have access to this value to determine
-              // how to serialize the link
-              closeToken.attrPush(["class", "internal-link"]);
               return [openToken, contentToken, closeToken];
             }
           });

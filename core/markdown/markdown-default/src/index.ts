@@ -17,51 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import { DefaultMarkdownRenderer } from "./defaultMarkdownRenderer";
 import { parseInternalImages } from "./parseInternalImages";
 import { parseInternalLinks } from "./parseInternalLinks";
 import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
-import { Container, inject, injectable } from "inversify";
-import markdownit from "markdown-it";
-import type { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
-import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
-import type MarkdownIt from "markdown-it";
-
-/**
- * Default implementation based on markdown-it.
- * @since 0.13
- */
-@injectable()
-class DefaultMarkdownRenderer implements MarkdownRenderer {
-  private md: MarkdownIt;
-
-  constructor(
-    @inject<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-    private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
-    @inject<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
-    private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
-  ) {
-    this.md = markdownit();
-    const modelReferenceParser = this.modelReferenceParserProvider.get()!;
-    const remoteURLSerializer = this.remoteURLSerializerProvider.get()!;
-    this.md.core.ruler.before(
-      "inline",
-      "markdown-internal-links",
-      parseInternalLinks(modelReferenceParser, remoteURLSerializer),
-    );
-    // This declaration needs to happen after markdown-internal-links, otherwise an error is thrown because
-    // markdown-internal-links is not found. But, "markdown-internal-images" is executed before
-    // "markdown-internal-links"
-    this.md.core.ruler.before(
-      "markdown-internal-links",
-      "markdown-internal-images",
-      parseInternalImages(modelReferenceParser, remoteURLSerializer),
-    );
-  }
-
-  render(markdown: string): string {
-    return this.md.render(markdown);
-  }
-}
+import { Container } from "inversify";
 
 class ComponentInit {
   constructor(container: Container) {

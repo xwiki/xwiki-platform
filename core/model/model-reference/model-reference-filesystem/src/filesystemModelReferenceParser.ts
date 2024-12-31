@@ -30,26 +30,59 @@ import { injectable } from "inversify";
 @injectable()
 export class FileSystemModelReferenceParser implements ModelReferenceParser {
   parse(reference: string): EntityReference {
-    const segments = reference.split("/");
+    const segments = reference.split(/(?<!\\)\//);
     if (segments[segments.length - 2] == "attachments") {
       return new AttachmentReference(
-        segments[segments.length - 1],
+        this.unescape(segments[segments.length - 1]),
         new DocumentReference(
-          segments[segments.length - 3],
+          this.unescape(segments[segments.length - 3]),
           new SpaceReference(
             undefined,
-            ...segments.slice(0, segments.length - 3),
+            ...segments
+              .slice(0, segments.length - 3)
+              .map((s) => this.unescape(s)),
           ),
         ),
       );
     } else {
       return new DocumentReference(
-        segments[segments.length - 1],
+        this.unescape(segments[segments.length - 1]),
         new SpaceReference(
           undefined,
-          ...segments.slice(0, segments.length - 1),
+          ...segments
+            .slice(0, segments.length - 1)
+            .map((s) => this.unescape(s)),
         ),
       );
+    }
+  }
+
+  private unescape(string: string) {
+    let ret = "";
+    for (let index = 0; index < string.length; index++) {
+      const { index: newIndex, char } = this.unescapeLocal(index, string);
+      index = newIndex;
+      ret += char;
+    }
+    return ret;
+  }
+
+  private unescapeLocal(
+    index: number,
+    string: string,
+  ): { char: string; index: number } {
+    if (index < string.length - 1) {
+      const c0 = string[index];
+      const c1 = string[index + 1];
+      if (c0 == "\\" && ["/", "\\"].includes(c1)) {
+        return { char: c1, index: index + 1 };
+      } else {
+        return { char: c0, index };
+      }
+    } else if (index < string.length) {
+      return { char: string[index], index };
+    } else {
+      return { char: "", index };
     }
   }
 }

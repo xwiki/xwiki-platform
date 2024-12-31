@@ -46,26 +46,39 @@ export class FileSystemModelReferenceSerializer
         throw new Error("Wiki currently not supported from FileSystem");
       case SPACE: {
         const spaceReference = reference as SpaceReference;
-        return spaceReference.names.join("/");
+        return spaceReference.names.map(this.escapeSegment).join("/");
       }
       case DOCUMENT: {
         const documentReference = reference as DocumentReference;
         const spaces = this.serialize(documentReference.space);
         const name = documentReference.name;
         if (spaces === undefined) {
-          return name;
+          return this.escapeSegment(name);
         } else {
-          return `${spaces}/${name}`;
+          return `${spaces}/${this.escapeSegment(name)}`;
         }
       }
       case ATTACHMENT: {
         const attachmentReference = reference as AttachmentReference;
         const document = this.serialize(attachmentReference.document);
         const name = attachmentReference.name;
-        return `${document}/attachments/${name}`;
+        return `${document}/attachments/${this.escapeSegment(name)}`;
       }
       default:
         throw new Error(`Unknown reference type [${type}]`);
     }
+  }
+
+  private escapeSegment(segment: string) {
+    return segment
+      .split("")
+      .map((c) => {
+        if (["/", "\\"].includes(c)) {
+          return "\\" + c;
+        } else {
+          return c;
+        }
+      })
+      .join("");
   }
 }

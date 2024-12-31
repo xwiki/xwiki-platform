@@ -41,14 +41,18 @@ class FileSystemRemoteURLSerializer implements RemoteURLSerializer {
         throw new Error("Not implemented");
       case EntityType.DOCUMENT: {
         const documentReference = reference as DocumentReference;
-        const spaces = documentReference.space?.names.join("/");
-        return `${protocol}://${spaces}/${documentReference.name}`;
+        const spaces = documentReference.space?.names
+          .map(encodeURIComponent)
+          .join("/");
+        return `${protocol}://${spaces}/${encodeURIComponent(documentReference.name)}`;
       }
       case EntityType.ATTACHMENT: {
         const attachmentReference = reference as AttachmentReference;
         const documentReference = attachmentReference.document;
-        const spaces = documentReference.space?.names.map(encodeURI).join("/");
-        return `${protocol}://${spaces}/${documentReference.name}/attachments/${attachmentReference.name}`;
+        const spaces = documentReference.space?.names
+          .map(encodeURIComponent)
+          .join("/");
+        return `${protocol}://${spaces}/${encodeURIComponent(documentReference.name)}/attachments/${encodeURIComponent(attachmentReference.name)}`;
       }
     }
   }

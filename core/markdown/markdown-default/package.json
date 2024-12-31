@@ -39,7 +39,8 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",
-    "vite": "6.0.3"
+    "vite": "6.0.3",
+    "vitest-mock-extended": "2.0.2"
   },
   "publishConfig": {
     "exports": {

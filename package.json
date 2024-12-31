@@ -19,12 +19,14 @@
   "main": "./src/index.ts",
   "scripts": {
     "build": "tsc --project tsconfig.json && vite build",
-    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
+    "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
+    "test": "vitest --run"
   },
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*"
   },
   "devDependencies": {
+    "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.6.3",
     "vite": "6.0.3"
   },

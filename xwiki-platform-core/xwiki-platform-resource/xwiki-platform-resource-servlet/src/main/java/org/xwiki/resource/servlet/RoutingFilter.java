@@ -24,14 +24,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -46,23 +46,26 @@ import org.xwiki.url.ExtendedURL;
 /**
  * Decides how to route an incoming URL into the XWiki system. There are various possibilities:
  * <ul>
- *   <li>If there's a registered component of type {@link org.xwiki.resource.ResourceReferenceHandler} matching the
- *       {@link ResourceType} passed in the URL (for example when using the {@code standard} URL scheme, the Resource
- *       Type is the segment path just after the Context Path, i.e. {@code bin} in
- *       {@code http://<server>/xwiki/bin/view/Space/Page}), then the {@code resourceReferenceHandler} Servlet is
- *       called to handle it.</li>
- *   <li>If not, then continue executing the rest of the {@code web.xml} file, thus bridging to the old system,
- *       including the existing Struts Action Servlet.</li>
+ * <li>If there's a registered component of type {@link org.xwiki.resource.ResourceReferenceHandler} matching the
+ * {@link ResourceType} passed in the URL (for example when using the {@code standard} URL scheme, the Resource Type is
+ * the segment path just after the Context Path, i.e. {@code bin} in {@code http://<server>/xwiki/bin/view/Space/Page}),
+ * then the {@code resourceReferenceHandler} Servlet is called to handle it.</li>
+ * <li>If not, then continue executing the rest of the {@code web.xml} file, thus bridging to the old system, including
+ * the existing Struts Action Servlet.</li>
  * </ul>
  * As time progresses it is expected that more and more Resource Types will have registered
  * {@link org.xwiki.resource.ResourceReferenceHandler}.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * API from Java point of view.
  *
  * @version $Id$
- * @since 7.1M1
+ * @since 42.0.0
  */
 public class RoutingFilter implements Filter
 {
     static final String RESOURCE_TYPE_NAME = "resourceType";
+
     static final String RESOURCE_EXTENDEDURL = "resourceURL";
 
     private ComponentManager rootComponentManager;
@@ -169,8 +172,8 @@ public class RoutingFilter implements Filter
     {
         ResourceTypeResolver<ExtendedURL> urlResourceTypeResolver;
         try {
-            urlResourceTypeResolver = this.rootComponentManager.getInstance(
-                new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
+            urlResourceTypeResolver = this.rootComponentManager
+                .getInstance(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
         } catch (ComponentLookupException e) {
             // Should not happen since an ExtendedURL Resource Type Resolver should exist on the system.
             throw new ServletException("Failed to locate an ExtendedURL Resource Type Resolver component", e);
@@ -208,7 +211,8 @@ public class RoutingFilter implements Filter
             // Shouldn't happen normally!
             throw new ServletException(
                 String.format("Failed to reconstruct URL from HTTP Servlet Request (URL [%s], Query String [%s])",
-                    request.getRequestURL(), request.getQueryString()), e);
+                    request.getRequestURL(), request.getQueryString()),
+                e);
         }
         return url;
     }

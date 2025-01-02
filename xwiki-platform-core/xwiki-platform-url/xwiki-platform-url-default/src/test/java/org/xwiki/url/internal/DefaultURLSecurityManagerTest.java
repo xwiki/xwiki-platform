@@ -19,6 +19,16 @@
  */
 package org.xwiki.url.internal;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,11 +38,12 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Provider;
-import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.LogLevel;
@@ -46,17 +57,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Tests for {@link DefaultURLSecurityManager}.
@@ -79,6 +81,9 @@ class DefaultURLSecurityManagerTest
 
     @MockComponent
     private Execution execution;
+
+    @MockComponent
+    private Container container;
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
@@ -119,10 +124,11 @@ class DefaultURLSecurityManagerTest
             "enterprise.eu"
         ));
 
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(this.xWikiContext.getRequest()).thenReturn(request);
-        HttpServletRequest servletRequest = mock(HttpServletRequest.class);
-        when(request.getHttpServletRequest()).thenReturn(servletRequest);
+        ServletRequest request = mock();
+        when(this.container.getRequest()).thenReturn(request);
+        HttpServletRequest servletRequest = mock();
+        when(request.getRequest()).thenReturn(servletRequest);
+        when(servletRequest.getScheme()).thenReturn("http");
         when(servletRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/xwiki/bin/register/"));
         when(this.wikiDescriptorManager.getAll()).thenReturn(Arrays.asList(wikiDescriptor1, wikiDescriptor2));
 

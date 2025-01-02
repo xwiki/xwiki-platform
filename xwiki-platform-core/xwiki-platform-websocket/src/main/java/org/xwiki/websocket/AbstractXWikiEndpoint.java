@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.websocket.CloseReason;
-import javax.websocket.EncodeException;
-import javax.websocket.Endpoint;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Session;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;

@@ -620,7 +620,6 @@
           <plugin>
             <groupId>org.codehaus.gmavenplus</groupId>
             <artifactId>gmavenplus-plugin</artifactId>
-            <version>4.0.1</version>
             <executions>
               <execution>
                 <id>set-system-properties-file</id>

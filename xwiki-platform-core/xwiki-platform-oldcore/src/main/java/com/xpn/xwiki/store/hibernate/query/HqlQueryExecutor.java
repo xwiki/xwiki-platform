@@ -104,6 +104,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private Logger logger;
 
+    // We don't need the content of safeNamedQueries to be thread safe since it's never modified after being initialized
+    // and the init is protected by a synchronized(). The volatile here is only used for the reference of that
+    // variable.
+    @SuppressWarnings("java:S3077")
     private volatile Set<String> safeNamedQueries;
 
     @Override

@@ -28,6 +28,7 @@
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
+  'id': 'document',
   'limit': 15,
   'root': '',
   'rootData': {},

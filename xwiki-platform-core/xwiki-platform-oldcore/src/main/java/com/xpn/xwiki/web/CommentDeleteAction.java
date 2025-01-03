@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
@@ -38,13 +39,29 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+
+/**
+ * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
+ * largely inspired by ObjectRemoveAction and Comment
+ *
+ * @version $Id$
+ * @since 17.0.0RC1
+ */
 @Component
-@Named("objectremove")
+@Named("commentdelete")
 @Singleton
-public class ObjectRemoveAction extends XWikiAction
+public class CommentDeleteAction extends XWikiAction
 {
     private static final String FAIL_MESSAGE = "failed";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectRemoveAction.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentDeleteAction.class);
+
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserResolver;
+
     @Override
     protected Class<? extends XWikiForm> getFormClass()
     {
@@ -58,21 +75,26 @@ public class ObjectRemoveAction extends XWikiAction
 
         String className = form.getClassName();
         int classId = form.getClassId();
+        String attributeName = "message";
         if (StringUtils.isBlank(className)) {
-            getCurrentScriptContext().setAttribute("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"),
+            getCurrentScriptContext().setAttribute(attributeName,
+                localizePlainOrReturnKey("platform.core.action.commentRemove.noClassnameSpecified"),
                 ScriptContext.ENGINE_SCOPE);
         } else if (classId < 0) {
-            getCurrentScriptContext().setAttribute("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"), ScriptContext.ENGINE_SCOPE);
+            getCurrentScriptContext().setAttribute(attributeName,
+                localizePlainOrReturnKey("platform.core.action.commentRemove.noCommentSpecified"),
+                ScriptContext.ENGINE_SCOPE);
         } else {
-            obj = doc.getObject(className, classId);
+            // Comment class reference
+            DocumentReference commentClass = new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE,
+                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+            obj = doc.getXObject(commentClass, classId);
             if (obj == null) {
-                getCurrentScriptContext().setAttribute("message",
-                    localizePlainOrKey("platform.core.action.objectRemove.invalidObject"), ScriptContext.ENGINE_SCOPE);
+                getCurrentScriptContext().setAttribute(attributeName,
+                    localizePlainOrReturnKey("platform.core.action.commentRemove.invalidComment"),
+                    ScriptContext.ENGINE_SCOPE);
             }
         }
-
         return obj;
     }
 
@@ -86,8 +108,8 @@ public class ObjectRemoveAction extends XWikiAction
 
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
-        DocumentReference userReference = context.getUserReference();
         XWikiDocument doc = context.getDoc();
+        DocumentReference userReference = context.getUserReference();
 
         // We need to clone this document first, since a cached storage would return the same object for the
         // following requests, so concurrent request might get a partially modified object, or worse, if an error
@@ -99,15 +121,16 @@ public class ObjectRemoveAction extends XWikiAction
             return true;
         }
 
-        doc.removeObject(obj);
-        doc.setAuthorReference(userReference);
+        doc.removeXObject(obj);
+        UserReference currentUserReference = this.currentUserResolver.resolve(CurrentUserReference.INSTANCE);
+        doc.getAuthors().setEffectiveMetadataAuthor(currentUserReference);
 
-        String comment = localizePlainOrKey("core.comment.deleteObject");
+        String changeComment = localizePlainOrReturnKey("core.comment.deleteComment");
 
         // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
+        context.getWiki().checkSavingDocument(userReference, doc, changeComment, true, context);
 
-        xwiki.saveDocument(doc, comment, true, context);
+        xwiki.saveDocument(doc, changeComment, true, context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);

@@ -154,8 +154,8 @@ public class XWikiDocumentArchive
         XWikiRCSNodeInfo latestNode = getLatestNode();
         if (latestNode != null) {
             int nodesCount = getNodes().size();
-            int nodesPerFull = context.getWiki() == null ? 5
-                : Integer.parseInt(context.getWiki().getConfig().getProperty("xwiki.store.rcs.nodesPerFull", "5"));
+            int nodesPerFull = context.getWiki() == null ? 1
+                : Integer.parseInt(context.getWiki().getConfig().getProperty("xwiki.store.rcs.nodesPerFull", "1"));
             if (nodesPerFull <= 0 || (nodesCount % nodesPerFull) != 0) {
                 XWikiRCSNodeContent latestContent = latestNode.getContent(context);
                 latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(), doc, context);

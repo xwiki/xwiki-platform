@@ -37,6 +37,9 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
+  <span id="xtree#if($!{macro.options.id})-$!{macro.options.id}#{end}-description" class="sr-only">
+    $services.localization.render('tree.macro.description')
+  </span>
 #end
 
 #macro (treeAttributes $options $isWikiSyntax)
@@ -62,7 +65,6 @@
     $entry.key = "$escapedValue"##
   #end
 #end
-
 #macro (getTreeAttributes $options $attributes)
   #set ($macro.options = {})
   #set ($discard = $macro.options.putAll($defaultTreeOptions))
@@ -70,6 +72,7 @@
   #if ($macro.options.id)
     #set ($discard = $attributes.put('id', $macro.options.id))
   #end
+  #set ($discard = $attributes.put('aria-describedby', "xtree#if($!{macro.options.id})-$!{macro.options.id}#{end}-description"))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

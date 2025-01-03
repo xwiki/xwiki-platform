@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 
@@ -52,12 +53,15 @@ class XWikiDocumentArchiveTest
 {
     private XWikiContext context;
 
+    private MemoryConfigurationSource xwikicfg;
+
     @BeforeEach
     void setUp(MockitoOldcore mockitoOldcore) throws Exception
     {
         this.context = mockitoOldcore.getXWikiContext();
+        this.xwikicfg = mockitoOldcore.registerMockXWikiCfg();
     }
-    
+
     /**
      * JRCS uses the user.name system property to set the author of a change. Verify that it
      * works if the user name has a space in its name. This used to fail and this test is here to
@@ -290,8 +294,59 @@ class XWikiDocumentArchiveTest
     }
 
     @Test
-    void getNextFullVersions() throws XWikiException
+    void getNextFullVersions(MockitoOldcore mockitoOldcore) throws XWikiException
     {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        // We have a full version every 5 nodes, so we're injecting 15 versions
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        doc.setContent("content 2.2\nqweq@ ");
+        archive.updateArchive(doc, author, new Date(), "2.2", new Version(2,2), context);
+
+        doc.setContent("content 2.3\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.3", new Version(2,3), context);
+
+        doc.setContent("content 2.4\nqweqe @@");
+        archive.updateArchive(doc, author, new Date(), "2.4", new Version(2,4), context);
+
+        // 5 nodes so far,
+        // let's add 5
+
+        for (int i = 1; i <= 5; i++) {
+            String version = String.format("3.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+
+        // let's add 7
+        for (int i = 1; i <= 7; i++) {
+            String version = String.format("4.%s", i);
+            doc.setContent(version + "\nqweqe @@");
+            archive.updateArchive(doc, author, new Date(), version, new Version(version), context);
+        }
+        assertEquals(new Version(4,7), archive.getLatestVersion());
+
+        assertEquals(new Version("2.3"), archive.getNextFullVersion(new Version("2.3")));
+        assertEquals(new Version("1.1"), archive.getNextFullVersion(new Version("1.1")));
+        assertEquals(new Version("2.1"), archive.getNextFullVersion(new Version("2.1")));
+        assertEquals(new Version("3.1"), archive.getNextFullVersion(new Version("3.1")));
+        assertEquals(new Version("4.6"), archive.getNextFullVersion(new Version("4.6")));
+        assertEquals(new Version("4.4"), archive.getNextFullVersion(new Version("4.4")));
+    }
+
+    @Test
+    void getNextFullVersionsWhenFullEvery5Versions(MockitoOldcore mockitoOldcore) throws XWikiException
+    {
+        // Change the configuration to create a full patch only every 5 versions
+        this.xwikicfg.setProperty("xwiki.store.rcs.nodesPerFull", 5);
+
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
@@ -369,6 +424,51 @@ class XWikiDocumentArchiveTest
     @Test
     void verifyDiffAndFullRevisionAlgorithm() throws Exception
     {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        addRevisionToHistory(archive, doc, "content 1.1", author, "1.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 2.1", author, "2.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 3.1", author, "3.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 4.1", author, "4.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 5.1", author, "5.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 6.1", author, "6.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(6, 1)).isDiff());
+    }
+
+    @Test
+    void verifyDiffAndFullRevisionAlgorithmWhenFullEvery5Versions() throws Exception
+    {
+        // Change the configuration to create a full patch only every 5 versions
+        this.xwikicfg.setProperty("xwiki.store.rcs.nodesPerFull", 5);
+
         XWikiDocument doc = new XWikiDocument(new DocumentReference("Test", "Test", "Test"));
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);

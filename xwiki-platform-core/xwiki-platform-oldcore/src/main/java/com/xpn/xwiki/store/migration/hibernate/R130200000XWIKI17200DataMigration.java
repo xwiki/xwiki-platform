@@ -173,13 +173,13 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
     private void deleteIndexIfExist(Class entityClass, String indexName, DatabaseMetaData databaseMetaData,
         StringBuilder builder) throws SQLException
     {
-        String databaseName = this.hibernateStore.getDatabaseFromWikiName();
+        String databaseName = this.hibernateStore.getAdapter().getDatabaseFromWikiName();
         PersistentClass persistentClass =
             this.hibernateStore.getConfigurationMetadata().getEntityBinding(entityClass.getName());
-        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+        String tableName = this.hibernateStore.getAdapter().getTableName(persistentClass);
 
         ResultSet resultSet;
-        if (this.hibernateStore.isCatalog()) {
+        if (this.hibernateStore.getAdapter().isCatalog()) {
             resultSet = databaseMetaData.getIndexInfo(databaseName, null, tableName, false, false);
         } else {
             resultSet = databaseMetaData.getIndexInfo(null, databaseName, tableName, false, false);
@@ -209,7 +209,7 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
 
         Property property = persistentClass.getProperty(propertyName);
 
-        String tableName = this.hibernateStore.getConfiguredTableName(persistentClass);
+        String tableName = this.hibernateStore.getAdapter().getTableName(persistentClass);
         String columnName = this.hibernateStore.getConfiguredColumnName(persistentClass, propertyName);
 
         try (ResultSet resultSet = getColumns(databaseMetaData, tableName, columnName)) {
@@ -264,12 +264,12 @@ public class R130200000XWIKI17200DataMigration extends AbstractHibernateDataMigr
     private ResultSet getColumns(DatabaseMetaData databaseMetaData, String tableName, String columnName)
         throws SQLException
     {
-        if (this.hibernateStore.isCatalog()) {
-            return databaseMetaData.getColumns(this.hibernateStore.getDatabaseFromWikiName(), null, tableName,
-                columnName);
+        if (this.hibernateStore.getAdapter().isCatalog()) {
+            return databaseMetaData.getColumns(this.hibernateStore.getAdapter().getDatabaseFromWikiName(), null,
+                tableName, columnName);
         } else {
-            return databaseMetaData.getColumns(null, this.hibernateStore.getDatabaseFromWikiName(), tableName,
-                columnName);
+            return databaseMetaData.getColumns(null, this.hibernateStore.getAdapter().getDatabaseFromWikiName(),
+                tableName, columnName);
         }
     }
 }

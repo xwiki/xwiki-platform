@@ -175,10 +175,10 @@
     #set ($parameters.attributes.data-upload-disabled = 'true')
   #end
   ## We use the velocity template context to convey the startupFocus parameter to CKEditor.
-  #if ($startupFocus)
+    #if ($wysiwygEditorConfig.startupFocus)
     #set ($parameters.attributes.data-startup-focus = 'true')
     ## We make sure to clear this context so that it doesn't interfere with CKEditors opened later.
-    #set ($startupFocus = false)
+    #set ($wysiwygEditorConfig.startupFocus = false)
   #end
   ##
   &lt;textarea

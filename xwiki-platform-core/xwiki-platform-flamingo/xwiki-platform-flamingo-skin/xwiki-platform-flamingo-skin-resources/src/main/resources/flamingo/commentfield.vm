@@ -73,7 +73,9 @@
 <label for="$name">$services.localization.render('core.viewers.comments.add.comment.label')</label>
 #initRequiredSkinExtensions()
 ## This startupFocus parameter is used by the CKEditor WYSIWYG editor.
-#set ($startupFocus = true)
+  #set ($wysiwygEditorConfig = {
+    'startupFocus': true
+  })
 ## display of the comment field
 $doc.displayEdit($fieldToDisplay, '', $commentObj)
 

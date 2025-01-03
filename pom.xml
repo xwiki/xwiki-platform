@@ -1179,6 +1179,17 @@
       <!-- Database connectors -->
       <!-- Exclude optional dependencies -->
       <dependency>
+        <groupId>${hsqldb.groupId}</groupId>
+        <artifactId>${hsqldb.artifactId}</artifactId>
+        <version>${hsqldb.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>${mysql.groupId}</groupId>
         <artifactId>${mysql.artifactId}</artifactId>
         <version>${mysql.version}</version>

@@ -67,32 +67,12 @@ notifications.filters.description.minorEventAlertNotificationFilter=隐藏有关
 notifications.filters.name.minorEventEmailNotificationFilter=小事件（电子邮件）
 notifications.filters.description.minorEventEmailNotificationFilter=隐藏有关页面上的微小更改的通知
 
-## Filter Types
-notifications.filters.type.inclusive=包括的
-notifications.filters.type.exclusive=独家
-
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=范围通知过滤器
 notifications.filters.preferences.scopeNotificationFilter.page=仅限页面
 notifications.filters.preferences.scopeNotificationFilter.space=页面和子项
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
-
-notifications.filters.preferences.allEvents=-
-
-notifications.filters.preferences.addPreference.filterType.inclusive=包含的
-notifications.filters.preferences.addPreference.filterType.exclusive=独占
-notifications.filters.preferences.addPreference.notificationFormat.label=通知格式
-notifications.filters.preferences.addPreference.notificationFormat.hint=该过滤器应采用哪种格式的通知？
-notifications.filters.preferences.addPreference.eventType.label=事件类型
-notifications.filters.preferences.addPreference.eventType.hint=过滤器应该针对哪种事件类型？
-notifications.filters.preferences.addPreference.location.label=过滤范围
-notifications.filters.preferences.addPreference.location.hint=过滤器应该针对哪个页面？
-notifications.filters.preferences.delete.inProgress=删除中...
-notifications.filters.preferences.delete.done=过滤器偏好已删除！
-notifications.filters.preferences.delete.error=删除过滤器偏好失败
-notifications.filters.preferences.setEnabled.inProgress=保存中...
-notifications.filters.preferences.setEnabled.done=过滤器偏好已保存！
-notifications.filters.preferences.setEnabled.error=保存过滤器偏好失败
+### Missing: notifications.filters.preferences.scopeNotificationFilter.user=User
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=如果您想监视这些位置，则需要在设置中启用通知
@@ -100,20 +80,50 @@ notifications.toggle.disabled.hint=如果您想监视这些位置，则需要在
 ## Notifications formats
 notifications.format.alert=警报
 notifications.format.email=邮件
+notifications.filters.preferences.delete.inProgress=删除中...
+notifications.filters.preferences.delete.done=过滤器偏好已删除！
+notifications.filters.preferences.delete.error=删除过滤器偏好失败
+notifications.filters.preferences.setEnabled.inProgress=保存中...
+notifications.filters.preferences.setEnabled.done=过滤器偏好已保存！
+notifications.filters.preferences.setEnabled.error=保存过滤器偏好失败
+notifications.filters.preferences.allEvents=-
 
-## Filter preferences settings
-notifications.settings.filters.preferences.title=过滤器
-notifications.settings.filters.preferences.hint=创建过滤器以更精确地控制活动事件何时应触发通知。
-notifications.settings.filters.preferences.forGuest=登录或注册以处理您的通知过滤器。
-
+## System Filter preferences settings
+notifications.settings.filters.preferences.system.title=系统过滤器
+notifications.settings.filters.preferences.system.hint=您可以开关系统过滤器来更细粒度地控制您想要接收的通知。
 ## Header definition for notification filter preferences
-notifications.settings.filters.preferences.table.name=名称
-notifications.settings.filters.preferences.table.filterType=过滤器类型
-notifications.settings.filters.preferences.table.eventTypes=事件
-notifications.settings.filters.preferences.table.notificationFormats=格式
-notifications.settings.filters.preferences.table.isEnabled=确定要启用？
-notifications.settings.filters.preferences.table._actions=操作
+### Missing: notifications.settings.filters.preferences.system.table.name=Name
+### Missing: notifications.settings.filters.preferences.system.table.filterDescription=Description
+### Missing: notifications.settings.filters.preferences.system.table.filterType=Description
+### Missing: notifications.settings.filters.preferences.system.table.notificationFormats=Formats
+### Missing: notifications.settings.filters.preferences.system.table.isEnabled=Is enabled?
 
+## Custom Filter preferences settings
+notifications.settings.filters.preferences.custom.title=自定义过滤器
+notifications.settings.filters.preferences.custom.hint=创建过滤器来控制您要接收的通知。
+## Header definition for notification filter preferences
+### Missing: notifications.settings.filters.preferences.custom.table.filterPreferenceId=Identifier
+### Missing: notifications.settings.filters.preferences.custom.table.scope=Scope
+### Missing: notifications.settings.filters.preferences.custom.table.location=Location
+### Missing: notifications.settings.filters.preferences.custom.table.filterType=Filter Action
+### Missing: notifications.settings.filters.preferences.custom.table.eventTypes=Events
+### Missing: notifications.settings.filters.preferences.custom.table.notificationFormats=Formats
+### Missing: notifications.settings.filters.preferences.custom.table.isEnabled=Is enabled?
+### Missing: notifications.settings.filters.preferences.custom.table._actions=Actions
+notifications.filters.type.custom.inclusive=为事件产生通知
+### Missing: notifications.filters.type.custom.exclusive=Ignore the event
+notifications.settings.addFilter=添加过滤器
+### Missing: notifications.settings.addFilter.hint=Create a filter for events happening on specific locations. The filter can trigger the sending of a notification or prevent one from being sent, depending on the event and the notification channel.
+### Missing: notifications.filters.preferences.custom.addFilter.location.label=Location
+### Missing: notifications.filters.preferences.custom.addFilter.location.hint=This filter applies on the events happening on the locations selected here. Select one or more locations.
+### Missing: notifications.filters.preferences.custom.addFilter.type.label=Action
+notifications.filters.preferences.custom.addFilter.type.hint=此过滤器可以通知或忽略所选 Location 上发生的事件。选择您要对事件采取的操作。
+notifications.filters.preferences.custom.addFilter.filterType.inclusive=为事件产生通知
+### Missing: notifications.filters.preferences.custom.addFilter.filterType.exclusive=Ignore the event
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.label=Channel
+### Missing: notifications.filters.preferences.custom.addFilter.notificationFormat.hint=This filter applies only to the notifications sent on the communication channels selected below. Choose one or more communication channels.
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.label=Events
+### Missing: notifications.filters.preferences.custom.addFilter.eventType.hint=This filter applies to the events selected here, in the locations selected above. Choose one or more events.
 notifications.menu.header=通知
 notifications.menu.header.settings=设置
 notifications.menu.clear=清空所有
@@ -135,7 +145,6 @@ notifications.settings.saving=您的设置正在保存中......
 notifications.settings.saved=已保存！
 notifications.settings.savingfailed=保存您的设置失败
 notifications.settings.filters=过滤器（{0}）
-notifications.settings.addFilter=添加过滤器
 notifications.settings.errorFilterWiki=错误：您必须选择Wiki，而不是页面
 notifications.settings.preferences=首选项
 notifications.settings.preferences.hint=捕获正在发生的事件并通过流或电子邮件将它们发送出去。
@@ -143,6 +152,7 @@ notifications.settings.applications.title=应用
 notifications.settings.applications.hint=这是可以发送通知的应用程序列表。您可以启用或禁用其中任何一个。
 notifications.settings.applications.forGuest=登录或注册以处理您的通知设置。
 notifications.settings.applications.appName=名称
+### Missing: notifications.settings.applications.table.dropdown.toggle.label=Toggle the details for notifications from the {0} application.
 notifications.settings.events=事件
 notifications.settings.watch.title=已监视页面
 notifications.settings.watch.autowatchmode=自动监视页面
@@ -182,6 +192,12 @@ XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=每次�
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=每次我做一个重大修改
 XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=只有当我创建一个新页面时
 
+## Common notification settings errors
+### Missing: notifications.settings.error.userReferenceNotSupported=The given user reference is not supported, only DocumentUserReference are supported for now.
+### Missing: notifications.settings.error.userReferenceAdminForbidden=You don't have administration right for the given user: {0}.
+### Missing: notifications.settings.error.badCSRF=Bad CSRF token.
+### Missing: notifications.settings.badParameters=Bad request parameters.
+
 ## User profile
 notifications.userprofile.following=已关注
 notifications.userprofile.notfollowing=未关注
@@ -196,7 +212,6 @@ rendering.macro.notificationsApplicationsPreferences.name=通知应用程序偏�
 rendering.macro.notificationsApplicationsPreferences.description=显示当前用户关于通知应用程序的偏好。
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=目标
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=宏的目标（可以是当前用户的“用户”或当前Wiki的“wiki”）
-
 rendering.macro.notificationsAutoWatchPreferences.name=通知自动监视偏好
 rendering.macro.notificationsAutoWatchPreferences.description=显示当前用户关于自动监视页面的偏好。
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=目标
@@ -212,5 +227,91 @@ notifications.switches.tooltip.page=监视该页面
 notifications.switches.tooltip.pageAndChildren=监视该页面及其所有子页面
 notifications.switches.tooltip.space=监视父页面及其所有子页面
 notifications.switches.tooltip.wiki=监视该Wiki
-notifications.switches.changeStatusError=无法更改通知的状态。</content>
+notifications.switches.changeStatusError=无法更改通知的状态。
+
+## Watch button and modal
+
+notifications.watch.button.title=此页面的通知设置：{0}- 单击以更改它
+notifications.watch.button.status.notset=没有设置
+notifications.watch.button.status.followed=已关注
+notifications.watch.button.status.blocked=已屏蔽
+notifications.watch.button.status.custom=自定义关注
+notifications.watch.modal.title=此页面的通知设置
+notifications.watch.modal.description.options=您可以使用以下选项更改通知设置: 
+notifications.watch.modal.description.ancestoroption=您可以转到 {0} 并在那里修改通知设置，也可以使用以下选项直接在当前页面上应用设置： 
+notifications.watch.modal.title.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=关注页面的通知设置
+notifications.watch.modal.description.WATCHED_FOR_ALL_EVENTS_AND_FORMATS=您正在关注此页面：您将收到它的通知。
+### Missing: notifications.watch.modal.title.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Followed page by parent watch settings
+### Missing: notifications.watch.modal.description.WATCHED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are following this page through a parent in the hierarchy: you will receive notifications for it.
+### Missing: notifications.watch.modal.title.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Followed page and children watch settings
+notifications.watch.modal.description.WATCHED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=您正在关注此页面及其子页面：您将收到它的通知。
+notifications.watch.modal.title.NOT_SET=未设置监视设置
+notifications.watch.modal.description.NOT_SET=您尚未配置监视此页面的任何设置，因此您没有关注此页面：您不会收到有关它的通知。
+### Missing: notifications.watch.modal.title.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=Blocked page watch settings
+notifications.watch.modal.description.BLOCKED_FOR_ALL_EVENTS_AND_FORMATS=您忽略此页面：您不会收到任何通知。
+### Missing: notifications.watch.modal.title.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=Blocked page by parent watch settings
+### Missing: notifications.watch.modal.description.BLOCKED_BY_ANCESTOR_FOR_ALL_EVENTS_AND_FORMATS=You are ignoring this page through a parent in the hierarchy: you won't receive any notifications for it.
+### Missing: notifications.watch.modal.title.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=Blocked page and children watch settings
+notifications.watch.modal.description.BLOCKED_WITH_CHILDREN_FOR_ALL_EVENTS_AND_FORMATS=您忽略了此页面及其子页面：您不会收到任何通知。
+notifications.watch.modal.title.CUSTOM=自定义监视设置
+notifications.watch.modal.description.CUSTOM=您正在使用此页面的自定义通知设置：您可能正在关注或阻止页面的特定事件，或者您可能仅针对通知的特定渠道。我们邀请您查看个人资料中的通知设置。
+notifications.watch.modal.option.watchpage.title=关注当前页面
+notifications.watch.modal.option.watchpage.hint=您将仅收到该页面的通知。
+notifications.watch.modal.option.watchspace.title=关注当前页面及其子页面
+notifications.watch.modal.option.watchspace.hint=您将收到该页面及其子页面的通知。
+notifications.watch.modal.option.watchwiki.title=关注整个维基
+notifications.watch.modal.option.watchwiki.hint=此选项不仅会影响当前页面或空间：您将收到 wiki 中任何页面的通知。
+notifications.watch.modal.option.blockpage.title=屏蔽当前页面
+notifications.watch.modal.option.blockpage.hint=您将仅屏蔽该页面的任何通知。
+notifications.watch.modal.option.blockspace.title=屏蔽当前页面及其子页面
+notifications.watch.modal.option.blockspace.hint=您将屏蔽该页面及其所有子页面的任何通知。
+notifications.watch.modal.option.unwatchpage.title=取消关注当前页面
+notifications.watch.modal.option.unwatchpage.hint=您将仅停止接收该页面的通知。
+notifications.watch.modal.option.unwatchspace.title=取消关注当前页面及其子页面
+notifications.watch.modal.option.unwatchspace.hint=您将停止接收有关该页面及其子页面的通知。
+notifications.watch.modal.option.unwatchwiki.title=取消关注整个维基
+notifications.watch.modal.option.unwatchwiki.hint=此选项不仅会影响当前页面或空间：您将停止接收维基中任何页面的通知。
+notifications.watch.modal.option.unblockpage.title=取消屏蔽当前页面
+notifications.watch.modal.option.unblockpage.hint=您将仅收到该页面的通知。
+notifications.watch.modal.option.unblockspace.title=取消屏蔽当前页面及其子页面
+notifications.watch.modal.option.unblockspace.hint=您将收到该页面及其子页面的通知。
+notifications.watch.modal.option.unblockwiki.title=取消屏蔽整个维基
+notifications.watch.modal.option.unblockwiki.hint=此选项不仅会影响当前页面或空间：您将停止忽略维基中任何页面的通知。
+notifications.watch.modal.close=关闭（不保存）
+notifications.watch.modal.savechanges=保存更改
+notifications.watch.modal.gotosettings=管理所有通知设置
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=过滤器
+notifications.settings.filters.preferences.hint=创建过滤器以更精确地控制活动事件何时应触发通知。
+notifications.settings.filters.preferences.forGuest=登录或注册以处理您的通知过滤器。
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=名称
+notifications.settings.filters.preferences.table.filterType=过滤器类型
+notifications.settings.filters.preferences.table.eventTypes=事件
+notifications.settings.filters.preferences.table.notificationFormats=格式
+notifications.settings.filters.preferences.table.isEnabled=确定要启用？
+notifications.settings.filters.preferences.table._actions=操作
+notifications.filters.preferences.addPreference.filterType.inclusive=包含的
+notifications.filters.preferences.addPreference.filterType.exclusive=独占
+notifications.filters.preferences.addPreference.notificationFormat.label=通知格式
+notifications.filters.preferences.addPreference.notificationFormat.hint=该过滤器应采用哪种格式的通知？
+notifications.filters.preferences.addPreference.eventType.label=事件类型
+notifications.filters.preferences.addPreference.eventType.hint=过滤器应该针对哪种事件类型？
+notifications.filters.preferences.addPreference.location.label=过滤范围
+notifications.filters.preferences.addPreference.location.hint=过滤器应该针对哪个页面？
+
+## Filter Types
+notifications.filters.type.inclusive=包括的
+notifications.filters.type.exclusive=独家
+
+## until 16.2.0RC1
+### Missing: notifications.settings.filters.preferences.custom.table.description=This table lists every custom filter registered for the given user or current wiki.
+### Missing: notifications.settings.filters.preferences.system.table.description=This table lists every system filter registered in the wiki.
+### Missing: notifications.settings.filters.preferences.custom.table.name=Location
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

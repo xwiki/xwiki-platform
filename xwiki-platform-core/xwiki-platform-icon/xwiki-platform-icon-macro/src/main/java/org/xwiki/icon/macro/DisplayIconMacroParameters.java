@@ -103,7 +103,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.10.0
+     * @since 16.10.3
      * @return the text alternative picked for the icon
      */
     @Unstable
@@ -113,7 +113,7 @@ public class DisplayIconMacroParameters
     }
 
     /**
-     * @since 16.10.0
+     * @since 16.10.3
      * @param textAlternative a text alternative for the icon
      */
     @PropertyName("Text Alternative")

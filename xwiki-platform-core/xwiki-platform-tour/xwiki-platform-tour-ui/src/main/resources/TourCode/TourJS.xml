@@ -428,7 +428,10 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
           createTour(tour);
         }
       }
+    }).fail(function (data) {
+      console.log("Querying the JSON for the Tour failed. %o", data);
     });
+    ;
   });
 });</code>
     </property>

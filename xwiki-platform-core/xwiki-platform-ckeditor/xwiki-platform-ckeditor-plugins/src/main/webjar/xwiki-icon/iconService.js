@@ -52,6 +52,7 @@ define('xwiki-iconService', [
       iconsPromise = iconsPromisesPerTheme[query] = $.getJSON(getResourceURL('data_icons', {
         iconTheme,
         query,
+        metadata: true
       }));
       iconsPromise.catch(() => {
         // Reset the promise so that we can try again later.

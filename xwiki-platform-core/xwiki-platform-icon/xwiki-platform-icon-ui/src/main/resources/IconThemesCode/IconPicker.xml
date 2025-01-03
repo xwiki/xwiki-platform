@@ -55,11 +55,14 @@
   #set ($iconNamePrefix = $request.query.toLowerCase())
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
-      #set ($discard = $icons.add({
+      #set ($icon = {
         'name': $xwikiIcon,
-        'render': $services.icon.renderHTML($xwikiIcon, $iconTheme),
-        'metadata': $services.icon.getMetaData($xwikiIcon, $iconTheme)
-      }))
+        'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
+      })
+      #if ($request.metadata == 'true')
+        #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
+      #end
+      #set ($discard = $icons.add($icon))
     #end
   #end
   #jsonResponse($icons)
@@ -233,24 +236,24 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   /**
    * Display the list of icons
    */
-  var displayList = function(iconTheme) {
+  var displayList = function(iconList) {
     // Filter the icons we display based on the value of the input field.
     let selectedIconName = '';
     if (currentInput.data('xwikiIconPickerSettings') !== '') {
       selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
     }
     // For each icon
-    for (var i=0; i &lt; iconTheme.length; ++i) {
+    iconList.forEach(icon => {
       // Display the icon
-      if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
+      if (selectedIconName === '' || icon.name.includes(selectedIconName)) {
         var displayer = $(document.createElement('div'));
         iconListSection.append(displayer);
         displayer.addClass('xwikiIconPickerIcon');
         var imageDiv = $(document.createElement('div'));
-        imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+        imageDiv.addClass('xwikiIconPickerIconImage').html(icon.render);
         displayer.append(imageDiv);
         var iconNameSpan = $(document.createElement('span'));
-        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        iconNameSpan.addClass('xwikiIconPickerIconName').text(icon.name);
         displayer.append(iconNameSpan);
         // Change the input value when the icon is clicked
         displayer.on('click', function(event) {

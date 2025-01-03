@@ -618,6 +618,11 @@
       <code>.xdocLastModification,
 #hierarchy.breadcrumb {
   display: none;
+}
+
+/* Needed to avoid an overflow of the input with a long filename in Firefox zoomed above 100 percent.*/
+#officeImportForm #filePath {
+  max-width: 100%;
 }</code>
     </property>
     <property>

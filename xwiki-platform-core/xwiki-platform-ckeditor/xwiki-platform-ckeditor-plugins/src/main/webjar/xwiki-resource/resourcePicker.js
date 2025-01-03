@@ -19,7 +19,8 @@
  */
 define('resourcePickerTranslationKeys', [], [
   'attach.hint',
-  'doc.hint'
+  'doc.hint',
+  'dropdown.toggle.title'
 ]);
 
 define('resourcePicker', [
@@ -35,7 +36,8 @@ define('resourcePicker', [
           '<button type="button" class="resourceType btn btn-default">' +
             '<span class="icon">' +
           '</button>' +
-          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
+    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
+    '<span class="sr-only"></span>' +
             '<span class="caret"></span>' +
           '</button>' +
           '<ul class="resourceTypes dropdown-menu dropdown-menu-right"></ul>' +
@@ -48,6 +50,8 @@ define('resourcePicker', [
     options = options || {};
 
     var resourcePicker = $(resourcePickerTemplate);
+    resourcePicker.find('button.dropdown-toggle').first().attr('title', translations.get('dropdown.toggle.title'));
+    resourcePicker.find('button.dropdown-toggle .sr-only').first().text(translations.get('dropdown.toggle.title'));
     resourcePicker.data("options", options);
     element.on('selectResource', onSelectResource).hide().after(resourcePicker);
 

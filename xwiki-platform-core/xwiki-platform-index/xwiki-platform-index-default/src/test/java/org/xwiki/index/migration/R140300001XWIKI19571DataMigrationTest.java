@@ -45,6 +45,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.doc.tasks.XWikiDocumentIndexingTask;
 import org.xwiki.index.internal.TasksStore;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -103,6 +104,9 @@ class R140300001XWIKI19571DataMigrationTest
     private Metadata metadata;
 
     @Mock
+    private HibernateAdapter adapter;
+
+    @Mock
     private PersistentClass persistentClass;
 
     @Mock
@@ -128,8 +132,10 @@ class R140300001XWIKI19571DataMigrationTest
         when(this.hibernateStore.getConfigurationMetadata()).thenReturn(this.metadata);
         when(this.metadata.getEntityBinding(XWikiDocumentIndexingTask.class.getName()))
             .thenReturn(this.persistentClass);
-        when(this.hibernateStore.getConfiguredTableName(this.persistentClass)).thenReturn("XWIKIDOCUMENTINDEXINGQUEUE");
-        when(this.hibernateStore.getDatabaseFromWikiName()).thenReturn("dbname");
+        when(this.adapter).thenReturn(this.adapter);
+        when(this.adapter.getTableName(this.persistentClass))
+            .thenReturn("XWIKIDOCUMENTINDEXINGQUEUE");
+        when(this.adapter.getDatabaseFromWikiName()).thenReturn("dbname");
         when(this.connection.getMetaData()).thenReturn(this.databaseMetaData);
         when(this.hibernateStore.getConfiguredColumnName(this.persistentClass, "docId")).thenReturn("DOC_ID");
         when(this.hibernateStore.getConfiguredColumnName(this.persistentClass, "version")).thenReturn("VERSION");

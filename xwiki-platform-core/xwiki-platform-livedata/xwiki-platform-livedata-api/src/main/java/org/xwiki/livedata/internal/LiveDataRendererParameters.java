@@ -292,7 +292,7 @@ public class LiveDataRendererParameters
      * @param showPaginationOnSinglePage {@code true} to always show the page list, 
      * {@code false} only show it when there's multiple pages;
      * leave {@code null} to inherit from the default configuration
-     * @since 16.10.0RC1
+     * @since 16.10.3
      */
     public void setShowPaginationOnSinglePage(Boolean showPaginationOnSinglePage)
     {

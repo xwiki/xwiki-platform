@@ -1,5 +1,29 @@
 # @xwiki/cristal-attachments-ui
 
+## 0.13.0
+
+### Minor Changes
+
+- 06a5d1b: Cristal 0.13 Release
+
+### Patch Changes
+
+- Updated dependencies [06a5d1b]
+  - @xwiki/cristal-api@0.13.0
+  - @xwiki/cristal-alerts-api@0.13.0
+  - @xwiki/cristal-attachments-api@0.13.0
+  - @xwiki/cristal-date-ui@0.13.0
+  - @xwiki/cristal-document-api@0.13.0
+  - @xwiki/cristal-extra-tabs-api@0.13.0
+  - @xwiki/cristal-file-preview-ui@0.13.0
+  - @xwiki/cristal-info-actions-api@0.13.0
+  - @xwiki/cristal-model-api@0.13.0
+  - @xwiki/cristal-model-click-listener@0.13.0
+  - @xwiki/cristal-model-reference-api@0.13.0
+  - @xwiki/cristal-uiextension-api@0.13.0
+  - @xwiki/cristal-user-ui@0.13.0
+  - @xwiki/cristal-dsapi@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

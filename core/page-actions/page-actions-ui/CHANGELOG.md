@@ -1,5 +1,22 @@
 # @xwiki/cristal-page-actions-ui
 
+## 0.13.0
+
+### Minor Changes
+
+- 06a5d1b: Cristal 0.13 Release
+
+### Patch Changes
+
+- Updated dependencies [06a5d1b]
+  - @xwiki/cristal-api@0.13.0
+  - @xwiki/cristal-alerts-api@0.13.0
+  - @xwiki/cristal-backend-api@0.13.0
+  - @xwiki/cristal-document-api@0.13.0
+  - @xwiki/cristal-hierarchy-api@0.13.0
+  - @xwiki/cristal-icons@0.13.0
+  - @xwiki/cristal-page-actions-api@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

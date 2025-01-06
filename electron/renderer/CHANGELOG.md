@@ -1,5 +1,24 @@
 # @xwiki/cristal-electron-renderer
 
+## 0.13.0
+
+### Minor Changes
+
+- 06a5d1b: Cristal 0.13 Release
+
+### Patch Changes
+
+- Updated dependencies [06a5d1b]
+  - @xwiki/cristal-hierarchy-filesystem@0.13.0
+  - @xwiki/cristal-model-reference-filesystem@0.13.0
+  - @xwiki/cristal-model-remote-url-filesystem-default@0.13.0
+  - @xwiki/cristal-navigation-tree-filesystem@0.13.0
+  - @xwiki/cristal-electron-authentication-xwiki-renderer@0.13.0
+  - @xwiki/cristal-browser-electron@0.13.0
+  - @xwiki/cristal-link-suggest-filesystem@0.13.0
+  - @xwiki/cristal-electron-storage@0.13.0
+  - @xwiki/cristal-lib@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

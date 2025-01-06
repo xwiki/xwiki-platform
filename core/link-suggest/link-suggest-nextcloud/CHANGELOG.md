@@ -1,5 +1,18 @@
 # @xwiki/cristal-link-suggest-nextcloud
 
+## 0.13.0
+
+### Minor Changes
+
+- 06a5d1b: Cristal 0.13 Release
+
+### Patch Changes
+
+- Updated dependencies [06a5d1b]
+  - @xwiki/cristal-api@0.13.0
+  - @xwiki/cristal-authentication-nextcloud@0.13.0
+  - @xwiki/cristal-link-suggest-api@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

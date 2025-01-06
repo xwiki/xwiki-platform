@@ -1,5 +1,22 @@
 # @xwiki/cristal-web
 
+## 0.13.0
+
+### Minor Changes
+
+- 06a5d1b: Cristal 0.13 Release
+
+### Patch Changes
+
+- Updated dependencies [06a5d1b]
+  - @xwiki/cristal-authentication-xwiki@0.13.0
+  - @xwiki/cristal-browser-default@0.13.0
+  - @xwiki/cristal-navigation-tree-default@0.13.0
+  - @xwiki/cristal-navigation-tree-github@0.13.0
+  - @xwiki/cristal-navigation-tree-nextcloud@0.13.0
+  - @xwiki/cristal-navigation-tree-xwiki@0.13.0
+  - @xwiki/cristal-lib@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

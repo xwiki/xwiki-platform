@@ -150,7 +150,7 @@ function onClickOutsideMainSidebar() {
           onCloseMainSidebar();
         "
       ></c-icon>
-      <x-img class="logo" :src="logo" :width="72" />
+      <x-img class="logo" :src="logo" :width="72" :height="22" />
       <suspense>
         <u-i-extensions uix-name="sidebar.actions"></u-i-extensions>
       </suspense>

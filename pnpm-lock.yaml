@@ -3435,8 +3435,8 @@ importers:
         specifier: workspace:*
         version: link:../dev/test-utils
       ts-essentials:
-        specifier: 10.0.3
-        version: 10.0.3(typescript@5.6.3)
+        specifier: 10.0.4
+        version: 10.0.4(typescript@5.6.3)
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -8294,6 +8294,14 @@ packages:
 
   ts-essentials@10.0.3:
     resolution: {integrity: sha512-/FrVAZ76JLTWxJOERk04fm8hYENDo0PWSP3YLQKxevLwWtxemGcl5JJEzN4iqfDlRve0ckyfFaOBu4xbNH/wZw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  ts-essentials@10.0.4:
+    resolution: {integrity: sha512-lwYdz28+S4nicm+jFi6V58LaAIpxzhg9rLdgNC1VsdP/xiFBseGhF1M/shwCk6zMmwahBZdXcl34LVHrEang3A==}
     peerDependencies:
       typescript: '>=4.5.0'
     peerDependenciesMeta:
@@ -14140,6 +14148,10 @@ snapshots:
       typescript: 5.6.3
 
   ts-essentials@10.0.3(typescript@5.6.3):
+    optionalDependencies:
+      typescript: 5.6.3
+
+  ts-essentials@10.0.4(typescript@5.6.3):
     optionalDependencies:
       typescript: 5.6.3
 

@@ -71,7 +71,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.13",
+    "@types/lodash": "4.17.14",
     "@types/markdown-it": "14.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",

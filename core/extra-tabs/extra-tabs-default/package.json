@@ -31,7 +31,7 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.13",
+    "@types/lodash": "4.17.14",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.6.3",

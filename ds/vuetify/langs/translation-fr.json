@@ -1,1 +1,4 @@
-{}
+{
+    "vuetify.file.input.mandatory": "Champ obligatoire",
+    "vuetify.text.input.mandatory": "Champ obligatoire"
+}

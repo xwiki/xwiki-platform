@@ -3,7 +3,7 @@ org.xwiki.security.authorization.cache.internal.DefaultSecurityCache
 org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoader
 org.xwiki.security.authorization.internal.AuthorizationSettlerProvider
 org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker
-org.xwiki.security.authorization.DefaultAuthorizationManager
+org.xwiki.security.internal.authorization.DefaultAuthorizationManager
 org.xwiki.security.authorization.internal.DefaultAuthorizationManagerConfiguration
 org.xwiki.security.authorization.internal.DefaultAuthorizationSettler
 org.xwiki.security.authorization.internal.PrioritizingAuthorizationSettler

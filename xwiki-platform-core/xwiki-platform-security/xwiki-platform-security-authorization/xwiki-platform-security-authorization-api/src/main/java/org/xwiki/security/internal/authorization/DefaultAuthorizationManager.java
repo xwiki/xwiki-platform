@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.internal.authorization;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -37,6 +37,16 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.security.authorization.RightDescription;
+import org.xwiki.security.authorization.RuleState;
+import org.xwiki.security.authorization.SecurityAccess;
+import org.xwiki.security.authorization.SecurityAccessEntry;
+import org.xwiki.security.authorization.SecurityRuleEntry;
+import org.xwiki.security.authorization.UnableToRegisterRightException;
 import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheLoader;
 import org.xwiki.security.authorization.internal.DocumentRequiredRightsChecker;

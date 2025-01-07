@@ -27,7 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.internal.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**

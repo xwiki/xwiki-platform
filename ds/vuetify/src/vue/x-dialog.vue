@@ -18,16 +18,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import { useSlots } from "vue";
-
 defineProps<{
   title: string;
   width: string | number | undefined;
 }>();
-
-const slots = useSlots();
-
-// const innerIsActive = ref(props.isActive);
 </script>
 
 <template>
@@ -42,7 +36,7 @@ const slots = useSlots();
         <v-card-text>
           <slot name="default" />
         </v-card-text>
-        <v-card-actions v-if="slots.footer">
+        <v-card-actions v-if="$slots.footer">
           <slot name="footer" />
         </v-card-actions>
       </v-card>

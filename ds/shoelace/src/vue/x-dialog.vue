@@ -19,7 +19,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/dialog/dialog";
-import { useSlots, useTemplateRef } from "vue";
+import { useTemplateRef } from "vue";
 import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog";
 
 defineProps<{
@@ -28,7 +28,6 @@ defineProps<{
 }>();
 
 const dialog = useTemplateRef<SlDialog>("dialog");
-const slots = useSlots();
 
 function click() {
   open.value = true;
@@ -53,7 +52,7 @@ const open = defineModel<boolean>();
          requires the (now deprecated) slot attribute. As such, we define a
          conditional wrapper that will be bound to the sl-dialog component,
          and will hold the contents of our own footer slot (if any). -->
-    <div v-if="slots.footer" slot="footer">
+    <div v-if="$slots.footer" slot="footer">
       <slot name="footer" />
     </div>
   </sl-dialog>

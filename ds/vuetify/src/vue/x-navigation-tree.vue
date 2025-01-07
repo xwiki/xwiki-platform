@@ -61,7 +61,6 @@ const treeSource: NavigationTreeSource = cristal
   .get();
 
 const rootNodes: Ref<Array<TreeItem>> = ref([]);
-const tree: Ref<VTreeview | undefined> = ref(undefined);
 
 const activatedNodes: Ref<Array<string>> = ref(new Array<string>());
 const expandedNodes: Ref<Array<string>> = ref(new Array<string>());
@@ -242,7 +241,6 @@ async function onDocumentUpdate(page: PageData) {
 
 <template>
   <v-treeview
-    ref="tree"
     v-model:opened="expandedNodes"
     density="compact"
     :activated="activatedNodes"

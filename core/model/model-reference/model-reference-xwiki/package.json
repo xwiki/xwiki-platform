@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/lodash": "4.17.14",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "vite": "6.0.7",
     "vitest": "2.1.8",
     "vitest-mock-extended": "2.0.2",

@@ -20,7 +20,6 @@
 
 import { defineConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
-import Inspect from "vite-plugin-inspect";
 import dts from "vite-plugin-dts";
 import vuetify from "vite-plugin-vuetify";
 
@@ -46,12 +45,7 @@ export default defineConfig({
     vuetify(),
     dts({
       insertTypesEntry: true,
-    }),
-    // https://github.com/antfu/vite-plugin-inspect
-    Inspect({
-      // change this to enable inspect for debugging
-      enabled: true,
-    }),
+    })
   ],
   optimizeDeps: {
     esbuildOptions: {

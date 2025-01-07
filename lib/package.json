@@ -94,7 +94,7 @@
     "@xwiki/cristal-dev-config": "workspace:*",
     "typescript": "5.6.3",
     "vite": "6.0.7",
-    "vue-tsc": "2.1.10"
+    "vue-tsc": "2.2.0"
   },
   "publishConfig": {
     "exports": {

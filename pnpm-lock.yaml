@@ -2115,8 +2115,8 @@ importers:
         specifier: 10.0.5
         version: 10.0.5(vue@3.5.13(typescript@5.6.3))
       vue-tippy:
-        specifier: 6.5.0
-        version: 6.5.0(vue@3.5.13(typescript@5.6.3))
+        specifier: 6.6.0
+        version: 6.6.0(vue@3.5.13(typescript@5.6.3))
       vue3-draggable-resizable:
         specifier: 1.6.5
         version: 1.6.5
@@ -8658,8 +8658,8 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  vue-tippy@6.5.0:
-    resolution: {integrity: sha512-U44UDETTLuZWZGosagslEwgimWQdt1JVSxfWStVPnVdeqo2jo9X5zW3SB04k7JaTFosdgrDhFsUDrd6n42Nh7Q==}
+  vue-tippy@6.6.0:
+    resolution: {integrity: sha512-ISRIUQDlcEP05K1nCbvlVcd8yuWS6S3dI91qD0A2slgtwwWjih8Fn9Aymq4SNaHQsdiP5+MLRPZVDxFjKMPgKA==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -14502,7 +14502,7 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.6.3)
 
-  vue-tippy@6.5.0(vue@3.5.13(typescript@5.6.3)):
+  vue-tippy@6.6.0(vue@3.5.13(typescript@5.6.3)):
     dependencies:
       tippy.js: 6.3.7
       vue: 3.5.13(typescript@5.6.3)

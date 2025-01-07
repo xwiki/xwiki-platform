@@ -37,7 +37,7 @@
     "lodash": "4.17.21",
     "prosemirror-markdown": "1.13.1",
     "vue-i18n": "10.0.5",
-    "vue-tippy": "6.5.0",
+    "vue-tippy": "6.6.0",
     "vue3-draggable-resizable": "1.6.5"
   },
   "peerDependencies": {

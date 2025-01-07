@@ -72,6 +72,7 @@ import org.xwiki.security.authorization.testwikis.TestUserDocument;
 import org.xwiki.security.authorization.testwikis.TestWiki;
 import org.xwiki.security.internal.UserBridge;
 import org.xwiki.security.internal.XWikiBridge;
+import org.xwiki.security.internal.authorization.DefaultAuthorizationManager;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;

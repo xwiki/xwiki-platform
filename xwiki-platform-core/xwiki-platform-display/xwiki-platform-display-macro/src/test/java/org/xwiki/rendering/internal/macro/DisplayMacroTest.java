@@ -66,7 +66,7 @@ import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.internal.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;

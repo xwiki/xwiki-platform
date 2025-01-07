@@ -21,7 +21,7 @@
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "electron": "33.3.0"
+    "electron": "33.3.1"
   },
   "devDependencies": {
     "@types/node": "22.10.5",

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.VelocityMacros" locale="">
+<xwikidoc version="1.6" reference="CKEditor.VelocityMacros" locale="">
   <web>CKEditor</web>
   <name>VelocityMacros</name>
   <language/>
@@ -72,11 +72,6 @@
     #end
   #else
     #set ($output = $services.wysiwyg.fromAnnotatedXHTML($text, $sourceSyntax.toIdString()))
-    #if ("$!output" == '' &amp;&amp; $output != '')
-      ## $output is null, probably because $services.wysiwyg.fromAnnotatedXHTML() is not available (before 10.10RC1)
-      #set ($xdom = $services.rendering.parse($text, 'xhtml/1.0'))
-      #set ($output = $services.rendering.render($xdom, $sourceSyntax.toIdString()))
-    #end
   #end
   #if ("$!output" != '' || $output == '')
     $output##
@@ -89,19 +84,6 @@
 #macro (ckeditor_renderContentSheet $source)
   ## The $source variable is used inside the content sheet.
   #set ($output = $services.wysiwyg.render('CKEditor.ContentSheet'))
-  #if ("$!output" == '' &amp;&amp; $output != '')
-    ## $output is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
-    #set ($output = $xwiki.getDocument('CKEditor.ContentSheet').getRenderedContent())
-    #set ($skinExtensionHooks = {
-      'ssx': 'CssSkinExtensionPlugin',
-      'ssfx': 'CssSkinFileExtensionPlugin',
-      'ssrx': 'CssResourceSkinExtensionPlugin'
-    })
-    #foreach ($entry in $skinExtensionHooks.entrySet())
-      #set ($output = $output.replace("&lt;!-- com.xpn.xwiki.plugin.skinx.$entry.value --&gt;",
-        $xwiki.get($entry.key).importString))
-    #end
-  #end
   ## Unescape {{ which happened in CKEditor.ContentSheet for protecting the {{html}} macro.
   $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
 #end
@@ -110,25 +92,11 @@
   ## Make sure the edited content is rendered for view because this is a WYSIWYG editor.
   #set ($macro.previousDisplayMode = $xcontext.displayMode)
   #set ($discard = $xcontext.setDisplayMode('view'))
-  #if ($xcontext.displayMode != 'view')
-    ## Before XWiki 14.0-rc-1, 13.4.7, 13.10.3 and 12.10.12 there's no API to get the current display mode so we can't
-    ## restore the previous display mode properly. We assume the previous display mode is 'edit' because the WYSIWYG
-    ## editor is used.
-    #set ($macro.previousDisplayMode = 'edit')
-  #end
   #set ($restricted = "$!source.restricted" == 'true')
   #if ($source.html)
     #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference, $restricted))
-    #if ("$!html" == '' &amp;&amp; $html != '')
-      ## Before XWiki 11.9RC1 (see XWIKI-16737)
-      #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
-    #end
   #else
     #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference, $restricted))
-    #if ("$!html" == '' &amp;&amp; $html != '')
-      ## Before XWiki 11.9RC1 (see XWIKI-16737)
-      #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
-    #end
   #end
   #if ("$!html" == '')
     ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
@@ -263,10 +231,6 @@
 
 #macro (ckeditor_initRequiredSkinExtensions)
   #set ($requiredSkinExtensions = $collectiontool.orderedMap)
-  #if ("$!requiredSkinExtensions" == '')
-    ## For XWiki versions older than 12.1RC1 fallback on the old $collectionstool (available since 4.0M1).
-    #set ($requiredSkinExtensions = $collectionstool.orderedMap)
-  #end
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
   ## (they are aready available on the edit page so there's no need to load them).
   #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
@@ -281,21 +245,5 @@
     $!stringtool.removeStart($importString, $entry.value).trim()##
   #end
 #end
-
-#macro (ckeditor_defineSortTool $sortToolVariable)
-  #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
-  ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
-  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
-    #setVariable ($sortToolVariable, $collectiontool)
-  ## With the upgrade of Velocity $sorttool has been replaced by $collectionstool (XCOMMONS-1296)
-  #elseif ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.0-SNAPSHOT") &gt;= 0)
-    #setVariable ($sortToolVariable, $collectionstool)
-  ## Old API for sorting was $sorttool
-  #else
-    #setVariable ($sortToolVariable, $sorttool)
-  #end
-#end
-
-#ckeditor_defineSortTool("$resolvedSortTool")
 {{/velocity}}</content>
 </xwikidoc>

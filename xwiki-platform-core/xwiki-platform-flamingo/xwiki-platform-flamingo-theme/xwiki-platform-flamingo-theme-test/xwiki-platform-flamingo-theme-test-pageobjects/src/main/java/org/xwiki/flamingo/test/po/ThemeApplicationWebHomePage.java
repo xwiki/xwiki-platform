@@ -35,7 +35,7 @@ public class ThemeApplicationWebHomePage extends ViewPage
     @FindBy(id = "newThemeName")
     private WebElement newThemeNameInput;
 
-    @FindBy(xpath = "//div[@class='theme-creation-form']//input[@type='submit']")
+    @FindBy(xpath = "//form[contains(@class, 'theme-creation-form')]//input[@type='submit']")
     private WebElement createNewThemeButton;
 
     public static ThemeApplicationWebHomePage gotoPage()

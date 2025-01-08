@@ -78,7 +78,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private int refreshPeriod;
 
-    private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
+    private Map<String, UpdateThread> updateThreads = new HashMap<>();
 
     private Converter syntaxConverter;
 
@@ -426,7 +426,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
     }
 
-    public void stopUpdateFeedsInSpace(String space, XWikiContext context) throws XWikiException
+    public void stopUpdateFeedsInSpace(String space, XWikiContext context)
     {
         UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread != null) {
@@ -494,7 +494,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             @SuppressWarnings("unchecked")
             Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
             if (map == null) {
-                map = new HashMap<String, Exception>();
+                map = new HashMap<>();
                 context.put("updateFeedError", map);
             }
             map.put(feedurl, e);
@@ -657,7 +657,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     private void saveEntry(String feedname, String feedurl, SyndEntry entry, XWikiDocument doc, BaseObject obj,
-        boolean fullContent, XWikiContext context) throws XWikiException
+        boolean fullContent, XWikiContext context)
     {
         obj.setStringValue("feedname", feedname);
         obj.setStringValue("title", entry.getTitle());
@@ -879,7 +879,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(context);
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        List<SyndEntry> entries = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             SyndEntry entry = getFeedEntry(context);
             try {
@@ -899,8 +899,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source,
         Map<String, Object> sourceParams, XWikiContext context) throws XWikiException
     {
-        List<Object> entries = new ArrayList<Object>();
-        entries.addAll(context.getWiki().getStore().searchDocumentsNames(query, count, start, context));
+        List<Object> entries =
+            new ArrayList<>(context.getWiki().getStore().searchDocumentsNames(query, count, start, context));
         return getFeed(entries, source, sourceParams, context);
     }
 

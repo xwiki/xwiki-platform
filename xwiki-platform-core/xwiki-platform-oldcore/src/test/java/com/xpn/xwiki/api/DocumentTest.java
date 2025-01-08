@@ -20,7 +20,6 @@
 package com.xpn.xwiki.api;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -46,12 +45,10 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
-import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.user.CurrentUserReference;
@@ -110,29 +107,12 @@ class DocumentTest
     @MockComponent
     private ContextualLocalizationManager contextualLocalizationManager;
 
-    @MockComponent
-    private DocumentRequiredRightsManager documentRequiredRightsManager;
-
-    @InjectMockComponents
-    private DocumentRequiredRightsReader documentRequiredRightsReader;
-
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @BeforeEach
     void setUp() throws AuthorizationException, ComponentLookupException
     {
-        when(this.documentRequiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
-        {
-            DocumentReference reference = invocationOnMock.getArgument(0);
-            XWikiDocument document =
-                this.oldcore.getSpyXWiki().getDocument(reference.withoutLocale(), this.oldcore.getXWikiContext());
-            if (document.isNew()) {
-                return Optional.empty();
-            }
-            return Optional.of(this.documentRequiredRightsReader.readRequiredRights(document));
-        });
-
         this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
 
         DefaultParameterizedType currentUserReferenceResolverType =

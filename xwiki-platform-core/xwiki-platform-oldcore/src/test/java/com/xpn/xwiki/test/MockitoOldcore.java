@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
@@ -59,6 +60,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -78,6 +80,7 @@ import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.DocumentAuthorizationManager;
+import org.xwiki.security.authorization.requiredrights.DocumentRequiredRightsManager;
 import org.xwiki.test.TestEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.internal.MockConfigurationSource;
@@ -1081,6 +1084,29 @@ public class MockitoOldcore
 
                     return spyXWiki.exists(documentReference, context);
                 }
+            });
+        }
+
+        // Add a DocumentRequiredRightsManager if we have a DocumentRequiredRightsReader as the former isn't easily
+        // available in a mocked setup while the latter can be loaded without problems.
+        if (!this.componentManager.hasComponent(DocumentRequiredRightsManager.class)
+            && this.componentManager.hasComponent(DocumentRequiredRightsReader.class)) {
+            DocumentRequiredRightsManager requiredRightsManager =
+                this.componentManager.registerMockComponent(DocumentRequiredRightsManager.class);
+            DocumentRequiredRightsReader documentRequiredRightsReader =
+                this.componentManager.getInstance(DocumentRequiredRightsReader.class);
+
+            when(requiredRightsManager.getRequiredRights(any())).then(invocationOnMock ->
+            {
+                DocumentReference reference = invocationOnMock.getArgument(0);
+                if (reference != null) {
+                    XWikiDocument document = getSpyXWiki().getDocument(reference.withoutLocale(), getXWikiContext());
+                    if (!document.isNew()) {
+                        return Optional.of(documentRequiredRightsReader.readRequiredRights(document));
+                    }
+                }
+
+                return Optional.empty();
             });
         }
 

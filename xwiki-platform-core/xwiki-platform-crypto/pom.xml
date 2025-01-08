@@ -28,11 +28,13 @@
     <version>17.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-crypto</artifactId>
-  <name>XWiki Platform - Cryptographic Services</name>
+  <name>XWiki Platform - Cryptographic Services - Parent POM</name>
   <description>XWiki Platform - Cryptographic Services</description>
   <packaging>pom</packaging>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-crypto-script</module>
     <module>xwiki-platform-crypto-store</module>
+    <module>xwiki-platform-crypto-ui</module>
   </modules>
 </project>

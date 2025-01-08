@@ -101,7 +101,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
-
+    
     /**
      * @return a merge manager instance.
      * @since 11.8RC1

@@ -213,19 +213,11 @@ define('xwiki-selectize', [
       return result;
     }
     let oldSetActiveOption = this.selectize.setActiveOption;
-    this.selectize.setActiveOption = function(option, scroll, animate) {
-      if (this.liveRegion) {
-        if (option instanceof jQuery) {
-          this.liveRegion.text(option.text());
-        } else if (option instanceof HTMLElement) {
-          this.liveRegion.text(option.innerText);
-        } else {
-          this.liveRegion.text("");
-        }
-      }
-      oldSetActiveOption.call(this, option, scroll, animate);
+    this.selectize.setActiveOption = function(option, ...args) {
+      this.liveRegion?.text($(option).text());
+      oldSetActiveOption.call(this, option, ...args);
     }
-    /* Create a live region to store the value of the currently active option.*/
+    // Create a live region to store the value of the currently active option.
     this.selectize.liveRegion = $('<span>');
     this.selectize.liveRegion.attr('aria-live', 'assertive');
     this.selectize.liveRegion.addClass('sr-only');

@@ -44,7 +44,7 @@
     "@types/node": "22.10.5",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.7.2",
+    "typescript": "5.7.3",
     "vite": "6.0.7",
     "vite-plugin-node": "4.0.0"
   },

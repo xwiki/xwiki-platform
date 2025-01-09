@@ -49,6 +49,9 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
 
+    <!-- GitHub related metadata -->
+    <xwiki.github.repository>xwiki-platform</xwiki.github.repository>
+
     <!-- Dependencies versions -->
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.17</batik.version>
@@ -121,10 +124,7 @@
     <oracle.version>21.16.0.0</oracle.version>
   </properties>
   <scm>
-    <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki/xwiki-platform.git</developerConnection>
-    <url>https://github.com/xwiki/xwiki-platform/tree/master/</url>
-    <tag>stable-15.10.x</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>

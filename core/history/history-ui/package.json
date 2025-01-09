@@ -26,7 +26,6 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
     "@xwiki/cristal-history-api": "workspace:*",
     "@xwiki/cristal-user-ui": "workspace:*",
@@ -40,6 +39,7 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.2",
     "vite": "6.0.7",

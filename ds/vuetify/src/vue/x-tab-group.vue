@@ -21,11 +21,11 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import { ref } from "vue";
 const tab = ref(null);
 
-const emits = defineEmits(["change"]);
+const emits = defineEmits(["tab-change"]);
 
 function change(tabId: unknown) {
   if (typeof tabId == "string") {
-    emits("change", tabId);
+    emits("tab-change", tabId);
   }
 }
 </script>

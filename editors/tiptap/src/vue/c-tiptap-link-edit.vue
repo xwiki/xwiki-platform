@@ -188,7 +188,6 @@ const { up, down, enter } = {
       ></CTiptapLinkSuggest>
       <!-- TODO: distinguish between following internal and external links? -->
       <x-btn
-        color="primary"
         title="Follow link"
         variant="default"
         size="small"

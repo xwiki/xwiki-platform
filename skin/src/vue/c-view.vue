@@ -20,6 +20,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script lang="ts" setup>
 import CMain from "./c-main.vue";
 import CTemplate from "./c-template.vue";
+import UIX from "./c-uix.vue";
 import { ViewportType, useViewportType } from "../composables/viewport";
 import { Ref, onMounted, ref, watch } from "vue";
 import "../css/main.css";

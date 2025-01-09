@@ -29,7 +29,6 @@
     "@shoelace-style/shoelace": "2.19.1",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "6.2.1",
@@ -39,8 +38,10 @@
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
+    "@vue/runtime-dom": "3.5.13",
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.2",
     "vite": "6.0.7",

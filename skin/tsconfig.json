@@ -3,7 +3,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "types": [
-      "vite/client"
+      "vite/client",
+      "@xwiki/cristal-dsapi"
     ],
     "declaration": true,
     "resolveJsonModule": true,

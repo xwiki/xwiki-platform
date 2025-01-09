@@ -36,5 +36,3 @@ defineProps<BreadcrumbProps>();
     </sl-breadcrumb-item>
   </sl-breadcrumb>
 </template>
-
-<style scoped></style>

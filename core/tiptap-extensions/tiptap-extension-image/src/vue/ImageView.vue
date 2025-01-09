@@ -110,26 +110,28 @@ function onResize({ w: wp, h: hp }: { w: number; h: number }) {
 }
 </script>
 <template>
-  <node-view-wrapper @click="setActive">
-    <div v-if="loading">Loading...</div>
-    <div v-else-if="imageLoadingError !== undefined">
-      {{ imageLoadingError }}
-    </div>
-    <div v-else class="image-container" :style="computedStyle">
-      <!-- Resizing is currently deactivated as no backend supports it -->
-      <vue3-draggable-resizable
-        v-model:active="isActive"
-        :parent="true"
-        :draggable="false"
-        :resizable="false"
-        :h="h"
-        :w="w"
-        :handles="['br']"
-        :lock-aspect-ratio="true"
-        @resize-end="onResize"
-      >
-        <img :src="src" :alt="alt" class="img" />
-      </vue3-draggable-resizable>
+  <node-view-wrapper>
+    <div @click="setActive">
+      <div v-if="loading">Loading...</div>
+      <div v-else-if="imageLoadingError !== undefined">
+        {{ imageLoadingError }}
+      </div>
+      <div v-else class="image-container" :style="computedStyle">
+        <!-- Resizing is currently deactivated as no backend supports it -->
+        <vue3-draggable-resizable
+          v-model:active="isActive"
+          :parent="true"
+          :draggable="false"
+          :resizable="false"
+          :h="h"
+          :w="w"
+          :handles="['br']"
+          :lock-aspect-ratio="true"
+          @resize-end="onResize"
+        >
+          <img :src="src" :alt="alt" class="img" />
+        </vue3-draggable-resizable>
+      </div>
     </div>
   </node-view-wrapper>
 </template>

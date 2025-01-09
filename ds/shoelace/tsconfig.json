@@ -2,7 +2,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "isolatedDeclarations": false
+    "isolatedDeclarations": false,
+    "types": ["@shoelace-style/shoelace/dist/types/vue"]
   },
   "extends": "./../../tsconfig.json",
   "include": [

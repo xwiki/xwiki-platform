@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UIX from "./c-uix.vue";
 import messages from "../translations";
 import { AlertsToasts } from "@xwiki/cristal-alerts-ui";
 import { PageData } from "@xwiki/cristal-api";

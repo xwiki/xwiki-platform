@@ -18,9 +18,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <script lang="ts" setup>
-import CNavigationDrawer from "./c-navigation-drawer.vue";
 import CPageCreationMenu from "./c-page-creation-menu.vue";
 import CSidebarPanel from "./c-sidebar-panel.vue";
+import UIX from "./c-uix.vue";
 import { useMouseCoordinates } from "../composables/mouse";
 import { ViewportType, useViewportType } from "../composables/viewport";
 import xlogo from "../images/xwiki-logo-color.svg";
@@ -122,10 +122,9 @@ function onClickOutsideMainSidebar() {
   <div class="collapsed-main-sidebar" @click="onOpenMainSidebar">
     <c-icon name="list" class="open-sidebar"></c-icon>
   </div>
-  <c-navigation-drawer
+  <div
     id="sidebar"
-    class="main-sidebar"
-    :class="{ 'is-visible': !isSidebarClosed }"
+    :class="{ 'is-visible': !isSidebarClosed, 'main-sidebar': true }"
   >
     <UIX uixname="sidebar.before" />
     <div class="sidebar-collapse-controls">
@@ -171,7 +170,7 @@ function onClickOutsideMainSidebar() {
       @mousedown="startMainSidebarResize"
       @touchstart="startMainSidebarResize"
     ></div>
-  </c-navigation-drawer>
+  </div>
 </template>
 <style scoped>
 .panel-container {

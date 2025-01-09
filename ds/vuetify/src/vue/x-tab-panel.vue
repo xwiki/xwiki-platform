@@ -26,5 +26,3 @@ defineProps<TabPanelProps>();
 <template>
   <v-tabs-window-item :value="tabId"><slot></slot></v-tabs-window-item>
 </template>
-
-<style scoped></style>

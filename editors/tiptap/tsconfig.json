@@ -8,7 +8,8 @@
     "isolatedDeclarations": false,
     "types": [
       "@types/lodash",
-      "@types/markdown-it"
+      "@types/markdown-it",
+      "@xwiki/cristal-dsapi"
     ]
   },
   "extends": "./../../tsconfig.json",

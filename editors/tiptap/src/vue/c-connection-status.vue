@@ -88,7 +88,6 @@ provider.on("awarenessChange", (event: onAwarenessChangeParameters) => {
         variant="shape"
         :border="true"
         :size="28"
-        :title="user.name"
       />
     </span>
   </span>

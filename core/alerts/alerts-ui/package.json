@@ -25,7 +25,6 @@
   "dependencies": {
     "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
-    "@xwiki/cristal-dsapi": "workspace:*",
     "inversify": "6.2.1",
     "vue": "3.5.13",
     "vue-i18n": "11.0.1"
@@ -35,6 +34,7 @@
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.2",
     "vite": "6.0.7",

@@ -19,21 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <template>
   <template v-if="pageStatus.withSheet">
-    <c-template
-      :name="pageStatus.sheet"
-      :document="pageStatus.document"
-      mode="edit"
-    />
+    <c-template :name="pageStatus.sheet" />
   </template>
   <template v-else>
-    <iframe
-      id="editui"
-      :src="link"
-      width="100%"
-      height="90%"
-      border="0"
-      frameborder="0"
-    />
+    <iframe id="editui" :src="link" width="100%" height="90%" frameborder="0" />
   </template>
 </template>
 <script lang="ts">

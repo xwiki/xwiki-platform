@@ -52,6 +52,8 @@ const open = defineModel<boolean>();
          requires the (now deprecated) slot attribute. As such, we define a
          conditional wrapper that will be bound to the sl-dialog component,
          and will hold the contents of our own footer slot (if any). -->
+    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
+    Disabling it for now as I did not find an elegant solution to declare this property. -->
     <div v-if="$slots.footer" slot="footer">
       <slot name="footer" />
     </div>

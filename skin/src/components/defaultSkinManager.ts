@@ -23,7 +23,6 @@ import Blog from "../vue/c-blog.vue";
 import Config from "../vue/c-config.vue";
 import Content from "../vue/c-content.vue";
 import Edit from "../vue/c-edit.vue";
-import Footer from "../vue/c-footer.vue";
 import Main from "../vue/c-main.vue";
 import Movie from "../vue/c-movie.vue";
 import Panel from "../vue/c-panel.vue";
@@ -44,15 +43,12 @@ export class DefaultSkinManager implements SkinManager {
   public templates: Map<string, Component>;
   public designSystem: string = "";
 
-  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-  // eslint-disable-next-line max-statements
   constructor() {
     this.templates = new Map<string, Component>();
     this.templates.set("view", View);
     this.templates.set("config", Config);
     this.templates.set("sidebar", Sidebar);
     this.templates.set("content", Content);
-    this.templates.set("footer", Footer);
     this.templates.set("panel", Panel);
     this.templates.set("main", Main);
     this.templates.set("edit", Edit);

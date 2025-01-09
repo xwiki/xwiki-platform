@@ -249,7 +249,6 @@ async function onDocumentUpdate(page: PageData) {
     activatable
     active-strategy="independent"
     item-value="id"
-    open-strategy="multiple"
     @update:activated="clearSelection"
   >
     <template #title="{ item }: { item: any }">

@@ -18,88 +18,97 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/**
- * Shared types for the x-breadcrumb component implementations.
- * @since 0.8
- */
-type BreadcrumbProps = {
-  items: [{ label: string; url: string }];
-};
+import {
+  ButtonHTMLAttributes,
+  DefineComponent,
+  FormHTMLAttributes,
+  HTMLAttributes,
+  ImgHTMLAttributes,
+  InputHTMLAttributes,
+} from "vue";
+import type { AlertActions, AlertProps, AlterAction } from "./XAlert";
+import type { AvatarProps } from "./XAvatar";
+import type {
+  BreadcrumbItem,
+  BreadcrumbItems,
+  BreadcrumbProps,
+} from "./XBreadcrumb";
+import type { BtnProps } from "./XBtn";
+import type { CardProps } from "./XCard";
+import type { DialogProps } from "./XDialog";
+import type { DividerProps } from "./XDivider";
+import type { FileInputModel, FileInputProps } from "./XFileInput";
+import type { FormProps } from "./XForm";
+import type { ImgProps } from "./XImg";
+import type { LoadProps } from "./XLoad";
+import type { MenuProps } from "./XMenu";
+import type { MenuItemProps } from "./XMenuItem";
+import type { MenuLabelProps } from "./XMenuLabel";
+import type { NavigationTreeProps } from "./XNavigationTree";
+import type { TabProps } from "./XTab";
+import type { TabGroupProps } from "./XTabGroup";
+import type { TabPanelProps } from "./XTabPanel";
+import type { TextFieldProps } from "./XTextField";
 
 /**
- * Props of the x-tab-panel component.
+ * {@link HTMLAttributes} must be a type for all components. Possibly a sub-type of the abstract component is expected
+ * to mick an existing HTML element (e.g., {@link ButtonHTMLAttributes} from {@link AbstractElements.XBtn}).
  *
- * @since 0.9
+ * @since 0.14
  */
-type TabPanelProps = {
-  tabId: string;
+type AbstractElements = {
+  XAlert: DefineComponent<AlertProps & HTMLAttributes>;
+  XAvatar: DefineComponent<AvatarProps & HTMLAttributes>;
+  XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
+  XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
+  XCard: DefineComponent<CardProps & HTMLAttributes>;
+  XDialog: DefineComponent<DialogProps & HTMLAttributes>;
+  XDivider: DefineComponent<DividerProps & HTMLAttributes>;
+  XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
+  XForm: DefineComponent<FormProps & FormHTMLAttributes>;
+  XImg: DefineComponent<ImgProps & ImgHTMLAttributes>;
+  XLoad: DefineComponent<LoadProps & HTMLAttributes>;
+  XMenu: DefineComponent<MenuProps & HTMLAttributes>;
+  XMenuItem: DefineComponent<MenuItemProps & HTMLAttributes>;
+  XMenuLabel: DefineComponent<MenuLabelProps & HTMLAttributes>;
+  XNavigationTree: DefineComponent<NavigationTreeProps & HTMLAttributes>;
+  XTab: DefineComponent<TabProps & HTMLAttributes>;
+  XTabGroup: DefineComponent<HTMLAttributes & TabGroupProps>;
+  XTabPanel: DefineComponent<TabPanelProps & HTMLAttributes>;
+  XTextField: DefineComponent<TextFieldProps & ImgHTMLAttributes>;
 };
 
-/**
- * Props of the x-tab component.
- * @since 0.9
- */
-type TabProps = {
-  tabId: string;
-};
-
-/**
- * Props of the text-field component.
- * @since 0.9
- */
-type TextFieldProps = {
-  name: string;
-  label: string;
-  required: boolean;
-  /**
-   * Whether the field should be focused on load or not (default: false).
-   * @since 0.13
-   */
-  autofocus?: boolean;
-};
-
-/**
- * Props for the btn component.
- *
- * @since 0.11
- */
-type BtnProps = {
-  variant?:
-    | "default"
-    | "primary"
-    | "success"
-    | "neutral"
-    | "warning"
-    | "danger"
-    | "text";
-};
-
-type TextFieldModel = File | File[] | null | undefined;
-
-/**
- * Props for the alert component.
- *
- * @since 0.11
- */
-type AlertProps = {
-  title?: string;
-  type: "success" | "warning" | "error" | "info";
-  description: string;
-  actions?: [{ name: string; callback: () => void }];
-  closable?: boolean;
-  /**
-   * Other (less important) data to show in the alert.
-   * @since 0.13
-   */
-  details?: string;
-};
-
+// Expose all the abstract components types. For instance: props, actions, model value.
 export type {
+  AbstractElements,
+  AlertActions,
   AlertProps,
+  AlterAction,
+  AvatarProps,
+  BreadcrumbItem,
+  BreadcrumbItems,
   BreadcrumbProps,
   BtnProps,
+  CardProps,
+  DialogProps,
+  DividerProps,
+  FileInputModel,
+  FileInputProps,
+  FormProps,
+  ImgProps,
+  LoadProps,
+  MenuItemProps,
+  MenuLabelProps,
+  MenuProps,
+  NavigationTreeProps,
+  TabGroupProps,
   TabPanelProps,
   TabProps,
-  TextFieldModel,
   TextFieldProps,
 };
+
+// Inspired from what shoelace is doing to expose the types of their web components in Vue.
+declare module "vue" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface GlobalComponents extends AbstractElements {}
+}

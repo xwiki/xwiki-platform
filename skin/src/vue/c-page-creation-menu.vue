@@ -94,7 +94,6 @@ function createPage() {
       <x-btn
         id="new-page-button"
         size="small"
-        variant="secondary"
         color="secondary"
         @click="updateCurrentPage"
       >

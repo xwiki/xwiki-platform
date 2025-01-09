@@ -62,6 +62,8 @@ open.value = true;
     @sl-show="open = true"
     @sl-hide="open = false"
   >
+    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
+    Disabling it for now as I did not find an elegant solution to declare this property. -->
     <c-icon slot="icon" :name="variant.icon"></c-icon>
     <strong v-if="title">{{ title }}</strong>
     <br v-if="title" />

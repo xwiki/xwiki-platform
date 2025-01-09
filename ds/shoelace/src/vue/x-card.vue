@@ -17,14 +17,18 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<script lang="ts">
+<script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/card/card";
-export default {
-  props: { title: { type: String, required: true } },
-};
+import { CardProps } from "@xwiki/cristal-dsapi";
+defineProps<CardProps>();
 </script>
 <template>
-  <sl-card :title="title" variant="outlined">
+  <sl-card>
+    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
+    Disabling it for now as I did not find an elegant solution to declare this property. -->
+    <div v-if="title" slot="header">
+      {{ title }}
+    </div>
     <slot />
   </sl-card>
 </template>

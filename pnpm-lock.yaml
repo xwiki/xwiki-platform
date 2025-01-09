@@ -135,6 +135,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -181,9 +184,6 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../../api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../../../ds/api
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -197,6 +197,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -292,9 +295,6 @@ importers:
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../../../ds/api
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../../extra-tabs/extra-tabs-api
@@ -341,6 +341,9 @@ importers:
       '@xwiki/cristal-dev-test-utils':
         specifier: workspace:*
         version: link:../../../dev/test-utils
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -448,6 +451,9 @@ importers:
       '@xwiki/cristal-dev-test-utils':
         specifier: workspace:*
         version: link:../../../dev/test-utils
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -865,6 +871,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -1148,9 +1157,6 @@ importers:
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../document/document-api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../../../ds/api
       '@xwiki/cristal-extra-tabs-api':
         specifier: workspace:*
         version: link:../../extra-tabs/extra-tabs-api
@@ -1176,6 +1182,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2054,6 +2063,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2130,6 +2142,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.2)
@@ -2155,6 +2170,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../../ds/api
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.2)
@@ -2300,6 +2318,16 @@ importers:
         version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
 
   ds/api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../../core/navigation-tree/navigation-tree-api
+      vue:
+        specifier: 3.5.13
+        version: 3.5.13(typescript@5.7.2)
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2335,6 +2363,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2359,9 +2390,6 @@ importers:
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
@@ -2375,12 +2403,18 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.2)
     devDependencies:
+      '@vue/runtime-dom':
+        specifier: 3.5.13
+        version: 3.5.13
       '@vue/test-utils':
         specifier: 2.4.6
         version: 2.4.6
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2402,9 +2436,6 @@ importers:
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../api
       '@xwiki/cristal-model-api':
         specifier: workspace:*
         version: link:../../core/model/model-api
@@ -2430,6 +2461,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2572,6 +2606,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3128,9 +3165,15 @@ importers:
         specifier: 4.5.0
         version: 4.5.0(vue@3.5.13(typescript@5.7.2))
     devDependencies:
+      '@shoelace-style/shoelace':
+        specifier: 2.19.1
+        version: 2.19.1(@floating-ui/utils@0.2.8)(@types/react@18.2.52)
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../ds/api
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -3159,6 +3202,9 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../dev/config
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -3434,6 +3480,9 @@ importers:
       '@xwiki/cristal-dev-test-utils':
         specifier: workspace:*
         version: link:../dev/test-utils
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../ds/api
       ts-essentials:
         specifier: 10.0.4
         version: 10.0.4(typescript@5.7.2)
@@ -5809,15 +5858,6 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.3.4:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
     engines: {node: '>=6.0'}
@@ -7286,9 +7326,6 @@ packages:
 
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
-
-  ms@2.1.2:
-    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -11242,10 +11279,6 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.3.4:
-    dependencies:
-      ms: 2.1.2
-
   debug@4.3.7(supports-color@5.5.0):
     dependencies:
       ms: 2.1.3
@@ -12950,8 +12983,6 @@ snapshots:
 
   ms@2.0.0: {}
 
-  ms@2.1.2: {}
-
   ms@2.1.3: {}
 
   muggle-string@0.4.1: {}
@@ -14282,7 +14313,7 @@ snapshots:
   vite-plugin-vuetify@2.0.4(vite@6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1))(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.6):
     dependencies:
       '@vuetify/loader-shared': 2.0.3(vue@3.5.13(typescript@5.7.2))(vuetify@3.7.6)
-      debug: 4.3.4
+      debug: 4.4.0
       upath: 2.0.1
       vite: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
       vue: 3.5.13(typescript@5.7.2)

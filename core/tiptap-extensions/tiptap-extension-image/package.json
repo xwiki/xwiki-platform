@@ -49,6 +49,7 @@
     "@tiptap/core": "2.11.0",
     "@types/lodash": "4.17.14",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "vue": "3.5.13",
     "vue-tsc": "2.2.0"
   },

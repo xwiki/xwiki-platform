@@ -3,13 +3,13 @@ import messages from "../../translations";
 import { computed, defineModel } from "vue";
 import { useI18n } from "vue-i18n";
 import { VFileInput } from "vuetify/components/VFileInput";
-import type { TextFieldModel, TextFieldProps } from "@xwiki/cristal-dsapi";
+import type { FileInputModel, TextFieldProps } from "@xwiki/cristal-dsapi";
 
 const { t } = useI18n({
   messages,
 });
 
-const model = defineModel<TextFieldModel>();
+const model = defineModel<FileInputModel>();
 const props = defineProps<TextFieldProps>();
 
 const rules = computed(() => {

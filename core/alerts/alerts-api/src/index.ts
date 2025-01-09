@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { AlertActions } from "@xwiki/cristal-dsapi";
 import type { Ref } from "vue";
 
 type Action = { name: string; callback: () => void };
@@ -30,7 +31,7 @@ interface Alert {
   id: number;
   type: Type;
   message: string;
-  actions?: Action[];
+  actions?: AlertActions;
   /**
    * Number of times this specific alert has already been created.
    * @since 0.13

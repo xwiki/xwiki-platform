@@ -74,6 +74,7 @@
     "@types/lodash": "4.17.14",
     "@types/markdown-it": "14.1.2",
     "@xwiki/cristal-dev-config": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.2",
     "vite": "6.0.7",

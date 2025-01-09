@@ -4,7 +4,9 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "@xwiki/cristal-dsapi",
+      "@shoelace-style/shoelace/dist/types/vue"
     ],
     "isolatedDeclarations": false
   },

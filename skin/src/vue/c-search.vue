@@ -19,11 +19,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <template>
   <div id="search">
-    <x-text-field
-      label="Search"
-      prepend-inner-icon="mdi:mdi-magnify"
-      variant="solo"
-    />
+    <x-text-field label="Search" />
   </div>
 </template>
 <script lang="ts">

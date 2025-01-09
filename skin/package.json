@@ -58,6 +58,7 @@
     "@vue/test-utils": "2.4.6",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dev-test-utils": "workspace:*",
+    "@xwiki/cristal-dsapi": "workspace:*",
     "ts-essentials": "10.0.4",
     "typescript": "5.7.2",
     "vite": "6.0.7",

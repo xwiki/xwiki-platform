@@ -19,10 +19,10 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/tab-group/tab-group";
-const emits = defineEmits(["change"]);
+const emits = defineEmits(["tab-change"]);
 
 function change(event: CustomEvent<{ name: string }>) {
-  emits("change", event.detail.name);
+  emits("tab-change", event.detail.name);
 }
 </script>
 

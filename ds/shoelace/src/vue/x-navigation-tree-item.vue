@@ -179,6 +179,8 @@ async function onDocumentUpdate(parents: string[]) {
       >{{ node.label }}</a
     >
     <a v-else :href="node.url">{{ node.label }}</a>
+    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
+    Disabling it for now as I did not find an elegant solution to declare this property. -->
     <x-navigation-tree-item
       v-for="item in nodes"
       :key="item.id"

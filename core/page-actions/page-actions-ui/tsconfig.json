@@ -3,7 +3,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "resolveJsonModule": true,
-    "isolatedDeclarations": false
+    "isolatedDeclarations": false,
+    "types": ["@xwiki/cristal-dsapi"]
   },
   "extends": "../../../tsconfig.json",
   "include": [

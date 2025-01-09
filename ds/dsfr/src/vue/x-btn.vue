@@ -19,6 +19,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 -->
 <script lang="ts" setup>
 import { DsfrButton } from "@gouvminint/vue-dsfr";
+import { BtnProps } from "@xwiki/cristal-dsapi";
+
+defineProps<BtnProps>();
 </script>
 <template>
   <DsfrButton size="large">

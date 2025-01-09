@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { TextFieldModel } from "@xwiki/cristal-dsapi";
+import { FileInputModel } from "@xwiki/cristal-dsapi";
 import { Ref, ref } from "vue";
 
 defineProps<{ isUploading: boolean }>();
-const fileInputValue: Ref<TextFieldModel> = ref();
+const fileInputValue: Ref<FileInputModel> = ref();
 const emits = defineEmits<{
   (e: "files-selected", files: File[]): void;
 }>();

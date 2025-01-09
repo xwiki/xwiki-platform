@@ -55,7 +55,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <x-tab-group class="tab-group" @change="change">
+  <x-tab-group class="tab-group" @tab-change="change">
     <template #tabs>
       <x-tab v-for="tab in list" :key="tab.id" :tab-id="tab.id">
         {{ tab.title }}

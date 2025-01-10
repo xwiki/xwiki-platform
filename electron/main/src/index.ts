@@ -53,6 +53,11 @@ app.on("window-all-closed", () => {
   }
 });
 
+if (process.env.NODE_ENV !== "development") {
+  // Deactivate debug logs when the environment is not explicitly in development mode.
+  console.debug = () => {};
+}
+
 /**
  * Create the application window when the background process is ready.
  */

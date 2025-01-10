@@ -33,7 +33,7 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.AbstractAdditionalRightsTestCase;
-import org.xwiki.security.authorization.DefaultAuthorizationManager;
+import org.xwiki.security.internal.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;

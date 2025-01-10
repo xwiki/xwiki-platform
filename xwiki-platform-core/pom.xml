@@ -497,6 +497,21 @@
                 </item>
               </differences>
             </revapi.differences>
+            <revapi.differences>
+              <justification>
+                This class should have never been exposed as an API as it's an internal component implementation.
+                It has been moved to an internal package following the vote performed on
+                https://forum.xwiki.org/t/move-defaultauthorizationmanager-to-an-internal-package/15926.
+              </justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.security.authorization.DefaultAuthorizationManager</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>

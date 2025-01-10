@@ -206,7 +206,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param impliedByRights the already existing rights that imply this new right.
      * @since 12.6
      */
-    Right(RightDescription description, Set<Right> impliedByRights)
+    public Right(RightDescription description, Set<Right> impliedByRights)
     {
         this(description.getName(), description.getDefaultState(), description.getTieResolutionPolicy(),
             description.getInheritanceOverridePolicy(),
@@ -420,7 +420,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      *
      * @since 13.5RC1
      */
-    void unregister()
+    public void unregister()
     {
         Set<EntityType> entityTypes = this.getTargetedEntityType();
         synchronized (VALUES) {
@@ -535,7 +535,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param description a right description to compare this right to.
      * @return true if the right is equivalent to the provided description.
      */
-    boolean like(RightDescription description)
+    public boolean like(RightDescription description)
     {
         return new EqualsBuilder()
             .append(this.isReadOnly(), description.isReadOnly())

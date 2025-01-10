@@ -21,19 +21,22 @@ package org.xwiki.container.servlet.filters.internal;
 
 import java.io.IOException;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Filter that set the desired header of the HTTP response to the desired value.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * different API from Java point of view.
  *
  * @version $Id$
- * @since 6.3M2
+ * @since 42.0.0
  */
 public class SetHTTPHeaderFilter implements Filter
 {

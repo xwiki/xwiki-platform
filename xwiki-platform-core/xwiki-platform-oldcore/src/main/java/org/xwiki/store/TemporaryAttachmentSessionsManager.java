@@ -23,12 +23,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.Part;
+import jakarta.servlet.http.Part;
 
 import org.xwiki.attachment.validation.AttachmentValidationException;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -39,7 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * The idea of this API is to allow obtaining directly a temporary {@link XWikiAttachment} from a {@link Part} and to
  * keep it in cache until it's saved.
  * <P>
- * The manager is handling a separated map of attachments for each {@link javax.servlet.http.HttpSession}.
+ * The manager is handling a separated map of attachments for each {@link jakarta.servlet.http.HttpSession}.
  *
  * @version $Id$
  * @since 14.3RC1
@@ -57,9 +59,33 @@ public interface TemporaryAttachmentSessionsManager
      * @throws TemporaryAttachmentException in case of problem when reading the part
      * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
      *             is reached)
+     * @deprecated use {@link #uploadAttachment(DocumentReference, Part)} instead
      */
-    XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
-        throws TemporaryAttachmentException, AttachmentValidationException;
+    @Deprecated(since = "42.0.0")
+    default XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part)
+        throws TemporaryAttachmentException, AttachmentValidationException
+    {
+        return uploadAttachment(documentReference, part, null);
+    }
+
+    /**
+     * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
+     * {@link DocumentReference}.
+     *
+     * @param documentReference the reference of the document that the attachment should be attached to.
+     * @param part the actual data that is uploaded.
+     * @return an attachment that is not saved yet but cached and contains the data of the given part.
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
+     *             is reached)
+     * @since 42.0.0
+     */
+    @Unstable
+    default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
+        throws TemporaryAttachmentException, AttachmentValidationException
+    {
+        return uploadAttachment(documentReference, part, null);
+    }
 
     /**
      * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
@@ -74,9 +100,32 @@ public interface TemporaryAttachmentSessionsManager
      * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
      *             is reached)
      * @since 14.9RC1
+     * @deprecated use {@link #uploadAttachment(DocumentReference, Part, String)} instead
      */
-    XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+    @Deprecated(since = "42.0.0")
+    XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException;
+
+    /**
+     * Temporary store the given {@link Part} to a cached {@link XWikiAttachment} attached to the given
+     * {@link DocumentReference}.
+     *
+     * @param documentReference the reference of the document that the attachment should be attached to
+     * @param part the actual data that is uploaded
+     * @param filename an optional filename used instead of using {@link Part#getSubmittedFileName()}, ignored when
+     *            {@code null} or blank
+     * @return an attachment that is not saved yet but cached and contains the data of the given part
+     * @throws TemporaryAttachmentException in case of problem when reading the part
+     * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
+     *             is reached)
+     * @since 42.0.0
+     */
+    @Unstable
+    default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)
+        throws TemporaryAttachmentException, AttachmentValidationException
+    {
+        return uploadAttachment(documentReference, JakartaServletBridge.toJavax(part), filename);
+    }
 
     /**
      * Allow to temporarily attach the given instance of {@link XWikiAttachment} to the given document reference.

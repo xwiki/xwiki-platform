@@ -19,9 +19,11 @@
  */
 package org.xwiki.security.authentication;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
+import org.xwiki.stability.Unstable;
 
 /**
  * Describes a strategy to perform in case the limit of authentication failures is reached.
@@ -57,8 +59,25 @@ public interface AuthenticationFailureStrategy
      * @param username the username used for the authentication failure.
      * @param request the authentication request.
      * @return true if the authentication request can be validated, i.e. if the user should be authorized to login.
+     * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
-    boolean validateForm(String username, HttpServletRequest request);
+    @Deprecated(since = "42.0.0")
+    default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return validateForm(username, JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * @param username the username used for the authentication failure.
+     * @param request the authentication request.
+     * @return true if the authentication request can be validated, i.e. if the user should be authorized to login.
+     * @since 42.0.0
+     */
+    @Unstable
+    default boolean validateForm(String username, HttpServletRequest request)
+    {
+        return validateForm(username, JakartaServletBridge.toJavax(request));
+    }
 
     /**
      * Notify the strategy about an authentication failure limit reached.

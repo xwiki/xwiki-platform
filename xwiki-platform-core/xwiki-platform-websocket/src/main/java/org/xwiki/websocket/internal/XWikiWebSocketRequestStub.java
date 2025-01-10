@@ -33,23 +33,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import javax.websocket.server.HandshakeRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.server.HandshakeRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
+import org.xwiki.container.servlet.HttpServletRequestStub;
 
 /**
- * Adapts a {@link HandshakeRequest} to {@link XWikiRequest}.
+ * Adapts a {@link HandshakeRequest} to {@link jakarta.servlet.http.HttpServletRequest}.
  * 
  * @version $Id$
  * @since 13.7RC1
  */
-public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
+public class XWikiWebSocketRequestStub extends HttpServletRequestStub
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebSocketRequestStub.class);
 

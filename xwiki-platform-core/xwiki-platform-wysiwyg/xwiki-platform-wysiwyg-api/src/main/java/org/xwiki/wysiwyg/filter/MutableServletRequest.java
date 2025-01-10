@@ -29,7 +29,9 @@ import javax.servlet.ServletResponse;
  * request parameters, inside a filter.
  * 
  * @version $Id$
+ * @deprecated use {@link MutableJakartaServletRequest} instead
  */
+@Deprecated(since = "42.0.0")
 public interface MutableServletRequest extends ServletRequest
 {
     /**

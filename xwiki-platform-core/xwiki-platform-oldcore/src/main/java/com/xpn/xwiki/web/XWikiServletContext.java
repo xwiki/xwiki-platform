@@ -25,6 +25,13 @@ import java.net.URL;
 
 import javax.servlet.ServletContext;
 
+/**
+ * Servlet based implementation of {@link XWikiEngineContext}.
+ * 
+ * @version $Id$
+ * @deprecated use the {@link org.xwiki.container.Container} API instead
+ */
+@Deprecated(since = "42.0.0")
 public class XWikiServletContext implements XWikiEngineContext
 {
     private ServletContext scontext;

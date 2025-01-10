@@ -53,8 +53,8 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
       <scope>compile</scope>
     </dependency>
@@ -106,6 +106,7 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

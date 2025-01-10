@@ -19,10 +19,12 @@
  */
 package org.xwiki.security.authentication;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Manager of the authentication failures strategies.
@@ -35,12 +37,33 @@ public interface AuthenticationFailureManager
 {
     /**
      * Record that the given username fails to authenticate.
+     * 
      * @param username the username that fails the authentication. Should be the username typed by the user and not a
-     *          computed login.
+     *            computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return true if the authentication failure limits defined by the configuration has been reached.
+     * @deprecated use {@link #recordAuthenticationFailure(String, HttpServletRequest)}
      */
-    boolean recordAuthenticationFailure(String username, HttpServletRequest request);
+    @Deprecated(since = "42.0.0")
+    default boolean recordAuthenticationFailure(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return recordAuthenticationFailure(username, JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * Record that the given username fails to authenticate.
+     * 
+     * @param username the username that fails the authentication. Should be the username typed by the user and not a
+     *            computed login.
+     * @param request a wrapping of the request used for the authentication.
+     * @return true if the authentication failure limits defined by the configuration has been reached.
+     * @since 42.0.0
+     */
+    @Unstable
+    default boolean recordAuthenticationFailure(String username, HttpServletRequest request)
+    {
+        return recordAuthenticationFailure(username, JakartaServletBridge.toJavax(request));
+    }
 
     /**
      * Remove all records of authentication failure for the given user.
@@ -56,19 +79,62 @@ public interface AuthenticationFailureManager
      *                   not a computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return the aggregated form information to add to the standard login form, or an empty string.
+     * @deprecated use {@link #getForm(String, HttpServletRequest)} instead
      */
-    String getForm(String username, HttpServletRequest request);
+    @Deprecated(since = "42.0.0")
+    default String getForm(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return getForm(username, JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * If the user reached the authentication failure limit, aggregate form information returned by the different
+     * strategies (see {@link AuthenticationFailureStrategy#getForm(String)}). Else return an empty string.
+     * @param username the username that is used for the authentication. Should be the username typed by the user and
+     *                   not a computed login.
+     * @param request a wrapping of the request used for the authentication.
+     * @return the aggregated form information to add to the standard login form, or an empty string.
+     * @since 42.0.0
+     */
+    @Unstable
+    default String getForm(String username, HttpServletRequest request)
+    {
+        return getForm(username, JakartaServletBridge.toJavax(request));        
+    }
 
     /**
      * If the user reached the authentication failure limit, validate the form information against the different
-     * strategies used and return the result
-     * (see {@link AuthenticationFailureStrategy#validateForm(String, HttpServletRequest)}). Else returns true.
+     * strategies used and return the result (see
+     * {@link AuthenticationFailureStrategy#validateForm(String, HttpServletRequest)}). Else returns true.
+     * 
      * @param username the username that is used for the authentication. Should be the username typed by the user and
-     *      not a computed login.
+     *            not a computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return true if all strategies validate the request or if the user didn't reach the limit.
+     * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
-    boolean validateForm(String username, HttpServletRequest request);
+    @Deprecated(since = "42.0.0")
+    default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
+    {
+        return validateForm(username, JakartaServletBridge.toJakarta(request));
+    }
+
+    /**
+     * If the user reached the authentication failure limit, validate the form information against the different
+     * strategies used and return the result (see
+     * {@link AuthenticationFailureStrategy#validateForm(String, HttpServletRequest)}). Else returns true.
+     * 
+     * @param username the username that is used for the authentication. Should be the username typed by the user and
+     *            not a computed login.
+     * @param request a wrapping of the request used for the authentication.
+     * @return true if all strategies validate the request or if the user didn't reach the limit.
+     * @since 42.0.0
+     */
+    @Unstable
+    default boolean validateForm(String username, HttpServletRequest request)
+    {
+        return validateForm(username, JakartaServletBridge.toJavax(request));
+    }
 
     /**
      * If the user reached the authentication failure limit, aggregate the error message of the different strategies

@@ -24,14 +24,14 @@ import java.util.Enumeration;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,8 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * XHTML form has only one target URL. In previous versions of XWiki this was accomplished using javascript code, with a
  * fall-back on a pseudo-dispatcher inside the {@link PreviewAction}, which was on obvious case of bad code design.
  * <p>
- * The filter dispatches requests based on the presence of a request parameter starting with {@code action_} followed
- * by the name of the action that should actually process the request. For example, the button that does
+ * The filter dispatches requests based on the presence of a request parameter starting with {@code action_} followed by
+ * the name of the action that should actually process the request. For example, the button that does
  * {@code Save and Continue} looks like:
  *
  * <pre>
@@ -56,9 +56,13 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  *
  * As a result, when clicking the button, the request is not sent to the form's target ({@code preview}), but is
  * actually forwarded internally to {@code /bin/saveandcontinue/The/Document}.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * different API from Java point of view.
  *
  * @version $Id$
  * @since 1.8M1
+ * @since 42.0.0
  */
 public class ActionFilter implements Filter
 {
@@ -83,31 +87,28 @@ public class ActionFilter implements Filter
     {
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-        ServletException
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException
     {
         // Only HTTP requests can be dispatched.
-        if (request instanceof HttpServletRequest
-            && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
-        {
-            HttpServletRequest hrequest = (HttpServletRequest) request;
+        if (request instanceof HttpServletRequest hrequest
+            && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String parameter = parameterNames.nextElement();
-                
+
                 // If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken into
                 // account if they are part of the xaction list. Otherwise, all the parameters prefixed with 'action_'
                 // are accepted.
                 String[] xactions = request.getParameterValues("xaction");
-                if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
-                    .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
-                {
+                if (parameter.startsWith(ACTION_PREFIX) && (xactions == null
+                    || Stream.of(xactions).anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it))))) {
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {
-                        LOGGER.debug("Forwarding request to " + targetURL);
+                        LOGGER.debug("Forwarding request to [{}]", targetURL);
+
                         request.setAttribute(ATTRIBUTE_ACTION_DISPATCHED, "true");
                         dispatcher.forward(hrequest, response);
                         // Allow multiple calls to this filter as long as they are not nested.
@@ -136,8 +137,8 @@ public class ActionFilter implements Filter
      *
      * @param request the original request
      * @param action the action parameter, starting with {@code action_}
-     * @return The rebuilt URL path, with the specified action in place of the original action. Note that unlike
-     *         the HTTP path, this does not contain the application context part.
+     * @return The rebuilt URL path, with the specified action in place of the original action. Note that unlike the
+     *         HTTP path, this does not contain the application context part.
      */
     private String getTargetURL(HttpServletRequest request, String action)
     {
@@ -163,9 +164,8 @@ public class ActionFilter implements Filter
         ConfigurationSource configuration =
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
-            if (servletPath.equals(PATH_SEPARATOR
-                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")))
-            {
+            if (servletPath
+                .equals(PATH_SEPARATOR + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

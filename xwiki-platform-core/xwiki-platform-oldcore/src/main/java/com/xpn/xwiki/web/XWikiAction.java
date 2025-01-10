@@ -33,8 +33,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.script.ScriptContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -56,6 +57,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.internal.web.DocExistValidator;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -329,7 +331,8 @@ public abstract class XWikiAction implements LegacyAction
             // Initialize the XWiki Context which is the main object used to pass information across
             // classes/methods. It's also wrapping the request, response, and all container objects
             // in general.
-            context = initializeXWikiContext(servletRequest, servletResponse);
+            context =
+                initializeXWikiContext(JakartaServletBridge.toJavax(servletRequest), JakartaServletBridge.toJavax(servletResponse));
 
             // From this line forward all information can be found in the XWiki Context.
             execute(context);
@@ -827,8 +830,9 @@ public abstract class XWikiAction implements LegacyAction
         xcontext.setFinished(true);
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse)
+    @Deprecated(since = "42.0.0")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse)
         throws XWikiException, ServletException, InstantiationException, IllegalAccessException
     {
         XWikiForm form;
@@ -850,8 +854,9 @@ public abstract class XWikiAction implements LegacyAction
         return this.componentDescriptor.getRoleHint();
     }
 
-    protected XWikiContext initializeXWikiContext(HttpServletRequest servletRequest,
-        HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
+    @Deprecated(since = "42.0.0")
+    protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
     {
         String action = getName();
 
@@ -906,8 +911,8 @@ public abstract class XWikiAction implements LegacyAction
     {
         Request request = this.container.getRequest();
 
-        if (request instanceof ServletRequest) {
-            return ((ServletRequest) request).getHttpServletRequest().getServletContext().getRealPath(path);
+        if (request instanceof ServletRequest servletRequest) {
+            return servletRequest.getRequest().getServletContext().getRealPath(path);
         }
 
         return null;

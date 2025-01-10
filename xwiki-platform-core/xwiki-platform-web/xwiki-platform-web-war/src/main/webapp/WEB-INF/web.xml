@@ -50,6 +50,19 @@
     <filter-class>org.xwiki.resource.servlet.RoutingFilter</filter-class>
   </filter>
 
+  <!-- Filter which inject a response wrapper in charge of resolving the relative URL on XWiki side instead of application
+       server side, to reduce setup requirements. -->
+  <filter>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.ResolveRelativeRedirectFilter</filter-class>
+  </filter>
+
+  <!-- Filter which inject a response wrapper in charge of converting the redirect location into a safe URL. -->
+  <filter>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SafeRedirectFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -153,6 +166,16 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
     <dispatcher>ERROR</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>ResolveRelativeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SafeRedirectFilter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <filter-mapping>

@@ -21,15 +21,20 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * A simple action that redirects to the main page of the wiki. This is to allow users to enter a URL like
  * <code>http://localhost:8080/xwiki</code> and be redirected automatically to
  * <code>http://localhost:8080/xwiki/bin/view/Main/</code>.
+ * <p>
+ * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different API
+ * from Java point of view.
+ * 
+ * @since 42.0.0
  */
 public class HomePageRedirectServlet extends HttpServlet
 {
@@ -39,7 +44,6 @@ public class HomePageRedirectServlet extends HttpServlet
     @Override
     public void init() throws ServletException
     {
-        super.init();
         // TODO: we cannot use the XWiki API to determine the right URL, because this is a servlet and the core
         // is reachable mainly from Struts. Getting access to the core requires too much duplication, so for the
         // moment we're going the easy way: hardcoded values.

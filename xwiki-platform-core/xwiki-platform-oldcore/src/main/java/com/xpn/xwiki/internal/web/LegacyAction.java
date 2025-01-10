@@ -44,7 +44,7 @@ public interface LegacyAction
      * @throws Exception when the action produces an unexptected error
      * @deprecated use {@link #execute(HttpServletRequest, HttpServletResponse)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default void execute(javax.servlet.http.HttpServletRequest servletRequest,
         javax.servlet.http.HttpServletResponse servletResponse) throws Exception
     {
@@ -55,7 +55,7 @@ public interface LegacyAction
      * @param servletRequest the request passed to the servlet
      * @param servletResponse the response passed to the servlet
      * @throws Exception when the action produces an unexptected error
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     default void execute(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws Exception
     {

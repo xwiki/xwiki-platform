@@ -90,7 +90,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public static URL getSourceURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -119,7 +119,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      * @throws MalformedURLException when an invalid URL was received
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public static URL getSourceBaseURL(HttpServletRequest servletRequest) throws MalformedURLException
@@ -244,7 +244,7 @@ public final class HttpServletUtils
     /**
      * @param request the servlet request input
      * @return true if the request explicitly disable getting resources from the cache
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public static boolean isCacheReadAllowed(HttpServletRequest request)
@@ -266,7 +266,7 @@ public final class HttpServletUtils
     /**
      * @param request the request from which to extract the headers
      * @return the headers of the request
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public static Map<String, List<String>> getHeaders(HttpServletRequest request)
@@ -296,7 +296,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static URL getSourceURL(javax.servlet.http.HttpServletRequest servletRequest)
     {
         try {
@@ -317,7 +317,7 @@ public final class HttpServletUtils
      * @param servletRequest the servlet request input
      * @return the URL as close as possible from what the client used
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static URL getSourceBaseURL(javax.servlet.http.HttpServletRequest servletRequest)
     {
         try {
@@ -332,7 +332,7 @@ public final class HttpServletUtils
      * @return true if the request explicitly disable getting resources from the cache
      * @since 11.8RC1
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static boolean isCacheReadAllowed(javax.servlet.http.HttpServletRequest request)
     {
         return isCacheReadAllowed(JakartaServletBridge.toJakarta(request));

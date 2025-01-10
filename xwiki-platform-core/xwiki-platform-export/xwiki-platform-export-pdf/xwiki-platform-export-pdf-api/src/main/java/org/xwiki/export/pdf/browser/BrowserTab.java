@@ -64,7 +64,7 @@ public interface BrowserTab extends AutoCloseable
      * @since 14.9
      * @deprecated use {@link #navigate(URL, Cookie[], boolean, int)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException;
 
     /**
@@ -76,7 +76,7 @@ public interface BrowserTab extends AutoCloseable
      * @param timeout the number of seconds to wait for the web page to be ready before timing out
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait, int timeout) throws IOException
@@ -93,7 +93,7 @@ public interface BrowserTab extends AutoCloseable
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait) throws IOException
     {
         return navigate(url, cookies, wait, 60);
@@ -107,7 +107,7 @@ public interface BrowserTab extends AutoCloseable
      * @param wait {@code true} to wait for the page to be ready, {@code false} otherwise
      * @return {@code true} if the navigation was successful, {@code false} otherwise
      * @throws IOException if navigating to the specified web page fails
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean navigate(URL url, Cookie[] cookies, boolean wait) throws IOException

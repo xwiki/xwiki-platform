@@ -44,7 +44,7 @@ public interface MutableServletRequestFactory
      * @return a new mutable servlet request.
      * @deprecated use {@link #newInstance(ServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default MutableServletRequest newInstance(javax.servlet.ServletRequest request)
     {
         return new JavaxToJakartaMutableHttpServletRequest(newInstance(JakartaServletBridge.toJakarta(request)));
@@ -55,7 +55,7 @@ public interface MutableServletRequestFactory
      * 
      * @param request The original servlet request to wrap.
      * @return a new mutable servlet request.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default MutableJakartaServletRequest newInstance(ServletRequest request)

@@ -1635,7 +1635,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # Container
 #-------------------------------------------------------------------------------------
 
-#-# [Since 42.0.0]
+#-# [Since 17.0.0RC1]
 #-# "true" if the relative redirect URLs should be resolved by XWiki instead of the application server.
 #-# 
 #-# Default is "true".

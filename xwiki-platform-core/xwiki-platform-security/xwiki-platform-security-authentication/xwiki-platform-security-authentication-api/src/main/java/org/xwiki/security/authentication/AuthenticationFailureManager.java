@@ -44,7 +44,7 @@ public interface AuthenticationFailureManager
      * @return true if the authentication failure limits defined by the configuration has been reached.
      * @deprecated use {@link #recordAuthenticationFailure(String, HttpServletRequest)}
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default boolean recordAuthenticationFailure(String username, javax.servlet.http.HttpServletRequest request)
     {
         return recordAuthenticationFailure(username, JakartaServletBridge.toJakarta(request));
@@ -57,7 +57,7 @@ public interface AuthenticationFailureManager
      *            computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return true if the authentication failure limits defined by the configuration has been reached.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean recordAuthenticationFailure(String username, HttpServletRequest request)
@@ -81,7 +81,7 @@ public interface AuthenticationFailureManager
      * @return the aggregated form information to add to the standard login form, or an empty string.
      * @deprecated use {@link #getForm(String, HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default String getForm(String username, javax.servlet.http.HttpServletRequest request)
     {
         return getForm(username, JakartaServletBridge.toJakarta(request));
@@ -94,7 +94,7 @@ public interface AuthenticationFailureManager
      *                   not a computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return the aggregated form information to add to the standard login form, or an empty string.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default String getForm(String username, HttpServletRequest request)
@@ -113,7 +113,7 @@ public interface AuthenticationFailureManager
      * @return true if all strategies validate the request or if the user didn't reach the limit.
      * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
     {
         return validateForm(username, JakartaServletBridge.toJakarta(request));
@@ -128,7 +128,7 @@ public interface AuthenticationFailureManager
      *            not a computed login.
      * @param request a wrapping of the request used for the authentication.
      * @return true if all strategies validate the request or if the user didn't reach the limit.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean validateForm(String username, HttpServletRequest request)

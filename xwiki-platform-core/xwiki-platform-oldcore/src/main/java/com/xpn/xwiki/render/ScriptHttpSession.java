@@ -40,7 +40,7 @@ import org.xwiki.security.authorization.Right;
  * @deprecated use the container script service instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class ScriptHttpSession implements HttpSession, HttpSessionContext
 {
     private static final String KEY_SAFESESSION = ScriptHttpSession.class.getName();

@@ -275,7 +275,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @return the request in the context
      * @deprecated use the {@link Container} API instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public XWikiRequest getRequest()
     {
         return this.request;
@@ -285,7 +285,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @param request the request to put in the context
      * @deprecated use the {@link Container} API instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public void setRequest(XWikiRequest request)
     {
         this.request = request;
@@ -305,7 +305,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @return the response in the context
      * @deprecated use the {@link Container} API instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public XWikiResponse getResponse()
     {
         return this.response;
@@ -315,7 +315,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * @param response the response to put in the context
      * @deprecated use the {@link Container} API instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public void setResponse(XWikiResponse response)
     {
         this.response = response;

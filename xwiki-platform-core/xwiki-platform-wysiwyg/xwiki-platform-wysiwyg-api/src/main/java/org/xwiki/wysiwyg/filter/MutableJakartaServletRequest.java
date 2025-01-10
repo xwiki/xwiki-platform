@@ -29,7 +29,7 @@ import jakarta.servlet.ServletResponse;
  * request parameters, inside a filter.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public interface MutableJakartaServletRequest extends ServletRequest
 {

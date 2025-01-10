@@ -63,7 +63,7 @@ public interface Response
      *
      * @param location the redirect URL
      * @throws IOException if an error happens
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void sendRedirect(String location) throws IOException
@@ -79,7 +79,7 @@ public interface Response
      *
      * @param sc the status code
      * @see #sendError
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void setStatus(int sc)
@@ -97,7 +97,7 @@ public interface Response
      * @param msg the descriptive message
      * @exception IOException If an input or output exception occurs
      * @exception IllegalStateException If the response was committed
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void sendError(int sc, String msg) throws IOException
@@ -114,7 +114,7 @@ public interface Response
      * @param sc the error status code
      * @exception IOException If an input or output exception occurs
      * @exception IllegalStateException If the response was committed before this method call
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void sendError(int sc) throws IOException
@@ -127,7 +127,7 @@ public interface Response
      * 
      * @param name the header name
      * @return <code>true</code> if the named response header has already been set; <code>false</code> otherwise
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean containsHeader(String name)
@@ -145,7 +145,7 @@ public interface Response
      *            (http://www.ietf.org/rfc/rfc2047.txt)
      * @see #containsHeader
      * @see #addHeader
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void setHeader(String name, String value)
@@ -161,7 +161,7 @@ public interface Response
      * @param value the additional header value If it contains octet string, it should be encoded according to RFC 2047
      *            (http://www.ietf.org/rfc/rfc2047.txt)
      * @see #setHeader
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void addHeader(String name, String value)

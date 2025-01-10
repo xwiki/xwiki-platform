@@ -43,11 +43,11 @@ import org.xwiki.observation.ObservationManager;
  * {@link HttpSession#invalidate()} on all sessions before disposal of the component: this ensures that all listeners
  * relying on the session disposal can be executed.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implements a completely
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implements a completely
  * different API from Java point of view.
  *
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 @Component(roles = HttpSessionManager.class)
 @Singleton

@@ -61,7 +61,7 @@ public interface TemporaryAttachmentSessionsManager
      *             is reached)
      * @deprecated use {@link #uploadAttachment(DocumentReference, Part)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part)
         throws TemporaryAttachmentException, AttachmentValidationException
     {
@@ -78,7 +78,7 @@ public interface TemporaryAttachmentSessionsManager
      * @throws TemporaryAttachmentException in case of problem when reading the part
      * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
      *             is reached)
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part)
@@ -102,7 +102,7 @@ public interface TemporaryAttachmentSessionsManager
      * @since 14.9RC1
      * @deprecated use {@link #uploadAttachment(DocumentReference, Part, String)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     XWikiAttachment uploadAttachment(DocumentReference documentReference, javax.servlet.http.Part part, String filename)
         throws TemporaryAttachmentException, AttachmentValidationException;
 
@@ -118,7 +118,7 @@ public interface TemporaryAttachmentSessionsManager
      * @throws TemporaryAttachmentException in case of problem when reading the part
      * @throws AttachmentValidationException in case of error when validating the attachment (e.g., the maximum filesize
      *             is reached)
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default XWikiAttachment uploadAttachment(DocumentReference documentReference, Part part, String filename)

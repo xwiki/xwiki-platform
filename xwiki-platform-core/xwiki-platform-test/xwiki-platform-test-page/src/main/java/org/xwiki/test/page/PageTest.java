@@ -92,7 +92,7 @@ public class PageTest
     /**
      * The stubbed request used to simulate a real Servlet Request.
      * 
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     protected HttpServletRequestStub stubRequest;
 
@@ -101,13 +101,13 @@ public class PageTest
      * 
      * @deprecated use {@link #stubRequest} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiServletRequestStub request;
 
     /**
      * The stubbed response used to simulate a real Servlet Response.
      * 
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     protected HttpServletResponseStub stubResponse;
 
@@ -116,7 +116,7 @@ public class PageTest
      * 
      * @deprecated use {@link #stubResponse} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiServletResponseStub response;
 
     /**

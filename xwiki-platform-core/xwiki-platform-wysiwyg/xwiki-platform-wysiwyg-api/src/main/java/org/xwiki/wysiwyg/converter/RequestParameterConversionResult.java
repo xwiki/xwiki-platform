@@ -34,7 +34,7 @@ import org.xwiki.wysiwyg.internal.filter.http.JavaxToJakartaMutableHttpServletRe
  * @since 14.10
  * @deprecated use {@link JakartaRequestParameterConversionResult} instead
  */
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public class RequestParameterConversionResult
 {
     private MutableServletRequest request;
@@ -59,7 +59,7 @@ public class RequestParameterConversionResult
      * Default constructor.
      *
      * @param result the jakarta result to copy
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     public RequestParameterConversionResult(JakartaRequestParameterConversionResult result)
     {

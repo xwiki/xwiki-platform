@@ -57,12 +57,12 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * As a result, when clicking the button, the request is not sent to the form's target ({@code preview}), but is
  * actually forwarded internally to {@code /bin/saveandcontinue/The/Document}.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
  * different API from Java point of view.
  *
  * @version $Id$
  * @since 1.8M1
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class ActionFilter implements Filter
 {

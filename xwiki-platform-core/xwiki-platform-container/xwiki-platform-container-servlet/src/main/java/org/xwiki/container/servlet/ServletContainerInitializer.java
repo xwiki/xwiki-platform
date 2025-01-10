@@ -29,17 +29,17 @@ import org.xwiki.stability.Unstable;
 @Role
 public interface ServletContainerInitializer
 {
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     void initializeRequest(javax.servlet.http.HttpServletRequest request, Object xwikiContext)
         throws ServletContainerException;
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     void initializeRequest(javax.servlet.http.HttpServletRequest request) throws ServletContainerException;
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     void initializeResponse(javax.servlet.http.HttpServletResponse response);
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     void initializeSession(javax.servlet.http.HttpServletRequest request);
 
     /**
@@ -51,7 +51,7 @@ public interface ServletContainerInitializer
     /**
      * @param request the current request
      * @param response the current response
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void initializeRequest(HttpServletRequest request, HttpServletResponse response)

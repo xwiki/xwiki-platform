@@ -35,7 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * context. This trick is used in to give a daemon thread access to the XWiki api.
  *
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class HttpServletResponseStub implements HttpServletResponse
 {

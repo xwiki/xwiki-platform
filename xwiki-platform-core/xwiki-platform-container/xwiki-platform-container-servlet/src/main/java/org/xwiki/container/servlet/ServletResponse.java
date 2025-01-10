@@ -39,7 +39,7 @@ public class ServletResponse implements RedirectResponse
 
     /**
      * @param jakartaHttpServletResponse the standard Jakarta {@link HttpServletResponse} instance
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     public ServletResponse(HttpServletResponse jakartaHttpServletResponse)
     {
@@ -50,7 +50,7 @@ public class ServletResponse implements RedirectResponse
      * @param javaxHttpServletResponse the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
      * @deprecated use {@link #ServletResponse(HttpServletResponse)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public ServletResponse(javax.servlet.http.HttpServletResponse javaxHttpServletResponse)
     {
         this.jakartaHttpServletResponse = JakartaServletBridge.toJakarta(javaxHttpServletResponse);
@@ -58,7 +58,7 @@ public class ServletResponse implements RedirectResponse
 
     /**
      * @return the standard Jakarta {@link HttpServletResponse} instance
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     public HttpServletResponse getResponse()
     {
@@ -69,7 +69,7 @@ public class ServletResponse implements RedirectResponse
      * @return the legacy Javax {@link javax.servlet.http.HttpServletResponse} instance
      * @deprecated use {@link #getResponse()} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public javax.servlet.http.HttpServletResponse getHttpServletResponse()
     {
         return JakartaServletBridge.toJavax(this.jakartaHttpServletResponse);

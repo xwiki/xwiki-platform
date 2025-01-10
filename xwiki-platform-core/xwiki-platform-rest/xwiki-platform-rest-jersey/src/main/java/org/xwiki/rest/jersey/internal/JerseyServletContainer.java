@@ -45,11 +45,11 @@ import org.xwiki.rest.XWikiRestComponent;
  * Encapsulate the Jersey {@link ServletContainer} to control it's initialization and reload (when a REST component is
  * registered/unregistered).
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
  * API from Java point of view.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 @Component(roles = JerseyServletContainer.class)
 @Singleton

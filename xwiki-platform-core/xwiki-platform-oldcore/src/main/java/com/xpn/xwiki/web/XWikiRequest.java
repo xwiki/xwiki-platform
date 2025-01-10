@@ -32,7 +32,7 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @deprecated use the {@link org.xwiki.container.Container} API instead
  */
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public interface XWikiRequest extends HttpServletRequest
 {
     String get(String name);

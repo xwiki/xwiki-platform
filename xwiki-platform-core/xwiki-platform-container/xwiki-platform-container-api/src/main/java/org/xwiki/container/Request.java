@@ -42,7 +42,7 @@ public interface Request
     /**
      * The name of the attribute holding the request effective author.
      * 
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public static final String ATTRIBUTE_EFFECTIVE_AUTHOR = Request.class.getName() + "#effectiveAuthor";
@@ -62,7 +62,7 @@ public interface Request
      * @return an <code>Object</code> containing the value of the parameter, or <code>null</code> if the parameter does
      *         not exist
      * @see #getParameterValues
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Object getParameter(String key)
@@ -79,7 +79,7 @@ public interface Request
      * @param name a <code>String</code> containing the name of the parameter whose value is requested
      * @return an array of <code>String</code> objects containing the parameter's values
      * @see #getParameter
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default String[] getParameterValues(String name)
@@ -94,7 +94,7 @@ public interface Request
      *
      * @return an <code>Enumeration</code> of <code>String</code> objects, each <code>String</code> containing the name
      *         of a request parameter; or an empty <code>Enumeration</code> if the request has no parameters
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Enumeration<String> getParameterNames()
@@ -109,7 +109,7 @@ public interface Request
      * @param name a <code>String</code> specifying the name of the attribute
      * @return an <code>Object</code> containing the value of the attribute, or <code>null</code> if the attribute does
      *         not exist
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Object getAttribute(String name)
@@ -122,7 +122,7 @@ public interface Request
      *
      * @param name a <code>String</code> specifying the name of the attribute
      * @param o the <code>Object</code> to be stored
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void setAttribute(String name, Object o)
@@ -135,7 +135,7 @@ public interface Request
      * the request is being handled.
      *
      * @param name a <code>String</code> specifying the name of the attribute to remove
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void removeAttribute(String name)
@@ -148,7 +148,7 @@ public interface Request
      * returns an empty <code>Enumeration</code> if the request has no attributes available to it.
      * 
      * @return an <code>Enumeration</code> of strings containing the names of the request's attributes
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Enumeration<String> getAttributeNames()
@@ -163,7 +163,7 @@ public interface Request
      *         triggered by this request. If the request doesn't indicate an effective author then the user that gets
      *         authenticated with the information provided by this request (or the guest user, if authentication
      *         information is missing) should be considered the effective author.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default UserReference getEffectiveAuthor()
@@ -176,7 +176,7 @@ public interface Request
     /**
      * @deprecated use {@link #getParameter(String)} or {@link #getAttribute(String)} instead depending on the need
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default Object getProperty(String key)
     {
         Object result;
@@ -195,7 +195,7 @@ public interface Request
      *             need
      * @since 3.2M3
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default List<Object> getProperties(String key)
     {
         List<Object> result = new ArrayList<>();
@@ -216,7 +216,7 @@ public interface Request
     /**
      * @deprecated use {@link #setAttribute(String, Object)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default void setProperty(String key, Object value)
     {
         setAttribute(key, value);
@@ -225,7 +225,7 @@ public interface Request
     /**
      * @deprecated use {@link #removeAttribute(String)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default void removeProperty(String key)
     {
         removeAttribute(key);

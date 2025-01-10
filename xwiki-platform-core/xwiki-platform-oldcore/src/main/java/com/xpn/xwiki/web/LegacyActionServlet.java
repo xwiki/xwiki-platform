@@ -43,11 +43,11 @@ import com.xpn.xwiki.internal.web.LegacyAction;
  * Executed the right right action depending on the XWiki configuration (for example leading to view action by default
  * if enabled, etc.).
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
  * API from Java point of view.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class LegacyActionServlet extends HttpServlet
 {

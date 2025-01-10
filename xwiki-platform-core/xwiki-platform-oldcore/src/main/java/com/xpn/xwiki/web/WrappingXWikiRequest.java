@@ -34,7 +34,7 @@ import org.xwiki.container.Container;
  * @deprecated use the {@link Container} API instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class WrappingXWikiRequest extends HttpServletRequestWrapper implements XWikiRequest
 {
     protected final XWikiRequest request;

@@ -47,11 +47,11 @@ import com.xpn.xwiki.user.api.XWikiUser;
 /**
  * This filter can be used to initialize the XWiki context before processing a request.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
  * API from Java point of view.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class XWikiContextInitializationFilter implements Filter
 {
@@ -95,7 +95,7 @@ public class XWikiContextInitializationFilter implements Filter
      * @throws ServletException if the initialization fails
      * @deprecated use {@link #initializeXWikiContext(ServletRequest, ServletResponse)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     protected void initializeXWikiContext(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response)
         throws ServletException
     {
@@ -108,7 +108,7 @@ public class XWikiContextInitializationFilter implements Filter
      * @param request the request being processed
      * @param response the response
      * @throws ServletException if the initialization fails
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     protected void initializeXWikiContext(ServletRequest request, ServletResponse response) throws ServletException
     {

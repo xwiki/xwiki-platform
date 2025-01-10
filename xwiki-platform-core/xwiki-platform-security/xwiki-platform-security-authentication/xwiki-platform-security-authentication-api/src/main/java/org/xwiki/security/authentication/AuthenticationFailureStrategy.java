@@ -61,7 +61,7 @@ public interface AuthenticationFailureStrategy
      * @return true if the authentication request can be validated, i.e. if the user should be authorized to login.
      * @deprecated use {@link #validateForm(String, HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default boolean validateForm(String username, javax.servlet.http.HttpServletRequest request)
     {
         return validateForm(username, JakartaServletBridge.toJakarta(request));
@@ -71,7 +71,7 @@ public interface AuthenticationFailureStrategy
      * @param username the username used for the authentication failure.
      * @param request the authentication request.
      * @return true if the authentication request can be validated, i.e. if the user should be authorized to login.
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default boolean validateForm(String username, HttpServletRequest request)

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.xwiki.jakartabridge.JavaxToJakartaWrapper;
 
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public class XWikiServletResponse extends HttpServletResponseWrapper
     implements XWikiResponse, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletResponse>
 {

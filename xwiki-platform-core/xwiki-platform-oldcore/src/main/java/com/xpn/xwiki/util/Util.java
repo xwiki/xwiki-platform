@@ -193,7 +193,7 @@ public class Util
         return patterns;
     }
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static Map<String, String[]> getObject(XWikiRequest request, String prefix)
     {
         @SuppressWarnings("unchecked")

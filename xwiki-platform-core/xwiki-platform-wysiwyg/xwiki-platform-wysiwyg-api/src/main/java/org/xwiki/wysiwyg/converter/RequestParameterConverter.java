@@ -52,7 +52,7 @@ public interface RequestParameterConverter
      * @throws IOException in case of problem to write an answer in the response
      * @deprecated use {@link #convert(ServletRequest, ServletResponse)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default Optional<javax.servlet.ServletRequest> convert(javax.servlet.ServletRequest request,
         javax.servlet.ServletResponse response) throws IOException
     {
@@ -73,7 +73,7 @@ public interface RequestParameterConverter
      * @param response the response used to redirect or do changes in case of conversion error
      * @return a mutable request with the converted parameters, or an empty optional in case of error
      * @throws IOException in case of problem to write an answer in the response
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
@@ -96,7 +96,7 @@ public interface RequestParameterConverter
      * @since 14.10
      * @deprecated use {@link #convert(ServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     default RequestParameterConversionResult convert(javax.servlet.ServletRequest request)
     {
         return new RequestParameterConversionResult(convert(JakartaServletBridge.toJakarta(request)));
@@ -111,7 +111,7 @@ public interface RequestParameterConverter
      * @param request the request that might contain parameter needing conversion
      * @return an instance of {@link RequestParameterConversionResult} containing the modified request and the output
      *         and errors that might have occurred
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default JakartaRequestParameterConversionResult convert(ServletRequest request)

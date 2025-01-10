@@ -41,7 +41,7 @@ public class ServletSession implements Session
      * @param request the servlet request
      * @deprecated use {@link #ServletSession(HttpSession)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public ServletSession(javax.servlet.http.HttpServletRequest request)
     {
         this(JakartaServletBridge.toJakarta(request.getSession(true)));
@@ -49,7 +49,7 @@ public class ServletSession implements Session
 
     /**
      * @param session the Servlet session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public ServletSession(HttpSession session)
@@ -61,7 +61,7 @@ public class ServletSession implements Session
      * @return the current Servlet session
      * @deprecated use {@link #getSession()} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public javax.servlet.http.HttpSession getHttpSession()
     {
         return JakartaServletBridge.toJavax(this.httpSession);
@@ -69,7 +69,7 @@ public class ServletSession implements Session
 
     /**
      * @return the current Servlet session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public HttpSession getSession()

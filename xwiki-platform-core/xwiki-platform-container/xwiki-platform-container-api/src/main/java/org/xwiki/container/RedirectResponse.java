@@ -29,7 +29,7 @@ import java.io.IOException;
  * @since 10.0
  * @deprecated merged with {@link Response}
  */
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public interface RedirectResponse extends Response
 {
     /**

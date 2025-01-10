@@ -56,11 +56,11 @@ import org.xwiki.url.ExtendedURL;
  * As time progresses it is expected that more and more Resource Types will have registered
  * {@link org.xwiki.resource.ResourceReferenceHandler}.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
  * API from Java point of view.
  *
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class RoutingFilter implements Filter
 {

@@ -33,7 +33,7 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public class XWikiServletRequest extends HttpServletRequestWrapper
     implements XWikiRequest, JavaxToJakartaWrapper<jakarta.servlet.http.HttpServletRequest>
 {

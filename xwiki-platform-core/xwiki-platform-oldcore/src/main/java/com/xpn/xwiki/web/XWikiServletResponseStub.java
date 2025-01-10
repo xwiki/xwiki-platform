@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * @deprecated use the {@link Container} API instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class XWikiServletResponseStub extends HttpServletResponseWrapper
     implements XWikiResponse, JavaxToJakartaWrapper<HttpServletResponseStub>
 {
@@ -49,7 +49,7 @@ public class XWikiServletResponseStub extends HttpServletResponseWrapper
 
     /**
      * @param jakarta the request wrap
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public XWikiServletResponseStub(HttpServletResponseStub jakarta)

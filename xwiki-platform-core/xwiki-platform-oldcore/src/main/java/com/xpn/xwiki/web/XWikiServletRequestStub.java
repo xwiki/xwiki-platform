@@ -43,7 +43,7 @@ import com.xpn.xwiki.util.Util;
  * @deprecated use {@link HttpServletRequestStub} instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class XWikiServletRequestStub extends HttpServletRequestWrapper
     implements XWikiRequest, JavaxToJakartaWrapper<HttpServletRequestStub>
 {
@@ -176,7 +176,7 @@ public class XWikiServletRequestStub extends HttpServletRequestWrapper
 
     /**
      * @param jakarta the request wrap
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     public XWikiServletRequestStub(HttpServletRequestStub jakarta)

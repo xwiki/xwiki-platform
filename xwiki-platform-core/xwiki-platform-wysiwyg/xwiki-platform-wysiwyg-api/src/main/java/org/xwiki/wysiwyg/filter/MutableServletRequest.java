@@ -31,7 +31,7 @@ import javax.servlet.ServletResponse;
  * @version $Id$
  * @deprecated use {@link MutableJakartaServletRequest} instead
  */
-@Deprecated(since = "42.0.0")
+@Deprecated(since = "17.0.0RC1")
 public interface MutableServletRequest extends ServletRequest
 {
     /**

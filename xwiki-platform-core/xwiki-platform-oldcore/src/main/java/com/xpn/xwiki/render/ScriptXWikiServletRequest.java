@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * @deprecated use the {@link org.xwiki.container.script.ContainerScriptService} instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class ScriptXWikiServletRequest extends WrappingXWikiRequest
 {
     /**

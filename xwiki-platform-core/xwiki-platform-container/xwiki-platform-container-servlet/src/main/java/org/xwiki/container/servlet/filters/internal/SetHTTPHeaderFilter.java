@@ -32,11 +32,11 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Filter that set the desired header of the HTTP response to the desired value.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
  * different API from Java point of view.
  *
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class SetHTTPHeaderFilter implements Filter
 {

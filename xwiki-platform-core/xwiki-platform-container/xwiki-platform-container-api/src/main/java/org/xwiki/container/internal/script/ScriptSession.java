@@ -32,7 +32,7 @@ import org.xwiki.security.authorization.Right;
  * A wrapper around {@link Session} with security related checks.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class ScriptSession implements Session
 {

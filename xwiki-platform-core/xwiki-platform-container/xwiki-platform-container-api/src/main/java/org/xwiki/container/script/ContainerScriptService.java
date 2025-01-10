@@ -38,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * The main entry point for a script to manipulate {@link Container} related APIs.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 @Unstable
 @Component

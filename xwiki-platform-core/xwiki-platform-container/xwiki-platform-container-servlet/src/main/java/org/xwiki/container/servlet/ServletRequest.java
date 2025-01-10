@@ -37,7 +37,7 @@ public class ServletRequest implements Request
 
     /**
      * @param jakartaHttpServletRequest the standard Jakarta {@link HttpServletRequest} instance
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     public ServletRequest(HttpServletRequest jakartaHttpServletRequest)
     {
@@ -48,7 +48,7 @@ public class ServletRequest implements Request
      * @param javaxHttpServletRequest the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
      * @deprecated use {@link #ServletRequest(HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public ServletRequest(javax.servlet.http.HttpServletRequest javaxHttpServletRequest)
     {
         this.jakartaHttpServletRequest = JakartaServletBridge.toJakarta(javaxHttpServletRequest);
@@ -56,7 +56,7 @@ public class ServletRequest implements Request
 
     /**
      * @return the standard Jakarta {@link HttpServletRequest} instance
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     public HttpServletRequest getRequest()
     {
@@ -67,7 +67,7 @@ public class ServletRequest implements Request
      * @return the legacy Javax {@link javax.servlet.http.HttpServletRequest} instance
      * @deprecated use {@link #getRequest()} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public javax.servlet.http.HttpServletRequest getHttpServletRequest()
     {
         return JakartaServletBridge.toJavax(this.jakartaHttpServletRequest);

@@ -28,7 +28,7 @@ import org.xwiki.user.UserReference;
  * A wrapper around {@link Request}.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class WrappingRequest implements Request
 {

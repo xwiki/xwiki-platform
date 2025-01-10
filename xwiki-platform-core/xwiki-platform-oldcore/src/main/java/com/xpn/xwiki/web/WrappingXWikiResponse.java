@@ -28,11 +28,11 @@ import org.xwiki.container.Container;
  * A wrapper around {@link XWikiResponse}.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  * @deprecated use the {@link Container} API instead
  */
 // TODO: uncomment the annotation when XWiki Standard scripts are fully migrated to the new API
-// @Deprecated(since = "42.0.0")
+// @Deprecated(since = "17.0.0RC1")
 public class WrappingXWikiResponse extends HttpServletResponseWrapper implements XWikiResponse
 {
     protected final XWikiResponse response;

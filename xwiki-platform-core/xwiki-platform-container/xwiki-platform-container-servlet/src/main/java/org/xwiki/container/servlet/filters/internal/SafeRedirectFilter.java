@@ -43,7 +43,7 @@ import org.xwiki.url.URLSecurityManager;
  * Filter which inject a response wrapper in charge of converting the redirect location into a safe URL.
  * 
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class SafeRedirectFilter implements Filter
 {

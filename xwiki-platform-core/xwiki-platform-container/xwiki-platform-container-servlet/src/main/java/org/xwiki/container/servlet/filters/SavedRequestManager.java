@@ -68,7 +68,7 @@ public final class SavedRequestManager
          * @param request the request that needs to be saved
          * @deprecated use {@link #SavedRequest(HttpServletRequest)}) instead
          */
-        @Deprecated(since = "42.0.0")
+        @Deprecated(since = "17.0.0RC1")
         public SavedRequest(javax.servlet.http.HttpServletRequest request)
         {
             this(JakartaServletBridge.toJakarta(request));
@@ -78,7 +78,7 @@ public final class SavedRequestManager
          * Constructor that copies the needed information from a request.
          * 
          * @param request the request that needs to be saved
-         * @since 42.0.0
+         * @since 17.0.0RC1
          */
         @Unstable
         public SavedRequest(HttpServletRequest request)
@@ -173,7 +173,7 @@ public final class SavedRequestManager
      * @return the identifier of the saved request
      * @deprecated use {@link #saveRequest(HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static String saveRequest(javax.servlet.http.HttpServletRequest request)
     {
         return saveRequest(JakartaServletBridge.toJakarta(request));
@@ -186,7 +186,7 @@ public final class SavedRequestManager
      * 
      * @param request the request to save
      * @return the identifier of the saved request
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     @SuppressWarnings("unchecked")
@@ -224,7 +224,7 @@ public final class SavedRequestManager
      *         request information
      * @deprecated use {@link #getOriginalUrl(HttpServletRequest)} instead
      */
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     public static String getOriginalUrl(javax.servlet.http.HttpServletRequest request)
     {
         return getOriginalUrl(JakartaServletBridge.toJakarta(request));
@@ -238,7 +238,7 @@ public final class SavedRequestManager
      * @param request the current request
      * @return the original requested URL that triggered a detour, or <code>null</code> if there isn't any original
      *         request information
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     @SuppressWarnings("unchecked")

@@ -38,7 +38,7 @@ public interface Session
      * @param name a string specifying the name of the object
      * @return the object with the specified name
      * @exception IllegalStateException if this method is called on an invalidated session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Object getAttribute(String name)
@@ -55,7 +55,7 @@ public interface Session
      * @param name the name to which the object is bound; cannot be null
      * @param value the object to be bound
      * @exception IllegalStateException if this method is called on an invalidated session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void setAttribute(String name, Object value)
@@ -69,7 +69,7 @@ public interface Session
      *
      * @param name the name of the object to remove from this session
      * @exception IllegalStateException if this method is called on an invalidated session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default void removeAttribute(String name)
@@ -84,7 +84,7 @@ public interface Session
      * @return an <code>Enumeration</code> of <code>String</code> objects specifying the names of all the objects bound
      *         to this session
      * @exception IllegalStateException if this method is called on an invalidated session
-     * @since 42.0.0
+     * @since 17.0.0RC1
      */
     @Unstable
     default Enumeration<String> getAttributeNames()

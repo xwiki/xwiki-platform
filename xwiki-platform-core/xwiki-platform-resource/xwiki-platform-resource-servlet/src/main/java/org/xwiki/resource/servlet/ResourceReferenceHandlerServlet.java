@@ -48,11 +48,11 @@ import org.xwiki.url.ExtendedURL;
  * {@link org.xwiki.resource.ResourceReferenceHandler}) and any URL matching the corresponding {@link ResourceType} will
  * be handled.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implements a completely
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implements a completely
  * different API from Java point of view.
  *
  * @version $Id$
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class ResourceReferenceHandlerServlet extends HttpServlet
 {

@@ -830,7 +830,7 @@ public abstract class XWikiAction implements LegacyAction
         xcontext.setFinished(true);
     }
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
         javax.servlet.http.HttpServletResponse servletResponse)
         throws XWikiException, ServletException, InstantiationException, IllegalAccessException
@@ -854,7 +854,7 @@ public abstract class XWikiAction implements LegacyAction
         return this.componentDescriptor.getRoleHint();
     }
 
-    @Deprecated(since = "42.0.0")
+    @Deprecated(since = "17.0.0RC1")
     protected XWikiContext initializeXWikiContext(javax.servlet.http.HttpServletRequest servletRequest,
         javax.servlet.http.HttpServletResponse servletResponse, XWikiForm form) throws XWikiException, ServletException
     {

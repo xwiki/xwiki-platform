@@ -31,10 +31,10 @@ import jakarta.servlet.http.HttpServletResponse;
  * <code>http://localhost:8080/xwiki</code> and be redirected automatically to
  * <code>http://localhost:8080/xwiki/bin/view/Main/</code>.
  * <p>
- * While the class is much older, the since annotation was moved to 42.0.0 because it implement a completely different API
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different API
  * from Java point of view.
  * 
- * @since 42.0.0
+ * @since 17.0.0RC1
  */
 public class HomePageRedirectServlet extends HttpServlet
 {

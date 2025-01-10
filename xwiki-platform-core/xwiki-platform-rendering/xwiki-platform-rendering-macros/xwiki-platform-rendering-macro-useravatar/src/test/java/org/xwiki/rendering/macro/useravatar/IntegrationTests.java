@@ -27,8 +27,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -42,10 +43,10 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macrouseravatar.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macrouseravatar.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         // Skin Access Bridge Mock
@@ -106,10 +107,5 @@ public class IntegrationTests implements RenderingTests
             .thenReturn("XWiki.UserWithExceptionRetrievingAvatarFile@mockAvatar.png");
         when(ers.serialize(userWithExceptionRetrievingAvatarFileReference))
             .thenReturn("XWiki.UserWithExceptionRetrievingAvatarFile");
-
-        // Entity Reference Serializer Mock
-        EntityReferenceValueProvider ervp =
-            componentManager.registerMockComponent(EntityReferenceValueProvider.class, "current");
-        when(ervp.getDefaultValue(EntityType.WIKI)).thenReturn("wiki");
     }
 }

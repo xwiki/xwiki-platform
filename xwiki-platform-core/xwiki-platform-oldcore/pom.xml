@@ -218,6 +218,12 @@
       <artifactId>batik-svgrasterizer</artifactId>
     </dependency>
 
+    <!-- Guava, currently only used in SimpleDocumentCache -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
     <!-- Misc -->
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
@@ -574,6 +580,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- The Login and Register links are injected as UI extensions. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- XWiki syntax parsers -->
@@ -874,7 +887,6 @@
                 **/web/ExportAction.java,
                 **/web/ExportURLFactory.java,
                 **/web/HomePageRedirectServlet.java,
-                **/web/ImportAction.java,
                 **/web/includeservletasstring/BufferedResponse.java,
                 **/web/includeservletasstring/BufferOutputStream.java,
                 **/web/includeservletasstring/IncludeServletAsString.java,

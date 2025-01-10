@@ -57,8 +57,8 @@
     </dependency>
     <!-- Used by the date filter. -->
     <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>momentjs</artifactId>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>moment</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

@@ -20,6 +20,7 @@
 package org.xwiki.websocket.internal;
 
 import java.net.HttpCookie;
+import java.net.URI;
 import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,6 +37,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.HandshakeRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -47,7 +51,15 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  */
 public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebSocketRequestStub.class);
+
     private final HandshakeRequest request;
+
+    private final URI requestURI;
+
+    private final String queryString;
+
+    private final Principal userPrincipal;
 
     /**
      * Creates a new XWiki request that wraps the given WebSocket handshake request.
@@ -59,6 +71,9 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
         super(buildFromHandshakeRequest(request));
 
         this.request = request;
+        this.requestURI = request.getRequestURI();
+        this.queryString = request.getQueryString();
+        this.userPrincipal = request.getUserPrincipal();
     }
 
     private static Builder buildFromHandshakeRequest(HandshakeRequest request)
@@ -67,6 +82,7 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
         Optional<String> cookieHeader = headers.getOrDefault("Cookie", Collections.emptyList()).stream().findFirst();
         return new Builder().setRequestParameters(adaptParameterMap(request.getParameterMap()))
             .setCookies(parseCookies(cookieHeader)).setHeaders(headers)
+            .setHttpSession((HttpSession) request.getHttpSession())
             // The WebSocket API (JSR-356) doesn't expose the client IP address but at least we can avoid a null pointer
             // exception.
             .setRemoteAddr("");
@@ -111,7 +127,7 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
     @Override
     public String getRequestURI()
     {
-        return this.request.getRequestURI().toString();
+        return this.requestURI.toString();
     }
 
     private static Map<String, String[]> adaptParameterMap(Map<String, List<String>> params)
@@ -124,18 +140,6 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
     }
 
     @Override
-    public HttpSession getSession()
-    {
-        return getSession(true);
-    }
-
-    @Override
-    public HttpSession getSession(boolean create)
-    {
-        return (HttpSession) this.request.getHttpSession();
-    }
-
-    @Override
     public String getServletPath()
     {
         return "";
@@ -144,30 +148,37 @@ public class XWikiWebSocketRequestStub extends XWikiServletRequestStub
     @Override
     public String getPathInfo()
     {
-        return this.request.getRequestURI().getPath();
+        return this.requestURI.getPath();
     }
 
     @Override
     public String getScheme()
     {
-        return this.request.getRequestURI().getScheme();
+        return this.requestURI.getScheme();
     }
 
     @Override
     public String getQueryString()
     {
-        return this.request.getQueryString();
+        return this.queryString;
     }
 
     @Override
     public Principal getUserPrincipal()
     {
-        return this.request.getUserPrincipal();
+        return this.userPrincipal;
     }
 
     @Override
     public boolean isUserInRole(String role)
     {
-        return this.request.isUserInRole(role);
+        try {
+            return this.request.isUserInRole(role);
+        } catch (Exception e) {
+            LOGGER.debug("Failed to determine if the currently authenticated user has the specified role. "
+                + "This can happen if this method is called outside the WebSocket handshake request, "
+                + "i.e. from a WebSocket end-point.", e);
+            return false;
+        }
     }
 }

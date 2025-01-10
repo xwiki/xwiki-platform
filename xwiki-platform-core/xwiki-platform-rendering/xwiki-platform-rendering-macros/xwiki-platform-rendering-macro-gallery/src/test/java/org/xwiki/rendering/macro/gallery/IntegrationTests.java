@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.macro.gallery;
 
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -32,10 +34,10 @@ import org.xwiki.test.mockito.MockitoComponentManager;
  * @since 3.0RC1
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macrogallery.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macrogallery.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception
     {
         componentManager.registerMockComponent(SkinExtension.class, "jsfx");

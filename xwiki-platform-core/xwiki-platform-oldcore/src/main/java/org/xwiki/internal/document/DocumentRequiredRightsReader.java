@@ -19,6 +19,7 @@
  */
 package org.xwiki.internal.document;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,6 +61,20 @@ public class DocumentRequiredRightsReader
      */
     public static final String PROPERTY_NAME = "level";
 
+    private static final DocumentRequiredRights ENFORCED_EMPTY = new DocumentRequiredRights(true, Set.of());
+
+    private static final DocumentRequiredRights ENFORCED_SCRIPT = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.SCRIPT, EntityType.DOCUMENT)));
+
+    private static final DocumentRequiredRights ENFORCED_PROGRAMMING = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.PROGRAM, null)));
+
+    private static final DocumentRequiredRights ENFORCED_ADMIN = new DocumentRequiredRights(true,
+        Set.of(new DocumentRequiredRight(Right.ADMIN, EntityType.WIKI)));
+
+    private static final List<DocumentRequiredRights> STATIC_INSTANCES = List.of(ENFORCED_EMPTY, ENFORCED_SCRIPT,
+        ENFORCED_PROGRAMMING, ENFORCED_ADMIN);
+
     @Inject
     private Logger logger;
 
@@ -71,15 +86,33 @@ public class DocumentRequiredRightsReader
      */
     public DocumentRequiredRights readRequiredRights(XWikiDocument document)
     {
-        return new DocumentRequiredRights(document.isEnforceRequiredRights(),
-            document.getXObjects(CLASS_REFERENCE).stream()
-                .filter(Objects::nonNull)
-                .map(this::readRequiredRight)
-                // Don't allow edit right/edit right implies no extra right.
-                // Filter out invalid values.
-                .filter(requiredRight ->
-                    !Right.EDIT.equals(requiredRight.right()) && !Right.ILLEGAL.equals(requiredRight.right()))
-                .collect(Collectors.toUnmodifiableSet()));
+        boolean enforce = document.isEnforceRequiredRights();
+        Set<DocumentRequiredRight> rights = document.getXObjects(CLASS_REFERENCE).stream()
+            .filter(Objects::nonNull)
+            .map(this::readRequiredRight)
+            // Don't allow edit right/edit right implies no extra right.
+            // Filter out invalid values.
+            .filter(requiredRight ->
+                !Right.EDIT.equals(requiredRight.right()) && !Right.ILLEGAL.equals(requiredRight.right()))
+            .collect(Collectors.toUnmodifiableSet());
+
+        // Try returning a static instance to avoid creating lots of objects that contain the same values as most
+        // documents will be in the case of one of the static instances. This is also to reduce the memory usage of
+        // the cache.
+        if (!enforce && rights.isEmpty()) {
+            return DocumentRequiredRights.EMPTY;
+        }
+
+        // Return the static instance that has the same set of rights.
+        if (enforce) {
+            for (DocumentRequiredRights staticInstance : STATIC_INSTANCES) {
+                if (staticInstance.rights().equals(rights)) {
+                    return staticInstance;
+                }
+            }
+        }
+
+        return new DocumentRequiredRights(enforce, rights);
     }
 
     private DocumentRequiredRight readRequiredRight(BaseObject object)

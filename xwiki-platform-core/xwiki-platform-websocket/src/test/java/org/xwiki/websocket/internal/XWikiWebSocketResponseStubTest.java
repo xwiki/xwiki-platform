@@ -35,6 +35,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
 class XWikiWebSocketResponseStubTest
 {
     @Test
-    void verifyStub() throws Exception
+    void verifyStub()
     {
         Map<String, List<String>> headers = new LinkedHashMap<>();
 
@@ -89,5 +90,16 @@ class XWikiWebSocketResponseStubTest
 
         assertTrue(stub.containsHeader("dATe"));
         assertFalse(stub.containsHeader("Age"));
+    }
+
+    @Test
+    void staleResponse()
+    {
+        HandshakeResponse handshakeResponse = mock(HandshakeResponse.class);
+        when(handshakeResponse.getHeaders()).thenThrow(new RuntimeException("Stale response"));
+
+        XWikiWebSocketResponseStub stub = new XWikiWebSocketResponseStub(handshakeResponse);
+
+        assertNull(stub.getHeader("foo"));
     }
 }

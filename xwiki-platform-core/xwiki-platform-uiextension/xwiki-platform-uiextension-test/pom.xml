@@ -48,7 +48,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-uiextension-api</artifactId>
+      <artifactId>xwiki-platform-uiextension-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Required since the content of the UI extensions used in the tests is written in velocity -->

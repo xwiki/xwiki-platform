@@ -23,7 +23,9 @@ import javax.script.ScriptContext;
 import javax.script.SimpleScriptContext;
 
 import org.xwiki.rendering.macro.script.JUnit5ScriptMockSetup;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.Scope;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -38,10 +40,10 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-@RenderingTests.Scope(pattern = "macropython.*")
-public class IntegrationTests implements RenderingTests
+@Scope(pattern = "macropython.*")
+public class IntegrationTests extends RenderingTest
 {
-    @RenderingTests.Initialized
+    @Initialized
     public void initialize(MockitoComponentManager cm) throws Exception
     {
         new JUnit5ScriptMockSetup(cm);

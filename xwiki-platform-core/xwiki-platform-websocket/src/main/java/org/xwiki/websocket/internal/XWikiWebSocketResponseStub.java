@@ -25,10 +25,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ import javax.servlet.http.Cookie;
 import javax.websocket.HandshakeResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -49,6 +52,8 @@ import com.xpn.xwiki.web.XWikiServletResponseStub;
  */
 public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiWebSocketResponseStub.class);
+
     private final HandshakeResponse response;
 
     /**
@@ -64,58 +69,67 @@ public class XWikiWebSocketResponseStub extends XWikiServletResponseStub
     @Override
     public void addHeader(String name, String value)
     {
-        List<String> values = getHeaderValues(name);
-        if (values == null) {
-            values = new ArrayList<>();
-            this.response.getHeaders().put(name, values);
-        }
+        List<String> values = getHeaderValues(name).orElseGet(() -> {
+            List<String> emptyValues = new ArrayList<>();
+            getHeaders().put(name, emptyValues);
+            return emptyValues;
+        });
         values.add(value);
     }
 
     @Override
     public boolean containsHeader(String name)
     {
-        List<String> values = getHeaderValues(name);
-        return values != null && !values.isEmpty();
+        return getHeaderValues(name).map(values -> !values.isEmpty()).orElse(false);
     }
 
     @Override
     public String getHeader(String name)
     {
-        List<String> values = getHeaderValues(name);
-        return values != null && !values.isEmpty() ? values.get(0) : null;
+        return getHeaderValues(name).map(values -> values.isEmpty() ? null : values.get(0)).orElse(null);
     }
 
-    private List<String> getHeaderValues(String name)
+    private Optional<List<String>> getHeaderValues(String name)
     {
-        for (Map.Entry<String, List<String>> entry : this.response.getHeaders().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : getHeaders().entrySet()) {
             if (StringUtils.equalsIgnoreCase(name, entry.getKey())) {
-                return entry.getValue();
+                return Optional.of(entry.getValue());
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Collection<String> getHeaders(String name)
     {
-        List<String> values = getHeaderValues(name);
-        return values != null ? new ArrayList<>(values) : Collections.emptyList();
+        return getHeaderValues(name).map(ArrayList::new).orElseGet(ArrayList::new);
     }
 
     @Override
     public Collection<String> getHeaderNames()
     {
-        return new LinkedHashSet<>(this.response.getHeaders().keySet());
+        return new LinkedHashSet<>(getHeaders().keySet());
+    }
+
+    private Map<String, List<String>> getHeaders()
+    {
+        try {
+            return this.response.getHeaders();
+        } catch (Exception e) {
+            LOGGER.debug("Failed to retrieve the WebSocket handshake response headers. "
+                + "This can happen if the HandshakeResponse object is used after the handshake is performed, "
+                + "e.g. in the WebSocket end-point.", e);
+            return new HashMap<>();
+        }
     }
 
     @Override
     public void setHeader(String name, String value)
     {
-        Set<String> namesToRemove = this.response.getHeaders().keySet().stream()
+        Set<String> namesToRemove = getHeaders().keySet().stream()
             .filter(headerName -> StringUtils.equalsIgnoreCase(name, headerName)).collect(Collectors.toSet());
-        this.response.getHeaders().keySet().removeAll(namesToRemove);
-        this.response.getHeaders().put(name, new ArrayList<>(Arrays.asList(value)));
+        getHeaders().keySet().removeAll(namesToRemove);
+        getHeaders().put(name, new ArrayList<>(Arrays.asList(value)));
     }
 
     @Override

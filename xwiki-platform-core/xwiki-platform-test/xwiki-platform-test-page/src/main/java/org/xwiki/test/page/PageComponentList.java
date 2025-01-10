@@ -38,7 +38,6 @@ import org.xwiki.display.internal.DocumentContentAsyncExecutor;
 import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
-import org.xwiki.internal.document.DefaultDocumentRequiredRightsManager;
 import org.xwiki.internal.document.DocumentRequiredRightsReader;
 import org.xwiki.internal.script.XWikiScriptContextInitializer;
 import org.xwiki.internal.velocity.XWikiVelocityManager;
@@ -312,7 +311,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultCacheControl.class,
 
     // Required rights (needed for Document/Object API)
-    DefaultDocumentRequiredRightsManager.class,
     DocumentRequiredRightsReader.class
 })
 @Inherited

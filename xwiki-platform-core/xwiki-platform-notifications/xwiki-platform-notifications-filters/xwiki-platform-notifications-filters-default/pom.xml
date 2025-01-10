@@ -50,6 +50,11 @@
       <artifactId>xwiki-platform-livedata-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-requiredrights-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>

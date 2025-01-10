@@ -9,6 +9,7 @@ const { t } = useI18n({
   messages,
 });
 const props = defineProps<TextFieldProps>();
+const input = defineModel<string>();
 
 const rules = computed(() => {
   const rulesList = [];
@@ -27,6 +28,7 @@ const rules = computed(() => {
 
 <template>
   <v-text-field
+    v-model="input"
     :label="label"
     :name="name"
     :autofocus="autofocus"

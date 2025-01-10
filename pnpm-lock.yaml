@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  avvvatars-vue:
-    hash: usix32k57inq7lu5l5hlwk33gm
-    path: patches/avvvatars-vue.patch
-
 importers:
 
   .:
@@ -2350,6 +2345,9 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../api
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -2363,9 +2361,6 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2527,12 +2522,18 @@ importers:
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
+      '@xwiki/cristal-authentication-api':
+        specifier: workspace:*
+        version: link:../../core/authentication/authentication-api
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../../core/backends/backend-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
+      '@xwiki/cristal-dsapi':
+        specifier: workspace:*
+        version: link:../../ds/api
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../core/icons
@@ -2560,9 +2561,6 @@ importers:
       '@xwiki/cristal-tiptap-link-suggest-ui':
         specifier: workspace:*
         version: link:../../core/tiptap-extensions/tiptap-link-suggest-ui
-      avvvatars-vue:
-        specifier: 1.1.0
-        version: 1.1.0(patch_hash=usix32k57inq7lu5l5hlwk33gm)(vue@3.5.13(typescript@5.7.3))
       eventemitter3:
         specifier: 5.0.1
         version: 5.0.1
@@ -2606,9 +2604,6 @@ importers:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
-      '@xwiki/cristal-dsapi':
-        specifier: workspace:*
-        version: link:../../ds/api
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -5509,12 +5504,6 @@ packages:
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
-
-  avvvatars-vue@1.1.0:
-    resolution: {integrity: sha512-hTzzg2yBdaYZSLeN2O6ToC40Fp7np7diZoVJfAn8j+T1hhhlkzwbwSvXCykAjHCdH8JFSn5emrnaplvxD7XgBQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      vue: '>=3'
 
   axios@1.7.9:
     resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
@@ -10852,10 +10841,6 @@ snapshots:
   available-typed-arrays@1.0.7:
     dependencies:
       possible-typed-array-names: 1.0.0
-
-  avvvatars-vue@1.1.0(patch_hash=usix32k57inq7lu5l5hlwk33gm)(vue@3.5.13(typescript@5.7.3)):
-    dependencies:
-      vue: 3.5.13(typescript@5.7.3)
 
   axios@1.7.9:
     dependencies:

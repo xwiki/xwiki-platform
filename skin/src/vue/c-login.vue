@@ -25,7 +25,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
       </x-avatar>
       <x-avatar
         image="https://images.unsplash.com/photo-1511485977113-f34c92461ad9?ixlib=rb-1.2.1&w=128&h=128&dpr=2&q=80"
-        :alt="displayname"
+        :name="displayname"
       >
         {{ initials }}
       </x-avatar>

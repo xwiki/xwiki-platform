@@ -21,6 +21,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 import CConnectionStatus from "./c-connection-status.vue";
 import CSaveStatus from "./c-save-status.vue";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
+import { computeCurrentUser } from "./compute-current-user";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import { Slash } from "../components/extensions/slash";
 import { CollaborationKit, User } from "../extensions/collaboration";
@@ -34,6 +35,7 @@ import TableRow from "@tiptap/extension-table-row";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
+import { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import {
   ModelReferenceParserProvider,
@@ -68,6 +70,10 @@ const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const documentService = cristal
   .getContainer()
   .get<DocumentService>(documentServiceName);
+const authenticationManager = cristal
+  .getContainer()
+  .get<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+  .get();
 const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
 const currentPage: Ref<PageData | undefined> =
@@ -100,11 +106,11 @@ const save = async (authors: User[]) => {
     authors.map((author) => author.name).join(", "),
   );
 
-  // TODO: html does not make any sense here.
   const storage = cristal
     .getContainer()
     .get<StorageProvider>("StorageProvider")
     .get();
+  // TODO: html does not make any sense here.
   await storage.save(
     currentPageName.value ?? "",
     editor.value?.storage.markdown.getMarkdown(),
@@ -120,61 +126,22 @@ const save = async (authors: User[]) => {
 };
 const submit = async () => {
   if (!hasRealtime) {
-    await save([
-      {
-        name: currentUser.name,
-      },
-    ]);
+    await save([currentUser!]);
   } else {
     await editor.value?.storage.cristalCollaborationKit.autoSaver.save();
   }
   view();
 };
 
-// TODO: Remove this when we add support for user authentication.
-const names = [
-  "Lea Thompson",
-  "Cyndi Lauper",
-  "Tom Cruise",
-  "Madonna",
-  "Jerry Hall",
-  "Joan Collins",
-  "Winona Ryder",
-  "Christina Applegate",
-  "Alyssa Milano",
-  "Molly Ringwald",
-  "Ally Sheedy",
-  "Debbie Harry",
-  "Olivia Newton-John",
-  "Elton John",
-  "Michael J. Fox",
-  "Axl Rose",
-  "Emilio Estevez",
-  "Ralph Macchio",
-  "Rob Lowe",
-  "Jennifer Grey",
-  "Mickey Rourke",
-  "John Cusack",
-  "Matthew Broderick",
-  "Justine Bateman",
-  "Lisa Bonet",
-];
-const randomName = () => names[Math.floor(Math.random() * names.length)];
-const currentUser = {
-  name: randomName(),
-};
+let currentUser: undefined | User = undefined;
 
 let editor: Ref<Editor | undefined> = ref(undefined);
 
 const debounced = debounce(() => {
-  save([
-    {
-      name: currentUser.name,
-    },
-  ]);
+  save([currentUser!]);
 }, 500);
 
-function editorInit(
+async function editorInit(
   container: Container,
   linkSuggest: LinkSuggestService | undefined,
   MarkdownExtension: typeof Markdown,
@@ -182,6 +149,7 @@ function editorInit(
   serializer: ModelReferenceSerializer,
   parser: RemoteURLParser,
 ) {
+  currentUser = await computeCurrentUser(authenticationManager);
   const realtimeExtension = [];
   if (hasRealtime) {
     realtimeExtension.push(
@@ -284,7 +252,7 @@ async function loadEditor(page: PageData | undefined) {
       remoteURLSerialize,
     );
 
-    editor.value = editorInit(
+    editor.value = await editorInit(
       container,
       linkSuggest,
       MarkdownExtension,
@@ -314,7 +282,7 @@ watch(
       return await editor.value?.storage.cristalCollaborationKit.autoSaver.save(
         [
           {
-            name: currentUser.name,
+            name: currentUser!.name,
           },
         ],
       );

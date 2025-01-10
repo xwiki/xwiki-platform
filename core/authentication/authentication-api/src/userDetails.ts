@@ -26,4 +26,10 @@
 export interface UserDetails {
   profile?: string;
   name: string;
+  /**
+   * URL of the user avatar. Must be publicly accessible.
+   *
+   * @since 0.14
+   */
+  avatar?: string;
 }

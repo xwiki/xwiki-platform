@@ -28,7 +28,14 @@ type AvatarProps = {
    * Image URL.
    */
   image?: string;
-  alt?: string;
+  /**
+   * Image maximum dimension, with a unit (e.g., 30 px)
+   */
+  size?: string;
+  /**
+   * User name.
+   */
+  name?: string;
 };
 
 export type { AvatarProps };

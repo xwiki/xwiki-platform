@@ -28,7 +28,6 @@ import {
   onStatusParameters,
 } from "@hocuspocus/provider";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { Avvvatars } from "avvvatars-vue";
 import { ref } from "vue";
 import type { Ref } from "vue";
 
@@ -81,19 +80,25 @@ provider.on("awarenessChange", (event: onAwarenessChangeParameters) => {
       v-if="status === WebSocketStatus.Connected"
       class="connection-status-users"
     >
-      <Avvvatars
+      <x-avatar
         v-for="user in users"
         :key="user.name"
-        :value="user.name"
-        variant="shape"
-        :border="true"
-        :size="28"
-      />
+        class="avatar"
+        :image="user.avatar"
+        :name="user.name"
+        :size="'28px'"
+      >
+        {{ user.name }}
+      </x-avatar>
     </span>
   </span>
 </template>
 
 <style scoped>
+.avatar {
+  max-width: 28px;
+  height: 28px;
+}
 .connection-status-icon + .connection-status-label {
   margin-left: 0.2em;
 }

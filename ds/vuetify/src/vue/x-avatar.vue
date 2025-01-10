@@ -17,14 +17,14 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<template>
-  <v-avatar :image="image" :size="size"></v-avatar>
-</template>
-<script lang="ts">
-export default {
-  props: {
-    image: { type: String, required: true },
-    size: { type: String, required: true },
-  },
-};
+<script lang="ts" setup>
+import type { AvatarProps } from "@xwiki/cristal-dsapi";
+
+defineProps<AvatarProps>();
 </script>
+<template>
+  <v-avatar :size="size">
+    <v-img v-if="image" :alt="name" :src="image"></v-img>
+    <span v-else>{{ name }}</span>
+  </v-avatar>
+</template>

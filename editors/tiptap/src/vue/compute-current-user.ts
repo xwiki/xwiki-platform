@@ -18,28 +18,37 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
+import { User } from "../extensions/collaboration";
+import noavatar from "../images/noavatar.png";
+import { AuthenticationManager } from "@xwiki/cristal-authentication-api";
 
 /**
- * Access to user profile.
  *
- * @returns the name and profile url, and an error status
- * @since 0.11
+ * @param authentication - an authentication manager components
+ * @since 0.14
  */
-export async function getUserProfile(
-  authenticationManager: AuthenticationManager,
-): Promise<{
-  name?: string;
-  profile?: string;
-  avatar?: string;
-  error: boolean;
-}> {
-  try {
-    const { profile, name, avatar } =
-      await authenticationManager.getUserDetails();
-    return { profile, name, avatar, error: false };
-  } catch (e) {
-    console.error("Failed to access the user profile", e);
-    return { error: true };
+export async function computeCurrentUser(
+  authentication?: AuthenticationManager,
+): Promise<User> {
+  let ret = {
+    name: "Anonymous",
+    avatar: noavatar,
+  };
+  if (authentication && (await authentication.isAuthenticated())) {
+    try {
+      const userDetails = await authentication.getUserDetails();
+      ret = {
+        name: userDetails.name,
+        avatar: userDetails.avatar ?? noavatar,
+      };
+    } catch (e) {
+      console.error("Failed to get the user details", e);
+      ret = {
+        name: "Unknown",
+        avatar: noavatar,
+      };
+    }
   }
+
+  return ret;
 }

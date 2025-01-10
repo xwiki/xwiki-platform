@@ -17,29 +17,4 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-import type { AuthenticationManager } from "@xwiki/cristal-authentication-api";
-
-/**
- * Access to user profile.
- *
- * @returns the name and profile url, and an error status
- * @since 0.11
- */
-export async function getUserProfile(
-  authenticationManager: AuthenticationManager,
-): Promise<{
-  name?: string;
-  profile?: string;
-  avatar?: string;
-  error: boolean;
-}> {
-  try {
-    const { profile, name, avatar } =
-      await authenticationManager.getUserDetails();
-    return { profile, name, avatar, error: false };
-  } catch (e) {
-    console.error("Failed to access the user profile", e);
-    return { error: true };
-  }
-}
+declare module "*.png";

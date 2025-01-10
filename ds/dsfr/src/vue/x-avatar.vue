@@ -24,8 +24,21 @@ import { AvatarProps } from "@xwiki/cristal-dsapi";
 defineProps<AvatarProps>();
 </script>
 <template>
-  <DsfrPicture v-if="image" :src="image" class="avatar"></DsfrPicture>
-  <DsfrPicture v-else size="small" class="avatar" src=""></DsfrPicture>
+  <DsfrPicture
+    v-if="image"
+    :src="image"
+    class="avatar"
+    :alt="name"
+    :title="name"
+  ></DsfrPicture>
+  <DsfrPicture
+    v-else
+    size="small"
+    class="avatar"
+    src=""
+    :alt="name"
+    :title="name"
+  ></DsfrPicture>
 </template>
 
 <style scoped>

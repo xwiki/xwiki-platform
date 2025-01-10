@@ -13,10 +13,7 @@
     ]
   },
   "extends": "./../../tsconfig.json",
-  "include": [
-    "./src/index.ts",
-    "./src/**/*"
-  ],
+  "include": ["src"],
   "exclude": [
     "**/*.spec.ts",
     "**/*.test.ts"

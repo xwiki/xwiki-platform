@@ -17,13 +17,22 @@ License along with this software; if not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<template>
-  <sl-avatar :image="image"></sl-avatar>
-</template>
-<script lang="ts">
+<script lang="ts" setup>
 import "@shoelace-style/shoelace/dist/components/avatar/avatar";
+import type { AvatarProps } from "@xwiki/cristal-dsapi";
 
-export default {
-  props: { image: { type: String, required: true } },
-};
+withDefaults(defineProps<AvatarProps>(), {
+  // reuse shoelace default avatar size when no explicit size value is passed in the props.
+  size: "3rem",
+});
 </script>
+
+<template>
+  <sl-avatar :image="image" :label="name" class="avatar"></sl-avatar>
+</template>
+
+<style scoped>
+.avatar {
+  --size: v-bind("size");
+}
+</style>

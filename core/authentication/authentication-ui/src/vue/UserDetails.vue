@@ -39,7 +39,9 @@ const authenticationManager = cristal
 
 const browserApi = cristal.getContainer().get<BrowserApi>(browserApiName);
 
-const { profile, name, error } = await getUserProfile(authenticationManager);
+const { profile, name, error, avatar } = await getUserProfile(
+  authenticationManager,
+);
 
 function logout() {
   authenticationManager.logout().then(() => browserApi.reload());
@@ -49,7 +51,10 @@ function logout() {
 <template>
   <template v-if="!error">
     <i18n-t keypath="userDescription" tag="span">
-      <a :href="profile">{{ name }}</a>
+      <a :href="profile">
+        <x-avatar v-if="avatar" :image="avatar" :name="name"></x-avatar>
+        {{ name }}
+      </a>
     </i18n-t>
   </template>
   <span v-else>{{ t("userDetails.error") }}</span>

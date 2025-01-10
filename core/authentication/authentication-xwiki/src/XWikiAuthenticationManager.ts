@@ -128,10 +128,10 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
       },
     };
     const {
-      data: { profile, name },
+      data: { profile, name, picture },
     } = await axios.get(userinfoUrl, data);
 
-    return { profile, name };
+    return { profile, name, avatar: picture };
   }
 
   async logout(): Promise<void> {

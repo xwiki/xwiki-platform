@@ -8,8 +8,6 @@ We brought the following changes from the default Jetty files obtained from the 
 1. Addition of `modules/xwiki.mod`, to group all modules we depend on.
 1. Addition of `start.d/xwiki.ini` to configure the following properties:
    1. Disable WAR scanning/hot deployment (since we use static deployment, and it speeds up Jetty).
-   1. Configure Jetty to use RFC3986 for URLs + allow for ambiguous elements in the URLs as XWiki currently needs 
-      them (see the doc in start.d/xwiki.ini).
 1. Addition of `etc/jetty-xwiki.xml` to print a message in the console when XWiki is started.
 1. Modification of `etc/console-capture.xml` to send logs to both the console and files. Namely, we wrap:
    ```

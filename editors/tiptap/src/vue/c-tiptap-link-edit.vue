@@ -144,6 +144,7 @@ watch(
 
 function existingLinkAction(link: LinkSuggestionActionDescriptor) {
   linkValue.value = link.url;
+  submitLink();
 }
 
 // Bind the keyboard event of the input field to the actions of the link suggest

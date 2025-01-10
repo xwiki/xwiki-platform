@@ -46,6 +46,20 @@
   #set ($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
   #jsonResponse($map)
 ###########################
+## DATA: ICON_AMOUNT
+###########################
+#elseif ($request.action == 'data_iconamount')
+  #set ($iconTheme = $request.iconTheme)
+  #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
+  #set ($iconNamePrefix = $request.query.toLowerCase())
+  #set ($total = 0)
+  #foreach ($xwikiIcon in $xwikiIcons)
+    #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
+      #set ($total = $total + 1)
+    #end
+  #end
+  #jsonResponse($total)
+###########################
 ## DATA: ICONS
 ###########################
 #elseif ($request.action == 'data_icons')
@@ -53,16 +67,23 @@
   #set ($iconTheme = $request.iconTheme)
   #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
   #set ($iconNamePrefix = $request.query.toLowerCase())
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  #set ($number = $numbertool.toNumber($request.number).intValue())
+  #if (!$offset || $offset < 0)
+    #set($offset = 0)
+  #end
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
-      #set ($icon = {
-        'name': $xwikiIcon,
-        'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
-      })
-      #if ($request.metadata == 'true')
-        #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
+      #if (($foreach.count >= $offset) && (!$number || $foreach.count < $offset + $number))
+        #set ($icon = {
+          'name': $xwikiIcon,
+          'render': $services.icon.renderHTML($xwikiIcon, $iconTheme)
+        })
+        #if ($request.metadata == 'true')
+          #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
+        #end
+        #set ($discard = $icons.add($icon))
       #end
-      #set ($discard = $icons.add($icon))
     #end
   #end
   #jsonResponse($icons)
@@ -261,20 +282,32 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
           closePicker();
         });
       }
-    }
+    });
   }
   
   /**
    * Load the icon list (get the JSON from the server) and display it afterwards
    */
   var loadIconList = function(iconTheme) {
-    $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme), function(dataIcons) {
+    let pageSize = 20;
+    let maxItems = 0;
+    $.getJSON(getResourceURL('data_iconamount', 'iconTheme=' + iconTheme) , function(dataIconAmount) {maxItems = 
+        dataIconAmount});
+    $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme + '&number=' + pageSize.toString()), 
+    function(dataIcons) {
       // Put the result in the icons map
       icons[iconTheme] = dataIcons;
       // Display the list
       displayList(icons[iconTheme]);
       // Hide the spinner
       spinner.hide();
+    });
+    // Load more items if the user scrolled at the end of the current list and everything is not loaded yet.
+    iconListSection.off('scroll');
+    iconListSection.on('scroll', event => {
+      if ( iconListSection[0].scrollTop + iconListSection[0].clientHeight >= iconListSection[0].scrollHeight) {
+        console.log('I am on the bottom!');
+      }
     });
   }
   

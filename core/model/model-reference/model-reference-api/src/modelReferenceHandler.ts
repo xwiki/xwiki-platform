@@ -20,6 +20,7 @@
 
 import type {
   DocumentReference,
+  EntityReference,
   SpaceReference,
 } from "@xwiki/cristal-model-api";
 
@@ -42,6 +43,11 @@ interface ModelReferenceHandler {
     name: string,
     space: SpaceReference,
   ): DocumentReference;
+
+  /**
+   * Return the title of a reference
+   */
+  getTitle(reference: EntityReference): string;
 }
 
 export type { ModelReferenceHandler };

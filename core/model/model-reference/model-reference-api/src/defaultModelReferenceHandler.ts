@@ -18,10 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DocumentReference } from "@xwiki/cristal-model-api";
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
 import { injectable } from "inversify";
 import type { ModelReferenceHandler } from "./modelReferenceHandler";
-import type { SpaceReference } from "@xwiki/cristal-model-api";
+import type {
+  EntityReference,
+  SpaceReference,
+  WikiReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Default implementation for {@link ModelReferenceHandler}.
@@ -35,6 +43,21 @@ class DefaultModelReferenceHandler implements ModelReferenceHandler {
     space: SpaceReference,
   ): DocumentReference {
     return new DocumentReference(name, space);
+  }
+
+  getTitle(reference: EntityReference): string {
+    switch (reference.type) {
+      case EntityType.WIKI:
+        return (reference as WikiReference).name;
+      case EntityType.SPACE:
+        return [...(reference as SpaceReference).names].pop()!;
+      case EntityType.DOCUMENT: {
+        return (reference as DocumentReference).name;
+      }
+      case EntityType.ATTACHMENT:
+        return (reference as AttachmentReference).name;
+    }
+    return "";
   }
 }
 

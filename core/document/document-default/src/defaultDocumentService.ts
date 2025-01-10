@@ -29,6 +29,7 @@ import type {
 } from "@xwiki/cristal-document-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
+  ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
@@ -52,11 +53,15 @@ type StateRefs = WrappedRefs<
   State & {
     documentReference: DocumentReference | undefined;
     documentReferenceString: string | undefined;
+    displayTitle: string;
+    title: string | undefined;
   }
 >;
 type Getters = {
   documentReference(): DocumentReference | undefined;
   documentReferenceString(): string | undefined;
+  displayTitle(): string;
+  title(): string | undefined;
 };
 type Actions = {
   /**
@@ -87,6 +92,11 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
     .getContainer()
     .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider");
 
+  const modelReferenceHandler = cristal
+    .getContainer()
+    .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
+    .get();
+
   return defineStore<Id, State, Getters, Actions>("document", {
     state() {
       return {
@@ -111,6 +121,18 @@ function createStore(cristal: CristalApp): DocumentStoreDefinition {
         return modelReferenceSerializerProvider
           .get()
           ?.serialize(this.documentReference);
+      },
+      displayTitle(): string {
+        if (this.title) {
+          return this.title;
+        } else if (this.documentReference) {
+          return modelReferenceHandler?.getTitle(this.documentReference) ?? "";
+        } else {
+          return "";
+        }
+      },
+      title(): string | undefined {
+        return this.document?.headline;
       },
     },
     actions: {
@@ -187,6 +209,14 @@ export class DefaultDocumentService implements DocumentService {
 
   getCurrentDocumentRevision(): Ref<string | undefined> {
     return this.refs.revision;
+  }
+
+  getDisplayTitle(): Ref<string> {
+    return this.refs.displayTitle;
+  }
+
+  getTitle(): Ref<string | undefined> {
+    return this.refs.title;
   }
 
   isLoading(): Ref<boolean> {

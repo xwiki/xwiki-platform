@@ -38,6 +38,7 @@ import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import {
+  ModelReferenceHandlerProvider,
   ModelReferenceParserProvider,
   ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
@@ -67,12 +68,13 @@ import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
-const documentService = cristal
-  .getContainer()
-  .get<DocumentService>(documentServiceName);
-const authenticationManager = cristal
-  .getContainer()
+const container = cristal.getContainer();
+const documentService = container.get<DocumentService>(documentServiceName);
+const authenticationManager = container
   .get<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+  .get();
+const modelReferenceHandler = container
+  .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
   .get();
 const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
@@ -83,7 +85,9 @@ const currentPage: Ref<PageData | undefined> =
 // Make the loading status first.
 const content = ref("");
 const title = ref("");
-const titlePlaceholder = ref("");
+const titlePlaceholder = modelReferenceHandler?.getTitle(
+  documentService.getCurrentDocumentReference().value!,
+);
 
 const hasRealtime = cristal.getWikiConfig().realtimeURL != undefined;
 
@@ -106,10 +110,7 @@ const save = async (authors: User[]) => {
     authors.map((author) => author.name).join(", "),
   );
 
-  const storage = cristal
-    .getContainer()
-    .get<StorageProvider>("StorageProvider")
-    .get();
+  const storage = container.get<StorageProvider>("StorageProvider").get();
   // TODO: html does not make any sense here.
   await storage.save(
     currentPageName.value ?? "",
@@ -202,7 +203,6 @@ async function editorInit(
 }
 
 function loadComponentsFromLoadEditor() {
-  const container = cristal.getContainer();
   const linkSuggest = container
     .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider")
     .get();
@@ -234,8 +234,7 @@ async function loadEditor(page: PageData | undefined) {
   if (!editor.value) {
     content.value =
       page?.syntax == "markdown/1.2" ? page?.source : page?.html || "";
-    title.value = page?.headlineRaw || "";
-    titlePlaceholder.value = page?.name ?? currentPageName.value ?? "";
+    title.value = documentService.getTitle().value ?? "";
     const {
       container,
       linkSuggest,

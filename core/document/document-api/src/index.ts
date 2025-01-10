@@ -59,6 +59,22 @@ interface DocumentService {
   getCurrentDocumentRevision(): Ref<string | undefined>;
 
   /**
+   * Return the document title, either with the defined title (from {@link getTitle}), or by using the name of the
+   * document reference.
+   *
+   * @since 0.14
+   */
+  getDisplayTitle(): Ref<string>;
+
+  /**
+   * Return the defined document title, or undefined if no title is defined. To get a never empty title to display,
+   * see {@link getDisplayTitle}.
+   *
+   * @since 0.14
+   */
+  getTitle(): Ref<string | undefined>;
+
+  /**
    * @returns a ref to the loading state. true when the page is loading, false otherwise
    */
   isLoading(): Ref<boolean>;

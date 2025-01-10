@@ -119,10 +119,6 @@ async function readPage(
     const pageContent = await fs.promises.readFile(path);
     const pageStats = await fs.promises.stat(path);
     const parse = JSON.parse(pageContent.toString("utf8"));
-    if (!parse.name) {
-      // Fallback to the current directory name if the name is not explicitly defined.
-      parse.name = basename(dirname(path));
-    }
     return {
       type: EntityType.DOCUMENT,
       value: {

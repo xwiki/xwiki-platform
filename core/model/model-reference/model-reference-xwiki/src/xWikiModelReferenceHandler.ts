@@ -18,9 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { DocumentReference } from "@xwiki/cristal-model-api";
+import {
+  AttachmentReference,
+  DocumentReference,
+  EntityType,
+} from "@xwiki/cristal-model-api";
 import { injectable } from "inversify";
-import type { SpaceReference } from "@xwiki/cristal-model-api";
+import type {
+  EntityReference,
+  SpaceReference,
+  WikiReference,
+} from "@xwiki/cristal-model-api";
 import type { ModelReferenceHandler } from "@xwiki/cristal-model-reference-api";
 
 /**
@@ -36,5 +44,25 @@ export class XWikiModelReferenceHandler implements ModelReferenceHandler {
   ): DocumentReference {
     space.names.push(name);
     return new DocumentReference("WebHome", space);
+  }
+
+  getTitle(reference: EntityReference): string {
+    switch (reference.type) {
+      case EntityType.WIKI:
+        return (reference as WikiReference).name;
+      case EntityType.SPACE:
+        return [...(reference as SpaceReference).names].pop()!;
+      case EntityType.DOCUMENT: {
+        const name = (reference as DocumentReference).name;
+        if (name === "WebHome" && (reference as DocumentReference).space) {
+          return this.getTitle((reference as DocumentReference).space!);
+        } else {
+          return name;
+        }
+      }
+      case EntityType.ATTACHMENT:
+        return (reference as AttachmentReference).name;
+    }
+    return "";
   }
 }

@@ -77,6 +77,9 @@ function mountCComponent(params: {
       getCurrentDocumentReferenceString() {
         return ref("The.Page.Reference");
       }
+      getDisplayTitle() {
+        return ref("PageName");
+      }
     },
   );
 

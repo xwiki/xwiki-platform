@@ -48,6 +48,7 @@ const currentPage: Ref<PageData | undefined> =
 const currentPageRevision: Ref<string | undefined> =
   documentService.getCurrentDocumentRevision();
 const currentPageName = documentService.getCurrentDocumentReferenceString();
+const displayTitle = documentService.getDisplayTitle();
 
 const contentRoot = ref(undefined);
 
@@ -64,12 +65,6 @@ const content: ComputedRef<string | undefined> = computed(() => {
   } else {
     return undefined;
   }
-});
-
-const title = computed(() => {
-  return (
-    currentPage.value?.document?.get("headline") || currentPage.value?.name
-  );
 });
 
 const pageExist = computed(() => {
@@ -95,7 +90,7 @@ onUpdated(() => {
     after-u-i-x-p-id="content.after"
   >
     <template #title>
-      <h1 class="doc-title">{{ title }}</h1>
+      <h1 class="doc-title">{{ displayTitle }}</h1>
     </template>
     <template #doc-page-actions>
       <div class="doc-page-actions">

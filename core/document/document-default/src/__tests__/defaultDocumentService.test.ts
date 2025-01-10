@@ -30,26 +30,33 @@ import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import { MockProxy, any, mock } from "vitest-mock-extended";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { ModelReferenceHandlerProvider } from "@xwiki/cristal-model-reference-api";
 
+// eslint-disable-next-line max-statements
 function initMocks(): MockProxy<CristalApp> & CristalApp {
   const cristalMock = mock<CristalApp>();
   const containerMock = mock<Container>();
   const modelReferenceParserProviderMock = mock<ModelReferenceParserProvider>();
+  const modelReferenceHandlerProviderMock =
+    mock<ModelReferenceHandlerProvider>();
   modelReferenceParserProviderMock.get.mockReturnValue(
     mock<ModelReferenceParser>(),
   );
   const modelReferenceSerializerProviderMock =
     mock<ModelReferenceSerializerProvider>();
+
   modelReferenceSerializerProviderMock.get.mockReturnValue(
     mock<ModelReferenceSerializer>(),
   );
-
   containerMock.get
     .calledWith("ModelReferenceParserProvider")
     .mockReturnValue(modelReferenceParserProviderMock);
   containerMock.get
     .calledWith("ModelReferenceSerializerProvider")
     .mockReturnValue(modelReferenceSerializerProviderMock);
+  containerMock.get
+    .calledWith("ModelReferenceHandlerProvider")
+    .mockReturnValue(modelReferenceHandlerProviderMock);
   cristalMock.getContainer.mockReturnValue(containerMock);
 
   return cristalMock;

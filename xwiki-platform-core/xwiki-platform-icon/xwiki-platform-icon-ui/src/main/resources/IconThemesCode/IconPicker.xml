@@ -69,14 +69,14 @@
   #set ($iconNamePrefix = $request.query.toLowerCase())
   #set ($offset = $numbertool.toNumber($request.offset).intValue())
   #set ($limit = $numbertool.toNumber($request.limit).intValue())
-  #if (!$offset || $offset < 0)
+  #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
       ## We compare $foreach.count - 1 to our values since foreach.count is 1 based index (!= standard 0 based index)
       ## We want to make sure we retrieve only the right values.
-      #if (($foreach.count - 1  >= $offset) && (!$limit || $foreach.count - 1  < $offset + $limit))
+      #if (($foreach.count - 1  &gt;= $offset) &amp;&amp; (!$limit || $foreach.count - 1  &lt; $offset + $limit))
         #set ($icon = {
           'name': $xwikiIcon,
           'render': $services.icon.renderHTML($xwikiIcon, $iconTheme),
@@ -86,7 +86,7 @@
           #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
         #end
         #set ($discard = $icons.add($icon))
-      #elseif($limit && ($foreach.count - 1  >= $offset + $limit))
+      #elseif($limit &amp;&amp; ($foreach.count - 1  &gt;= $offset + $limit))
         ## We already got all the icons we wanted, we can exit the foreach loop.
         #break
       #end
@@ -271,7 +271,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
     }
     // For each icon
-    iconList.forEach(icon => {
+    iconList.forEach(icon =&gt; {
       // Display the icon
       if (selectedIconName === '' || icon.name.includes(selectedIconName)) {
         var displayer = $(document.createElement('div'));
@@ -308,8 +308,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         dataIconCount});
       }
       $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme
-        + '&offset=' + itemCount.toString()
-        + '&limit=' + pageSize.toString()),
+        + '&amp;offset=' + itemCount.toString()
+        + '&amp;limit=' + pageSize.toString()),
         function(dataIcons) {
         // Put the result in the icons map
         icons[iconTheme].push.apply(icons[iconTheme], dataIcons);
@@ -321,7 +321,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         }
         // Whatever the value of the current icon theme, we finish loading this one so that we have a correct state 
         // if the user ever comes back to it.
-        if (itemCount + pageSize < maxItems) {
+        if (itemCount + pageSize &lt; maxItems) {
           partialLoadIcon(maxItems);
         } else if (iconTheme === currentIconTheme) {
           // All icons have been loaded and the user didn't change the icon theme in the meantime.

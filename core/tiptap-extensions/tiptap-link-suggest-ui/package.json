@@ -27,7 +27,7 @@
     "@xwiki/cristal-link-suggest-api": "workspace:*"
   },
   "peerDependencies": {
-    "@tiptap/core": "2.11.1",
+    "@tiptap/core": "2.11.2",
     "reflect-metadata": "0.2.2",
     "vue": "3.5.13"
   },

@@ -48,7 +48,7 @@
 ###########################
 ## DATA: ICON_AMOUNT
 ###########################
-#elseif ($request.action == 'data_iconcount')
+#elseif ($request.action == 'data_icon_count')
   #set ($iconTheme = $request.iconTheme)
   #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
   #set ($iconNamePrefix = $request.query.toLowerCase())
@@ -298,7 +298,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     var partialLoadIcon = function () {
       let itemCount = icons[iconTheme].length;
       if( maxItems === -1) {
-        $.getJSON(getResourceURL('data_iconcount', 'iconTheme=' + iconTheme) , function(dataIconAmount) {maxItems =
+        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconAmount) {maxItems =
         dataIconAmount});
       }
       $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme

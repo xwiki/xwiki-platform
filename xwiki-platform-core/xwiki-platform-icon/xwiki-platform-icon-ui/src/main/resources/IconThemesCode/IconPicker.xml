@@ -46,6 +46,20 @@
   #set ($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
   #jsonResponse($map)
 ###########################
+## DATA: ICON COUNT
+###########################
+#elseif ($request.action == 'data_icon_count')
+  #set ($iconTheme = $request.iconTheme)
+  #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
+  #set ($iconNamePrefix = $request.query.toLowerCase())
+  #set ($total = 0)
+  #foreach ($xwikiIcon in $xwikiIcons)
+    #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
+      #set ($total = $total + 1)
+    #end
+  #end
+  #jsonResponse($total)
+###########################
 ## DATA: ICONS
 ###########################
 #elseif ($request.action == 'data_icons')
@@ -53,13 +67,29 @@
   #set ($iconTheme = $request.iconTheme)
   #set ($xwikiIcons = $collectiontool.sort($services.icon.getIconNames($iconTheme)))
   #set ($iconNamePrefix = $request.query.toLowerCase())
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
+  #if (!$offset || $offset &lt; 0)
+    #set ($offset = 0)
+  #end
   #foreach ($xwikiIcon in $xwikiIcons)
-    #if ("$!iconNamePrefix" == '' || $xwikiIcon.startsWith($iconNamePrefix))
-      #set ($discard = $icons.add({
-        'name': $xwikiIcon,
-        'render': $services.icon.renderHTML($xwikiIcon, $iconTheme),
-        'metadata': $services.icon.getMetaData($xwikiIcon, $iconTheme)
-      }))
+    #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
+      ## We compare $foreach.count - 1 to our values since foreach.count is 1 based index (!= standard 0 based index)
+      ## We want to make sure we retrieve only the right values.
+      #if (($foreach.count - 1  &gt;= $offset) &amp;&amp; (!$limit || $foreach.count - 1  &lt; $offset + $limit))
+        #set ($icon = {
+          'name': $xwikiIcon,
+          'render': $services.icon.renderHTML($xwikiIcon, $iconTheme),
+          'queryString': $iconNamePrefix
+        })
+        #if ($request.metadata == 'true')
+          #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
+        #end
+        #set ($discard = $icons.add($icon))
+      #elseif($limit &amp;&amp; ($foreach.count - 1  &gt;= $offset + $limit))
+        ## We already got all the icons we wanted, we can exit the foreach loop.
+        #break
+      #end
     #end
   #end
   #jsonResponse($icons)
@@ -233,24 +263,25 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   /**
    * Display the list of icons
    */
-  var displayList = function(iconTheme) {
+  var displayList = function(iconList) {
     // Filter the icons we display based on the value of the input field.
-    let selectedIconName = '';
+    let selectedIconName = currentInput[0].value;
     if (currentInput.data('xwikiIconPickerSettings') !== '') {
+      // We need to remove the prefix for comparison to UI elements.
       selectedIconName = currentInput[0].value.replace(currentInput.data('xwikiIconPickerSettings').prefix, '');
     }
     // For each icon
-    for (var i=0; i &lt; iconTheme.length; ++i) {
+    iconList.forEach(icon =&gt; {
       // Display the icon
-      if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
+      if (selectedIconName === '' || icon.name.includes(selectedIconName)) {
         var displayer = $(document.createElement('div'));
         iconListSection.append(displayer);
         displayer.addClass('xwikiIconPickerIcon');
         var imageDiv = $(document.createElement('div'));
-        imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
+        imageDiv.addClass('xwikiIconPickerIconImage').html(icon.render);
         displayer.append(imageDiv);
         var iconNameSpan = $(document.createElement('span'));
-        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        iconNameSpan.addClass('xwikiIconPickerIconName').text(icon.name);
         displayer.append(iconNameSpan);
         // Change the input value when the icon is clicked
         displayer.on('click', function(event) {
@@ -258,21 +289,49 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
           closePicker();
         });
       }
-    }
+    });
   }
   
   /**
-   * Load the icon list (get the JSON from the server) and display it afterwards
+   * Load part of the icon list (get the JSON from the server) and display it afterwards
    */
   var loadIconList = function(iconTheme) {
-    $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme), function(dataIcons) {
-      // Put the result in the icons map
-      icons[iconTheme] = dataIcons;
-      // Display the list
-      displayList(icons[iconTheme]);
-      // Hide the spinner
-      spinner.hide();
-    });
+    var pageSize = 20;
+    var maxItems = -1;
+    // Recursive function helper. This calls the page to retrieve the icon information, by chunk of pageSize.
+    // After receiving the icon info, it displays them and calls itself again if the colortheme is not fully loaded.
+    var partialLoadIcon = function () {
+      let itemCount = icons[iconTheme].length;
+      if( maxItems === -1) {
+        // The first call will retrieve the total count of items we'll need to get.
+        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconCount) {
+          maxItems = dataIconCount
+        });
+      }
+      $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme
+        + '&amp;offset=' + itemCount.toString()
+        + '&amp;limit=' + pageSize.toString()),
+        function(dataIcons) {
+        // Put the result in the icons map
+        icons[iconTheme].push.apply(icons[iconTheme], dataIcons);
+        // Display the list of new icons.
+        // Since this recursive calls can take a while on poor network, we want to make sure we only display the newly
+        // retrieved icons if the iconTheme input still has their value.
+        if (iconTheme === currentIconTheme) {
+          displayList(dataIcons);
+        }
+        // Whatever the value of the current icon theme, we finish loading this one so that we have a correct state 
+        // if the user ever comes back to it.
+        if (itemCount + pageSize &lt; maxItems) {
+          partialLoadIcon(maxItems);
+        } else if (iconTheme === currentIconTheme) {
+          // All icons have been loaded and the user didn't change the icon theme in the meantime.
+          // We can finalize the rendering and hide the spinner.
+          spinner.hide();
+        }
+      });
+    };
+    partialLoadIcon();
   }
   
   /**
@@ -320,6 +379,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       currentIconTheme = iconThemeSelector.val();
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
+      // And reset the state of the loading spinner.
+      spinner.hide();
       // Display the new ones
       if (icons[currentIconTheme].length == 0) {
         // if the icon theme has not already been loaded, load it

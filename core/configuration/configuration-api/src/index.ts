@@ -18,29 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CristalAppLoader } from "@xwiki/cristal-lib";
-import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/cristal-authentication-xwiki";
-import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
-import { Container } from "inversify";
-import { loadConfig } from "@xwiki/cristal-configuration-web";
+import { Primitive } from "utility-types";
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  loadConfig("/config.json"),
-  true,
-  false,
-  "XWiki",
-  (container: Container) => {
-    new BrowserComponentInit(container);
-    new AuthenticationXWikiComponentInit(container);
-  },
-);
+/**
+ * A single configuration entry.
+ *
+ * @since 0.14
+ */
+type Configuration = {
+  configType: string;
+  [key: string]: Primitive;
+};
+
+/**
+ * The set of available configurations.
+ *
+ * @since 0.14
+ */
+type Configurations = { [key: string]: Configuration };
+
+/**
+ * Signature of the configuration loader.
+ *
+ * @since 0.14
+ */
+type ConfigurationLoader = () => Promise<Configurations>;
+
+export type { Configuration, ConfigurationLoader, Configurations };

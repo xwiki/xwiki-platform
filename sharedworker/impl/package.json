@@ -33,6 +33,7 @@
     "@xwiki/cristal-backend-github": "workspace:*",
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",

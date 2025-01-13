@@ -1,0 +1,16 @@
+{
+  "FileSystem": {
+    "name": "FileSystem",
+    "configType": "FileSystem",
+    "serverRendering": false,
+    "offline": false,
+    "designSystem": "vuetify"
+  },
+  "FileSystemSL": {
+    "name": "FileSystemSL",
+    "configType": "FileSystem",
+    "serverRendering": false,
+    "offline": false,
+    "designSystem": "shoelace"
+  }
+}

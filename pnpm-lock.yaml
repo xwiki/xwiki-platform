@@ -95,6 +95,9 @@ importers:
       '@xwiki/cristal-authentication-api':
         specifier: workspace:*
         version: link:../core/authentication/authentication-api
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../core/configuration/configuration-api
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -679,6 +682,38 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.7
+        version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/configuration/configuration-api:
+    dependencies:
+      utility-types:
+        specifier: 3.11.0
+        version: 3.11.0
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.7
+        version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/configuration/configuration-web:
+    dependencies:
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../configuration-api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
       typescript:
         specifier: 5.7.3
         version: 5.7.3
@@ -2739,6 +2774,63 @@ importers:
         specifier: 6.0.7
         version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
 
+  electron/configuration/configuration-electron/configuration-electron-main:
+    dependencies:
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../../../../core/configuration/configuration-api
+      electron:
+        specifier: 33.3.1
+        version: 33.3.1
+      electron-store:
+        specifier: 10.0.0
+        version: 10.0.0
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.7
+        version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
+
+  electron/configuration/configuration-electron/configuration-electron-preload:
+    dependencies:
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../../../../core/configuration/configuration-api
+      electron:
+        specifier: 33.3.1
+        version: 33.3.1
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.7
+        version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
+
+  electron/configuration/configuration-electron/configuration-electron-renderer:
+    dependencies:
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../../../../core/configuration/configuration-api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../../dev/config
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.7
+        version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.6.1)
+
   electron/link-suggest/link-suggest-filesystem:
     dependencies:
       '@xwiki/cristal-api':
@@ -2778,6 +2870,9 @@ importers:
       '@xwiki/cristal-browser-electron':
         specifier: workspace:*
         version: link:../browser
+      '@xwiki/cristal-configuration-electron-main':
+        specifier: workspace:*
+        version: link:../configuration/configuration-electron/configuration-electron-main
       '@xwiki/cristal-electron-authentication-xwiki-main':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-main
@@ -2800,6 +2895,9 @@ importers:
 
   electron/preload:
     dependencies:
+      '@xwiki/cristal-configuration-electron-preload':
+        specifier: workspace:*
+        version: link:../configuration/configuration-electron/configuration-electron-preload
       '@xwiki/cristal-electron-authentication-xwiki-preload':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-preload
@@ -2828,6 +2926,9 @@ importers:
       '@xwiki/cristal-browser-electron':
         specifier: workspace:*
         version: link:../browser
+      '@xwiki/cristal-configuration-electron-renderer':
+        specifier: workspace:*
+        version: link:../configuration/configuration-electron/configuration-electron-renderer
       '@xwiki/cristal-electron-authentication-xwiki-renderer':
         specifier: workspace:*
         version: link:../authentication/authentication-xwiki/authentication-xwiki-renderer
@@ -3015,6 +3116,9 @@ importers:
       '@xwiki/cristal-browser-api':
         specifier: workspace:*
         version: link:../core/browser/browser-api
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../core/configuration/configuration-api
       '@xwiki/cristal-date-api':
         specifier: workspace:*
         version: link:../core/date/date-api
@@ -3147,9 +3251,6 @@ importers:
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
-      utility-types:
-        specifier: 3.11.0
-        version: 3.11.0
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -3344,6 +3445,9 @@ importers:
       '@xwiki/cristal-backend-xwiki':
         specifier: workspace:*
         version: link:../../core/backends/backend-xwiki
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../../core/configuration/configuration-api
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api
@@ -3530,6 +3634,9 @@ importers:
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
+      '@xwiki/cristal-configuration-web':
+        specifier: workspace:*
+        version: link:../core/configuration/configuration-web
       '@xwiki/cristal-lib':
         specifier: workspace:*
         version: link:../lib

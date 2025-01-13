@@ -40,6 +40,7 @@
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-browser-api": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-date-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-document-default": "workspace:*",
@@ -84,7 +85,6 @@
     "inversify": "6.2.1",
     "pinia": "2.3.0",
     "reflect-metadata": "0.2.2",
-    "utility-types": "3.11.0",
     "vue": "3.5.13",
     "vue-i18n": "11.0.1",
     "vue-router": "4.5.0"

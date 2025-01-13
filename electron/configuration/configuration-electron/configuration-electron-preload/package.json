@@ -1,12 +1,12 @@
 {
-  "name": "@xwiki/cristal-api",
+  "name": "@xwiki/cristal-configuration-electron-preload",
   "version": "0.13.0",
   "license": "LGPL 2.1",
   "author": "XWiki Org Community <contact@xwiki.org>",
   "homepage": "https://cristal.xwiki.org/",
   "repository": {
     "type": "git",
-    "directory": "api",
+    "directory": "electron/configuration/configuration-electron/configuration-electron-preload",
     "url": "https://github.com/xwiki-contrib/cristal/"
   },
   "bugs": {
@@ -18,36 +18,30 @@
   },
   "main": "./src/index.ts",
   "scripts": {
-    "build": "pnpm compile",
+    "build": "tsc --project tsconfig.json && vite build",
     "clean": "rimraf dist",
-    "compile": "vue-tsc --project tsconfig.json && vite build",
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0",
-    "prepack": "pnpm build",
     "test": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-authentication-api": "workspace:*",
-    "@xwiki/cristal-configuration-api": "workspace:*",
-    "inversify": "6.2.1",
-    "vue": "3.5.13",
-    "vue-router": "4.5.0"
+    "@xwiki/cristal-configuration-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "electron": "33.3.1"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",
-    "reflect-metadata": "0.2.2",
     "typescript": "5.7.3",
-    "vite": "6.0.7",
-    "vue-tsc": "2.2.0"
+    "vite": "6.0.7"
   },
   "publishConfig": {
     "exports": {
       ".": {
-        "import": "./dist/index.es.js",
         "require": "./dist/index.umd.js",
         "types": "./dist/index.d.ts"
       }
     },
-    "main": "./dist/index.es.js",
+    "main": "./dist/index.umd.js",
     "types": "./dist/index.d.ts"
   }
 }

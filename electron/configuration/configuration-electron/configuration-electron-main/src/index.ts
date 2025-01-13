@@ -17,30 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import config from "./defaultConfig.json";
+import { ipcMain } from "electron";
+import Store from "electron-store";
 
-import { CristalAppLoader } from "@xwiki/cristal-lib";
-import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/cristal-authentication-xwiki";
-import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
-import { Container } from "inversify";
-import { loadConfig } from "@xwiki/cristal-configuration-web";
-
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  loadConfig("/config.json"),
-  true,
-  false,
-  "XWiki",
-  (container: Container) => {
-    new BrowserComponentInit(container);
-    new AuthenticationXWikiComponentInit(container);
+const schema = {
+  configuration: {
+    type: "object",
   },
-);
+};
+
+const storeInstance: Store = new Store({
+  name: "config",
+  schema,
+});
+
+export function load(): void {
+  ipcMain.handle("configuration:load", async () => {
+    // Create the configuration with default values the first time Cristal is loaded.
+    // @ts-expect-error type resolution failing because of electron-store library bug
+    if (!storeInstance.has("configuration")) {
+      // @ts-expect-error type resolution failing because of electron-store library bug
+      storeInstance.set("configuration", config);
+    }
+    // @ts-expect-error type resolution failing because of electron-store library bug
+    return storeInstance.get("configuration");
+  });
+}

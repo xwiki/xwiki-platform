@@ -18,29 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { CristalAppLoader } from "@xwiki/cristal-lib";
-import { ComponentInit as AuthenticationXWikiComponentInit } from "@xwiki/cristal-authentication-xwiki";
-import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-default";
-import { Container } from "inversify";
-import { loadConfig } from "@xwiki/cristal-configuration-web";
+import type { Configurations } from "@xwiki/cristal-configuration-api";
 
-CristalAppLoader.init(
-  [
-    "skin",
-    "dsvuetify",
-    "dsfr",
-    "dsshoelace",
-    "macros",
-    "storage",
-    "extension-menubuttons",
-    "sharedworker",
-  ],
-  loadConfig("/config.json"),
-  true,
-  false,
-  "XWiki",
-  (container: Container) => {
-    new BrowserComponentInit(container);
-    new AuthenticationXWikiComponentInit(container);
-  },
-);
+/**
+ * @param input - the input string
+ *
+ * @since 0.8
+ */
+function loadConfig(input: string) {
+  return async (): Promise<Configurations> => {
+    const response = await fetch(input);
+    return await response.json();
+  };
+}
+
+export { loadConfig };

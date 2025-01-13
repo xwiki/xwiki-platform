@@ -23,3 +23,4 @@ export { versions } from "./versions";
 import "@xwiki/cristal-electron-storage/preload";
 import "@xwiki/cristal-browser-electron/preload";
 import "@xwiki/cristal-electron-authentication-xwiki-preload";
+import "@xwiki/cristal-configuration-electron-preload";

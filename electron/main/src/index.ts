@@ -23,6 +23,7 @@ import { loadFile } from "./reload";
 import "./security-restrictions";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import loadBrowser from "@xwiki/cristal-browser-electron/main";
+import { load as loadConfiguration } from "@xwiki/cristal-configuration-electron-main";
 import { load as loadAuthentication } from "@xwiki/cristal-electron-authentication-xwiki-main";
 // @ts-expect-error shouldn't happen, but we need to generate the types for the whole project once.
 import load from "@xwiki/cristal-electron-storage/main";
@@ -68,6 +69,7 @@ app
     restoreOrCreateWindow().then((w) => {
       loadBrowser(w);
       loadAuthentication(w, loadFile);
+      loadConfiguration();
     });
     /**
      * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.

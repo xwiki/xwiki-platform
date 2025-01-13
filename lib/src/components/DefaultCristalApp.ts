@@ -23,6 +23,7 @@
 import "reflect-metadata";
 import Index from "../c-index.vue";
 import { DefaultLogger, DefaultPageData } from "@xwiki/cristal-api";
+import { Configurations } from "@xwiki/cristal-configuration-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import { inject, injectable, multiInject } from "inversify";
 import { createPinia } from "pinia";
@@ -159,24 +160,19 @@ export class DefaultCristalApp implements CristalApp {
     }
   }
 
-  // TODO remplace any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setAvailableConfigurations(config: Map<string, any>): void {
-    console.log(config);
-    // TODO remplace any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config.forEach((wikiConfigObject: any, key: string) => {
+  setAvailableConfigurations(configs: Configurations): void {
+    for (const configKey in configs) {
+      const wikiConfigObject = configs[configKey];
       const configType = wikiConfigObject?.configType;
-
       if (wikiConfigObject) {
         const wikiConfig = this.container.getNamed<WikiConfig>(
           "WikiConfig",
           configType,
         );
         wikiConfig.setConfigFromObject(wikiConfigObject);
-        this.availableConfigurations.set(key, wikiConfig);
+        this.availableConfigurations.set(configKey, wikiConfig);
       }
-    });
+    }
   }
 
   getAvailableConfigurations(): Map<string, WikiConfig> {

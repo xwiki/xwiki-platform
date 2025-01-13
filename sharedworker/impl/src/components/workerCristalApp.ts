@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { Configurations } from "@xwiki/cristal-configuration-api";
 import { injectable } from "inversify";
 import type {
   CristalApp as CristalApp,
@@ -48,9 +49,11 @@ export class WorkerCristalApp implements CristalApp {
   getApp(): App {
     throw new Error("Method not implemented.");
   }
+
   getRouter(): Router {
     throw new Error("Method not implemented.");
   }
+
   getContainer(): Container {
     return this.container;
   }
@@ -62,6 +65,7 @@ export class WorkerCristalApp implements CristalApp {
   getWikiConfig(): WikiConfig {
     return this.wikiConfig;
   }
+
   setWikiConfig(wikiConfig: WikiConfig): void {
     this.wikiConfig = wikiConfig;
   }
@@ -72,24 +76,19 @@ export class WorkerCristalApp implements CristalApp {
 
   switchConfig(): void {}
 
-  // TODO remove use of any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setAvailableConfigurations(config: Map<string, any>): void {
-    console.log(config);
-    // TODO remove use of any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config.forEach((wikiConfigObject: any, key: string) => {
+  setAvailableConfigurations(configs: Configurations): void {
+    for (const configKey in configs) {
+      const wikiConfigObject = configs[configKey];
       const configType = wikiConfigObject?.configType;
-
       if (wikiConfigObject) {
         const wikiConfig = this.container.getNamed<WikiConfig>(
           "WikiConfig",
           configType,
         );
         wikiConfig.setConfigFromObject(wikiConfigObject);
-        this.availableConfigurations.set(key, wikiConfig);
+        this.availableConfigurations.set(configKey, wikiConfig);
       }
-    });
+    }
   }
 
   getAvailableConfigurations(): Map<string, WikiConfig> {
@@ -99,42 +98,55 @@ export class WorkerCristalApp implements CristalApp {
   run(): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   getUIXTemplates(): Component[] {
     throw new Error("Method not implemented.");
   }
+
   getMenuEntries(): string[] {
     throw new Error("Method not implemented.");
   }
+
   getCurrentPage(): string {
     throw new Error("Method not implemented.");
   }
+
   getCurrentContent(): string {
     throw new Error("Method not implemented.");
   }
+
   getCurrentSource(): string {
     throw new Error("Method not implemented.");
   }
+
   getCurrentSyntax(): string {
     throw new Error("Method not implemented.");
   }
+
   setCurrentPage(): void {
     throw new Error("Method not implemented.");
   }
+
   setContentRef(): void {
     throw new Error("Method not implemented.");
   }
+
   loadPageFromURL(): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   loadPage(): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   getPage(): Promise<PageData> {
     throw new Error("Method not implemented.");
   }
+
   getLogger(): Logger {
     throw new Error("Method not implemented.");
   }
+
   getLoggerConfig(): LoggerConfig {
     throw new Error("Method not implemented.");
   }

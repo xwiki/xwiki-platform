@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",
+    "@xwiki/cristal-configuration-electron-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "electron": "33.3.1"

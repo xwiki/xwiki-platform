@@ -21,21 +21,12 @@
 import { DefaultCristalApp } from "./DefaultCristalApp";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import { Container } from "inversify";
-import { Primitive } from "utility-types";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
-
-/**
- *
- * @param input - the input string
- * @since 0.8
- */
-function loadConfig(input: string) {
-  return async (): Promise<Record<string, Primitive>> => {
-    const response = await fetch(input);
-    return await response.json();
-  };
-}
+import type {
+  ConfigurationLoader,
+  Configurations,
+} from "@xwiki/cristal-configuration-api";
 
 async function handleCallback(container: Container): Promise<void> {
   if (window.location.pathname.startsWith("/callback")) {
@@ -60,14 +51,14 @@ class CristalAppLoader extends CristalLoader {
 
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
-  public async loadApp<T>(
-    config: { [s: string]: T },
+  public async loadApp(
+    config: Configurations,
     isElectron: boolean,
     configName: string,
   ): Promise<void> {
     const defaultConfig = configName;
-    const configMap = new Map<string, T>(Object.entries(config));
-    this.cristal.setAvailableConfigurations(configMap);
+
+    this.cristal.setAvailableConfigurations(config);
 
     await handleCallback(this.cristal.getContainer());
 
@@ -120,7 +111,7 @@ class CristalAppLoader extends CristalLoader {
   // eslint-disable-next-line max-statements
   public async launchApp(
     forceStaticMode: boolean,
-    loadConfig: () => Promise<Record<string, Primitive>>,
+    loadConfig: ConfigurationLoader,
     isElectron: boolean,
     configName: string,
     additionalComponents?: (container: Container) => void,
@@ -153,7 +144,7 @@ class CristalAppLoader extends CristalLoader {
 
   public static init(
     extensionList: Array<string>,
-    loadConfig: () => Promise<Record<string, Primitive>>,
+    loadConfig: ConfigurationLoader,
     staticBuild: boolean,
     isElectron: boolean,
     configName: string,
@@ -171,4 +162,4 @@ class CristalAppLoader extends CristalLoader {
   }
 }
 
-export { CristalAppLoader, loadConfig };
+export { CristalAppLoader };

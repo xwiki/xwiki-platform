@@ -19,12 +19,12 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -91,9 +91,9 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     private static final String SCHEMA_PATH = "conf/managed-schema.xml";
 
     private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
-    
+
     private static final String CORE_PROPERTIES_FILENAME = "core.properties";
-    
+
     private static final String DATA_DIR_PROPERTY = "dataDir";
 
     /**
@@ -133,8 +133,36 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {
+
+                // Due to https://jira.xwiki.org/browse/XWIKI-22741 the cache on windows was
+                // being put in the wrong place. Let's check and clean it up if we find it
+                boolean buggedCache = false; // if we find the bug, recreate the search core.
+                {
+
+                    File corePropertiesFile = getCacheCorePropertiesFile(this.solrSearchCorePath);
+                    if (corePropertiesFile.exists()) {
+                        Properties properties = new Properties();
+                        try (FileInputStream in = new FileInputStream(corePropertiesFile)) {
+                            properties.load(in);
+                        }
+
+                        String dataDirPropertyValue = properties.getProperty(DATA_DIR_PROPERTY);
+                        if (dataDirPropertyValue != null && !dataDirPropertyValue.contains(File.separator)) {
+                            // it's bugged
+                            this.logger.info("Found XWIKI-22741 bug!");
+                            buggedCache = true;
+                            File badCacheLocation = new File(corePropertiesFile.getParent(), dataDirPropertyValue);
+                            if (badCacheLocation.exists()) {
+                                this.logger.info(
+                                    "Removing old Solr Search Cache files from: " + badCacheLocation.getAbsolutePath());
+                                FileUtils.deleteDirectory(badCacheLocation);
+                            }
+                        }
+                    }
+                }
+
                 // Make sure the core setup is up to date
-                if (!isSearchCoreValid()) {
+                if (buggedCache || !isSearchCoreValid()) {
                     // Recreate the home folder
                     recreateSearchCore();
                 }
@@ -467,28 +495,21 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         createCacheCore(this.solrSearchCorePath, toSolrCoreName(SolrClientInstance.CORE_NAME));
     }
 
+    private File getCacheCorePropertiesFile(Path corePath)
+    {
+        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
+        return corePropertiesFile;
+    }
+
     private void createCacheCore(Path corePath, String solrCoreName) throws IOException
     {
-        // Indicate the path of the data
         Path dataDir = getCacheCoreDataDir(corePath, solrCoreName);
-        File corePropertiesFile = corePath.resolve(CORE_PROPERTIES_FILENAME).toFile();
+        File corePropertiesFile = getCacheCorePropertiesFile(corePath);
         Properties coreProperties = new Properties();
-        // we used to append this property to this file.
-        // I'm not sure any other properties are ever in here, but jic let's be passive
-        // So I load the existing file if it exists, and add my property.
-        if(corePropertiesFile.exists()) 
-        {
-        	try(BufferedReader in = new BufferedReader(new FileReader(corePropertiesFile, StandardCharsets.UTF_8)) )
-        	{
-        		coreProperties.load(in);
-        	}
-        }
         coreProperties.setProperty(DATA_DIR_PROPERTY, dataDir.toString());
-        // Normally we write using the Apache Commons FileUtils, but this is a properties file. 
-        // Use the standard library Properties class writes it in the proper format.
-        try(PrintWriter out = new PrintWriter(corePropertiesFile, StandardCharsets.UTF_8); )
-        {
-        	coreProperties.store(out, "");
+        // we recreate this file every time this gets called.
+        try (FileOutputStream out = new FileOutputStream(corePropertiesFile, false);) {
+            coreProperties.store(out, "");
         }
     }
 

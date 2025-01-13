@@ -74,7 +74,9 @@
   #end
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
-      #if (($foreach.count >= $offset) && (!$limit || $foreach.count < $offset + $limit))
+      ## We compare $foreach.count - 1 to our values since foreach.count is 1 based index (!= standard 0 based index)
+      ## We want to make sure we retrieve only the right values.
+      #if (($foreach.count - 1  >= $offset) && (!$limit || $foreach.count - 1  < $offset + $limit))
         #set ($icon = {
           'name': $xwikiIcon,
           'render': $services.icon.renderHTML($xwikiIcon, $iconTheme),
@@ -84,6 +86,9 @@
           #set ($icon.metadata = $services.icon.getMetaData($xwikiIcon, $iconTheme))
         #end
         #set ($discard = $icons.add($icon))
+      #elseif($limit && ($foreach.count - 1  >= $offset + $limit))
+        ## We already got all the icons we wanted, we can exit the foreach loop.
+        #break
       #end
     #end
   #end

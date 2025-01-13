@@ -28,7 +28,10 @@ import linkSuggestStore, {
 } from "../stores/link-suggest-store";
 import { SelectionRange } from "@tiptap/pm/state";
 import { CIcon, Size } from "@xwiki/cristal-icons";
-import { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
+import {
+  ModelReferenceParserProvider,
+  ModelReferenceSerializerProvider,
+} from "@xwiki/cristal-model-reference-api";
 import { ContentTools } from "@xwiki/cristal-skin";
 import { debounce } from "lodash";
 import { Ref, inject, onMounted, onUpdated, ref, toRefs, watch } from "vue";
@@ -39,6 +42,33 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api/dist";
+import type {
+  RemoteURLParserProvider,
+  RemoteURLSerializerProvider,
+} from "@xwiki/cristal-model-remote-url-api/dist";
+
+const cristal: CristalApp = inject<CristalApp>("cristal")!;
+
+const modelReferenceSerializer = cristal
+  .getContainer()
+  .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
+  .get()!;
+
+const modelReferenceParser = cristal
+  .getContainer()
+  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+  .get()!;
+
+const remoteURLParser = cristal
+  .getContainer()
+  .get<RemoteURLParserProvider>("RemoteURLParserProvider")
+  .get()!;
+
+const remoteURLSerializer = cristal
+  .getContainer()
+  .get<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+  .get()!;
 
 const emits = defineEmits(["close"]);
 
@@ -66,18 +96,43 @@ const props = withDefaults(
     isAmbiguous: false,
   },
 );
+
+function urlToReference(url: string) {
+  if (props.isAmbiguous || !url) {
+    return "";
+  }
+  try {
+    return modelReferenceSerializer.serialize(
+      remoteURLParser.parse(url)! as DocumentReference,
+    );
+  } catch {
+    return url;
+  }
+}
+
+function referenceToUrl(reference: string) {
+  try {
+    return remoteURLSerializer.serialize(modelReferenceParser.parse(reference));
+  } catch {
+    return reference;
+  }
+}
+
 // We don't propose the link when the selection is ambiguous.
-const linkValue = ref(props.isAmbiguous ? "" : props.url);
+const linkValue = ref(props.isAmbiguous ? "" : urlToReference(props.url!));
 
 const { url } = toRefs(props);
 
 watch(url, (value) => {
-  linkValue.value = value;
+  linkValue.value = urlToReference(value!);
 });
 
 function submitLink() {
   const { action, editor, range } = props;
-  action.command({ editor, range }, { linkValue: linkValue.value });
+  action.command(
+    { editor, range },
+    { linkValue: referenceToUrl(linkValue.value!) },
+  );
 }
 
 function removeLink() {
@@ -97,7 +152,6 @@ const linkSuggestComp: Ref<typeof CTiptapLinkSuggest | undefined> =
 
 // Capture internal link navigation for the follow link button.
 function listenToLinks() {
-  const cristal: CristalApp = inject<CristalApp>("cristal")!;
   if (formRoot.value) {
     ContentTools.listenToClicks(formRoot.value, cristal);
   }
@@ -106,16 +160,11 @@ function listenToLinks() {
 onMounted(listenToLinks);
 onUpdated(listenToLinks);
 
-const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const linkSuggestServiceProvider = cristal
   .getContainer()
   .get<LinkSuggestServiceProvider>("LinkSuggestServiceProvider");
 let linkSuggest: LinkSuggestService | undefined =
   linkSuggestServiceProvider.get();
-const modelReferenceParser = cristal
-  .getContainer()
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get();
 
 const store: LinkSuggestStore = linkSuggestStore();
 

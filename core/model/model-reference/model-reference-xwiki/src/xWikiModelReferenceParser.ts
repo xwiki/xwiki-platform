@@ -39,6 +39,13 @@ export class XWikiModelReferenceParser implements ModelReferenceParser {
   ) {}
 
   parse(reference: string, type?: EntityType): EntityReference {
+    if (/^https?:\/\//.test(reference)) {
+      throw new Error(`[${reference}] is not a valid entity reference`);
+    }
+    return this.innerParse(reference, type);
+  }
+
+  private innerParse(reference: string, type: EntityType | undefined) {
     const splits = reference.split(":");
     const noWiki = splits[splits.length - 1];
     if (

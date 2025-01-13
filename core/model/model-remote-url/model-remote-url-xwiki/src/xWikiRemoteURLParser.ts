@@ -60,7 +60,7 @@ class XWikiRemoteURLParser implements RemoteURLParser {
     }
     const [bin, action] = segments;
     // TODO: the current approach is easy but does not work if some url rewriting is done in front of XWiki.
-    if (bin == "bin" && action == "view") {
+    if (bin == "bin" && (action == "view" || action == "create")) {
       segments = segments.slice(2);
       const pageName = segments[segments.length - 1];
       const spaces = segments.slice(0, segments.length - 1);

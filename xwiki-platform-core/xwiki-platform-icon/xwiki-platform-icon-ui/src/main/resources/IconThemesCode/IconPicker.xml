@@ -54,7 +54,7 @@
   #set ($iconNamePrefix = $request.query.toLowerCase())
   #set ($total = 0)
   #foreach ($xwikiIcon in $xwikiIcons)
-    #if ("$!iconNamePrefix" == '' || $xwikiIcon.toLowerCase().startsWith($iconNamePrefix))
+    #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
       #set ($total = $total + 1)
     #end
   #end
@@ -73,7 +73,7 @@
     #set($offset = 0)
   #end
   #foreach ($xwikiIcon in $xwikiIcons)
-    #if ("$!iconNamePrefix" == '' || $xwikiIcon.toLowerCase().startsWith($iconNamePrefix))
+    #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
       #if (($foreach.count >= $offset) && (!$limit || $foreach.count < $offset + $limit))
         #set ($icon = {
           'name': $xwikiIcon,

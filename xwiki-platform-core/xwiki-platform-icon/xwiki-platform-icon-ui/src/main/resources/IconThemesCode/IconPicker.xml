@@ -46,7 +46,7 @@
   #set ($discard = $map.put('currentIconTheme', $services.icon.currentIconSetName))
   #jsonResponse($map)
 ###########################
-## DATA: ICON_AMOUNT
+## DATA: ICON COUNT
 ###########################
 #elseif ($request.action == 'data_icon_count')
   #set ($iconTheme = $request.iconTheme)
@@ -298,8 +298,9 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     var partialLoadIcon = function () {
       let itemCount = icons[iconTheme].length;
       if( maxItems === -1) {
-        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconAmount) {maxItems =
-        dataIconAmount});
+        // The first call will retrieve the total count of items we'll need to get.
+        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconCount) {maxItems =
+        dataIconCount});
       }
       $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme
         + '&offset=' + itemCount.toString()
@@ -324,7 +325,6 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         }
       });
     };
-    // We want the first call to retrieve the total amount of items that should be loaded.
     partialLoadIcon();
   }
   

@@ -187,21 +187,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtime</scope>
     </dependency>
+    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
+         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tool-jetty-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <!-- Using provided even though it's not strictly required but in case some other module depend on this one, to
-           stop the chain -->
-      <scope>provided</scope>
+      <scope>runtile</scope>
     </dependency>
-    <!-- Dependencies that are not needed for this module but that we need for functional tests modules so that
-         they get all the required dependencies in the local maven repository where the tests execute -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-minimaldependencies</artifactId>

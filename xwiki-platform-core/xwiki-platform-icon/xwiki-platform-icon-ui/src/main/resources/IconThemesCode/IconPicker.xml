@@ -379,6 +379,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       currentIconTheme = iconThemeSelector.val();
       // Remove all the displayed icons
       $('.xwikiIconPickerIcon').remove();
+      // And reset the state of the loading spinner.
+      spinner.hide();
       // Display the new ones
       if (icons[currentIconTheme].length == 0) {
         // if the icon theme has not already been loaded, load it

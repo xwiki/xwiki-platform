@@ -215,7 +215,7 @@ define('xwiki-selectize', [
     let oldSetActiveOption = this.selectize.setActiveOption;
     this.selectize.setActiveOption = function(option, ...args) {
       this.liveRegion?.text($(option).text());
-      oldSetActiveOption.call(this, option, ...args);
+      return oldSetActiveOption.call(this, option, ...args);
     }
     // Create a live region to store the value of the currently active option.
     this.selectize.liveRegion = $('<span>');

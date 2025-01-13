@@ -70,7 +70,7 @@
   #set ($offset = $numbertool.toNumber($request.offset).intValue())
   #set ($limit = $numbertool.toNumber($request.limit).intValue())
   #if (!$offset || $offset &lt; 0)
-    #set($offset = 0)
+    #set ($offset = 0)
   #end
   #foreach ($xwikiIcon in $xwikiIcons)
     #if ("$!iconNamePrefix" == '' || $stringtool.startsWithIgnoreCase($xwikiIcon, $iconNamePrefix))
@@ -304,8 +304,9 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
       let itemCount = icons[iconTheme].length;
       if( maxItems === -1) {
         // The first call will retrieve the total count of items we'll need to get.
-        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconCount) {maxItems =
-        dataIconCount});
+        $.getJSON(getResourceURL('data_icon_count', 'iconTheme=' + iconTheme) , function(dataIconCount) {
+          maxItems = dataIconCount
+        });
       }
       $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme
         + '&amp;offset=' + itemCount.toString()

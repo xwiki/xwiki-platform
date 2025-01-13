@@ -39,8 +39,8 @@ import com.xpn.xwiki.web.Utils;
  * This filter is used to convert the values of request parameters that require HTML conversion before being processed.
  * A HTML editor can use this filter to convert its output to a specific syntax before it is saved.
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
- * API from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
  * @since 17.0.0RC1

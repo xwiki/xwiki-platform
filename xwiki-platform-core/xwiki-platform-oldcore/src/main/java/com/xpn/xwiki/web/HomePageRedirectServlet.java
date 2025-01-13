@@ -31,8 +31,8 @@ import jakarta.servlet.http.HttpServletResponse;
  * <code>http://localhost:8080/xwiki</code> and be redirected automatically to
  * <code>http://localhost:8080/xwiki/bin/view/Main/</code>.
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @since 17.0.0RC1
  */

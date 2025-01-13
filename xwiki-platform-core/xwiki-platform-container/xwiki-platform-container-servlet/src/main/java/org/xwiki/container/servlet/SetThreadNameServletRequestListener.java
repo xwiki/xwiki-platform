@@ -29,8 +29,8 @@ import jakarta.servlet.http.HttpServletRequest;
  * better to do this a component like a RequestInitializer component to work for any kind of container. Right now
  * component can't really access the initial URL.
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
- * API from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
  * @since 17.0.0RC1

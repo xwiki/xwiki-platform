@@ -55,8 +55,8 @@ import org.xwiki.observation.event.ApplicationStoppedEvent;
 /**
  * Implementation of the {@link ServletContextListener}. Initializes component manager and application context.
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
- * API from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
  * @since 17.0.0RC1

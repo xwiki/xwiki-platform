@@ -47,8 +47,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
 /**
  * This filter can be used to initialize the XWiki context before processing a request.
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different
- * API from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
  * @since 17.0.0RC1

@@ -52,8 +52,8 @@ import jakarta.servlet.ServletResponse;
  * and <code>User-Agent</code> headers, or a value stashed in the current user's session.
  * </p>
  * <p>
- * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely different API
- * from Java point of view.
+ * While the class is much older, the since annotation was moved to 17.0.0RC1 because it implement a completely
+ * different API from Java point of view.
  * 
  * @version $Id$
  * @since 17.0.0RC1

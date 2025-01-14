@@ -87,6 +87,53 @@ function parseStringForInternalLinks(
   return tokens;
 }
 
+function referenceToURL(
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+  reference: string,
+) {
+  return remoteURLSerializer.serialize(modelReferenceParser.parse(reference));
+}
+
+function parseReference(
+  v: InternalLink,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+) {
+  const { text, reference } = v;
+  let href: string;
+  try {
+    href =
+      referenceToURL(remoteURLSerializer, modelReferenceParser, reference) ??
+      "";
+  } catch {
+    // Prevent the parser from failing in case of bad reference (e.g., an url in an internal link).
+    href = reference;
+  }
+  return { text, reference, href };
+}
+
+function handleLink(
+  v: InternalLink,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+  state: StateCore,
+) {
+  const { text, reference, href } = parseReference(
+    v,
+    remoteURLSerializer,
+    modelReferenceParser,
+  );
+
+  const openToken = new state.Token("link_open", "a", 1);
+  openToken.attrSet("href", href ?? "");
+  openToken.attrPush(["class", "internal-link"]);
+  const contentToken = new state.Token("text", "", 0);
+  contentToken.content = text ?? reference;
+  const closeToken = new state.Token("link_close", "a", -1);
+  return [openToken, contentToken, closeToken];
+}
+
 export function parseInternalLinks(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,
@@ -100,29 +147,18 @@ export function parseInternalLinks(
         // We replace the content of the current block node only if at least a link has been found.
         if (hasLink(internalTokens)) {
           blockToken.content = "";
-          // TODO: reduce the number of statements in the following method and reactivate the disabled eslint
-          // rule.
-          // eslint-disable-next-line max-statements
           blockToken.children = internalTokens.flatMap((v) => {
             if (typeof v == "string") {
               const token = new state.Token("text", "span", 0);
               token.content = v;
               return [token];
             } else {
-              const { text, reference } = v;
-
-              const openToken = new state.Token("link_open", "a", 1);
-              openToken.attrSet(
-                "href",
-                remoteURLSerializer.serialize(
-                  modelReferenceParser.parse(reference),
-                ) ?? "",
+              return handleLink(
+                v,
+                remoteURLSerializer,
+                modelReferenceParser,
+                state,
               );
-              openToken.attrPush(["class", "internal-link"]);
-              const contentToken = new state.Token("text", "", 0);
-              contentToken.content = text || reference;
-              const closeToken = new state.Token("link_close", "a", -1);
-              return [openToken, contentToken, closeToken];
             }
           });
         }

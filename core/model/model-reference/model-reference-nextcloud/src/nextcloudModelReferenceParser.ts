@@ -30,6 +30,9 @@ import { injectable } from "inversify";
 @injectable()
 export class NextcloudModelReferenceParser implements ModelReferenceParser {
   parse(reference: string): EntityReference {
+    if (/^https?:\/\//.test(reference)) {
+      throw new Error(`[${reference}] is not a valid entity reference`);
+    }
     let segments = reference.split("/");
     if (segments[0] == "") {
       segments = segments.slice(1);

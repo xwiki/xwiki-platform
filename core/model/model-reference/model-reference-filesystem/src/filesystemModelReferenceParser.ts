@@ -30,6 +30,9 @@ import { injectable } from "inversify";
 @injectable()
 export class FileSystemModelReferenceParser implements ModelReferenceParser {
   parse(reference: string): EntityReference {
+    if (/^https?:\/\//.test(reference)) {
+      throw new Error(`[${reference}] is not a valid entity reference`);
+    }
     const segments = reference.split(/(?<!\\)\//);
     if (segments[segments.length - 2] == "attachments") {
       return new AttachmentReference(

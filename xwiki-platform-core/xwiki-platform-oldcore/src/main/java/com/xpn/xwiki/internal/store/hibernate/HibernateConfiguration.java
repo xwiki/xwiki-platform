@@ -21,6 +21,8 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,6 +31,9 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 
@@ -45,6 +50,10 @@ public class HibernateConfiguration
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     private ConfigurationSource xwikiConfiguration;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> resolver;
 
     private String path;
 
@@ -163,5 +172,22 @@ public class HibernateConfiguration
     public List<String> getIgnoredMigrations()
     {
         return getList("xwiki.store.migration.ignored");
+    }
+
+    /**
+     * @return the local references of the classes for which we should apply a save optimization (save only the modified
+     *         ones)
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    public Set<EntityReference> getOptimizedXObjectClasses()
+    {
+        List<String> references =
+            this.xwikiConfiguration.getProperty("xwiki.store.hibernate.optimizedObjectSave.classes", List.class);
+
+        return references != null
+            ? references.stream().map(r -> this.resolver.resolve(r, EntityType.DOCUMENT)).collect(Collectors.toSet())
+            : null;
     }
 }

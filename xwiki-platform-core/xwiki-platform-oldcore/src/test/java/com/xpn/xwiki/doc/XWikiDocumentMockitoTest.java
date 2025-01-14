@@ -568,6 +568,17 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
+    void testCloneIdentical()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+        document.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = document.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+    }
+
+    @Test
     void testCloneNullObjects()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));

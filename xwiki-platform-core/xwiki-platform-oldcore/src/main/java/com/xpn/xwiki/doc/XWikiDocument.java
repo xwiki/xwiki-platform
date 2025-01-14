@@ -532,6 +532,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private boolean isMetaDataDirty = true;
 
+    private boolean changeTracked;
+
     private int elements = HAS_OBJECTS | HAS_ATTACHMENTS;
 
     // Meta Data
@@ -2411,6 +2413,34 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setMetaDataDirty(boolean metaDataDirty)
     {
         this.isMetaDataDirty = metaDataDirty;
+    }
+
+    /**
+     * Indicate if flags indicating which part of the document has been modified can be trusted.
+     * 
+     * @return the true if change made to this {@link XWikiDocument} instance are tracked
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public boolean isChangeTracked()
+    {
+        return this.changeTracked;
+    }
+
+    /**
+     * Indicate if flags indicating which part of the document has been modified can be trusted.
+     * 
+     * @param changeTracked true if change made to this {@link XWikiDocument} instance are tracked
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public void setChangeTracked(boolean changeTracked)
+    {
+        this.changeTracked = changeTracked;
     }
 
     public String getAttachmentURL(String filename, XWikiContext context)
@@ -4541,6 +4571,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         try {
             Constructor<? extends XWikiDocument> constructor = getClass().getConstructor(DocumentReference.class);
             doc = constructor.newInstance(newDocumentReference);
+
+            if (keepsIdentity && getDocumentReference().equals(doc.getDocumentReference())) {
+                doc.setChangeTracked(isChangeTracked());
+            }
 
             // Make sure the coordinate of the document is fully accurate before any other manipulation
             doc.setLocale(getLocale());

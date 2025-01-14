@@ -255,8 +255,8 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         // We add Line Break Opportunity elements in the middle of this word so that it's cut into nice to read 
         // substrings.
         let iconNameWithLineBreakOpportunities = iconTheme[i].name
-          .replaceAll("-","<wbr/>-")
-          .replaceAll("_","<wbr/>_");
+          .replaceAll("-","&lt;wbr/&gt;-")
+          .replaceAll("_","&lt;wbr/&gt;_");
         iconNameSpan.addClass('xwikiIconPickerIconName').html(iconNameWithLineBreakOpportunities);
         displayer.append(iconNameSpan);
         // Change the input value when the icon is clicked
@@ -633,7 +633,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 }
 
 /* Avoid stretching on the Loader element. */
-.xwikiIconPickerList > img {
+.xwikiIconPickerList &gt; img {
   object-fit: contain;
 }
 

@@ -38,7 +38,7 @@ export default function (
       this.editor.storage.markdown.parser.md =
         this.editor.storage.markdown.parser.md.use((md: MarkdownIt) => {
           md.core.ruler.before(
-            "inline",
+            "linkify",
             "markdown-internal-links",
             parseInternalLinks(modelReferenceParser, remoteURLSerializer),
           );

@@ -3427,6 +3427,9 @@ importers:
 
   sharedworker/impl:
     dependencies:
+      '@xwiki/cristal-alerts-default':
+        specifier: workspace:*
+        version: link:../../core/alerts/alerts-default
       '@xwiki/cristal-api':
         specifier: workspace:*
         version: link:../../api
@@ -3448,6 +3451,12 @@ importers:
       '@xwiki/cristal-configuration-api':
         specifier: workspace:*
         version: link:../../core/configuration/configuration-api
+      '@xwiki/cristal-configuration-electron-renderer':
+        specifier: workspace:*
+        version: link:../../electron/configuration/configuration-electron/configuration-electron-renderer
+      '@xwiki/cristal-configuration-web':
+        specifier: workspace:*
+        version: link:../../core/configuration/configuration-web
       '@xwiki/cristal-document-api':
         specifier: workspace:*
         version: link:../../core/document/document-api

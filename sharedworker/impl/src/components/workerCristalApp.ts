@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { DefaultLogger } from "@xwiki/cristal-api";
 import { Configurations } from "@xwiki/cristal-configuration-api";
 import { injectable } from "inversify";
 import type {
@@ -144,7 +145,7 @@ export class WorkerCristalApp implements CristalApp {
   }
 
   getLogger(): Logger {
-    throw new Error("Method not implemented.");
+    return new DefaultLogger();
   }
 
   getLoggerConfig(): LoggerConfig {

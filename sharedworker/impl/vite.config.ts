@@ -19,7 +19,7 @@
  */
 
 import { generateConfig } from "../../vite.config";
-import { mergeConfig, defineConfig } from "vite";
+import { defineConfig, mergeConfig } from "vite";
 import comlink from "vite-plugin-comlink";
 
 export default mergeConfig(
@@ -27,6 +27,7 @@ export default mergeConfig(
   defineConfig({
     plugins: [comlink()],
     worker: {
+      format: "es",
       plugins: () => [comlink()],
     },
   }),

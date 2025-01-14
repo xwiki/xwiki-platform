@@ -42,11 +42,11 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
-import type { DocumentReference } from "@xwiki/cristal-model-api/dist";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   RemoteURLParserProvider,
   RemoteURLSerializerProvider,
-} from "@xwiki/cristal-model-remote-url-api/dist";
+} from "@xwiki/cristal-model-remote-url-api";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 

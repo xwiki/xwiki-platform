@@ -21,17 +21,53 @@
 import "reflect-metadata";
 import { WorkerCristalApp } from "./workerCristalApp";
 import WorkerQueueWorker from "./workerQueueWorker";
+import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-alerts-default";
 import { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
 import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
 import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
+import {
+  ConfigurationLoader,
+  Configurations,
+} from "@xwiki/cristal-configuration-api";
 import { CristalLoader } from "@xwiki/cristal-extension-manager";
 import * as Comlink from "comlink";
 import type { WikiConfig } from "@xwiki/cristal-api";
 import type { MyWorker, QueueWorker } from "@xwiki/cristal-sharedworker-api";
 import type { Container } from "inversify";
+
+async function loadConfigElectron() {
+  const loadConfig: ConfigurationLoader = (
+    await import("@xwiki/cristal-configuration-electron-renderer")
+  ).loadConfig;
+  return await loadConfig();
+}
+
+async function loadConfigWeb() {
+  const loadConfig: ConfigurationLoader = (
+    await import("@xwiki/cristal-configuration-web")
+  ).loadConfig("/config.json");
+  return await loadConfig();
+}
+
+/**
+ * Currently, the best know option is to search for a process value at runtime and to decide how to load the
+ * configuration based on this information.
+ */
+async function loadConfig(): Promise<Configurations> {
+  try {
+    // @ts-expect-error process is not a known variable and might not be defined
+    if (process && process.versions && process.versions["electron"]) {
+      return await loadConfigElectron();
+    } else {
+      return await loadConfigWeb();
+    }
+  } catch {
+    return await loadConfigWeb();
+  }
+}
 
 export class Worker implements MyWorker {
   private currentNumber: number = 0;
@@ -200,8 +236,7 @@ export class Worker implements MyWorker {
   public async initialize(): Promise<void> {
     console.log("Starting initialize");
     const extensionList: Array<string> = ["storage"];
-    const response = await fetch("/config.json");
-    const config = await response.json();
+    const config = await loadConfig();
     this.configMap = new Map(Object.entries(config));
     console.log("Loaded json config", this.configMap);
     const cristalLoader = new CristalLoader(extensionList);
@@ -226,6 +261,7 @@ export class Worker implements MyWorker {
     new NextcloudBackendComponentInit(cristalLoader.container);
     new XWikiBackendComponentInit(cristalLoader.container);
     new AuthenticationDefaultComponentInit(cristalLoader.container);
+    new AlertsDefaultComponentInit(cristalLoader.container);
     console.log("Loading storage components");
     this.initialized = true;
     console.log("Finished initialize");

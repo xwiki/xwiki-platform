@@ -27,6 +27,7 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@xwiki/cristal-alerts-default": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-default": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",
@@ -34,6 +35,8 @@
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",
+    "@xwiki/cristal-configuration-electron-renderer": "workspace:*",
+    "@xwiki/cristal-configuration-web": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-extension-manager": "workspace:*",
     "@xwiki/cristal-sharedworker-api": "workspace:*",

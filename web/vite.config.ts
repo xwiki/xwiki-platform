@@ -47,6 +47,9 @@ export default defineConfig({
       insertTypesEntry: true,
     })
   ],
+  worker: {
+    format: "es",
+  },
   optimizeDeps: {
     esbuildOptions: {
       tsconfigRaw: {

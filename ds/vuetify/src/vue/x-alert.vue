@@ -37,3 +37,11 @@ defineProps<AlertProps>();
     <slot />
   </v-alert>
 </template>
+
+<style scoped>
+:deep(.v-alert__content a.router-link-active),
+:deep(.v-alert__content a.router-link-active:visited) {
+  color: inherit;
+  text-decoration-color: inherit;
+}
+</style>

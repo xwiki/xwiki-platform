@@ -148,7 +148,7 @@
       <linkShowTargetTab>0</linkShowTargetTab>
     </property>
     <property>
-      <loadJavaScriptSkinExtensions>0</loadJavaScriptSkinExtensions>
+      <loadJavaScriptSkinExtensions>1</loadJavaScriptSkinExtensions>
     </property>
     <property>
       <removeButtons/>

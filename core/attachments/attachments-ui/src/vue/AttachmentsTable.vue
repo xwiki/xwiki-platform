@@ -56,9 +56,9 @@ function attachmentName(name: string) {
 }
 </script>
 <template>
-  <span v-if="isLoading">{{ t("attachments.tab.loading") }}</span>
-  <span v-else-if="errorMessage">{{ errorMessage }}</span>
-  <span v-else-if="attachments.length == 0">
+  <span class="str-loading" v-if="isLoading">{{ t("attachments.tab.loading") }}</span>
+  <span class="str-error" v-else-if="errorMessage">{{ errorMessage }}</span>
+  <span class="str-no-attachment" v-else-if="attachments.length == 0">
     {{ t("attachments.tab.noAttachments") }}
   </span>
   <table v-else class="mobile-transform">
@@ -124,3 +124,8 @@ function attachmentName(name: string) {
     </tbody>
   </table>
 </template>
+<style scoped>
+.v-card-text .str-no-attachment {
+  padding: 0 var(--cr-spacing-medium);
+}
+</style>

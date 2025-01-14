@@ -670,7 +670,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   /* For the few names that need three lines, we make sure the user can scroll to read the whole name. */
   overflow-y: scroll;
   overflow-x: hidden;
-  /* Make sure the name wraps onto multiple lines isntead of overflowing. */
+  /* Make sure the name wraps onto multiple lines instead of overflowing. */
   white-space: pre-wrap;
   word-break: break-word;
 }

@@ -562,6 +562,9 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     {
         PropertyClass pclass = (PropertyClass) super.clone();
         pclass.setObject(getObject());
+
+        pclass.setDirty(isDirty());
+
         return pclass;
     }
 

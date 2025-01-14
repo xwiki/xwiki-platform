@@ -138,4 +138,28 @@ describe("DefaultMarkdownRenderer", () => {
       '<p><img src="https://cristal.xwiki.org/image.png"></a></p>\n',
     );
   });
+
+  it("renders bolded links", () => {
+    const defaultMarkdownRenderer = initComponent();
+    expect(
+      defaultMarkdownRenderer.render(
+        "**before [[Main.WebHome@image.png]] after**",
+      ),
+    ).toBe(
+      "<p><strong>before " +
+        '<a href="https://cristal.xwiki.org/image.png" class="internal-link">Main.WebHome@image.png</a> ' +
+        "after</strong></p>\n",
+    );
+  });
+
+  it("renders bolded images", () => {
+    const defaultMarkdownRenderer = initComponent();
+    expect(
+      defaultMarkdownRenderer.render(
+        "**before ![[Main.WebHome@image.png]] after**",
+      ),
+    ).toBe(
+      '<p><strong>before <img src="https://cristal.xwiki.org/image.png"></a> after</strong></p>\n',
+    );
+  });
 });

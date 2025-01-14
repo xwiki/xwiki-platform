@@ -45,7 +45,7 @@ export class DefaultMarkdownRenderer implements MarkdownRenderer {
     const modelReferenceParser = this.modelReferenceParserProvider.get()!;
     const remoteURLSerializer = this.remoteURLSerializerProvider.get()!;
     this.md.core.ruler.before(
-      "inline",
+      "linkify",
       "markdown-internal-links",
       parseInternalLinks(modelReferenceParser, remoteURLSerializer),
     );

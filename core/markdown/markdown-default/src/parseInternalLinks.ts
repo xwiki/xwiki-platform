@@ -18,9 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import MarkdownIt from "markdown-it";
 import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
-import type { StateCore } from "markdown-it";
+import type { StateCore, Token } from "markdown-it";
 
 const INTERNAL_LINK_REGEX = /\[\[((?<text>[^\]|]+)\|)?(?<reference>[^\]|]+)]]/g;
 
@@ -134,34 +135,77 @@ function handleLink(
   return [openToken, contentToken, closeToken];
 }
 
+function handleTextToken(
+  token: Token,
+  newChildren: Token[],
+  state: StateCore,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+) {
+  const internalTokens = parseStringForInternalLinks(token.content);
+  if (hasLink(internalTokens)) {
+    for (const v of internalTokens) {
+      if (typeof v == "string") {
+        const token = new state.Token("text", "span", 0);
+        token.content = v;
+        newChildren.push(token);
+      } else {
+        const linkTokens = handleLink(
+          v,
+          remoteURLSerializer,
+          modelReferenceParser,
+          state,
+        );
+        newChildren.push(...linkTokens);
+      }
+    }
+  } else {
+    newChildren.push(token);
+  }
+}
+
+function handleInlineBlockToken(
+  blockToken: Token,
+  state: StateCore,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+) {
+  if (!blockToken.children) {
+    return;
+  }
+  const newChildren = [];
+  for (const element of blockToken.children) {
+    const token = element;
+    if (token.type == "text") {
+      handleTextToken(
+        token,
+        newChildren,
+        state,
+        remoteURLSerializer,
+        modelReferenceParser,
+      );
+    } else {
+      newChildren.push(token);
+    }
+  }
+
+  blockToken.children = newChildren;
+}
+
 export function parseInternalLinks(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,
-) {
+): MarkdownIt.Core.RuleCore {
   return function (state: StateCore): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state.tokens.forEach((blockToken: any) => {
       if (blockToken.type == "inline") {
-        const internalTokens = parseStringForInternalLinks(blockToken.content);
-
-        // We replace the content of the current block node only if at least a link has been found.
-        if (hasLink(internalTokens)) {
-          blockToken.content = "";
-          blockToken.children = internalTokens.flatMap((v) => {
-            if (typeof v == "string") {
-              const token = new state.Token("text", "span", 0);
-              token.content = v;
-              return [token];
-            } else {
-              return handleLink(
-                v,
-                remoteURLSerializer,
-                modelReferenceParser,
-                state,
-              );
-            }
-          });
-        }
+        handleInlineBlockToken(
+          blockToken,
+          state,
+          remoteURLSerializer,
+          modelReferenceParser,
+        );
       }
     });
   };

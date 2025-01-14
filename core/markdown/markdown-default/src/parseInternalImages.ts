@@ -19,9 +19,9 @@
  */
 
 import { EntityType } from "@xwiki/cristal-model-api";
+import MarkdownIt, { StateCore, Token } from "markdown-it";
 import type { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLSerializer } from "@xwiki/cristal-model-remote-url-api";
-import type { StateCore } from "markdown-it";
 
 const INTERNAL_IMAGE_REGEX =
   /!\[\[((?<text>[^\]|]+)\|)?(?<reference>[^\]|]+)]]/g;
@@ -89,46 +89,100 @@ function parseStringForInternalLinks(
   return tokens;
 }
 
+function handleImageLink(
+  v: InternalImage,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+  state: StateCore,
+) {
+  const { text, reference } = v;
+
+  const openToken = new state.Token("image_open", "img", 1);
+  openToken.attrSet(
+    "src",
+    remoteURLSerializer.serialize(
+      modelReferenceParser.parse(reference, EntityType.ATTACHMENT),
+    ) ?? "",
+  );
+  if (text) {
+    openToken.attrSet("alt", text);
+  }
+  const closeToken = new state.Token("link_close", "a", -1);
+
+  return [openToken, closeToken];
+}
+
+function handleTextToken(
+  token: Token,
+  newChildren: Token[],
+  state: StateCore,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+) {
+  const internalTokens = parseStringForInternalLinks(token.content);
+  if (hasLink(internalTokens)) {
+    for (const v of internalTokens) {
+      if (typeof v == "string") {
+        const token = new state.Token("text", "span", 0);
+        token.content = v;
+        newChildren.push(token);
+      } else {
+        const linkTokens = handleImageLink(
+          v,
+          remoteURLSerializer,
+          modelReferenceParser,
+          state,
+        );
+        newChildren.push(...linkTokens);
+      }
+    }
+  } else {
+    newChildren.push(token);
+  }
+}
+
+function handleInlineBlockToken(
+  blockToken: Token,
+  state: StateCore,
+  remoteURLSerializer: RemoteURLSerializer,
+  modelReferenceParser: ModelReferenceParser,
+) {
+  if (!blockToken.children) {
+    return;
+  }
+  const newChildren = [];
+  for (const element of blockToken.children) {
+    const token = element;
+    if (token.type == "text") {
+      handleTextToken(
+        token,
+        newChildren,
+        state,
+        remoteURLSerializer,
+        modelReferenceParser,
+      );
+    } else {
+      newChildren.push(token);
+    }
+  }
+
+  blockToken.children = newChildren;
+}
+
 export function parseInternalImages(
   modelReferenceParser: ModelReferenceParser,
   remoteURLSerializer: RemoteURLSerializer,
-) {
+): MarkdownIt.Core.RuleCore {
   return function (state: StateCore): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state.tokens.forEach((blockToken: any) => {
       if (blockToken.type == "inline") {
-        const internalTokens = parseStringForInternalLinks(blockToken.content);
-
-        // We replace the content of the current block node only if at least a link has been found.
-        if (hasLink(internalTokens)) {
-          blockToken.content = "";
-          // TODO: reduce the number of statements in the following method and reactivate the disabled eslint
-          // rule.
-          // eslint-disable-next-line max-statements
-          blockToken.children = internalTokens.flatMap((v) => {
-            if (typeof v == "string") {
-              const token = new state.Token("text", "span", 0);
-              token.content = v;
-              return [token];
-            } else {
-              const { text, reference } = v;
-
-              const openToken = new state.Token("image_open", "img", 1);
-              openToken.attrSet(
-                "src",
-                remoteURLSerializer.serialize(
-                  modelReferenceParser.parse(reference, EntityType.ATTACHMENT),
-                ) ?? "",
-              );
-              if (text) {
-                openToken.attrSet("alt", text);
-              }
-              const closeToken = new state.Token("link_close", "a", -1);
-
-              return [openToken, closeToken];
-            }
-          });
-        }
+        handleInlineBlockToken(
+          blockToken,
+          state,
+          remoteURLSerializer,
+          modelReferenceParser,
+        );
       }
     });
   };

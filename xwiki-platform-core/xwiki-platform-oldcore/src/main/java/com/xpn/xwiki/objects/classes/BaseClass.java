@@ -86,11 +86,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private String nameField;
 
     /**
-     * Set to true if the class is modified from the database version of it.
-     */
-    private boolean isDirty = true;
-
-    /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
@@ -464,8 +459,9 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         bclass.setValidationScript(getValidationScript());
         bclass.setNameField(getNameField());
 
-        bclass.setDirty(this.isDirty);
         bclass.setOwnerDocument(this.ownerDocument);
+
+        bclass.setDirty(isDirty());
 
         return bclass;
     }
@@ -1639,22 +1635,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (this.ownerDocument != null) {
                 setDocumentReference(this.ownerDocument.getDocumentReference());
             }
-
-            if (ownerDocument != null && this.isDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
-        }
-    }
-
-    /**
-     * @param isDirty Indicate if the dirty flag should be set or cleared.
-     * @since 4.3M2
-     */
-    public void setDirty(boolean isDirty)
-    {
-        this.isDirty = isDirty;
-        if (isDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 }

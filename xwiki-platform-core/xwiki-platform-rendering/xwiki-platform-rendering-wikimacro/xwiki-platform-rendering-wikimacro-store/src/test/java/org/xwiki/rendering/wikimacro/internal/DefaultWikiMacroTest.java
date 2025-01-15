@@ -707,4 +707,25 @@ class DefaultWikiMacroTest
 
         assertEquals(expect, printer.toString());
     }
+
+    @Test
+    void wikiMacroParameterWithDefaultValueContext() throws Exception
+    {
+        String defaultValue = "{{velocity}}$xcontext.sdoc{{/velocity}}";
+        List<WikiMacroParameterDescriptor> parameterDescriptors = List.of(new WikiMacroParameterDescriptor("param",
+            "Test parameter", false, defaultValue, Block.LIST_BLOCK_TYPE));
+
+        registerWikiMacro("defaultmacro", "{{wikimacroparameter name=\"param\"/}}", Syntax.XWIKI_2_1,
+            parameterDescriptors);
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(
+            new StringReader("{{defaultmacro /}} {{defaultmacro param=\"Outside: %s\" /}}".formatted(defaultValue)),
+            Syntax.XWIKI_2_1, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("space.macroPage Outside: sspace.sdoc", printer.toString());
+
+    }
 }

@@ -29,9 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -183,15 +181,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         List<String> javaOpts = new ArrayList<>();
 
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
-        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
-        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
-        // run on Java 17+.
-        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
-        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
-        // ATM).
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            addJava17AddOpens(javaOpts);
-        }
+        addJava17AddOpens(javaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:

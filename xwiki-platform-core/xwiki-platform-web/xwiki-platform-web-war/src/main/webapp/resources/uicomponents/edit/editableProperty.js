@@ -133,13 +133,15 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       var editInput = editor.find(':input').filter(':visible');
       // If we cannot find any kind of editInput, then we're in a weird edge case
       // and we don't want to apply any of the following changes.
-      if(!editInput) { return; }
+      if (!editInput) {
+        return;
+      }
       editInput.focus();
       // Make sure the edit input has an ID, and use the name of the input as a fallback
       if (!editInput.attr('id')) {
         editInput.attr('id', editInput.attr('name'));
       }
-      // Bind the label to the newly generated edit input
+      // Bind the label to the newly generated edit input.
       editableProperty.find('label').attr('for', editInput.attr('id'));
     }).catch(() => {
       new XWiki.widgets.Notification(l10n['web.editableProperty.editFailed'], 'error');
@@ -158,14 +160,14 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       .next('.editableProperty-editor').filter(':visible').trigger('xwiki:actions:cancel').hide();
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').hide();
     editableProperty.find('.editableProperty-edit').show();
-    // Remove the for attribute from the label, resetting it to its default state
+    // Remove the for attribute from the label, resetting it to its default state.
     editableProperty.find('label').removeAttr('for');
   };
 
   var save = function(editableProperty) {
     // Disable the save and cancel actions while the property is being saved.
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').addClass('disabled');
-    // Remove the for attribute from the label, resetting it to its default state
+    // Remove the for attribute from the label, resetting it to its default state.
     editableProperty.find('label').removeAttr('for');
     // Show progress notification message.
     var notification = new XWiki.widgets.Notification(l10n['core.editors.saveandcontinue.notification.inprogress'],

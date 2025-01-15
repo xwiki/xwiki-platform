@@ -41,6 +41,7 @@ import org.xwiki.velocity.internal.util.VelocityDetector;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * @version $Id$
@@ -62,6 +63,9 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
 
     @Inject
     private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
+
+    @Inject
+    private RequiredRightAnalyzer<BaseClass> classRequiredRightAnalyzer;
 
     @Inject
     private VelocityDetector velocityDetector;
@@ -94,12 +98,14 @@ public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer
                 // Analyze the content
                 result.addAll(this.xdomRequiredRightAnalyzer.analyze(document.getXDOM()));
 
-                // Analyze XObjects on the Root locale version of the document
+                // Analyze XObjects and XClass on the Root locale version of the document
                 XWikiDocument rootLocaleDocument = document;
                 if (document.getLocale() != null && !document.getLocale().equals(Locale.ROOT)) {
                     XWikiContext context = this.contextProvider.get();
                     rootLocaleDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
                 }
+
+                result.addAll(this.classRequiredRightAnalyzer.analyze(rootLocaleDocument.getXClass()));
 
                 for (List<BaseObject> baseObjects : rootLocaleDocument.getXObjects().values()) {
                     for (BaseObject object : baseObjects) {

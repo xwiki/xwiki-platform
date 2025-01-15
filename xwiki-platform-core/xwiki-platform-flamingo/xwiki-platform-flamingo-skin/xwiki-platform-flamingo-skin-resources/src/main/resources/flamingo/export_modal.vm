@@ -83,7 +83,7 @@
         $uix.parameters.excludeNestedPagesByDefault == 'true'))
       #set ($discard = $exportFormatsForCategory.add($exportFormat))
       ## Include the resources and configuration required by this export format.
-      $services.rendering.render($uix.execute(), 'html/5.0')
+      $!services.rendering.render($uix.execute(), 'html/5.0')
     #end
   #end
   #addLegacyExportFormats($exportFormatsByCategory)

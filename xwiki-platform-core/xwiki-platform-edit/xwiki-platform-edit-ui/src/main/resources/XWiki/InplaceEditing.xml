@@ -464,6 +464,16 @@ define('editInPlace', [
     return Promise.resolve(xwikiDocument);
   }
 
+  // The version of the edited document can change even if the in-place editor doesn't save the document (e.g. because a
+  // remote user has saved the document in a realtime editing session or because the document was updated outside the
+  // in-place editor by uploading an attachment). We need to update the version of the edited document in order to avoid
+  // merge conflicts on save (this version is passed to the server on save, see updateFormDataBeforeSave).
+  $(document).on('xwiki:document:changeVersion', (event, data) =&gt; {
+    if (data.documentReference.equals(currentXWikiDocument?.documentReference)) {
+      currentXWikiDocument.version = data.version;
+    }
+  });
+
   var editPage = function() {
     return editInPlace({
       afterEdit: function() {
@@ -489,11 +499,9 @@ define('editInPlace', [
     return editInPlace({
       lockFailed: function() {
         // Revert the changes done on #xwikicontent.
-        $('#xwikicontent').removeAttr('tabindex').children(':header').children('.edit_section').removeClass('hidden');
+        $('#xwikicontent').children(':header').children('.edit_section').removeClass('hidden');
       },
       afterEdit: function() {
-        // We don't need the tabindex attribute anymore now that the content is editable.
-        $('#xwikicontent').removeAttr('tabindex');
         if (sectionId) {
           // Select the heading of the specified section.
           $('#xwikicontent &gt; #' + $.escapeSelector(sectionId)).each(function() {
@@ -521,8 +529,7 @@ define('editInPlace', [
         options.afterEdit(xwikiDocument);
         return xwikiDocument;
       }).finally(() =&gt; {
-        // Remove the aria-expanded attribute which is incorrect for role=textbox
-        $('#xwikicontent').removeClass('loading').removeAttr('aria-expanded');
+        $('#xwikicontent').removeClass('loading');
       // Then wait for an action (save, cancel, reload) only if the editors were loaded successfully.
       }).then(maybeSave)
       // Then unlock the document both when the edit ended with success and with a failure.
@@ -659,11 +666,18 @@ define('editInPlace', [
       // deferred object (promise) cannot change once it was resolved. So the first event that fires will resolve the
       // promise and the remaining events won't be able to change that. The remaining event listeners could be called
       // later but they won't have any effect on the deferred object.
+      //
+      // Enable the action buttons to receive action events, because they might have been disabled when the previous
+      // action was handled, see below.
+      const actionButtons = $('.inplace-editing-buttons').prop('disabled', false);
       $(document).one([
         'xwiki:actions:save',
         'xwiki:actions:reload',
         'xwiki:actions:cancel',
       ].join(' '), '.xcontent.form', function(event, data) {
+        // Disable the action buttons while we handle the current action. They will be re-enabled once waitForAction is
+        // called again to wait for the next action. This way we avoid handling multiple actions at the same time.
+        actionButtons.prop('disabled', true);
         resolve({
           name: event.type.substring('xwiki:actions:'.length),
           document: xwikiDocument,
@@ -1198,8 +1212,15 @@ require(['jquery'], function($) {
       // Return the id of the edited section.
       return $(event.target).closest(':header').attr('id');
     },
-    edit: function(editInPlace, sectionId) {
-      return editInPlace.editSection(sectionId);
+    edit: async function(editInPlace, sectionId) {
+      try {
+        return await editInPlace.editSection(sectionId);
+      } finally {
+        // We have to remove the tabindex attribute ourselves because CKEditor restores at the end the attributes it
+        // finds on the editable element before initialization (and we're setting the tab index above before loading the
+        // editor).
+        $('#xwikicontent').removeAttr('tabindex');
+      }
     }
   }, onInPlaceEditing);
 

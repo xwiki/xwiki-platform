@@ -82,6 +82,7 @@ public class ChangePasswordPage extends BasePage
         this.password1.sendKeys(password);
         this.password2.clear();
         this.password2.sendKeys(password2);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.xpath("//input[@id='xwikipassword2']"),"class");
     }
 
     /**
@@ -97,6 +98,7 @@ public class ChangePasswordPage extends BasePage
         this.password1.sendKeys(password);
         this.password2.clear();
         this.password2.sendKeys(password2);
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.xpath("//input[@id='xwikipassword2']"),"class");
     }
 
     /**

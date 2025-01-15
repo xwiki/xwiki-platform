@@ -27,7 +27,6 @@ import org.dom4j.Element;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.xml.XMLUtils;
 
@@ -319,7 +318,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     protected MergeManagerResult<Object, Object> mergeValue(Object previousValue, Object newValue,
         MergeConfiguration mergeConfiguration)
     {

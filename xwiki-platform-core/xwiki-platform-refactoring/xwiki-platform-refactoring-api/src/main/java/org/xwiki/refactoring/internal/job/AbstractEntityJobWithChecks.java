@@ -47,7 +47,7 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
      * Map that will contain all entities that are concerned by the refactoring.
      * Note that the EntityReference key locale is automatically set to null if it's the Locale.ROOT.
      */
-    private final Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
+    protected final Map<EntityReference, EntitySelection> concernedEntities = new HashMap<>();
 
     @Override
     protected void runInternal() throws Exception
@@ -104,7 +104,7 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         }
     }
 
-    private DocumentReference cleanLocale(DocumentReference documentReference)
+    protected DocumentReference cleanLocale(DocumentReference documentReference)
     {
         // We don't want to have locale information for root locale in the reference to not have problems with
         // the questions.
@@ -121,13 +121,13 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         }
     }
 
-    private void putInConcernedEntities(DocumentReference documentReference)
+    protected void putInConcernedEntities(DocumentReference documentReference)
     {
         DocumentReference cleanDocumentReference = cleanLocale(documentReference);
         this.concernedEntities.put(cleanDocumentReference, new EntitySelection(cleanDocumentReference));
     }
 
-    private void getEntities(DocumentReference documentReference)
+    protected void getEntities(DocumentReference documentReference)
     {
         if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
             getEntities(documentReference.getLastSpaceReference());
@@ -136,7 +136,7 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         }
     }
 
-    private void getEntities(SpaceReference spaceReference)
+    protected void getEntities(SpaceReference spaceReference)
     {
         visitDocuments(spaceReference, this::putInConcernedEntities);
     }

@@ -722,19 +722,6 @@ a.search-result-highlightAll:after {
   position: relative;
 }
 
-.search-facet-header:after {
-  border-bottom: 1px dotted $theme.pageContentBackgroundColor;
-  border-top: 1px dotted $theme.borderColor;
-  clear: both;
-  content: "";
-  display: block;
-  height: 0;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-}
-
 .search-facet:last-of-type .search-facet-header:after {
   border: medium none;
 }

@@ -19,10 +19,11 @@
  */
 package org.xwiki.test.ui.po;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -64,26 +65,28 @@ public abstract class AbstractRegistrationPage extends BasePage
     public void fillRegisterForm(final String firstName, final String lastName, final String username,
         final String password, final String confirmPassword, final String email)
     {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         // remove the onfocus on login, to avoid any problem to put the value.
         getDriver().executeJavascript("try{ document.getElementById('xwikiname').onfocus = null; " +
             "}catch(err){}");
-        if (firstName != null) {
+        if (StringUtils.isNotEmpty(firstName)) {
             map.put("register_first_name", firstName);
         }
-        if (lastName != null) {
+        if (StringUtils.isNotEmpty(lastName)) {
             map.put("register_last_name", lastName);
         }
-        if (username != null) {
+        if (StringUtils.isNotEmpty(username)) {
             map.put("xwikiname", username);
         }
-        if (password != null) {
-            map.put("register_password", password);
-        }
-        if (confirmPassword != null) {
+        // We invert the order of password fields fill to test that the validation of this second password is properly
+        // updated when the first password field is changed.
+        if (StringUtils.isNotEmpty(confirmPassword)) {
             map.put("register2_password", confirmPassword);
         }
-        if (email != null) {
+        if (StringUtils.isNotEmpty(password)) {
+            map.put("register_password", password);
+        }
+        if (StringUtils.isNotEmpty(email)) {
             map.put("register_email", email);
         }
         getForm().fillFieldsByName(map);
@@ -116,7 +119,9 @@ public abstract class AbstractRegistrationPage extends BasePage
     public boolean validationFailureMessagesInclude(String message)
     {
         return !getDriver().findElementsWithoutWaiting(
-            By.xpath("//dd/span[contains(@class,'LV_validation_message LV_invalid') and . = '" + message + "']"))
+            By.xpath("//dd/span[contains(@class, 'LV_validation_message') and " + 
+                "contains(@class, 'LV_invalid') and " +
+                "contains(., '" + message + "')]"))
             .isEmpty();
     }
 

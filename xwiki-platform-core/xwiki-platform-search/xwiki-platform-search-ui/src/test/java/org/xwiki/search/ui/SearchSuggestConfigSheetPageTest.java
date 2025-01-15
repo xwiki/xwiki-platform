@@ -27,15 +27,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.evaluation.internal.DefaultObjectEvaluator;
 import org.xwiki.evaluation.internal.VelocityObjectPropertyEvaluator;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.RenderingScriptServiceComponentList;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfigurationComponentList;
 import org.xwiki.search.internal.SearchSuggestSourceObjectEvaluator;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.page.HTML50ComponentList;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.TestNoScriptMacro;
@@ -80,9 +79,6 @@ public class SearchSuggestConfigSheetPageTest extends PageTest
 
     private static final DocumentReference AUTHOR_REFERENCE =
         new DocumentReference(WIKI_NAME, "XWiki", "TestUser");
-
-    @MockComponent
-    private AuthorizationManager authorizationManager;
 
     private AuthorExecutor authorExecutor;
 
@@ -138,12 +134,14 @@ public class SearchSuggestConfigSheetPageTest extends PageTest
     @Test
     void displaySourceWithoutScriptRights() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(false);
 
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);
 
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, TEST_PAGE);
+        verify(this.oldcore.getMockDocumentAuthorizationManager()).hasAccess(Right.SCRIPT, EntityType.DOCUMENT,
+            AUTHOR_REFERENCE, TEST_PAGE);
         verify(this.velocityEngine, never()).evaluate(any(), any(), any(), eq(this.testString));
 
         Element presentationLink =
@@ -163,12 +161,14 @@ public class SearchSuggestConfigSheetPageTest extends PageTest
     @Test
     void displaySourceWithScriptRights() throws Exception
     {
-        when(this.authorizationManager.hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE)).thenReturn(true);
 
         this.context.setDoc(this.testPageDocument);
         Document result = renderHTMLPage(this.searchSuggestConfigSheetDocument);
 
-        verify(this.authorizationManager).hasAccess(Right.SCRIPT, AUTHOR_REFERENCE, TEST_PAGE);
+        verify(this.oldcore.getMockDocumentAuthorizationManager())
+            .hasAccess(Right.SCRIPT, EntityType.DOCUMENT, AUTHOR_REFERENCE, TEST_PAGE);
         verify(this.authorExecutor).call(any(), eq(AUTHOR_REFERENCE), eq(TEST_PAGE));
         verify(this.velocityEngine, times(2)).evaluate(any(), any(), any(), eq(this.testString));
 

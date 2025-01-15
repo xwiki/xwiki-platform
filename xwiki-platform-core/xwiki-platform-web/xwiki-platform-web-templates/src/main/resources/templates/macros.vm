@@ -1718,7 +1718,7 @@ $displayName##
       #if ("$!action.icon" == '')
         #set ($defaultActionIcons = {
           'rename': 'move',
-          'delete': 'cross',
+          'delete': 'trash',
           'restore': 'refresh',
           'undelete': 'refresh',
           'rights': 'lock',

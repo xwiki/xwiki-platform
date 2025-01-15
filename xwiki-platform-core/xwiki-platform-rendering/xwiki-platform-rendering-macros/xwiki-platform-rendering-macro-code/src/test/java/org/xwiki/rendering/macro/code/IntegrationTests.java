@@ -22,7 +22,8 @@ package org.xwiki.rendering.macro.code;
 import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 import org.xwiki.rendering.macro.source.MacroContentWikiSource;
 import org.xwiki.rendering.macro.source.MacroContentWikiSourceFactory;
-import org.xwiki.rendering.test.integration.junit5.RenderingTests;
+import org.xwiki.rendering.test.integration.Initialized;
+import org.xwiki.rendering.test.integration.junit5.RenderingTest;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -38,8 +39,8 @@ import static org.mockito.Mockito.when;
  * @since 3.0RC1
  */
 @AllComponents
-// @RenderingTests.Scope(pattern = "macrocode1.test")
-public class IntegrationTests implements RenderingTests
+// @Scope(pattern = "macrocode1.test")
+public class IntegrationTests extends RenderingTest
 {
     @Initialized
     public void initialize(MockitoComponentManager componentManager) throws Exception

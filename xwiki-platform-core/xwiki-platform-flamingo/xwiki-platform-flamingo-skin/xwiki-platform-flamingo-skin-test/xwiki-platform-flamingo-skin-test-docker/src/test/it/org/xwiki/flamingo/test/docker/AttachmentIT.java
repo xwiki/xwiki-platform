@@ -20,6 +20,9 @@
 package org.xwiki.flamingo.test.docker;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,8 +70,6 @@ class AttachmentIT
     private static final String FIRST_ATTACHMENT = "SmallAttachment.txt";
 
     private static final String SECOND_ATTACHMENT = "SmallAttachment2.txt";
-
-    private static final String ESCAPED_ATTACHMENT = "<strong>EscapedAttachment.txt";
 
     private static final String IMAGE_ATTACHMENT = "image.gif";
 
@@ -448,19 +449,24 @@ class AttachmentIT
 
     @Test
     @Order(9)
-    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference,
-        TestConfiguration testConfiguration)
+    void checkEscapingInAttachmentName(TestUtils setup, TestReference testReference) throws IOException
     {
         setup.loginAsSuperAdmin();
+
+        // We shouldn't store files with special characters in the repository, since some filesystems don't support it.
+        // Instead, we create the file during the test.
+        Path unescapedFile = Files.createTempFile("<strong>", null);
+        String unescapedFileName = unescapedFile.getFileName().toString();
+
         setup.createPage(testReference, "Empty content");
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
 
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, ESCAPED_ATTACHMENT).getAbsolutePath());
-        attachmentsPane.waitForUploadToFinish(ESCAPED_ATTACHMENT);
+        attachmentsPane.setFileToUpload(unescapedFile.toString(), true);
+        attachmentsPane.waitForUploadToFinish(unescapedFileName);
         attachmentsPane.clickHideProgress();
 
-        assertTrue(attachmentsPane.attachmentExistsByFileName(ESCAPED_ATTACHMENT));
-        attachmentsPane.deleteAttachmentByFileByName(ESCAPED_ATTACHMENT);
+        assertTrue(attachmentsPane.attachmentExistsByFileName(unescapedFileName));
+        attachmentsPane.deleteAttachmentByFileByName(unescapedFileName);
     }
 
     private String getAttachmentsMacroContent(DocumentReference docRef)

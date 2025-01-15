@@ -29,9 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.JavaVersion;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -183,15 +181,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         List<String> javaOpts = new ArrayList<>();
 
         // TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 has been fixed.
-        // Note that we should check the version of Java inside the Jetty container but that's hard and FTM we consider
-        // that if the Maven build for the tests runs with Java 17+ then, it's very likely that Jetty/XWiki will also
-        // run on Java 17+.
-        // PS: We could check the tag and verify if it contains "jdkNN" or "jreNN" where NN >= 17 but the problem is
-        // that there are plenty of tags that don't mention the jdk or jre (like "10" for example which runs on Java 21
-        // ATM).
-        if (SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_17)) {
-            addJava17AddOpens(javaOpts);
-        }
+        addJava17AddOpens(javaOpts);
 
         // When executing on the Oracle database, we get the following timezone error unless we pass a system
         // property to the Oracle JDBC driver:
@@ -205,23 +195,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         maybeEnableRemoteDebugging(javaOpts);
         this.servletContainer.withEnv("JAVA_OPTIONS", StringUtils.join(javaOpts, ' '));
 
-        // Jetty has a protection for URLs that don't respect the Servlet specification and that are considered
-        // ambiguous.See https://github.com/jetty/jetty.project/issues/12162#issuecomment-2286747043 for an explanation.
-        // Since XWiki uses them, we need to configure Jetty to allow for it. See also
-        //   https://jetty.org/docs/jetty/10/operations-guide/modules/standard.html#server-compliance
-        // Thus we need to relax the following rules in addition to using RFC3986:
-        //   Remove AMBIGUOUS_PATH_ENCODING when https://jira.xwiki.org/browse/XWIKI-22422 is fixed.
-        //   Remove AMBIGUOUS_EMPTY_SEGMENT when https://jira.xwiki.org/browse/XWIKI-22428 is fixed.
-        //   Remove AMBIGUOUS_PATH_SEPARATOR when https://jira.xwiki.org/browse/XWIKI-22435 is fixed.
-        // Note: It's important that this command comes before the one below that specifies the module.
-        this.servletContainer.setCommand("jetty.httpConfig.uriCompliance="
-            + "RFC3986,AMBIGUOUS_PATH_ENCODING,AMBIGUOUS_EMPTY_SEGMENT,AMBIGUOUS_PATH_SEPARATOR");
-
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
-        // (ee8 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
+        // (ee10 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
         if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
             this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
-                "--module=ee8-webapp,ee8-deploy,ee8-jstl,ee8-websocket-javax,ee8-websocket-jetty");
+                "--module=ext,console-capture,ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
         }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
@@ -267,11 +245,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         List<String> catalinaOpts = new ArrayList<>();
         catalinaOpts.add("-Xmx1024m");
-        catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
-        catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
-        catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
 
-        // Note: Tomcat 9.x automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
+        // Note: Tomcat automatically add the various "--add-opens" to make XWiki work on Java 17, so we don't
         // need to add them as we do for Jetty.
         // see https://jira.xwiki.org/browse/XWIKI-19034 and https://jira.xwiki.org/browse/XRENDERING-616
 
@@ -369,10 +344,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private String getDockerImageTag(TestConfiguration testConfiguration)
     {
-        // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
-        // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
-        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag()
-            : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
+        return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
@@ -410,9 +382,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             // https://downloadarchive.documentfoundation.org/libreoffice/old so that we can benefit
                             // from automatic LTS updates without any maintenance on our side. This is because the
                             // LTS version is exposed without the full versions, e.g. 7.2.7 instead of 7.2.7.2.
-                            // TODO: Use back stable URL when upgrade to LO 24.+
                             .env("LIBREOFFICE_DOWNLOAD_URL",
-                                "https://download.documentfoundation.org/libreoffice/old/"
+                                "https://download.documentfoundation.org/libreoffice/stable/"
                                 + "$LIBREOFFICE_VERSION/deb/x86_64/"
                                 + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
                             // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
@@ -420,14 +391,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                             .run("apt-get update && "
                                 + "apt-get --no-install-recommends -y install curl wget unzip procps libxinerama1 "
                                 + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 libx11-xcb1 libnss3 "
-                                + "libxml2 libxslt1-dev && "
-                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
-                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "libxml2 libxslt1-dev")
+                            .run("wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
                                 + "mkdir /tmp/libreoffice && "
-                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
-                                + "cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
-                                + "dpkg -i *.deb && "
-                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz")
+                            .run("cd `ls -d /tmp/LibreOffice_${LIBREOFFICE_VERSION}*_Linux_x86-64_deb/DEBS` && "
+                                + "dpkg -i *.deb && ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
                             .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);

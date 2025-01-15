@@ -44,21 +44,23 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreContainer.CoreLoadFailure;
-import org.apache.solr.servlet.SolrDispatchFilter;
 import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrCore;
+import org.apache.solr.servlet.SolrDispatchFilter;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -82,6 +84,10 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     public static final String TYPE = "embedded";
 
     private static final String SOLRCONFIG_PATH = "conf/solrconfig.xml";
+
+    private static final String SCHEMA_PATH = "conf/managed-schema.xml";
+
+    private static final long SEARCH_CORE_SCHEMA_VERSION = AbstractSolrCoreInitializer.SCHEMA_VERSION_16_6;
 
     /**
      * Solr configuration.
@@ -273,6 +279,38 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return null;
     }
 
+    private long getCoreVersion(File schemaFile)
+    {
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        // Prevent any XXE attack by disabling DOCTYPE declarations (even though we control the solr config file and
+        // thus the risk is almost non-existent. The user would need to find a way to replace it).
+        // Note that all solrconfig files checked didn't contain any DOCTYPE so that should be good.
+        // This will also prevent SonarQube from complaining every time this file is modified.
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+
+        try (FileReader reader = new FileReader(schemaFile)) {
+            XMLStreamReader xmlReader = factory.createXMLStreamReader(reader);
+
+            for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+                if (xmlReader.getLocalName().equals("fieldType")
+                    && SolrSchemaUtils.SOLR_TYPENAME_CVERSION.equals(xmlReader.getAttributeValue(null, "name"))) {
+                    String version = xmlReader.getAttributeValue(null, SolrSchemaUtils.SOLR_VERSIONFIELDTYPE_VALUE);
+                    if (version != null) {
+                        return NumberUtils.createLong(version);
+                    }
+
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            this.logger.warn("Failed to parse Solr configuration at [{}]: {}", schemaFile,
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        // Not the right version or invalid configuration
+        return -1;
+    }
+
     private boolean isSearchCoreValid()
     {
         // Exists but is unusable.
@@ -284,7 +322,18 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
 
         // Check solrconfig.xml
         File solrconfigFile = this.solrSearchCorePath.resolve(SOLRCONFIG_PATH).toFile();
-        return solrconfigFile.exists() && Version.LATEST.equals(getLuceneVersion(solrconfigFile));
+        if (!solrconfigFile.exists() || !Version.LATEST.equals(getLuceneVersion(solrconfigFile))) {
+            return false;
+        }
+
+        // Check the version of the schema
+        File schemaFile = this.solrSearchCorePath.resolve(SCHEMA_PATH).toFile();
+        if (!schemaFile.exists() || SEARCH_CORE_SCHEMA_VERSION > getCoreVersion(schemaFile)) {
+            return false;
+        }
+
+        // Everything seems to have as expected
+        return true;
     }
 
     private void recreateSearchCore() throws IOException

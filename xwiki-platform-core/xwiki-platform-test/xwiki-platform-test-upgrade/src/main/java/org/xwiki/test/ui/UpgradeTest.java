@@ -19,6 +19,11 @@
  */
 package org.xwiki.test.ui;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -30,7 +35,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
@@ -57,11 +61,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Validate the Distribution Wizard part of the upgrade process.
@@ -117,12 +116,6 @@ public class UpgradeTest extends AbstractTest
     private static final String STEP_EXTENSIONS_NAME = "Extensions";
 
     private static final int STEP_EXTENSIONS_ID = 3;
-
-    /**
-     * Automatically register as Admin user.
-     */
-    @Rule
-    public AdminAuthenticationRule adminAuthenticationRule = new AdminAuthenticationRule(getUtil());
 
     /**
      * Prepare and start XWiki.
@@ -196,8 +189,11 @@ public class UpgradeTest extends AbstractTest
         // Setup logs ignores
         setupLogs();
 
-        // Access home page (and be automatically redirected)
-        getUtil().gotoPage("Main", "WebHome", "view");
+        // Access the home page.
+        ViewPage viewPage = getUtil().gotoPage("Main", "WebHome");
+        assertFalse("Unexpected URL", getUtil().getDriver().getCurrentUrl().contains("/distribution/"));
+        // Login as Admin and be automatically redirected to the Distribution Wizard.
+        viewPage.login().loginAsAdmin();
 
         // Make sure we are redirected to the Distribution Wizard
         assertEquals(

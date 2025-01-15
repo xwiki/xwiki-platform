@@ -42,7 +42,6 @@ public interface WatchedEntityReference
      *
      * @since 15.5RC1
      */
-    @Unstable
     enum WatchedStatus
     {
         /**
@@ -215,7 +214,6 @@ public interface WatchedEntityReference
      * @return whether the filter preference concerns this exact entity
      * @since 15.5RC1
      */
-    @Unstable
     default boolean match(NotificationFilterPreference notificationFilterPreference)
     {
         return matchExactly(notificationFilterPreference);

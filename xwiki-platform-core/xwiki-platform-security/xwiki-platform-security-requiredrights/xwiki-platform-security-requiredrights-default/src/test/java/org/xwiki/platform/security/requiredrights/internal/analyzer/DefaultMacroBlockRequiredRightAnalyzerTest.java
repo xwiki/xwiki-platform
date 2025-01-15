@@ -28,6 +28,10 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRight;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRightReporter;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.rendering.block.Block;
@@ -42,6 +46,7 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -53,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -67,6 +73,7 @@ import static org.mockito.Mockito.withSettings;
  */
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(DefaultMacroRequiredRightReporter.class)
 class DefaultMacroBlockRequiredRightAnalyzerTest
 {
     @InjectMockComponents
@@ -79,6 +86,9 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
     @MockComponent
     @Named(ScriptMacroAnalyzer.ID)
     private RequiredRightAnalyzer<MacroBlock> scriptMacroAnalyzer;
+
+    @MockComponent
+    private MacroRequiredRightsAnalyzer defaultMacroRequiredRightsAnalyzer;
 
     @MockComponent
     private MacroManager macroManager;
@@ -180,5 +190,26 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
             verifyNoInteractions(this.xdomRequiredRightAnalyzer);
             assertEquals(List.of(), result);
         }
+    }
+
+    @Test
+    void analyzeDefaultMacro()
+    {
+        String macroName = "default";
+
+        MacroBlock block = mock();
+        when(block.getId()).thenReturn(macroName);
+
+        doAnswer(invocationOnMock -> {
+            MacroBlock macroBlock = invocationOnMock.getArgument(0);
+            MacroRequiredRightReporter reporter = invocationOnMock.getArgument(1);
+            reporter.report(macroBlock, List.of(MacroRequiredRight.PROGRAM), "test.summary");
+            return null;
+        }).when(this.defaultMacroRequiredRightsAnalyzer).analyze(eq(block), any());
+
+        List<RequiredRightAnalysisResult> results = this.analyzer.analyze(block);
+        assertEquals(1, results.size());
+        RequiredRightAnalysisResult result = results.get(0);
+        assertEquals(List.of(RequiredRight.PROGRAM), result.getRequiredRights());
     }
 }

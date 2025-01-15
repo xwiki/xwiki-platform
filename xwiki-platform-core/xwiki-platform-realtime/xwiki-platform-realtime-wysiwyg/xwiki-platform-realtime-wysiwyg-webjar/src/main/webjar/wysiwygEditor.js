@@ -21,7 +21,6 @@ define('xwiki-realtime-wysiwyg', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -33,8 +32,8 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  ChainPad, Crypto, Patches
+  $, realtimeConfig, Messages, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto,
+  Patches
 ) {
   'use strict';
 
@@ -119,9 +118,8 @@ define('xwiki-realtime-wysiwyg', [
       // Listen to local changes and propagate them to the other users.
       this._editor.onChange(() => {
         if (this._connection.status === ConnectionStatus.CONNECTED) {
-          this._saver.destroyDialog();
-          this._saver.setLocalEditFlag(true);
           this._onLocal();
+          this._saver.contentModifiedLocally();
         }
       });
 
@@ -134,9 +132,24 @@ define('xwiki-realtime-wysiwyg', [
         setTimeout(this._onUnlock.bind(this), 0);
       });
 
+      // Flush the uncommitted work back to the server on actions that might cause the editor to be destroyed without
+      // the beforeDestroy event being called.
+      const flushUncommittedWork = () => {
+        if (this._connection.status === ConnectionStatus.CONNECTED) {
+          this._connection.chainpad.sync();
+        }
+      };
+      const form = document.getElementById(RealtimeEditor._getFormId());
+      $(form).on('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+
       // Leave the realtime session and stop the autosave when the editor is destroyed. We have to do this because the
       // editor can be destroyed without the page being reloaded (e.g. when editing in-place).
       this._editor.onBeforeDestroy(() => {
+        // Flush the uncommitted work back to the server. There is no guarantee that the work is actually committed but
+        // at least we try.
+        flushUncommittedWork();
+        $(form).off('xwiki:actions:cancel xwiki:actions:save xwiki:actions:reload', flushUncommittedWork);
+
         // Notify the others that we're not editing anymore.
         this._realtimeContext.destroy();
         this._onAbort();
@@ -245,6 +258,8 @@ define('xwiki-realtime-wysiwyg', [
         userName,
         network: info.network,
         channel: this._eventsChannel,
+        showNotification: Interface.createMergeMessageElement(
+          this._connection.toolbar.toolbar.find('.rt-toolbar-rightside')),
         setTextValue: (newText) => {
           this._patchedEditor.setHTML(newText, true);
         },
@@ -252,7 +267,7 @@ define('xwiki-realtime-wysiwyg', [
           try {
             return this._editor.getOutputHTML();
           } catch (e) {
-            this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
+            this._editor.showNotification(Messages['editor.getContentFailed'], 'warning');
             return null;
           }
         },
@@ -263,15 +278,9 @@ define('xwiki-realtime-wysiwyg', [
             outputSyntaxVersion:'5.0',
             transformations:'macro'
           })));
-        },
-        safeCrash: (reason, debugLog) => {
-          this._onAbort(null, reason, debugLog);
         }
       };
       this._saver = await new Saver(saverConfig).toBeReady();
-      this._saver._lastSaved.mergeMessage = Interface.createMergeMessageElement(
-        this._connection.toolbar.toolbar.find('.rt-toolbar-rightside'));
-      this._saver.setLastSavedContent(this._editor.getOutputHTML());
     }
 
     static _getFormId() {
@@ -372,8 +381,7 @@ define('xwiki-realtime-wysiwyg', [
         onLocal: this._onLocal.bind(this),
         onRemote: this._onRemote.bind(this),
         onConnectionChange: this._onConnectionChange.bind(this),
-        beforeReconnecting: this._beforeReconnecting.bind(this),
-        onAbort: this._onAbort.bind(this),
+        beforeReconnecting: this._beforeReconnecting.bind(this)
       };
     }
 
@@ -525,7 +533,7 @@ define('xwiki-realtime-wysiwyg', [
           // The Netflux channel used before the WebSocket connection closed is not available anymore so we have to
           // abort the current realtime session.
           this._onAbort();
-          if (!this._saver.getLocalEditFlag()) {
+          if (!this._saver.isDirty()) {
             // Fortunately we don't have any unsaved local changes so we can rejoin the realtime session using the new
             // Netflux channel.
             //
@@ -546,7 +554,7 @@ define('xwiki-realtime-wysiwyg', [
       });
     }
 
-    _onAbort(info, reason, debug) {
+    _onAbort() {
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         // We already left the realtime session.
         return;
@@ -563,11 +571,11 @@ define('xwiki-realtime-wysiwyg', [
       this._realtimeContext.setRealtimeEnabled(false);
 
       // Stop the autosave (and leave the events Netflux channel associated with the edited document).
-      this._saver.stop();
+      this._saver?.stop();
 
       // Remove the realtime toolbar.
-      this._connection.toolbar.failed();
-      this._connection.toolbar.toolbar.remove();
+      this._connection.toolbar?.failed();
+      this._connection.toolbar?.toolbar.remove();
 
       // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
       this._connection.userData.stop?.();
@@ -584,10 +592,6 @@ define('xwiki-realtime-wysiwyg', [
       this._connection = {
         status: ConnectionStatus.DISCONNECTED
       };
-
-      if (reason || debug) {
-        ErrorBox.show(reason || 'disconnected', debug);
-      }
     }
 
     _onLock() {

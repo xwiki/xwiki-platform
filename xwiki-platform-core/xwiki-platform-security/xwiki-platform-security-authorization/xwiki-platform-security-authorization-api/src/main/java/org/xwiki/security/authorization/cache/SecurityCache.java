@@ -26,7 +26,6 @@ import org.xwiki.security.SecurityReference;
 import org.xwiki.security.UserSecurityReference;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
-import org.xwiki.stability.Unstable;
 
 /**
  * A cache for fast access right rules checking.
@@ -42,7 +41,6 @@ public interface SecurityCache
      * 
      * @since 15.4RC1
      */
-    @Unstable
     int CACHE_INVALIDATION_PRIORITY = EventListener.CACHE_INVALIDATION_DEFAULT_PRIORITY;
 
     /**

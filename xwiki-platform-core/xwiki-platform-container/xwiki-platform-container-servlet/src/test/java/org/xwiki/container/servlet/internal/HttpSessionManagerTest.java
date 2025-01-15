@@ -21,8 +21,8 @@ package org.xwiki.container.servlet.internal;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLifecycleException;

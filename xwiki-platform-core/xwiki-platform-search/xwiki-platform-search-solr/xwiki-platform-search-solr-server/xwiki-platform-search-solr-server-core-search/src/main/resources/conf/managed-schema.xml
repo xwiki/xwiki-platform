@@ -65,6 +65,14 @@
        1.6: useDocValuesAsStored defaults to true.
     -->
 
+    <!-- XWIKI: the version of the schema from XWiki point of view.
+         The version should be updated when the configuration need to be updated for the core to work as expected.
+         It cause the whole schema to be re-created with embedded Solr setup.
+
+         160600000: added support for Ukrainian locale, this also requires a special JAR in the lib/ folder
+    -->
+    <fieldType name="__cversion" class="solr.ExternalFileField" defVal="160600000"/>
+
     <!-- Valid attributes for fields:
      name: mandatory - the name for the field
      type: mandatory - the name of a field type from the
@@ -790,6 +798,7 @@
     <!-- German -->
     <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_de" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_de_DE" type="text_de"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>
@@ -883,6 +892,8 @@
     <!-- French -->
     <!-- XWiki: XWiki historically uses a different suffix than the standard one -->
     <dynamicField name="*_fr" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_FR" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
+    <dynamicField name="*_fr_BE" type="text_fr"  indexed="true"  stored="true" multiValued="true"/>
     <fieldType name="text_fr" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer name="standard"/>

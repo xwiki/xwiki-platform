@@ -26,6 +26,7 @@ import org.slf4j.MarkerFactory;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.annotation.Default;
+import org.xwiki.stability.Unstable;
 
 /**
  * Document related events.
@@ -196,6 +197,14 @@ public interface WikiDocumentFilter
      * @type {@link Boolean}
      */
     String PARAMETER_REVISION_MINOR = "revision_minor";
+
+    // required rights
+    /**
+     * @type {@link Boolean}
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    String PARAMETER_ENFORCE_REQUIRED_RIGHTS = "enforce_required_rights";
 
     // Events
 

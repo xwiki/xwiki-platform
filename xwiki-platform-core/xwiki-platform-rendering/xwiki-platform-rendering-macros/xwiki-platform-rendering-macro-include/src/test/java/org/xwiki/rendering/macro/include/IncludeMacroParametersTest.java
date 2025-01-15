@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * 
  * @version $Id$
  */
-public class IncludeMacroParametersTest
+class IncludeMacroParametersTest
 {
     @Test
-    public void setPage()
+    void setPage()
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
@@ -43,7 +43,7 @@ public class IncludeMacroParametersTest
     }
     
     @Test
-    public void setExcludeFirstHeading() 
+    void setExcludeFirstHeading()
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 

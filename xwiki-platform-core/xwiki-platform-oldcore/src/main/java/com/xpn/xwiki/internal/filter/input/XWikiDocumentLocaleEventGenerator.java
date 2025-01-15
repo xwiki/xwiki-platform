@@ -183,6 +183,11 @@ public class XWikiDocumentLocaleEventGenerator
         }
         revisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
+        // Only put the enforce_required_rights parameter when it is set to true to avoid producing warnings when
+        // such documents are imported in older instances.
+        if (document.isEnforceRequiredRights()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_ENFORCE_REQUIRED_RIGHTS, true);
+        }
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_EFFECTIVEMETADATA_AUTHOR, toString(document.getAuthors().getEffectiveMetadataAuthor()));
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_ORIGINALMETADATA_AUTHOR, toString(document.getAuthors().getOriginalMetadataAuthor()));

@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.PageReference;
@@ -743,7 +744,8 @@ public class XWikiDocumentTest
     @Test
     void testRenderedTitleWhenVelocityError() throws XWikiVelocityException
     {
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.SCRIPT), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager()
+            .hasAccess(same(Right.SCRIPT), same(EntityType.DOCUMENT), any(), any())).thenReturn(true);
 
         this.document.setContent("Some content");
         this.document.setTitle("some content that generate a velocity error");

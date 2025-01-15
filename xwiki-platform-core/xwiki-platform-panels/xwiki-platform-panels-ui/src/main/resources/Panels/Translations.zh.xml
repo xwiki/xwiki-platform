@@ -42,11 +42,20 @@ panels.description=描述
 panels.type=类型
 panels.category=分类
 panels._actions=动作
-panels.emptyvalue=
+### Missing: panels.emptyvalue=
 panels.children.title=子页面
 panels.siblings.title=同级页面
+panels.customize=您可以使用 {0}
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
 panels.documentInformation.configureSyntaxes=配置更多语法
 panels.documentInformation.confirmChangeSyntaxWysiwyg=您是否还要将文档的内容和对象转换为选定的语法？选择“取消”会将语法重置为上一个语法，并且不执行任何操作。请注意，如果选择“确定”，则将丢失修改内容，这将自动保存文档，您可以通过转到文档历史记录界面并恢复上一个版本来取消此修改。
 panels.documentInformation.confirmChangeSyntax=您是否想将文档的内容和对象转换为所选语法？选择 "取消 "只会改变语法标识符，不会修改文档的内容。注意，如果您选择 "确定 "，则会自动保存文档，您可以通过进入文档历史记录界面取消修改，并恢复到最后的版本。
-panels.documentInformation.failedSyntaxConversion=无法转换到所选语法。如果你想要使用这个语法，您可以选择但不会作出任何转换。</content>
+panels.documentInformation.failedSyntaxConversion=无法转换到所选语法。如果你想要使用这个语法，您可以选择但不会作出任何转换。
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
 </xwikidoc>

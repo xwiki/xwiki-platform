@@ -93,14 +93,26 @@
 
       editor.toBeReady = function() {
         return new Promise(resolve => {
+          function resolveWhenReady() {
+            // Announce that the editor is ready only after the event loop has finished, to allow the code that
+            // triggered the event to finish its execution. This is important for instance in the case of the refresh
+            // command which needs to end the editor loading state before it can restore the selection (the editing area
+            // needs to be visible and have the focus).
+            setTimeout(async () => {
+              // Double check that the editor is ready, because other event listeners or some remote change might have
+              // updated the editor status in the meantime.
+              await editor.toBeReady();
+              resolve();
+            }, 0);
+          }
           if (loadingCounter > 0) {
-            this.once('endLoading', resolve);
+            this.once('endLoading', resolveWhenReady);
           } else if (this.status === 'ready') {
             resolve();
           } else if (this.status === 'recreating') {
-            this.once('contentDom', resolve);
+            this.once('contentDom', resolveWhenReady);
           } else {
-            this.on('instanceReady', resolve);
+            this.on('instanceReady', resolveWhenReady);
           }
         });
       };

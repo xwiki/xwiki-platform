@@ -22,7 +22,6 @@ package org.xwiki.refactoring;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.internal.RefactoringUtils;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents an in-memory wiki page used by the {@link org.xwiki.refactoring.splitter.DocumentSplitter} interface.
@@ -70,7 +69,6 @@ public class WikiDocument
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public WikiDocument(DocumentReference documentReference, XDOM xdom, WikiDocument parent)
     {
         this.documentReference = documentReference;
@@ -93,7 +91,6 @@ public class WikiDocument
      * @since 14.10.2
      * @since 15.0RC1
      */
-    @Unstable
     public DocumentReference getDocumentReference()
     {
         return this.documentReference;

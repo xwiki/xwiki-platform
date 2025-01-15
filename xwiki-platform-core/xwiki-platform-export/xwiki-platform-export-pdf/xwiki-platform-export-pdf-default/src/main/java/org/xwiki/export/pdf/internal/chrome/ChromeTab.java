@@ -25,17 +25,20 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.export.pdf.PDFExportConfiguration;
 import org.xwiki.export.pdf.browser.BrowserTab;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.github.kklisura.cdt.protocol.commands.Network;
 import com.github.kklisura.cdt.protocol.commands.Page;
@@ -99,6 +102,12 @@ public class ChromeTab implements BrowserTab
         this.tabDevToolsService.close();
         LOGGER.debug("Disposing browser context [{}].", browserContextId);
         this.browserDevToolsService.getTarget().disposeBrowserContext(browserContextId);
+    }
+
+    @Override
+    public boolean navigate(URL url, javax.servlet.http.Cookie[] cookies, boolean wait, int timeout) throws IOException
+    {
+        return navigate(url, JakartaServletBridge.toJakarta(cookies), wait, timeout);
     }
 
     @Override
@@ -255,5 +264,19 @@ public class ChromeTab implements BrowserTab
         network.enable();
         network.clearBrowserCookies();
         network.setCookies(browserCookies);
+    }
+
+    @Override
+    public void setExtraHTTPHeaders(Map<String, List<String>> headers)
+    {
+        LOGGER.debug("Setting extra HTTP headers [{}].", headers);
+        Network network = this.tabDevToolsService.getNetwork();
+        network.enable();
+        // The documentation of setExtraHTTPHeaders is not clear about the type of value we can pass for a header (key).
+        // We tried passing a List<String> and a String[] but in both cases we got an exception: "Invalid header value,
+        // string expected". So we concatenate the values of a header with a comma.
+        Map<String, Object> extraHeaders = headers.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> StringUtils.join(entry.getValue(), ",")));
+        network.setExtraHTTPHeaders(extraHeaders);
     }
 }

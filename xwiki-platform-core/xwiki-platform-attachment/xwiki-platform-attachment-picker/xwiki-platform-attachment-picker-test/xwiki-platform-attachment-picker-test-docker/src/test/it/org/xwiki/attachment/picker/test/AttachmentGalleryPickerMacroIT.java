@@ -49,9 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @UITest(extraJARs = {
     "org.xwiki.platform:xwiki-platform-search-solr-query"
-}, properties = {
-    "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin,"
-        + "com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin"
 })
 class AttachmentGalleryPickerMacroIT
 {

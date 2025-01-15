@@ -75,6 +75,10 @@
         <property name="syntaxId" type="string" column="XWD_SYNTAX_ID" length="50" />
         <property name="hidden" type="boolean" column="XWD_HIDDEN" index="DOC_HIDDEN" not-null="true" />
         <property name="originalMetadataAuthorReference" type="string" column="XWD_ORIGINAL_METADATA_AUTHOR" length="768" index="DOC_ORIGINAL_METADATA_AUTHOR" />
+        <property name="enforceRequiredRights" type="boolean">
+            <column name="XWD_ENFORCE_REQUIRED_RIGHTS" default="false" index="DOC_ENFORCE_REQUIRED_RIGHTS"
+                not-null="true"/>
+        </property>
     </class>
 
     <!-- com.xpn.xwiki.doc.XWikiSpace root -->

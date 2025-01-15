@@ -36,7 +36,6 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DocumentDoesNotExistPage;
-import org.xwiki.test.ui.po.PageTypePicker;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -116,10 +115,9 @@ class PageTemplatesIT
         // Verify that clicking on the wanted link pops up a box to choose the template.
         EntityReference wantedLinkReference =
             setup.resolveDocumentReference(testSpace + "." + TEMPLATE_NAME + "Instance" + ".NewPage");
-        vp.clickWantedLink(wantedLinkReference, true);
-        PageTypePicker pageTypePicker = new PageTypePicker();
-        assertEquals(availableTemplateSize, pageTypePicker.countAvailableTemplates());
-        assertTrue(pageTypePicker.getAvailableTemplates().contains(templateProviderFullName));
+        createPagePage = vp.clickWantedLink(wantedLinkReference);
+        assertEquals(availableTemplateSize, createPagePage.getAvailableTemplateSize());
+        assertTrue(createPagePage.getAvailableTemplates().contains(templateProviderFullName));
 
         // Step 3: Create a new page when located on a non-existing page
 

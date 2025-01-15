@@ -20,7 +20,6 @@
 package org.xwiki.security.authservice;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.user.api.XWikiAuthService;
 
@@ -37,7 +36,6 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
  * @since 15.3RC1
  */
 @Role
-@Unstable
 public interface XWikiAuthServiceComponent extends XWikiAuthService
 {
     /**

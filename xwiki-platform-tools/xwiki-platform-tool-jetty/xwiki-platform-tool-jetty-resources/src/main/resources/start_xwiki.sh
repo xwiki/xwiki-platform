@@ -24,11 +24,12 @@
 # -----------------
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
-#   JETTY_OPTS - optional parameters passed to Jetty's start.jar. For example to list the configuration that will
-#       execute, try setting it to "--list-config". See
-#       http://www.eclipse.org/jetty/documentation/current/start-jar.html for more options.
+#   JETTY_OPTS - optional parameters passed to Jetty's start.jar.
+#       For example to list the configuration that will execute, try setting it to "--list-config".
+#       See http://www.eclipse.org/jetty/documentation/current/start-jar.html for more options.
 #   JETTY_PORT - the port on which to start Jetty.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
+#   JETTY_DEBUG_PORT - the port to use for debugging purpose (default: 5005).
 # ----------------------------------------------------------------------------------------------------------------
 
 usage() {
@@ -39,6 +40,12 @@ usage() {
   echo "    is started. Defaults to /var/tmp."
   echo "-j, --jmx: Allows monitoring/managing Jetty through JMX."
   echo "-ni, --noninteractive: Don't ask questions to the user. Useful when called in an automated script."
+  echo "-d, --debug: Start the JVM in debug mode"
+  echo "-dp, --debugPort: The Jetty JVM port to use for remote debugging. Defaults to 5005."
+  echo "--suspend: if defined then debug is in suspend mode (i.e. wait for a debugger to connect before progressing)."
+  echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
+  echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
+  echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
   echo ""
   echo "Example: start_xwiki.sh -p 8080 -sp 8079"
 }
@@ -73,6 +80,11 @@ if [ -z "$JETTY_STOP_PORT" ]; then
   JETTY_STOP_PORT=8079
 fi
 
+# The port on which to listen for debugging operations.
+if [ -z "$JETTY_DEBUG_PORT" ]; then
+  JETTY_DEBUG_PORT=5005
+fi
+
 # Make sure the standard Java tmpdir is isolated per instance (by default Jetty provides applications work dir in the Java tmpdir)
 JAVA_TMP="${PRGDIR}/tmp"
 XWIKI_OPTS="$XWIKI_OPTS -Djava.io.tmpdir=${JAVA_TMP}"
@@ -83,6 +95,9 @@ fi
 
 # The location where to store the process id
 XWIKI_LOCK_DIR="${JAVA_TMP}"
+
+# By default suspend is false for debug
+SUSPEND="n"
 
 # Parse script parameters
 while [[ $# > 0 ]]; do
@@ -103,10 +118,22 @@ while [[ $# > 0 ]]; do
       ;;
     -j|--jmx)
       JETTY_OPTS="$JETTY_OPTS --module=jmx"
-      shift
       ;;
     -ni|--noninteractive)
       XWIKI_NONINTERACTIVE=true
+      ;;
+    -d|--debug)
+      DEBUG=true
+      ;;
+    --suspend)
+      SUSPEND="y"
+      ;;
+    -dp|--debugPort)
+      JETTY_DEBUG_PORT="$1"
+      shift
+      ;;
+    -yp|--yourkitpath)
+      YOURKIT_PATH="$1"
       shift
       ;;
     -h|--help)
@@ -115,11 +142,18 @@ while [[ $# > 0 ]]; do
       ;;
     *)
       # unknown option
+      echo "Unknown option: $key"
       usage
       exit 1
       ;;
   esac
 done
+
+# Enable debug
+if [ "$DEBUG" = true ] ; then
+  XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
+  XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=*:${JETTY_DEBUG_PORT}"
+fi
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
@@ -135,6 +169,15 @@ if [ -e $XWIKI_LOCK_FILE ]; then
     echo An XWiki lock file exists at ${XWIKI_LOCK_FILE} but no XWiki is executing. Removing lock file...
     rm -f $XWIKI_LOCK_FILE
   fi
+fi
+
+# Enabling YourKit Profiling.
+if [ -n "$YOURKIT_PATH" ]; then
+  XWIKI_OPTS="$XWIKI_OPTS -agentlib:yjpagent"
+  # Linux
+  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${YOURKIT_PATH}"
+  # Mac
+  export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:${YOURKIT_PATH}"
 fi
 
 # Location where XWiki stores generated data and where database files are.
@@ -204,33 +247,34 @@ java_version() {
 
 # Check version of Java (when in non-interactive mode)
 JAVA_VERSION="$(java_version)"
-if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
-  if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
-    echo "No Java found. You need Java installed for XWiki to work."
-    exit 0
-  fi
-  if [ "$JAVA_VERSION" -lt 11 ]; then
-    echo This version of XWiki requires Java 11 or greater.
-    exit 0
-  fi
-  if [ "$JAVA_VERSION" -gt 17 ]; then
+
+if [[ "$JAVA_VERSION" -eq "no_java" ]]; then
+  echo "No Java found. You need Java installed for XWiki to work."
+  exit 1
+fi
+if [ "$JAVA_VERSION" -lt ${xwiki.java.version} ]; then
+  echo This version of XWiki requires Java ${xwiki.java.version} or greater.
+  exit 1
+fi
+if [ "$JAVA_VERSION" -gt ${xwiki.java.version.support} ]; then
+  if [ ! "$XWIKI_NONINTERACTIVE" = true ] ; then
     read -p "You're using Java $JAVA_VERSION which XWiki doesn't fully support yet. Continue (y/N)? " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      exit 0
+      exit 1
     fi
+  else
+    echo "Warning: you're using Java $JAVA_VERSION which XWiki doesn't fully support yet."
   fi
 fi
 
 # TODO: Remove once https://jira.xwiki.org/browse/XCOMMONS-2852 is fixed. In summary we need this to allow the XWiki
 # code or 3rd party code to use reflection to access private variables (setAccessible() calls).
 # See https://tinyurl.com/tdhkn6mp
-if [ "$JAVA_VERSION" -gt 11 ]; then
-  XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
-  XWIKI_OPENS_IO="--add-opens java.base/java.io=ALL-UNNAMED"
-  XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
-  XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.util.concurrent=ALL-UNNAMED"
-  XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_IO $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
-fi
+XWIKI_OPENS_LANG="--add-opens java.base/java.lang=ALL-UNNAMED"
+XWIKI_OPENS_IO="--add-opens java.base/java.io=ALL-UNNAMED"
+XWIKI_OPENS_UTIL="--add-opens java.base/java.util=ALL-UNNAMED"
+XWIKI_OPENS_CONCURRENT="--add-opens java.base/java.util.concurrent=ALL-UNNAMED"
+XWIKI_OPTS="$XWIKI_OPENS_LANG $XWIKI_OPENS_IO $XWIKI_OPENS_UTIL $XWIKI_OPENS_CONCURRENT $XWIKI_OPTS"
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command
 # and thus the java process PID will actually be the shell PID.

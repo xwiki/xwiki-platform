@@ -42,5 +42,10 @@ public enum IndexOperation
     /**
      * Stop indexing thread.
      */
-    STOP
+    STOP,
+
+    /**
+     * Marker for waiting on indexing to finish all previously queued operations.
+     */
+    READY_MARKER
 }

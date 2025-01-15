@@ -258,18 +258,61 @@ define('xwiki-realtime-wysiwyg-patches', [
           savedRange.startContainer = range.startContainer;
           savedRange.startOffset = range.startOffset;
         } else {
-          savedRange.startAfter = range.startContainer.childNodes[range.startOffset - 1];
-          savedRange.startBefore = range.startContainer.childNodes[range.startOffset];
+          // We can't simply store a reference to the DOM node before / after the selection boundary because when
+          // applying a remote patch, diffDOM can reuse a DOM node for a different purpose (e.g. replacing its content
+          // and its attributes). So the fact that a node is still attached to the DOM after the remote patch is applied
+          // doesn't mean it has the same meaning as before. At the same time, the fact that a node has been modified by
+          // a remote patch (e.g. by changing the value of an attribute) doesn't necessarily mean it's meaning has
+          // changed. Saving a relative selection is important to avoid restoring the text selection which is slow
+          // because it relies on diffing the text content. But we should restore the relative selection only if the
+          // boundary nodes preserve their meaning afte the remote patch is applied. The ensure this we save the left
+          // and right path from the root of the edited content to the selection boundary nodes, and invalidate the
+          // saved selection if both change after the remote patch is applied.
+          savedRange.startAfter = this._getNodePath(range.startContainer.childNodes[range.startOffset - 1]);
+          savedRange.startBefore = this._getNodePath(range.startContainer.childNodes[range.startOffset]);
         }
         if (!range.endContainer.childNodes.length) {
           savedRange.endContainer = range.endContainer;
           savedRange.endOffset = range.endOffset;
         } else {
-          savedRange.endAfter = range.endContainer.childNodes[range.endOffset - 1];
-          savedRange.endBefore = range.endContainer.childNodes[range.endOffset];
+          savedRange.endAfter = this._getNodePath(range.endContainer.childNodes[range.endOffset - 1]);
+          savedRange.endBefore = this._getNodePath(range.endContainer.childNodes[range.endOffset]);
         }
         return savedRange;
       });
+    }
+
+    /**
+     * Compute the path of the given DOM node within the edited content.
+     *
+     * @param {Node} node the node for which to compute the path
+     * @returns {Object} the path of the given node in the DOM tree, each path item representing the child index at that
+     *   level
+     */
+    _getNodePath(node) {
+      const path = {
+        // The node the path was computed for.
+        node,
+        // The child index for this node and all its ancestors, counting from the left.
+        left: [],
+        // The child index for this node and all its ancestors, counting from the right.
+        right: []
+      };
+      while (node?.parentNode && node !== this._editor.getContentWrapper()) {
+        const nodeIndex = Array.from(node.parentNode.childNodes).indexOf(node);
+        path.left.push(nodeIndex);
+        path.right.push(node.parentNode.childNodes.length - nodeIndex);
+        node = node.parentNode;
+      }
+      // We return the computed path only if the node is part of the edited content.
+      if (node === this._editor.getContentWrapper()) {
+        // Reverse the path because we built it starting from the node and going up to the content wrapper.
+        path.left.reverse();
+        path.right.reverse();
+        path.left = path.left.join('/');
+        path.right = path.right.join('/');
+        return path;
+      }
     }
 
     /**
@@ -292,6 +335,13 @@ define('xwiki-realtime-wysiwyg-patches', [
         if (range.endContainer?.nodeType === Node.TEXT_NODE && updatedNodes.has(range.endContainer)) {
           delete range.endContainer;
         }
+        // Invalidate the selection boundaries for which both the left and the right path have changed.
+        [range.startAfter, range.startBefore, range.endAfter, range.endBefore].forEach(oldPath => {
+          const newPath = this._getNodePath(oldPath?.node);
+          if (newPath?.left !== oldPath?.left && newPath?.right !== oldPath?.right) {
+            delete oldPath.node;
+          }
+        });
       });
     }
 
@@ -303,8 +353,10 @@ define('xwiki-realtime-wysiwyg-patches', [
      */
     _restoreSelection(selection) {
       const invalidRange = selection.find(savedRange =>
-        [savedRange.startContainer, savedRange.startAfter, savedRange.startBefore].every(node => !node?.isConnected) ||
-        [savedRange.endContainer, savedRange.endAfter, savedRange.endBefore].every(node => !node?.isConnected));
+        [savedRange.startContainer, savedRange.startAfter?.node, savedRange.startBefore?.node]
+          .every(node => !node?.isConnected) ||
+        [savedRange.endContainer, savedRange.endAfter?.node, savedRange.endBefore?.node]
+          .every(node => !node?.isConnected));
       if (invalidRange) {
         // Some of the selected nodes were removed from the DOM or the selection was in a text node that was modified.
         // Restore the text selection.
@@ -316,17 +368,17 @@ define('xwiki-realtime-wysiwyg-patches', [
           range.reversed = savedRange.reversed;
           if (savedRange.startContainer?.isConnected) {
             range.setStart(savedRange.startContainer, savedRange.startOffset);
-          } else if (savedRange.startBefore?.isConnected) {
-            range.setStartBefore(savedRange.startBefore);
+          } else if (savedRange.startBefore?.node?.isConnected) {
+            range.setStartBefore(savedRange.startBefore.node);
           } else {
-            range.setStartAfter(savedRange.startAfter);
+            range.setStartAfter(savedRange.startAfter.node);
           }
           if (savedRange.endContainer?.isConnected) {
             range.setEnd(savedRange.endContainer, savedRange.endOffset);
-          } else if (savedRange.endAfter?.isConnected) {
-            range.setEndAfter(savedRange.endAfter);
+          } else if (savedRange.endAfter?.node?.isConnected) {
+            range.setEndAfter(savedRange.endAfter.node);
           } else {
-            range.setEndBefore(savedRange.endBefore);
+            range.setEndBefore(savedRange.endBefore.node);
           }
           return range;
         }));

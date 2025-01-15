@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.Translations" locale="ru">
+<xwikidoc version="1.6" reference="CKEditor.Translations" locale="ru">
   <web>CKEditor</web>
   <name>Translations</name>
   <language>ru</language>
@@ -278,6 +278,8 @@ resourcePicker.attach.hint=Выберите вложение
 resourcePicker.doc.hint=Выберите страницу
 entityResourceSuggester.doc.placeholder=Найти страницу ...
 entityResourceSuggester.attach.placeholder=Найти вложение ...
+entityResourceSuggester.create.resolvedInSpace=Создать новую страницу...
+entityResourceSuggester.create.fullyResolvedInput=Создать с точной ссылкой...
 entityResourcePicker.select=Выбрать
 entityResourcePicker.doc.title=Выбрать страницу
 entityResourcePicker.attach.title=Выбрать вложение

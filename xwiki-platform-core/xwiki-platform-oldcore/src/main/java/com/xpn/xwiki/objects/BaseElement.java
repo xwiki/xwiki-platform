@@ -101,7 +101,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
-
+    
     /**
      * @return a merge manager instance.
      * @since 11.8RC1
@@ -503,7 +503,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public String toXMLString(boolean format)
     {
         XAROutputProperties xarProperties = new XAROutputProperties();
-        xarProperties.setFormat(false);
+        xarProperties.setFormat(format);
 
         try {
             return Utils.getComponent(XWikiDocumentFilterUtils.class).exportEntity(this, xarProperties);

@@ -20,25 +20,29 @@
 package org.xwiki.wysiwyg.internal.converter;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.url.URLSecurityManager;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
-import org.xwiki.wysiwyg.converter.RequestParameterConversionResult;
+import org.xwiki.wysiwyg.converter.JakartaRequestParameterConversionResult;
 import org.xwiki.wysiwyg.converter.RequestParameterConverter;
-import org.xwiki.wysiwyg.filter.MutableServletRequest;
+import org.xwiki.wysiwyg.filter.MutableJakartaServletRequest;
 import org.xwiki.wysiwyg.filter.MutableServletRequestFactory;
 
 /**
@@ -82,27 +86,33 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
     private HTMLConverter htmlConverter;
 
     @Inject
+    private URLSecurityManager urlSecurityManager;
+
+    @Inject
     private Logger logger;
 
     @Override
     public Optional<ServletRequest> convert(ServletRequest request, ServletResponse response) throws IOException
     {
-        RequestParameterConversionResult conversionResult = this.convert(request);
+        JakartaRequestParameterConversionResult conversionResult = convert(request);
         Optional<ServletRequest> result;
         if (conversionResult.getErrors().isEmpty()) {
             result = Optional.of(conversionResult.getRequest());
         } else {
             result = Optional.empty();
-            this.handleConversionErrors(conversionResult, response);
+            handleConversionErrors(conversionResult, response);
         }
+
         return result;
     }
 
     @Override
-    public RequestParameterConversionResult convert(ServletRequest request)
+    public JakartaRequestParameterConversionResult convert(ServletRequest request)
     {
-        MutableServletRequest mutableServletRequest = this.mutableServletRequestFactory.newInstance(request);
-        RequestParameterConversionResult result = new RequestParameterConversionResult(mutableServletRequest);
+        MutableJakartaServletRequest mutableServletRequest = this.mutableServletRequestFactory.newInstance(request);
+        JakartaRequestParameterConversionResult result =
+            new JakartaRequestParameterConversionResult(mutableServletRequest);
+
         // Take the list of request parameters that require HTML conversion.
         String[] parametersRequiringHTMLConversion = request.getParameterValues(REQUIRES_HTML_CONVERSION);
         if (parametersRequiringHTMLConversion != null) {
@@ -110,13 +120,14 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
             result.getRequest().removeParameter(REQUIRES_HTML_CONVERSION);
             convertHTML(parametersRequiringHTMLConversion, result);
         }
+
         return result;
     }
 
     private void convertHTML(String[] parametersRequiringHTMLConversion,
-        RequestParameterConversionResult conversionResult)
+        JakartaRequestParameterConversionResult conversionResult)
     {
-        MutableServletRequest request = conversionResult.getRequest();
+        MutableJakartaServletRequest request = conversionResult.getRequest();
         for (String parameterName : parametersRequiringHTMLConversion) {
             String html = request.getParameter(parameterName);
             // Remove the syntax parameter from the request to avoid interference with further request processing.
@@ -135,13 +146,13 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         }
     }
 
-    private void handleConversionErrors(RequestParameterConversionResult conversionResult, ServletResponse res)
+    private void handleConversionErrors(JakartaRequestParameterConversionResult conversionResult, ServletResponse res)
         throws IOException
     {
-        MutableServletRequest mutableRequest = conversionResult.getRequest();
+        MutableJakartaServletRequest mutableRequest = conversionResult.getRequest();
         ServletRequest originalRequest = mutableRequest.getRequest();
-        if (originalRequest instanceof HttpServletRequest
-            && "XMLHttpRequest".equals(((HttpServletRequest) originalRequest).getHeader("X-Requested-With"))) {
+        if (originalRequest instanceof HttpServletRequest httpRequest
+            && "XMLHttpRequest".equals(httpRequest.getHeader("X-Requested-With"))) {
             // If this is an AJAX request then we should simply send back the error.
             StringBuilder errorMessage = new StringBuilder();
             // Aggregate all error messages (for all fields that have conversion errors).
@@ -167,12 +178,27 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
         // Remove the previous key from the query string. We have to do this since this might not be the first
         // time the conversion fails for this redirect URL.
         queryString = queryString.replaceAll("key=.*&?", "");
-        if (queryString.length() > 0 && !queryString.endsWith(String.valueOf('&'))) {
+        if (!queryString.isEmpty() && !queryString.endsWith(String.valueOf('&'))) {
             queryString += '&';
         }
         // Save the output and the caught exceptions on the session.
         queryString += "key=" + save(conversionResult);
-        mutableRequest.sendRedirect(res, redirectURL + '?' + queryString);
+        String unsafeURL = redirectURL + '?' + queryString;
+        if (originalRequest instanceof HttpServletRequest httpRequest) {
+            try {
+                URI safeURI = this.urlSecurityManager.parseToSafeURI(unsafeURL, httpRequest.getServerName());
+                mutableRequest.sendRedirect(res, safeURI.toString());
+            } catch (URISyntaxException | SecurityException e) {
+                this.logger.warn(
+                    "Possible phishing attack, attempting to redirect to [{}], this request has been blocked. "
+                        + "If the request was legitimate, please check the URL security configuration. You "
+                        + "might need to add the domain related to this request in the list of trusted domains in "
+                        + "the configuration: it can be configured in xwiki.properties in url.trustedDomains.",
+                    unsafeURL);
+                this.logger.debug("Original error preventing the redirect: ", e);
+                ((HttpServletResponse) res).sendError(400, "The error redirect URI isn't considered safe.");
+            }
+        }
     }
 
     /**
@@ -184,11 +210,11 @@ public class DefaultRequestParameterConverter implements RequestParameterConvert
      *         {@value #CONVERSION_ERRORS} session attributes
      */
     @SuppressWarnings("unchecked")
-    private String save(RequestParameterConversionResult conversionResult)
+    private String save(JakartaRequestParameterConversionResult conversionResult)
     {
         // Generate a random key to identify the request.
-        String key = RandomStringUtils.randomAlphanumeric(4);
-        MutableServletRequest request = conversionResult.getRequest();
+        String key = RandomStringUtils.secure().nextAlphanumeric(4);
+        MutableJakartaServletRequest request = conversionResult.getRequest();
 
         // Save the output on the session.
         Map<String, Map<String, String>> conversionOutput =

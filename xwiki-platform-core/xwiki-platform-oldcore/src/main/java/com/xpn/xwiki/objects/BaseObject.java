@@ -34,7 +34,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -449,7 +448,6 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * @since 15.5.5
      * @since 15.10.2
      */
-    @Unstable
     public Map<String, String> evaluate() throws ObjectEvaluatorException
     {
         ObjectEvaluator objectEvaluator = Utils.getComponent(ObjectEvaluator.class);

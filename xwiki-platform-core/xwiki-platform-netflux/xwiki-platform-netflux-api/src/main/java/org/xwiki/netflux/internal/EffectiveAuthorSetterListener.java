@@ -79,7 +79,7 @@ public class EffectiveAuthorSetterListener extends AbstractLocalEventListener
         Request request = this.container.getRequest();
         getEffectiveAuthor(request).ifPresent(effectiveAuthor -> {
             this.logger.debug("Setting the effective author of the request to [{}].", effectiveAuthor);
-            request.setProperty("com.xpn.xwiki.web.XWikiRequest#effectiveAuthor", effectiveAuthor);
+            request.setProperty(Request.ATTRIBUTE_EFFECTIVE_AUTHOR, effectiveAuthor);
         });
     }
 

@@ -296,6 +296,7 @@ public class DownloadAction extends XWikiAction
      * @param context the XWikiContext just in case it is needed to load the attachment content
      * @throws XWikiException if something goes wrong
      */
+    @Deprecated(since = "17.0.0RC1")
     protected void sendContent(final XWikiAttachment attachment, final XWikiRequest request,
         final XWikiResponse response, final XWikiContext context) throws XWikiException
     {

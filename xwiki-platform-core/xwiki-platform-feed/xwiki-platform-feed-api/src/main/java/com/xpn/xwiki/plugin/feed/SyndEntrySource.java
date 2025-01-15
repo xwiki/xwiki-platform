@@ -21,7 +21,7 @@ package com.xpn.xwiki.plugin.feed;
 
 import java.util.Map;
 
-import com.sun.syndication.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntry;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 

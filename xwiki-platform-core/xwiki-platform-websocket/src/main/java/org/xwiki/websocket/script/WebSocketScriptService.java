@@ -49,6 +49,8 @@ public class WebSocketScriptService implements ScriptService
 {
     private static final String UTF8 = "UTF-8";
 
+    private static final String PATH_SEPARATOR = "/";
+
     @Inject
     private Logger logger;
 
@@ -83,10 +85,15 @@ public class WebSocketScriptService implements ScriptService
         try {
             XWikiContext xcontext = this.xcontextProvider.get();
 
-            StringBuilder path = new StringBuilder("/");
-            path.append(xcontext.getWiki().getWebAppPath(xcontext));
-            path.append("websocket").append(path(pathOrRoleHint));
+            StringBuilder path = new StringBuilder(PATH_SEPARATOR);
 
+            // Test if installed with ROOT servlet context and avoid double slash.
+            String webAppPath = xcontext.getWiki().getWebAppPath(xcontext);
+            if (!PATH_SEPARATOR.equals(webAppPath)) {
+                path.append(webAppPath);
+            }
+
+            path.append("websocket").append(path(pathOrRoleHint));
             URL serverURL = xcontext.getURLFactory().getServerURL(xcontext);
             String scheme = "https".equals(serverURL.getProtocol()) ? "wss" : "ws";
             // We have to add the path afterwards because the URI constructor double encodes it.
@@ -102,7 +109,7 @@ public class WebSocketScriptService implements ScriptService
 
     private String path(String pathOrRoleHint) throws UnsupportedEncodingException
     {
-        if (pathOrRoleHint.charAt(0) == '/') {
+        if (pathOrRoleHint.startsWith(PATH_SEPARATOR)) {
             return pathOrRoleHint;
         } else {
             String currentWiki = this.xcontextProvider.get().getWikiId();

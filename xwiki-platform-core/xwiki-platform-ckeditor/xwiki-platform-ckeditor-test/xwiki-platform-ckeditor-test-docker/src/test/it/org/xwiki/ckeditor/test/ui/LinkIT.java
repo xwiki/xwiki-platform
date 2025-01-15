@@ -142,6 +142,7 @@ class LinkIT extends AbstractCKEditorIT
         LinkDialog linkDialog = editor.getToolBar().insertOrEditLink();
         LinkPickerModal linkPickerModal = linkDialog.openDocumentPicker();
         LinkTreeElement tree = linkPickerModal.getTree();
+        tree.waitForIt();
         assertTrue(tree.hasNewPageCreation(testReference));
         tree.createNode(testReference, "SubPage");
         SpaceReference testReferenceLastSpace = new SpaceReference("SubPage", testReference.getLastSpaceReference());

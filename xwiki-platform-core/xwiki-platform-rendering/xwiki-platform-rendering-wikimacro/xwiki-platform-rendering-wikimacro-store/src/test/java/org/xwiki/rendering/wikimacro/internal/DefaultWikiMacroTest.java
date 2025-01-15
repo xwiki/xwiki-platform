@@ -62,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +130,8 @@ class DefaultWikiMacroTest
 
         this.oldcore.getSpyXWiki().saveDocument(this.wikiMacroDocument, this.oldcore.getXWikiContext());
 
-        when(this.oldcore.getMockAuthorizationManager().hasAccess(same(Right.PROGRAM), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(same(Right.PROGRAM), isNull(), any(), any()))
+            .thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.PROGRAM))).thenReturn(true);
         when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(same(Right.SCRIPT))).thenReturn(true);
         when(this.oldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);

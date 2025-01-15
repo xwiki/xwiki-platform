@@ -21,21 +21,33 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
+import javax.inject.Named;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.internal.document.DocumentRequiredRightsReader;
+import org.xwiki.internal.document.RequiredRightClassMandatoryDocumentInitializer;
+import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.sheet.SheetBinder;
 import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -56,10 +68,12 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
@@ -71,19 +85,41 @@ import static org.mockito.Mockito.when;
 
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList({ DocumentRequiredRightsReader.class, RequiredRightClassMandatoryDocumentInitializer.class })
 class DocumentTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
 
-    @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @MockComponent
     private ObservationManager observationManager;
 
+    // Needed for the mandatory document initializer
+    @MockComponent
+    private JobProgressManager jobProgressManager;
+
+    @MockComponent
+    @Named("document")
+    private SheetBinder sheetBinder;
+
+    @MockComponent
+    private ContextualLocalizationManager contextualLocalizationManager;
+
     @RegisterExtension
     private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+
+    @BeforeEach
+    void setUp() throws AuthorizationException, ComponentLookupException
+    {
+        this.oldcore.getSpyXWiki().initializeMandatoryDocuments(this.oldcore.getXWikiContext());
+
+        DefaultParameterizedType currentUserReferenceResolverType =
+            new DefaultParameterizedType(null, UserReferenceResolver.class, CurrentUserReference.class);
+        this.currentUserReferenceUserReferenceResolver =
+            this.oldcore.getMocker().getInstance(currentUserReferenceResolverType);
+    }
 
     @Test
     void toStringReturnsFullName()
@@ -313,6 +349,78 @@ class DocumentTest
         assertEquals(new DocumentReference("wiki1", "XWiki", "initialcreator"), document.getCreatorReference());
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "false, , , true",
+        "false, programming, , false",
+        "false, script, , true",
+        "true, , , false",
+        "true, script, script, false",
+        "true, script, programming, true",
+        "true, programming, script, false"
+    })
+    void markAsRestrictedWhenNoPR(boolean enforceOnEditedDocument, String rightOnSecureDocument,
+        String rightOnEditedDocument, boolean shouldBeRestricted) throws XWikiException
+    {
+        XWikiDocument secureDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page"));
+        DocumentReference secureAuthor = new DocumentReference("wiki1", "XWiki", "secureAuthor");
+        secureDocument.setAuthorReference(secureAuthor);
+        DocumentReference secureContentAuthor = new DocumentReference("wiki1", "XWiki", "secureContentAuthor");
+        secureDocument.setContentAuthorReference(secureContentAuthor);
+        secureDocument.setCreatorReference(new DocumentReference("wiki1", "XWiki", "secureCreator"));
+        secureDocument.setEnforceRequiredRights(true);
+        if (StringUtils.isNotBlank(rightOnSecureDocument)) {
+            BaseObject requiredRightObject =
+                secureDocument.newXObject(DocumentRequiredRightsReader.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+            requiredRightObject.setStringValue(DocumentRequiredRightsReader.PROPERTY_NAME, rightOnSecureDocument);
+
+            Right secureDocumentRight = Right.toRight(rightOnSecureDocument);
+            when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(any(), any(),
+                eq(secureContentAuthor), eq(secureDocument.getDocumentReference())))
+                .then(invocationOnMock -> {
+                    Right requestedRight = invocationOnMock.getArgument(0);
+                    return secureDocumentRight.equals(requestedRight) || Right.PROGRAM.equals(secureDocumentRight);
+                });
+        }
+        secureDocument.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(secureDocument, this.oldcore.getXWikiContext());
+
+        this.oldcore.getXWikiContext()
+            .setDoc(this.oldcore.getSpyXWiki().getDocument(secureDocument.getDocumentReference(),
+                this.oldcore.getXWikiContext()));
+
+        XWikiDocument editedXDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page1"));
+        DocumentReference editedInitialAuthor = new DocumentReference("wiki1", "XWiki", "editedInitialAuthor");
+        editedXDocument.setAuthorReference(editedInitialAuthor);
+        DocumentReference editedInitialContentAuthor =
+            new DocumentReference("wiki1", "XWiki", "editedInitialContentAuthor");
+        editedXDocument.setContentAuthorReference(editedInitialContentAuthor);
+        editedXDocument.setCreatorReference(new DocumentReference("wiki1", "XWiki", "editedCreator"));
+        editedXDocument.setEnforceRequiredRights(enforceOnEditedDocument);
+        if (StringUtils.isNotBlank(rightOnEditedDocument)) {
+            BaseObject requiredRightObject =
+                editedXDocument.newXObject(DocumentRequiredRightsReader.CLASS_REFERENCE,
+                    this.oldcore.getXWikiContext());
+            requiredRightObject.set(DocumentRequiredRightsReader.PROPERTY_NAME, rightOnEditedDocument,
+                this.oldcore.getXWikiContext());
+        }
+        editedXDocument.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(editedXDocument, this.oldcore.getXWikiContext());
+
+        Document editedDocument = this.oldcore.getSpyXWiki().getDocument(editedXDocument.getDocumentReference(),
+            this.oldcore.getXWikiContext()).newDocument(this.oldcore.getXWikiContext());
+
+        assertEquals(editedInitialAuthor, editedDocument.getAuthorReference());
+        assertEquals(editedInitialContentAuthor, editedDocument.getContentAuthorReference());
+        assertFalse(editedDocument.isRestricted());
+
+        editedDocument.setContent("Updated content");
+
+        assertEquals(secureContentAuthor, editedDocument.getAuthorReference());
+        assertEquals(secureContentAuthor, editedDocument.getContentAuthorReference());
+        assertEquals(shouldBeRestricted, editedDocument.isRestricted());
+    }
+
     @Test
     void saveAsAuthorWhenNoPR(MockitoComponentManager componentManager) throws XWikiException, ComponentLookupException
     {
@@ -370,6 +478,99 @@ class DocumentTest
         document.save();
 
         assertEquals(userContextReference, document.getAuthors().getEffectiveMetadataAuthor());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, , , true, false",
+        "false, programming, , false, false",
+        "false, script, , true, false",
+        "false, script, programming, true, true",
+        "true, , , false, false",
+        "true, script, script, false, false",
+        "true, programming, script, false, false",
+        "true, script, programming, false, true"
+    })
+    void saveWithRequiredRights(boolean enforceOnEditedDocument, String rightOnSecureDocument,
+        String rightOnEditedDocument, boolean shouldEnforce, boolean shouldFail)
+        throws XWikiException, AccessDeniedException
+    {
+        XWikiDocument secureDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page"));
+        DocumentReference secureAuthor = new DocumentReference("wiki1", "XWiki", "secureAuthor");
+        secureDocument.setAuthorReference(secureAuthor);
+        DocumentReference secureContentAuthor = new DocumentReference("wiki1", "XWiki", "secureContentAuthor");
+        secureDocument.setContentAuthorReference(secureContentAuthor);
+        secureDocument.setCreatorReference(new DocumentReference("wiki1", "XWiki", "secureCreator"));
+        secureDocument.setEnforceRequiredRights(true);
+        if (StringUtils.isNotBlank(rightOnSecureDocument)) {
+            BaseObject requiredRightObject =
+                secureDocument.newXObject(DocumentRequiredRightsReader.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+            requiredRightObject.setStringValue(DocumentRequiredRightsReader.PROPERTY_NAME, rightOnSecureDocument);
+        }
+
+        Right secureDocumentRight = Right.toRight(rightOnSecureDocument);
+        if (!Right.PROGRAM.equals(secureDocumentRight)) {
+            doThrow(new AccessDeniedException(Right.PROGRAM, secureDocument.getDocumentReference(),
+                secureContentAuthor))
+                .when(this.oldcore.getMockDocumentAuthorizationManager())
+                .checkAccess(Right.PROGRAM, null, secureContentAuthor, secureDocument.getDocumentReference());
+            if (!Right.SCRIPT.equals(secureDocumentRight)) {
+                doThrow(new AccessDeniedException(secureDocumentRight, secureDocument.getDocumentReference(),
+                    secureContentAuthor))
+                    .when(this.oldcore.getMockDocumentAuthorizationManager())
+                    .checkAccess(secureDocumentRight, null, secureContentAuthor, secureDocument.getDocumentReference());
+            }
+        } else {
+            when(this.oldcore.getMockDocumentAuthorizationManager().hasAccess(any(), any(), eq(secureContentAuthor),
+                eq(secureDocument.getDocumentReference()))).thenReturn(true);
+        }
+
+        secureDocument.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(secureDocument, this.oldcore.getXWikiContext());
+
+        this.oldcore.getXWikiContext()
+            .setDoc(this.oldcore.getSpyXWiki().getDocument(secureDocument.getDocumentReference(),
+                this.oldcore.getXWikiContext()));
+
+        XWikiDocument editedXDocument = new XWikiDocument(new DocumentReference("xwiki", "Space", "Page1"));
+        DocumentReference editedInitialAuthor = new DocumentReference("wiki1", "XWiki", "editedInitialAuthor");
+        editedXDocument.setAuthorReference(editedInitialAuthor);
+        DocumentReference editedInitialContentAuthor =
+            new DocumentReference("wiki1", "XWiki", "editedInitialContentAuthor");
+        editedXDocument.setContentAuthorReference(editedInitialContentAuthor);
+        editedXDocument.setCreatorReference(new DocumentReference("wiki1", "XWiki", "editedCreator"));
+        editedXDocument.setEnforceRequiredRights(enforceOnEditedDocument);
+        if (StringUtils.isNotBlank(rightOnEditedDocument)) {
+            BaseObject requiredRightObject =
+                editedXDocument.newXObject(DocumentRequiredRightsReader.CLASS_REFERENCE,
+                    this.oldcore.getXWikiContext());
+            requiredRightObject.set(DocumentRequiredRightsReader.PROPERTY_NAME, rightOnEditedDocument,
+                this.oldcore.getXWikiContext());
+        }
+        editedXDocument.setContentDirty(false);
+        this.oldcore.getSpyXWiki().saveDocument(editedXDocument, this.oldcore.getXWikiContext());
+
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT, secureContentAuthor,
+            editedXDocument.getDocumentReference())).thenReturn(true);
+
+        Document editedDocument = this.oldcore.getSpyXWiki().getDocument(editedXDocument.getDocumentReference(),
+            this.oldcore.getXWikiContext()).newDocument(this.oldcore.getXWikiContext());
+
+        assertEquals(editedInitialAuthor, editedDocument.getAuthorReference());
+        assertEquals(editedInitialContentAuthor, editedDocument.getContentAuthorReference());
+        assertFalse(editedDocument.isRestricted());
+
+        if (shouldFail) {
+            assertThrows(XWikiException.class, () -> editedDocument.saveAsAuthor("Test fail", false));
+        } else {
+            editedDocument.saveAsAuthor("Test", false);
+        }
+
+        if (!enforceOnEditedDocument) {
+            assertEquals(shouldEnforce, editedDocument.isEnforceRequiredRights());
+        }
+
+        assertEquals(editedDocument.getAuthorReference(), secureContentAuthor);
     }
 
     @Test

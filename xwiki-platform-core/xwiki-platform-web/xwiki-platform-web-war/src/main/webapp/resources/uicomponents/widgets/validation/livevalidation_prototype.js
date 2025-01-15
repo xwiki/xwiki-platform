@@ -100,17 +100,15 @@ LiveValidation.prototype = {
 	  // hooks
 	  beforeValidation: function(){},
 	  beforeValid: function(){},
-	  onValid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  onValid: function(){this.addFieldClass(); },
 	  afterValid: function(){},
 	  beforeInvalid: function(){},
-	  onInvalid: function(){ this.insertMessage(this.createMessageSpan()); this.addFieldClass(); },
+	  onInvalid: function(){this.addFieldClass(); },
 	  afterInvalid: function(){},
 	  afterValidation: function(){},
     }, optionsObj || {});
 	var node = this.options.insertAfterWhatNode || this.element;
     this.options.insertAfterWhatNode = $(node);
-    this.messageHolder = this.createMessageSpan();
-    this.options.insertAfterWhatNode.up().appendChild(this.messageHolder);
     Object.extend(this, this.options); // copy the options to the actual object
     // add to form if it has been provided
     if(this.form){
@@ -171,18 +169,36 @@ LiveValidation.prototype = {
       }
     }
     this.validations = [];
-	this.removeMessageAndFieldClass();
+	this.removeFieldClass();
   },
   
   /**
-   *	adds a validation to perform to a LiveValidation object
+   *	adds a validation to perform on a LiveValidation object
    *
    *	@param validationFunction {Function} - validation function to be used (ie Validate.Presence )
    *	@param validationParamsObj {Object} - parameters for doing the validation, if wanted or necessary
    *    @return {Object} - the LiveValidation object itself so that calls can be chained
    */
   add: function(validationFunction, validationParamsObj){
-    this.validations.push( { type: validationFunction, params: validationParamsObj || {} } );
+    let validationMessageHolder;
+    /* The identifier helps us give specific behaviour to different kinds of validations. The user expectations change
+     * depending on the validation type, and this identifier makes sure we can retrieve the right message from the set
+     * of messages in the template. */
+    if (validationParamsObj.identifier) {
+      validationMessageHolder = this.options.insertAfterWhatNode.up().querySelector("." + validationParamsObj.identifier);
+      /* We use the failure message as a fallback for the success message for regexes. This ensures that the regex stays
+       * shown to the user at all times. */
+      if (validationParamsObj.identifier.includes("regex") && validationParamsObj.validMessage == null) {
+        validationParamsObj.validMessage = validationParamsObj.failureMessage;
+      }
+    } else {
+      /* If we don't have an identifier for the validation, this is a legacy use of the livevalidation.
+        We create a message holder from scratch to make it compatible with the way the new implementation works. */
+      validationMessageHolder = this.createMessageSpan();
+      this.options.insertAfterWhatNode.up().appendChild(validationMessageHolder);
+    }
+    /* We add one validation object to the list of validations for the current field. */
+    this.validations.push( { type: validationFunction, params: validationParamsObj || {}, messageHolder: validationMessageHolder } );
     return this;
   },
   
@@ -204,7 +220,6 @@ LiveValidation.prototype = {
    * makes the validation wait the alotted time from the last keystroke 
    */
   deferValidation: function(e){
-    if(this.wait >= 300) this.removeMessageAndFieldClass();
     if(this.timeout) clearTimeout(this.timeout);
     this.timeout = setTimeout(this.validate.bind(this), this.wait);
   },
@@ -222,7 +237,7 @@ LiveValidation.prototype = {
    */
   doOnFocus: function(){
     this.focused = true;
-    this.removeMessageAndFieldClass();
+    this.removeFieldClass();
   },
 		
   /**
@@ -264,11 +279,11 @@ LiveValidation.prototype = {
   doValidations: function(){
     this.validationFailed = false;
     for(var i = 0, len = this.validations.length; i < len; ++i){
-	  this.validationFailed = !this.validateElement(this.validations[i].type, this.validations[i].params);
-      if(this.validationFailed) return false;	
+      let isValid = this.validateElement(this.validations[i].type, this.validations[i].params);
+      this.insertMessage(this.validations[i], isValid);
+      this.validationFailed = this.validationFailed || !isValid;
     }
-    this.message = this.validMessage;
-    return true;
+    return !this.validationFailed;
   },
     
   /**
@@ -364,50 +379,64 @@ LiveValidation.prototype = {
     
   /** Message insertion methods ****************************
    * 
-   * These are only used in the onValid and onInvalid callback functions and so if you overide the default callbacks,
-   * you must either impliment your own functions to do whatever you want, or call some of these from them if you 
+   * These are only used in the onValid and onInvalid callback functions and so if you override the default callbacks,
+   * you must either implement your own functions to do whatever you want, or call some of these from them if you
    * want to keep some of the functionality
    */
    
   /**
-   *	makes a span containg the passed or failed message
+   *	makes a span to contain the passed or failed message
    *
-   *    @return {HTMLSpanObject} - a span element with the message in it
+   *    @return {HTMLSpanObject} - an empty span element to contain the message.
    */
   createMessageSpan: function(){
     var span = document.createElement('span');
+    span.classList.add(this.messageClass);
     span.setAttribute('aria-live', 'polite');
     return span;
   },
-    
+
   /**
-   *  inserts the element to contain the message in place of the element that already exists (if it does)
-   *
-   *  @param elementToInsert {HTMLElementObject} - an element node to insert
+   *  inserts the message in its container.
    */
-  insertMessageHolder: function(elementToInsert){
-    var className = this.validationFailed ? this.invalidClass : this.validClass;
-    $(elementToInsert).addClassName(this.messageClass + ' ' + className);
-    var parent = this.options.insertAfterWhatNode.up();
-    var nxtSibling = this.options.insertAfterWhatNode.next();
-    if (nxtSibling) {
-      parent.insertBefore(elementToInsert, nxtSibling);
-    }else{
-      parent.appendChild(elementToInsert);
+  insertMessage: function(validation, isValid) {
+    let messageHolder = validation.messageHolder;
+    if(validation.params.validMessage=="" && !validation.params.validMessage) return; // dont insert anything if validMessage is an empty string
+    if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) ||
+      this.element.value != '' ||
+      validation.params.identifier.includes("regex")){
+      this.removeMessageClass(messageHolder);
+      /* If the isValid state is null, we assume that the validation did not occur yet. We do not add any class that
+      * would give a false hint towards a result. */
+      if(isValid != null) {
+        this.addMessageClass(messageHolder, isValid);
+      }
+      // We change just the lastChild textContent. This last child is a text node. This allows to not remove the icons.
+      let validMessage = validation.params.validMessage ? validation.params.validMessage : this.options.validMessage;
+      let newMessageContent = isValid ? validMessage : validation.params.failureMessage;
+      if (messageHolder.lastChild != null) {
+        messageHolder.lastChild.textContent = newMessageContent;
+      } else {
+        messageHolder.textContent = newMessageContent;
+      }
+
     }
   },
 
   /**
-   *  inserts the message in its container of the message that already exists (if it does)
+   *  Add a class for the holder of the validation message.
    */
-  insertMessage: function() {
-    this.removeMessage();
-    if(!this.validationFailed && !this.validMessage) return; // dont insert anything if validMesssage has been set to false or empty string
-    if( (this.displayMessageWhenEmpty && (this.elementType == LiveValidation.CHECKBOX || this.element.value == '')) || this.element.value != '' ){
-      var className = this.validationFailed ? this.invalidClass : this.validClass;
-      this.messageHolder.addClassName(this.messageClass + ' ' + className);
-      this.messageHolder.textContent = this.message;
-    }
+  removeMessageClass: function(messageHolder) {
+    messageHolder.removeClassName(this.invalidClass);
+    messageHolder.removeClassName(this.validClass);
+  },
+
+  /**
+   *  Add a class for the holder of the validation message.
+   */
+  addMessageClass: function(messageHolder, isValid) {
+    let className = isValid ? this.validClass : this.invalidClass;
+    messageHolder.addClassName(className);
   },
     
   /**
@@ -425,15 +454,18 @@ LiveValidation.prototype = {
   },
     
   /**
-   *	removes the message element if it exists
+   *	Empties out the message elements if they exist
    */
   removeMessage: function(){
-    this.messageHolder.className = 'message-holder';
-    this.messageHolder.textContent = '';
+    for (let validation of validations) {
+      let messageHolder = validation.messageHolder;
+      this.removeMessageClass(messageHolder);
+      messageHolder.lastChild.textContent = '';
+    }
   },
     
   /**
-   *  removes the class that has been applied to the field to indicte if valid or not
+   *  removes the class that has been applied to the field to indicate if valid or not
    */
   removeFieldClass: function(){
     this.element.removeClassName(this.invalidFieldClass);

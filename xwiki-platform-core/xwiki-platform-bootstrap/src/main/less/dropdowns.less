@@ -60,9 +60,18 @@
   .divider {
     .nav-divider(@dropdown-divider-bg);
   }
+  
+  // Dividers within the dropdown with an improved semantic representation
+  li:has(> ul) + li:has(> ul) {
+    border-top: solid 1px @dropdown-divider-bg;
+    padding-top: ((@line-height-computed / 2) - 1);
+  }
+  li:has(> ul):has(+ li > ul) {
+    margin-bottom: ((@line-height-computed / 2) - 1);
+  }
 
-  // Links within the dropdown menu
-  > li > a {
+  // Links within the dropdown menu and submenus
+  > li > a, > li > ul > li > a {
     display: block;
     padding: 3px 20px;
     clear: both;

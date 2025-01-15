@@ -138,7 +138,7 @@ class ImageIT extends AbstractCKEditorIT
         // Verify that the content matches what we did using CKEditor.
         assertEquals("[[image:image.gif]]\n"
             + "\n"
-            + "[[Caption>>image:image.gif]]", savedPage.editWiki().getContent());
+            + "[[Caption>>image:image.gif]]\n\n ", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -321,7 +321,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
 
         // Re-edit the page.
@@ -337,7 +337,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
 
         // Edit again to set the caption a second time.
@@ -353,7 +353,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]",
+        assertEquals("[[Caption>>image:image.gif||data-xwiki-image-style-alignment=\"center\"]]\n\n ",
             savedPage.editWiki().getContent());
     }
 
@@ -456,7 +456,7 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
         // Test that when re-editing the image, the link, caption and alignment are still set.
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
@@ -486,7 +486,7 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         assertEquals("[[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]", savedPage.editWiki().getContent());
+            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
     }
 
     @Test

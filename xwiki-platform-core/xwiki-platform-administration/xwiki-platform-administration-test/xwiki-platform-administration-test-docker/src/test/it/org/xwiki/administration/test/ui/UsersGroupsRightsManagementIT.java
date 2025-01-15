@@ -268,6 +268,7 @@ class UsersGroupsRightsManagementIT
         UsersAdministrationSectionPage usersPage = UsersAdministrationSectionPage.gotoPage();
         RegistrationModal registrationModal = usersPage.clickAddNewUser();
         registrationModal.fillRegisterForm("", "", userName, userName, userName, "");
+        registrationModal.waitForLiveValidationSuccess();
         registrationModal.clickRegister();
         usersPage.waitForNotificationSuccessMessage("User created");
         usersPage.getUsersLiveData().getTableLayout().assertRow("User", userName);

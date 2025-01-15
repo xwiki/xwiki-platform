@@ -426,7 +426,6 @@ public class BasePage extends BaseElement
      */
     public LoginPage login()
     {
-        getDrawerMenu().toggle();
         this.loginLink.click();
         return new LoginPage();
     }
@@ -511,7 +510,6 @@ public class BasePage extends BaseElement
      */
     public RegistrationPage register()
     {
-        getDrawerMenu().toggle();
         this.registerLink.click();
         return new RegistrationPage();
     }

@@ -188,4 +188,31 @@
       editor.setKeystroke(shortcut, commandName);
     }
   });
+
+  // The editor (its focus manager to be precise) is blurred (loses focus) with a delay (200ms by default). This is done
+  // using a timer. Our save listener (see above) needs to determine if a blur is scheduled and for this it checks this
+  // timer. Unfortunately the timer is nullified (deleted) only when the scheduled blur handler is executed, but not
+  // when it's canceled (i.e. when clearTimeout is called). This means that our save listener above may blur the editor
+  // even if there's no scheduled blur, just because the last blur was canceled. To overcome this we override the focus
+  // manager's methods to nullify the timer when it's canceled.
+  function nullifyBlurTimerOnClearTimeout(originalMethod) {
+    return function(...args) {
+      const originalClearTimeout = clearTimeout;
+      const focusManager = this;
+      try {
+        clearTimeout = function(...args) {
+          if (focusManager._.timer === args[0]) {
+            delete focusManager._.timer;
+          }
+          return originalClearTimeout.apply(this, args);
+        };
+        return originalMethod.apply(this, args);
+      } finally {
+        clearTimeout = originalClearTimeout;
+      }
+    };
+  }
+  ['focus', 'blur'].forEach(function(method) {
+    CKEDITOR.focusManager.prototype[method] = nullifyBlurTimerOnClearTimeout(CKEDITOR.focusManager.prototype[method]);
+  });
 })();

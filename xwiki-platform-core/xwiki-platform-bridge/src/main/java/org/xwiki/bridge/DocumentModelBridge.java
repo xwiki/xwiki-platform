@@ -216,8 +216,19 @@ public interface DocumentModelBridge
      * @since 15.2RC1
      * @since 14.10.7
      */
-    @Unstable
     default boolean isRestricted()
+    {
+        return false;
+    }
+
+    /**
+     * @return {@code true} if required rights defined in a {@code XWiki.RequiredRightClass} object shall be
+     * enforced, meaning that editing will be limited to users with these rights and content of this document can't
+     * use more rights than defined in the object, {@code false} otherwise
+     * @since 16.10.0RC1
+     */
+    @Unstable
+    default boolean isEnforceRequiredRights()
     {
         return false;
     }

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -777,6 +778,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
 
         @Override
+        public HasAcl addDocument(String name, String creator, boolean enforceRequiredRights, String alt)
+        {
+            return mockDocument(name, creator, false, enforceRequiredRights, alt);
+        }
+
+        @Override
         public XWikiDocument removeDocument(String name)
         {
             TestDocument document = documents.get(name);
@@ -795,13 +802,18 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         TestDocument mockDocument(String name, String creator, boolean isNew, String alt)
         {
+            return mockDocument(name, creator, isNew, false, alt);
+        }
+
+        TestDocument mockDocument(String name, String creator, boolean isNew, boolean enforceRequiredRights, String alt)
+        {
             TestDocument document = getTestDocument(name);
 
             if (document == null) {
                 if (creator == null) {
                     creator = "XWiki.Admin";
                 }
-                document = new TestDocument(name, this, creator, isNew, alt);
+                document = new TestDocument(name, this, creator, isNew, enforceRequiredRights, alt);
                 documents.put(name, document);
             }
 
@@ -855,7 +867,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         UserTestDocument(String name, TestSpace space, String creator, Boolean isNew, String alt)
         {
-            super(name, space, creator, isNew, alt);
+            super(name, space, creator, isNew, false, alt);
 
             this.userObject = mockUserBaseObject();
 
@@ -907,7 +919,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         GroupTestDocument(String name, TestSpace space, String creator, Boolean isNew, String alt)
         {
-            super(name, space, creator, isNew, alt);
+            super(name, space, creator, isNew, false, alt);
 
             mockery.checking(new Expectations()
             {
@@ -989,7 +1001,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         }
     }
 
-    private class TestDocument extends TestAcl
+    private class TestDocument extends TestAcl implements HasRequiredRights
     {
         protected final XWikiDocument mockedDocument;
 
@@ -1001,17 +1013,21 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         protected final String creator;
 
+        protected final Map<String, Set<String>> requiredRightScopes;
+
         TestDocument(final String name, final TestSpace space, final String creator, final Boolean isNew)
         {
-            this(name, space, creator, isNew, null);
+            this(name, space, creator, isNew, false, null);
         }
 
-        TestDocument(final String name, final TestSpace space, final String creator, final Boolean isNew, String alt)
+        TestDocument(final String name, final TestSpace space, final String creator, final Boolean isNew,
+            final Boolean enforceRequiredRights, String alt)
         {
             this.space = space;
             this.name = name;
             this.creator = creator;
             this.alt = alt;
+            this.requiredRightScopes = new HashMap<>();
 
             mockedDocument = mockery.mock(XWikiDocument.class, new Formatter()
                 .format("%s:%s.%s", getSpace().getWiki().getName(), getSpace().getName(), getName()).toString());
@@ -1073,6 +1089,28 @@ public class LegacyTestWiki extends AbstractTestWiki
                     allowing(mockedDocument)
                         .getXObjects(XWikiGroupsDocumentInitializer.XWIKI_GROUPS_DOCUMENT_REFERENCE);
                     will(returnValue(Collections.emptyList()));
+                    allowing(mockedDocument).isEnforceRequiredRights();
+                    will(returnValue(enforceRequiredRights));
+                    allowing(mockedDocument)
+                        .getXObjects(with(equal(new LocalDocumentReference("XWiki", "RequiredRightClass"))));
+                    will(new CustomAction("return a vector of required rights")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return getRequiredRightObjects();
+                        }
+                    });
+                    allowing(mockedDocument).getXObjects(
+                        with(equal(new DocumentReference(space.wiki.getName(), "XWiki", "RequiredRightClass"))));
+                    will(new CustomAction("return a vector of required rights")
+                    {
+                        @Override
+                        public Object invoke(Invocation invocation)
+                        {
+                            return getRequiredRightObjects();
+                        }
+                    });
                 }
             });
 
@@ -1096,6 +1134,15 @@ public class LegacyTestWiki extends AbstractTestWiki
                             public Object invoke(Invocation invocation)
                             {
                                 return getLegacyDocumentRights();
+                            }
+                        });
+                        allowing(mockedDocument).getObjects("XWiki.RequiredRightClass");
+                        will(new CustomAction("return a vector of required rights")
+                        {
+                            @Override
+                            public Object invoke(Invocation invocation)
+                            {
+                                return getRequiredRightObjects();
                             }
                         });
                         allowing(mockedDocument).getWikiName();
@@ -1142,6 +1189,11 @@ public class LegacyTestWiki extends AbstractTestWiki
             if (globalRights != null) {
                 objects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "XWikiRights"), rights);
             }
+            Vector<BaseObject> requiredrights = getRequiredRightObjects();
+            if (!requiredrights.isEmpty()) {
+                objects.put(new DocumentReference(this.space.wiki.getName(), "XWiki", "RequiredRightClass"),
+                    requiredrights);
+            }
 
             return objects;
         }
@@ -1162,6 +1214,40 @@ public class LegacyTestWiki extends AbstractTestWiki
         public String getPrettyName()
         {
             return (this.alt != null) ? this.alt : this.name;
+        }
+
+        @Override
+        public void addRequiredRight(String type, String scope)
+        {
+            this.requiredRightScopes.computeIfAbsent(type, k -> new HashSet<>()).add(scope);
+        }
+
+        private Vector<BaseObject> getRequiredRightObjects()
+        {
+            return this.requiredRightScopes.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                    .map(scope -> mockRequiredRightBaseObject(entry.getKey(), scope)))
+                .collect(Collectors.toCollection(Vector::new));
+        }
+
+        private BaseObject mockRequiredRightBaseObject(String type, String scope)
+        {
+            objectNumber++;
+
+            BaseObject requiredRightBaseObject =
+                mockery.mock(BaseObject.class, getName() + objectNumber + ' ' + name + ' ' + type + ' ' + scope);
+
+            String level = "document".equals(scope) ? type : scope + "_" + type;
+
+            mockery.checking(new Expectations()
+            {
+                {
+                    allowing(requiredRightBaseObject).getStringValue("level");
+                    will(returnValue(level));
+                }
+            });
+
+            return requiredRightBaseObject;
         }
 
         TestSpace getSpace()

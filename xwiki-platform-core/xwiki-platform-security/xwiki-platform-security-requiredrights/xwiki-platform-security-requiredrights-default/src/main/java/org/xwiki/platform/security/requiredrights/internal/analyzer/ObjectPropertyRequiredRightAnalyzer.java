@@ -223,7 +223,16 @@ public class ObjectPropertyRequiredRightAnalyzer
         return result;
     }
 
-    private List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String value,
+    /**
+     * Analyze the given wiki content in a property of the object.
+     *
+     * @param object the object to which the property belongs, used for getting the syntax and document reference
+     * @param value the value with the wiki content
+     * @param reference the reference of the property
+     * @return the analysis results
+     * @throws RequiredRightsException if an error occurs during the analysis
+     */
+    public List<RequiredRightAnalysisResult> analyzeWikiContent(BaseObject object, String value,
         EntityReference reference)
         throws RequiredRightsException
     {

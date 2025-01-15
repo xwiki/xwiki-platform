@@ -19,6 +19,8 @@
  */
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
+import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,7 +45,9 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.ComponentList;
@@ -55,12 +59,15 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -211,5 +218,77 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
         assertEquals(1, results.size());
         RequiredRightAnalysisResult result = results.get(0);
         assertEquals(List.of(RequiredRight.PROGRAM), result.getRequiredRights());
+    }
+
+    @Test
+    void analyzeWikiParameters() throws Exception
+    {
+        String macroName = "wikiParameter";
+
+        String wikiValue = "wikiValue";
+        String wikiValue2 = "WikiValue";
+        String wikiDisplay = "WikiDisplay";
+        List<String> wikiValues = List.of(wikiValue, wikiValue2, wikiDisplay);
+
+        // Use a LinkedHashMap to ensure that the order of the parameters is preserved.
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("wiki", wikiValue);
+        parameters.put("Wiki", wikiValue2);
+        parameters.put("wikiDisplaY", wikiDisplay);
+        parameters.put("string", "String");
+        parameters.put("other", "other value");
+        MacroBlock block = new MacroBlock(macroName, parameters, false);
+
+        // Create a fake syntax to create the macro id.
+        Syntax syntax = mock();
+        MacroId macroId = new MacroId(macroName, syntax);
+
+        // Mock the macro.
+        Macro<?> macro = mock();
+        doReturn(macro).when(this.macroManager).getMacro(argThat(macroIdArg -> macroName.equals(macroIdArg.getId())));
+
+        // Mock the macro descriptor.
+        MacroDescriptor macroDescriptor = mock();
+        when(macro.getDescriptor()).thenReturn(macroDescriptor);
+        when(macroDescriptor.getId()).thenReturn(macroId);
+        Map<String, ParameterDescriptor> parameterDescriptorMap = Map.of(
+            "wiki", getParameterDescriptor("wiki", Block.LIST_BLOCK_TYPE, String.class),
+            "wikidisplay", getParameterDescriptor("wikiDisplay", String.class, Block.LIST_BLOCK_TYPE),
+            "string", getParameterDescriptor("string", String.class, String.class));
+        when(macroDescriptor.getParameterDescriptorMap()).thenReturn(parameterDescriptorMap);
+        when(macroDescriptor.getContentDescriptor()).thenReturn(new DefaultContentDescriptor(false));
+
+        // Stub the macro content parser and the XDOM analyzer to simply pass on the analyzed content as mock name.
+        // That way, we can easily verify that all parameters were analyzed.
+        when(this.macroContentParser.parse(any(), any(), any(), anyBoolean(), any(), anyBoolean()))
+            .then(invocationOnMock -> {
+                String content = invocationOnMock.getArgument(0);
+                return mock(XDOM.class, content);
+            });
+
+        when(this.xdomRequiredRightAnalyzer.analyze(any())).then(invocationOnMock -> {
+            XDOM xdom = invocationOnMock.getArgument(0);
+            return List.of(mock(RequiredRightAnalysisResult.class, getMockName(xdom)));
+        });
+
+        List<RequiredRightAnalysisResult> results = this.analyzer.analyze(block);
+
+        List<String> analyzedValues = results.stream().map(this::getMockName).toList();
+
+        assertEquals(wikiValues, analyzedValues);
+    }
+
+    private static ParameterDescriptor getParameterDescriptor(String id, Type parameterType, Type displayType)
+    {
+        ParameterDescriptor wikiParameterDescriptor = mock();
+        when(wikiParameterDescriptor.getParameterType()).thenReturn(parameterType);
+        when(wikiParameterDescriptor.getDisplayType()).thenReturn(displayType);
+        when(wikiParameterDescriptor.getId()).thenReturn(id);
+        return wikiParameterDescriptor;
+    }
+
+    private String getMockName(Object mockObject)
+    {
+        return mockingDetails(mockObject).getMockCreationSettings().getMockName().toString();
     }
 }

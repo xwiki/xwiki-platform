@@ -67,13 +67,6 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Needed for mocking XWikiDocument -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed for ReferenceComponentList -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>

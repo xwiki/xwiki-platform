@@ -68,19 +68,11 @@
     </dependency>
 
     <!-- Test dependencies -->
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Used to mock XWiki class -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

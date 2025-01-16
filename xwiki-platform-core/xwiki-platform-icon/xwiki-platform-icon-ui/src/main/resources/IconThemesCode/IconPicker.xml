@@ -243,14 +243,21 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     for (var i=0; i &lt; iconTheme.length; ++i) {
       // Display the icon
       if (selectedIconName === '' || iconTheme[i].name.includes(selectedIconName)) {
-        var displayer = $(document.createElement('div'));
+        var displayer = $(document.createElement('button'));
+        displayer.addClass('btn');
         iconListSection.append(displayer);
         displayer.addClass('xwikiIconPickerIcon');
-        var imageDiv = $(document.createElement('div'));
+        var imageDiv = $(document.createElement('p'));
         imageDiv.addClass('xwikiIconPickerIconImage').html(iconTheme[i].render);
         displayer.append(imageDiv);
-        var iconNameSpan = $(document.createElement('span'));
-        iconNameSpan.addClass('xwikiIconPickerIconName').text(iconTheme[i].name);
+        var iconNameSpan = $(document.createElement('p'));
+        // Usually, the icon name is just one "word" in snakecase. e.g. arrow_refresh_small
+        // We add Line Break Opportunity elements in the middle of this word so that it's cut into nice to read 
+        // substrings.
+        let iconNameWithLineBreakOpportunities = iconTheme[i].name
+          .replaceAll("-","&lt;wbr/&gt;-")
+          .replaceAll("_","&lt;wbr/&gt;_");
+        iconNameSpan.addClass('xwikiIconPickerIconName').html(iconNameWithLineBreakOpportunities);
         displayer.append(iconNameSpan);
         // Change the input value when the icon is clicked
         displayer.on('click', function(event) {
@@ -373,7 +380,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   }
   
   /**
-   * Create the piccker
+   * Create the picker
    */
   var createPicker = function (input) {
     // If the picker already exists
@@ -392,7 +399,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     xwikiCurrentIconsPicker = $(document.createElement('div'));
     xwikiCurrentIconsPicker.addClass('xwikiIconPickerContainer');
     // Insert the picker in the DOM
-    $(body).append(xwikiCurrentIconsPicker);
+    xwikiCurrentIconsPicker.insertAfter(currentInput);
     // Set the position
     setPickerPosition();
     // Add the icon list section
@@ -446,6 +453,13 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         }
         lastTimeout = setTimeout(reloadIconList, 500);
       }
+    });
+    iconThemeSelector.on('keyup', function(event) {
+      // Close the picker when the user press 'escape'.
+      // See: http://stackoverflow.com/questions/1160008/which-keycode-for-escape-key-with-jquery
+      if (event.which == 27) {
+        closePicker();
+      } 
     });
   }
 
@@ -613,10 +627,17 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 .xwikiIconPickerList {
   overflow-y: scroll;
   height: 240px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3em;
+}
+
+/* Avoid stretching on the Loader element. */
+.xwikiIconPickerList &gt; img {
+  object-fit: contain;
 }
 
 .xwikiIconPickerIcon {
-  float: left;
   height: 80px;
   width: 100px;
   text-align: center;
@@ -625,6 +646,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
   overflow: hidden;
   padding: 10px;
   cursor: pointer;
+  background-color: transparent;
 }
 
 .xwikiIconPickerIcon:hover {
@@ -633,11 +655,24 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
 
 .xwikiIconPickerIconImage {
   font-size: 24px;
+  line-height: 1;
   margin: 0;
 }
 
 .xwikiIconPickerIconImage img{
   width: 24px;
+}
+
+.xwikiIconPickerIcon .xwikiIconPickerIconName {
+  /* We want to limit the number of lines in the name so that it always fit inside the standard button size. 
+    The value below is just about twice the line-height. */
+  max-height: 2.9em;
+  /* For the few names that need three lines, we make sure the user can scroll to read the whole name. */
+  overflow-y: scroll;
+  overflow-x: hidden;
+  /* Make sure the name wraps onto multiple lines instead of overflowing. */
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .xwikiIconPickerIconThemeSelector {

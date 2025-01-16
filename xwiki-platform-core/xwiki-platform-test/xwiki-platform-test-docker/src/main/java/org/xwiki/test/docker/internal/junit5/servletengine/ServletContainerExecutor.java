@@ -197,9 +197,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         // Starting with Jetty 12, Jetty is able to run multiple environments, and we need to tell it which one to run
         // (ee10 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
-        if (extractJettyVersionFromDockerTag(this.testConfiguration.getServletEngineTag()) >= 12) {
-            this.servletContainer.setCommand(this.servletContainer.getCommandParts()[0],
-                "--module=ext,console-capture,ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
+        int jettyVersion = extractJettyMajorVersionFromDockerTag(this.testConfiguration.getServletEngineTag());
+        if (jettyVersion >= 12) {
+            this.servletContainer
+                .setCommand("--module=ext,console-capture,ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
+        } else {
+            throw new Exception(String.format("Unsupported version of Jetty: [%n]", jettyVersion));
         }
 
         // We need to run Jetty using the root user (instead of the jetty user) in order to have access to the Docker
@@ -208,7 +211,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.servletContainer.withCreateContainerCmdModifier(cmd -> cmd.withUser(ROOT_USER));
     }
 
-    private int extractJettyVersionFromDockerTag(String tag)
+    private int extractJettyMajorVersionFromDockerTag(String tag)
     {
         int result = 12;
         if (tag != null) {

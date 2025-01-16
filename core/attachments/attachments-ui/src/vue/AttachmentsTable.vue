@@ -130,4 +130,7 @@ function attachmentName(name: string) {
 .v-card-text .str-no-attachment {
   padding: 0 var(--cr-spacing-medium);
 }
+table {
+  margin: 0 var(--cr-spacing-medium);
+}
 </style>

@@ -87,6 +87,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <!--
+              Disable tracing during test startup to avoid conflicts between opentelemetry versions.
+              The conflict comes from transitive dependencies of Selenium and Elasticsearch.
+              Disabling tracing is the easiest option, but if tracing becomes necessary, we can resolve the version
+              conflict by specifying the opentelemetry version.
+            -->
+            <webdriver.remote.enableTracing>false</webdriver.remote.enableTracing>
+          </systemProperties>
+        </configuration>
       </plugin>
     </plugins>
   </build>

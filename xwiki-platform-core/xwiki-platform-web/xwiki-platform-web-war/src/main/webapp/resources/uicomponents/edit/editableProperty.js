@@ -140,7 +140,11 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       // Make sure the edit input has an ID, and use the name of the input as a fallback.
       // We add some random UUID to make sure we don't inadvertently collide with another ID.
       if (!editInput.attr('id')) {
-        editInput.attr('id', editInput.attr('name') + '-' + crypto.randomUUID().toString());
+        let id = editInput.attr('name');
+        if(typeof crypto?.randomUUID === "function") {
+          id = id + '-' + crypto.randomUUID().toString();
+        }
+        editInput.attr('id', id);
       }
       // Bind the label to the newly generated edit input.
       editableProperty.find('label').attr('for', editInput.attr('id'));

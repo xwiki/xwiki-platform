@@ -40,6 +40,7 @@ const attachments = attachmentsService.list();
 const isLoading = attachmentsService.isLoading();
 const errorMessage = attachmentsService.getError();
 const isUploading = attachmentsService.isUploading();
+const currentPage = documentService.getCurrentDocument();
 
 // Watch for route change to refresh the tab when a user visits a new page.
 const route = useRoute();
@@ -75,6 +76,7 @@ async function upload(files: File[]) {
 <template>
   <div class="attachments">
     <AttachmentUploadForm
+      v-if="currentPage?.canEdit"
       ref="attachmentUpload"
       :is-uploading="isUploading"
       @files-selected="upload"

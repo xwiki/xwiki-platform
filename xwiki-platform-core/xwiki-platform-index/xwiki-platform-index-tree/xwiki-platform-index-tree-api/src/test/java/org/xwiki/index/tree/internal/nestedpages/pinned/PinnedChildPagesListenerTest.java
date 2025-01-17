@@ -38,7 +38,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
+import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -66,6 +68,9 @@ class PinnedChildPagesListenerTest
 
     @MockComponent
     private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @MockComponent
+    private ObservationContext observationContext;
 
     @Mock
     private Job currentJob;
@@ -110,11 +115,12 @@ class PinnedChildPagesListenerTest
         when(this.pinnedChildPagesManager.getPinnedChildPages(this.documentReference.getLastSpaceReference()))
             .thenReturn(List.of(foo, this.documentReference, bar));
 
-        // Not inside a delete job (e.g. could be a rename job).
+        // Inside a rename job.
+        when(this.observationContext.isIn(new DocumentRenamingEvent())).thenReturn(true);
         this.pinnedChildPagesListener.onEvent(new DocumentDeletedEvent(), this.document, null);
 
         // Inside a delete job and there are pinned pages.
-        when(this.currentJob.getType()).thenReturn(RefactoringJobs.DELETE);
+        when(this.observationContext.isIn(new DocumentRenamingEvent())).thenReturn(false);
         this.pinnedChildPagesListener.onEvent(new DocumentDeletedEvent(), this.document, null);
 
         // Trigger the event again to verify that the pinned pages are not updated again.

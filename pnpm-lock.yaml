@@ -2665,8 +2665,8 @@ importers:
         version: 6.3.9
     devDependencies:
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
       electron-builder:
         specifier: 25.1.8
         version: 25.1.8(electron-builder-squirrel-windows@24.13.3)
@@ -2686,8 +2686,8 @@ importers:
         specifier: 1.7.9
         version: 1.7.9
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
       electron-store:
         specifier: 10.0.0
         version: 10.0.0
@@ -2708,8 +2708,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/authentication/authentication-api
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2755,8 +2755,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/browser/browser-api
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -2780,8 +2780,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/configuration/configuration-api
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
       electron-store:
         specifier: 10.0.0
         version: 10.0.0
@@ -2802,8 +2802,8 @@ importers:
         specifier: workspace:*
         version: link:../../../../core/configuration/configuration-api
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
     devDependencies:
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
@@ -2880,8 +2880,8 @@ importers:
         specifier: workspace:*
         version: link:../storage
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
     devDependencies:
       '@types/node':
         specifier: 22.10.7
@@ -2988,8 +2988,8 @@ importers:
         specifier: workspace:*
         version: link:../../core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api
       electron:
-        specifier: 33.3.1
-        version: 33.3.1
+        specifier: 34.0.0
+        version: 34.0.0
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -5894,8 +5894,8 @@ packages:
   electron-updater@6.3.9:
     resolution: {integrity: sha512-2PJNONi+iBidkoC5D1nzT9XqsE8Q1X28Fn6xRQhO3YX8qRRyJ3mkV4F1aQsuRnYPqq6Hw+E51y27W75WgDoofw==}
 
-  electron@33.3.1:
-    resolution: {integrity: sha512-Z7l2bVgpdKxHQMI4i0CirBX2n+iCYKOx5mbzNM3BpOyFELwlobEXKmzCmEnwP+3EcNeIhUQyIEBFQxN06QgdIw==}
+  electron@34.0.0:
+    resolution: {integrity: sha512-fpaPb0lifoUJ6UJa4Lk8/0B2Ku/xDZWdc1Gkj67jbygTCrvSon0qquju6Ltx1Kz23GRqqlIHXiy9EvrjpY7/Wg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -11056,7 +11056,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@33.3.1:
+  electron@34.0.0:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.16.10

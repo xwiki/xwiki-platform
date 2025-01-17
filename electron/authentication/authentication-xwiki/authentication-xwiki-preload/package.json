@@ -27,7 +27,7 @@
     "@xwiki/cristal-authentication-api": "workspace:*"
   },
   "peerDependencies": {
-    "electron": "33.3.1"
+    "electron": "34.0.0"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

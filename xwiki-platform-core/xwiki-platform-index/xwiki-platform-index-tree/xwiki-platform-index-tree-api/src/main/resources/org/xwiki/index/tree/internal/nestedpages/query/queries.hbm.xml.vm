@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
@@ -61,7 +80,8 @@
     language field. -->
   <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
     implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
-  <sql-query name="nestedPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
+#foreach ($order in ['Asc', 'Desc'])
+  <sql-query name="nestedPagesOrderedByTitle$order" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
     select xwikiPage.reference reference, xwikiPage.terminal terminal
@@ -94,12 +114,14 @@
 
     ) xwikiPage
 
-    order by lower(xwikiPage.title), xwikiPage.title
+    order by lower(xwikiPage.title) $order, xwikiPage.title $order
   </sql-query>
+#end
 
   <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
     implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
-  <sql-query name="nestedPagesOrderedByName" resultset-ref="XWikiPageReference" read-only="true">
+#foreach ($order in ['Asc', 'Desc'])
+  <sql-query name="nestedPagesOrderedByName$order" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
     select xwikiPage.reference reference, xwikiPage.terminal terminal
@@ -121,15 +143,56 @@
 
     ) xwikiPage
 
-    order by lower(xwikiPage.pageName), xwikiPage.pageName
+    order by lower(xwikiPage.pageName) $order, xwikiPage.pageName $order
   </sql-query>
+#end
+
+  <!-- This query follows the SQL-2013 ANSI standard, but it uses a non-core feature F591 "Derived tables" which is
+    implemented by most of the databases (HSQLDB, MySql, Oracle, PostgreSQL) -->
+#set ($documentSortFields = {
+  'Date': 'DATE',
+  'CreationDate': 'CREATION_DATE'
+})
+#foreach ($entry in $documentSortFields.entrySet())
+#foreach ($order in ['Asc', 'Desc'])
+  <sql-query name="nestedPagesOrderedBy$entry.key$order" resultset-ref="XWikiPageReference" read-only="true">
+    <synchronize table="xwikidoc" />
+    <synchronize table="xwikispace" />
+    select xwikiPage.reference reference, xwikiPage.terminal terminal
+
+    from (
+
+        (select XWS_REFERENCE reference,
+                0 terminal,
+                XWD_$entry.value fieldValue
+            from xwikispace
+            left outer join xwikidoc on (
+                XWD_WEB = XWS_REFERENCE and
+                XWD_NAME = 'WebHome' and
+                (XWD_LANGUAGE = '' OR XWD_LANGUAGE is NULL)))
+
+        union all
+
+        (select XWD_FULLNAME reference,
+                1 terminal,
+                XWD_$entry.value fieldValue
+            from xwikidoc doc
+            where XWD_TRANSLATION = 0 and XWD_NAME &lt;&gt; 'WebHome')
+
+    ) xwikiPage
+
+    order by xwikiPage.fieldValue $order
+  </sql-query>
+#end
+#end
 
   <!-- We have to duplicate the title fall-back expression in the order by clause because PostgreSQL doesn't support the
     usage of column aliases in order by expressions (e.g. for lower(columnAlias) it throws "column 'columnAlias' does
     not exist"). See https://www.postgresql.org/docs/9.4/static/sql-select.html#SQL-ORDERBY
     For the double check on doc.XWD_LANGUAGE see comment in query "nestedPagesOrderedByTitle" above -->
   <!-- This query conforms to Core SQL-2003 ANSI standard. -->
-  <sql-query name="nonTerminalPagesOrderedByTitle" resultset-ref="XWikiPageReference" read-only="true">
+#foreach ($order in ['Asc', 'Desc'])
+  <sql-query name="nonTerminalPagesOrderedByTitle$order" resultset-ref="XWikiPageReference" read-only="true">
     <synchronize table="xwikidoc" />
     <synchronize table="xwikispace" />
     select XWS_REFERENCE reference,
@@ -143,7 +206,8 @@
             tdoc.XWD_WEB = XWS_REFERENCE and
             tdoc.XWD_NAME = 'WebHome' and
             tdoc.XWD_LANGUAGE = :locale)
-        order by lower(coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)),
-            coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)
+        order by lower(coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME)) $order,
+            coalesce(nullif(tdoc.XWD_TITLE, ''), nullif(doc.XWD_TITLE, ''), XWS_NAME) $order
   </sql-query>
+#end
 </hibernate-mapping>

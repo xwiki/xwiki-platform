@@ -100,6 +100,11 @@ async function isDirectory(path: string) {
   return stat?.isDirectory();
 }
 
+async function isEmpty(path: string) {
+  const readdir = await fs.promises.readdir(path);
+  return readdir.length == 0;
+}
+
 async function pathExists(path: string) {
   try {
     await fs.promises.lstat(path);
@@ -333,9 +338,39 @@ async function search(
   ).filter((it) => it !== undefined);
 }
 
+/**
+ * Initialize the wiki with a minimal content.
+ *
+ * @since 0.14
+ */
+async function createMinimalContent() {
+  await savePage(
+    join(HOME_PATH_FULL, "index", "page.json"),
+    "# Welcome\n" +
+      "\n" +
+      "This is a new **Cristal** wiki.\n" +
+      "\n" +
+      "You can use it to take your *own* notes.\n" +
+      "\n" +
+      "You can also create new [[pages|index/newpage]].\n" +
+      "\n" +
+      "Enjoy!",
+    "",
+  );
+}
+
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
-export default function load(): void {
+export default async function load(): Promise<void> {
+  // Check if the root directory does not exist, or exists and is empty.
+  // If that's the case, create it and populate it with a default minimal content.
+  if (
+    !(await pathExists(HOME_PATH_FULL)) ||
+    ((await isDirectory(HOME_PATH_FULL)) && (await isEmpty(HOME_PATH_FULL)))
+  ) {
+    await createMinimalContent();
+  }
+
   protocol.handle(cristalFSProtocol, async (request) => {
     const path = join(
       HOME_PATH_FULL,

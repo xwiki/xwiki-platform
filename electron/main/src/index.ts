@@ -64,8 +64,8 @@ if (process.env.NODE_ENV !== "development") {
  */
 app
   .whenReady()
-  .then(() => {
-    load();
+  .then(async () => {
+    await load();
     restoreOrCreateWindow().then((w) => {
       loadBrowser(w);
       loadAuthentication(w, loadFile);

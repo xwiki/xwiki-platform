@@ -2511,16 +2511,16 @@ importers:
     dependencies:
       '@hocuspocus/provider':
         specifier: 2.15.0
-        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)
+        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
       '@tiptap/core':
         specifier: 2.11.2
         version: 2.11.2(@tiptap/pm@2.11.2)
       '@tiptap/extension-collaboration':
         specifier: 2.11.2
-        version: 2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(@tiptap/pm@2.11.2)(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22))
+        version: 2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(@tiptap/pm@2.11.2)(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23))
       '@tiptap/extension-collaboration-cursor':
         specifier: 2.11.2
-        version: 2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22))
+        version: 2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23))
       '@tiptap/extension-heading':
         specifier: 2.11.2
         version: 2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))
@@ -2627,8 +2627,8 @@ importers:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.3)
       yjs:
-        specifier: 13.6.22
-        version: 13.6.22
+        specifier: 13.6.23
+        version: 13.6.23
     devDependencies:
       '@types/lodash':
         specifier: 4.17.14
@@ -3315,7 +3315,7 @@ importers:
     dependencies:
       '@hocuspocus/server':
         specifier: 2.15.0
-        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)
+        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
       express:
         specifier: 4.21.2
         version: 4.21.2
@@ -8575,8 +8575,8 @@ packages:
   yauzl@2.10.0:
     resolution: {integrity: sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==}
 
-  yjs@13.6.22:
-    resolution: {integrity: sha512-+mJxdbmitioqqsql1Zro4dqT3t9HgmW4dxlPtkcsKFJhXSAMyk3lwawhQFxZjj2upJXzhrTUDsaDkZgJWnv3NA==}
+  yjs@13.6.23:
+    resolution: {integrity: sha512-ExtnT5WIOVpkL56bhLeisG/N5c4fmzKn4k0ROVfJa5TY2QHbH7F0Wu2T5ZhR7ErsFWQEFafyrnSI8TPKVF9Few==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
 
   yn@3.1.1:
@@ -9110,19 +9110,19 @@ snapshots:
     dependencies:
       lib0: 0.2.98
 
-  '@hocuspocus/provider@2.15.0(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)':
+  '@hocuspocus/provider@2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
     dependencies:
       '@hocuspocus/common': 2.15.0
       '@lifeomic/attempt': 3.1.0
       lib0: 0.2.98
       ws: 8.18.0
-      y-protocols: 1.0.6(yjs@13.6.22)
-      yjs: 13.6.22
+      y-protocols: 1.0.6(yjs@13.6.23)
+      yjs: 13.6.23
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@hocuspocus/server@2.15.0(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)':
+  '@hocuspocus/server@2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
     dependencies:
       '@hocuspocus/common': 2.15.0
       async-lock: 1.4.1
@@ -9130,8 +9130,8 @@ snapshots:
       lib0: 0.2.98
       uuid: 11.0.3
       ws: 8.18.0
-      y-protocols: 1.0.6(yjs@13.6.22)
-      yjs: 13.6.22
+      y-protocols: 1.0.6(yjs@13.6.23)
+      yjs: 13.6.23
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -9533,16 +9533,16 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.11.2(@tiptap/pm@2.11.2)
 
-  '@tiptap/extension-collaboration-cursor@2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22))':
+  '@tiptap/extension-collaboration-cursor@2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23))':
     dependencies:
       '@tiptap/core': 2.11.2(@tiptap/pm@2.11.2)
-      y-prosemirror: 1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)
+      y-prosemirror: 1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
 
-  '@tiptap/extension-collaboration@2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(@tiptap/pm@2.11.2)(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22))':
+  '@tiptap/extension-collaboration@2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))(@tiptap/pm@2.11.2)(y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23))':
     dependencies:
       '@tiptap/core': 2.11.2(@tiptap/pm@2.11.2)
       '@tiptap/pm': 2.11.2
-      y-prosemirror: 1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22)
+      y-prosemirror: 1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
 
   '@tiptap/extension-document@2.11.2(@tiptap/core@2.11.2(@tiptap/pm@2.11.2))':
     dependencies:
@@ -13991,19 +13991,19 @@ snapshots:
 
   xmlbuilder@15.1.1: {}
 
-  y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.22))(yjs@13.6.22):
+  y-prosemirror@1.2.11(prosemirror-model@1.23.0)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23):
     dependencies:
       lib0: 0.2.99
       prosemirror-model: 1.23.0
       prosemirror-state: 1.4.3
       prosemirror-view: 1.37.0
-      y-protocols: 1.0.6(yjs@13.6.22)
-      yjs: 13.6.22
+      y-protocols: 1.0.6(yjs@13.6.23)
+      yjs: 13.6.23
 
-  y-protocols@1.0.6(yjs@13.6.22):
+  y-protocols@1.0.6(yjs@13.6.23):
     dependencies:
       lib0: 0.2.99
-      yjs: 13.6.22
+      yjs: 13.6.23
 
   y18n@5.0.8: {}
 
@@ -14028,7 +14028,7 @@ snapshots:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
 
-  yjs@13.6.22:
+  yjs@13.6.23:
     dependencies:
       lib0: 0.2.99
 

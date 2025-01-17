@@ -199,8 +199,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         // (ee10 in our case). This was not needed in versions of Jetty < 12 since there was a default environment used.
         int jettyVersion = extractJettyMajorVersionFromDockerTag(this.testConfiguration.getServletEngineTag());
         if (jettyVersion >= 12) {
-            this.servletContainer
-                .setCommand("--module=ext,console-capture,ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
+            this.servletContainer.setCommand("--module=ee10-apache-jsp,ee10-deploy,ee10-websocket-jakarta,http");
         } else {
             throw new Exception(String.format("Unsupported version of Jetty: [%n]", jettyVersion));
         }

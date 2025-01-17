@@ -20,7 +20,6 @@
 
 import { chrome } from "../.electron-vendors.cache.json";
 import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
-import { preload } from "unplugin-auto-expose";
 import { join } from "node:path";
 
 const PACKAGE_ROOT = __dirname;
@@ -54,7 +53,7 @@ const config = {
     emptyOutDir: true,
     reportCompressedSize: false,
   },
-  plugins: [preload.vite(), injectAppVersion()],
+  plugins: [injectAppVersion()],
 };
 
 export default config;

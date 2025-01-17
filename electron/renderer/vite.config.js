@@ -23,7 +23,6 @@
 import { chrome } from "../.electron-vendors.cache.json";
 import { injectAppVersion } from "../version/inject-app-version-plugin.mjs";
 import vue from "@vitejs/plugin-vue";
-import { renderer } from "unplugin-auto-expose";
 import { join } from "node:path";
 
 const PACKAGE_ROOT = __dirname;
@@ -65,13 +64,7 @@ const config = {
   worker: {
     format: "es",
   },
-  plugins: [
-    vue(),
-    renderer.vite({
-      preloadEntry: join(PACKAGE_ROOT, "../preload/src/index.ts"),
-    }),
-    injectAppVersion(),
-  ],
+  plugins: [vue(), injectAppVersion()],
 };
 
 export default config;

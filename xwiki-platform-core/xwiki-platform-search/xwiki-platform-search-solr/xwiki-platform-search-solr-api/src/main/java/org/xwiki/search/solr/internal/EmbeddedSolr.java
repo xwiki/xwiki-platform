@@ -134,35 +134,8 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
             // Validate and create the search core
             if (Files.exists(this.solrSearchCorePath)) {
 
-                // Due to https://jira.xwiki.org/browse/XWIKI-22741 the cache on windows was
-                // being put in the wrong place. Let's check and clean it up if we find it
-                boolean buggedCache = false; // if we find the bug, recreate the search core.
-                {
-
-                    File corePropertiesFile = getCacheCorePropertiesFile(this.solrSearchCorePath);
-                    if (corePropertiesFile.exists()) {
-                        Properties properties = new Properties();
-                        try (FileInputStream in = new FileInputStream(corePropertiesFile)) {
-                            properties.load(in);
-                        }
-
-                        String dataDirPropertyValue = properties.getProperty(DATA_DIR_PROPERTY);
-                        if (dataDirPropertyValue != null && !dataDirPropertyValue.contains(File.separator)) {
-                            // it's bugged
-                            this.logger.info("Found XWIKI-22741 bug!");
-                            buggedCache = true;
-                            File badCacheLocation = new File(corePropertiesFile.getParent(), dataDirPropertyValue);
-                            if (badCacheLocation.exists()) {
-                                this.logger.info(
-                                    "Removing old Solr Search Cache files from: " + badCacheLocation.getAbsolutePath());
-                                FileUtils.deleteDirectory(badCacheLocation);
-                            }
-                        }
-                    }
-                }
-
                 // Make sure the core setup is up to date
-                if (buggedCache || !isSearchCoreValid()) {
+                if (!isSearchCoreValid()) {
                     // Recreate the home folder
                     recreateSearchCore();
                 }
@@ -346,8 +319,35 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return -1;
     }
 
-    private boolean isSearchCoreValid()
+    private boolean isSearchCoreValid() throws IOException
     {
+
+        // Due to https://jira.xwiki.org/browse/XWIKI-22741 the cache on windows was
+        // being put in the wrong place. Let's check and clean it up if we find it
+        {
+
+            File corePropertiesFile = getCacheCorePropertiesFile(this.solrSearchCorePath);
+            if (corePropertiesFile.exists()) {
+                Properties properties = new Properties();
+                try (FileInputStream in = new FileInputStream(corePropertiesFile)) {
+                    properties.load(in);
+                }
+
+                String dataDirPropertyValue = properties.getProperty(DATA_DIR_PROPERTY);
+                if (dataDirPropertyValue != null && !dataDirPropertyValue.contains(File.separator)) {
+                    // it's bugged
+                    this.logger.info("Found XWIKI-22741 bug!");
+                    File badCacheLocation = new File(corePropertiesFile.getParent(), dataDirPropertyValue);
+                    if (badCacheLocation.exists()) {
+                        this.logger
+                            .info("Removing old Solr Search Cache files from: " + badCacheLocation.getAbsolutePath());
+                        FileUtils.deleteDirectory(badCacheLocation);
+                    }
+                    return false;
+                }
+            }
+        }
+
         // Exists but is unusable.
         if (!Files.isDirectory(this.solrSearchCorePath) || !Files.isWritable(this.solrSearchCorePath)
             || !Files.isReadable(this.solrSearchCorePath)) {

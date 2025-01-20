@@ -31,7 +31,7 @@ define('xwiki-selectize', [
   'xwiki-events-bridge'
 ], function($, Selectize, l10n) {
   var optionTemplate = [
-    '<div class="xwiki-selectize-option" role="option" aria-selected="false" data-value="">',
+    '<div class="xwiki-selectize-option" data-value="">',
       '<span class="xwiki-selectize-option-icon"></span>',
       '<span class="xwiki-selectize-option-label"></span>',
     '</div>'
@@ -206,10 +206,6 @@ define('xwiki-selectize', [
     let oldOnOptionSelect = this.selectize.onOptionSelect;
     this.selectize.onOptionSelect = function(...args) {
       const result = oldOnOptionSelect.apply(this, args);
-      // clear aria-selected state on all previously selected elements first
-      this.get$('dropdown').find('.option').attr('aria-selected','false');
-      // then set the aria-selected state of the newly selected element.
-      this.get$('dropdown').find('.selected').attr('aria-selected','true');
       return result;
     }
     let oldSetActiveOption = this.selectize.setActiveOption;

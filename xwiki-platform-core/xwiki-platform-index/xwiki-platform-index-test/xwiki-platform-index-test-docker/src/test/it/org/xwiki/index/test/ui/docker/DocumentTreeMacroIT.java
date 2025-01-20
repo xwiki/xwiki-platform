@@ -33,6 +33,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
@@ -72,24 +73,24 @@ class DocumentTreeMacroIT
         setup.deletePage(testReference, true);
 
         // Setup.
-        setup.createPage(carolSecond, "", "Second");
+        createPage(setup, carolSecond, "Second");
         // Make sure the creation date is different for each document (taking into account that milliseconds are lost
         // when the date is saved in the database), otherwise we can't verify the sort on creation date.
         Thread.sleep(1000);
-        setup.createPage(george, "", "2. George");
+        createPage(setup, george, "2. George");
         Thread.sleep(1000);
-        setup.createPage(alice, "", "3. Alice");
+        createPage(setup, alice, "3. Alice");
         Thread.sleep(1000);
-        setup.createPage(bob, "", "1. Bob");
+        createPage(setup, bob, "1. Bob");
 
         Thread.sleep(1000);
-        setup.createPage(eve, "", "3. Eve");
+        createPage(setup, eve, "3. Eve");
         Thread.sleep(1000);
-        setup.createPage(henry, "", "1. Henry");
+        createPage(setup, henry, "1. Henry");
         Thread.sleep(1000);
-        setup.createPage(fionaThird, "", "Third");
+        createPage(setup, fionaThird, "Third");
         Thread.sleep(1000);
-        setup.createPage(denis, "", "2. Denis");
+        createPage(setup, denis, "2. Denis");
 
         // Make sure the last modification date is different for each document (taking into account that milliseconds
         // are lost when the date is saved in the database), otherwise we can't verify the sort on modification date.
@@ -170,6 +171,13 @@ class DocumentTreeMacroIT
         assertNodeLabels(tree.getTopLevelNodes(), "Fiona", "3. Eve", "2. Denis", "1. Henry");
     }
 
+    private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title)
+    {
+        // We don't care what parent page is used, we just want to avoid creating orphan pages in order to not interfere
+        // with other tests in this module.
+        return setup.createPage(documentReference, "", title, "xwiki/2.1", "Main.WebHome");
+    }
+
     private TreeElement getDocumentTree(TestUtils setup, TestReference testReference, Map<String, Object> parameters)
     {
         parameters = new HashMap<>(parameters);
@@ -180,7 +188,7 @@ class DocumentTreeMacroIT
         StringBuilder content = new StringBuilder("{{documentTree");
         parameters.forEach((key, value) -> content.append(" ").append(key).append("='").append(value).append("'"));
         content.append("/}}");
-        setup.createPage(testReference, content.toString(), "");
+        setup.createPage(testReference, content.toString(), "", "xwiki/2.1", "Main.WebHome");
         return new TreeElement(setup.getDriver().findElement(By.id(id))).waitForIt();
     }
 
@@ -190,7 +198,7 @@ class DocumentTreeMacroIT
         StringBuilder content = new StringBuilder("{{children");
         parameters.forEach((key, value) -> content.append(" ").append(key).append("='").append(value).append("'"));
         content.append("/}}");
-        setup.createPage(parentReference, content.toString(), "");
+        setup.createPage(parentReference, content.toString(), "", "xwiki/2.1", "Main.WebHome");
         return new TreeElement(setup.getDriver().findElement(By.cssSelector("#xwikicontent .xtree"))).waitForIt();
     }
 

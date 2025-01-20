@@ -50,6 +50,7 @@ import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 
+import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -367,18 +368,39 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
     }
 
+    private String getDockerImageHash(TestConfiguration testConfiguration)
+    {
+        // Not using try-with-resources since the global docker client should never be closed (triggers an
+        // IllegalStateException)
+        InspectImageResponse inspectImageResponse =
+            DockerClientFactory.instance().client().inspectImageCmd(getBaseImageName(testConfiguration)).exec();
+        String imageId = inspectImageResponse.getId();
+        String prefix = "sha256:";
+        if (imageId.startsWith(prefix)) {
+            imageId = imageId.substring(prefix.length());
+        }
+        return imageId;
+    }
+
+    private String getBaseImageName(TestConfiguration testConfiguration)
+    {
+        return String.format("%s:%s",
+            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
+    }
+
     private GenericContainer<?> createServletContainer() throws Exception
     {
-        String baseImageName = String.format("%s:%s",
-            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
+        String baseImageName = getBaseImageName(testConfiguration);
+        LOGGER.info("Get base image name: {}", baseImageName);
         GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
             // So we compute a name for the image we will build, and we check that the image does not exist yet.
-            String imageName = String.format("xwiki-%s-office:%s",
+            String imageName = String.format("xwiki-%s-%s-office:%s",
                 this.testConfiguration.getServletEngine().name().toLowerCase(),
-                getDockerImageTag(this.testConfiguration));
+                getDockerImageTag(testConfiguration),
+                getDockerImageHash(this.testConfiguration));
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");

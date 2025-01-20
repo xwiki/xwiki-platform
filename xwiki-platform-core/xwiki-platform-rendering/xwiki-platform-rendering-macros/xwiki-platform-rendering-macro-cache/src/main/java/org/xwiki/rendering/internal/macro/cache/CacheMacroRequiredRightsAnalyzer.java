@@ -23,8 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightReporter;
+import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
 import org.xwiki.rendering.block.MacroBlock;
 
 /**
@@ -43,7 +43,10 @@ public class CacheMacroRequiredRightsAnalyzer implements MacroRequiredRightsAnal
     @Override
     public void analyze(MacroBlock macroBlock, MacroRequiredRightReporter reporter)
     {
-        reporter.analyzeContent(macroBlock, macroBlock.getParameter("id"));
+        macroBlock.getParameters().entrySet().stream()
+            .filter(entry -> "id".equalsIgnoreCase(entry.getKey()))
+            .forEach(entry -> reporter.analyzeContent(macroBlock, entry.getValue()));
+
         reporter.analyzeContent(macroBlock, macroBlock.getContent());
     }
 }

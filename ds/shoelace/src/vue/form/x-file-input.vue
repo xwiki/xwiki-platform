@@ -69,6 +69,12 @@ is not supported by shoelace currently.
 </template>
 
 <style scoped>
+.input {
+  display: flex;
+  align-items: center;
+  padding: var(--cr-spacing-small);
+}
+
 .input--medium {
   border-radius: var(--sl-input-border-radius-medium);
   font-size: var(--sl-input-font-size-medium);

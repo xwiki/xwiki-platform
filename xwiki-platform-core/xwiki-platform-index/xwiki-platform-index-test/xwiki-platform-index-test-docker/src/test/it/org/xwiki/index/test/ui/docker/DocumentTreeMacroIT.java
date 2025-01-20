@@ -118,15 +118,15 @@ class DocumentTreeMacroIT
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "name:desc"));
         assertNodeLabels(tree.getTopLevelNodes(), "2. George", "Carol", "1. Bob", "3. Alice");
 
-        // Sort by last modification date descending.
+        // Sort by last modification date descending (null values last).
         tree = getDocumentTree(setup, testReference,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "date:desc"));
-        assertNodeLabels(tree.getTopLevelNodes(), "Carol", "3. Alice", "1. Bob", "2. George");
+        assertNodeLabels(tree.getTopLevelNodes(), "3. Alice", "1. Bob", "2. George", "Carol");
 
-        // Sort by creation date ascending.
+        // Sort by creation date ascending (null values last).
         tree = getDocumentTree(setup, testReference,
             Map.of("showTerminalDocuments", false, "sortDocumentsBy", "creationDate"));
-        assertNodeLabels(tree.getTopLevelNodes(), "Carol", "2. George", "3. Alice", "1. Bob");
+        assertNodeLabels(tree.getTopLevelNodes(), "2. George", "3. Alice", "1. Bob", "Carol");
 
         // Let's check also the order of descendant pages (where we mix terminal and non-terminal pages).
 
@@ -143,14 +143,14 @@ class DocumentTreeMacroIT
             getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "title:desc"));
         assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "Fiona", "3. Eve", "2. Denis", "1. Henry");
 
-        // Sort by last modification date ascending.
+        // Sort by last modification date ascending (null values last).
         tree = getDocumentTree(setup, testReference, Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "date:asc"));
-        assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "Fiona", "1. Henry", "2. Denis", "3. Eve");
+        assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "1. Henry", "2. Denis", "3. Eve", "Fiona");
 
-        // Sort by creation date descending.
+        // Sort by creation date descending (null values last).
         tree = getDocumentTree(setup, testReference,
             Map.of("openTo", getNodeId(alice), "sortDocumentsBy", "creationDate:desc"));
-        assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "Fiona", "2. Denis", "1. Henry", "3. Eve");
+        assertNodeLabels(tree.getNode(getNodeId(alice)).getChildren(), "2. Denis", "1. Henry", "3. Eve", "Fiona");
 
         // Verify the sort on the Children macro, which is a simple wrapper around the Document Tree macro.
 
@@ -166,9 +166,9 @@ class DocumentTreeMacroIT
         tree = getChildrenTree(setup, alice, Map.of("sort", "title:desc"));
         assertNodeLabels(tree.getTopLevelNodes(), "Fiona", "3. Eve", "2. Denis", "1. Henry");
 
-        // Sort by last modification date descending.
+        // Sort by last modification date descending (null values last).
         tree = getChildrenTree(setup, alice, Map.of("sort", "date:desc"));
-        assertNodeLabels(tree.getTopLevelNodes(), "Fiona", "3. Eve", "2. Denis", "1. Henry");
+        assertNodeLabels(tree.getTopLevelNodes(), "3. Eve", "2. Denis", "1. Henry", "Fiona");
     }
 
     private ViewPage createPage(TestUtils setup, DocumentReference documentReference, String title)

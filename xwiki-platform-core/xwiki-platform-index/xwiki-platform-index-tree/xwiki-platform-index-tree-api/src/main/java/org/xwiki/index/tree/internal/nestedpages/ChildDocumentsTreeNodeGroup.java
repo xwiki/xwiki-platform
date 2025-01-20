@@ -197,7 +197,8 @@ public class ChildDocumentsTreeNodeGroup extends AbstractChildDocumentsTreeNodeG
                 // We need the space home page to be able to sort by creation date and last modification date.
                 statement.append(" left outer join XWikiDocument doc on doc.space = space.reference");
                 statement.append(" and doc.name = 'WebHome' and doc.translation = 0");
-                statement.append(String.format(" order by doc.%s %s", fieldName, order.toLowerCase()));
+                // Put null values (coming from missing space home pages) last.
+                statement.append(String.format(" order by doc.%s %s nulls last", fieldName, order.toLowerCase()));
             } else {
                 statement
                     .append(String.format(" order by lower(space.name) %1$s, space.name %1$s", order.toLowerCase()));

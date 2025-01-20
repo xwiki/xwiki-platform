@@ -181,7 +181,7 @@
 
     ) xwikiPage
 
-    order by xwikiPage.fieldValue $order
+    order by case when xwikiPage.fieldValue is null then 1 else 0 end, xwikiPage.fieldValue $order
   </sql-query>
 #end
 #end

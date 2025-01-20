@@ -41,6 +41,29 @@ export default function initLinkExtension(
   }
 
   return Link.extend({
+    addAttributes() {
+      const parents = this.parent?.();
+      return {
+        ...parents,
+        external: {
+          default: null,
+          renderHTML(attributes) {
+            const classes = [];
+            // Add the wikiexternallink class on links that are not marked as internal.
+            // We do so by checking if the 'internal-link' class is defined on the element.
+            if (
+              !attributes.class ||
+              !attributes.class.split(" ").includes("internal-link")
+            ) {
+              classes.push("wikiexternallink");
+            }
+            return {
+              class: classes.join(" "),
+            };
+          },
+        },
+      };
+    },
     addStorage() {
       return {
         markdown: {

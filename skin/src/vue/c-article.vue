@@ -260,4 +260,29 @@ watch(
 .doc-header-inner {
   padding: 0;
 }
+
+/* External links style. */
+:deep(.wikiexternallink) {
+  font-style: italic;
+  position: relative;
+  display: inline-flex;
+}
+
+:deep(.wikiexternallink a:after),
+:deep(a.wikiexternallink:after) {
+  /*
+  TODO: Try to make this customisable, it is dependant on bootstrap icons for now.
+  */
+  content: "\F1C5";
+  display: inline-block;
+  font-family: bootstrap-icons;
+  font-style: normal;
+  font-weight: bold;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  font-size: 0.7rem;
+  text-decoration: none;
+  margin-left: 4px;
+}
 </style>

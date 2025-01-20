@@ -321,10 +321,6 @@ TODO: these rules about opening and closing the sidebar should be better organiz
 WIKI STYLES
 TODO: Discuss and move them to a more appropriate place
 */
-:deep(.wikiexternallink) {
-  font-style: italic;
-}
-
 @container xwCristal (max-width: 600px) {
   :deep(.wrapper.sidebar-is-collapsed) {
     &:has(.main-sidebar.is-visible) {

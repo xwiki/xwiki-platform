@@ -360,7 +360,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         start(this.servletContainer, this.testConfiguration);
     }
 
-    private String getDockerImageTag(TestConfiguration testConfiguration)
+    private String getDockerImageTag()
     {
         // TODO: We currently cannot use Tomcat 10.x as it corresponds to a package change for JakartaEE and we'll need
         // XWiki to move to the new packages first. This is why we force an older version for Tomcat.
@@ -368,12 +368,16 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             : (testConfiguration.getServletEngine().equals(ServletEngine.TOMCAT) ? "9-jdk17" : LATEST);
     }
 
-    private String getDockerImageHash(TestConfiguration testConfiguration)
+    private String getDockerImageHash() throws InterruptedException
     {
         // Not using try-with-resources since the global docker client should never be closed (triggers an
         // IllegalStateException)
+        DockerClientFactory.instance().client()
+            .pullImageCmd(this.testConfiguration.getServletEngine().getDockerImageName())
+            .withTag(getDockerImageTag())
+            .start().awaitCompletion();
         InspectImageResponse inspectImageResponse =
-            DockerClientFactory.instance().client().inspectImageCmd(getBaseImageName(testConfiguration)).exec();
+            DockerClientFactory.instance().client().inspectImageCmd(getBaseImageName()).exec();
         String imageId = inspectImageResponse.getId();
         String prefix = "sha256:";
         if (imageId.startsWith(prefix)) {
@@ -382,15 +386,15 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         return imageId;
     }
 
-    private String getBaseImageName(TestConfiguration testConfiguration)
+    private String getBaseImageName()
     {
         return String.format("%s:%s",
-            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
+            this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag());
     }
 
     private GenericContainer<?> createServletContainer() throws Exception
     {
-        String baseImageName = getBaseImageName(testConfiguration);
+        String baseImageName = getBaseImageName();
         LOGGER.info("Get base image name: {}", baseImageName);
         GenericContainer<?> container;
 
@@ -399,8 +403,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             // So we compute a name for the image we will build, and we check that the image does not exist yet.
             String imageName = String.format("xwiki-%s-%s-office:%s",
                 this.testConfiguration.getServletEngine().name().toLowerCase(),
-                getDockerImageTag(testConfiguration),
-                getDockerImageHash(this.testConfiguration));
+                getDockerImageTag(),
+                getDockerImageHash());
 
             // We rebuild every time the LibreOffice version changes
             String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");

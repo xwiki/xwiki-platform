@@ -30,6 +30,6 @@
     "electron": "34.0.0",
     "electron-builder": "25.1.8",
     "typescript": "5.7.3",
-    "vite": "6.0.9"
+    "vite": "6.0.11"
   }
 }

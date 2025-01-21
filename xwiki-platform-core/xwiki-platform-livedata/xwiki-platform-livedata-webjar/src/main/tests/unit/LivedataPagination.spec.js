@@ -37,7 +37,8 @@ import _ from "lodash";
  *           maxShownPages: 10,
  *           showEntryRange: true,
  *           showPageSizeDropdown: true,
- *           pageSizes: [10, 20, 30]
+ *           pageSizes: [10, 20, 30],
+ *           showPaginationOnSinglePage: true
  *         }
  *       },
  *       query: { limit: 20 },
@@ -75,7 +76,8 @@ function initWrapper({provide} = {}) {
               maxShownPages: 10,
               showEntryRange: true,
               showPageSizeDropdown: true,
-              pageSizes: [10, 20, 30, 100]
+              pageSizes: [10, 20, 30, 100],
+              showPaginationOnSinglePage: true
             }
           },
           query: {limit: 20},
@@ -166,5 +168,22 @@ describe('LivedataPagination.vue', () => {
     expect(pageNavs.at(0).text()).toBe("1");
     expect(pageNavs.at(1).text()).toBe("2");
     expect(pageNavs.at(2).text()).toBe("3");
+  });
+  
+  it('Displays the pagination indexes when there is only one page and the option to display it is OFF', () => {
+    const wrapper = initWrapper({
+      provide: {
+        logic: {
+          data: {
+            meta: {
+              pagination: {
+                showPaginationOnSinglePage: false
+              }
+            }
+          }
+        }
+      }
+    });
+    expect(wrapper.findAll('.livedata-pagination').length).toBe(0);
   })
 })

@@ -1,0 +1,18 @@
+// .backportrc.json
+{
+  // example repo info
+  "repoOwner": "xwiki",
+  "repoName": "xwiki-platform",
+
+  // the branches available to backport to
+  "targetBranchChoices": [],
+
+  // In this case, adding the label "backport-production" will backport the PR to the "production" branch
+  "branchLabelMapping": {
+    "^backport-(.+)$": "$1"
+  },
+  "autoAssign": true,
+  "publishStatusCommentOnAbort": true,
+  "publishStatusCommentOnFailure": true,
+  "copySourcePRReviewers": true
+}

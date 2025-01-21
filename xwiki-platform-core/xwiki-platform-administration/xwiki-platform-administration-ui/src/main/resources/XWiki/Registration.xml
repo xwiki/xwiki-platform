@@ -350,7 +350,7 @@
     ## We need to trim the output so that we can keep indentations in the validation script.
     #set ($validationText = $stringtool.trim("#validateFields($fields, $request)"))
     $validationText##
-    ## If server side validation was successfull, create the user
+    ## If server side validation was successful, create the user
     #if($allFieldsValid)
       #createUser($fields, $request, $response, $doAfterRegistration)
     #end

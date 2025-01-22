@@ -1,6 +1,9 @@
 {
   "third": "Third",
   "page.actions.create.label": "Create a new document",
+  "page.creation.menu.alert.content": "The page {pageName} already exists.",
+  "page.creation.menu.alert.content.edit": "The page {pageName} already exists, either use another name or {link}.",
+  "page.creation.menu.alert.content.edit.link": "edit the existing page",
   "page.creation.menu.button": "New Page",
   "page.creation.menu.field.location": "Parent location",
   "page.creation.menu.field.name": "Name",

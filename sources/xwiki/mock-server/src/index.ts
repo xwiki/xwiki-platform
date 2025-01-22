@@ -87,8 +87,8 @@ ${revision ? "Revision " + revision : ""}
       break;
 
     case "Main.NewPage.WebHome":
-      name = "NewPage";
-      break;
+      res.sendStatus(404);
+      return;
 
     default:
       page = id;

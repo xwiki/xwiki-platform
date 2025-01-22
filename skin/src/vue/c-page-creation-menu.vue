@@ -48,7 +48,9 @@ const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
 const namePlaceholder: Ref<string> = ref("");
 const location: Ref<string> = ref("");
+const existingPage: Ref<PageData | undefined> = ref(undefined);
 var locationReference: SpaceReference | undefined = undefined;
+let newDocumentReference: string = "";
 
 defineProps<{
   currentPage: PageData;
@@ -68,19 +70,27 @@ function updateCurrentPage() {
   name.value = "";
 }
 
-function createPage() {
+async function createPage() {
   const newDocumentName = name.value ? name.value : namePlaceholder.value;
-  const newDocumentReference = referenceHandler.createDocumentReference(
-    newDocumentName,
-    locationReference!,
-  );
+  newDocumentReference = referenceSerializer.serialize(
+    referenceHandler.createDocumentReference(
+      newDocumentName,
+      locationReference!,
+    ),
+  )!;
 
-  cristal.setCurrentPage(
-    referenceSerializer.serialize(newDocumentReference)!,
-    "edit",
-  );
+  existingPage.value = await cristal.getPage(newDocumentReference);
 
+  if (!existingPage.value) {
+    cristal.setCurrentPage(newDocumentReference, "edit");
+
+    dialogOpen.value = false;
+  }
+}
+
+function editExistingPage() {
   dialogOpen.value = false;
+  cristal.setCurrentPage(newDocumentReference, "edit");
 }
 </script>
 
@@ -103,6 +113,62 @@ function createPage() {
     </template>
     <template #default>
       <div id="new-page-content" class="grid">
+        <!-- We need 2 different divs to implement the following behavior:
+               - Use max available width from the parent
+               - Do not resize the parent if the content is larger -->
+        <div class="alerts-wrapper">
+          <div class="alerts">
+            <!-- Indicate that the selected page already exists. -->
+            <x-alert v-if="existingPage !== undefined" type="error">
+              <i18n-t
+                v-if="!existingPage!.canEdit"
+                keypath="page.creation.menu.alert.content"
+                tag="span"
+              >
+                <template #pageName>
+                  <a
+                    :href="
+                      cristal.getRouter().resolve({
+                        name: 'view',
+                        params: { page: newDocumentReference },
+                      }).href
+                    "
+                    >{{ newDocumentReference }}</a
+                  >
+                </template>
+              </i18n-t>
+              <i18n-t
+                v-else
+                keypath="page.creation.menu.alert.content.edit"
+                tag="span"
+              >
+                <template #pageName>
+                  <a
+                    :href="
+                      cristal.getRouter().resolve({
+                        name: 'view',
+                        params: { page: newDocumentReference },
+                      }).href
+                    "
+                    >{{ newDocumentReference }}</a
+                  >
+                </template>
+                <template #link>
+                  <a
+                    :href="
+                      cristal.getRouter().resolve({
+                        name: 'edit',
+                        params: { page: newDocumentReference },
+                      }).href
+                    "
+                    @click.prevent="editExistingPage"
+                    >{{ t("page.creation.menu.alert.content.edit.link") }}</a
+                  >
+                </template>
+              </i18n-t>
+            </x-alert>
+          </div>
+        </div>
         <x-form class="subgrid" @form-submit="createPage">
           <x-text-field
             v-model="name"
@@ -169,6 +235,13 @@ function createPage() {
   gap: 0.5rem;
 }
 
+.alerts-wrapper {
+  display: flex;
+}
+.alerts {
+  flex-grow: 1;
+  width: 0;
+}
 input[type="submit"] {
   display: none;
 }

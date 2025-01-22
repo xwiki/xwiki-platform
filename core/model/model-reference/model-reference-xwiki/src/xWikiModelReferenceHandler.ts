@@ -22,13 +22,10 @@ import {
   AttachmentReference,
   DocumentReference,
   EntityType,
+  SpaceReference,
 } from "@xwiki/cristal-model-api";
 import { injectable } from "inversify";
-import type {
-  EntityReference,
-  SpaceReference,
-  WikiReference,
-} from "@xwiki/cristal-model-api";
+import type { EntityReference, WikiReference } from "@xwiki/cristal-model-api";
 import type { ModelReferenceHandler } from "@xwiki/cristal-model-reference-api";
 
 /**
@@ -42,8 +39,8 @@ export class XWikiModelReferenceHandler implements ModelReferenceHandler {
     name: string,
     space: SpaceReference,
   ): DocumentReference {
-    space.names.push(name);
-    return new DocumentReference("WebHome", space);
+    const newSpace = new SpaceReference(space.wiki, ...space.names, name);
+    return new DocumentReference("WebHome", newSpace);
   }
 
   getTitle(reference: EntityReference): string {

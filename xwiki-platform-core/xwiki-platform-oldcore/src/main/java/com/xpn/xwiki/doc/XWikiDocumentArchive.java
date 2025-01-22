@@ -55,22 +55,22 @@ public class XWikiDocumentArchive
     private long id;
 
     /** SortedMap from Version to XWikiRCSNodeInfo. */
-    private SortedMap<Version, XWikiRCSNodeInfo> versionToNode = new TreeMap<Version, XWikiRCSNodeInfo>();
+    private SortedMap<Version, XWikiRCSNodeInfo> versionToNode = new TreeMap<>();
 
     /**
      * SortedSet of Version - versions which has full document, not patch. Latest version is always full.
      */
-    private SortedSet<Version> fullVersions = new TreeSet<Version>();
+    private SortedSet<Version> fullVersions = new TreeSet<>();
 
     // store-specific information
     /** Set of {@link XWikiRCSNodeInfo} which need to delete. */
-    private Set<XWikiRCSNodeInfo> deletedNodes = new TreeSet<XWikiRCSNodeInfo>();
+    private Set<XWikiRCSNodeInfo> deletedNodes = new TreeSet<>();
 
     /** Set of {@link XWikiRCSNodeInfo} which need to saveOrUpdate. */
-    private Set<XWikiRCSNodeInfo> updatedNodeInfos = new TreeSet<XWikiRCSNodeInfo>();
+    private Set<XWikiRCSNodeInfo> updatedNodeInfos = new TreeSet<>();
 
     /** Set of {@link XWikiRCSNodeContent} which need to update. */
-    private Set<XWikiRCSNodeContent> updatedNodeContents = new TreeSet<XWikiRCSNodeContent>();
+    private Set<XWikiRCSNodeContent> updatedNodeContents = new TreeSet<>();
 
     /**
      * @param wikiReference the wiki of the document
@@ -212,11 +212,11 @@ public class XWikiDocumentArchive
     {
         int[] ito = lowerBound.getNumbers();
         // We do perform this call because by default subMap considers the first argument as inclusive and the second
-        // as exclusive. So if we call subMap(2.2,2.2) and we do have a version 2.2 it will return no version.
-        // So if getNodes is called with [2.2,2.2] submap will be called with (2.2,2.1): first argument is inclusive,
-        // and second exclusive but it's a lower bound than 2.2, so 2.2 version will be retrieved.
+        // as exclusive. So if we call "subMap(2.2,2.2)" and we do have a version 2.2 it will return no version.
+        // So if getNodes is called with "[2.2,2.2]" submap will be called with "(2.2,2.1)": first argument is
+        // inclusive, and second exclusive, but it's a lower bound than 2.2, so 2.2 version will be retrieved.
         // Note that it works because we never have a version X.0 in XWiki: we always have X.1, so if we want to get
-        // [2.1,2.1] it will look for (2.1,2.0) and it works.
+        // "[2.1,2.1]", it will look for "(2.1,2.0)" and it works.
         if (ito.length > 1) {
             ito[1]--;
         }
@@ -230,7 +230,7 @@ public class XWikiDocumentArchive
         for (XWikiRCSNodeInfo node : versions) {
             updateNode(node);
         }
-        if (getNodes().size() > 0) {
+        if (!getNodes().isEmpty()) {
             // ensure latest version is full
             getLatestNode().setDiff(false);
             updateNode(getLatestNode());
@@ -239,7 +239,7 @@ public class XWikiDocumentArchive
 
     /**
      * @param context - used for load nodes content
-     * @return serialization of class used in {@link com.xpn.xwiki.plugin.packaging.PackagePlugin}.
+     * @return serialization of class
      * @throws XWikiException if any error
      */
     public String getArchive(XWikiContext context) throws XWikiException
@@ -249,7 +249,7 @@ public class XWikiDocumentArchive
     }
 
     /**
-     * Deserialize class. Used in {@link com.xpn.xwiki.plugin.packaging.PackagePlugin}.
+     * Deserialize class.
      *
      * @param text - archive in JRCS format
      * @throws XWikiException if parse error
@@ -268,7 +268,7 @@ public class XWikiDocumentArchive
                 this.updatedNodeContents.add(nodeContent);
             }
         } catch (Exception e) {
-            Object[] args = {text, Long.valueOf(getId())};
+            Object[] args = {text, getId() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
                 "Exception while constructing archive for JRCS string [{0}] for document [{1}]", e, args);
         }
@@ -362,7 +362,7 @@ public class XWikiDocumentArchive
             updateNode(niBefore);
             getUpdatedNodeContents().add(ncBefore);
         }
-        // if (firstVersionBefore == null) => nothing else to do, except delete
+        // If (firstVersionBefore == null) => nothing else to do, except delete
         for (Iterator<XWikiRCSNodeInfo> it = getNodes(upperBound, lowerBound).iterator(); it.hasNext();) {
             XWikiRCSNodeInfo ni = it.next();
             this.fullVersions.remove(ni.getId().getVersion());
@@ -399,7 +399,7 @@ public class XWikiDocumentArchive
 
             return doc;
         } catch (Exception e) {
-            Object[] args = {version.toString(), Long.valueOf(getId())};
+            Object[] args = {version.toString(), getId() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                 "Exception while reading version [{0}] for document id [{1,number}]", e, args);
@@ -420,7 +420,7 @@ public class XWikiDocumentArchive
         Version nextFullVersion = getNextFullVersion(version);
 
         List<XWikiRCSNodeContent> lstContent = loadRCSNodeContents(version, nextFullVersion, context);
-        List<String> origText = new ArrayList<String>();
+        List<String> origText = new ArrayList<>();
         for (XWikiRCSNodeContent nodeContent : lstContent) {
             nodeContent.getPatch().patch(origText);
         }
@@ -440,7 +440,7 @@ public class XWikiDocumentArchive
     /** @return latest version in history for document. null if none. */
     public Version getLatestVersion()
     {
-        return this.versionToNode.size() == 0 ? null : (Version) this.versionToNode.firstKey();
+        return this.versionToNode.isEmpty() ? null : this.versionToNode.firstKey();
     }
 
     /** @return latest node in history for document. null if none. */
@@ -457,7 +457,7 @@ public class XWikiDocumentArchive
     {
         // headMap is exclusive
         SortedMap<Version, XWikiRCSNodeInfo> headmap = this.versionToNode.headMap(ver);
-        return (headmap.size() == 0) ? null : headmap.lastKey();
+        return headmap.isEmpty() ? null : headmap.lastKey();
     }
 
     /**
@@ -514,7 +514,7 @@ public class XWikiDocumentArchive
     private List<XWikiRCSNodeContent> loadRCSNodeContents(Version lowerBound, Version upperBound, XWikiContext context)
         throws XWikiException
     {
-        List<XWikiRCSNodeContent> result = new ArrayList<XWikiRCSNodeContent>();
+        List<XWikiRCSNodeContent> result = new ArrayList<>();
         for (XWikiRCSNodeInfo nodeInfo : getNodes(upperBound, lowerBound)) {
             XWikiRCSNodeContent nodeContent = nodeInfo.getContent(context);
             result.add(nodeContent);

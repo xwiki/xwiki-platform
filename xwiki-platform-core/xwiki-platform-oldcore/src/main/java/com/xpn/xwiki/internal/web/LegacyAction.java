@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.internal.web;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 
 import com.xpn.xwiki.web.XWikiAction;
 
@@ -41,6 +42,23 @@ public interface LegacyAction
      * @param servletRequest the request passed to the servlet
      * @param servletResponse the response passed to the servlet
      * @throws Exception when the action produces an unexptected error
+     * @deprecated use {@link #execute(HttpServletRequest, HttpServletResponse)} instead
      */
-    void execute(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws Exception;
+    @Deprecated(since = "17.0.0RC1")
+    default void execute(javax.servlet.http.HttpServletRequest servletRequest,
+        javax.servlet.http.HttpServletResponse servletResponse) throws Exception
+    {
+        execute(JakartaServletBridge.toJakarta(servletRequest), JakartaServletBridge.toJakarta(servletResponse));
+    }
+
+    /**
+     * @param servletRequest the request passed to the servlet
+     * @param servletResponse the response passed to the servlet
+     * @throws Exception when the action produces an unexptected error
+     * @since 17.0.0RC1
+     */
+    default void execute(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws Exception
+    {
+        execute(JakartaServletBridge.toJavax(servletRequest), JakartaServletBridge.toJavax(servletResponse));
+    }
 }

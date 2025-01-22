@@ -28,7 +28,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
+    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<>();
 
     /** Token for guest user. */
     private String guestToken;
@@ -172,6 +173,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         if (token == null || token.isEmpty() || !storedToken.equals(token)) {
             this.logger.warn("Secret CSRF token verification failed (token: [{}], stored token: [{}])", token,
                 storedToken);
+
             return false;
         }
         return true;
@@ -241,8 +243,9 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     {
         Request request = this.container.getRequest();
         if (request instanceof ServletRequest servletRequest) {
-            return servletRequest.getHttpServletRequest();
+            return servletRequest.getRequest();
         }
+
         throw new RuntimeException("Not supported request type");
     }
 

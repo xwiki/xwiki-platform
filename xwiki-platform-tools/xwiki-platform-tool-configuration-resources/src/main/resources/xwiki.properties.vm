@@ -1001,6 +1001,15 @@ distribution.automaticStartOnWiki=$xwikiPropertiesAutomaticStartOnWiki
 #-# The default is:
 # url.trustedSchemes=http,https,ftp
 
+#-# [Since JAKARTA]
+#-# By default, XWiki will try its best to force the application server to let any URL go through despite their default
+#-# protections and what Servlet 6.0 recommend.
+#-# The point of this option is to allow disabling this bypass of the application server default protections.
+#-# For example, if you are using the same application server for something else than XWiki.
+#-#
+#-# The default is:
+# url.forceAllowAnyCharacter=true
+
 #-------------------------------------------------------------------------------------
 # Attachment
 #-------------------------------------------------------------------------------------
@@ -1621,5 +1630,15 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# Configure the timeout in seconds for downloading an image via HTTP to embed it into the XML diff output as data URI.
 #-# Default is 10 seconds.
 # diff.xml.dataURI.httpTimeout = 10
+
+#-------------------------------------------------------------------------------------
+# Container
+#-------------------------------------------------------------------------------------
+
+#-# [Since 17.0.0RC1]
+#-# "true" if the relative redirect URLs should be resolved by XWiki instead of the application server.
+#-# 
+#-# Default is "true".
+# container.request.resolveRelativeRedirect=true
 
 $!xwikiPropertiesAdditionalProperties

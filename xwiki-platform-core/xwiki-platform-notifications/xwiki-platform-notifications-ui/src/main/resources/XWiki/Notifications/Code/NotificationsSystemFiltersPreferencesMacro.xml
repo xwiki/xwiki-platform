@@ -134,7 +134,7 @@
   ]
 });
 
-require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 'vue', 'xwiki-platform-notifications-webjar'], function ($, l10n, Vue, notifications) {
+require(['jquery', 'xwiki-l10n!notifications-system-filters-preferences-macro', 'vue', 'xwiki-platform-notifications-webjar', 'xwiki-bootstrap-switch'], function ($, l10n, Vue, notifications) {
   Vue.component('DisplayerToggle', notifications.DisplayerToggle)
   Vue.component('DisplayerStaticList', notifications.DisplayerStaticList);
 

@@ -189,6 +189,7 @@ async function onDocumentUpdate(page: PageData) {
   let currentParent: string | undefined = undefined;
   let currentItems: TreeItem[] | undefined = rootNodes.value;
   let notFound = false;
+  let isRoot = true;
 
   currentItemsLoop: while (currentItems && !notFound) {
     for (const i of currentItems.keys()) {
@@ -207,10 +208,13 @@ async function onDocumentUpdate(page: PageData) {
         } else {
           currentParent = currentItems[i].id;
           if (!currentItems[i].children) {
+            // This node had no children, we reset this so new ones can be
+            // loaded lazily.
             currentItems[i].children = [];
           }
           currentItems = currentItems[i].children;
           parents.shift();
+          isRoot = false;
           continue currentItemsLoop;
         }
       }
@@ -219,9 +223,14 @@ async function onDocumentUpdate(page: PageData) {
   }
 
   // New page
+  if (currentItems.length == 0 && !isRoot) {
+    // We don't do anything because this node will be loaded lazily anyway.
+    return;
+  }
   const newItems = await treeSource.getChildNodes(
     currentParent ? currentParent : "",
   );
+  const currentPageParents = treeSource.getParentNodesId(props.currentPage);
   newItemsLoop: for (const newItem of newItems) {
     for (const i of currentItems!.keys()) {
       if (newItem.id == currentItems![i].id) {
@@ -235,6 +244,13 @@ async function onDocumentUpdate(page: PageData) {
       children: newItem.has_children ? [] : undefined,
       _location: newItem.location,
     });
+    if (
+      currentPageParents.length > 0 &&
+      currentPageParents[currentPageParents.length - 1] === newItem.id
+    ) {
+      // If we add a node, and it's the current page, it should be activated.
+      activatedNodes.value = [newItem.id];
+    }
   }
 }
 </script>

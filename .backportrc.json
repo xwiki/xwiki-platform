@@ -9,7 +9,7 @@
 
   // In this case, adding the label "backport-production" will backport the PR to the "production" branch
   "branchLabelMapping": {
-    "^backport-(.+)$": "$1"
+    "^backport (.+)$": "$1"
   },
   "autoAssign": true,
   "publishStatusCommentOnAbort": true,

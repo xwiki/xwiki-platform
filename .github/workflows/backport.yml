@@ -35,7 +35,7 @@ jobs:
         uses: sorenlouv/backport-github-action@v9.5.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          auto_backport_label_prefix: backport-
+          auto_backport_label_prefix: backport
 
       - name: Info log
         if: ${{ success() }}

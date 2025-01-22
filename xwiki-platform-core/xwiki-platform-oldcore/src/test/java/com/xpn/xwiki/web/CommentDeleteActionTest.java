@@ -35,7 +35,6 @@ import org.xwiki.csrf.CSRFToken;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
@@ -56,7 +55,6 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 17.0.0RC1
  */
-@ComponentList
 @ReferenceComponentList
 @OldcoreTest(mockXWiki = false)
 class CommentDeleteActionTest

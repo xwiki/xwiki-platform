@@ -25,6 +25,10 @@
   height: 64px;
 }
 
+main ul {
+  padding-inline-start: var(--cr-spacing-x-large);
+}
+
 :root {
   --cr-sizes-max-page-width: 960px; /*This value controls the width of the main content. It should be 100% for spanning text along the whole width or an arbitraty value*/
   --cr-sizes-main-sidebar-width: 15%; /*The default width of the main sidebar*/
@@ -38,6 +42,8 @@
   /*
    * Typography
    */
+
+
 
   /* Fonts */
   --cr-font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;

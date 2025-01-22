@@ -19,122 +19,20 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 @Named("objectremove")
 @Singleton
-public class ObjectRemoveAction extends XWikiAction
+public class ObjectRemoveAction extends AbstractObjectRemoveAction
 {
-    private static final String FAIL_MESSAGE = "failed";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObjectRemoveAction.class);
-    @Override
-    protected Class<? extends XWikiForm> getFormClass()
+    public ObjectRemoveAction()
     {
-        return ObjectRemoveForm.class;
-    }
-
-    protected BaseObject getObject(XWikiDocument doc, XWikiContext context)
-    {
-        ObjectRemoveForm form = (ObjectRemoveForm) context.getForm();
-        BaseObject obj = null;
-
-        String className = form.getClassName();
-        int classId = form.getClassId();
-        if (StringUtils.isBlank(className)) {
-            getCurrentScriptContext().setAttribute("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noClassnameSpecified"),
-                ScriptContext.ENGINE_SCOPE);
-        } else if (classId < 0) {
-            getCurrentScriptContext().setAttribute("message",
-                localizePlainOrKey("platform.core.action.objectRemove.noObjectSpecified"), ScriptContext.ENGINE_SCOPE);
-        } else {
-            obj = doc.getObject(className, classId);
-            if (obj == null) {
-                getCurrentScriptContext().setAttribute("message",
-                    localizePlainOrKey("platform.core.action.objectRemove.invalidObject"), ScriptContext.ENGINE_SCOPE);
-            }
-        }
-
-        return obj;
-    }
-
-    @Override
-    public boolean action(XWikiContext context) throws XWikiException
-    {
-        // CSRF prevention
-        if (!csrfTokenCheck(context)) {
-            return false;
-        }
-
-        XWiki xwiki = context.getWiki();
-        XWikiResponse response = context.getResponse();
-        DocumentReference userReference = context.getUserReference();
-        XWikiDocument doc = context.getDoc();
-
-        // We need to clone this document first, since a cached storage would return the same object for the
-        // following requests, so concurrent request might get a partially modified object, or worse, if an error
-        // occurs during the save, the cached object will not reflect the actual document at all.
-        doc = doc.clone();
-
-        BaseObject obj = getObject(doc, context);
-        if (obj == null) {
-            return true;
-        }
-
-        doc.removeObject(obj);
-        doc.setAuthorReference(userReference);
-
-        String comment = localizePlainOrKey("core.comment.deleteObject");
-
-        // Make sure the user is allowed to make this modification
-        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
-
-        xwiki.saveDocument(doc, comment, true, context);
-
-        if (Utils.isAjaxRequest(context)) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            response.setContentLength(0);
-        } else {
-            // forward to edit
-            String redirect = Utils.getRedirect("edit", context);
-            sendRedirect(response, redirect);
-        }
-        return false;
-    }
-
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        if (Utils.isAjaxRequest(context)) {
-            XWikiResponse response = context.getResponse();
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.setContentType("text/plain");
-            try {
-                response.getWriter().print(FAIL_MESSAGE);
-            } catch (IOException e) {
-                LOGGER.error("Failed to send error response to AJAX comment delete request.", e);
-            }
-            return null;
-        } else {
-            return "error";
-        }
+        noClassNameKey = "platform.core.action.objectRemove.noClassnameSpecified";
+        noIdKey = "platform.core.action.objectRemove.noObjectSpecified";
+        invalidKey = "platform.core.action.objectRemove.invalidObject";
+        this.deleteSuccessfulKey = "core.comment.deleteObject";
     }
 }

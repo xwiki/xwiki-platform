@@ -56,9 +56,9 @@ import static org.mockito.Mockito.when;
  * @since 17.0.0RC1
  */
 @ReferenceComponentList
-@OldcoreTest(mockXWiki = false)
+@OldcoreTest()
 class CommentDeleteActionTest
-{
+{   
     /**
      * The object being tested.
      */

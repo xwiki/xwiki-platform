@@ -25,10 +25,6 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -38,11 +34,19 @@ import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.jakartabridge.servlet.JakartaServletBridge;
 import org.xwiki.websocket.WebSocketContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
+import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.XWikiServletResponse;
+
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
  * Default {@link WebSocketContext} implementation. Initializes the XWiki execution context and binds it to the
@@ -52,6 +56,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * @version $Id$
  * @since 13.7RC1
  */
+@SuppressWarnings("checkstyle:ClassFanOutComplexity")
 @Component
 @Singleton
 public class DefaultWebSocketContext implements WebSocketContext
@@ -116,9 +121,13 @@ public class DefaultWebSocketContext implements WebSocketContext
 
         XWikiContext xcontext = getXWikiContext();
         if (xcontext != null) {
-            this.container.setRequest(new ServletRequest(xcontext.getRequest()));
-            this.container.setResponse(new ServletResponse(xcontext.getResponse()));
-            this.container.setSession(new ServletSession(xcontext.getRequest()));
+            if (xcontext.getRequest() != null) {
+                this.container.setRequest(new ServletRequest(xcontext.getRequest()));
+                this.container.setSession(new ServletSession(xcontext.getRequest()));
+            }
+            if (xcontext.getResponse() != null) {
+                this.container.setResponse(new ServletResponse(xcontext.getResponse()));
+            }
         }
     }
 
@@ -159,8 +168,10 @@ public class DefaultWebSocketContext implements WebSocketContext
                 xcontext.setWikiId(wiki);
             }
 
-            xcontext.setRequest(new XWikiWebSocketRequestStub(request));
-            xcontext.setResponse(new XWikiWebSocketResponseStub(response));
+            xcontext.setRequest(
+                new XWikiServletRequest(JakartaServletBridge.toJavax(new XWikiWebSocketRequestStub(request))));
+            xcontext.setResponse(
+                new XWikiServletResponse(JakartaServletBridge.toJavax(new XWikiWebSocketResponseStub(response))));
 
             xcontext.declareInExecutionContext(context);
         }

@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -47,13 +46,12 @@ import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation of {@link PageChannelsResource}.
- * 
+ *
  * @version $Id$
  * @since 13.9RC1
  */
 @Component
 @Named("org.xwiki.netflux.internal.rest.DefaultPageChannelsResource")
-@Singleton
 public class DefaultPageChannelsResource extends XWikiResource implements PageChannelsResource
 {
     private static final String PATH_SEPARATOR = "/";

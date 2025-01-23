@@ -114,7 +114,7 @@ class CristalAppLoader extends CristalLoader {
     loadConfig: ConfigurationLoader,
     isElectron: boolean,
     configName: string,
-    additionalComponents?: (container: Container) => void,
+    additionalComponents: (container: Container) => void,
   ): Promise<void> {
     let staticMode = forceStaticMode;
     if (import.meta.env.MODE == "development" || staticMode) {

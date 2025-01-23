@@ -3101,9 +3101,6 @@ importers:
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../core/backends/backend-dexie
-      '@xwiki/cristal-backend-github':
-        specifier: workspace:*
-        version: link:../core/backends/backend-github
       '@xwiki/cristal-backend-nextcloud':
         specifier: workspace:*
         version: link:../core/backends/backend-nextcloud
@@ -3125,9 +3122,6 @@ importers:
       '@xwiki/cristal-document-default':
         specifier: workspace:*
         version: link:../core/document/document-default
-      '@xwiki/cristal-dsfr':
-        specifier: workspace:*
-        version: link:../ds/dsfr
       '@xwiki/cristal-dsshoelace':
         specifier: workspace:*
         version: link:../ds/shoelace
@@ -3149,9 +3143,6 @@ importers:
       '@xwiki/cristal-hierarchy-default':
         specifier: workspace:*
         version: link:../core/hierarchy/hierarchy-default
-      '@xwiki/cristal-hierarchy-github':
-        specifier: workspace:*
-        version: link:../core/hierarchy/hierarchy-github
       '@xwiki/cristal-hierarchy-nextcloud':
         specifier: workspace:*
         version: link:../core/hierarchy/hierarchy-nextcloud
@@ -3161,9 +3152,6 @@ importers:
       '@xwiki/cristal-history-default':
         specifier: workspace:*
         version: link:../core/history/history-default
-      '@xwiki/cristal-history-github':
-        specifier: workspace:*
-        version: link:../core/history/history-github
       '@xwiki/cristal-history-ui':
         specifier: workspace:*
         version: link:../core/history/history-ui
@@ -3212,9 +3200,6 @@ importers:
       '@xwiki/cristal-navigation-tree-default':
         specifier: workspace:*
         version: link:../core/navigation-tree/navigation-tree-default
-      '@xwiki/cristal-navigation-tree-github':
-        specifier: workspace:*
-        version: link:../core/navigation-tree/navigation-tree-github
       '@xwiki/cristal-navigation-tree-nextcloud':
         specifier: workspace:*
         version: link:../core/navigation-tree/navigation-tree-nextcloud
@@ -3436,9 +3421,6 @@ importers:
       '@xwiki/cristal-backend-dexie':
         specifier: workspace:*
         version: link:../../core/backends/backend-dexie
-      '@xwiki/cristal-backend-github':
-        specifier: workspace:*
-        version: link:../../core/backends/backend-github
       '@xwiki/cristal-backend-nextcloud':
         specifier: workspace:*
         version: link:../../core/backends/backend-nextcloud
@@ -3649,9 +3631,6 @@ importers:
       '@xwiki/cristal-navigation-tree-default':
         specifier: workspace:*
         version: link:../core/navigation-tree/navigation-tree-default
-      '@xwiki/cristal-navigation-tree-github':
-        specifier: workspace:*
-        version: link:../core/navigation-tree/navigation-tree-github
       '@xwiki/cristal-navigation-tree-nextcloud':
         specifier: workspace:*
         version: link:../core/navigation-tree/navigation-tree-nextcloud

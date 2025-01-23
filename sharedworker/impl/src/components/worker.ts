@@ -25,7 +25,6 @@ import { ComponentInit as AlertsDefaultComponentInit } from "@xwiki/cristal-aler
 import { CristalApp, WrappingStorage } from "@xwiki/cristal-api";
 import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
 import { ComponentInit as DexieBackendComponentInit } from "@xwiki/cristal-backend-dexie";
-import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
 import {
@@ -257,7 +256,6 @@ export class Worker implements MyWorker {
     // TODO: find a way to do this loading differently. Here we need to
     //  explicitly depend on all required storage and this is not good.
     new DexieBackendComponentInit(cristalLoader.container);
-    new GithubBackendComponentInit(cristalLoader.container);
     new NextcloudBackendComponentInit(cristalLoader.container);
     new XWikiBackendComponentInit(cristalLoader.container);
     new AuthenticationDefaultComponentInit(cristalLoader.container);

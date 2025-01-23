@@ -20,5 +20,6 @@
 
 import { DefaultCristalApp } from "./components/DefaultCristalApp";
 import { CristalAppLoader } from "./components/cristalAppLoader";
+import { defaultComponentsList } from "./defaultComponentsList";
 
-export { CristalAppLoader, DefaultCristalApp };
+export { CristalAppLoader, DefaultCristalApp, defaultComponentsList };

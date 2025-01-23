@@ -84,7 +84,6 @@
         // Delete links are only shown for latest added object of an xclass to keep a good numbering.
         $('.xobject-action.edit').show();
         $('.xobject a.delete').show();
-        });
 
         // We need to put all info about added objects in the saved objects collection.
         // We don't need to do that for deleted objects since we cannot revert a deletion in the UI except by canceling

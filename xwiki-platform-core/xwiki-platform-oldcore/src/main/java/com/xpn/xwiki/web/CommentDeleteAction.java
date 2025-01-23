@@ -21,18 +21,29 @@ package com.xpn.xwiki.web;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
+/**
+ * Action used to remove a comment from a page, requires comment right but not edit right. Note that this class is
+ * largely inspired by ObjectRemoveAction and Comment
+ *
+ * @version $Id$
+ * @since 17.1.0RC1
+ */
 @Component
-@Named("objectremove")
+@Named("commentremove")
 @Singleton
-public class ObjectRemoveAction extends AbstractObjectRemoveAction
+public class CommentDeleteAction extends AbstractObjectRemoveAction
 {
-    public ObjectRemoveAction()
+    /**
+     * Set up the few keys used by this component.
+     */
+    public CommentDeleteAction()
     {
-        noClassNameKey = "platform.core.action.objectRemove.noClassnameSpecified";
-        noIdKey = "platform.core.action.objectRemove.noObjectSpecified";
-        invalidKey = "platform.core.action.objectRemove.invalidObject";
-        this.deleteSuccessfulKey = "core.comment.deleteObject";
+        noClassNameKey = "platform.core.action.commentRemove.noClassnameSpecified";
+        noIdKey = "platform.core.action.commentRemove.noCommentSpecified";
+        invalidKey = "platform.core.action.commentRemove.invalidComment";
+        this.deleteSuccessfulKey = "core.comment.deleteComment";
     }
 }

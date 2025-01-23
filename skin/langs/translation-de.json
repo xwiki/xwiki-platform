@@ -11,5 +11,8 @@
     "page.creation.menu.submit": "Erstellen",
     "article.loading": "Lädt...",
     "page.edited.details.user": "{user} bearbeitete am {date}",
-    "page.edited.details": "Bearbeitet am {date}"
+    "page.edited.details": "Bearbeitet am {date}",
+    "page.creation.menu.alert.content": "Die Seite {pageName} existiert bereits.",
+    "page.creation.menu.alert.content.edit": "Die Seite {pageName} existiert bereits, verwende entweder einen anderen Namen oder {link}.",
+    "page.creation.menu.alert.content.edit.link": "die bestehende Seite bearbeiten"
 }

@@ -24,8 +24,6 @@
   right: -@xwiki-drawer-width;
 }
 
-
-
 #tmDrawer.drawer-nav {
   background-color: @xwiki-drawer-bg;
   width: @xwiki-drawer-width;
@@ -171,6 +169,16 @@
     color: @xwiki-drawer-menu-category-color;
     padding: @xwiki-drawer-menu-item-padding;
     font-size: larger;
+  }
+}
+
+@media (scripting: none), (scripting: initial-only) {
+  /* If scripting (understand here: javascript) is not supported on the current context, then we want to 
+    make sure the dialog which is closed by default is still visible. 
+    It's not looking very good but at least it works :) */
+  #tmDrawer.drawer-nav {
+    display: block;
+    margin-right: 0;
   }
 }
 

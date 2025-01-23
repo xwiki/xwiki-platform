@@ -4,55 +4,55 @@
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiOffline": {
     "name": "XWikiOffline",
     "configType": "XWiki",
     "serverRendering": true,
     "offline": true,
-    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiSSR": {
     "name": "XWikiSSR",
     "configType": "XWiki",
     "serverRendering": true,
     "offline": false,
-    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiDSFR": {
     "name": "XWikiDSFR",
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "dsfr",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "XWikiSL": {
     "name": "XWikiSL",
     "configType": "XWiki",
     "serverRendering": false,
     "offline": false,
-    "baseURL": "https://cristal.demo.xwiki.com/xwiki",
+    "baseURL": "https://cristal-backend.demo.xwiki.com/xwiki",
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "shoelace",
-    "realtimeURL": "http://localhost:15681/collaboration"
+    "realtimeURL": "https://cristal.demo.xwiki.com:8093/collaboration"
   },
   "Localhost": {
     "name": "Localhost",
@@ -76,17 +76,6 @@
     "designSystem": "shoelace",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
-  "LocalhostDSFR": {
-    "name": "LocalhostDSFR",
-    "configType": "XWiki",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "http://localhost:15680/xwiki",
-    "baseRestURL": "/rest/cristal/page?media=json",
-    "homePage": "Main.WebHome",
-    "designSystem": "dsfr",
-    "realtimeURL": "http://localhost:15681/collaboration"
-  },
   "LocalhostOffline": {
     "name": "LocalhostOffline",
     "configType": "XWiki",
@@ -96,39 +85,6 @@
     "baseRestURL": "/rest/cristal/page?media=json",
     "homePage": "Main.WebHome",
     "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
-  },
-  "GitHub": {
-    "name": "GitHub",
-    "configType": "GitHub",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "https://github.com/ldubost/test/tree/master/",
-    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
-    "homePage": "README.md",
-    "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
-  },
-  "GitHubOffline": {
-    "name": "GitHubOffline",
-    "configType": "GitHub",
-    "serverRendering": false,
-    "offline": true,
-    "baseURL": "https://github.com/ldubost/test/tree/master/",
-    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
-    "homePage": "README.md",
-    "designSystem": "vuetify",
-    "realtimeURL": "http://localhost:15681/collaboration"
-  },
-  "GitHubSL": {
-    "name": "GitHubSL",
-    "configType": "GitHub",
-    "serverRendering": false,
-    "offline": false,
-    "baseURL": "https://github.com/ldubost/test/tree/master/",
-    "baseRestURL": "https://raw.githubusercontent.com/ldubost/test/master/",
-    "homePage": "README.md",
-    "designSystem": "shoelace",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
   "Nextcloud": {

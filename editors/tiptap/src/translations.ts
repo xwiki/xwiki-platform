@@ -18,35 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { WikiConfig } from "@xwiki/cristal-api";
+import en from "../langs/translation-en.json";
 
-/**
- * Provide the operations to interact with the browser. We need this abstraction
- * because interacting with the browser is not equivalent when Cristal is
- * running directly on a browser, or in an Electron app managing a browser.
- * @since 0.8
- */
-export interface BrowserApi {
-  /**
-   * Change the wiki configuration of the Cristal instance
-   * @param wikiConfig - the new wiki config to use
-   */
-  switchLocation(wikiConfig: WikiConfig): void;
-
-  /**
-   * Fully reload the current window.
-   *
-   * @since 0.11
-   */
-  reload(): void;
-
-  /**
-   * Calls a callback when the current "window" is close, can either be a browser tab, or an electron windows.
-   * @param callback - the lamda called before the window is closed
-   * @since 0.14
-   */
-
-  onClose(callback: () => boolean): void;
-}
-
-export const name = "BrowserApi";
+const translations: Record<string, Record<string, string>> = {
+  en,
+};
+export default translations;

@@ -22,11 +22,13 @@ import CConnectionStatus from "./c-connection-status.vue";
 import CSaveStatus from "./c-save-status.vue";
 import CTiptapBubbleMenu from "./c-tiptap-bubble-menu.vue";
 import { computeCurrentUser } from "./compute-current-user";
+import { initOnQuitHelper } from "./on-quit-helper";
 import { loadLinkSuggest } from "../components/extensions/link-suggest";
 import { Slash } from "../components/extensions/slash";
 import { CollaborationKit, User } from "../extensions/collaboration";
 import initLinkExtension from "../extensions/link";
 import initMarkdown from "../extensions/markdown";
+import messages from "../translations";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
@@ -36,6 +38,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { CristalApp, PageData } from "@xwiki/cristal-api";
 import { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
+import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { name as documentServiceName } from "@xwiki/cristal-document-api";
 import {
   ModelReferenceHandlerProvider,
@@ -57,6 +60,8 @@ import { Container } from "inversify";
 import { debounce } from "lodash";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { inject, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 import type {
@@ -65,6 +70,10 @@ import type {
 } from "@xwiki/cristal-link-suggest-api";
 import type { Markdown } from "tiptap-markdown";
 import type { Ref } from "vue";
+
+const { t } = useI18n({
+  messages,
+});
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 
@@ -76,6 +85,11 @@ const authenticationManager = container
 const modelReferenceHandler = container
   .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
   .get();
+const storage = container.get<StorageProvider>("StorageProvider").get();
+const browserApi = container.get<BrowserApi>("BrowserApi");
+const alertsService = cristal
+  .getContainer()
+  .get<AlertsService>("AlertsService")!;
 const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
 const currentPage: Ref<PageData | undefined> =
@@ -98,26 +112,47 @@ const viewRouterParams = {
   name: "view",
   params: { page: currentPageName.value ?? "" },
 };
+let editor: Ref<Editor | undefined> = ref(undefined);
+
 const view = () => {
   // Destroy the editor instance.
   editor.value?.destroy();
   // Navigate to view mode.
   cristal?.getRouter().push(viewRouterParams);
 };
-const save = async (authors: User[]) => {
-  console.log(
-    "Saving changes made by: ",
-    authors.map((author) => author.name).join(", "),
-  );
 
-  const storage = container.get<StorageProvider>("StorageProvider").get();
-  // TODO: html does not make any sense here.
-  await storage.save(
-    currentPageName.value ?? "",
-    editor.value?.storage.markdown.getMarkdown(),
-    title.value,
-    "html",
-  );
+// init last save content with the initial editor value.
+const { update } = initOnQuitHelper(
+  getEditorMarkdown,
+  cristal.getRouter(),
+  browserApi,
+);
+const updateOnQuitContent: () => void = update;
+
+function getEditorMarkdown() {
+  return editor?.value?.storage.markdown.getMarkdown();
+}
+
+let lastSaveSucceeded = true;
+
+const save = async () => {
+  try {
+    // TODO: html does not make any sense here.
+    await storage.save(
+      currentPageName.value ?? "",
+      getEditorMarkdown(),
+      title.value,
+      "html",
+    );
+    // Update the on quit content with the last successfully saved content.
+    updateOnQuitContent();
+    lastSaveSucceeded = true;
+  } catch (e) {
+    lastSaveSucceeded = false;
+    console.error(e);
+    alertsService.error(t("tiptap.editor.save.error"));
+  }
+
   // If this save operation just created the document, the current document
   // will be undefined. So we update it.
   if (!currentPage.value) {
@@ -127,19 +162,23 @@ const save = async (authors: User[]) => {
 };
 const submit = async () => {
   if (!hasRealtime) {
-    await save([currentUser!]);
+    await save();
   } else {
     await editor.value?.storage.cristalCollaborationKit.autoSaver.save();
   }
-  view();
+  let goToView = true;
+  if (!lastSaveSucceeded) {
+    goToView = confirm(t("tiptap.editor.onquit.message"));
+  }
+  if (goToView) {
+    view();
+  }
 };
 
 let currentUser: undefined | User = undefined;
 
-let editor: Ref<Editor | undefined> = ref(undefined);
-
 const debounced = debounce(() => {
-  save([currentUser!]);
+  save();
 }, 500);
 
 async function editorInit(
@@ -259,6 +298,8 @@ async function loadEditor(page: PageData | undefined) {
       modelReferenceSerializer,
       remoteURLParser,
     );
+
+    update();
   }
 }
 

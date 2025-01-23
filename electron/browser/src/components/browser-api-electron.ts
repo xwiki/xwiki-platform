@@ -39,4 +39,9 @@ export class BrowserApiElectron implements BrowserApi {
   reload(): void {
     browserElectron.reloadBrowser();
   }
+
+  onClose(): void {
+    // TODO: CRISTAL-429 we did not find a viable implementation to intercept the close action and display a confirm
+    // dialog to ask for the user if the confirm closing the page.
+  }
 }

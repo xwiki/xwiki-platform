@@ -42,9 +42,11 @@
     "@tiptap/starter-kit": "2.11.2",
     "@tiptap/suggestion": "2.11.2",
     "@tiptap/vue-3": "2.11.2",
+    "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
+    "@xwiki/cristal-browser-api": "workspace:*",
     "@xwiki/cristal-document-api": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "@xwiki/cristal-icons": "workspace:*",
@@ -66,6 +68,8 @@
     "tiptap-markdown": "0.8.10",
     "utility-types": "3.11.0",
     "vue": "3.5.13",
+    "vue-i18n": "11.0.1",
+    "vue-router": "4.5.0",
     "yjs": "13.6.23"
   },
   "peerDependencies": {

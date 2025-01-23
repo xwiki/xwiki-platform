@@ -21,6 +21,7 @@
 import { WikiConfig } from "@xwiki/cristal-api";
 import { BrowserApi } from "@xwiki/cristal-browser-api";
 import { injectable } from "inversify";
+import { onBeforeMount, onBeforeUnmount } from "vue";
 
 /**
  * Default implementation for the browser. Set the window location, and the
@@ -34,5 +35,18 @@ export class BrowserApiDefault implements BrowserApi {
 
   reload(): void {
     window.location.reload();
+  }
+
+  onClose(callback: () => boolean): void {
+    const listener = (e: Event) => {
+      e.preventDefault();
+      return callback();
+    };
+    onBeforeMount(() => {
+      window.addEventListener("beforeunload", listener);
+    });
+    onBeforeUnmount(() => {
+      window.removeEventListener("beforeunload", listener);
+    });
   }
 }

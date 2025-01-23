@@ -90,8 +90,7 @@
         // Edit link is hidden on not-saved objects since it needs to be saved on the server.
         // Delete links are only shown for latest added object of an xclass to keep a good numbering.
         $('.xobject-action.edit').show();
-        $('.xobject').each(function () {
-          $(this).find('a.delete').show();
+        $('.xobject a.delete').show();
         });
 
         // We need to put all info about added objects in the saved objects collection.
@@ -112,12 +111,8 @@
       // in case of cancel we just clean everything so that we don't get any warnings for leaving the page without saving.
       $(document).on('xwiki:actions:cancel', function () {
         // Remove fields about deleted and added objects
-        $('input[name=deletedObjects]').each(function() {
-          $(this).remove();
-        });
-        $('input[name=addedObjects]').each(function() {
-          $(this).remove();
-        });
+        $('input[name=deletedObjects]').remove();
+        $('input[name=addedObjects]').remove();
         self.editorStatus.addedXObjects = {};
         self.editorStatus.deletedXObjects = {};
       });

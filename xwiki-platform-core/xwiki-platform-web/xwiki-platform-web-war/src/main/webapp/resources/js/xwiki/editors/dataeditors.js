@@ -48,7 +48,7 @@
       'class.switchClass.confirm'
     ]
   });
-  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','scriptaculous/dragdrop'], function ($, xm, l10n) {
+  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','jquery-ui'], function ($, xm, l10n) {
     class XDataEditors {
     constructor() {
       let self = this;
@@ -700,26 +700,23 @@
           });
         });
         let self = this;
-        Sortable.create('xclassContent', {
-          tag: 'div',
-          only: 'xproperty',
-          handle: 'move',
-          starteffect: self.startDrag,
-          endeffect: self.endDrag,
-          onUpdate: self.updateOrder
+        $('#xclassContent').sortable({
+          cursor: 'move',
+          items: '.xproperty',
+          start: self.startDrag,
+          stop: self.endDrag,
+          update: self.updateOrder
         });
       }
     }
 
-    updateOrder(container) {
-      let i = 0;
-      $(container).children().each(function () {
-        $(this).find(".xproperty-content").data('numberProperty', i++);
-      });
+    updateOrder() {
+      let i = 1;
+      $(this).find(".xproperty-content").data('numberProperty').val(i++);
     }
 
-    startDrag(dragged) {
-      $(dragged).addClass('dragged');
+    startDrag() {
+      $(this).addClass('dragged');
       $('#xclassContent').children().each(function() {
         let item = $(this);
         item.data('_expandedBeforeDrag', !item.hasClass('collapsed'));
@@ -727,8 +724,8 @@
       });
     }
 
-    endDrag(dragged) {
-      $(dragged).removeClass('dragged');
+    endDrag() {
+      $(this).removeClass('dragged');
       $('#xclassContent').children().each(function() {
         let item = $(this);
         if (item.data('_expandedBeforeDrag')) {

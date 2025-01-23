@@ -18,54 +18,47 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 /*!
-## Velocity code here.
-#set ($l10nKeys = [
-  'core.editors.object.add.inProgress',
-  'core.editors.object.add.done',
-  'core.editors.object.add.failed',
-  'core.editors.object.delete.confirmJS',
-  'core.editors.object.removeDeprecatedProperties.inProgress',
-  'core.editors.object.removeDeprecatedProperties.done',
-  'core.editors.object.removeDeprecatedProperties.failed',
-  'core.editors.class.addProperty.inProgress',
-  'core.editors.class.addProperty.done',
-  'core.editors.class.addProperty.failed',
-  'core.editors.class.deleteProperty.confirm',
-  'core.editors.class.deleteProperty.inProgress',
-  'core.editors.class.deleteProperty.done',
-  'core.editors.class.deleteProperty.failed',
-  'core.editors.object.loadObject.inProgress',
-  'core.editors.object.loadObject.done',
-  'core.editors.object.loadObject.failed',
-  'core.editors.class.moveProperty.handle.label',
-  'core.editors.class.switchClass.confirm'
-])
-#set ($l10n = {})
-#foreach ($key in $l10nKeys)
-  #set ($params = $key.subList(1, $key.size()))
-  #if ($params)
-    #set ($discard = $l10n.put($key[0], $services.localization.render($key[0], $params)))
-  #else
-    #set ($discard = $l10n.put($key, $services.localization.render($key)))
-  #end
-#end
 #set ($icons = {'reposition': $services.icon.renderHTML('reposition')})
 #[[*/
 // Start JavaScript-only code.
-(function(l10n, icons) {
+
+(function(icons) {
   "use strict";
-  require(['jquery','xwiki-meta','xwiki-events-bridge','scriptaculous/dragdrop'], function ($, xm) {
-    let XDataEditors = Class.create({
+  define('dataeditors-translations', {
+    prefix: 'core.editors.',
+    keys: [
+      'object.add.inProgress',
+      'object.add.done',
+      'object.add.failed',
+      'object.delete.confirmJS',
+      'object.removeDeprecatedProperties.inProgress',
+      'object.removeDeprecatedProperties.done',
+      'object.removeDeprecatedProperties.failed',
+      'class.addProperty.inProgress',
+      'class.addProperty.done',
+      'class.addProperty.failed',
+      'class.deleteProperty.confirm',
+      'class.deleteProperty.inProgress',
+      'class.deleteProperty.done',
+      'class.deleteProperty.failed',
+      'object.loadObject.inProgress',
+      'object.loadObject.done',
+      'object.loadObject.failed',
+      'class.moveProperty.handle.label',
+      'class.switchClass.confirm'
+    ]
+  });
+  require(['jquery','xwiki-meta','xwiki-l10n!dataeditors-translations','xwiki-events-bridge','scriptaculous/dragdrop'], function ($, xm, l10n) {
+    class XDataEditors {
+    constructor() {
+      let self = this;
       // Maintain informations about actions performed on the editor.
       // Data abouts xobjects are map whom keys are xclass names and values are list of sorted xobjects ids
-      editorStatus : {
+      this.editorStatus = {
         savedXObjects: {}, // already saved objects
         addedXObjects: {}, // objects added but not saved yet
         deletedXObjects: {} // objects deleted but not removed yet
-      },
-
-    initialize : function() {
-      let self = this;
+      };
       this.editedDocument = XWiki.currentDocument;
 
       $('.xclass').each(function() {
@@ -127,67 +120,74 @@
           return;
         }
       });
-    },
+    }
+
     /**
      * Sort function to allow sorting an array of integer.
      * Using [3, 0, 1].sort(numberSort) produces [0, 1, 3].
      */
-    numberSort : function (a, b) {
+    numberSort(a, b) {
       return a - b;
-    },
+    }
+
     /**
      * Extract the xclass name from the XDOM id of the xclass.
      */
-    getXClassNameFromXClassId : function (xclassId) {
+    getXClassNameFromXClassId(xclassId) {
       return xclassId.substring("xclass_".length);
-    },
+    }
+
     /**
      * Extract the xclass name from the XDOM id of an xobject.
      */
-    getXClassNameFromXObjectId : function (xobjectId) {
+    getXClassNameFromXObjectId(xobjectId) {
       return xobjectId.substring("xobject_".length, xobjectId.lastIndexOf('_'));
-    },
+    }
+
     /**
      * Extract the xobject number from the XDOM id of an xobject.
      */
-    getXObjectNumberFromXObjectId : function (xobjectId) {
+    getXObjectNumberFromXObjectId(xobjectId) {
       return xobjectId.substring(xobjectId.lastIndexOf('_') + 1);
-    },
+    }
+
     /**
      * Returns true if an object exists with the given classname and number.
      */
-    xObjectAlreadyExist : function (xclassName, objectNumber) {
+    xObjectAlreadyExist(xclassName, objectNumber) {
       return (this.editorStatus.savedXObjects[xclassName] !== undefined
         && this.editorStatus.savedXObjects[xclassName].indexOf(objectNumber) !== -1)
         || (this.editorStatus.addedXObjects[xclassName] !== undefined
           && this.editorStatus.addedXObjects[xclassName].indexOf(objectNumber) !== -1);
-    },
+    }
+
     /**
      * Returns the xobject DOM element for the given class and number.
      */
-    getXObject : function (xclassName, objectNumber) {
-      let expectedId = 'xobject_' + xclassName + '_' + objectNumber;
-      // We cannot use # + expectedId because of the dots to escape.
-      return $("[id='"+expectedId+"']");
-    },
+    getXObject(xclassName, objectNumber) {
+      let expectedId = CSS.escape('xobject_' + xclassName + '_' + objectNumber);
+      return $('#' + expectedId);
+    }
 
-    getDeletedXObject : function (xclassName, objectNumber) {
-      let expectedId = ('deletedObject_' + xclassName + '_' + objectNumber).replaceAll('.', '\\.');
+    getDeletedXObject(xclassName, objectNumber) {
+      let expectedId = CSS.escape('deletedObject_' + xclassName + '_' + objectNumber);
       return $('input[name=deletedObjects]#' + expectedId);
-    },
+    }
+
     /**
      * Helper to remove an element from an array if and only if it was already in the array.
      */
-    removeElementFromArray : function (array, element) {
+    removeElementFromArray(array, element) {
       if (array.indexOf(element) !== -1) {
         array.splice(array.indexOf(element), 1);
       }
-    },
+    }
+
     /**
      * Compute the new object number for a class name given the information we already have about savedXObjects and
      * addedXObjects.
      */
-    getNewObjectNumber : function (xclassName) {
+    getNewObjectNumber(xclassName) {
       let objectNumberVal;
       // if we already added xobjects of this type, the last number has to be taken there
       if (this.editorStatus.addedXObjects[xclassName] !== undefined) {
@@ -210,14 +210,15 @@
         }
       }
       return objectNumberVal;
-    },
+    }
+
     /**
      * Enhance xclass for the JS behaviours and iterate over inner xobjects or xproperties to enhance them.
      *
      * @param xclass the xclass DOM element
      * @param init true if it's the call performed during the script initialization.
      */
-    enhanceClassUX : function(xclass, init) {
+    enhanceClassUX(xclass, init) {
       this.ajaxObjectAdd(xclass);
       this.expandCollapseClass(xclass);
 
@@ -234,8 +235,9 @@
       xclass.find('.xobject').each(function() {
         self.enhanceObjectUX($(this), init);
       });
-    },
-    enhanceObjectUX : function(object, init) {
+    }
+
+    enhanceObjectUX(object, init) {
       let xclassName = this.getXClassNameFromXObjectId(object.attr('id'));
       let objectNumber = this.getXObjectNumberFromXObjectId(object.attr('id'));
       let listObjects;
@@ -277,10 +279,11 @@
         this.expandCollapseObject(object);
         this.ajaxRemoveDeprecatedProperties(object, ".syncProperties");
       }
-    },
+    }
+
     // -----------------------------------------------
     /* AJAX object add */
-    ajaxObjectAdd : function(element) {
+    ajaxObjectAdd(element) {
       if (!element) {
         return;
       }
@@ -313,7 +316,7 @@
           let notification;
           if (!item.prop('disabled') && validClassName) {
             item.prop('disabled', true);
-            notification = new XWiki.widgets.Notification(l10n['core.editors.object.add.inProgress'], "inprogress");
+            notification = new XWiki.widgets.Notification(l10n['object.add.inProgress'], "inprogress");
             $.post(url).done(function(data) {
               let activator = item.parents('.add_xobject');
               if (activator.length > 0) {
@@ -335,8 +338,6 @@
                     self.enhanceClassUX(insertedElement, false);
                     insertedObject = insertedElement.find('.xobject');
                   } else if (insertedElement.hasClass('xobject')) {
-                    let classId = insertedElement.attr('id').replace(/^xobject_/, "xclass_").replace(/_\d+$/, "").replaceAll('.', '\\.');
-
                     // clean up the deletion array if we add back a deleted object.
                     let xclassName = self.getXClassNameFromXObjectId(insertedElement.attr('id'));
                     if (self.editorStatus.deletedXObjects[xclassName] !== undefined) {
@@ -351,7 +352,8 @@
                       }
                     }
                     self.enhanceObjectUX(insertedElement, false);
-                    let xclass = $('#' + classId);
+                    let classId = insertedElement.attr('id').replace(/^xobject_/, "xclass_").replace(/_\d+$/, "");
+                    let xclass = $('#' + CSS.escape(classId));
                     if (xclass.length > 0) {
                       xclass.find('.add_xobject').before(insertedElement);
                       self.updateXObjectCount(xclass);
@@ -365,21 +367,22 @@
                   insertedObject.find('.xobject-action.edit').hide();
                 }
               }
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.add.done'], "done"));
+              notification.replace(new XWiki.widgets.Notification(l10n['object.add.done'], "done"));
               $(document).trigger('xwiki:dom:refresh');
             }).fail(function (error) {
               let failureReason = error.responseText || 'Server not responding';
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.add.failed'] + failureReason, "error"));
+              notification.replace(new XWiki.widgets.Notification(l10n['object.add.failed'] + failureReason, "error"));
             }).always(function () {
               item.prop('disabled',false);
             });
           }
         });
       });
-    },
+    }
+
     // ------------------------------------
     // Ajax object deletion
-    ajaxObjectDeletion : function(object) {
+    ajaxObjectDeletion(object) {
       let item = object.find('a.delete');
       let xclassName = this.getXClassNameFromXObjectId(object.attr('id'));
       let addedObjects = this.editorStatus.addedXObjects[xclassName];
@@ -438,15 +441,16 @@
             }
           },
         }, {
-          confirmationText: l10n['core.editors.object.delete.confirmJS'],
+          confirmationText: l10n['object.delete.confirmJS'],
           // Allow the users to cancel the switch.
           showCancelButton: true
         });
       });
-    },
+    }
+
     // -----------------------------------------------
     /* AJAX removal of deprecated properties */
-    ajaxRemoveDeprecatedProperties : function(container, triggerSelector) {
+    ajaxRemoveDeprecatedProperties(container, triggerSelector) {
       // Should never happen, but helpful for tests.
       if (!container) {
         return;
@@ -458,24 +462,25 @@
           event.stopPropagation();
           if (!item.disabled) {
             item.prop('disabled', true);
-            let notification = new XWiki.widgets.Notification(l10n['core.editors.object.removeDeprecatedProperties.inProgress'], "inprogress");
+            let notification = new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.inProgress'], "inprogress");
             $.post(item.href).done(function(data) {
               // Remove deprecated properties box
               container.find(".deprecatedProperties").remove();
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.removeDeprecatedProperties.done'], "done"));
+              notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.done'], "done"));
             }).fail(function (error) {
               let failureReason = error.responseText || 'Server not responding';
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.removeDeprecatedProperties.failed'] + failureReason, "error"));
+              notification.replace(new XWiki.widgets.Notification(l10n['object.removeDeprecatedProperties.failed'] + failureReason, "error"));
             }).always(function () {
               item.prop('disabled', false);
             });
           }
         });
       });
-    },
+    }
+
     // -----------------------------------------------
     /* AJAX property add */
-    ajaxPropertyAdd : function() {
+    ajaxPropertyAdd() {
       let self = this;
       $('input[name=action_propadd]').each(function(){
         let item = $(this);
@@ -497,7 +502,7 @@
               form_token: xm.form_token
             }));
             item.prop('disabled', true);
-            let notification = new XWiki.widgets.Notification(l10n['core.editors.class.addProperty.inProgress'], "inprogress");
+            let notification = new XWiki.widgets.Notification(l10n['class.addProperty.inProgress'], "inprogress");
             $.post(ref).done(function(data) {
               $('#xclassContent').append(data);
               let insertedPropertyElt = $('#xclassContent :last-child');
@@ -507,20 +512,22 @@
               self.makeSortable(insertedPropertyElt);
               self.ajaxPropertyDeletion(insertedPropertyElt);
               self.makeDisableVisible(insertedPropertyElt);
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.class.addProperty.done'], "done"));
+              notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.done'], "done"));
             }).fail(function (error) {
-              let failureReason = error.responseText || 'Server not responding';
-              notification.replace(new XWiki.widgets.Notification(l10n['core.editors.class.addProperty.failed'] + failureReason, "error"));
+              // FIXME: we should change translation value for action.addClassProperty.error.invalidName
+              let failureReason = error.responseText.replaceAll("&#60;br/&#62;", "<br/>") || 'Server not responding';
+              notification.replace(new XWiki.widgets.Notification(l10n['class.addProperty.failed'] + failureReason, "error"));
             }).always(function () {
               item.prop('disabled', false);
             });
           }
         });
       });
-    },
+    }
+
     // ------------------------------------
     // Ajax property deletion
-    ajaxPropertyDeletion : function(property) {
+    ajaxPropertyDeletion(property) {
       let item = property.find('a.delete');
       item.on('click', function(event) {
         item.blur();
@@ -543,26 +550,28 @@
             },
             /* Interaction parameters */
             {
-              confirmationText: l10n['core.editors.class.deleteProperty.confirm'],
-              progressMessageText : l10n['core.editors.class.deleteProperty.inProgress'],
-              successMessageText : l10n['core.editors.class.deleteProperty.done'],
-              failureMessageText : l10n['core.editors.class.deleteProperty.failed']
+              confirmationText: l10n['class.deleteProperty.confirm'],
+              progressMessageText : l10n['class.deleteProperty.inProgress'],
+              successMessageText : l10n['class.deleteProperty.done'],
+              failureMessageText : l10n['class.deleteProperty.failed']
             }
           );
         }
       });
-    },
+    }
+
     // ------------------------------------
     //
-    makeDisableVisible : function(property) {
+    makeDisableVisible(property) {
       property.find('.disabletool input').on("click", function() {
         property.toggleClass('disabled');
       })
-    },
+    }
+
     // ------------------------------------
     // Edit button behavior
     // Prevent from collapsing the object subtree when clicking on edit
-    editButtonBehavior : function(object) {
+    editButtonBehavior(object) {
       let item = object.find('a.edit');
       if (!item) {
         return;
@@ -572,9 +581,10 @@
         event.stopPropagation();
         window.location = item.href;
       });
-    },
+    }
+
     // Update the number of objects displayed in the class group title, when objects are added or deleted
-    updateXObjectCount: function(xclass) {
+    updateXObjectCount(xclass) {
       let xobjectCount = xclass.find('.xobject').length;
       if (xobjectCount == 0) {
         xclass.remove();
@@ -584,10 +594,11 @@
           xobjectCountElement.text('(' + xobjectCount + ')');
         }
       }
-    },
+    }
+
     // ------------------------------------
     // Expand/collapse objects and object properties
-    expandCollapseObject : function(object) {
+    expandCollapseObject(object) {
       let self = this;
       object.addClass('collapsable');
       let objectContent = object.find('.xobject-content');
@@ -609,16 +620,16 @@
             objectNumber: xObjectNumber,
             form_token: xm.form_token
           }));
-          let notification = new XWiki.widgets.Notification(l10n['core.editors.object.loadObject.inProgress'], "inprogress");
+          let notification = new XWiki.widgets.Notification(l10n['object.loadObject.inProgress'], "inprogress");
           $.post(editURL).done(function(data) {
             objectContent.append(data);
             // display the elements before firing the event to be sure they are visible.
             object.toggleClass('collapsed');
             $(document).trigger('xwiki:dom:updated', {elements: objectContent.toArray()});
-            notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.loadObject.done'], "done"));
+            notification.replace(new XWiki.widgets.Notification(l10n['object.loadObject.done'], "done"));
           }).fail(function (error) {
             let failureReason = error.responseText || 'Server not responding';
-            notification.replace(new XWiki.widgets.Notification(l10n['core.editors.object.loadObject.failed'] + failureReason, "error"));
+            notification.replace(new XWiki.widgets.Notification(l10n['object.loadObject.failed'] + failureReason, "error"));
           }).always(function () {
             object.removeClass('loading');
           });
@@ -626,10 +637,11 @@
           object.toggleClass('collapsed');
         }
       });
-    },
+    }
+
     // ------------------------------------
     //  Expand/collapse classes
-    expandCollapseClass : function(xclass) {
+    expandCollapseClass(xclass) {
       // Classes are expanded by default
       let xclassTitle = xclass.find('.xclass-title');
       if (!xclassTitle) {
@@ -640,10 +652,11 @@
       xclassTitle.on('click', function() {
         xclassTitle.parent().toggleClass('collapsed');
       });
-    },
+    }
+
     // ------------------------------------
     // Class editor: expand-collapse meta properties
-    expandCollapseMetaProperty : function(property) {
+    expandCollapseMetaProperty(property) {
       let propertyTitle = property.find('.xproperty-title');
       if (!propertyTitle) {
         // No such object...
@@ -654,10 +667,11 @@
       propertyTitle.on('click', function() {
         propertyTitle.parent().toggleClass('collapsed');
       });
-    },
+    }
+
     //---------------------------------------------------
     /* Class editor: xproperty ordering */
-    makeSortable : function(element) {
+    makeSortable(element) {
       if (element.length > 0) {
         // Hide the property number, as ordering can be done by drag and drop
         element.find('.xproperty-content').each(function () {
@@ -678,7 +692,7 @@
           let item = $(this);
           let movebutton = $('<span>', {
             'class': 'tool move',
-            title: l10n['core.editors.class.moveProperty.handle.label']
+            title: l10n['class.moveProperty.handle.label']
           }).html(icons['reposition']);
           item.css('position', 'relative');
           item.append(movebutton);
@@ -696,22 +710,25 @@
           onUpdate: self.updateOrder
         });
       }
-    },
-    updateOrder : function(container) {
+    }
+
+    updateOrder(container) {
       let i = 0;
       $(container).children().each(function () {
         $(this).find(".xproperty-content").data('numberProperty', i++);
       });
-    },
-    startDrag : function(dragged) {
+    }
+
+    startDrag(dragged) {
       $(dragged).addClass('dragged');
       $('#xclassContent').children().each(function() {
         let item = $(this);
         item.data('_expandedBeforeDrag', !item.hasClass('collapsed'));
         item.addClass('collapsed');
       });
-    },
-    endDrag : function(dragged) {
+    }
+
+    endDrag(dragged) {
       $(dragged).removeClass('dragged');
       $('#xclassContent').children().each(function() {
         let item = $(this);
@@ -720,7 +737,7 @@
         }
       });
     }
-  });
+  }
 
     let initSwitchClassListener = function () {
       $('#switch-xclass').on('change', function (event) {
@@ -744,7 +761,7 @@
             // Switch without saving the current class.
             onNo: switchClass
           }, {
-            confirmationText: l10n['core.editors.class.switchClass.confirm'],
+            confirmationText: l10n['class.switchClass.confirm'],
             // Allow the users to cancel the switch.
             showCancelButton: true
           });
@@ -756,10 +773,8 @@
       ((XWiki || {}).editors || {}).XDataEditors = new XDataEditors();
       initSwitchClassListener();
     }
-
-    // When the document is loaded, create the Autosave control
     $(init);
   });
 
 // End JavaScript-only code.
-}).apply(']]#', $jsontool.serialize([$l10n, $icons]));
+}).apply(']]#', $jsontool.serialize([$icons]));

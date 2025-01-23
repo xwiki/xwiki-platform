@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -42,8 +41,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  */
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
-public class BaseProperty<R extends EntityReference> extends BaseElement<R>
-    implements PropertyInterface, Serializable, Cloneable
+public class BaseProperty<R extends EntityReference> extends BaseElement<R> implements PropertyInterface, Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -53,11 +51,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     private BaseCollection object;
 
     private long id;
-
-    /**
-     * Set to true if value is not the same as the database value.
-     */
-    private boolean isValueDirty = true;
 
     @Override
     protected R createReference()
@@ -82,6 +75,10 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     public void setObject(BaseCollection object)
     {
         this.object = object;
+
+        if (this.object != null && isDirty()) {
+            this.object.setDirty(true);
+        }
     }
 
     @Override
@@ -124,9 +121,13 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     @Override
     public void setId(long id)
     {
-        // I hate this.. needed for hibernate to find the object
-        // when loading the collections..
-        this.id = id;
+        if (id != this.id) {
+            // I hate this.. needed for hibernate to find the object
+            // when loading the collections..
+            this.id = id;
+
+            setDirty(true);
+        }
     }
 
     @Override
@@ -155,10 +156,11 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
 
         cloneInternal(property);
 
-        property.isValueDirty = this.isValueDirty;
         property.ownerDocument = this.ownerDocument;
 
         property.setObject(getObject());
+
+        property.setDirty(isDirty());
 
         return property;
     }
@@ -347,10 +349,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @return {@literal true} if the property value doesn't match the value in the database.
      * @since 4.3M2
+     * @deprecated use {@link #isDirty()} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public boolean isValueDirty()
     {
-        return this.isValueDirty;
+        return isDirty();
     }
 
     /**
@@ -360,7 +364,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
      */
     protected void setValueDirty(Object newValue)
     {
-        if (!this.isValueDirty && !Objects.equals(newValue, getValue())) {
+        if (!isDirty() && !Objects.equals(newValue, getValue())) {
             setValueDirty(true);
         }
     }
@@ -368,30 +372,21 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     /**
      * @param valueDirty Indicate if the dirty flag should be set or cleared.
      * @since 4.3M2
+     * @deprecated use {@link #setDirty(boolean)} instead
      */
+    @Deprecated(since = "17.1.0RC1")
     public void setValueDirty(boolean valueDirty)
     {
-        this.isValueDirty = valueDirty;
-        if (valueDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(true);
-        }
+        setDirty(valueDirty);
     }
 
-    /**
-     * Set the owner document of this base property.
-     *
-     * @param ownerDocument The owner document.
-     * @since 4.3M2
-     */
     @Override
-    public void setOwnerDocument(XWikiDocument ownerDocument)
+    public void setDirty(boolean dirty)
     {
-        if (this.ownerDocument != ownerDocument) {
-            super.setOwnerDocument(ownerDocument);
+        super.setDirty(dirty);
 
-            if (ownerDocument != null && this.isValueDirty) {
-                ownerDocument.setMetaDataDirty(true);
-            }
+        if (dirty && this.object != null) {
+            this.object.setDirty(true);
         }
     }
 

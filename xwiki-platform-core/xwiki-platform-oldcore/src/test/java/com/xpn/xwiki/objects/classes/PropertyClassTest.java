@@ -27,6 +27,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.job.event.status.JobProgressManager;
@@ -108,6 +109,7 @@ public class PropertyClassTest
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         this.oldCore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.oldCore.getMocker().registerMockComponent(ContextualLocalizationManager.class);
 
         DocumentReference contextDocumentReference = new DocumentReference("wiki", "XWiki", "Context");
         this.oldCore.getXWikiContext().setDoc(new XWikiDocument(contextDocumentReference));

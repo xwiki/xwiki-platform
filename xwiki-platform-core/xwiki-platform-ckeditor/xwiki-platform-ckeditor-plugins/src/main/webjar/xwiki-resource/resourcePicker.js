@@ -36,8 +36,8 @@ define('resourcePicker', [
           '<button type="button" class="resourceType btn btn-default">' +
             '<span class="icon">' +
           '</button>' +
-    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
-    '<span class="sr-only"></span>' +
+          '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' +
+            '<span class="sr-only"></span>' +
             '<span class="caret"></span>' +
           '</button>' +
           '<ul class="resourceTypes dropdown-menu dropdown-menu-right"></ul>' +

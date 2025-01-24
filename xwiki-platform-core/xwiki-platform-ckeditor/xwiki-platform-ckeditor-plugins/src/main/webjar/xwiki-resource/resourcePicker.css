@@ -19,23 +19,6 @@
  */
 #template('colorThemeInit.vm')
 
-/* CKEditor contains a CSS reset. It works with its own style sheets and does not use the ones in XWiki.
-  However, we want `.sr-only` from XWiki to still be usable in our CKEditor plugins.
-  We need to redefine the XWiki styles of this class to have better priority than the CKEditor CSS reset.
-  Without this, the elements with this class are still shown
-  which would be different from the behaviour of `.sr-only` anywhere else in XWiki (as described in our doc). 
-  This redefinition allows for a more consistent behaviour of the `.sr-only` class. */
-.resourcePicker .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
 .resourcePicker .dropdown-menu > .active > a,
 .resourcePicker .dropdown-menu > .active > a:hover,
 .resourcePicker .dropdown-menu > .active > a:focus {

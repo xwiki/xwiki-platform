@@ -55,7 +55,7 @@
       var editable = editor.editable();
       if (editable) {
         const domRanges = this.getSelection(editor);
-        editor._.textSelection = this.textSelection.from(editable.$, domRanges);
+        editor._.textSelection = (editor._.textSelection || this.textSelection).from(editable.$, domRanges);
         // Remember to also restore the focus when restoring the selection. In order to know if we have to restore the
         // focus we need to check the active element on the top level window. We can't rely on the focus state of the
         // editable area because the focus is lost when the user switches to a different browser tab or a different
@@ -67,33 +67,95 @@
       }
     },
 
-    restoreSelection: function(editor, ranges) {
-      var editable = editor.editable();
-      var textSelection = editor._.textSelection;
+    restoreSelection: async function(editor, options) {
+      const editable = editor.editable();
+      let textSelection = editor._.textSelection;
+      let {ranges, beforeApply} = options || {};
       if (editable && textSelection) {
-        const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
-        if (focus) {
-          // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable area
-          // that contains the selection when we apply it.
-          editable.$.focus(focus);
+        const notification = this._showRestoringSelectionNotification(editor);
+        try {
+          if (!ranges) {
+            textSelection = await textSelection.transform(editable.$);
+          }
+
+          beforeApply?.();
+          beforeApply = () => {};
+
+          const focus = textSelection.restoreFocus ? {preventScroll: !textSelection.contentOverwritten} : false;
+          if (focus) {
+            // This is mostly needed for the Source mode. For the WYSIWYG mode we take care of focusing the editable
+            // area that contains the selection when we apply it.
+            editable.$.focus(focus);
+          }
+
+          if (ranges) {
+            // Apply the provided selection.
+            this.setSelection(editor, ranges, focus);
+          } else {
+            // Apply the transformed saved text selection.
+            textSelection.applyTo(editable.$, {
+              // Scroll the restored selection into view if the editor content was overwritten since we saved the
+              // selection and the editing area had the focus when the selection was saved.
+              scrollIntoView: focus && !focus.preventScroll,
+              applyDOMRange: domRange => {
+                maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
+                this.setSelection(editor, [domRange], focus);
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Failed to restore selection: ", e);
+          beforeApply?.();
+        } finally {
+          notification.hide();
         }
-        if (ranges) {
-          // Apply the provided selection.
-          this.setSelection(editor, ranges, focus);
-        } else {
-          // Restore the saved text selection.
-          // Scroll the restored selection into view if the editor content was overwritten since we saved the selection
-          // and the editing area had the focus when the selection was saved.
-          const scrollIntoView = focus && !focus.preventScroll;
-          textSelection.applyTo(editable.$, {
-            scrollIntoView,
-            applyDOMRange: domRange => {
-              maybeMoveToFirstNestedEditable(editor, domRange, !focus.preventScroll);
-              this.setSelection(editor, [domRange], focus);
-            }
-          });
-        }
+      } else {
+        beforeApply?.();
       }
+    },
+
+    _showRestoringSelectionNotification: function(editor) {
+      if (editor._.restoringSelectionNotification) {
+        // Abort the ongoing selection restore operation.
+        editor._.restoringSelectionNotification.hide();
+      } else {
+        // Register the abort listener only once, when the notification is created for the first time.
+        editor.on('notificationHide', (event) => {
+          if (event.data.notification === editor._.restoringSelectionNotification) {
+            delete editor._.restoringSelectionNotification;
+            // Abort the ongoing selection restore operation.
+            editor._.textSelection?.abortApplyTo?.();
+          }
+        });
+      }
+
+      // Create a new notification.
+      const notification = editor._.restoringSelectionNotification = new CKEDITOR.plugins.notification(editor, {
+        message: editor.localization.get('xwiki-selection.restoring'),
+        type: 'progress',
+      });
+      // Show the notification only if the selection restore takes more than usual, to avoid flickering.
+      setTimeout(() => {
+        if (notification === editor._.restoringSelectionNotification) {
+          notification.show();
+          this._showFakeProgress(notification);
+        }
+      }, 1000);
+
+      return notification;
+    },
+
+    _showFakeProgress: function(notification) {
+      let step = 0;
+      const interval = setInterval(() => {
+        if (notification.isVisible()) {
+          // Reaches 63% after 5 seconds and 99% after 9 seconds. Replace 4 with a higher number to slow down the
+          // progression.
+          notification.update({progress: 1 - Math.exp(-1 * step++ / 4)});
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
     },
 
     isEditingAreaFocused: function(editor) {
@@ -186,6 +248,7 @@
   }
 
   CKEDITOR.plugins.add('xwiki-selection', {
+    requires: 'notification',
     onLoad: function() {
       require(['textSelection'], function(textSelection) {
         CKEDITOR.plugins.xwikiSelection.textSelection = textSelection;
@@ -241,19 +304,107 @@
   });
 })();
 
-define('node-module', ['jquery'], function($) {
-  return {
-    load: function(name, req, onLoad, config) {
-      $.get(req.toUrl(name + '.js'), function(text) {
-        onLoad.fromText('define(function(require, exports, module) {' + text + '});');
-      }, 'text');
-    }
-  };
-});
+(function() {
+  const currentScript = document.currentScript.src;
+  let diffWorkerPath = 'diffWorker.js?evaluate=true';
+  if (currentScript.endsWith('webjar.bundle.min.js')) {
+    // The 'xwiki-selection' plugin is bundled with the other plugins rather than being loaded separately.
+    diffWorkerPath = 'xwiki-selection/' + diffWorkerPath;
+  }
+  const diffWorkerURL = new URL(diffWorkerPath, currentScript).href;
 
-define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {
+  define('xwiki-diff-service', [], function() {
+    class DiffService {
+      constructor() {
+        // Reuse the same worker to serve a queue of diff computation requests.
+        this._queue = [];
+        // Have the worker ready before the first diff computation is requested (because worker creation is costly).
+        this._recreateWorker();
+      }
+
+      /**
+       * Schedule a diff computation.
+       *
+       * @param {string} previous the previous version of the text
+       * @param {string} next the next version of the text
+       * @returns {object} an object like {cancel: function, promise: Promise} that allows to cancel the diff
+       *   computation or to wait for the computed diff
+       */
+      diff(previous, next) {
+        const entry = {previous, next};
+        this._queue.push(entry);
+        if (this._queue.length === 1) {
+          // Start the diff computation if this is the only entry in the queue.
+          this._processQueue();
+        }
+
+        return {
+          // A promise that resolves with the computed diff or rejects with an error (e.g. when the diff computation is
+          // cancelled).
+          promise: new Promise((resolve, reject) => {
+            entry.resolve = resolve;
+            entry.reject = reject;
+          }),
+
+          /**
+           * Unschedule or terminate the diff computation.
+           */
+          cancel: () => {
+            const error = new Error('Diff computation cancelled.');
+            const index = this._queue.indexOf(entry);
+            if (index === 0) {
+              // Stop the current diff computation.
+              this._worker.onerror(error);
+            } else if (index > 0) {
+              // Unschedule the diff computation.
+              this._queue.splice(index, 1);
+              entry.reject(error);
+            }
+          }
+        };
+      }
+
+      _recreateWorker() {
+        this._worker = new Worker(diffWorkerURL);
+        this._worker.onerror = error => {
+          this._worker.terminate();
+          if (this._queue.length) {
+            // A diff computation error occurred or the diff computation was cancelled.
+            this._queue.shift().reject(error);
+            this._recreateWorker();
+            // Continue with the next diff computation.
+            this._processQueue();
+          } else {
+            // Worker initialization error.
+            throw error;
+          }
+        };
+        this._worker.onmessage = event => {
+          // We received the computed diff.
+          this._queue.shift().resolve(event.data);
+          // Continue with the next diff computation.
+          this._processQueue();
+        };
+      }
+
+      _processQueue() {
+        if (this._queue.length) {
+          const {previous, next} = this._queue[0];
+          // Ask the worker to compute the diff.
+          this._worker.postMessage([previous, next]);
+        }
+      }
+    }
+
+    return DiffService;
+  });
+})();
+
+define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], function($, DiffService, scrollUtils) {
+  const diffService = new DiffService();
+
   function isTextInput(element) {
-    return typeof element.setSelectionRange === 'function';
+    return typeof element?.setSelectionRange === 'function';
   }
 
   function getTextSelection(root, ranges) {
@@ -397,9 +548,9 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
   }
 
   const maybeVisitText = (visitor, node) => node.nodeType === Node.TEXT_NODE &&
-    (visitor.before(node) || visitor.after(node));
-  const maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element);
-  const maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
+    (visitor.before(node) || visitor.after(node)),
+    maybeVisitBeforeElement = (visitor, element) => canPlaceCaretBeforeElement(element) && visitor.before(element),
+    maybeVisitAfterElement = (visitor, element) => canPlaceCaretAfterElement(element) && visitor.after(element);
 
   function canPlaceCaretBeforeElement(element) {
     return element.hasAttribute('tabindex') || (element.nodeName === 'BR' &&
@@ -470,8 +621,10 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
     };
   }
 
-  function changeText(textSelection, newText) {
-    const changes = diff(textSelection.text, newText);
+  async function changeText(textSelection, newText) {
+    const {promise, cancel} = diffService.diff(textSelection.text, newText);
+    textSelection.abortApplyTo = cancel;
+    const changes = await promise;
     const startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
     const endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
       findTextOffsetInChanges(changes, textSelection.endOffset);
@@ -554,13 +707,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
         }
       }, options);
 
-      var range;
-      if (isTextInput(element)) {
-        range = this.withText(element.value);
-      } else {
-        range = this.withText(getVisibleText(element)).asRange(element);
-      }
-
+      const range = isTextInput(element) ? this : this.asRange(element);
       if (options.scrollIntoView) {
         scrollSelectionIntoView(element, range);
       }
@@ -572,11 +719,14 @@ define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], func
       }
     },
 
-    withText: function(text) {
-      if (this.text === text) {
-        return this;
+    transform: async function(textOrElement) {
+      const text = isTextInput(textOrElement) ? textOrElement.value :
+        (textOrElement?.nodeType === Node.ELEMENT_NODE ? getVisibleText(textOrElement) : textOrElement);
+      if (typeof text === 'string' && text !== this.text) {
+        return $.extend({}, this, await changeText(this, text));
       } else {
-        return $.extend({}, this, changeText(this, text));
+        // No change or unknown input type. Text selection remains the same.
+        return this;
       }
     },
 

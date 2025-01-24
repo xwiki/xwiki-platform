@@ -41,7 +41,7 @@ public class TopLevelPageFilter extends AbstractNestedPageFilter
     protected String filterNestedPagesStatement(String statement)
     {
         // The constraint is different depending on whether we filter a native SQL query or an HQL query.
-        String constraint = statement.indexOf("XWS_REFERENCE") < 0 ? "parent is null " : "XWS_PARENT is null ";
+        String constraint = statement.indexOf("XWS_REFERENCE") < 0 ? "space.parent is null " : "XWS_PARENT is null ";
         return insertWhereConstraint(statement, constraint);
     }
 

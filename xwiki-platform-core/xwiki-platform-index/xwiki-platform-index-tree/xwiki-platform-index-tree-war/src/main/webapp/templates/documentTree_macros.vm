@@ -45,7 +45,8 @@
   'showTerminalDocuments': true,
   'showTranslations': true,
   'showWikiPrettyName': true,
-  'showWikis': false
+  'showWikis': false,
+  'sortDocumentsBy': ''
 })
 
 #macro (documentTree $options)

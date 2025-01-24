@@ -42,11 +42,9 @@ solr.admin.submit=Pielietot
 solr.admin.error.notallowed=Jums nav atļauts izpildīt šo darbību.
 solr.admin.error.norights=Lai piekļūtu šai sadaļai, ir nepieciešamas administratora tiesības.
 ### Missing: solr.admin.success.action={0} successfully triggered.
-
 solr.admin.status.title=Statuss
 solr.admin.status.queueSize.label=Rindas izmērs
 solr.admin.status.queueSize.hint=Atlikušo vienumu skaits, kurus ir nepieciešams indeksēt, pārindeksēt vai dzēst no indeksa (atkarībā no izvēlētās darbības).
-
 solr.admin.indexing.title=Indeksēšana
 solr.admin.indexing.action.label=Darbība
 solr.admin.indexing.action.hint=Indeksam pielietojamā darbība.
@@ -58,9 +56,7 @@ solr.admin.indexing.wiki.hint=Viki, kura visiem dokumentiem tiks veikta izvēlē
 solr.admin.indexing.wiki.select_farm=Visai fermai
 solr.admin.indexing.query.label=Pielāgots pieprasījums
 solr.admin.indexing.query.hint=Neobligāts dokumentu skaita ierobežojums, kuriem indeksā tiks pielietota izvēlētā darbība.
-
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
-
 solr.sortBy=Kārtot pēc:
 solr.sortBy.score=Atbilstība
 solr.sortBy.title_sort=Virsraksts
@@ -72,20 +68,17 @@ solr.sortBy.attdate_sort=Augšuplādēts
 solr.sortBy.attauthor_display_sort=Augšuplādējis
 solr.sortOrder.asc=Augoši
 solr.sortOrder.desc=Dilstoši
-
 solr.options=Rādīt:
 solr.options.highlight=Izgaismošana
 solr.options.highlight.title=Parādīt iztvērumu ar atbilstošo rezultātu
 solr.options.facet=Aspekti
 solr.options.facet.title=Atļaut papildu meklēšanu rezultātos
-
 solr.result.language=Valoda
 solr.result.locatedIn=Atrodas
 solr.result.author=Mainījis {0} {1}
 solr.result.mediaType={0} veida fails
 solr.result.uploadedBy=Augšuplādējis {0} {1} ({2})
 solr.result.highlightAll=Izgaismot visas atbilstības
-
 solr.facets.title=Precizēt meklējumu
 solr.facets.hint=Izvēlieties kategoriju un pielietojiet filtru atlases rezultātiem
 solr.facets.resetAll=Atstatīt visu
@@ -93,12 +86,10 @@ solr.facets.expandAll=Izvērst visu
 solr.facets.collapseAll=Sakļaut visu
 solr.facets.emptyValue=Tukša vērtība
 solr.facets.moreValues={0} pārējos
-
 solr.filterBy.type.document=Dokuments
 solr.filterBy.type.attachment=Pielikums
 solr.filterBy.type.object=Objekts
 solr.filterBy.type.object_property=Objekta īpašība
-
 solr.filterBy.fileType.image=Attēls
 solr.filterBy.fileType.audio=Skaņa
 solr.filterBy.fileType.video=Video
@@ -118,7 +109,6 @@ solr.facet.fileType.image.icon=Ikona
 solr.facet.fileType.archive.java-archive=JAR
 solr.facet.fileType.archive.xara=XAR
 solr.facet.fileType.other.octet-stream=Bināri dati
-
 solr.facet.date.today=Šodien
 solr.facet.date.last7Days=Iepriekšējās 7 dienas
 solr.facet.date.last30Days=Iepriekšējās 30 dienas
@@ -131,7 +121,6 @@ solr.facet.date.between=No {0} līdz {1}
 solr.facet.date.after=Pēc {0}
 solr.facet.date.before=Pirms {0}
 solr.facet.date.any=Jebkurā laikā
-
 solr.facet.size.tiny=Niecīgs
 solr.facet.size.small=Mazs
 solr.facet.size.medium=Vidējs
@@ -140,7 +129,6 @@ solr.facet.size.between=Starp {0} un {1}
 solr.facet.size.lessThan=Mazāk par {0}
 solr.facet.size.moreThan=Vairāk par {0}
 solr.facet.size.any=Jebkurš izmērs
-
 solr.field.type=Rezultātu veids
 solr.field.locale=Valoda
 solr.field.locale.emptyValue=Nav valodas
@@ -173,7 +161,6 @@ solr.field.attauthor=Augšuplādējis
 solr.field.attauthor_display=Augšuplādējis
 solr.field.attdate=Augšuplādes laiks
 solr.field.attsize=Faila izmērs
-
 solr.uix.docdoesnotexist.title=Varbūt jūs meklējāt sekojošas lapas?
 solr.uix.attachmentdoesnotexist.title=Varbūt jūs meklējāt kādu no sekojošiem pielikumiem?
 
@@ -187,5 +174,6 @@ solr.result.location=Atrodas {0} » {1} » {2}
 solr.field.space=Vieta
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend</content>
+#@deprecatedend
+</content>
 </xwikidoc>

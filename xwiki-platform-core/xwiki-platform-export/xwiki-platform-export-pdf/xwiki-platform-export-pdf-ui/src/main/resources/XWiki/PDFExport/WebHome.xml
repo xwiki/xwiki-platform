@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.WebHome" locale="">
+<xwikidoc version="1.6" reference="XWiki.PDFExport.WebHome" locale="">
   <web>XWiki.PDFExport</web>
   <name>WebHome</name>
   <language/>
@@ -302,7 +302,6 @@ require([
       .text(l10n['export.pdf.generator.checking'])
       .prepend(renderIcon(config.icons.spinner));
     return fetch(XWiki.currentDocument.getURL('get', $.param({
-      outputSyntax: 'plain',
       sheet: 'XWiki.PDFExport.WebHome',
       data: 'serverSidePrintingAvailable',
     }))).then(response =&gt; response.json()).then(data =&gt; {
@@ -372,7 +371,6 @@ require([
     });
     const locale = document.documentElement.getAttribute('lang') || '';
     data.push(
-      {name: 'outputSyntax', value: 'plain'},
       {name: 'sheet', value: 'XWiki.PDFExport.WebHome'},
       {name: 'action', value: 'export'},
       {name: 'form_token', value: xwikiMeta.form_token},
@@ -399,7 +397,6 @@ require([
         return {
           url: XWiki.currentDocument.getURL('get'),
           data: {
-            outputSyntax: 'plain',
             sheet: 'XWiki.PDFExport.WebHome',
             data: 'jobStatus',
             jobId: jobId.join('/')
@@ -418,7 +415,6 @@ require([
 
   const cancelPDFExportJob = (jobId) =&gt; {
     return Promise.resolve($.post(XWiki.currentDocument.getURL('get'), {
-      outputSyntax: 'plain',
       sheet: 'XWiki.PDFExport.WebHome',
       action: 'cancel',
       form_token: xwikiMeta.form_token,
@@ -805,7 +801,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

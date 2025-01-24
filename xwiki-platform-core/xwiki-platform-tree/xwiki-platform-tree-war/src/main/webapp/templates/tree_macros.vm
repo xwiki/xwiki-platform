@@ -26,6 +26,7 @@
   'exclusions': $collectiontool.set,
   'finder': false,
   'icons': true,
+  'id': "xtree-${datetool.date.time}-${mathtool.random(100, 1000)}",
   'limit': 15,
   'links': false,
   'openTo': '',
@@ -37,7 +38,7 @@
 
 #macro (tree $options)
   <div #treeAttributes($options)></div>
-  <span id="xtree#if($!{macro.options.id})-$!{macro.options.id}#{end}-description" class="sr-only">
+  <span id="$!{attributes.id}-description" class="sr-only">
     $services.localization.render('tree.macro.description')
   </span>
 #end
@@ -72,7 +73,7 @@
   #if ($macro.options.id)
     #set ($discard = $attributes.put('id', $macro.options.id))
   #end
-  #set ($discard = $attributes.put('aria-describedby', "xtree#if($!{macro.options.id})-$!{macro.options.id}#{end}-description"))
+  #set ($discard = $attributes.put('aria-describedby', "$!{macro.options.id}-description"))
   #set ($classes = ["$!macro.options.get('class')"])
   #set ($noLinks = $macro.options.links != 'true')
   #if ($noLinks)

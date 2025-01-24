@@ -19,7 +19,9 @@
  */
 package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -41,6 +43,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
 
 /**
@@ -106,8 +109,9 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
 
                 if (macro instanceof ScriptMacro) {
                     result = this.scriptMacroAnalyzer.analyze(macroBlock);
-                } else if (macro != null && this.shouldMacroContentBeParsed(macro)) {
-                    result = analyzeMacroContent(macroBlock, macroBlock.getContent());
+                } else if (macro != null) {
+                    result = new ArrayList<>(maybeAnalyzeMacroContent(macroBlock, macro));
+                    result.addAll(maybeAnalyzeParameters(macroBlock, macro));
                 } else {
                     result = List.of();
                 }
@@ -115,6 +119,41 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
         }
 
         return result;
+    }
+
+    private List<RequiredRightAnalysisResult> maybeAnalyzeParameters(MacroBlock macroBlock, Macro<?> macro)
+        throws RequiredRightsException
+    {
+        List<RequiredRightAnalysisResult> results = new ArrayList<>();
+
+        Map<String, ParameterDescriptor> parameterDescriptorMap = macro.getDescriptor().getParameterDescriptorMap();
+
+        for (Map.Entry<String, String> parameter : macroBlock.getParameters().entrySet()) {
+            ParameterDescriptor parameterDescriptor = parameterDescriptorMap.get(parameter.getKey().toLowerCase());
+
+            if (parameterDescriptor != null && parameter.getValue() != null
+                // Analyze the content if either the display type or the parameter type is wiki syntax as both are a
+                // strong indication that the content is parsed and executed.
+                && (Block.LIST_BLOCK_TYPE.equals(parameterDescriptor.getParameterType())
+                || Block.LIST_BLOCK_TYPE.equals(parameterDescriptor.getDisplayType())))
+            {
+                results.addAll(analyzeMacroContent(macroBlock, parameter.getValue()));
+            }
+        }
+
+        return results;
+    }
+
+    private List<RequiredRightAnalysisResult> maybeAnalyzeMacroContent(MacroBlock macroBlock, Macro<?> macro)
+        throws RequiredRightsException
+    {
+        ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
+
+        if (contentDescriptor != null && Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType())) {
+            return analyzeMacroContent(macroBlock, macroBlock.getContent());
+        }
+
+        return List.of();
     }
 
     private Optional<RequiredRightAnalyzer<MacroBlock>> getMacroBlockRequiredRightAnalyzer(MacroBlock macroBlock)
@@ -148,11 +187,5 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
         } catch (ComponentLookupException e) {
             return Optional.empty();
         }
-    }
-
-    private boolean shouldMacroContentBeParsed(Macro<?> macro)
-    {
-        ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
-        return contentDescriptor != null && Block.LIST_BLOCK_TYPE.equals(contentDescriptor.getType());
     }
 }

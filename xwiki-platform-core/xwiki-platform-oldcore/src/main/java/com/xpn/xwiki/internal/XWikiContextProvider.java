@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.container.servlet.ServletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
@@ -96,10 +97,11 @@ public class XWikiContextProvider implements Provider<XWikiContext>
             xcontext.declareInExecutionContext(econtext);
 
             // Set the stub request and the response
-            if (this.container.getRequest() == null) {
+            if (this.container.getRequest() == null && xcontext.getRequest() != null) {
                 this.container.setRequest(new ServletRequest(xcontext.getRequest()));
+                this.container.setSession(new ServletSession(xcontext.getRequest()));
             }
-            if (this.container.getResponse() == null) {
+            if (this.container.getResponse() == null && xcontext.getResponse() != null) {
                 this.container.setResponse(new ServletResponse(xcontext.getResponse()));
             }
         }

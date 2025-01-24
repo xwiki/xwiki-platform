@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>17.0.0-SNAPSHOT</version>
+    <version>17.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -137,6 +137,17 @@
             </revapi.differences>
 
                  Single justification example:
+
+            <revapi.differences>
+              <differences>
+                <item>
+                  <code>java.method.removed</code>
+                  <old>method void org.xwiki.diff.xml.XMLDiff::xxx()</old>
+                  <justification>Unstable API added by mistake.</justification>
+                  <criticality>highlight</criticality>
+                </item>
+              </differences>
+            </revapi.differences>
             -->
             <revapi.differences>
               <justification>
@@ -497,6 +508,125 @@
                 </item>
               </differences>
             </revapi.differences>
+
+            <!-- Jakarta -->
+            <revapi.differences>
+              <justification>revapi false positives</justification>
+              <criticality>allowed</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>java.method.addedToInterface</code>
+                  <new>.*@ com.xpn.xwiki.web.XWikiResponse</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>java.method.addedToInterface</code>
+                  <new>.*@ com.xpn.xwiki.web.XWikiRequest</new>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                  <new>class com.xpn.xwiki.render.ScriptXWikiServletRequest</new>
+                  <superClass>javax.servlet.ServletRequestWrapper</superClass>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.WrappingXWikiRequest</old>
+                  <new>class com.xpn.xwiki.web.WrappingXWikiRequest</new>
+                  <superClass>javax.servlet.ServletRequestWrapper</superClass>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.XWikiServletRequestStub</old>
+                  <new>class com.xpn.xwiki.web.XWikiServletRequestStub</new>
+                  <superClass>javax.servlet.ServletRequestWrapper</superClass>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                  <old>class com.xpn.xwiki.web.XWikiServletResponseStub</old>
+                  <new>class com.xpn.xwiki.web.XWikiServletResponseStub</new>
+                  <superClass>javax.servlet.ServletResponseWrapper</superClass>
+                </item>
+              </differences>
+            </revapi.differences>
+            <revapi.differences>
+              <justification>Move to Jakarta</justification>
+              <criticality>highlight</criticality>
+              <differences>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.websocket.AbstractXWikiEndpoint.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.container.servlet.SetThreadNameServletRequestListener.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.resource.servlet.ResourceReferenceHandlerServlet.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.resource.servlet.RoutingFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.wysiwyg.filter.ConversionFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.ActionFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.HomePageRedirectServlet.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.LegacyActionServlet.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*org.xwiki.container.servlet.XWikiServletContextListener.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <regex>true</regex>
+                  <code>.*</code>
+                  <old>.*com.xpn.xwiki.web.XWikiContextInitializationFilter.*</old>
+                </item>
+                <item>
+                  <ignore>true</ignore>
+                  <code>java.class.removed</code>
+                  <old>class org.xwiki.wysiwyg.filter.XWikiContextInitializationFilter</old>
+                </item>
+              </differences>
+            </revapi.differences>
           </analysisConfiguration>
         </configuration>
       </plugin>
@@ -620,7 +750,6 @@
           <plugin>
             <groupId>org.codehaus.gmavenplus</groupId>
             <artifactId>gmavenplus-plugin</artifactId>
-            <version>4.0.1</version>
             <executions>
               <execution>
                 <id>set-system-properties-file</id>

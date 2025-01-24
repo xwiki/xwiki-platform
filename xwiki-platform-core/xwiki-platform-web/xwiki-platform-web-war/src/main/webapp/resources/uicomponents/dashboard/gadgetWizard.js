@@ -68,8 +68,8 @@ define(['jquery', 'xwiki-ckeditor'], function($, ckeditorPromise) {
   };
 
   var getDefaultGadgetTitle = function(macroEditor) {
-    var gadgetName = macroEditor.attr('data-macroid').split('/')[0];
-    return "$services.localization.render('rendering.macro." + gadgetName + ".name')";
+    const gadgetName = macroEditor.attr('data-macroid').split('/')[0];
+    return '{{translation key="rendering.macro.' + gadgetName.replace('~', '~~').replace('"', '~"') + '.name"/}}';
   };
 
   var currentGadget;

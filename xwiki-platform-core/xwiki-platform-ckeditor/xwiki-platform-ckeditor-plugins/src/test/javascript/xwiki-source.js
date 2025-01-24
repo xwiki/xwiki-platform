@@ -19,48 +19,50 @@
  */
 define(['jquery', 'textSelection'], function($, textSelectionAPI) {
   describe('XWiki Source Plugin for CKEditor', function() {
-    it('Convert text selection between WYSIWYG and Source modes', function() {
-      assertSelection('a|b|c', 'a|b|c');
+    it('Convert text selection between WYSIWYG and Source modes', async function(done) {
+      await assertSelection('a|b|c', 'a|b|c');
 
-      assertSelection('abc *abc|*', 'abc <b>abc|</b>');
+      await assertSelection('abc *abc|*', 'abc <b>abc|</b>');
 
-      assertSelection('abc [[ab|c>>x|yz]] xyz', 'abc <a href="#xyz">ab|c|</a> xyz', 'abc [[ab|c|>>xyz]] xyz');
+      await assertSelection('abc [[ab|c>>x|yz]] xyz', 'abc <a href="#xyz">ab|c|</a> xyz', 'abc [[ab|c|>>xyz]] xyz');
 
-      assertSelection('abc [|[abc>>xyz]|] xyz', 'abc |<a href="#xyz">abc|</a> xyz', 'abc |[[abc|>>xyz]] xyz');
+      await assertSelection('abc [|[abc>>xyz]|] xyz', 'abc |<a href="#xyz">abc|</a> xyz', 'abc |[[abc|>>xyz]] xyz');
 
-      assertSelection('{{abc/}} **a|bc**', 'xyz <b>a|bc</b>');
+      await assertSelection('{{abc/}} **a|bc**', 'xyz <b>a|bc</b>');
 
-      assertSelection('{{abc/}} [[ab|c>>x|yz]] xyz', '<b>xyz</b> <a href="#xyz">ab|c|</a> xyz',
+      await assertSelection('{{abc/}} [[ab|c>>x|yz]] xyz', '<b>xyz</b> <a href="#xyz">ab|c|</a> xyz',
         '{{abc/}} [[ab|c|>>xyz]] xyz');
 
-      assertSelection('one\ntwo\nthr|ee', '<p>one</p><p>two</p><p>thr|ee</p>');
+      await assertSelection('one\ntwo\nthr|ee', '<p>one</p><p>two</p><p>thr|ee</p>');
+
+      done();
     });
   });
 
-  var assertSelection = function(textBefore, html, textAfter) {
+  async function assertSelection(textBefore, html, textAfter) {
     textAfter = textAfter || textBefore;
 
     //
     // Setup
     //
 
-    var textArea = $('<textarea/>').appendTo(document.body).val(textBefore)[0];
-    var textSelection = getSpecifiedTextSelection(textArea);
+    const textArea = $('<textarea/>').appendTo(document.body).val(textBefore)[0];
+    let textSelection = getSpecifiedTextSelection(textArea);
 
-    var root = $('<div/>').appendTo(document.body).attr('contenteditable', true).html(html)[0];
-    var expectedRange = getSpecifiedRange(root);
+    const root = $('<div/>').appendTo(document.body).attr('contenteditable', true).html(html)[0];
+    const expectedRange = getSpecifiedRange(root);
 
     //
     // From Source to WYSIWYG
     //
 
-    var selection = window.getSelection();
+    const selection = window.getSelection();
     selection.removeAllRanges();
     textArea.setSelectionRange(textSelection.startOffset, textSelection.endOffset);
 
-    textSelectionAPI.from(textArea).applyTo(root);
+    (await textSelectionAPI.from(textArea).transform(root)).applyTo(root);
 
-    var range = selection.getRangeAt(0);
+    const range = selection.getRangeAt(0);
     assertRange(range, expectedRange);
 
     //
@@ -68,9 +70,9 @@ define(['jquery', 'textSelection'], function($, textSelectionAPI) {
     //
 
     textArea.value = textAfter;
-    var expectedTextSelection = getSpecifiedTextSelection(textArea);
+    const expectedTextSelection = getSpecifiedTextSelection(textArea);
 
-    textSelectionAPI.from(root).applyTo(textArea);
+    (await textSelectionAPI.from(root, [selection.getRangeAt(0)]).transform(textArea)).applyTo(textArea);
 
     textSelection = textSelectionAPI.from(textArea);
     assertTextSelection(textSelection, expectedTextSelection);
@@ -80,7 +82,7 @@ define(['jquery', 'textSelection'], function($, textSelectionAPI) {
     //
 
     $(root).add(textArea).remove();
-  };
+  }
 
   var assertRange = function(range, expectedRange) {
     expect(range.startContainer).toBe(expectedRange.startContainer);

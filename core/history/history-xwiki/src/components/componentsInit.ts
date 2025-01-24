@@ -156,23 +156,29 @@ class XWikiPageRevisionManager implements PageRevisionManager {
         headers.Authorization = authorization;
       }
       const response = await fetch(restApiUrl, { headers });
-      const jsonResponse = await response.json();
-      let user = jsonResponse.pageName;
-      jsonResponse.properties.forEach(
-        (property: { name: string; value: string }) => {
-          // Properties are sorted alphabetically.
-          switch (property.name) {
-            case "first_name":
-              user = property.value;
-              break;
-            case "last_name":
-              if (property.value) {
-                user += ` ${property.value}`;
-              }
-              break;
-          }
-        },
-      );
+      const jsonResponse: {
+        properties: { name: string; value: string }[];
+        pageName: string;
+      } = await response.json();
+
+      const firstName =
+        jsonResponse.properties
+          .filter((p) => p.name == "first_name")
+          .map((p) => p.value) ?? "";
+      const lastName =
+        jsonResponse.properties
+          .filter((p) => p.name == "last_name")
+          .map((p) => p.value) ?? "";
+      const fullName = `${firstName} ${lastName}`.trim();
+      let user: string;
+      // If at least one of first or last name is not empty, the full name is not empty and the fullname is used.
+      // Otherwise, we fallback to the user id.
+      if (fullName != "") {
+        user = fullName;
+      } else {
+        user = jsonResponse.pageName;
+      }
+
       return {
         name: user,
         profile: this.cristalApp.getRouter().resolve({

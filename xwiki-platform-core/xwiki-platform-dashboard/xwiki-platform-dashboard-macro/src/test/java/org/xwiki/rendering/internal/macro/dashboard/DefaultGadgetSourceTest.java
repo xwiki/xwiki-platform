@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -78,6 +79,9 @@ class DefaultGadgetSourceTest
 
     @MockComponent
     private DocumentAuthorizationManager authorizationManager;
+
+    @MockComponent
+    private ContextualLocalizationManager localizationManager;
 
     @Mock
     private DocumentReference documentReference;
@@ -193,17 +197,28 @@ class DefaultGadgetSourceTest
         assertEquals(new ArrayList<>(), this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext));
 
         BaseObject gadgetObject1 = mock(BaseObject.class);
-        when(xWikiDocument.getXObjects(gadgetClassReference)).thenReturn(Collections.singletonList(gadgetObject1));
         when(gadgetObject1.getOwnerDocument()).thenReturn(ownerDocument);
         when(gadgetObject1.getStringValue("title")).thenReturn("Gadget 2");
         when(gadgetObject1.getLargeStringValue("content")).thenReturn("Some other content");
         when(gadgetObject1.getStringValue("position")).thenReturn("2");
         when(gadgetObject1.getNumber()).thenReturn(12);
+
+        BaseObject gadgetObject2 = mock();
+        when(gadgetObject2.getOwnerDocument()).thenReturn(ownerDocument);
+        when(gadgetObject2.getStringValue("title")).thenReturn("$services.localization.render('xwiki.gadget2')");
+        when(gadgetObject2.getLargeStringValue("content")).thenReturn("Localized content");
+        when(gadgetObject2.getStringValue("position")).thenReturn("3");
+        when(gadgetObject2.getNumber()).thenReturn(13);
+
+        when(this.localizationManager.getTranslationPlain("xwiki.gadget2")).thenReturn("Translated Title");
+
+        when(xWikiDocument.getXObjects(gadgetClassReference)).thenReturn(List.of(gadgetObject1, gadgetObject2));
+
         when(this.authorizationManager.hasAccess(Right.SCRIPT, EntityType.DOCUMENT, ownerAuthorReference,
             ownerSourceReference)).thenReturn(false);
 
         List<Gadget> gadgets = this.defaultGadgetSource.getGadgets(testSource, macroTransformationContext);
-        assertEquals(1, gadgets.size());
+        assertEquals(2, gadgets.size());
         Gadget gadget = gadgets.get(0);
         assertEquals("Gadget 2", gadget.getTitle().get(0).toString());
         assertEquals("Some other content", gadget.getContent().get(0).toString());
@@ -212,5 +227,14 @@ class DefaultGadgetSourceTest
             .execute(eq("Gadget 2"), any(), any(), any());
         verify(this.contentExecutor)
             .execute(eq("Some other content"), any(), any(), any());
+
+        Gadget gadget2 = gadgets.get(1);
+        assertEquals("Translated Title", gadget2.getTitle().get(0).toString());
+        assertEquals("Localized content", gadget2.getContent().get(0).toString());
+        assertEquals("13", gadget2.getId());
+        verify(this.contentExecutor)
+            .execute(eq("Translated Title"), any(), any(), any());
+        verify(this.contentExecutor)
+            .execute(eq("Localized content"), any(), any(), any());
     }
 }

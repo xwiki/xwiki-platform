@@ -50,8 +50,8 @@ define('resourcePicker', [
     options = options || {};
 
     var resourcePicker = $(resourcePickerTemplate);
-    resourcePicker.find('button.dropdown-toggle').first().attr('title', translations.get('dropdown.toggle.title'));
-    resourcePicker.find('button.dropdown-toggle .sr-only').first().text(translations.get('dropdown.toggle.title'));
+    resourcePicker.find('button.dropdown-toggle').attr('title', translations.get('dropdown.toggle.title'));
+    resourcePicker.find('button.dropdown-toggle .sr-only').text(translations.get('dropdown.toggle.title'));
     resourcePicker.data("options", options);
     element.on('selectResource', onSelectResource).hide().after(resourcePicker);
 

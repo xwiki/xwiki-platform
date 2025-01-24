@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { readConfiguration } from "@xwiki/cristal-configuration-electron-main";
 import { app, shell } from "electron";
 import { URL } from "node:url";
 import type { Session } from "electron";
@@ -32,7 +33,8 @@ type Permission = Parameters<
 /**
  * A list of origins that you allow open INSIDE the application and permissions for them.
  *
- * In development mode you need allow open `VITE_DEV_SERVER_URL`.
+ * In development mode, you need allow open `VITE_DEV_SERVER_URL`.
+ * @deprecated the allowed origins and permissions should be derived from the configuration.
  */
 const ALLOWED_ORIGINS_AND_PERMISSIONS: Map<string, Set<Permission>> = new Map<
   string,
@@ -69,9 +71,20 @@ app.on("web-contents-created", (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
+  const configuration = readConfiguration();
   contents.on("will-navigate", (event, url) => {
     const { origin } = new URL(url);
-    if (ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
+    const isAllowedOrigin = Object.values(configuration).some(
+      (configuration) => {
+        const baseURL = configuration.baseURL;
+        if (!baseURL) {
+          return false;
+        }
+        return new URL(baseURL).origin == origin;
+      },
+    );
+
+    if (isAllowedOrigin) {
       return;
     }
 
@@ -93,6 +106,8 @@ app.on("web-contents-created", (_, contents) => {
     (webContents, permission, callback) => {
       const { origin } = new URL(webContents.getURL());
 
+      // FIXME: this control is currently based on a fixed set of URLs, but seems also unused. We need to check more
+      // closely if this check is needed.
       const permissionGranted =
         !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
       callback(permissionGranted);
@@ -108,9 +123,9 @@ app.on("web-contents-created", (_, contents) => {
   /**
    * Hyperlinks leading to allowed sites are opened in the default browser.
    *
-   * The creation of new `webContents` is a common attack vector. Attackers attempt to convince the app to create new windows,
-   * frames, or other renderer processes with more privileges than they had before; or with pages opened that they couldn't open before.
-   * You should deny any unexpected window creation.
+   * The creation of new `webContents` is a common attack vector. Attackers attempt to convince the app to create new
+   * windows, frames, or other renderer processes with more privileges than they had before; or with pages opened that
+   * they couldn't open before. You should deny any unexpected window creation.
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#14-disable-or-limit-creation-of-new-windows
    * @see https://www.electronjs.org/docs/latest/tutorial/security#15-do-not-use-openexternal-with-untrusted-content

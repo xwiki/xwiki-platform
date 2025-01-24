@@ -51,4 +51,18 @@ describe("FileSystemModelReferenceSerializer", () => {
     );
     expect(url).toEqual("a/b/c/attachments/file.png");
   });
+
+  it("serialize a document reference without a space", () => {
+    const url = fileSystemModelReferenceSerializer.serialize(
+      new DocumentReference("page"),
+    );
+    expect(url).toEqual("page");
+  });
+
+  it("serialize a document reference with an empty space", () => {
+    const url = fileSystemModelReferenceSerializer.serialize(
+      new DocumentReference("page", new SpaceReference(undefined)),
+    );
+    expect(url).toEqual("page");
+  });
 });

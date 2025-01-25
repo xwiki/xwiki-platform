@@ -723,7 +723,10 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
       const text = isTextInput(textOrElement) ? textOrElement.value :
         (textOrElement?.nodeType === Node.ELEMENT_NODE ? getVisibleText(textOrElement) : textOrElement);
       if (typeof text === 'string' && text !== this.text) {
-        return $.extend({}, this, await changeText(this, text));
+        // Text selection transformation is asynchronous which means the text can change while we are waiting for the
+        // Web Worker to compute the diff. This means we need to trigger a new transformation until the text doesn't
+        // change.
+        return await $.extend({}, this, await changeText(this, text)).transform(textOrElement);
       } else {
         // No change or unknown input type. Text selection remains the same.
         return this;

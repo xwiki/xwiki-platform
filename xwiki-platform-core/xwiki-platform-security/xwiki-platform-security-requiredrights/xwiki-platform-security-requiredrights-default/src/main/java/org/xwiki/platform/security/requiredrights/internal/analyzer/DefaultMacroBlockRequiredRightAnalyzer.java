@@ -43,14 +43,12 @@ import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
-import org.xwiki.properties.converter.Converter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.script.ScriptMacro;
-import org.xwiki.rendering.macro.source.MacroContentSourceReference;
 
 /**
  * Default analyzer for macro blocks. Recurses into the macro content if it is wiki syntax.
@@ -76,9 +74,6 @@ public class DefaultMacroBlockRequiredRightAnalyzer extends AbstractMacroBlockRe
 
     @Inject
     private Provider<DefaultMacroRequiredRightReporter> macroRequiredRightReporterProvider;
-
-    @Inject
-    private Converter<MacroContentSourceReference> macroContentSourceReferenceConverter;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(MacroBlock macroBlock)

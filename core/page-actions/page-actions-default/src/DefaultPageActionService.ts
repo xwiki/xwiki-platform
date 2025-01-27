@@ -21,7 +21,7 @@
 import { PageAction, PageActionService } from "@xwiki/cristal-page-actions-api";
 
 import { injectable, multiInject } from "inversify";
-import { filter, sortBy } from "lodash";
+import { sortBy } from "lodash";
 
 /**
  * @since 0.11
@@ -30,11 +30,20 @@ import { filter, sortBy } from "lodash";
 class DefaultPageActionService implements PageActionService {
   constructor(
     @multiInject("PageAction")
-    private action: PageAction[],
+    private actions: PageAction[],
   ) {}
 
-  list(categoryId: string): PageAction[] {
-    return sortBy(filter(this.action, { categoryId: categoryId }), ["order"]);
+  async list(categoryId: string): Promise<PageAction[]> {
+    const enabledActions: boolean[] = await Promise.all(
+      this.actions.map(
+        async (action) =>
+          (await action.enabled()) && action.categoryId == categoryId,
+      ),
+    );
+    return sortBy(
+      this.actions.filter((_, i) => enabledActions[i]),
+      ["order"],
+    );
   }
 }
 

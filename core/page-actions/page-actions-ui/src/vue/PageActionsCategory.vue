@@ -43,7 +43,7 @@ const actions: Ref<{ action: PageAction; component: ShallowRef<Component> }[]> =
   ref([]);
 
 onMounted(async () => {
-  for (const currAction of actionService.list(props.category.id)) {
+  for (const currAction of await actionService.list(props.category.id)) {
     actions.value.push({
       action: currAction,
       component: shallowRef(await currAction.component()),

@@ -29,6 +29,7 @@ import { ComponentInit as FileSystemLinkSuggestComponentInit } from "@xwiki/cris
 import { ComponentInit as ModelReferenceFilesystemComponentInit } from "@xwiki/cristal-model-reference-filesystem";
 import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem-default";
 import { ComponentInit as FileSystemNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-filesystem";
+import { ComponentInit as FileSystemRenameComponentInit } from "@xwiki/cristal-rename-filesystem";
 import { Container } from "inversify";
 
 CristalAppLoader.init(
@@ -56,5 +57,6 @@ CristalAppLoader.init(
     new ModelReferenceFilesystemComponentInit(container);
     new ModelRemoteURLFilesystemComponentInit(container);
     new FileSystemLinkSuggestComponentInit(container);
+    new FileSystemRenameComponentInit(container);
   },
 );

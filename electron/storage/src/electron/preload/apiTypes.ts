@@ -60,4 +60,19 @@ export interface APITypes {
       | { type: EntityType.DOCUMENT; value: PageData }
     )[]
   >;
+
+  /**
+   * Move a page.
+   *
+   * @param path - the path to the page to move
+   * @param newPath - the new path for the page
+   * @param preserveChildren - whether to move children
+   *
+   * @since 0.14
+   */
+  movePage(
+    path: string,
+    newPath: string,
+    preserveChildren: boolean,
+  ): Promise<void>;
 }

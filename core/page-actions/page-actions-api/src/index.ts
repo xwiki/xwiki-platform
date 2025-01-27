@@ -78,6 +78,12 @@ interface PageAction {
   order: number;
 
   /**
+   * Compute if the page action should be displayed.
+   * @since 0.14
+   */
+  enabled(): Promise<boolean>;
+
+  /**
    * Get a Vue component for this action.
    * The component should handle the following props:
    *   - currentPage: PageData corresponding to the displayed page
@@ -97,7 +103,7 @@ interface PageActionService {
    *
    * @param categoryId - the id of the category
    */
-  list(categoryId: string): PageAction[];
+  list(categoryId: string): Promise<PageAction[]>;
 }
 
 /**

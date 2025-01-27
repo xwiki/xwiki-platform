@@ -221,4 +221,12 @@ export class WrappingOfflineStorage implements WrappingStorage {
   async delete(page: string): Promise<{ success: boolean; error?: string }> {
     return this.storage.delete(page);
   }
+
+  async move(
+    page: string,
+    newPage: string,
+    preserveChildren: boolean,
+  ): Promise<{ success: boolean; error?: string }> {
+    return this.storage.move(page, newPage, preserveChildren);
+  }
 }

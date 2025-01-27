@@ -124,4 +124,20 @@ export abstract class AbstractStorage implements Storage {
    * @since 0.11
    */
   abstract delete(page: string): Promise<{ success: boolean; error?: string }>;
+
+  /**
+   * Move a page.
+   *
+   * @param page - the page to move
+   * @param newPage - the new location for the page
+   * @param preserveChildren - whether to move children
+   * @returns true if the move was successful, false with the reason otherwise
+   *
+   * @since 0.14
+   */
+  abstract move(
+    page: string,
+    newPage: string,
+    preserveChildren: boolean,
+  ): Promise<{ success: boolean; error?: string }>;
 }

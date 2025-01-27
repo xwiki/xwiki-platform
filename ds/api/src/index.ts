@@ -35,6 +35,7 @@ import type {
 } from "./XBreadcrumb";
 import type { BtnProps } from "./XBtn";
 import type { CardProps } from "./XCard";
+import type { CheckboxProps } from "./XCheckbox";
 import type { DialogProps } from "./XDialog";
 import type { DividerProps } from "./XDivider";
 import type { FileInputModel, FileInputProps } from "./XFileInput";
@@ -62,6 +63,7 @@ type AbstractElements = {
   XBtn: DefineComponent<BtnProps & ButtonHTMLAttributes>;
   XBreadcrumb: DefineComponent<BreadcrumbProps & HTMLAttributes>;
   XCard: DefineComponent<CardProps & HTMLAttributes>;
+  XCheckbox: DefineComponent<CheckboxProps & HTMLAttributes>;
   XDialog: DefineComponent<DialogProps & HTMLAttributes>;
   XDivider: DefineComponent<DividerProps & HTMLAttributes>;
   XFileInput: DefineComponent<FileInputProps & InputHTMLAttributes>;
@@ -90,6 +92,7 @@ export type {
   BreadcrumbProps,
   BtnProps,
   CardProps,
+  CheckboxProps,
   DialogProps,
   DividerProps,
   FileInputModel,

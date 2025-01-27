@@ -21,6 +21,8 @@
 import {
   PageDeleteAction,
   PageManagementActionCategory,
+  PageMoveAction,
+  PageRenameAction,
 } from "./PageManagement";
 import PageActions from "./vue/PageActions.vue";
 import type {
@@ -34,6 +36,14 @@ class ComponentInit {
     container
       .bind<PageActionCategory>("PageActionCategory")
       .to(PageManagementActionCategory)
+      .whenTargetIsDefault();
+    container
+      .bind<PageAction>("PageAction")
+      .to(PageMoveAction)
+      .whenTargetIsDefault();
+    container
+      .bind<PageAction>("PageAction")
+      .to(PageRenameAction)
       .whenTargetIsDefault();
     container
       .bind<PageAction>("PageAction")

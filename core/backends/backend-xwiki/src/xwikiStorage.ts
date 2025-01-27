@@ -374,6 +374,11 @@ export class XWikiStorage extends AbstractStorage {
     return success;
   }
 
+  async move(): Promise<{ success: boolean; error?: string }> {
+    // TODO: to be implemented in CRISTAL-434.
+    throw new Error("Move not supported");
+  }
+
   private async getCredentials(): Promise<{ Authorization?: string }> {
     const authorizationHeader = await this.authenticationManagerProvider
       .get()

@@ -58,6 +58,7 @@ import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cr
 import { ComponentInit as XWikiNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-xwiki";
 import { ComponentInit as ActionsPagesComponentInit } from "@xwiki/cristal-page-actions-default";
 import { ComponentInit as ActionsPagesUIComponentInit } from "@xwiki/cristal-page-actions-ui";
+import { ComponentInit as RenameComponentInit } from "@xwiki/cristal-rename-default";
 import { ComponentInit as RenderingComponentInit } from "@xwiki/cristal-rendering";
 import { ComponentInit as QueueWorkerComponentInit } from "@xwiki/cristal-sharedworker-impl";
 import { ComponentInit as SkinComponentInit } from "@xwiki/cristal-skin";
@@ -116,4 +117,5 @@ export function defaultComponentsList(container: Container): void {
   new ModelReferenceXWikiComponentInit(container);
   new DateAPIComponentInit(container);
   new MarkdownDefaultComponentInit(container);
+  new RenameComponentInit(container);
 }

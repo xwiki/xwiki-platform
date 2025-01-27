@@ -73,5 +73,12 @@ const api: APITypes = {
   > {
     return ipcRenderer.invoke("search", { query, type, mimetype });
   },
+  movePage(
+    path: string,
+    newPath: string,
+    preserveChildren: boolean,
+  ): Promise<void> {
+    return ipcRenderer.invoke("movePage", { path, newPath, preserveChildren });
+  },
 };
 contextBridge.exposeInMainWorld("fileSystemStorage", api);

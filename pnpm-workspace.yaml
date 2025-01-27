@@ -41,6 +41,7 @@ packages:
   - "core/model/model-remote-url/model-remote-url-filesystem/*"
   - "core/navigation-tree/*"
   - "core/page-actions/*"
+  - "core/rename/*"
   - "core/tiptap-extensions/*"
   - "core/uiextension/*"
   - "core/user/*"

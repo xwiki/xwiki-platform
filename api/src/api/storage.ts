@@ -118,4 +118,20 @@ export interface Storage {
    * @since 0.11
    */
   delete(page: string): Promise<{ success: boolean; error?: string }>;
+
+  /**
+   * Move a page.
+   *
+   * @param page - the page to move
+   * @param newPage - the new location for the page
+   * @param preserveChildren - whether to move children
+   * @returns true if the move was successful, false with the reason otherwise
+   *
+   * @since 0.14
+   */
+  move(
+    page: string,
+    newPage: string,
+    preserveChildren: boolean,
+  ): Promise<{ success: boolean; error?: string }>;
 }

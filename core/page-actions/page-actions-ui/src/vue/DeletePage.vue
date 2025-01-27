@@ -105,7 +105,12 @@ async function deletePage() {
           t("page.action.action.delete.page.confirm", { page: currentPageName })
         }}
       </p>
-      <x-btn @click.stop="deletePage">
+    </template>
+    <template #footer>
+      <x-btn @click.stop="deleteDialogOpen = false">
+        {{ t("page.action.action.delete.page.cancel") }}
+      </x-btn>
+      <x-btn variant="primary" @click.stop="deletePage">
         {{ t("page.action.action.delete.page.title") }}
       </x-btn>
     </template>

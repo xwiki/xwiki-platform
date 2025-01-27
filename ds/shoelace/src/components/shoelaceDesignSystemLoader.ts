@@ -95,5 +95,10 @@ export class ShoelaceDesignSystemLoader implements DesignSystemLoader {
       "XNavigationTree",
       () => import("../vue/x-navigation-tree.vue"),
     );
+    registerAsyncComponent(
+      app,
+      "XCheckbox",
+      () => import("../vue/form/x-checkbox.vue"),
+    );
   }
 }

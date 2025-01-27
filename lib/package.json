@@ -73,6 +73,7 @@
     "@xwiki/cristal-navigation-tree-xwiki": "workspace:*",
     "@xwiki/cristal-page-actions-default": "workspace:*",
     "@xwiki/cristal-page-actions-ui": "workspace:*",
+    "@xwiki/cristal-rename-default": "workspace:*",
     "@xwiki/cristal-rendering": "workspace:*",
     "@xwiki/cristal-sharedworker-impl": "workspace:*",
     "@xwiki/cristal-skin": "workspace:*",

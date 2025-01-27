@@ -153,6 +153,10 @@ async function onDocumentUpdate(parents: string[]) {
   }
 
   // New page
+  if (current.value?.lazy) {
+    // We don't do anything because this node will be loaded lazily anyway.
+    return;
+  }
   const newItems = await treeSource.getChildNodes(props.node.id);
   newItemsLoop: for (const newItem of newItems) {
     for (const i of nodes.value.keys()) {
@@ -174,11 +178,12 @@ async function onDocumentUpdate(parents: string[]) {
   >
     <a
       v-if="props.clickAction"
+      class="undecorated"
       :href="node.url"
       @click.prevent="onClick(node)"
       >{{ node.label }}</a
     >
-    <a v-else :href="node.url">{{ node.label }}</a>
+    <a v-else :href="node.url" class="undecorated">{{ node.label }}</a>
     <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
     Disabling it for now as I did not find an elegant solution to declare this property. -->
     <x-navigation-tree-item
@@ -195,12 +200,12 @@ async function onDocumentUpdate(parents: string[]) {
 </template>
 
 <style scoped>
-:deep(a) {
+sl-tree-item > a.undecorated {
   text-decoration: none;
   color: var(--cr-base-text-color);
 }
 /* Disable hand cursor on items, since we disable the default click action. */
-:deep(sl-tree-item)::part(base) {
+sl-tree-item::part(base) {
   cursor: default;
 }
 </style>

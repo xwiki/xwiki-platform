@@ -2080,9 +2080,21 @@ importers:
       '@xwiki/cristal-icons':
         specifier: workspace:*
         version: link:../../icons
+      '@xwiki/cristal-model-api':
+        specifier: workspace:*
+        version: link:../../model/model-api
+      '@xwiki/cristal-model-reference-api':
+        specifier: workspace:*
+        version: link:../../model/model-reference/model-reference-api
+      '@xwiki/cristal-navigation-tree-api':
+        specifier: workspace:*
+        version: link:../../navigation-tree/navigation-tree-api
       '@xwiki/cristal-page-actions-api':
         specifier: workspace:*
         version: link:../page-actions-api
+      '@xwiki/cristal-rename-api':
+        specifier: workspace:*
+        version: link:../../rename/rename-api
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -2111,6 +2123,75 @@ importers:
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
+
+  core/rename/rename-api:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.11
+        version: 6.0.11(@types/node@22.10.7)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/rename/rename-default:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-rename-api':
+        specifier: workspace:*
+        version: link:../rename-api
+      inversify:
+        specifier: 6.2.1
+        version: 6.2.1(reflect-metadata@0.2.2)
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.11
+        version: 6.0.11(@types/node@22.10.7)(tsx@4.19.2)(yaml@2.6.1)
+
+  core/rename/rename-filesystem:
+    dependencies:
+      '@xwiki/cristal-api':
+        specifier: workspace:*
+        version: link:../../../api
+      '@xwiki/cristal-backend-api':
+        specifier: workspace:*
+        version: link:../../backends/backend-api
+      '@xwiki/cristal-rename-api':
+        specifier: workspace:*
+        version: link:../rename-api
+      inversify:
+        specifier: 6.2.1
+        version: 6.2.1(reflect-metadata@0.2.2)
+    devDependencies:
+      '@xwiki/cristal-dev-config':
+        specifier: workspace:*
+        version: link:../../../dev/config
+      reflect-metadata:
+        specifier: 0.2.2
+        version: 0.2.2
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vite:
+        specifier: 6.0.11
+        version: 6.0.11(@types/node@22.10.7)(tsx@4.19.2)(yaml@2.6.1)
 
   core/tiptap-extensions/tiptap-extension-image:
     dependencies:
@@ -2965,6 +3046,9 @@ importers:
       '@xwiki/cristal-navigation-tree-filesystem':
         specifier: workspace:*
         version: link:../../core/navigation-tree/navigation-tree-filesystem
+      '@xwiki/cristal-rename-filesystem':
+        specifier: workspace:*
+        version: link:../../core/rename/rename-filesystem
       inversify:
         specifier: 6.2.1
         version: 6.2.1(reflect-metadata@0.2.2)
@@ -3227,6 +3311,9 @@ importers:
       '@xwiki/cristal-page-actions-ui':
         specifier: workspace:*
         version: link:../core/page-actions/page-actions-ui
+      '@xwiki/cristal-rename-default':
+        specifier: workspace:*
+        version: link:../core/rename/rename-default
       '@xwiki/cristal-rendering':
         specifier: workspace:*
         version: link:../rendering/rendering

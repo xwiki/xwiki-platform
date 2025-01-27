@@ -39,30 +39,38 @@ const open = defineModel<boolean>();
   <span @click="click">
     <slot name="activator" />
   </span>
-  <sl-dialog
-    ref="dialog"
-    :open="open"
-    :label="title"
-    class="dialog-overview"
-    @sl-show="open = true"
-    @sl-hide="open = false"
-  >
-    <slot name="default" />
-    <!-- We use Vue3's `template` tag syntax to manage slots, but Shoelace
-         requires the (now deprecated) slot attribute. As such, we define a
-         conditional wrapper that will be bound to the sl-dialog component,
-         and will hold the contents of our own footer slot (if any). -->
-    <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
-    Disabling it for now as I did not find an elegant solution to declare this property. -->
-    <div v-if="$slots.footer" slot="footer">
-      <slot name="footer" />
-    </div>
-  </sl-dialog>
+  <!-- We need to place the modal in the root node to avoid overlay issues. -->
+  <Teleport to="#xwCristalApp">
+    <sl-dialog
+      ref="dialog"
+      :open="open"
+      :label="title"
+      class="dialog-overview"
+      @sl-show="open = true"
+      @sl-hide="open = false"
+    >
+      <slot name="default" />
+      <!-- We use Vue3's `template` tag syntax to manage slots, but Shoelace
+           requires the (now deprecated) slot attribute. As such, we define a
+           conditional wrapper that will be bound to the sl-dialog component,
+           and will hold the contents of our own footer slot (if any). -->
+      <!-- @vue-expect-error the slot attribute is shoelace specific and is not know by the typechecker.
+      Disabling it for now as I did not find an elegant solution to declare this property. -->
+      <div v-if="$slots.footer" slot="footer" class="footer">
+        <slot name="footer" />
+      </div>
+    </sl-dialog>
+  </Teleport>
 </template>
 
 <style scoped>
 sl-dialog {
   --width: v-bind(width);
   --body-spacing: 0 1.25rem 1.25rem;
+}
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cr-spacing-x-small);
 }
 </style>

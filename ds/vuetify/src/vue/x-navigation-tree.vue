@@ -165,20 +165,28 @@ function clearSelection() {
 // eslint-disable-next-line max-statements
 async function onDocumentDelete(page: PageData) {
   const parents = treeSource.getParentNodesId(page);
-  let currentItems: TreeItem[] | undefined = rootNodes.value;
-  while (currentItems) {
-    for (const i of currentItems.keys()) {
-      if (currentItems[i].id == parents[0]) {
+  let currentItem: TreeItem | undefined = undefined;
+  let currentItemChildren: TreeItem[] | undefined = rootNodes.value;
+  let notFound = false;
+
+  currentItemsLoop: while (currentItemChildren && !notFound) {
+    for (const i of currentItemChildren.keys()) {
+      if (currentItemChildren[i].id == parents[0]) {
         if (parents.length == 1) {
-          currentItems.splice(i, 1);
+          currentItemChildren.splice(i, 1);
+          if (currentItem && currentItemChildren.length == 0) {
+            currentItem!.children = undefined;
+          }
           return;
         } else {
-          currentItems = currentItems[i].children;
+          currentItem = currentItemChildren[i];
+          currentItemChildren = currentItem.children;
           parents.shift();
-          break;
+          continue currentItemsLoop;
         }
       }
     }
+    notFound = true;
   }
 }
 

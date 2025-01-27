@@ -107,6 +107,21 @@ export default class FileSystemStorage extends AbstractStorage {
     }
   }
 
+  async move(
+    page: string,
+    newPage: string,
+    preserveChildren: boolean,
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const path = await fileSystemStorage.resolvePath(page);
+      const newPath = await fileSystemStorage.resolvePath(newPage);
+      await fileSystemStorage.movePage(path, newPath, preserveChildren);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: (error as Error).message };
+    }
+  }
+
   private async saveAttachment(page: string, file: File): Promise<unknown> {
     const path = await fileSystemStorage.resolveAttachmentPath(page, file.name);
     await fileSystemStorage.saveAttachment(path, file);

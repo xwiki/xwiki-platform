@@ -40,6 +40,7 @@ import type { UserDetails } from "@xwiki/cristal-authentication-api";
 @injectable()
 export class NextcloudStorage extends AbstractStorage {
   private readonly ATTACHMENTS = "attachments";
+  private initBaseContentCalled: boolean = false;
 
   constructor(@inject<Logger>("Logger") logger: Logger) {
     super(logger, "storage.components.nextcloudStorage");
@@ -56,15 +57,14 @@ export class NextcloudStorage extends AbstractStorage {
   }
 
   async getPageContent(page: string): Promise<PageData | undefined> {
+    await this.initBaseContent();
     const baseRestURL = this.getWikiConfig().baseRestURL;
-    const headers = this.getBaseHeaders();
-
     try {
       const response = await fetch(
         `${baseRestURL}/${USERNAME}/.cristal/${page}/page.json`,
         {
           method: "GET",
-          headers,
+          headers: this.getBaseHeaders(),
         },
       );
 
@@ -333,5 +333,37 @@ export class NextcloudStorage extends AbstractStorage {
       // For now nextcloud does not allow for shared Cristal storage, so all files are owned by the current user
       author: undefined,
     };
+  }
+
+  private async initBaseContent() {
+    if (!this.initBaseContentCalled) {
+      this.initBaseContentCalled = true;
+      const baseRestURL = this.getWikiConfig().baseRestURL;
+      const headers = this.getBaseHeaders();
+      try {
+        const res = await fetch(`${baseRestURL}/${USERNAME}/.cristal`, {
+          method: "GET",
+          headers,
+        });
+        // if .cristal does not exist, initialize it with a default content.
+        if (res.status === 404) {
+          await this.save(
+            "home",
+            "# Welcome\n" +
+              "\n" +
+              "This is a new **Cristal** wiki.\n" +
+              "\n" +
+              "You can use it to take your *own* notes.\n" +
+              "\n" +
+              "You can also create new [[pages|home/newpage]].\n" +
+              "\n" +
+              "Enjoy!",
+            "",
+          );
+        }
+      } catch (e) {
+        console.error("Failed to initialize Cristal default content", e);
+      }
+    }
   }
 }

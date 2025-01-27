@@ -185,12 +185,6 @@ function editExistingPage() {
                 :click-action="treeNodeClickAction"
                 :current-page="currentPage"
               ></XNavigationTree>
-              <x-text-field
-                v-model="location"
-                :label="t('page.creation.menu.field.location')"
-                name="location"
-                required
-              ></x-text-field>
             </div>
           </div>
           <!-- This is a hidden button to enable submit events for Vuetify.

@@ -1,5 +1,21 @@
 # @xwiki/cristal-attachments-default
 
+## 0.14.0
+
+### Minor Changes
+
+- 3e5f853: Cristal 0.14 Release
+
+### Patch Changes
+
+- Updated dependencies [3e5f853]
+  - @xwiki/cristal-attachments-api@0.14.0
+  - @xwiki/cristal-authentication-api@0.14.0
+  - @xwiki/cristal-backend-api@0.14.0
+  - @xwiki/cristal-model-api@0.14.0
+  - @xwiki/cristal-model-reference-api@0.14.0
+  - @xwiki/cristal-model-remote-url-api@0.14.0
+
 ## 0.13.0
 
 ### Minor Changes

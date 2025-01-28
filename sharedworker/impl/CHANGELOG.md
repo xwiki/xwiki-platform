@@ -1,5 +1,27 @@
 # @xwiki/cristal-sharedworker-impl
 
+## 0.14.0
+
+### Minor Changes
+
+- 3e5f853: Cristal 0.14 Release
+
+### Patch Changes
+
+- Updated dependencies [3e5f853]
+  - @xwiki/cristal-api@0.14.0
+  - @xwiki/cristal-alerts-default@0.14.0
+  - @xwiki/cristal-authentication-default@0.14.0
+  - @xwiki/cristal-backend-dexie@0.14.0
+  - @xwiki/cristal-backend-nextcloud@0.14.0
+  - @xwiki/cristal-backend-xwiki@0.14.0
+  - @xwiki/cristal-configuration-api@0.14.0
+  - @xwiki/cristal-configuration-web@0.14.0
+  - @xwiki/cristal-document-api@0.14.0
+  - @xwiki/cristal-configuration-electron-renderer@0.14.0
+  - @xwiki/cristal-extension-manager@0.14.0
+  - @xwiki/cristal-sharedworker-api@0.14.0
+
 ## 0.13.0
 
 ### Minor Changes

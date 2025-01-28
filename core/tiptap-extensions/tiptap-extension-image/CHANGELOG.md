@@ -1,5 +1,23 @@
 # @xwiki/cristal-tiptap-extension-image
 
+## 0.14.0
+
+### Minor Changes
+
+- 3e5f853: Cristal 0.14 Release
+
+### Patch Changes
+
+- Updated dependencies [3e5f853]
+  - @xwiki/cristal-api@0.14.0
+  - @xwiki/cristal-attachments-api@0.14.0
+  - @xwiki/cristal-document-api@0.14.0
+  - @xwiki/cristal-link-suggest-api@0.14.0
+  - @xwiki/cristal-model-api@0.14.0
+  - @xwiki/cristal-model-reference-api@0.14.0
+  - @xwiki/cristal-model-remote-url-api@0.14.0
+  - @xwiki/cristal-tiptap-link-suggest-ui@0.14.0
+
 ## 0.13.0
 
 ### Minor Changes

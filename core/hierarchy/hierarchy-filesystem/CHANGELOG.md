@@ -1,5 +1,18 @@
 # @xwiki/cristal-hierarchy-filesystem
 
+## 0.14.0
+
+### Minor Changes
+
+- 3e5f853: Cristal 0.14 Release
+
+### Patch Changes
+
+- Updated dependencies [3e5f853]
+  - @xwiki/cristal-api@0.14.0
+  - @xwiki/cristal-hierarchy-api@0.14.0
+  - @xwiki/cristal-hierarchy-default@0.14.0
+
 ## 0.13.0
 
 ### Minor Changes

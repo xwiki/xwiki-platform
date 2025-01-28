@@ -3,7 +3,9 @@
 // --------------------------------------------------
 @figure-caption-font-size:          90%;
 @figure-caption-color:              @text-muted;
-@loginFormMaxWidth:                 450px;
+@login-form-max-width:              450px;
+
+@border-width:                      1px;
 
 // Standard pointer target sizes from WCAG recommendations
 @target-size-minimum:               24px;
@@ -13,14 +15,80 @@
 // By default it uses the same color as the other links, but the colorTheme can override this value.
 @breadcrumb-link-color:             @link-color;
 
+// Used in edit.less
+@button-spacing:                    2px;
+@button-border-width:               1px;
+
+// Used in headers.less
+// The height of the section edit link relative to the height of the parent heading.
+@edit-section-relative-height:      .7;
+
+// Used in layout.less
+@main-padding:                      @grid-gutter-width * 2;
+
+// Used in type.less
+// Since 15.9RC1: Defines the ratio between two headings levels (e.g., h1 is @font-size-headings-scale times larger than
+// h2)?
+@font-size-headings-scale:          1.190;
+@font-size-headings-scale-min:      1.125;
+@min-screen-size:                   768;
+@max-screen-size:                   1200;
+
+// Headings size is following a scale where each level is X times larger than the lower level.
+// H1
+@min-h1-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 4))));
+@max-h1-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 4))));
+
+// H2
+@min-h2-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 3))));
+@max-h2-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 3))));
+
+// H3
+@min-h3-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 2))));
+@max-h3-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 2))));
+
+// H4
+@min-h4-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 1))));
+@max-h4-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 1))));
+
+// H5 is the same size as the base font size, no computation needed
+
+// H6
+@min-h6-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, -1))));
+@max-h6-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, -1))));
+
+// Document title
+// The document title is a h1 heading one size higher in the size scale 
+// (e.g., 1.250 larger than the content's h1 headings)
+@min-document-title-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 5))));
+@max-document-title-font-size: unit(ceil((@font-size-base * pow(@font-size-headings-scale, 5))));
+@font-size-document-title: ~"max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px + (@{max-document-title-font-size} - @{min-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+
+
 //
-// Variables of bootstrap overrided by XWiki
+// Variables of bootstrap overridden by XWiki
 // --------------------------------------------------
 
-@border-width:                   1px;
 @headings-font-weight:           400;
 @nav-tabs-active-link-hover-bg:  @xwiki-page-content-bg;
 
 @border-radius-base:             7px;
 @border-radius-large:            10px;
 @border-radius-small:            5px;
+
+// Used in type.less
+// Headings size is following a scale where each level is X times larger than the lower level.
+// H1
+@font-size-h1: ~"max(@{min-h1-font-size}px, min(@{max-h1-font-size}px, calc(@{min-h1-font-size}px + (@{max-h1-font-size} - @{min-h1-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+// H2
+@font-size-h2: ~"max(@{min-h2-font-size}px, min(@{max-h2-font-size}px, calc(@{min-h2-font-size}px + (@{max-h2-font-size} - @{min-h2-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+// H3
+@font-size-h3: ~"max(@{min-h3-font-size}px, min(@{max-h3-font-size}px, calc(@{min-h3-font-size}px + (@{max-h3-font-size} - @{min-h3-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+// H4
+@font-size-h4: ~"max(@{min-h4-font-size}px, min(@{max-h4-font-size}px, calc(@{min-h4-font-size}px + (@{max-h4-font-size} - @{min-h4-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";
+// H5
+// The computations are not required for h5 as it is always the size of the base font size.
+@font-size-h5: @font-size-base;
+// H6
+// Note that the h6 heading is actually getting larger as the screen width decreases.
+@font-size-h6: ~"max(@{min-h6-font-size}px, min(@{max-h6-font-size}px, calc(@{min-h6-font-size}px + (@{max-h6-font-size} - @{min-h6-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))";

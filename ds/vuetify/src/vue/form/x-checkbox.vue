@@ -26,5 +26,10 @@ defineProps<CheckboxProps>();
 const checked = defineModel<boolean>();
 </script>
 <template>
-  <v-checkbox v-model="checked" :label="label" :messages="help"></v-checkbox>
+  <v-checkbox
+    v-model="checked"
+    :label="label"
+    :messages="help"
+    density="compact"
+  ></v-checkbox>
 </template>

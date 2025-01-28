@@ -39,7 +39,7 @@
 #macro (tree $options)
   <div #treeAttributes($options)></div>
   <span id="$!{attributes.id}-description" class="sr-only">
-    $services.localization.render('tree.macro.description')
+    $escapetool.xml($services.localization.render('tree.macro.description'))
   </span>
 #end
 

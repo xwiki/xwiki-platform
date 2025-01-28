@@ -23,7 +23,7 @@
  */
 type CheckboxProps = {
   label: string;
-  help: string;
+  help?: string;
   modelValue?: boolean;
 };
 

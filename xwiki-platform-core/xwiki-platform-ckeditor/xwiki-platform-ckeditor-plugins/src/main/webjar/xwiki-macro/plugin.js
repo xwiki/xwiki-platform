@@ -390,10 +390,13 @@
             });
           }).fail(this.done.bind(this, false, options));
         },
-        done: function(success, options) {
-          editor.setLoading(false);
+        done: async function(success, options) {
           if (options.preserveSelection) {
-            CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+            await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor, {
+              beforeApply: () => editor.setLoading(false)
+            });
+          } else {
+            editor.setLoading(false);
           }
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');

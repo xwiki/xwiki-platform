@@ -346,9 +346,11 @@
   ## If the submit button has been pressed, then we test the input and maybe create the user.
   #if($request.getParameter('xwikiname'))
     ## Do server side validation of input fields.
-    ## This must not be in a #set directive as it will output messages if something goes wrong.
-    #validateFields($fields, $request)
-    ## If server side validation was successfull, create the user
+    ## This will output messages if something goes wrong, nothing if everything is alright.
+    ## We need to trim the output so that we can keep indentations in the validation script.
+    #set ($validationText = $stringtool.trim("#validateFields($fields, $request)"))
+    $validationText##
+    ## If server side validation was successful, create the user
     #if($allFieldsValid)
       #createUser($fields, $request, $response, $doAfterRegistration)
     #end

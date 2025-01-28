@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,8 +43,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,7 +57,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-public class GroupsClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
+class GroupsClassPropertyValuesProviderTest extends AbstractListClassPropertyValuesProviderTest
 {
     @InjectMockComponents
     private GroupsClassPropertyValuesProvider provider;
@@ -73,11 +77,13 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
             .thenReturn("url/to/noavatar.png");
     }
 
-    @Test
-    public void getValuesLocal() throws Exception
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void getValuesLocal(boolean hasAccess) throws Exception
     {
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))
             .thenReturn(UserScope.LOCAL_ONLY);
+        when(this.authorizationManager.hasAccess(any(), any())).thenReturn(hasAccess);
 
         DocumentReference devsReference = new DocumentReference("wiki", "Groups", "Devs");
         XWikiDocument devsProfile = mock(XWikiDocument.class, "devs");
@@ -103,18 +109,32 @@ public class GroupsClassPropertyValuesProviderTest extends AbstractListClassProp
 
         assertEquals(2, values.getPropertyValues().size());
 
-        assertEquals("Developers", values.getPropertyValues().get(0).getMetaData().get("label"));
-        assertTrue(values.getPropertyValues().get(0).getMetaData().get("icon") instanceof Map);
+        Object devsLabel = values.getPropertyValues().get(0).getMetaData().get("label");
+        if (hasAccess) {
+            assertEquals("Developers", devsLabel);
+        } else {
+            assertEquals("Devs", devsLabel);
+        }
+        assertInstanceOf(Map.class, values.getPropertyValues().get(0).getMetaData().get("icon"));
 
-        assertEquals("Administrators", values.getPropertyValues().get(1).getMetaData().get("label"));
-        assertTrue(values.getPropertyValues().get(1).getMetaData().get("icon") instanceof Map);
+        Object adminLabel = values.getPropertyValues().get(1).getMetaData().get("label");
+        if (hasAccess) {
+            assertEquals("Administrators", adminLabel);
+        } else {
+            assertEquals("Admins", adminLabel);
+        }
+        assertInstanceOf(Map.class, values.getPropertyValues().get(1).getMetaData().get("icon"));
         Map icon = (Map) values.getPropertyValues().get(1).getMetaData().get("icon");
-        assertEquals("url/to/admins/image", icon.get("url"));
-        assertEquals("IMAGE", icon.get("iconSetType"));
+        if (hasAccess) {
+            assertEquals("url/to/admins/image", icon.get("url"));
+            assertEquals("IMAGE", icon.get("iconSetType"));
+        } else {
+            assertEquals("group", mockingDetails(icon).getMockCreationSettings().getMockName().toString());
+        }
     }
 
     @Test
-    public void getValuesLocalAndGlobal() throws Exception
+    void getValuesLocalAndGlobal() throws Exception
     {
         // We can have local groups.
         when(this.wikiUserManager.getUserScope(this.classReference.getWikiReference().getName()))

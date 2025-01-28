@@ -21,7 +21,6 @@ define('xwiki-realtime-wysiwyg', [
   'jquery',
   'xwiki-realtime-config',
   'xwiki-l10n!xwiki-realtime-messages',
-  'xwiki-realtime-errorBox',
   'xwiki-realtime-toolbar',
   'chainpad-netflux',
   'xwiki-realtime-userData',
@@ -33,8 +32,8 @@ define('xwiki-realtime-wysiwyg', [
   'xwiki-realtime-wysiwyg-patches'
 ], function (
   /* jshint maxparams:false */
-  $, realtimeConfig, Messages, ErrorBox, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver,
-  ChainPad, Crypto, Patches
+  $, realtimeConfig, Messages, Toolbar, ChainPadNetflux, UserData, TypingTest, Interface, Saver, ChainPad, Crypto,
+  Patches
 ) {
   'use strict';
 
@@ -124,13 +123,13 @@ define('xwiki-realtime-wysiwyg', [
         }
       });
 
-      this._editor.onLock(this._onLock.bind(this));
+      this._editor.onLock(this._pauseRealtimeSync.bind(this));
       this._editor.onUnlock(() => {
         // The editor is usually unlocked after the content is refreshed (e.g. after a macro is inserted). We execute
         // our handler on the next tick because our handler can trigger a new refresh (e.g. if we received remote
         // changes that either add a new macro or modify the parameters of an existing macro), and we want to avoid
         // executing "nested" refresh (async) commands because CKEditor doesn't handle them well.
-        setTimeout(this._onUnlock.bind(this), 0);
+        setTimeout(this._resumeRealtimeSync.bind(this), 0);
       });
 
       // Flush the uncommitted work back to the server on actions that might cause the editor to be destroyed without
@@ -268,7 +267,7 @@ define('xwiki-realtime-wysiwyg', [
           try {
             return this._editor.getOutputHTML();
           } catch (e) {
-            this._editor.showNotification(Messages['realtime.editor.getContentFailed'], 'warning');
+            this._editor.showNotification(Messages['editor.getContentFailed'], 'warning');
             return null;
           }
         },
@@ -382,8 +381,7 @@ define('xwiki-realtime-wysiwyg', [
         onLocal: this._onLocal.bind(this),
         onRemote: this._onRemote.bind(this),
         onConnectionChange: this._onConnectionChange.bind(this),
-        beforeReconnecting: this._beforeReconnecting.bind(this),
-        onAbort: this._onAbort.bind(this),
+        beforeReconnecting: this._beforeReconnecting.bind(this)
       };
     }
 
@@ -493,20 +491,29 @@ define('xwiki-realtime-wysiwyg', [
         return;
       }
 
-      let remoteContent = info.realtime.getUserDoc();
-      console.debug('Received remote content: ' + remoteContent);
+      // We have to pause the realtime sync while we apply remote changes because reloading the content (e.g. when a
+      // rendering macro is inserted or updated) and restoring the selection are asynchronous operations (macros have to
+      // be rendered server-side and selection restore uses a Web Worker to perform the diff).
+      this._pauseRealtimeSync();
 
-      // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they had
-      // to be reloaded, e.g. rendering macros have to be rendered server-side).
-      await this._patchedEditor.setHyperJSON(remoteContent);
+      try {
+        let remoteContent = info.realtime.getUserDoc();
+        console.debug("Received remote content: " + remoteContent);
 
-      const localContent = this._patchedEditor.getHyperJSON();
-      if (localContent !== remoteContent) {
-        console.warn('Unexpected local content after synchronization: ', {
-          expected: remoteContent,
-          actual: localContent,
-          diff: ChainPad.Diff.diff(remoteContent, localContent)
-        });
+        // Build a DOM from HyperJSON, diff and patch the editor, then wait for the widgets to be ready (in case they
+        // had to be reloaded, e.g. rendering macros have to be rendered server-side).
+        await this._patchedEditor.setHyperJSON(remoteContent);
+
+        const localContent = this._patchedEditor.getHyperJSON();
+        if (localContent !== remoteContent) {
+          console.warn("Unexpected local content after synchronization: ", {
+            expected: remoteContent,
+            actual: localContent,
+            diff: ChainPad.Diff.diff(remoteContent, localContent),
+          });
+        }
+      } finally {
+        await this._resumeRealtimeSync();
       }
     }
 
@@ -556,7 +563,7 @@ define('xwiki-realtime-wysiwyg', [
       });
     }
 
-    _onAbort(info, reason, debug) {
+    _onAbort() {
       if (this._connection.status === ConnectionStatus.DISCONNECTED) {
         // We already left the realtime session.
         return;
@@ -573,11 +580,11 @@ define('xwiki-realtime-wysiwyg', [
       this._realtimeContext.setRealtimeEnabled(false);
 
       // Stop the autosave (and leave the events Netflux channel associated with the edited document).
-      this._saver.stop();
+      this._saver?.stop();
 
       // Remove the realtime toolbar.
-      this._connection.toolbar.failed();
-      this._connection.toolbar.toolbar.remove();
+      this._connection.toolbar?.failed();
+      this._connection.toolbar?.toolbar.remove();
 
       // Stop receiving user caret updates (leave the user data Netflux channel associated with the edited document).
       this._connection.userData.stop?.();
@@ -594,42 +601,41 @@ define('xwiki-realtime-wysiwyg', [
       this._connection = {
         status: ConnectionStatus.DISCONNECTED
       };
-
-      if (reason || debug) {
-        ErrorBox.show(reason || 'disconnected', debug);
-      }
     }
 
-    _onLock() {
+    _pauseRealtimeSync() {
       if (this._connection.status === ConnectionStatus.CONNECTED) {
         this._connection.status = ConnectionStatus.PAUSED;
-        this._connection.remoteContentBeforeLock = this._connection.chainpad.getUserDoc();
+        this._connection.pauseDepth = 1;
+        this._connection.remoteContentBeforePause = this._connection.chainpad.getUserDoc();
+      } else if (this._connection.status === ConnectionStatus.PAUSED) {
+        this._connection.pauseDepth++;
       }
     }
 
-    _onUnlock() {
-      if (this._connection.status === ConnectionStatus.PAUSED) {
+    async _resumeRealtimeSync() {
+      if (this._connection.status === ConnectionStatus.PAUSED && --this._connection.pauseDepth === 0) {
         this._connection.status = ConnectionStatus.CONNECTED;
-        const remoteContentAfterLock = this._connection.chainpad.getUserDoc();
-        const localContentAfterLock = this._patchedEditor.getHyperJSON();
-        if (remoteContentAfterLock === this._connection.remoteContentBeforeLock) {
-          // We didn't receive any remote changes while the editor was locked.
-          if (localContentAfterLock !== this._connection.remoteContentBeforeLock) {
-            // The local content has changed while the editor was locked (e.g. because one of the inserted macros is
-            // editable in-place and its rendering added nested editable areas).
+        const remoteContentAfterPause = this._connection.chainpad.getUserDoc();
+        const localContentAfterPause = this._patchedEditor.getHyperJSON();
+        if (remoteContentAfterPause === this._connection.remoteContentBeforePause) {
+          // We didn't receive any remote changes while the realtime sync was paused.
+          if (localContentAfterPause !== this._connection.remoteContentBeforePause) {
+            // The local content has changed while the realtime sync was paused (e.g. because one of the inserted macros
+            // is editable in-place and its rendering added nested editable areas).
             this._onLocal();
           }
-        } else if (localContentAfterLock === this._connection.remoteContentBeforeLock) {
-          // The local content didn't change while the editor was locked, but we received remote changes. Let's apply
-          // them.
-          this._onRemote({
+        } else if (localContentAfterPause === this._connection.remoteContentBeforePause) {
+          // The local content didn't change while the realtime sync was paused, but we received remote changes. Let's
+          // apply them.
+          await this._onRemote({
             realtime: this._connection.chainpad
           });
         } else {
           // The local content and the remote content have diverged. We need a 3-way merge.
-          this._onLocal(Patches.merge(this._connection.remoteContentBeforeLock, remoteContentAfterLock,
-            localContentAfterLock));
-          this._onRemote({
+          this._onLocal(Patches.merge(this._connection.remoteContentBeforePause, remoteContentAfterPause,
+            localContentAfterPause));
+          await this._onRemote({
             realtime: this._connection.chainpad
           });
         }

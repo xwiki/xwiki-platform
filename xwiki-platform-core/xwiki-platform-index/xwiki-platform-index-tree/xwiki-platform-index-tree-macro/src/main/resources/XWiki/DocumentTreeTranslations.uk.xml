@@ -82,8 +82,11 @@ rendering.macro.documentTree.parameter.limit.name=Межа
 rendering.macro.documentTree.parameter.limit.description=Максимальна кількість дочірніх вузлів для відображення при розгортанні батьківського вузла вперше. Решта дочірніх вузлів доступні за посиланням "більше ...". Цей параметр в основному використовується для розбиття на сторінки дочірніх вузлів і, таким чином, допомагає масштабувати дерево, коли кількість дочірніх вузлів велика.
 rendering.macro.documentTree.parameter.exclusions.name=Виключення
 rendering.macro.documentTree.parameter.exclusions.description=Список вузлів для виключення з дерева. Вузли вказуються за їх id та відокремлені комами.
+rendering.macro.children.name=Дочірні сторінки
+rendering.macro.children.description=Показує дерево дочірніх сторінок поточної сторінки
 index.documentTree.empty=Нічого не знайдено
 index.documentTree.more=ще {0}...
+index.documentTree.addDocument=Нова сторінка...
 
 ## Deprecated translation keys
 

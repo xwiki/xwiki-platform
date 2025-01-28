@@ -25,7 +25,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,7 +168,7 @@ class ChromeTabTest
         when(this.page.navigate(url.toString())).thenReturn(navigate);
         when(navigate.getErrorText()).thenReturn("Failed to navigate!");
 
-        assertFalse(this.chromeTab.navigate(url, null, false));
+        assertFalse(this.chromeTab.navigate(url, (Cookie[]) null, false));
     }
 
     @Test
@@ -192,7 +192,7 @@ class ChromeTabTest
         when(evaluate.getResult()).thenReturn(result);
         when(result.getValue()).thenReturn("Page ready.");
 
-        assertTrue(this.chromeTab.navigate(url, null, true, 25));
+        assertTrue(this.chromeTab.navigate(url, (Cookie[]) null, true, 25));
 
         verify(this.runtime).enable();
     }
@@ -222,7 +222,7 @@ class ChromeTabTest
         when(exception.getValue()).thenReturn("'xwiki-page-ready' module not found");
 
         try {
-            this.chromeTab.navigate(url, null, true);
+            this.chromeTab.navigate(url, (Cookie[]) null, true);
             fail("Navigation should have thrown an exception.");
         } catch (IOException e) {
             assertEquals("Failed to wait for page to be ready. Root cause: 'xwiki-page-ready' module not found",

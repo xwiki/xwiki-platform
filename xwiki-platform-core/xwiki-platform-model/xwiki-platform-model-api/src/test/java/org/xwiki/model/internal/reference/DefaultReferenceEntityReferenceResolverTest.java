@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
  */
 @ComponentTest
 @ComponentList({ DefaultSymbolScheme.class })
-public class DefaultReferenceEntityReferenceResolverTest implements TestConstants
+class DefaultReferenceEntityReferenceResolverTest implements TestConstants
 {
     @MockComponent
     private EntityReferenceProvider referenceProvider;
@@ -59,7 +59,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     private DefaultReferenceEntityReferenceResolver resolver;
 
     @BeforeComponent
-    public void beforeComponent()
+    void beforeComponent()
     {
         when(this.referenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(DEFAULT_WIKI_REFERENCE);
         when(this.referenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(DEFAULT_SPACE_REFERENCE);
@@ -78,7 +78,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenMissingParents()
+    void resolveDocumentReferenceWhenMissingParents()
     {
         EntityReference partialReference = new EntityReference("document", EntityType.DOCUMENT);
 
@@ -89,10 +89,29 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
         assertEquals(EntityType.SPACE, reference.getParent().getType());
         assertEquals(DEFAULT_WIKI, reference.getParent().getParent().getName());
         assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+
+        partialReference = new EntityReference("WebHome", EntityType.DOCUMENT);
+        reference = this.resolver.resolve(partialReference, EntityType.DOCUMENT);
+
+        assertNotSame(partialReference, reference);
+        assertEquals(DEFAULT_SPACE, reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals(DEFAULT_WIKI, reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+
+        EntityReference spaceReference = new EntityReference("Space", EntityType.SPACE);
+        partialReference = new EntityReference("WebHome", EntityType.DOCUMENT, spaceReference);
+        reference = this.resolver.resolve(partialReference, EntityType.DOCUMENT);
+
+        assertNotSame(partialReference, reference);
+        assertEquals("Space", reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals(DEFAULT_WIKI, reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
     @Test
-    public void resolveAttachmentReferenceWhenMissingParents()
+    void resolveAttachmentReferenceWhenMissingParents()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
@@ -106,7 +125,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenMissingParentBetweenReferences()
+    void resolveDocumentReferenceWhenMissingParentBetweenReferences()
     {
         EntityReference partialReference =
             new EntityReference("document", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));
@@ -122,7 +141,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveAttachmentReferenceWhenMissingParentBetweenReferences()
+    void resolveAttachmentReferenceWhenMissingParentBetweenReferences()
     {
         EntityReference reference = this.resolver.resolve(
             new EntityReference("filename", EntityType.ATTACHMENT, new EntityReference("wiki", EntityType.WIKI)),
@@ -137,7 +156,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenInvalidReference()
+    void resolveDocumentReferenceWhenInvalidReference()
     {
         try {
             this.resolver.resolve(new EntityReference("document", EntityType.DOCUMENT,
@@ -150,7 +169,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenTypeIsSpace()
+    void resolveDocumentReferenceWhenTypeIsSpace()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("space", EntityType.SPACE), EntityType.DOCUMENT);
@@ -164,7 +183,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveSpaceReferenceWhenTypeIsDocument()
+    void resolveSpaceReferenceWhenTypeIsDocument()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("document", EntityType.DOCUMENT), EntityType.SPACE);
@@ -179,7 +198,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
      * Tests that a relative object reference is resolved correctly and completed with the default document parent.
      */
     @Test
-    public void resolveObjectReferenceWhenMissingParents()
+    void resolveObjectReferenceWhenMissingParents()
     {
         EntityReference reference =
             resolver.resolve(new EntityReference("object", EntityType.OBJECT), EntityType.OBJECT);
@@ -197,7 +216,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
      * Tests that a relative object property is resolved correctly and completed with the default object parent.
      */
     @Test
-    public void resolveObjectPropertyReferenceWhenMissingParents()
+    void resolveObjectPropertyReferenceWhenMissingParents()
     {
         EntityReference reference =
             resolver.resolve(new EntityReference("property", EntityType.OBJECT_PROPERTY), EntityType.OBJECT_PROPERTY);
@@ -218,7 +237,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
      * values for object name.
      */
     @Test
-    public void resolveObjectReferenceWhenTypeIsDocument()
+    void resolveObjectReferenceWhenTypeIsDocument()
     {
         EntityReference reference = resolver.resolve(
             new EntityReference("document", EntityType.DOCUMENT,
@@ -239,7 +258,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
      * values for object and property name.
      */
     @Test
-    public void resolveObjectPropertyReferenceWhenTypeIsDocument()
+    void resolveObjectPropertyReferenceWhenTypeIsDocument()
     {
         EntityReference reference = resolver.resolve(
             new EntityReference("document", EntityType.DOCUMENT,
@@ -258,7 +277,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenNullReference()
+    void resolveDocumentReferenceWhenNullReference()
     {
         EntityReference reference = this.resolver.resolve(null, EntityType.DOCUMENT);
 
@@ -271,7 +290,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolvePageReferenceWhenTypeIsDocument()
+    void resolvePageReferenceWhenTypeIsDocument()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("document", EntityType.DOCUMENT), EntityType.PAGE);
@@ -284,7 +303,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolvePageReferenceWhenTypeIsSpace()
+    void resolvePageReferenceWhenTypeIsSpace()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("space", EntityType.SPACE), EntityType.PAGE);
@@ -293,7 +312,7 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
     }
 
     @Test
-    public void resolveDocumentReferenceWhenTypeIsPage()
+    void resolveDocumentReferenceWhenTypeIsPage()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("page", EntityType.PAGE), EntityType.DOCUMENT);
@@ -303,12 +322,14 @@ public class DefaultReferenceEntityReferenceResolverTest implements TestConstant
         reference = this.resolver.resolve(
             new EntityReference("page1", EntityType.PAGE, new EntityReference("page2", EntityType.PAGE)),
             EntityType.DOCUMENT);
-
+        
+        // FIXME: there should be a check if the page exists or not.
+        // See https://jira.xwiki.org/browse/XWIKI-22699
         assertEquals(new DocumentReference(DEFAULT_WIKI, List.of("page2", "page1"), DEFAULT_DOCUMENT), reference);
     }
 
     @Test
-    public void resolveSpaceReferenceWhenTypeIsPage()
+    void resolveSpaceReferenceWhenTypeIsPage()
     {
         EntityReference reference =
             this.resolver.resolve(new EntityReference("page", EntityType.PAGE), EntityType.SPACE);

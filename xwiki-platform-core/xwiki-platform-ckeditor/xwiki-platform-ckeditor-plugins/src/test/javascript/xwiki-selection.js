@@ -68,9 +68,9 @@ define(['jquery', 'ckeditor', 'testUtils', 'xwiki-macro'], function($, CKEDITOR,
       // Reload the edited content.
       editor.config.fullData = true;
       editor.setData(editor.getData(), {
-        callback: function() {
+        callback: async function() {
           // Restore the selection.
-          CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
+          await CKEDITOR.plugins.xwikiSelection.restoreSelection(editor);
 
           // Verify that the same widget is selected.
           expect(editor.widgets.focused.pathName).toBe(pathName);

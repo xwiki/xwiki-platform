@@ -61,4 +61,10 @@ public class AllIT
     class NestedPinnedPagesIT extends PinnedPagesIT
     {
     }
+
+    @Nested
+    @DisplayName("Document Tree Macro")
+    class NestedDocumentTreeMacroIT extends DocumentTreeMacroIT
+    {
+    }
 }

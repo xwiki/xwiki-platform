@@ -8,9 +8,9 @@ paths: {
   jsTree: '/webjars/jstree',
   'xwiki-job-runner': '/webjars/jobRunner',
   'xwiki-tree-finder': '/webjars/finder',
-  'xwiki-tree': '/webjars/tree',
+  'xwiki-tree': '/webjars/xwiki-platform-tree-webjar/tree',
 
-  'fast-diff': '/webjars/diff',
+  'fast-diff': '/webjars/fast-diff/diff',
 
   // We need the full path here because ckeditor.js loads other resources using relative paths.
   ckeditor: '/webjars/xwiki-platform-ckeditor-webjar/${project.version}/ckeditor',
@@ -33,6 +33,10 @@ paths: {
   entityResourceDisplayer: 'xwiki-resource/entityResourceDisplayer',
   l10n: 'xwiki-localization/l10n',
   modal: 'xwiki-dialog/modal',
+
+  macroService: 'xwiki-macro/macroService',
+  macroSelector: 'xwiki-macro/macroSelector',
+  macroSelectorTranslationKeys: 'xwiki-macro/macroSelector',
 
   textSelection: 'xwiki-selection/plugin',
   scrollUtils: 'xwiki-selection/plugin'

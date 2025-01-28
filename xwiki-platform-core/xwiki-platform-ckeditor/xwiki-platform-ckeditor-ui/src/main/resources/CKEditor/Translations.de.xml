@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="CKEditor.Translations" locale="de">
+<xwikidoc version="1.6" reference="CKEditor.Translations" locale="de">
   <web>CKEditor</web>
   <name>Translations</name>
   <language>de</language>
@@ -90,6 +90,7 @@ ckeditor.plugin.resource.notSpecified={0} ist nicht angegeben.
 ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Änderungen. Wollen Sie diese verwerfen?
 ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
+ckeditor.plugin.selection.restoring=Auswahl wiederherstellen...
 ckeditor.plugin.toolbar.basicStyles=Einfache Stile
 ckeditor.plugin.toolbar.lists=Listen
 ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen

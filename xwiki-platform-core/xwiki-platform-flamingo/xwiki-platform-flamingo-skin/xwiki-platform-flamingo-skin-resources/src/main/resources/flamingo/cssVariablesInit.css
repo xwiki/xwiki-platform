@@ -1,3 +1,22 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
 #set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
 #if ($themeDocFullName == '')
 #set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
@@ -5,6 +24,7 @@
 #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
 #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
 ## List of all the variables available to customize directly in the Flamingo theme editor.
+## The key is the name and the value is the CSS type of the variable.
 #set($colorThemeVariables = {
 "text-color": "color",
 "body-bg": "color",
@@ -69,6 +89,51 @@
 "table-bg": "color",
 "table-bg-hover": "color",
 "table-border-color": "color"
+})
+## List of all the variables set in XWiki standard for various purposes.
+## Those should all be defined in variables.less
+#set($miscVariables = {
+"figure-caption-font-size": "length",
+"figure-caption-color": "color",
+"loginFormMaxWidth": "length",
+"login-form-max-width": "length",
+"target-size-minimum": "length",
+"target-size-recommended": "length",
+"breadcrumb-link-color": "color",
+"border-width": "length",
+"headings-font-weight": "font-weight-absolute",
+"nav-tabs-active-link-hover-bg": "color",
+"border-radius-base": "length",
+"border-radius-large": "length",
+"border-radius-small": "length",
+###############
+"button-spacing": "length",
+"button-border-width": "length",
+"edit-section-relative-height": "length",
+"main-padding": "length",
+"font-size-headings-scale": "length",
+"font-size-headings-scale-min": "length",
+"min-screen-size": "length",
+"max-screen-size": "length",
+"min-h1-font-size": "length",
+"max-h1-font-size": "length",
+"min-h2-font-size": "length",
+"max-h2-font-size": "length",
+"min-h3-font-size": "length",
+"max-h3-font-size": "length",
+"min-h4-font-size": "length",
+"max-h4-font-size": "length", 
+"min-h6-font-size": "length",
+"max-h6-font-size": "length",
+"min-document-title-font-size": "length",
+"max-document-title-font-size": "length",
+"font-size-document-title": "length",
+"font-size-h1": "length",
+"font-size-h2": "length",
+"font-size-h3": "length",
+"font-size-h4": "length",
+"font-size-h5": "length",
+"font-size-h6": "length"
 })
 :root {
 ## Create CSS variables for each colorTheme variable

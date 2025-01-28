@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,6 +47,8 @@ import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -232,12 +235,13 @@ class EmbeddedSolrInitializationTest
 
     /**
      * Check that the cleanup for XWIKI-22741 deletes the cache directory in the wrong location during initialization.
-     * When this happens the search core should also get created fixing the core.properties value.
+     * When this happens the search core should also get created fixing the core.properties value. We execute this test
+     * only on Windows since that's the only system on which it make sense.
      */
     @Test
+    @EnabledOnOs(OS.WINDOWS)
     void testRemoveBadCacheLocation() throws Exception
     {
-
         File solrHomeDirectory = new File(this.permanentDirectory, "store/solr");
         File solrSearchCoreDirectory = useStandardSolrHome(solrHomeDirectory);
         File corePropertiesFile = new File(solrSearchCoreDirectory, "core.properties");
@@ -247,8 +251,7 @@ class EmbeddedSolrInitializationTest
         // now simulate the bug even if we aren't on windows
         String propertyValue = "..\\..\\..\\cache\\solr\\" + SEARCH_SOLRCORE;
         String badCacheFolderPath = "......cachesolr" + SEARCH_SOLRCORE;
-        String goodCacheFolderPath = ".." + File.separator + ".." + File.separator + ".." + File.separator + "cache"
-            + File.separator + "solr" + File.separator + SEARCH_SOLRCORE;
+        String goodCacheFolderPath = "..\\..\\..\\cache\\solr\\" + SEARCH_SOLRCORE;
 
         // when you write the property like this without the Properties.store() method the '\\' becomes an
         // escape on windows when read properly
@@ -282,7 +285,7 @@ class EmbeddedSolrInitializationTest
         assertTrue(goodCacheLocation.exists(),
             "Expected to find cache at the right location but did not: " + goodCacheLocation.getAbsoluteFile());
         // the old bad location should be cleaned up
-        assertTrue(!badCacheLocation.exists(),
+        assertFalse(badCacheLocation.exists(),
             "Expected not to find a cache at the bad location (yet) but did: " + badCacheLocation.getAbsolutePath());
 
         Properties coreProperties = new Properties();

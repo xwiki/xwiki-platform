@@ -51,7 +51,7 @@
     "vite": "6.0.11",
     "vite-plugin-css-injected-by-js": "3.5.2",
     "vite-plugin-dts": "4.5.0",
-    "vitest": "3.0.2",
+    "vitest": "3.0.4",
     "vue-eslint-parser": "9.4.3"
   },
   "engines": {

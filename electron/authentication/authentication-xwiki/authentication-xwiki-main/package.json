@@ -26,7 +26,7 @@
   "dependencies": {
     "@xwiki/cristal-authentication-api": "workspace:*",
     "axios": "1.7.9",
-    "electron-store": "10.0.0"
+    "electron-store": "10.0.1"
   },
   "peerDependencies": {
     "electron": "34.0.0"

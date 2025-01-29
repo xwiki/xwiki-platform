@@ -312,16 +312,4 @@ async function onDocumentUpdate(page: PageData) {
 :deep(.v-list-item--link) {
   cursor: default;
 }
-/*TODO: This section needs to be removed when the oficial fix is released on Vuetify
-https://github.com/vuetifyjs/vuetify/issues/20421#event-16001533054
-START FIX
-*/
-:deep(.v-treeview-item:not(.v-list-group__header)) {
-  padding-inline-start: calc(39px + 6px) !important;
-}
-
-:deep(.v-treeview-item .v-list-item__spacer) {
-  width: 4px !important;
-}
-/*END FIX*/
 </style>

@@ -30,27 +30,37 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import jakarta.inject.Named;
+
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.internal.DefaultVersion;
-import org.xwiki.store.hibernate.DatabaseProductNameResolved;
+import org.xwiki.store.hibernate.DatabaseProductNameResolver;
 import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.store.hibernate.HibernateAdapterFactory;
 
-import com.xpn.xwiki.store.DatabaseProduct;
-
 /**
+ * A helper in charge of finding an adapter based on the database id and version.
+ * <p>
+ * It search for an implementation of {@link HibernateAdapter} with the following role hints:
+ * <ul>
+ * <li>"id/major version+" (for example the "mysql/8" one will be selected for a MySQL 9.0.1 server)</li>
+ * <li>"id" (for example the "mysql" one will be selected for a MySQL 5.7 server)</li>
+ * </ul>
+ * <p>
+ * The version is supposed to mean that the adapter was designed for "this version of greater".
+ * 
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultHibernateAdapterFactory implements HibernateAdapterFactory
+@Named("id/version")
+public class IDVersionHibernateAdapterFactory implements HibernateAdapterFactory
 {
     private static final Version DEFAULT_VERSION = new DefaultVersion("0");
 
@@ -58,19 +68,16 @@ public class DefaultHibernateAdapterFactory implements HibernateAdapterFactory
     private ComponentManager componentManager;
 
     @Inject
-    private List<DatabaseProductNameResolved> resolvers;
-
-    @Inject
-    private Logger logger;
+    private List<DatabaseProductNameResolver> resolvers;
 
     @Override
     public Optional<HibernateAdapter> createHibernateAdapter(DatabaseMetaData metaData,
         Configuration hibernateConfiguration) throws HibernateException
     {
-        HibernateAdapter adaparter = null;
+        HibernateAdapter adapter = null;
 
         // Index all adapters
-        Map<String, Map<Version, String>> mapping = getAdpaterMapping();
+        Map<String, Map<Version, String>> mapping = getAdapterMapping();
 
         // Gather adapter(s) associated to the specific database product id
         Map<Version, String> versions;
@@ -105,19 +112,19 @@ public class DefaultHibernateAdapterFactory implements HibernateAdapterFactory
             // Load the found adapter
             if (roleHint != null) {
                 try {
-                    adaparter = this.componentManager.getInstance(HibernateAdapter.class, roleHint);
+                    adapter = this.componentManager.getInstance(HibernateAdapter.class, roleHint);
                 } catch (ComponentLookupException e) {
                     throw new HibernateException("Failed to initialize the adapater", e);
                 }
             }
         }
 
-        return Optional.ofNullable(adaparter);
+        return Optional.ofNullable(adapter);
     }
 
     private String getDatabaseId(String databaseProductName)
     {
-        for (DatabaseProductNameResolved resolver : this.resolvers) {
+        for (DatabaseProductNameResolver resolver : this.resolvers) {
             Optional<String> id = resolver.resolve(databaseProductName);
 
             if (id.isPresent()) {
@@ -125,18 +132,10 @@ public class DefaultHibernateAdapterFactory implements HibernateAdapterFactory
             }
         }
 
-        // Default resolution based on old DatabaseProduct resolution, except for MariaDB (since it's identified as
-        // MySQL)
-        if (databaseProductName.equalsIgnoreCase(MariaDBHibernateAdapter.HINT)) {
-            return MariaDBHibernateAdapter.HINT;
-        } else {
-            DatabaseProduct product = DatabaseProduct.toProduct(databaseProductName);
-
-            return product != DatabaseProduct.UNKNOWN ? product.getJDBCScheme() : databaseProductName.toLowerCase();
-        }
+        return databaseProductName.toLowerCase();
     }
 
-    private Map<String, Map<Version, String>> getAdpaterMapping()
+    private Map<String, Map<Version, String>> getAdapterMapping()
     {
         List<ComponentDescriptor<HibernateAdapter>> descriptors =
             this.componentManager.getComponentDescriptorList(HibernateAdapter.class);

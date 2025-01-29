@@ -17,38 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.store;
+package org.xwiki.store.hibernate.internal;
 
-import org.xwiki.stability.Unstable;
+import java.util.Optional;
+
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.store.hibernate.DatabaseProductNameResolver;
 
 /**
- * Base exception for store related APIs.
- *
+ * Implementation of {@link DatabaseProductNameResolver} for MariaDB.
+ * 
  * @version $Id$
  * @since 17.1.0RC1
  */
-@Unstable
-public class StoreException extends Exception
+@Component
+@Singleton
+@Named(MariaDBHibernateAdapter.HINT)
+public class MariaDBDatabaseProductNameResolver implements DatabaseProductNameResolver
 {
-    /**
-     * Serialization identifier.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * @param message exception message
-     */
-    public StoreException(String message)
+    @Override
+    public Optional<String> resolve(String databaseProductName)
     {
-        super(message);
-    }
+        if (databaseProductName.equalsIgnoreCase(MariaDBHibernateAdapter.HINT)) {
+            return Optional.of(MariaDBHibernateAdapter.HINT);
+        }
 
-    /**
-     * @param message exception message
-     * @param cause nested exception
-     */
-    public StoreException(String message, Throwable cause)
-    {
-        super(message, cause);
+        return Optional.empty();
     }
 }

@@ -450,7 +450,7 @@ public class HibernateStore implements Disposable, Initializable
             }
         }
 
-        // Fallback on the default adapter if not specific one could be found
+        // Fallback on the default adapter if no specific one could be found
         return this.defaultHibernateAdapterProvider.get();
     }
 

@@ -21,28 +21,41 @@ package org.xwiki.store.hibernate.internal;
 
 import java.util.Optional;
 
+import javax.annotation.Priority;
+
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.store.hibernate.DatabaseProductNameResolved;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.store.hibernate.DatabaseProductNameResolver;
+
+import com.xpn.xwiki.store.DatabaseProduct;
 
 /**
- * Implementation of {@link DatabaseProductNameResolved} for MariaDB.
+ * Implementation of {@link DatabaseProductNameResolver} based on the old {@link DatabaseProduct} resolution, except for
+ * MariaDB (since it's identified as MySQL) which have a dedicated {@link DatabaseProductNameResolver} with a higher
+ * priority.
  * 
  * @version $Id$
  * @since 17.1.0RC1
  */
 @Component
 @Singleton
-@Named(MariaDBHibernateAdapter.HINT)
-public class MariaDBDatabaseProductNameResolved implements DatabaseProductNameResolved
+// Make sure it's executed before other resolvers
+@Priority(ComponentDescriptor.DEFAULT_PRIORITY + 1000)
+// TODO: deprecated and move DatabaseProduct to legacy and use dedicated DatabaseProductNameResolver components to
+// resolve all database identifiers
+@Named("legacy")
+public class LegacyDatabaseProductNameResolver implements DatabaseProductNameResolver
 {
     @Override
     public Optional<String> resolve(String databaseProductName)
     {
-        if (databaseProductName.equalsIgnoreCase(MariaDBHibernateAdapter.HINT)) {
-            return Optional.of(MariaDBHibernateAdapter.HINT);
+        DatabaseProduct product = DatabaseProduct.toProduct(databaseProductName);
+
+        if (product != DatabaseProduct.UNKNOWN) {
+            return Optional.of(product.getJDBCScheme());
         }
 
         return Optional.empty();

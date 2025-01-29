@@ -289,11 +289,12 @@ org.xwiki.query.hql.internal.ConfigurableHQLCompleteStatementValidator
 org.xwiki.query.hql.internal.DefaultHQLStatementValidator
 org.xwiki.query.hql.internal.StandardHQLCompleteStatementValidator
 org.xwiki.store.hibernate.internal.DefaultHibernateAdapter
-org.xwiki.store.hibernate.internal.DefaultHibernateAdapterFactory
 org.xwiki.store.hibernate.internal.DerbyHibernateAdapter
 org.xwiki.store.hibernate.internal.H2HibernateAdapter
 org.xwiki.store.hibernate.internal.HSQLDBHibernateAdapter
-org.xwiki.store.hibernate.internal.MariaDBDatabaseProductNameResolved
+org.xwiki.store.hibernate.internal.IDVersionHibernateAdapterFactory
+org.xwiki.store.hibernate.internal.LegacyDatabaseProductNameResolver
+org.xwiki.store.hibernate.internal.MariaDBDatabaseProductNameResolver
 org.xwiki.store.hibernate.internal.MariaDBHibernateAdapter
 org.xwiki.store.hibernate.internal.MySQL8HibernateAdapter
 org.xwiki.store.hibernate.internal.MySQLHibernateAdapter

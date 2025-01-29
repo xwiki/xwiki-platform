@@ -24,13 +24,13 @@ import java.util.Optional;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Provide an common identifier from the actual produce name given by the database.
+ * Provide an common identifier from the actual product name given by the database.
  *
  * @version $Id$
  * @since 17.1.0RC1
  */
 @Role
-public interface DatabaseProductNameResolved
+public interface DatabaseProductNameResolver
 {
     /**
      * @param databaseProductName the database product name

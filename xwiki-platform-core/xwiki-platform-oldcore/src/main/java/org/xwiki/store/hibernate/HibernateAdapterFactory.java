@@ -28,7 +28,11 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Factory in charge of providing a {@link HibernateAdapter} instance.
+ * A factory in charge of providing a specific {@link HibernateAdapter} instance, generally based on information found
+ * in the {@link DatabaseMetaData} (database server related metadata) and {@link Configuration} (Hibernate configuration
+ * properties).
+ * <p>
+ * If no specific adapter is returned by the various factories, a default one is used.
  * 
  * @version $Id$
  * @since 17.1.0RC1

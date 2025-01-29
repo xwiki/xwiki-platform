@@ -2594,8 +2594,8 @@ importers:
   editors/tiptap:
     dependencies:
       '@hocuspocus/provider':
-        specifier: 2.15.0
-        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
+        specifier: 2.15.1
+        version: 2.15.1(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
       '@tiptap/core':
         specifier: 2.11.3
         version: 2.11.3(@tiptap/pm@2.11.3)
@@ -3401,8 +3401,8 @@ importers:
   realtime:
     dependencies:
       '@hocuspocus/server':
-        specifier: 2.15.0
-        version: 2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
+        specifier: 2.15.1
+        version: 2.15.1(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)
       express:
         specifier: 4.21.2
         version: 4.21.2
@@ -4332,17 +4332,17 @@ packages:
       vue: ^3.4.21
       vue-router: ^4.3.0
 
-  '@hocuspocus/common@2.15.0':
-    resolution: {integrity: sha512-xmapO5PnQvf3lYFWrrOaYPjmdrEIVYOpyjInuiCkCzkUmMQCZDVM3wXjPdMJbgAtQXEPUDVkwpr6dJTLjZgTTQ==}
+  '@hocuspocus/common@2.15.1':
+    resolution: {integrity: sha512-XJ3gGaSB9PywXTZT3d1yI4yByJLQXNXwYAEvgBMKpaaeyokAR3y1Egjfo29XRau4cFJo1CIzr84YepvqyYQZrA==}
 
-  '@hocuspocus/provider@2.15.0':
-    resolution: {integrity: sha512-Zd1YYVIg1PYfxqMbwWlb89+R/pOGg+UQZWBr7u3g2RDOttdM8F9zzyUzm9XcI7CAGZAUvuqB/oiSsMyGxDsuNg==}
+  '@hocuspocus/provider@2.15.1':
+    resolution: {integrity: sha512-XIWdu6WYasmfMxmlw2XqZrKvSYJ7qY4Tv+eFL+3PKt3Zqkfw7X0P8GkmApVOOa/1ZzfCTCILV4n4G0cppCJLcw==}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
 
-  '@hocuspocus/server@2.15.0':
-    resolution: {integrity: sha512-JfhDOz11EOWLs3uExC5ymX2GZwsHodDpCNIwaaTBImffyQEzUqkkBGOHsnMsT9s6ST0ijnVCxCQ4nXp/qTxDZw==}
+  '@hocuspocus/server@2.15.1':
+    resolution: {integrity: sha512-lDsb59oj4BM4bEHUQyXAujR7mDMZ/+h9KSPc4qNWWuyLVdFNE4+zMRFfD6P/3LB16M8POXIKPIGQ3zysNQsZSQ==}
     peerDependencies:
       y-protocols: ^1.0.6
       yjs: ^13.6.8
@@ -6958,11 +6958,6 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  lib0@0.2.98:
-    resolution: {integrity: sha512-XteTiNO0qEXqqweWx+b21p/fBnNHUA1NwAtJNJek1oPrewEZs2uiT4gWivHKr9GqCjDPAhchz0UQO8NwU3bBNA==}
-    engines: {node: '>=16'}
-    hasBin: true
-
   lib0@0.2.99:
     resolution: {integrity: sha512-vwztYuUf1uf/1zQxfzRfO5yzfNKhTtgOByCruuiQQxWQXnPb8Itaube5ylofcV0oM0aKal9Mv+S1s1Ky0UYP1w==}
     engines: {node: '>=16'}
@@ -9222,15 +9217,15 @@ snapshots:
       vue: 3.5.13(typescript@5.7.3)
       vue-router: 4.5.0(vue@3.5.13(typescript@5.7.3))
 
-  '@hocuspocus/common@2.15.0':
+  '@hocuspocus/common@2.15.1':
     dependencies:
-      lib0: 0.2.98
+      lib0: 0.2.99
 
-  '@hocuspocus/provider@2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
+  '@hocuspocus/provider@2.15.1(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
     dependencies:
-      '@hocuspocus/common': 2.15.0
+      '@hocuspocus/common': 2.15.1
       '@lifeomic/attempt': 3.1.0
-      lib0: 0.2.98
+      lib0: 0.2.99
       ws: 8.18.0
       y-protocols: 1.0.6(yjs@13.6.23)
       yjs: 13.6.23
@@ -9238,12 +9233,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@hocuspocus/server@2.15.0(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
+  '@hocuspocus/server@2.15.1(y-protocols@1.0.6(yjs@13.6.23))(yjs@13.6.23)':
     dependencies:
-      '@hocuspocus/common': 2.15.0
+      '@hocuspocus/common': 2.15.1
       async-lock: 1.4.1
       kleur: 4.1.5
-      lib0: 0.2.98
+      lib0: 0.2.99
       uuid: 11.0.3
       ws: 8.18.0
       y-protocols: 1.0.6(yjs@13.6.23)
@@ -12358,10 +12353,6 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
-
-  lib0@0.2.98:
-    dependencies:
-      isomorphic.js: 0.2.5
 
   lib0@0.2.99:
     dependencies:

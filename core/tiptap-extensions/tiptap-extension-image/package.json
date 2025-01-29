@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@tiptap/core": "2.11.2",
-    "@types/lodash": "4.17.14",
+    "@types/lodash": "4.17.15",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "vue": "3.5.13",

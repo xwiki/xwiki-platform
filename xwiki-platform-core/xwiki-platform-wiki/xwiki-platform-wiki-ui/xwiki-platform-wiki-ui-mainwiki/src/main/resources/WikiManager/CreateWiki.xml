@@ -804,6 +804,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
   var isWikiNameSet = false;
   var isAliasSet = false;
   var lastWikiName;
+  var lastPrettyName;
 
   ## Error messages
   #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
@@ -857,6 +858,7 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
     if(prettyName.value.blank()){
       $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
       prettyName.addClassName('xErrorField');
+      $('wizard-next').disabled = true;
     }else{
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
@@ -865,6 +867,11 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
         var wikiName = $('wikiname');
         wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
         validateWikiName();
+      }
+      // No matter the path, at this point, the wikiName has been already validated.
+      // If it's valid and the pretty name is not blank, we make sure that the user can continue to the next step.
+      if ($('wikinamevalidation').innerHTML=='') {
+        $('wizard-next').disabled = false;
       }
       if(!isAliasSet){
         var wikiAlias = $('wikialias');
@@ -900,10 +907,12 @@ $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section
       wikiNameElement.value = filteredWikiName;
       wikiname = filteredWikiName;
     }
-    if (lastWikiName == wikiname){
+    var prettyName = $('prettyname').value
+    if (lastWikiName === wikiname &amp;&amp; lastPrettyName === prettyName){
       return;
     }
     lastWikiName = wikiname;
+    lastPrettyName = prettyName;
     if (wikiname &amp;&amp; !wikiname.blank()) {
       var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
       surl += "&amp;form_token=$!{services.csrf.getToken()}";

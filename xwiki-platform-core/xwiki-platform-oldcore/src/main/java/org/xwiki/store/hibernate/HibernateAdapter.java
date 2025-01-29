@@ -31,9 +31,19 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Implement XWiki Hibernate features specific to a RDBMS. The goal is mainly to extend the Hibernate {@link Dialect}
- * and JDBC {@link Driver} concepts with features they don't support (database creation, etc.).
+ * and JDBC {@link Driver} concepts with features they don't support (table compression, wiki -> database name, etc.).
  * <p>
  * It's recommended to extend {@link AbstractHibernateAdapter}.
+ * <p>
+ * A {@link HibernateAdapter} is supposed to be provided by a {@link HibernateAdapterFactory}, but if you need to
+ * associate the {@link HibernateAdapter} to a specific database engine (and optionally to a specific minimum version)
+ * you can use the following helper format:
+ * <ul>
+ * <li>"jdbc scheme/minimum version" (for example the "mysql/8" adapter will be selected for a MySQL 9.0.1 server, if no
+ * adapter is registered for version 9)</li>
+ * <li>"jdbc scheme" (for example the "mysql" adapter will be selected for a MySQL 5.7 server, if no adapter is
+ * registered for version 5.7 or lower)</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 17.1.0RC1

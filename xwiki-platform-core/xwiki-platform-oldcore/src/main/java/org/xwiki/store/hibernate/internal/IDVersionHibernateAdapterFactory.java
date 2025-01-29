@@ -49,8 +49,10 @@ import org.xwiki.store.hibernate.HibernateAdapterFactory;
  * <p>
  * It search for an implementation of {@link HibernateAdapter} with the following role hints:
  * <ul>
- * <li>"id/major version+" (for example the "mysql/8" one will be selected for a MySQL 9.0.1 server)</li>
- * <li>"id" (for example the "mysql" one will be selected for a MySQL 5.7 server)</li>
+ * <li>"jdbc scheme/minimum version" (for example the "mysql/8" adapter will be selected for a MySQL 9.0.1 server, if no
+ * adapter is registered for version 9)</li>
+ * <li>"jdbc scheme" (for example the "mysql" adapter will be selected for a MySQL 5.7 server, if no adapter is
+ * registered for version 5.7 or lower)</li>
  * </ul>
  * <p>
  * The version is supposed to mean that the adapter was designed for "this version of greater".

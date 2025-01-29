@@ -37,7 +37,7 @@
     "mime": "4.0.6"
   },
   "peerDependencies": {
-    "electron": "34.0.0",
+    "electron": "34.0.1",
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {

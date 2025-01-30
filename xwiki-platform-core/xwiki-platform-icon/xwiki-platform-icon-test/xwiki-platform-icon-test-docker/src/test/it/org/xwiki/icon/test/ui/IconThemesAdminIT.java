@@ -112,7 +112,7 @@ class IconThemesAdminIT
         setup.gotoPage(childPage);
         assertTrue(setup.isUsingFA());
 
-    /*Possible extension of the test:
-     Verify that the icon theme has not been applied to other pages*/
+        // Possible extension of the test:
+        // Verify that the icon theme has not been applied to other pages.
     }
 }

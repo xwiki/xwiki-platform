@@ -22,13 +22,15 @@ package org.xwiki.store.hibernate;
 import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provide an common identifier from the actual product name given by the database.
+ * Provide a common identifier from the actual product name given by the database.
  *
  * @version $Id$
  * @since 17.1.0RC1
  */
+@Unstable
 @Role
 public interface DatabaseProductNameResolver
 {

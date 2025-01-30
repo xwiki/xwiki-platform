@@ -94,7 +94,11 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     {
         return colorThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
     }
-
+    
+    /**
+    * @param themeInput is the input from which to retrieve themes.
+    * @return a list of the name of all the themes proposed by the themeInput.
+     */
     private List<String> getThemes(WebElement themeInput)
     {
         List<String> results = new ArrayList<>();
@@ -109,7 +113,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      */
     public List<String> getColorThemes()
     {
-        return getThemes(colorThemeInput);
+        return getThemes(this.colorThemeInput);
     }
 
     /**
@@ -117,7 +121,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
      */
     public List<String> getIconThemes()
     {
-        return getThemes(iconThemeInput);
+        return getThemes(this.iconThemeInput);
     }
 
     private void setTheme(String themeName, WebElement themeInput)

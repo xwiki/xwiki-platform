@@ -66,7 +66,7 @@ class IconThemesAdminIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
         ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
         // We expect the default icon to be Silk
-        assertFalse(iconThemeIsFA(setup));
+        assertFalse(setup.isUsingFA());
 
         // Set the new icon theme as the active theme
         presentationAdministrationSectionPage.setIconTheme(FA_THEME);
@@ -74,7 +74,7 @@ class IconThemesAdminIT
         presentationAdministrationSectionPage.clickSave();
 
         // Verify that the icon theme has been applied.
-        assertTrue(iconThemeIsFA(setup));
+        assertTrue(setup.isUsingFA());
 
         // Switch back to Silk
         administrationPage = AdministrationPage.gotoPage();
@@ -106,19 +106,13 @@ class IconThemesAdminIT
 
         // Verify that the icon theme has been applied to the top page
         setup.gotoPage(topPage);
-        assertTrue(iconThemeIsFA(setup));
+        assertTrue(setup.isUsingFA());
 
         // Verify that the icon theme has been applied to the children page
         setup.gotoPage(childPage);
-        assertTrue(iconThemeIsFA(setup));
+        assertTrue(setup.isUsingFA());
 
     /*Possible extension of the test:
      Verify that the icon theme has not been applied to other pages*/
-    }
-
-    private boolean iconThemeIsFA(TestUtils setup)
-    {
-        return setup.getDriver()
-            .findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed();
     }
 }

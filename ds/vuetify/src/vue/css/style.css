@@ -25,7 +25,7 @@
   height: 64px;
 }
 
-main ul {
+main ul, main ol {
   padding-inline-start: var(--cr-spacing-x-large);
 }
 

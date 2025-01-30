@@ -70,13 +70,16 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         super("Themes");
     }
 
-    private List<WebElement> getThemeOptions(WebElement themeInput) {
+    private List<WebElement> getThemeOptions(WebElement themeInput)
+    {
         return themeInput.findElements(By.tagName("option"));
     }
+
     private List<WebElement> getColorThemeOptions()
     {
         return getThemeOptions(colorThemeInput);
     }
+
     private List<WebElement> getIconThemeOptions()
     {
         return getThemeOptions(iconThemeInput);
@@ -86,12 +89,12 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     {
         return colorThemeInput.findElements(By.xpath("//optgroup[@label='Colibri Themes']//option"));
     }
+
     private List<WebElement> getFlamingoThemeOptions()
     {
         return colorThemeInput.findElements(By.xpath("//optgroup[@label='Flamingo Themes']//option"));
     }
 
-    
     private List<String> getThemes(WebElement themeInput)
     {
         List<String> results = new ArrayList<>();
@@ -100,22 +103,25 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         }
         return results;
     }
-    
+
     /**
      * @return the list of available color themes
      */
-    public List<String> getColorThemes() {
+    public List<String> getColorThemes()
+    {
         return getThemes(colorThemeInput);
     }
 
     /**
      * @return the list of available icon themes
      */
-    public List<String> getIconThemes() {
+    public List<String> getIconThemes()
+    {
         return getThemes(iconThemeInput);
     }
-    
-    private void setTheme(String themeName, WebElement themeInput) {
+
+    private void setTheme(String themeName, WebElement themeInput)
+    {
         // Make sure the theme that we want to set is available from the list first
         try {
             getDriver().waitUntilCondition(driver -> getThemeOptionElement(themeName, themeInput) != null);
@@ -138,6 +144,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified color theme.
+     *
      * @param colorThemeName name of the color theme to select
      */
     public void setColorTheme(String colorThemeName)
@@ -147,6 +154,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
 
     /**
      * Select the specified icon theme.
+     *
      * @param iconThemeName name of the icon theme to select
      */
     public void setIconTheme(String iconThemeName)
@@ -154,7 +162,8 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         setTheme(iconThemeName, iconThemeInput);
     }
 
-    private WebElement getThemeOptionElement(String themeName, WebElement themeInput) {
+    private WebElement getThemeOptionElement(String themeName, WebElement themeInput)
+    {
         WebElement element = null;
         for (WebElement option : getThemeOptions(themeInput)) {
             if (themeName.equals(option.getText())) {
@@ -164,7 +173,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         }
         return element;
     }
-    
+
     private WebElement getColorThemeOptionElement(String colorThemeName)
     {
         return getThemeOptionElement(colorThemeName, colorThemeInput);
@@ -175,7 +184,8 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         return getThemeOptionElement(iconThemeName, iconThemeInput);
     }
 
-    private String getCurrentTheme(WebElement themeInput) {
+    private String getCurrentTheme(WebElement themeInput)
+    {
         for (WebElement option : getThemeOptions(themeInput)) {
             if (option.isSelected()) {
                 return option.getText();
@@ -183,6 +193,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
         }
         return null;
     }
+
     /**
      * @return the current color theme
      */
@@ -229,7 +240,7 @@ public class ThemesAdministrationSectionPage extends AdministrationSectionPage
     public void clickOnCustomizeColorTheme()
     {
         getDriver().waitUntilElementIsVisible(
-                By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
+            By.xpath("//label[@class='colorTheme']//a[contains(text(), 'Customize')]"));
         customizeColorThemeButton.click();
     }
 

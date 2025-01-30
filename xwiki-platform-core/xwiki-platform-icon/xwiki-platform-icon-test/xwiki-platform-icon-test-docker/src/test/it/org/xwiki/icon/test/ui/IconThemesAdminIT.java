@@ -44,81 +44,81 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 class IconThemesAdminIT
 {
-  private static final String SILK_THEME = "Silk";
-  private static final String FA_THEME = "Font Awesome";
-  
-  @Test
-  void validateIconThemeFeatures(TestUtils setup, TestInfo info)
-  {
-    setup.loginAsSuperAdmin();
-    
-    // Validate setting a icon theme from the wiki Admin UI
-    validateSetThemeFromWikiAdminUI(setup);
+    private static final String SILK_THEME = "Silk";
 
-    // Validate setting a icon theme from the page Admin UI for the page and its children
-    validateSetThemeFromPageAdminUI(setup, info);
-    
-  }
-  
-  private void validateSetThemeFromWikiAdminUI(TestUtils setup)
-  {
-    // Go to the Theme Admin UI to verify we can set a new theme from there using the select control
-    AdministrationPage administrationPage = AdministrationPage.gotoPage();
-    ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
-    // We expect the default icon to be Silk
-    assertFalse(iconThemeIsFA(setup));
+    private static final String FA_THEME = "Font Awesome";
 
-    // Set the new icon theme as the active theme
-    presentationAdministrationSectionPage.setIconTheme(FA_THEME);
-    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
-    presentationAdministrationSectionPage.clickSave();
+    @Test
+    void validateIconThemeFeatures(TestUtils setup, TestInfo info)
+    {
+        setup.loginAsSuperAdmin();
 
-    // Verify that the icon theme has been applied.
-    assertTrue(iconThemeIsFA(setup));
+        // Validate setting a icon theme from the wiki Admin UI
+        validateSetThemeFromWikiAdminUI(setup);
 
-    // Switch back to Silk
-    administrationPage = AdministrationPage.gotoPage();
-    presentationAdministrationSectionPage = administrationPage.clickThemesSection();
-    presentationAdministrationSectionPage.setIconTheme(SILK_THEME);
-    presentationAdministrationSectionPage.clickSave();
-  }
+        // Validate setting a icon theme from the page Admin UI for the page and its children
+        validateSetThemeFromPageAdminUI(setup, info);
+    }
 
-  private void validateSetThemeFromPageAdminUI(TestUtils setup, TestInfo info)
-  {
-    // Create two nested pages. We'll apply the theme on the top page and verify that the nested page has it too.
-    DocumentReference topPage = new DocumentReference("xwiki", info.getTestClass().get().getSimpleName() +
-            "Parent", "WebHome");
-    DocumentReference childPage = new DocumentReference("xwiki", Arrays.asList(
-            info.getTestClass().get().getSimpleName() + "Parent",
-            info.getTestClass().get().getSimpleName() + "Child"), "WebHome");
-    setup.deletePage(topPage, true);
-    setup.createPage(childPage, "top page");
-    setup.createPage(topPage, "top page");
-    AdministrablePage ap = new AdministrablePage();
+    private void validateSetThemeFromWikiAdminUI(TestUtils setup)
+    {
+        // Go to the Theme Admin UI to verify we can set a new theme from there using the select control
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+        // We expect the default icon to be Silk
+        assertFalse(iconThemeIsFA(setup));
 
-    // Navigate to the top page's admin UI.
-    AdministrationPage page = ap.clickAdministerPage();
-    ThemesAdministrationSectionPage presentationAdministrationSectionPage = page.clickThemesSection();
+        // Set the new icon theme as the active theme
+        presentationAdministrationSectionPage.setIconTheme(FA_THEME);
+        assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
+        presentationAdministrationSectionPage.clickSave();
 
-    // Set the newly created icon theme as the active theme for the page and children
-    presentationAdministrationSectionPage.setIconTheme(FA_THEME);
-    assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
-    presentationAdministrationSectionPage.clickSave();
+        // Verify that the icon theme has been applied.
+        assertTrue(iconThemeIsFA(setup));
 
-    // Verify that the icon theme has been applied to the top page
-    setup.gotoPage(topPage);
-    assertTrue(iconThemeIsFA(setup));
+        // Switch back to Silk
+        administrationPage = AdministrationPage.gotoPage();
+        presentationAdministrationSectionPage = administrationPage.clickThemesSection();
+        presentationAdministrationSectionPage.setIconTheme(SILK_THEME);
+        presentationAdministrationSectionPage.clickSave();
+    }
 
-    // Verify that the icon theme has been applied to the children page
-    setup.gotoPage(childPage);
-    assertTrue(iconThemeIsFA(setup));
+    private void validateSetThemeFromPageAdminUI(TestUtils setup, TestInfo info)
+    {
+        // Create two nested pages. We'll apply the theme on the top page and verify that the nested page has it too.
+        String simpleName = info.getTestClass().get().getSimpleName();
+        DocumentReference topPage = new DocumentReference("xwiki", simpleName + "Parent", "WebHome");
+        DocumentReference childPage = new DocumentReference("xwiki", Arrays.asList(simpleName + "Parent",
+            simpleName + "Child"), "WebHome");
+        setup.deletePage(topPage, true);
+        setup.createPage(childPage, "top page");
+        setup.createPage(topPage, "top page");
+        AdministrablePage ap = new AdministrablePage();
+
+        // Navigate to the top page's admin UI.
+        AdministrationPage page = ap.clickAdministerPage();
+        ThemesAdministrationSectionPage presentationAdministrationSectionPage = page.clickThemesSection();
+
+        // Set the newly created icon theme as the active theme for the page and children
+        presentationAdministrationSectionPage.setIconTheme(FA_THEME);
+        assertEquals(FA_THEME, presentationAdministrationSectionPage.getCurrentIconTheme());
+        presentationAdministrationSectionPage.clickSave();
+
+        // Verify that the icon theme has been applied to the top page
+        setup.gotoPage(topPage);
+        assertTrue(iconThemeIsFA(setup));
+
+        // Verify that the icon theme has been applied to the children page
+        setup.gotoPage(childPage);
+        assertTrue(iconThemeIsFA(setup));
 
     /*Possible extension of the test:
      Verify that the icon theme has not been applied to other pages*/
-  }
+    }
 
-  private boolean iconThemeIsFA(TestUtils setup)
-  {
-    return setup.getDriver().findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed();
-  }
+    private boolean iconThemeIsFA(TestUtils setup)
+    {
+        return setup.getDriver()
+            .findElementWithoutScrolling(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isDisplayed();
+    }
 }

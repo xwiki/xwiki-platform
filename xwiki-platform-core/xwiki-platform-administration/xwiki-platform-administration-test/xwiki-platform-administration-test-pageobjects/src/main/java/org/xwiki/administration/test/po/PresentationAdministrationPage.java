@@ -31,9 +31,9 @@ import org.xwiki.test.ui.po.ViewPage;
  * Page object for the Presentation section of the administration.
  *
  * @version $Id$
- * @since 15.10.14
- * @since 16.4.6
- * @since 16.10.0RC1
+ * @since 16.4.7
+ * @since 16.10.4
+ * @since 17.1.0RC1
  */
 public class PresentationAdministrationPage extends ViewPage
 {

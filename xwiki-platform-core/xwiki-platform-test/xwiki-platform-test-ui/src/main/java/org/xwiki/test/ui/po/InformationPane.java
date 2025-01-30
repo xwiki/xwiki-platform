@@ -102,7 +102,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link that corresponds to the given locale.
-     * 
+     *
      * @param locale the locale to click on
      * @since 12.10.6
      * @since 13.2RC1
@@ -114,7 +114,7 @@ public class InformationPane extends BaseElement
 
     /**
      * Clicks on the translation link with the specified label (locale pretty name).
-     * 
+     *
      * @param label the locale pretty name
      * @since 12.10.6
      * @since 13.2RC1
@@ -136,9 +136,9 @@ public class InformationPane extends BaseElement
 
     /**
      * @return {@code true} if the information tab is found, {@code false} otherwise
-     * @since 15.10.14
-     * @since 16.4.6
-     * @since 16.10.0RC1
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
      */
     public boolean exists()
     {
@@ -147,9 +147,9 @@ public class InformationPane extends BaseElement
 
     /**
      * @return {@code true} if the information tab is not found, {@code false} otherwise
-     * @since 15.10.14
-     * @since 16.4.6
-     * @since 16.10.0RC1
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
      */
     public boolean doesNotExist()
     {

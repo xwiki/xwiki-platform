@@ -78,7 +78,7 @@ class AdministrationIT
         page = new AdministrablePage();
         AdministrationPage pageAdministrationPage = page.clickAdministerPage();
         String fullName = setup.serializeLocalReference(testReference.getParent());
-        assertEquals("Page Administration: " + fullName, 
+        assertEquals("Page Administration: " + fullName,
             pageAdministrationPage.getDocumentTitle());
         assertTrue(pageAdministrationPage.getBreadcrumbContent().endsWith("/Page Administration"));
 
@@ -97,9 +97,9 @@ class AdministrationIT
     /**
      * Validate that the show information setting of the Presentation section of the administration has an effect.
      *
-     * @since 15.10.14
-     * @since 16.4.6
-     * @since 16.10.0RC1
+     * @since 16.4.7
+     * @since 16.10.4
+     * @since 17.1.0RC1
      */
     @Test
     void showPageInformationTabSettings(TestUtils setup, TestReference testReference)

@@ -161,12 +161,6 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
     @Override
     public boolean isCompressionAllowed()
     {
-        Optional<Boolean> compressionAllowed = getCompressionAllowedConfiguration();
-
-        if (compressionAllowed.isPresent()) {
-            return compressionAllowed.get();
-        }
-
-        return true;
+        return getCompressionAllowedConfiguration().orElse(true);
     }
 }

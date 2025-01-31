@@ -22,7 +22,7 @@
     "@xwiki/cristal-configuration-electron-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
-    "electron": "34.0.1"
+    "electron": "34.0.2"
   },
   "devDependencies": {
     "@types/node": "22.12.0",

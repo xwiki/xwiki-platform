@@ -173,13 +173,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
     @Override
     public boolean isCompressionAllowed()
     {
-        Optional<Boolean> compressionAllowed = getCompressionAllowedConfiguration();
-
-        if (compressionAllowed.isPresent()) {
-            return compressionAllowed.get();
-        }
-
-        return false;
+        return getCompressionAllowedConfiguration().orElse(false);
     }
 
     // Global

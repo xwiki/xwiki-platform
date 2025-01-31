@@ -160,7 +160,7 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
     /**
      * @return the value of the compression configuration, or empty if not configured
      */
-    public Optional<Boolean> getCompressionAllowedConfiguration()
+    protected Optional<Boolean> getCompressionAllowedConfiguration()
     {
         String configuration = this.hibernateStore.getConfiguration().getProperty("xwiki.compressionAllowed");
         if (configuration == null) {

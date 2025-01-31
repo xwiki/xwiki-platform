@@ -22,6 +22,7 @@ package org.xwiki.store.hibernate.internal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -63,13 +64,15 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         // Gather tables row formats
         Map<String, String> rowFormats = getRowFormats(session);
 
+        boolean compressionAllowed = isCompressionAllowed();
+
         // Make sure each table row format matches the configuration
         for (PersistentClass entity : metadata.getEntityBindings()) {
             // Get the exact table name for the entity
             String tableName = getTableName(entity);
 
             // Check if the table is configured to be compressed
-            boolean compressed = entity.getMetaAttribute(META_ATTRIBUTE_COMPRESSED) != null;
+            boolean compressed = compressionAllowed && entity.getMetaAttribute(META_ATTRIBUTE_COMPRESSED) != null;
 
             // Compute the query statement
             String statement = getAlterRowFormatString(tableName, compressed, rowFormats, session);
@@ -155,4 +158,15 @@ public class MySQLHibernateAdapter extends AbstractHibernateAdapter
         return "Compressed";
     }
 
+    @Override
+    public boolean isCompressionAllowed()
+    {
+        Optional<Boolean> compressionAllowed = getCompressionAllowedConfiguration();
+
+        if (compressionAllowed.isPresent()) {
+            return compressionAllowed.get();
+        }
+
+        return true;
+    }
 }

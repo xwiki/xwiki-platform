@@ -53,8 +53,10 @@ public class OracleHibernateAdapter extends AbstractHibernateAdapter
     @Override
     public void updateDatabaseAfter(Metadata metadata, Session session) throws HibernateStoreException
     {
-        // Make sure all the configured tables have the right compression configuration
-        updateTableCompression(metadata, session);
+        if (isCompressionAllowed()) {
+            // Make sure all the configured tables have the right compression configuration
+            updateTableCompression(metadata, session);
+        }
     }
 
     private void updateTableCompression(Metadata metadata, Session session)

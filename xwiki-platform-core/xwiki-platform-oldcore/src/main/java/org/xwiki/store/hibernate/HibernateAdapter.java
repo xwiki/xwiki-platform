@@ -111,6 +111,12 @@ public interface HibernateAdapter
      */
     String escapeDatabaseName(String databaseName);
 
+    /**
+     * @return true if compression is enabled for this database. Its possible to force it using hibernate.cfg.xml
+     *         {@code xwiki.compression} property, but the default may vary depending on the database.
+     */
+    boolean isCompressionAllowed();
+
     // Global
 
     /**

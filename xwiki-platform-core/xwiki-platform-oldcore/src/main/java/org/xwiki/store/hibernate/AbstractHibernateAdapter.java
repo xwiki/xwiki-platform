@@ -21,6 +21,7 @@ package org.xwiki.store.hibernate;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -154,6 +155,31 @@ public abstract class AbstractHibernateAdapter implements HibernateAdapter
     {
         String closeQuote = String.valueOf(getDialect().closeQuote());
         return getDialect().openQuote() + databaseName.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
+    }
+
+    /**
+     * @return the value of the compression configuration, or empty if not configured
+     */
+    public Optional<Boolean> getCompressionAllowedConfiguration()
+    {
+        String configuration = this.hibernateStore.getConfiguration().getProperty("xwiki.compressionAllowed");
+        if (configuration == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Boolean.valueOf(configuration));
+    }
+
+    @Override
+    public boolean isCompressionAllowed()
+    {
+        Optional<Boolean> compressionAllowed = getCompressionAllowedConfiguration();
+
+        if (compressionAllowed.isPresent()) {
+            return compressionAllowed.get();
+        }
+
+        return false;
     }
 
     // Global

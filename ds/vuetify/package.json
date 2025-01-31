@@ -32,7 +32,7 @@
     "@xwiki/cristal-navigation-tree-api": "workspace:*",
     "inversify": "6.2.1",
     "vue": "3.5.13",
-    "vue-i18n": "11.0.1",
+    "vue-i18n": "11.1.0",
     "vuetify": "3.7.8"
   },
   "peerDependencies": {

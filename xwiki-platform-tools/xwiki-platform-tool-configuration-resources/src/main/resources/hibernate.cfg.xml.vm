@@ -318,9 +318,7 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <property name="hibernate.connection.useUnicode">true</property>
     <property name="hibernate.connection.characterEncoding">utf8</property>
 
-    <!-- To enable if basic compression feature is enabled in Oracle
-    <property name="xwiki.compressionAllowed">true</property>
-    -->
+    <property name="xwiki.compressionAllowed">false</property>
 
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>

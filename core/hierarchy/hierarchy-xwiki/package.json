@@ -32,7 +32,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-xwiki-utils": "workspace:*",
-    "inversify": "6.2.1"
+    "inversify": "6.2.2"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

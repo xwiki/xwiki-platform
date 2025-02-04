@@ -27,7 +27,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-link-suggest-api": "workspace:*",
-    "inversify": "6.2.1",
+    "inversify": "6.2.2",
     "xml-escape": "1.1.0"
   },
   "peerDependencies": {

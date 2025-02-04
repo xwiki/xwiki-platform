@@ -33,7 +33,7 @@
     "inversify": "6.2.1",
     "vue": "3.5.13",
     "vue-i18n": "11.1.0",
-    "vuetify": "3.7.9"
+    "vuetify": "3.7.11"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

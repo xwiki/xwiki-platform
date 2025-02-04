@@ -48,7 +48,7 @@
     "@eslint/eslintrc": "3.2.0",
     "@eslint/js": "9.19.0",
     "@playwright/test": "1.50.0",
-    "@types/node": "22.13.0",
+    "@types/node": "22.13.1",
     "@vitejs/plugin-vue": "5.2.1",
     "globals": "15.14.0",
     "inversify": "6.2.1",

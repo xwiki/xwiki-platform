@@ -51,6 +51,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
+import org.xwiki.store.hibernate.HibernateAdapter;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -105,6 +106,9 @@ public class XWikiHibernateStoreTest
      */
     @Mock
     private Session session;
+
+    @Mock
+    private HibernateAdapter adapter;
 
     /**
      * The Hibernate transaction.
@@ -175,8 +179,9 @@ public class XWikiHibernateStoreTest
         when(this.hibernateStore.getCurrentSession()).thenReturn(session);
         when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
 
+        when(this.hibernateStore.getAdapter()).thenReturn(this.adapter);
         // Default is schema mode
-        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(true);
+        when(this.adapter.isConfiguredInSchemaMode()).thenReturn(true);
     }
 
     @Test
@@ -219,7 +224,7 @@ public class XWikiHibernateStoreTest
     @Test
     void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(false);
+        when(this.adapter.isConfiguredInSchemaMode()).thenReturn(false);
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;

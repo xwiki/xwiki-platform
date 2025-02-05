@@ -289,6 +289,7 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - if you want the main wiki schema to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
+           - switch the xwiki.compressionAllowed property to true if compression is enabled in Oracle
 
     <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="hibernate.connection.username">xwiki</property>
@@ -303,6 +304,8 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <property name="hibernate.connection.charSet">UTF-8</property>
     <property name="hibernate.connection.useUnicode">true</property>
     <property name="hibernate.connection.characterEncoding">utf8</property>
+
+    <property name="xwiki.compressionAllowed">false</property>
 
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>

@@ -36,7 +36,7 @@ export class UIXMenuTemplateProvider extends DefaultUIXTemplateProvider {
     super();
   }
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Menu;
   }
 

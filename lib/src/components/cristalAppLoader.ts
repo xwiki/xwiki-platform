@@ -24,6 +24,7 @@ import { Container } from "inversify";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type {
+  Configuration,
   ConfigurationLoader,
   Configurations,
 } from "@xwiki/cristal-configuration-api";
@@ -61,20 +62,7 @@ class CristalAppLoader extends CristalLoader {
     this.cristal.setAvailableConfigurations(config);
 
     await handleCallback(this.cristal.getContainer());
-
-    if (isElectron) {
-      const localConfigName = window.localStorage.getItem("currentApp");
-      if (
-        localConfigName != null &&
-        this.cristal.getAvailableConfigurations().has(localConfigName)
-      ) {
-        configName = localConfigName;
-      } else {
-        configName = "FileSystemSL";
-      }
-    } else {
-      configName = this.getConfigFromPathName(window.location.pathname);
-    }
+    configName = this.resolveCurrentConfiguration(isElectron);
 
     let wikiConfig = this.cristal.getAvailableConfigurations().get(configName);
     if (wikiConfig == null) {
@@ -114,16 +102,21 @@ class CristalAppLoader extends CristalLoader {
     loadConfig: ConfigurationLoader,
     isElectron: boolean,
     configName: string,
-    additionalComponents: (container: Container) => void,
+    additionalComponents: (
+      container: Container,
+      config: Configuration,
+    ) => Promise<void>,
   ): Promise<void> {
     let staticMode = forceStaticMode;
+    const config = await loadConfig();
     if (import.meta.env.MODE == "development" || staticMode) {
       staticMode = true;
       const StaticBuild = await import("../staticBuild");
-      StaticBuild.StaticBuild.init(
+      await StaticBuild.StaticBuild.init(
         this.container,
         staticMode,
         additionalComponents,
+        config[this.resolveCurrentConfiguration(isElectron)],
       );
     }
 
@@ -138,7 +131,6 @@ class CristalAppLoader extends CristalLoader {
     this.cristal.isElectron = isElectron;
     this.cristal.setContainer(this.container);
 
-    const config = await loadConfig();
     await this.loadApp(config, isElectron, configName);
   }
 
@@ -148,7 +140,10 @@ class CristalAppLoader extends CristalLoader {
     staticBuild: boolean,
     isElectron: boolean,
     configName: string,
-    additionalComponents: (container: Container) => void,
+    additionalComponents: (
+      container: Container,
+      configuration: Configuration,
+    ) => Promise<void>,
   ): void {
     const cristalLoader = new CristalAppLoader(extensionList);
     cristalLoader.initializeContainer();
@@ -159,6 +154,22 @@ class CristalAppLoader extends CristalLoader {
       configName,
       additionalComponents,
     );
+  }
+
+  private resolveCurrentConfiguration(isElectron: boolean) {
+    if (isElectron) {
+      const localConfigName = window.localStorage.getItem("currentApp");
+      if (
+        localConfigName != null &&
+        this.cristal.getAvailableConfigurations().has(localConfigName)
+      ) {
+        return localConfigName;
+      } else {
+        return "FileSystemSL";
+      }
+    } else {
+      return this.getConfigFromPathName(window.location.pathname);
+    }
   }
 }
 

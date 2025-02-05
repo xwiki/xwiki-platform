@@ -100,7 +100,7 @@ export class WorkerCristalApp implements CristalApp {
     throw new Error("Method not implemented.");
   }
 
-  getUIXTemplates(): Component[] {
+  getUIXTemplates(): Promise<Component[]> {
     throw new Error("Method not implemented.");
   }
 

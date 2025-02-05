@@ -21,7 +21,6 @@
 import { defineConfig } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import dts from "vite-plugin-dts";
-import vuetify from "vite-plugin-vuetify";
 
 import { resolve } from "path";
 
@@ -29,8 +28,19 @@ export default defineConfig({
   build: {
     sourcemap: true,
     input: {
-      main: resolve(__dirname, "index.html"),
+      main: resolve(__dirname, "index.html")
     },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // For the wikimodel (very) large javascript file to be chuncked separately.
+          if (id.includes("components/wikimodel-teavm.ts")) {
+            return "wikimodel";
+          }
+          return null;
+        }
+      }
+    }
   },
   plugins: [
     Vue({
@@ -38,26 +48,22 @@ export default defineConfig({
       template: {
         compilerOptions: {
           isCustomElement: (tag) =>
-            tag.startsWith("sl-") || tag.startsWith("solid-"),
-        },
-      },
-    }),
-    vuetify(),
-    dts({
-      insertTypesEntry: true,
+            tag.startsWith("sl-") || tag.startsWith("solid-")
+        }
+      }
     })
   ],
   worker: {
-    format: "es",
+    format: "es"
   },
   optimizeDeps: {
     esbuildOptions: {
       tsconfigRaw: {
         compilerOptions: {
           // Workaround for a vite bug (see https://github.com/vitejs/vite/issues/13736)
-          experimentalDecorators: true,
-        },
-      },
-    },
-  },
+          experimentalDecorators: true
+        }
+      }
+    }
+  }
 });

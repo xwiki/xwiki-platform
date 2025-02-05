@@ -28,10 +28,10 @@
     "@xwiki/cristal-model-api": "workspace:*",
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "inversify": "6.2.2",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.15",
+    "@types/lodash-es": "4.17.12",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.3",
     "vite": "6.0.11",

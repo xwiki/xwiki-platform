@@ -21,7 +21,9 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 <template>
   <main>
-    <router-view />
+    <suspense>
+      <router-view />
+    </suspense>
   </main>
 </template>
 

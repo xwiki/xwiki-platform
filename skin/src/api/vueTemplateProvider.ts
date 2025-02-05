@@ -21,7 +21,7 @@
 import type { App, Component } from "vue";
 
 export interface VueTemplateProvider {
-  getVueComponent(): Component;
+  getVueComponent(): Promise<Component>;
 
   getVueName(): string;
 

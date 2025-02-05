@@ -28,7 +28,7 @@ import {
 import { ModelReferenceParser } from "@xwiki/cristal-model-reference-api";
 import { inject, injectable } from "inversify";
 
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import type { DocumentService } from "@xwiki/cristal-document-api";
 
 @injectable()

@@ -57,7 +57,7 @@ import {
   initTiptapImage,
 } from "@xwiki/cristal-tiptap-extension-image";
 import { Container } from "inversify";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import GlobalDragHandle from "tiptap-extension-global-drag-handle";
 import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";

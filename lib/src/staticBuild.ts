@@ -18,21 +18,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import type { Configuration } from "@xwiki/cristal-configuration-api";
 import type { Container } from "inversify";
 
 export class StaticBuild {
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 
-  public static init(
+  public static async init(
     container: Container,
     forceStaticBuild: boolean,
-    additionalComponents: (container: Container) => void,
-  ): void {
+    additionalComponents: (
+      container: Container,
+      configuration: Configuration,
+    ) => Promise<void>,
+    configuration: Configuration,
+  ): Promise<void> {
     if (
       (import.meta.env && import.meta.env.MODE == "development") ||
       forceStaticBuild
     ) {
-      additionalComponents(container);
+      await additionalComponents(container, configuration);
     }
   }
 }

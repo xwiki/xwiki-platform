@@ -30,7 +30,7 @@ export default class DefaultVueTemplateProvider implements VueTemplateProvider {
   public static priority = 1000;
   public static singleton = true;
 
-  getVueComponent(): Component {
+  getVueComponent(): Promise<Component> {
     throw new Error("Method not implemented.");
   }
 

@@ -30,7 +30,6 @@ import { ComponentInit as ModelReferenceFilesystemComponentInit } from "@xwiki/c
 import { ComponentInit as ModelRemoteURLFilesystemComponentInit } from "@xwiki/cristal-model-remote-url-filesystem-default";
 import { ComponentInit as FileSystemNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-filesystem";
 import { ComponentInit as FileSystemRenameComponentInit } from "@xwiki/cristal-rename-filesystem";
-import { Container } from "inversify";
 
 CristalAppLoader.init(
   [
@@ -47,8 +46,8 @@ CristalAppLoader.init(
   true,
   true,
   "FileSystemSL",
-  (container: Container) => {
-    defaultComponentsList(container);
+  async (container, configuration) => {
+    await defaultComponentsList(container, configuration);
     new ElectronStorageComponentInit(container);
     new BrowserComponentInit(container);
     new FileSystemPageHierarchyComponentInit(container);

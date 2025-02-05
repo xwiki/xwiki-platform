@@ -265,10 +265,10 @@ export class ContentTools {
    */
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
-  public static transformMacros(
+  public static async transformMacros(
     element: HTMLElement,
     cristal: CristalApp,
-  ): void {
+  ): Promise<void> {
     const macroTagList = element.getElementsByTagName("pre");
     for (let i = 0; i < macroTagList.length; i++) {
       const macroTag = macroTagList[i];
@@ -280,7 +280,7 @@ export class ContentTools {
             const macroProvider = cristal
               ?.getContainer()
               .getNamed<MacroProvider>("MacroProvider", macroName);
-            const vueComponent = macroProvider?.getVueComponent();
+            const vueComponent = await macroProvider?.getVueComponent();
             if (vueComponent && cristal?.getApp()) {
               macroTag.id = "wikimodel-macro-" + macroName + "-1";
               const macroData = macroProvider.parseParameters(macroTag);

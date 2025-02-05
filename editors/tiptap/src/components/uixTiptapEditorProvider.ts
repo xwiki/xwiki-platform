@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import TiptapEditor from "../vue/c-edit-tiptap.vue";
 import { CristalApp } from "@xwiki/cristal-api";
 import { DefaultVueTemplateProvider } from "@xwiki/cristal-skin";
 import { injectable } from "inversify";
@@ -34,9 +33,10 @@ export class UixTiptapEditorProvider extends DefaultVueTemplateProvider {
 
   registered = false;
 
-  override getVueComponent(): Component {
-    TiptapEditor.editorname = "tiptap";
-    return TiptapEditor;
+  override async getVueComponent(): Promise<Component> {
+    const component = (await import("../vue/c-edit-tiptap.vue")).default;
+    component.editorname = "tiptap";
+    return component;
   }
   override getVueName(): string {
     return "TiptapEditor";

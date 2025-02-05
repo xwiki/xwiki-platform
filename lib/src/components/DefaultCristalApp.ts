@@ -45,7 +45,6 @@ import type {
 } from "@xwiki/cristal-api";
 import type { BrowserApi } from "@xwiki/cristal-browser-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
-import "@mdi/font/css/materialdesignicons.css";
 import type { ExtensionManager } from "@xwiki/cristal-extension-manager";
 import type { MenuEntry } from "@xwiki/cristal-extension-menubuttons";
 import type { Renderer } from "@xwiki/cristal-rendering";
@@ -462,9 +461,9 @@ export class DefaultCristalApp implements CristalApp {
         vueComponent,
       );
       if (vueComponent.isGlobal()) {
-        this.logger?.debug("Vue component is ", vueComponent.getVueComponent());
-        const vueComp = vueComponent.getVueComponent();
-        this.app.component(vueComponent.getVueName(), vueComp);
+        const vueCompInstance = await vueComponent.getVueComponent();
+        this.logger?.debug("Vue component is ", vueCompInstance);
+        this.app.component(vueComponent.getVueName(), vueCompInstance);
       }
       // registering additional components
       this.logger?.debug(
@@ -528,7 +527,7 @@ export class DefaultCristalApp implements CristalApp {
     return menuEntriesElements;
   }
 
-  getUIXTemplates(extensionPoint: string): Array<Component> {
+  async getUIXTemplates(extensionPoint: string): Promise<Array<Component>> {
     const uixTemplates = new Array<Component>();
     try {
       this.logger?.debug(
@@ -546,7 +545,7 @@ export class DefaultCristalApp implements CristalApp {
         uixComponents,
       );
       for (const i in uixComponents) {
-        uixTemplates.push(uixComponents[i].getVueComponent());
+        uixTemplates.push(await uixComponents[i].getVueComponent());
       }
     } catch (e) {
       if (

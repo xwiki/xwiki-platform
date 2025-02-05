@@ -33,7 +33,7 @@ import {
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
 import { ContentTools } from "@xwiki/cristal-skin";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { Ref, inject, onMounted, onUpdated, ref, toRefs, watch } from "vue";
 import type { BubbleMenuAction } from "../components/extensions/bubble-menu/BubbleMenuAction";
 import type { Editor } from "@tiptap/core";

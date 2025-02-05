@@ -869,13 +869,13 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1314,13 +1314,13 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -1677,13 +1677,13 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       reflect-metadata:
         specifier: 0.2.2
         version: 0.2.2
@@ -2040,13 +2040,13 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2228,7 +2228,7 @@ importers:
       '@xwiki/cristal-tiptap-link-suggest-ui':
         specifier: workspace:*
         version: link:../tiptap-link-suggest-ui
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
       prosemirror-markdown:
@@ -2250,9 +2250,9 @@ importers:
       '@tiptap/core':
         specifier: 2.11.4
         version: 2.11.4(@tiptap/pm@2.11.4)
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2318,13 +2318,13 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../../dev/config
@@ -2692,7 +2692,7 @@ importers:
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
-      lodash:
+      lodash-es:
         specifier: 4.17.21
         version: 4.17.21
       markdown-it:
@@ -2726,9 +2726,9 @@ importers:
         specifier: 13.6.23
         version: 13.6.23
     devDependencies:
-      '@types/lodash':
-        specifier: 4.17.15
-        version: 4.17.15
+      '@types/lodash-es':
+        specifier: 4.17.12
+        version: 4.17.12
       '@types/markdown-it':
         specifier: 14.1.2
         version: 14.1.2
@@ -3170,9 +3170,6 @@ importers:
 
   lib:
     dependencies:
-      '@mdi/font':
-        specifier: 7.4.47
-        version: 7.4.47
       '@xwiki/cristal-alerts-default':
         specifier: workspace:*
         version: link:../core/alerts/alerts-default
@@ -3724,6 +3721,9 @@ importers:
       '@xwiki/cristal-browser-default':
         specifier: workspace:*
         version: link:../core/browser/browser-default
+      '@xwiki/cristal-configuration-api':
+        specifier: workspace:*
+        version: link:../core/configuration/configuration-api
       '@xwiki/cristal-configuration-web':
         specifier: workspace:*
         version: link:../core/configuration/configuration-web
@@ -4459,9 +4459,6 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@mdi/font@7.4.47':
-    resolution: {integrity: sha512-43MtGpd585SNzHZPcYowu/84Vz2a2g31TvPMTm9uTiCSWzaheQySUcSyUH/46fPnuPQWof2yd0pGBtzee/IQWw==}
-
   '@microsoft/api-extractor-model@7.30.2':
     resolution: {integrity: sha512-3/t2F+WhkJgBzSNwlkTIL0tBgUoBqDqL66pT+nh2mPbM0NIDGVGtpqbGWPgHIzn/mn7kGS/Ep8D8po58e8UUIw==}
 
@@ -5002,6 +4999,9 @@ packages:
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
   '@types/lodash@4.17.15':
     resolution: {integrity: sha512-w/P33JFeySuhN6JLkysYUK2gEmy9kHHFN7E8ro0tkfmlDOgxBDzWEZ/J8cWA+fHqFevpswDTFZnDx+R9lbL6xw==}
@@ -6456,9 +6456,6 @@ packages:
   get-tsconfig@4.10.0:
     resolution: {integrity: sha512-kGzZ3LWWQcGIAmg6iWvXn0ei6WDtV26wzHRMwDSzmAbcXrTEXxHy6IehI6/4eT6VRKyMP1eF1VqwrVUmE/LR7A==}
 
-  get-tsconfig@4.8.1:
-    resolution: {integrity: sha512-k9PN+cFBmaLWtVz29SkUoqU5O0slLuHJXt/2P+tMVFT+phsSGXGkp9t3rQIqdz0e+06EHNGs3oM6ZX1s2zHxRg==}
-
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -6993,6 +6990,9 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
+
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.defaults@4.2.0:
     resolution: {integrity: sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ==}
@@ -9369,8 +9369,6 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@mdi/font@7.4.47': {}
-
   '@microsoft/api-extractor-model@7.30.2(@types/node@22.13.1)':
     dependencies:
       '@microsoft/tsdoc': 0.15.1
@@ -9894,6 +9892,10 @@ snapshots:
   '@types/linkify-it@3.0.5': {}
 
   '@types/linkify-it@5.0.0': {}
+
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.15
 
   '@types/lodash@4.17.15': {}
 
@@ -11828,10 +11830,6 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  get-tsconfig@4.8.1:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
-
   glob-parent@5.1.2:
     dependencies:
       is-glob: 4.0.3
@@ -12394,6 +12392,8 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
+
+  lodash-es@4.17.21: {}
 
   lodash.defaults@4.2.0: {}
 
@@ -13742,7 +13742,7 @@ snapshots:
   tsx@4.19.2:
     dependencies:
       esbuild: 0.23.1
-      get-tsconfig: 4.8.1
+      get-tsconfig: 4.10.0
     optionalDependencies:
       fsevents: 2.3.3
 

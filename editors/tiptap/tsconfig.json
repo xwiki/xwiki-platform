@@ -7,7 +7,7 @@
     ],
     "isolatedDeclarations": false,
     "types": [
-      "@types/lodash",
+      "@types/lodash-es",
       "@types/markdown-it",
       "@xwiki/cristal-dsapi"
     ]

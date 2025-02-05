@@ -34,7 +34,7 @@ export class InfoMacro extends AlertMacro {
     return InfoMacro.macroName;
   }
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Info;
   }
 }

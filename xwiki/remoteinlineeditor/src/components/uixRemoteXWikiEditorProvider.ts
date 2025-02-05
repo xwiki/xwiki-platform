@@ -34,7 +34,7 @@ export class UIXRemoteXWikiEditorProvider extends DefaultVueTemplateProvider {
 
   registered = false;
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return TextEditor;
   }
   override getVueName(): string {

@@ -26,13 +26,13 @@
   "dependencies": {
     "@xwiki/cristal-uiextension-api": "workspace:*",
     "inversify": "6.2.2",
-    "lodash": "4.17.21"
+    "lodash-es": "4.17.21"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {
-    "@types/lodash": "4.17.15",
+    "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.3",

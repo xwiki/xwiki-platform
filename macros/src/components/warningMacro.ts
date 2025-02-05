@@ -34,7 +34,7 @@ export class WarningMacro extends AlertMacro {
     return WarningMacro.macroName;
   }
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Warning;
   }
 }

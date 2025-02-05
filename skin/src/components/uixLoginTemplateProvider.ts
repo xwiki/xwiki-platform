@@ -33,7 +33,7 @@ export class UIXLoginTemplateProvider extends DefaultVueTemplateProvider {
 
   registered = false;
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Login;
   }
   override getVueName(): string {

@@ -18,40 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import "reflect-metadata";
-import DefaultVueTemplateProvider from "./defaultUIXTemplateProvider";
-import UIX from "../vue/c-uix.vue";
-import { injectable } from "inversify";
-import type { VueTemplateProvider } from "../api/vueTemplateProvider";
+import { ComponentInit as NextcloudPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-nextcloud";
+import { ComponentInit as NextcloudLinkSuggestComponentInit } from "@xwiki/cristal-link-suggest-nextcloud";
+import { ComponentInit as ModelReferenceNextcloudComponentInit } from "@xwiki/cristal-model-reference-nextcloud";
+import { ComponentInit as ModelRemoteURLNextcloudComponentInit } from "@xwiki/cristal-model-remote-url-nextcloud";
+import { ComponentInit as NextcloudNavigationTreeComponentInit } from "@xwiki/cristal-navigation-tree-nextcloud";
 import type { Container } from "inversify";
-import type { Component } from "vue";
 
-@injectable()
-export class UIXVueTemplateProvider extends DefaultVueTemplateProvider {
-  public static override cname = "cristal.vuejs.component";
-  public static override hint = "uix";
-  public static override priority = 1000;
-  public static override singleton = true;
-
-  constructor() {
-    super();
-  }
-
-  override async getVueComponent(): Promise<Component> {
-    return UIX;
-  }
-
-  override getVueName(): string {
-    return "UIX";
-  }
-
-  override isGlobal(): boolean {
-    return true;
-  }
-
-  bindToContainer(container: Container): void {
-    container
-      .bind<VueTemplateProvider>("VueTemplateProvider")
-      .to(UIXVueTemplateProvider);
-  }
+export function load(container: Container) {
+  new NextcloudLinkSuggestComponentInit(container);
+  new NextcloudPageHierarchyComponentInit(container);
+  new NextcloudNavigationTreeComponentInit(container);
+  new ModelRemoteURLNextcloudComponentInit(container);
+  new ModelReferenceNextcloudComponentInit(container);
 }

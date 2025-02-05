@@ -23,7 +23,7 @@ import {
   UIExtensionsManager,
 } from "@xwiki/cristal-uiextension-api";
 import { injectable, multiInject } from "inversify";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 
 @injectable()
 export class DefaultUIExtensionsManager implements UIExtensionsManager {

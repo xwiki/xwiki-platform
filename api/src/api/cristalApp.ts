@@ -51,7 +51,16 @@ export interface CristalApp {
 
   run(): Promise<void>;
 
-  getUIXTemplates(extensionPoint: string): Array<Component>;
+  /**
+   * The method existed before 0.15, but wasn't allowing for components to be
+   * resolved asynchronously.
+   * This is useful to avoid loading all the components of a UIX during the first page load, and instead wait for the
+   * extension point to be actually required first.
+   *
+   * @param extensionPoint - id of the extension point to resolve
+   * @since 0.15
+   */
+  getUIXTemplates(extensionPoint: string): Promise<Array<Component>>;
 
   getMenuEntries(): Array<string>;
 

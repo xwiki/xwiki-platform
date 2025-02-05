@@ -21,7 +21,7 @@
 import { PageAction, PageActionService } from "@xwiki/cristal-page-actions-api";
 
 import { injectable, multiInject } from "inversify";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 
 /**
  * @since 0.11

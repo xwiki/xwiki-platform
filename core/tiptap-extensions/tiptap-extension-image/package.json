@@ -34,7 +34,7 @@
     "@xwiki/cristal-model-reference-api": "workspace:*",
     "@xwiki/cristal-model-remote-url-api": "workspace:*",
     "@xwiki/cristal-tiptap-link-suggest-ui": "workspace:*",
-    "lodash": "4.17.21",
+    "lodash-es": "4.17.21",
     "prosemirror-markdown": "1.13.1",
     "vue-i18n": "11.1.0",
     "vue-tippy": "6.6.0",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@tiptap/core": "2.11.4",
-    "@types/lodash": "4.17.15",
+    "@types/lodash-es": "4.17.12",
     "@xwiki/cristal-dev-config": "workspace:*",
     "@xwiki/cristal-dsapi": "workspace:*",
     "vue": "3.5.13",

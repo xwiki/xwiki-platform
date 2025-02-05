@@ -26,10 +26,10 @@ let comps: Array<Component>;
 let logger: Logger;
 
 export default {
-  setup() {
+  async setup() {
     let cristal = inject<CristalApp>("cristal");
     if (cristal) {
-      comps = cristal.getUIXTemplates("editor");
+      comps = await cristal.getUIXTemplates("editor");
       logger = cristal.getLogger("skin.vue.editor");
     }
   },

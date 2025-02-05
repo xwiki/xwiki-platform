@@ -37,7 +37,7 @@ export class TemplateComponent extends DefaultVueTemplateProvider {
     super();
   }
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Template;
   }
 

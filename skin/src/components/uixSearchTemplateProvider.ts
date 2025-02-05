@@ -33,7 +33,7 @@ export class UIXSearchTemplateProvider extends DefaultVueTemplateProvider {
 
   registered = false;
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Search;
   }
   override getVueName(): string {

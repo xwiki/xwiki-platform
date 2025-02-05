@@ -28,7 +28,7 @@ let logger: Logger | undefined = undefined;
 const props = defineProps<{ uixname: string }>();
 const cristal = inject<CristalApp>("cristal");
 if (cristal) {
-  components = cristal.getUIXTemplates(props.uixname);
+  components = await cristal.getUIXTemplates(props.uixname);
   logger = cristal.getLogger("skin.vue.template");
 }
 

@@ -26,7 +26,6 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@mdi/font": "7.4.47",
     "@xwiki/cristal-alerts-default": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-attachments-default": "workspace:*",

@@ -18,23 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import { AlertMacro } from "./alertMacro";
-import Error from "../vue/c-error.vue";
-import { Component } from "vue";
+import { ComponentInit as ShoelaceComponentInit } from "@xwiki/cristal-dsshoelace";
+import type { Container } from "inversify";
 
-export class ErrorMacro extends AlertMacro {
-  public static override cname = "cristal.macro.error";
-  public static override macroName = "error";
-
-  constructor() {
-    super();
-  }
-
-  override getMacroName(): string {
-    return ErrorMacro.macroName;
-  }
-
-  override async getVueComponent(): Promise<Component> {
-    return Error;
-  }
+export function load(container: Container) {
+  new ShoelaceComponentInit(container);
 }

@@ -34,7 +34,7 @@ export class SuccessMacro extends AlertMacro {
     return SuccessMacro.macroName;
   }
 
-  override getVueComponent(): Component {
+  override async getVueComponent(): Promise<Component> {
     return Success;
   }
 }

@@ -23,7 +23,7 @@ import {
   InfoActionsService,
 } from "@xwiki/cristal-info-actions-api";
 import { injectable, multiInject } from "inversify";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 
 /**
  * Default implementation of InfoActionsService. Returns the list of enabled

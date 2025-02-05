@@ -16,7 +16,7 @@ import {
 import { ModelReferenceParserProvider } from "@xwiki/cristal-model-reference-api";
 import { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-url-api";
 import { LinkSuggestItem } from "@xwiki/cristal-tiptap-link-suggest-ui";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { Ref, inject, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { Tippy } from "vue-tippy";

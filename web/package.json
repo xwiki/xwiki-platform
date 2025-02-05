@@ -32,6 +32,7 @@
   "dependencies": {
     "@xwiki/cristal-authentication-xwiki": "workspace:*",
     "@xwiki/cristal-browser-default": "workspace:*",
+    "@xwiki/cristal-configuration-api": "workspace:*",
     "@xwiki/cristal-configuration-web": "workspace:*",
     "@xwiki/cristal-lib": "workspace:*",
     "@xwiki/cristal-navigation-tree-default": "workspace:*",

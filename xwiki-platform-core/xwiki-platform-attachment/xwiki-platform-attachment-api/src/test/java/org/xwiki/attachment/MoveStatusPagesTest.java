@@ -85,7 +85,8 @@ class MoveStatusPagesTest extends PageTest
     {
         this.request.put("moveId", "42");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_STATUS_TEMPLATE));
-        assertEquals("attachment.move.status.notFound", render.select(".errormessage").text());
+        assertEquals("$services.icon.renderHTML($iconName) error " 
+            + "attachment.move.status.notFound", render.select(".errormessage").text());
         verify(this.jobScriptService).getJobStatus(List.of("refactoring", "moveAttachment", "42"));
     }
 

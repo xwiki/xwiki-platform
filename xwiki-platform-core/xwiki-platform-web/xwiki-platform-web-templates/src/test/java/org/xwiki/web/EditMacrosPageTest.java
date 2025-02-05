@@ -85,7 +85,7 @@ class EditMacrosPageTest extends PageTest
     private HttpSession httpSession;
 
     @BeforeEach
-    void setUp()
+    void setUp() throws Exception
     {
         this.request.setSession(this.httpSession);
     }
@@ -126,7 +126,8 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("warning", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
+        assertEquals("$services.icon.renderHTML($iconName) warning " 
+            + "platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
         assertEquals("Warning", message.selectFirst("#warning1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertEquals("forcelock", editConfirmation.get("confirm"));
@@ -160,7 +161,8 @@ class EditMacrosPageTest extends PageTest
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
         // This test is not to test the structure, but to verify the order in which the text are displayed.
-        assertEquals("platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
+        assertEquals("$services.icon.renderHTML($iconName) error " 
+            + "platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
             + ".additionalWarnings Warning 1 Warning 2", message.text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));
@@ -216,7 +218,7 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
+        assertEquals("$services.icon.renderHTML($iconName) error platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
         assertEquals("Error", message.selectFirst("#error1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));

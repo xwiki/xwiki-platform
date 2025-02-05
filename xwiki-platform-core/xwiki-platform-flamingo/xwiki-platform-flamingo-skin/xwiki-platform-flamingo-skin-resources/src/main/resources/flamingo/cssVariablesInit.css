@@ -163,7 +163,7 @@
 #end
 ## For now we just use only `string` variables, because it's the easiest to setup and because it's 100% compatible with
 ## LESS variables. We could use extra info on the variable types to use @property syntax later.
---$property: "$escapetool.javascript($!value)";
+--$property: $escapetool.javascript($!value);
 #end
 #end
 }

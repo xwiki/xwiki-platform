@@ -247,7 +247,7 @@
     {{/html}}
     
     {{error cssClass="xform"}}
-      {{html clean="false"}}
+      {{html}}
       #set ($pageIndexReference = $services.model.createDocumentReference(
         $userReference.wikiReference.name, 'Main', 'AllDocs'))
       #set ($pageIndexURL = $xwiki.getURL($pageIndexReference) + '#|t=alldocs&amp;doc.author=' +

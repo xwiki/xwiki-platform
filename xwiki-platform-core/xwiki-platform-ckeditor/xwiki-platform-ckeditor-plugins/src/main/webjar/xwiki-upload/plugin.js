@@ -351,7 +351,7 @@
     }
 
     async function waitBeforeUploading({editor, pastedImages, loadedImages, notification}) {
-      if (loadedImages.length < pastedImages.count() && notification.isVisible()) {
+      if (loadedImages.length < pastedImages.count() && notification?.isVisible()) {
         // Update the notification to inform the user that some images failed to be downloaded.
         const failedCount = pastedImages.count() - loadedImages.length;
         notification.update({
@@ -388,7 +388,7 @@
         });
       } else {
         // Nothing to upload.
-        notification.hide();
+        notification?.hide();
       }
 
       return {editor, pastedImages, loadedImages, notification};

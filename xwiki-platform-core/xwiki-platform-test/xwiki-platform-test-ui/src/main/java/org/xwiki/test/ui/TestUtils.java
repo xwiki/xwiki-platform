@@ -1626,6 +1626,14 @@ public class TestUtils
     }
 
     /**
+     * This function assumes that the breadcrumb is visible on the current page.
+     */
+    public boolean isUsingFA()
+    {
+        return !getDriver().findElements(By.cssSelector("#hierarchy_breadcrumb .dropdown .fa.fa-home")).isEmpty();
+    }
+
+    /**
      * Verify if the passed reference corresponds to the current page, independently of the wiki.
      * Throws an {@link AssertionFailedError} if it's not the case.
      *

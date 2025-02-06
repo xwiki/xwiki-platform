@@ -110,7 +110,7 @@
         </a>
       </div>
     #end
-    #warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
   #end
 </div>
 #end
@@ -265,7 +265,7 @@
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
       <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')</a></div>
     #end
-    #warningWithExtraClass($warningMessageContent 'deprecatedProperties')
+    #_warningWithExtraClass($warningMessageContent 'deprecatedProperties')
   #end
 #end ## checkPropertyDeprecation
 ##

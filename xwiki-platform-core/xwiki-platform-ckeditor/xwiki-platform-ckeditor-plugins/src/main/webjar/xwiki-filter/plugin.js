@@ -79,7 +79,7 @@
       var dataFilter = editor.dataProcessor && editor.dataProcessor.dataFilter;
       if (dataFilter) {
         dataFilter.addRules(replaceEmptyLinesWithEmptyParagraphs, {priority: 5});
-        if (editor.config.loadJavaScriptSkinExtensions) {
+        if (editor.config.loadJavaScriptSkinExtensions !== 0) {
           dataFilter.addRules(unprotectAllowedScripts, {priority: 5});
         }
       }

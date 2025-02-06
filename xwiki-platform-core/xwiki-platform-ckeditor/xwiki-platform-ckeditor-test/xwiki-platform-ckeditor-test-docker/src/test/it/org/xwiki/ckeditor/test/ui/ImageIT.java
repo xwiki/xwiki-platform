@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,8 @@ import org.xwiki.ckeditor.test.po.image.edit.ImageDialogAdvancedEditForm;
 import org.xwiki.ckeditor.test.po.image.edit.ImageDialogStandardEditForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogIconSelectForm;
 import org.xwiki.ckeditor.test.po.image.select.ImageDialogUrlSelectForm;
+import org.xwiki.flamingo.skin.test.po.AttachmentsPane;
+import org.xwiki.flamingo.skin.test.po.AttachmentsViewPage;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -145,9 +148,12 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("[[image:image.gif]]\n"
-            + "\n"
-            + "[[Caption>>image:image.gif]]\n\n ", savedPage.editWiki().getContent());
+        assertEquals("""
+            [[image:image.gif]]
+
+            [[Caption>>image:image.gif]]
+
+            \040""", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -377,20 +383,23 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
         WikiEditPage wikiEditPage = newPage.editWiki();
-        wikiEditPage.setContent("[[[[image:image.gif]]>>doc:]]\n"
-            + "\n"
-            + "(% a='b' %)[[[[image:image.gif]]>>doc:]]\n"
-            + "\n"
-            + "(% a=\"b\" %)\n"
-            + "[[aaaa>>image:image.gif]]");
+        wikiEditPage.setContent("""
+            [[[[image:image.gif]]>>doc:]]
+
+            (% a='b' %)[[[[image:image.gif]]>>doc:]]
+
+            (% a="b" %)
+            [[aaaa>>image:image.gif]]
+            """);
         ViewPage savedPage = wikiEditPage.clickSaveAndView();
 
-        assertEquals("[[[[image:image.gif]]>>doc:]]\n"
-            + "\n"
-            + "(% a='b' %)[[[[image:image.gif]]>>doc:]]\n"
-            + "\n"
-            + "(% a=\"b\" %)\n"
-            + "[[aaaa>>image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("""
+            [[[[image:image.gif]]>>doc:]]
+
+            (% a='b' %)[[[[image:image.gif]]>>doc:]]
+
+            (% a="b" %)
+            [[aaaa>>image:image.gif]]""", savedPage.editWiki().getContent());
 
         // Re-edit the page.
         WYSIWYGEditPage wysiwygEditPage = savedPage.editWYSIWYG();
@@ -398,12 +407,13 @@ class ImageIT extends AbstractCKEditorIT
         savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content is not altered when edited with CKEditor (expect for the additional escaping)
-        assertEquals("[[~[~[image:image.gif~]~]>>doc:]]\n"
-            + "\n"
-            + "(% a=\"b\" %)[[~[~[image:image.gif~]~]>>doc:]]\n"
-            + "\n"
-            + "(% a=\"b\" %)\n"
-            + "[[aaaa>>image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("""
+            [[~[~[image:image.gif~]~]>>doc:]]
+
+            (% a="b" %)[[~[~[image:image.gif~]~]>>doc:]]
+
+            (% a="b" %)
+            [[aaaa>>image:image.gif]]""", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -464,8 +474,10 @@ class ImageIT extends AbstractCKEditorIT
 
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
+        assertEquals("""
+            [[~[~[Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment="center"~]~]>>doc:Main.WebHome]]
+
+            \040""", savedPage.editWiki().getContent());
         // Test that when re-editing the image, the link, caption and alignment are still set.
         wysiwygEditPage = savedPage.editWYSIWYG();
         editor = new CKEditor("content").waitToLoad();
@@ -494,8 +506,10 @@ class ImageIT extends AbstractCKEditorIT
                 .sendKeys(Keys.HOME, "New "));
         savedPage = wysiwygEditPage.clickSaveAndView();
 
-        assertEquals("[[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment=\"center\"~]~]"
-            + ">>doc:Main.WebHome]]\n\n ", savedPage.editWiki().getContent());
+        assertEquals("""
+            [[~[~[New Caption~>~>image:image.gif~|~|data-xwiki-image-style-alignment="center"~]~]>>doc:Main.WebHome]]
+
+            \040""", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -818,7 +832,11 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
         // After this method, the clipboard contains an html content with some text and an image.
-        initPageWithImageAndCopyToClipboard(setup, newPage, imageURL);
+        copyHTML(setup, newPage, """
+                <p>
+                  a <img src="%s" alt="Test alt"> b
+                </p>
+            """.formatted(imageURL));
 
         DocumentReference subPageReference = new DocumentReference("Paste", testReference.getLastSpaceReference());
         WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(subPageReference).editWYSIWYG();
@@ -852,8 +870,9 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage newPage = uploadAttachment(setup, testReference, attachmentName);
 
         WikiEditPage wikiEditPage = newPage.editWiki();
-        wikiEditPage.setContent("* Item 1\n"
-            + "* Item 2 [[image:image.gif]]");
+        wikiEditPage.setContent("""
+            * Item 1
+            * Item 2 [[image:image.gif]]""");
         wikiEditPage.clickSaveAndView();
 
         WYSIWYGEditPage wysiwygEditPage = wikiEditPage.editWYSIWYG();
@@ -866,9 +885,10 @@ class ImageIT extends AbstractCKEditorIT
         ViewPage savedPage = wysiwygEditPage.clickSaveAndView();
 
         // Verify that the content matches what we did using CKEditor.
-        assertEquals("* Item 1\n"
-            + "\n"
-            + "1. Item 2 [[image:image.gif]]", savedPage.editWiki().getContent());
+        assertEquals("""
+            * Item 1
+
+            1. Item 2 [[image:image.gif]]""", savedPage.editWiki().getContent());
     }
 
     @Test
@@ -911,23 +931,103 @@ class ImageIT extends AbstractCKEditorIT
             savedPage.editWiki().getContent());
     }
 
+    @Test
+    @Order(22)
+    void uploadImagesFromPastedHTML(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+
+        String firstImageName = "image.gif";
+        uploadAttachment(setup, testReference, firstImageName);
+
+        String secondImageName = "otherImage.gif";
+        ViewPage sourcePage = uploadAttachment(setup, testReference, secondImageName);
+
+        AttachmentReference firstImageReference = new AttachmentReference(firstImageName, testReference);
+        String firstImageURL = setup.getURL(firstImageReference, "download", "");
+
+        AttachmentReference secondImageReference = new AttachmentReference(secondImageName, testReference);
+        String secondImageURL = setup.getURL(secondImageReference, "download", "x=y");
+
+        // After this method, the clipboard contains an html content with some text and an image.
+        copyHTML(setup, sourcePage, """
+            <p>
+                one <img src="%s"/> two <img src="%s"/> three
+            </p>
+            """.formatted(firstImageURL, secondImageURL));
+
+        DocumentReference subPageReference = new DocumentReference("Paste", testReference.getLastSpaceReference());
+        WYSIWYGEditPage editPage = edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
+        this.textArea.sendKeys(Keys.RIGHT, " after");
+        assertSourceEquals("one [[image:image.gif]] two [[image:otherImage.gif]] three after");
+        editPage.clickSaveAndView();
+
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+        assertEquals("image.gif", attachmentsPane.getAttachmentNameByIndex(1));
+        assertEquals("otherImage.gif", attachmentsPane.getAttachmentNameByIndex(2));
+
+        //
+        // Paste again, but this time cancel the upload.
+        //
+
+        editPage = edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.waitForOwnNotificationProgressMessage("Starting upload in 4s");
+        // Close the notification to cancel the upload.
+        this.textArea.sendKeys(Keys.ESCAPE);
+        try {
+            this.textArea.waitForOwnNotificationSuccessMessage("File successfully uploaded.");
+            fail("The upload should have been canceled.");
+        } catch (Exception expected) {
+            // Expected.
+        }
+        assertSourceEquals(
+            String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL));
+        editPage.clickSaveAndView();
+
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals(0, attachmentsPane.getNumberOfAttachments());
+
+        //
+        // Paste again, but this time undo the image replacement.
+        //
+
+        editPage = edit(setup, subPageReference, true);
+        this.textArea.clear();
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
+        this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
+        // Undo the image replacement.
+        this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
+        assertSourceEquals(String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL));
+        editPage.clickSaveAndView();
+
+        attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        // The image upload is not canceled though (i.e. undo currently operates only at the content level).
+        assertEquals(2, attachmentsPane.getNumberOfAttachments());
+    }
+
     /**
-     * Initialize a page with some content and an image. Then, copy its displayed content in the clipboard.
+     * Initialize a page with some HTML content and then, copy its displayed content to the clipboard.
      *
      * @param setup the test setup
-     * @param viewPage the page to edit
-     * @param imageURL the url of the image to include in the content
+     * @param viewPage the page to setup with the given HTML content
+     * @param html the HTML content to copy to the clipboard
      */
-    private static void initPageWithImageAndCopyToClipboard(TestUtils setup, ViewPage viewPage, String imageURL)
+    private static void copyHTML(TestUtils setup, ViewPage viewPage, String html)
     {
         WikiEditPage wikiEditPage = viewPage.editWiki();
-        wikiEditPage.sendKeys("{{html clean='false'}}\n"
-            + "<div contenteditable=\"true\" id=\"copyme\">\n"
-            + "  <p>\n"
-            + "    a <img src=\"" + imageURL + "\" alt=\"Test alt\"> b\n"
-            + "  </p>\n"
-            + "</div>\n"
-            + "{{/html}}");
+        wikiEditPage.sendKeys("""
+                {{html clean="false"}}
+                <div contenteditable="true" id="copyme">
+                  %s
+                </div>
+                {{/html}}
+            """.formatted(html));
         wikiEditPage.clickSaveAndView();
 
         WebElement element = setup.getDriver().findElement(By.id("copyme"));

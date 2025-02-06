@@ -63,6 +63,9 @@ office.config.serverState.connected=Connected
 office.config.serverState.notConnected=Not Connected
 office.config.serverState.confError=Invalid Configuration
 office.config.serverState.error=Error
+office.config.serverHost=Server host
+office.config.serverHost.hint=The hostname of the office server instance.
+office.config.workDir=Work directory
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart

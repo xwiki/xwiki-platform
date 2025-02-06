@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -45,17 +46,17 @@ public abstract class AbstractCKEditorIT
 
     protected RichTextAreaElement textArea;
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference entityReference)
     {
-        return edit(setup, testReference, true);
+        return edit(setup, entityReference, true);
     }
 
-    WYSIWYGEditPage edit(TestUtils setup, TestReference testReference, boolean startFresh)
+    WYSIWYGEditPage edit(TestUtils setup, EntityReference pageReference, boolean startFresh)
     {
         if (startFresh) {
-            setup.deletePage(testReference, true);
+            setup.deletePage(pageReference, true);
         }
-        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testReference);
+        WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(pageReference);
         this.editor = new CKEditor("content").waitToLoad();
         this.textArea = this.editor.getRichTextArea();
         return editPage;

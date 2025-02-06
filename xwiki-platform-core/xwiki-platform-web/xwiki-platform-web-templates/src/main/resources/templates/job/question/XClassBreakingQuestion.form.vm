@@ -24,8 +24,7 @@
 
 #questionHeader()
 #if ($question.isRefactoringForbidden())
-<div class="errormessage deleteWarningXClass">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle"))</strong></p>
+#define ($errorMessageContent)
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenExplanation"))</p>
   <div class="panel panel-default">
     <div class="panel-heading">
@@ -43,10 +42,10 @@
     </div>
     <button class="btn btn-default btAnswerCancel">$escapetool.xml($services.localization.render(["job.question.${status.jobType}.cancel", 'job.question.button.cancel']))</button>
   </div>
-</div>
+#end
+#_genericMessage("$errorMessageContent", 'error', 'exclamation', 'error', false, 'deleteWarningXClass', $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.forbiddenTitle")))
 #else
-<div class="warningmessage deleteWarningXClass">
-  <p><strong>$services.icon.renderHTML('warning') $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title"))</strong></p>
+#define ($warningMessageContent)
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.explanation"))</p>
   #if ($question.isObjectsPotentiallyHidden())
   <p>$escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.objectsPotentiallyMissingWarning"))</p>
@@ -62,7 +61,7 @@
     </div>
   </div>
   #questionButtons($jobStatus)
-</div>
 #end
-
+#_genericMessage("$warningMessageContent", 'warning', 'warning', 'warning', false, 'deleteWarningXClass', $escapetool.xml($services.localization.render("job.question.XClassBreakingQuestion.${job.type}.title")))
+#end
 #questionFooter()

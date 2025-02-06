@@ -125,8 +125,8 @@
     <oracle.version>21.17.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
-    <node.version>v20.12.0</node.version>
-    <npm.version>10.5.1</npm.version>
+    <node.version>v22.13.1</node.version>
+    <npm.version>11.1.0</npm.version>
   </properties>
   <scm>
     <tag>HEAD</tag>

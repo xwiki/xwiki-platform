@@ -35,89 +35,14 @@
       ">
 
     <!--
-      Display the pagination current entry range
-      Can be shown / hidden by the `pagination.showEntryRange` property
-      in the Livedata meta config
-    -->
-    <span
-      class="pagination-current-entries"
-      v-if="showEntryRange"
-    >
-      {{ $t("livedata.pagination.currentEntries", [
-      logic.getFirstIndexOfPage() + 1,
-      logic.getLastIndexOfPage() + 1,
-      data.data.count,
-    ]) }}
-    </span>
-
-    <!--
-      Select the pagination size (number of entries per page)
-      Can be shown / hidden by the `pagination.showPageSizeDropdown` property
-      in the Livedata meta config
-    -->
-    <span
-      class="pagination-page-size"
-      v-if="data.meta.pagination.showPageSizeDropdown"
-    >
-      {{ " " }}{{ $t("livedata.pagination.pageSize") }}
-      <select
-        :title="$t('livedata.pagination.selectPageSize')"
-        @change="changePageSize"
-      >
-        <!-- Page sizes (get from the `pagination.pageSizes` config -->
-        <option
-          v-for="pageSize in pageSizes"
-          :key="pageSize"
-          :value="pageSize"
-          :selected="pageSize === data.query.limit"
-        >{{ pageSize }}</option>
-      </select>
-    </span>
-
-    <!--
       The actual pagination widget
       It displays the the available pages numbers, and change to them on click.
       Not all page numbers are shown depending of the `pagination.maxShownPages`
       property in the Livedata meta config.
       Arrows can be shown to go to first, last, previous, next page.
     -->
-    <span class="pagination-indexes">
-      {{ $t("livedata.pagination.page") }}
-      <!--
-        Go to First Page button
-        Can be shown / hiden by the `pagination.showFirstLast` property
-        in the Livedata meta config
-      -->
-      <a
-        :class="['page-nav', {
-          'disabled': isFirstPage,
-        }]"
-        v-if="data.meta.pagination.showFirstLast"
-        :title="$t('livedata.pagination.first')"
-        href="#"
-        @click.prevent="changePageIndex(!isFirstPage, 0)"
-      >
-        <XWikiIcon :icon-descriptor="{name: 'fast-backward'}" />
-      </a>
-
-      <!--
-        Go to Previous Page button
-        Can be shown / hiden by the `pagination.showNextPrevious` property
-        in the Livedata meta config
-      -->
-      <a
-        :class="['page-nav', {
-          'disabled': isFirstPage,
-        }]"
-        v-if="data.meta.pagination.showNextPrevious"
-        :title="$t('livedata.pagination.previous')"
-        href="#"
-        @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
-      >
-        <XWikiIcon :icon-descriptor="{name: 'step-backward'}" />
-      </a>
-
-
+    <span class="pagination-indexes"
+      v-if="side !== 'right'">
       <!--
         Page Numbers
         Shown page numbers are specified by `this.paginationIndexesAndDots`
@@ -138,55 +63,134 @@
           :key="'...' + i"
         >...</span>
         <!-- Page numbers -->
-        <a
+        <button
           v-else
           :key="pageIndex"
           :class="{
+            'btn btn-default btn-xs': true, 
             'page-nav': true,
             'current': pageIndex === logic.getPageIndex(),
           }"
-          href="#"
+          :aria-current="pageIndex === logic.getPageIndex() ? 'page' : null"
           @click.prevent="changePageIndex(true, pageIndex)"
-        >{{ pageIndex + 1 }}</a>
+        >{{ pageIndex + 1 }} <span class="sr-only">{{$t('livedata.pagination.loadPageByNumber')}}</span></button>
         <!-- pageIndex + 1 because pageIndex are 0-based -->
       </template>
-
+      
+      <!--
+              Go to First Page button`
+              Can be shown / hidden by the `pagination.showFirstLast` property
+              in the Livedata meta config
+            -->
+      <button
+          :class="['page-nav',
+          'first-page', 
+        'btn btn-default btn-xs',  {
+          'disabled': isFirstPage,
+        }]"
+          v-if="data.meta.pagination.showFirstLast"
+          :title="$t('livedata.pagination.first')"
+          @click.prevent="changePageIndex(!isFirstPage, 0)"
+      >
+        <XWikiIcon :icon-descriptor="{name: 'fast-backward'}"/>
+      </button>
+      
+      <!--
+        Go to Previous Page button
+        Can be shown / hiden by the `pagination.showNextPrevious` property
+        in the Livedata meta config
+      -->
+      <button
+          :class="['page-nav',
+          'previous-page', 
+        'btn btn-default btn-xs',  {
+          'disabled': isFirstPage,
+        }]"
+          v-if="data.meta.pagination.showNextPrevious"
+          :title="$t('livedata.pagination.previous')"
+          @click.prevent="changePageIndex(!isFirstPage, logic.getPageIndex() - 1)"
+      >
+        <XWikiIcon :icon-descriptor="{name: 'caret-right'}" />
+      </button>
+      
       <!--
         Go to Next Page button
         Can be shown / hidden by the `pagination.showNextPrevious` property
         in the Livedata meta config
       -->
-      <a
-        :class="['page-nav', {
+      <button
+        :class="['page-nav',
+        'next-page', 
+        'btn btn-default btn-xs',  {
           'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showNextPrevious"
         :title="$t('livedata.pagination.next')"
-        href="#"
         @click.prevent="changePageIndex(!isLastPage , logic.getPageIndex() + 1)"
       >
-        <XWikiIcon :icon-descriptor="{name: 'step-forward'}" />
-      </a>
+        <XWikiIcon :icon-descriptor="{name: 'caret-right'}" />
+      </button>
 
       <!--
         Go to Last Page button
-        Can be shown / hiden by the `pagination.showFirstLast` property
+        Can be shown / hidden by the `pagination.showFirstLast` property
         in the Livedata meta config
       -->
-      <a
-        :class="['page-nav', {
+      <button
+        :class="['page-nav', 
+        'last-page', 
+        'btn btn-default btn-xs', {
           'disabled': isLastPage,
         }]"
         v-if="data.meta.pagination.showFirstLast"
         :title="$t('livedata.pagination.last')"
-        href="#"
         @click.prevent="changePageIndex(!isLastPage, logic.getPageCount() - 1)"
       >
         <XWikiIcon :icon-descriptor="{name: 'fast-forward'}" />
-      </a>
+      </button>
 
     </span>
+    
+    <!--
+      Display the pagination current entry range
+      Can be shown / hidden by the `pagination.showEntryRange` property
+      in the Livedata meta config
+    -->
+    <span
+        class="pagination-current-entries"
+        v-if="showEntryRange && side !== 'left'"
+    >
+      {{ $t("livedata.pagination.currentEntries", [
+      logic.getFirstIndexOfPage() + 1,
+      logic.getLastIndexOfPage() + 1,
+      data.data.count,
+    ])}}
+    </span>
 
+    <!--
+      Select the pagination size (number of entries per page)
+      Can be shown / hidden by the `pagination.showPageSizeDropdown` property
+      in the Livedata meta config
+    -->
+    <span
+        class="pagination-page-size"
+        v-if="data.meta.pagination.showPageSizeDropdown && side !== 'left'"
+    >
+      {{ $t('livedata.pagination.resultsPerPage') }}
+      <select
+          :title="$t('livedata.pagination.selectPageSize')"
+          @change="changePageSize"
+      >
+        <!-- Page sizes (get from the `pagination.pageSizes` config -->
+        <option
+            v-for="pageSize in pageSizes"
+            :key="pageSize"
+            :value="pageSize"
+            :selected="pageSize === data.query.limit"
+        >{{ pageSize }}</option>
+      </select>
+    </span>
+    
   </nav>
 </template>
 
@@ -201,6 +205,8 @@ export default {
   components: { XWikiIcon },
 
   inject: ["logic"],
+
+  props: ['side'],
 
   computed: {
     data() {
@@ -328,32 +334,46 @@ export default {
 .livedata-pagination {
   color: var(--text-muted);
   font-size: 0.9em;
+  display: flex;
+  width: 100%;
+  gap: 2em;
+  max-height: calc(var(--target-size-minimum) + 6px);
+  align-items: baseline;
 }
 
 .livedata-pagination .pagination-indexes {
-  display: inline-block;
-  margin-left: 2rem;
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
+  flex-grow: 1;
+  display: flex;
+  gap: .2em;
+  align-items: center;
 }
 
 .livedata-pagination .page-nav {
-  padding: 0px 3px;
   color: inherit;
-  cursor: pointer;
+  background-color: transparent;
+  border-color: transparent;
 }
 
 .livedata-pagination .page-nav.current {
   font-weight: bold;
+  background-color: @btn-primary-bg;
+  color: @btn-primary-color;
 }
 
 .livedata-pagination .page-nav:hover {
-  text-decoration: underline;
+  border-color: darken(@dropdown-divider-bg, 10%);
 }
 
-.livedata-pagination .page-nav:not(:hover) {
-  text-decoration: none;
+/* We make sure that the icons to navigate through the pages are big enough. */
+.livedata-pagination .page-nav.first-page,
+.livedata-pagination .page-nav.previous-page,
+.livedata-pagination .page-nav.next-page,
+.livedata-pagination .page-nav.last-page {
+  font-size: 1.3em;
+}
+
+.livedata-pagination .page-nav.previous-page > * {
+  transform: scaleX(-1);
 }
 
 .livedata-pagination .page-nav.disabled {

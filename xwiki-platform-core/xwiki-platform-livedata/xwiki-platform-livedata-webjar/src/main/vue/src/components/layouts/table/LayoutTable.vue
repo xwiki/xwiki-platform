@@ -34,9 +34,10 @@
     -->
     <LivedataTopbar>
       <template #left>
-        <LivedataPagination />
+        <LivedataPagination side="left"/>
       </template>
       <template #right>
+        <LivedataPagination side="right"/>
         <LivedataDropdownMenu />
       </template>
     </LivedataTopbar>

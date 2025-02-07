@@ -772,7 +772,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
+      <code>
 /***********************************************
  * Notification Container
  ***********************************************/
@@ -914,7 +914,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-events-bridge'], funct
       <name>CSS</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>currentPage</use>

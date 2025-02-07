@@ -146,6 +146,18 @@ watch(
   }
 }
 
+/*
+ * Code block style.
+ * TODO: replace with a code macro rendering as soon as we support macro.
+ */
+:deep(.box .code),
+:deep(.doc-content.editor pre) {
+  font-family: var(--cr-font-mono);
+  background: var(--cr-color-neutral-100);
+  border-radius: var(--cr-border-radius-medium);
+  padding: var(--cr-spacing-small);
+}
+
 /*TABLE STYLES*/
 /*TODO: Check a better way to write these styles without the global tag. Currently impossible to use :deep because the html inside the document content is not assigned an ID */
 .content {

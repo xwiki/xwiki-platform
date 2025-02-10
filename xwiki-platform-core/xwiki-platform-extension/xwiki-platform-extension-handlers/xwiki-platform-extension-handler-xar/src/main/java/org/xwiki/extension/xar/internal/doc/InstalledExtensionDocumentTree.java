@@ -52,8 +52,10 @@ public class InstalledExtensionDocumentTree
 {
     private static final class InstalledExtensionDocumentTreeNode
     {
+        @SuppressWarnings("checkstyle:javadocvariable")
         public Set<Locale> customizedLocales;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public Set<DocumentReference> children = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
 

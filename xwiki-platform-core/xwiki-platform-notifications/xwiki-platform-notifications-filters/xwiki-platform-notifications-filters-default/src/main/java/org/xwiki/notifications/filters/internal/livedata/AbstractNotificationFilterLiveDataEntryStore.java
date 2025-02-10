@@ -76,7 +76,9 @@ public abstract class AbstractNotificationFilterLiveDataEntryStore implements Li
 
     protected static final class TargetInformation
     {
+        @SuppressWarnings("checkstyle:javadocvariable")
         public boolean isWikiTarget;
+        @SuppressWarnings("checkstyle:javadocvariable")
         public EntityReference ownerReference;
 
     }

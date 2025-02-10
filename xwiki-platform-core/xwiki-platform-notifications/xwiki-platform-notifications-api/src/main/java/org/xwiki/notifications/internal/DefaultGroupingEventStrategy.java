@@ -46,10 +46,13 @@ public class DefaultGroupingEventStrategy implements GroupingEventStrategy
 
     private static final class BestSimilarity
     {
+        @SuppressWarnings("checkstyle:javadocvariable")
         public int value;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public CompositeEvent compositeEvent;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public Event event;
 
         public boolean isCompositeEventCompatibleWith(Event event)

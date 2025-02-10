@@ -52,22 +52,31 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 {
     private static final class DBListQuerySpec
     {
+        @SuppressWarnings("checkstyle:javadocvariable")
         public String wiki;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public String className;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public String idField;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public String valueField;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public String parentField;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public boolean hasClassName;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public boolean hasIdField;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public boolean hasValueField;
 
+        @SuppressWarnings("checkstyle:javadocvariable")
         public boolean hasParentField;
     }
 

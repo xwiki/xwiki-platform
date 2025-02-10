@@ -19,11 +19,10 @@
  */
 package org.xwiki.refactoring.internal.job;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -309,14 +308,28 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
     protected boolean checkAllRights(DocumentReference oldReference, DocumentReference newReference) throws Exception
     {
-        if (!hasAccess(Right.VIEW, oldReference)) {
-            this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
-            return false;
-        } else if (!hasAccess(Right.EDIT, newReference)
-            || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
-            this.logger.error("You don't have sufficient permissions over the destination document [{}].",
-                newReference);
-            return false;
+        boolean isWebPreferences =
+            isSpacePreferencesReference(oldReference) && isSpacePreferencesReference(newReference);
+        if (!isWebPreferences) {
+            if (!hasAccess(Right.VIEW, oldReference)) {
+                this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
+                return false;
+            } else if (!hasAccess(Right.EDIT, newReference)
+                || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference)))
+            {
+                this.logger.error("You don't have sufficient permissions over the destination document [{}].",
+                    newReference);
+                return false;
+            }
+        } else {
+            DocumentReference newHomeReference = getSpaceHomeReference(newReference);
+            DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
+            if (!this.concernedEntities.containsKey(oldHomeReference) || !hasAccess(Right.EDIT, newHomeReference)) {
+                this.logger.error("You don't have sufficient permissions over the home document of WebPreferences "
+                        + "[{}].",
+                    newReference);
+                return false;
+            }
         }
         return true;
     }
@@ -352,14 +365,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
 
             // Step 2: Delete the destination document if needed.
             this.progressManager.startStep(this);
-            if (this.modelBridge.exists(newReference)) {
-                if (this.request.isInteractive() && !this.modelBridge.canOverwriteSilently(newReference)
-                    && !confirmOverwrite(oldReference, newReference)) {
-                    this.logger.warn(
-                        "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
-                        oldReference, newReference);
-                    return false;
-                }
+            if (this.modelBridge.exists(newReference)
+                && this.request.isInteractive()
+                && !this.modelBridge.canOverwriteSilently(newReference)
+                && !confirmOverwrite(oldReference, newReference)) {
+                this.logger.warn(
+                    "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
+                    oldReference, newReference);
+                return false;
             }
             this.progressManager.endStep(this);
 
@@ -414,19 +427,6 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         List<EntityReference> entityReferences = new LinkedList<>(this.request.getEntityReferences());
         entityReferences.add(this.request.getDestination());
         return getCommonParent(entityReferences);
-    }
-
-    /**
-     * @return the list of references that have been selected to be refactored.
-     * @since 16.10.0RC1
-     */
-    public Map<EntityReference, EntityReference> getSelectedEntities()
-    {
-        return this.concernedEntities.values().stream()
-            .filter(EntitySelection::isSelected)
-            .filter(entity -> entity.getTargetEntityReference().isPresent())
-            .collect(Collectors.toMap(EntitySelection::getEntityReference,
-                entity -> entity.getTargetEntityReference().get()));
     }
 
     /**

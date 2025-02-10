@@ -28,10 +28,13 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.EndFoldEvent;
+import org.xwiki.refactoring.event.DocumentCopiedEvent;
+import org.xwiki.refactoring.event.DocumentCopyingEvent;
 import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.refactoring.event.DocumentRenamingEvent;
 import org.xwiki.refactoring.event.EntitiesRenamedEvent;
 import org.xwiki.refactoring.event.EntitiesRenamingEvent;
+import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
@@ -100,10 +103,18 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected void performRefactoring(DocumentReference oldReference, DocumentReference newReference)
     {
-        DocumentRenamingEvent documentRenamingEvent = new DocumentRenamingEvent(oldReference, newReference);
-        DocumentRenamedEvent documentRenamedEvent = new DocumentRenamedEvent(oldReference, newReference);
+        AbstractEntityCopyOrRenameEvent beforeEvent;
+        AbstractEntityCopyOrRenameEvent afterEvent;
+
+        if (this.addedWebPreferences.contains(oldReference)) {
+            beforeEvent = new DocumentCopyingEvent(oldReference, newReference);
+            afterEvent = new DocumentCopiedEvent(oldReference, newReference);
+        } else {
+            beforeEvent = new DocumentRenamingEvent(oldReference, newReference);
+            afterEvent = new DocumentRenamedEvent(oldReference, newReference);
+        }
         try {
-            copyOrMove(oldReference, newReference, documentRenamingEvent, documentRenamedEvent);
+            copyOrMove(oldReference, newReference, beforeEvent, afterEvent);
         } catch (Exception e) {
             this.logger.error("Failed to copy or move document from [{}] to [{}]", oldReference, newReference, e);
         }
@@ -112,6 +123,10 @@ public class MoveJob extends AbstractCopyOrMoveJob<MoveRequest>
     @Override
     protected boolean atomicOperation(DocumentReference source, DocumentReference target)
     {
-        return this.modelBridge.rename(source, target);
+        if (this.addedWebPreferences.contains(source)) {
+            return this.modelBridge.copy(source, target);
+        } else {
+            return this.modelBridge.rename(source, target);
+        }
     }
 }

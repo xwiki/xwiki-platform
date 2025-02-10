@@ -48,6 +48,8 @@ import org.xwiki.security.authorization.Right;
 public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     extends AbstractEntityJobWithChecks<T, EntityJobStatus<T>>
 {
+    protected List<DocumentReference> addedWebPreferences = new ArrayList<>();
+
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
      * with the same name are overwritten. When {@code false} all entities with the same name are skipped. If
@@ -177,6 +179,14 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     protected void getEntities(DocumentReference documentReference)
     {
         this.putInConcernedEntities(documentReference);
+
+        // if we perform a move or a copy of a space without its children, we copy its preferences
+        if (!request.isDeep() && isSpaceHomeReference(documentReference)) {
+            DocumentReference spacePreference = new DocumentReference(PREFERENCES_DOCUMENT_NAME,
+                documentReference.getLastSpaceReference());
+            this.addedWebPreferences.add(spacePreference);
+            this.putInConcernedEntities(spacePreference);
+        }
     }
 
     @Override
@@ -185,7 +195,8 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         DocumentReference source = cleanLocale(documentReference);
         EntityReference destination = this.request.getDestination();
         DocumentReference destinationDocumentReference;
-        if (processOnlySameSourceDestinationTypes()) {
+        if (processOnlySameSourceDestinationTypes()
+            && !(!this.request.isDeep() && isSpacePreferencesReference(documentReference))) {
             putInConcernedEntitiesOnlySameSource(source, destination);
         } else {
             if (this.request.isDeep() && isSpaceHomeReference(source)) {

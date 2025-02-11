@@ -337,7 +337,6 @@ export default {
   display: flex;
   width: 100%;
   gap: 2em;
-  max-height: calc(var(--target-size-minimum) + 6px);
   align-items: baseline;
 }
 
@@ -352,6 +351,7 @@ export default {
   color: inherit;
   background-color: transparent;
   border-color: transparent;
+  min-height: 30px;
 }
 
 .livedata-pagination .page-nav.current {
@@ -383,7 +383,6 @@ export default {
 }
 
 .livedata-pagination .pagination-page-size select {
-  height: unset;
   padding: 2px 4px;
 }
 

@@ -56,7 +56,7 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/etc/tomcat9/Catalina/localhost/xwiki.xml</linkName>
+              <linkName>/etc/tomcat${debian.tomcat.version}/Catalina/localhost/xwiki.xml</linkName>
               <linkTarget>/etc/xwiki/xwiki-tomcat${debian.tomcat.version}.xml</linkTarget>
             </data>
           </dataSet>

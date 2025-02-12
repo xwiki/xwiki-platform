@@ -962,13 +962,13 @@ class ImageIT extends AbstractCKEditorIT
         this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "v"));
         this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
         this.textArea.sendKeys(Keys.RIGHT, " after");
-        assertSourceEquals("one [[image:image.gif]] two [[image:otherImage.gif]] three after");
+        assertSourceEquals("one [[image:image.gif]] two [[image:otherImage.gif]] three after", true);
         editPage.clickSaveAndView();
 
         AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
-        assertEquals("image.gif", attachmentsPane.getAttachmentNameByIndex(1));
-        assertEquals("otherImage.gif", attachmentsPane.getAttachmentNameByIndex(2));
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("image.gif"));
+        assertTrue(attachmentsPane.attachmentIsDisplayedByFileName("otherImage.gif"));
 
         //
         // Paste again, but this time cancel the upload.
@@ -986,8 +986,8 @@ class ImageIT extends AbstractCKEditorIT
         } catch (Exception expected) {
             // Expected.
         }
-        assertSourceEquals(
-            String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL));
+        assertSourceEquals(String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL),
+            true);
         editPage.clickSaveAndView();
 
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
@@ -1003,7 +1003,8 @@ class ImageIT extends AbstractCKEditorIT
         this.textArea.waitForOwnNotificationSuccessMessage("Uploading pasted images: 2 / 2");
         // Undo the image replacement.
         this.textArea.sendKeys(Keys.chord(Keys.CONTROL, "z"));
-        assertSourceEquals(String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL));
+        assertSourceEquals(String.format("one [[image:%s]] two [[image:%s]] three", firstImageURL, secondImageURL),
+            true);
         editPage.clickSaveAndView();
 
         attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();

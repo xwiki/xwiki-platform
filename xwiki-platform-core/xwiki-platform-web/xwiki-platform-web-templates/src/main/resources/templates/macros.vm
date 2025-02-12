@@ -361,7 +361,7 @@ $xwiki.getUserName("xwiki:${username}")
 #macro(getUserAvatarURL $userName $return $size)
   #set ($specified = false)
   #set ($profileDoc = $xwiki.getDocument($userName))
-  #if ($profileDoc.getObject('XWiki.XWikiGroups'))
+  #if ($profileDoc.getObject('XWiki.XWikiGroups') || !$profileDoc.getObject('XWiki.XWikiGroups'))
     #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatargroup.png', true))
   #else
     #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatar.png', true))

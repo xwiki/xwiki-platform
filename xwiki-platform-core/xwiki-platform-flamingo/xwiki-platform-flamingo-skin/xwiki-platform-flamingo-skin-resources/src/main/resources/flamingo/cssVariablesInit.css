@@ -23,6 +23,15 @@
 #end
 #set ($themeDoc = $xwiki.getDocument($themeDocFullName))
 #set ($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+
+## List of Bootstrap variables we need to give default values for XWiki standard variables
+## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
+#set($bootstrapVariables = {
+"text-muted": "#555",
+"grid-gutter-width": "30px",
+"font-size-base": "1em"
+})
+
 ## List of all the variables available to customize directly in the Flamingo theme editor.
 ## The key is the name and the value is the CSS type of the variable.
 #set($colorThemeVariables = {
@@ -43,7 +52,6 @@
 "font-family-sans-serif": "text",
 "font-family-serif": "text",
 "font-family-monospace": "font",
-"font-size-base" : "size",
 "btn-font-weight" : "size",
 "btn-default-color" : "color",
 "btn-default-bg" : "color",
@@ -92,50 +100,68 @@
 })
 ## List of all the variables set in XWiki standard for various purposes.
 ## Those should all be defined in variables.less
-#set($miscVariables = {
+#set($xsVariables = {
 "figure-caption-font-size": "90%",
-"figure-caption-color": "@text-muted",
+"figure-caption-color": "var(--text-muted)",
 "loginFormMaxWidth": "450px",
 "login-form-max-width": "450px",
 "target-size-minimum": "24px",
 "target-size-recommended": "44px",
-"breadcrumb-link-color": "@link-color",
 "border-width": "1px",
 "headings-font-weight": "400",
-"nav-tabs-active-link-hover-bg": "@xwiki-page-content-bg",
+"nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
 "border-radius-base": "7px",
 "border-radius-large": "10px",
 "border-radius-small": "5px",
 "button-spacing": "2px",
 "button-border-width": "1px",
 "edit-section-relative-height": ".7",
-"main-padding": "@grid-gutter-width * 2",
+"main-padding": "calc(var(--grid-gutter-width) * 2)",
 "font-size-headings-scale": "1.190",
 "font-size-headings-scale-min": "1.125",
 "min-screen-size": "768",
 "max-screen-size": "1200",
-"min-h1-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 4))))",
-"max-h1-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 4))))",
-"min-h2-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 3))))",
-"max-h2-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 3))))",
-"min-h3-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 2))))",
-"max-h3-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 2))))",
-"min-h4-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 1))))",
-"max-h4-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 1))))", 
-"min-h6-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, -1))))",
-"max-h6-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, -1))))",
-"min-document-title-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale-min, 5))))",
-"max-document-title-font-size": "unit(ceil((@font-size-base * pow(@font-size-headings-scale, 5))))",
+"min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
+"max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
+"min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
+"max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
+"min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
+"max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
+"min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
+"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))", 
+"min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
+"max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
+"min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
+"max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
+"100vw": "100vw",
+"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
 "font-size-document-title": "max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px + (@{max-document-title-font-size} - @{min-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h1": "max(@{min-h1-font-size}px, min(@{max-h1-font-size}px, calc(@{min-h1-font-size}px + (@{max-h1-font-size} - @{min-h1-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h2": "max(@{min-h2-font-size}px, min(@{max-h2-font-size}px, calc(@{min-h2-font-size}px + (@{max-h2-font-size} - @{min-h2-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h3": "max(@{min-h3-font-size}px, min(@{max-h3-font-size}px, calc(@{min-h3-font-size}px + (@{max-h3-font-size} - @{min-h3-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h4": "max(@{min-h4-font-size}px, min(@{max-h4-font-size}px, calc(@{min-h4-font-size}px + (@{max-h4-font-size} - @{min-h4-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h5": "@font-size-base",
-"font-size-h6": "max(@{min-h6-font-size}px, min(@{max-h6-font-size}px, calc(@{min-h6-font-size}px + (@{max-h6-font-size} - @{min-h6-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))"
+"font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h5": "var(--font-size-base)",
+"font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))"
 })
+
+## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and Units module Level 4 is accepted and supported in browsers.
+## https://drafts.csswg.org/css-values/#calc-type-checking
+@property --100vw {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
 :root {
-## Create CSS variables for each colorTheme variable
+#foreach($property in $bootstrapVariables.keySet())
+#set($value = $bootstrapVariables.get($property))
+#if("$!value" != '')
+--$property: $escapetool.javascript($!value);
+#end
+#end
+
+
+## Create CSS variables for each colorTheme variable that is set.
 #foreach($property in $colorThemeVariables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
@@ -144,7 +170,7 @@
 #set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
 #end
 #set($propertyType = $colorThemeVariables.get($property))
-## For now we just use only `string` variables, because it's the easiest to setup and because it's 100% compatible with 
+## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with 
 ## LESS variables. We could use extra info on the variable types to use @property syntax later.
 #if($propertyType == 'escapedText')
 --$property: "$escapetool.javascript($!value)";
@@ -154,16 +180,10 @@
 #end
 #end
 
-#foreach($property in $miscVariables.keySet())
-#set($value = $miscVariables.get($property))
+#foreach($property in $xsVariables.keySet())
+#set($value = $xsVariables.get($property))
 #if("$!value" != '')
-## If the value we want to set is a LESS variables, we make sure to convert it into a CSS variable.
-#if($stringtool.startsWith($!value, '@'))
-#set($value = 'var(--' + $stringtool.substring($value, 1) + ')')
-#end
-## For now we just use only `string` variables, because it's the easiest to setup and because it's 100% compatible with
-## LESS variables. We could use extra info on the variable types to use @property syntax later.
---$property: $escapetool.javascript($!value);
+--$property: $!value;
 #end
 #end
 }

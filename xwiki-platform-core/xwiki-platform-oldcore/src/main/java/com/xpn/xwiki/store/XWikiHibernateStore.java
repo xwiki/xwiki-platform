@@ -1181,7 +1181,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 obj.setXClassReference(localGroupEntityReference);
                                 obj.setNumber(number.intValue());
                                 obj.setStringValue("member", member);
+                                // Mark the property that has just been loaded as clean.
+                                ((BaseProperty<?>) obj.getField("member")).setDirty(false);
                                 doc.setXObject(obj.getNumber(), obj);
+                                // The object just been loaded so make sure it's considered clean
+                                obj.setDirty(false);
                             }
                         }
                     }

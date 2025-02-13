@@ -30,6 +30,7 @@ import javax.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.platform.security.requiredrights.MacroParameterRequiredRightsAnalyzer;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRight;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightReporter;
 import org.xwiki.platform.security.requiredrights.MacroRequiredRightsAnalyzer;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -105,6 +107,9 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
 
     @MockComponent
     private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
+
+    @MockComponent
+    private MacroParameterRequiredRightsAnalyzer<List<Block>> listBlockParameterAnalyzer;
 
     @Test
     void analyzeWithCustomAnalyzer() throws Exception
@@ -257,6 +262,16 @@ class DefaultMacroBlockRequiredRightAnalyzerTest
             "string", getParameterDescriptor("string", String.class, String.class));
         when(macroDescriptor.getParameterDescriptorMap()).thenReturn(parameterDescriptorMap);
         when(macroDescriptor.getContentDescriptor()).thenReturn(new DefaultContentDescriptor(false));
+
+        doAnswer(invocationOnMock -> {
+            MacroBlock macroBlock = invocationOnMock.getArgument(0);
+            ParameterDescriptor parameterDescriptor = invocationOnMock.getArgument(1);
+            String value = invocationOnMock.getArgument(2);
+            MacroRequiredRightReporter reporter = invocationOnMock.getArgument(3);
+            assertSame(parameterDescriptorMap.get(parameterDescriptor.getId().toLowerCase()), parameterDescriptor);
+            reporter.analyzeContent(macroBlock, value);
+            return null;
+        }).when(this.listBlockParameterAnalyzer).analyze(eq(block), any(), any(), any());
 
         // Stub the macro content parser and the XDOM analyzer to simply pass on the analyzed content as mock name.
         // That way, we can easily verify that all parameters were analyzed.

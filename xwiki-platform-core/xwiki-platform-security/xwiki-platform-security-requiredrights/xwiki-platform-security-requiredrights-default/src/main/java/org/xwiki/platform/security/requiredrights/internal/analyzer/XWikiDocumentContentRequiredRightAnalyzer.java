@@ -21,74 +21,76 @@ package org.xwiki.platform.security.requiredrights.internal.analyzer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.internal.DocumentContextExecutor;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.platform.security.requiredrights.RequiredRight;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalysisResult;
 import org.xwiki.platform.security.requiredrights.RequiredRightAnalyzer;
 import org.xwiki.platform.security.requiredrights.RequiredRightsException;
+import org.xwiki.platform.security.requiredrights.display.BlockSupplierProvider;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.velocity.internal.util.VelocityDetector;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
+ * Required right analyzer that specifically only analyzes the content and not XObjects or XClass of the document.
+ *
  * @version $Id$
- * @since 15.9RC1
+ * @since 17.1.0RC1
  */
 @Component
 @Singleton
-public class XWikiDocumentRequiredRightAnalyzer implements RequiredRightAnalyzer<XWikiDocument>
+@Named("content")
+public class XWikiDocumentContentRequiredRightAnalyzer implements RequiredRightAnalyzer<XWikiDocument>
 {
     @Inject
     private DocumentContextExecutor documentContextExecutor;
 
     @Inject
-    private RequiredRightAnalyzer<BaseObject> objectRequiredRightAnalyzer;
+    @Named("translation")
+    private BlockSupplierProvider<String> translationMessageSupplierProvider;
 
     @Inject
-    private RequiredRightAnalyzer<BaseClass> classRequiredRightAnalyzer;
+    private RequiredRightAnalyzer<XDOM> xdomRequiredRightAnalyzer;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
-
-    @Inject
-    @Named("content")
-    private RequiredRightAnalyzer<XWikiDocument> contentRequiredRightAnalyzer;
+    private VelocityDetector velocityDetector;
 
     @Override
     public List<RequiredRightAnalysisResult> analyze(XWikiDocument document) throws RequiredRightsException
     {
-        // Analyze the content
         try {
-            ArrayList<RequiredRightAnalysisResult> result =
-                new ArrayList<>(this.contentRequiredRightAnalyzer.analyze(document));
-
             // Push the document into the context such that we, e.g., get the correct context wiki with the correct
             // wiki macros etc.
             return this.documentContextExecutor.call(() ->
             {
-                // Analyze XObjects and XClass on the Root locale version of the document
-                XWikiDocument rootLocaleDocument = document;
-                if (document.getLocale() != null && !document.getLocale().equals(Locale.ROOT)) {
-                    XWikiContext context = this.contextProvider.get();
-                    rootLocaleDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
+                List<RequiredRightAnalysisResult> result = new ArrayList<>();
+
+                // Analyze the title
+                if (this.velocityDetector.containsVelocityScript(document.getTitle())) {
+                    result.add(new RequiredRightAnalysisResult(
+                        document.getDocumentReferenceWithLocale(),
+                        this.translationMessageSupplierProvider.get("security.requiredrights.title"),
+                        this.translationMessageSupplierProvider.get("security.requiredrights.title.description",
+                            document.getTitle()),
+                        List.of(RequiredRight.MAYBE_SCRIPT, RequiredRight.MAYBE_PROGRAM)
+                    ));
                 }
 
-                result.addAll(this.classRequiredRightAnalyzer.analyze(rootLocaleDocument.getXClass()));
-
-                for (List<BaseObject> baseObjects : rootLocaleDocument.getXObjects().values()) {
-                    for (BaseObject object : baseObjects) {
-                        result.addAll(this.objectRequiredRightAnalyzer.analyze(object));
-                    }
+                // Analyze the content
+                XDOM xdom = document.getXDOM();
+                // Store the document reference with locale so it can correctly be reported by the macro analyzers.
+                if (xdom != null && xdom.getMetaData() != null) {
+                    xdom.getMetaData().addMetaData(XDOMRequiredRightAnalyzer.ENTITY_REFERENCE_METADATA,
+                        document.getDocumentReferenceWithLocale());
                 }
+                result.addAll(this.xdomRequiredRightAnalyzer.analyze(xdom));
 
                 return result;
             }, document);

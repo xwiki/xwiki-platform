@@ -1365,6 +1365,20 @@ class PDFExportIT
 
     @Test
     @Order(27)
+    void missingStyleSheet(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
+    {
+        ViewPage viewPage = setup.gotoPage(new LocalDocumentReference("PDFExportIT", "MissingStyleSheet"));
+        PDFExportOptionsModal exportOptions = PDFExportOptionsModal.open(viewPage);
+        try (PDFDocument pdf = export(exportOptions, testConfiguration)) {
+            // We should have 2 pages: cover page and one content page.
+            assertEquals(2, pdf.getNumberOfPages());
+            assertEquals("MissingStyleSheet\n2 / 2\nSome content.\n", pdf.getTextFromPage(1));
+        }
+    }
+
+    @Test
+    @Order(28)
     void pageTranslations(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
         throws Exception
     {

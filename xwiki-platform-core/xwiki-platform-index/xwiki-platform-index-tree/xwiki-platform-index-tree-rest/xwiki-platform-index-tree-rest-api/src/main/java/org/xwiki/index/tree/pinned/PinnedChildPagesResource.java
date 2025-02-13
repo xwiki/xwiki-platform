@@ -30,7 +30,14 @@ import org.xwiki.index.tree.pinned.rest.model.jaxb.PinnedChildPages;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
-
+/**
+ * REST resource dedicated for manipulation of pinned pages.
+ *
+ * @version $Id$
+ * @since 17.2.0RC1
+ * @since 16.10.4
+ * @since 16.4.7
+ */
 @Unstable
 @Path("/wikis/{wikiName}{spaceName : (/spaces/[^/]+)*}/pinnedChildPages")
 public interface PinnedChildPagesResource
@@ -41,11 +48,21 @@ public interface PinnedChildPagesResource
      * @param wikiName the name of the wiki
      * @param spaceName the space where to look for the pinned child pages
      * @return the list of pinned child pages.
+     * @throws XWikiRestException in case of problem when accessing the information
      */
     @GET
     PinnedChildPages getPinnedChildPages(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName) throws XWikiRestException;
 
+    /**
+     * Set a new pinned page value.
+     *
+     * @param wikiName the name of the wiki
+     * @param spaceName the space where to look for the pinned child pages
+     * @param pinnedChildPage the new pinned page information
+     * @return an http response with the status of the operation
+     * @throws XWikiRestException in case of problem when accessing the information
+     */
     @PUT
     Response addPinnedChildPages(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName, PinnedChildPage pinnedChildPage) throws XWikiRestException;

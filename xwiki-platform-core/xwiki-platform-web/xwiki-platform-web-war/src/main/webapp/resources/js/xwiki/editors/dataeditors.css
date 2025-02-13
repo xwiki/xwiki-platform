@@ -307,6 +307,12 @@ The default state is collapsed for xobjects and xproperties, but expanded for xc
   background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }
 
+.add_xproperty {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 #body #xwikiclassproperties #add_xproperty label,
 #body #xwikiobjects #add_xobject label {
   margin: 0;

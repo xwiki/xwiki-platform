@@ -1,0 +1,65 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+#requiredRightsDialog .rights-visualization {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#requiredRightsDialog .rights-visualization label.suggested {
+    border: 4px solid green;
+}
+
+#requiredRightsDialog .rights-visualization label.suggested-review {
+    border: 4px dashed green;
+}
+
+#requiredRightsDialog .rights-visualization label.active {
+    text-decoration: underline;
+}
+
+.box.requiredrights-warning {
+    display: flex;
+    align-items: baseline;
+}
+
+.box.requiredrights-warning p {
+    flex-grow: 1;
+}
+
+#required-rights-results .panel-heading {
+    padding: 0.7em;
+}
+
+#required-rights-results .panel-group {
+    margin-bottom: 0.5em;
+}
+
+#required-rights-results .panel-title a .fa {
+    width: 0.5em;
+}
+
+#required-rights-results .panel-title a[aria-expanded="false"] .icon-expanded {
+    display: none;
+}
+
+#required-rights-results .panel-title a[aria-expanded="true"] .icon-collapsed {
+    display: none;
+}

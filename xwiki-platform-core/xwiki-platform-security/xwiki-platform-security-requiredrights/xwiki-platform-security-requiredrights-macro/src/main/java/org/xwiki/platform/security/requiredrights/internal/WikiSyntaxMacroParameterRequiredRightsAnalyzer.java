@@ -35,7 +35,7 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
  *
  * @version $Id$
  * @since 17.1.0RC1
- * @since 16.10.3
+ * @since 16.10.4
  * @since 16.4.7
  */
 @Component

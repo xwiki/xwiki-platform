@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * @param <T> the type of the macro parameter.
  * @version $Id$
  * @since 17.1.0RC1
- * @since 16.10.3
+ * @since 16.10.4
  * @since 16.4.7
  */
 // The type parameter isn't used in the interface itself, but it is used to differentiate component implementations

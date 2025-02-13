@@ -42,6 +42,14 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+/**
+ * Default implementation of {@link PinnedChildPagesResource}.
+ *
+ * @version $Id$
+ * @since 17.2.0RC1
+ * @since 16.10.4
+ * @since 16.4.7
+ */
 @Component
 @Named("org.xwiki.index.internal.tree.pinned.DefaultPinnedChildPagesResource")
 public class DefaultPinnedChildPagesResource extends XWikiResource

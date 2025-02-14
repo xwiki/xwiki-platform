@@ -68,9 +68,15 @@ public class DefaultPinnedChildPagesResource extends XWikiResource
     private ContextualAuthorizationManager authorizationManager;
 
     @Override
+    public List<String> parseSpaceSegments(String spaceName) throws XWikiRestException
+    {
+        return super.parseSpaceSegments(spaceName.substring("/spaces/".length()));
+    }
+
+    @Override
     public List<String> getPinnedChildPages(String wikiName, String spaceName) throws XWikiRestException
     {
-        List<String> spaces = parseSpaceSegments(spaceName.substring("/spaces/".length()));
+        List<String> spaces = parseSpaceSegments(spaceName);
         DocumentReference homeReference = new DocumentReference(wikiName, spaces,
             this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
         List<DocumentReference> pinnedChildPages = this.pinnedChildPagesManager.getPinnedChildPages(homeReference);
@@ -81,7 +87,7 @@ public class DefaultPinnedChildPagesResource extends XWikiResource
     public Response setPinnedChildPages(String wikiName, String spaceName, List<String> pinnedChildPages)
         throws XWikiRestException
     {
-        List<String> spaces = parseSpaceSegments(spaceName.substring("/spaces/".length()));
+        List<String> spaces = parseSpaceSegments(spaceName);
         DocumentReference homeReference = new DocumentReference(wikiName, spaces,
             this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
         if (!this.authorizationManager.hasAccess(Right.EDIT, homeReference)) {

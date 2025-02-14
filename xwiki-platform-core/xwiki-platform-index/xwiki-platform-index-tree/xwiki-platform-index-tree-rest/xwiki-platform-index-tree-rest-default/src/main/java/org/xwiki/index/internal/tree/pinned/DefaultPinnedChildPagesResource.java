@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.internal.tree.pinned;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,8 +28,6 @@ import javax.ws.rs.core.Response;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager;
 import org.xwiki.index.tree.pinned.PinnedChildPagesResource;
-import org.xwiki.index.tree.pinned.rest.model.jaxb.PinnedChildPage;
-import org.xwiki.index.tree.pinned.rest.model.jaxb.PinnedChildPages;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -71,41 +68,34 @@ public class DefaultPinnedChildPagesResource extends XWikiResource
     private ContextualAuthorizationManager authorizationManager;
 
     @Override
-    public PinnedChildPages getPinnedChildPages(String wikiName, String spaceName) throws XWikiRestException
+    public List<String> getPinnedChildPages(String wikiName, String spaceName) throws XWikiRestException
     {
         List<String> spaces = parseSpaceSegments(spaceName.substring("/spaces/".length()));
         DocumentReference homeReference = new DocumentReference(wikiName, spaces,
             this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
         List<DocumentReference> pinnedChildPages = this.pinnedChildPagesManager.getPinnedChildPages(homeReference);
-        PinnedChildPages result = new PinnedChildPages();
-        int i = 0;
-        for (DocumentReference pinnedChildPage : pinnedChildPages) {
-            result.withPinnedChildPages(new PinnedChildPage()
-                .withIndex(i++)
-                .withReference(this.entityReferenceSerializer.serialize(pinnedChildPage)));
-        }
-        return result;
+        return pinnedChildPages.stream().map(this.entityReferenceSerializer::serialize).toList();
     }
 
     @Override
-    public Response addPinnedChildPages(String wikiName, String spaceName, PinnedChildPage pinnedChildPage)
+    public Response setPinnedChildPages(String wikiName, String spaceName, List<String> pinnedChildPages)
         throws XWikiRestException
     {
-        List<String> spaces = parseSpaceSegments(spaceName);
+        List<String> spaces = parseSpaceSegments(spaceName.substring("/spaces/".length()));
         DocumentReference homeReference = new DocumentReference(wikiName, spaces,
             this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
         if (!this.authorizationManager.hasAccess(Right.EDIT, homeReference)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        List<DocumentReference> pinnedChildPages =
-            new ArrayList<>(this.pinnedChildPagesManager.getPinnedChildPages(homeReference));
+        List<DocumentReference> pinnedChildPagesRef =
+            pinnedChildPages.stream().map(documentReferenceResolver::resolve).toList();
 
-        DocumentReference childPage = this.documentReferenceResolver.resolve(pinnedChildPage.getReference());
-        if (!childPage.hasParent(homeReference.getLastSpaceReference())) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        for (DocumentReference childPage : pinnedChildPagesRef) {
+            if (!childPage.hasParent(homeReference.getLastSpaceReference())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
         }
-        pinnedChildPages.add(pinnedChildPage.getIndex(), childPage);
-        this.pinnedChildPagesManager.setPinnedChildPages(homeReference, pinnedChildPages);
+        this.pinnedChildPagesManager.setPinnedChildPages(homeReference.getLastSpaceReference(), pinnedChildPagesRef);
         return Response.accepted().build();
     }
 }

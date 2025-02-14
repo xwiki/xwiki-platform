@@ -111,6 +111,8 @@ public class PinnedChildPagesManager
      */
     public void setPinnedChildPages(EntityReference parentReference, List<DocumentReference> pagesToPin)
     {
+        // FIXME: getPinnedChildPages() accept taking a DocumentReference as parent, so this one should also accept that
+        // and not only a SpaceReference as it's the case with the check below.
         // Make sure we pin only the pages that are children of the specified parent.
         List<DocumentReference> pinnedChildPages =
             pagesToPin.stream().filter(childReference -> Objects.equals(getParent(childReference), parentReference))

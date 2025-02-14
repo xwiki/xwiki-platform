@@ -19,14 +19,14 @@
  */
 package org.xwiki.index.tree.pinned;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.xwiki.index.tree.pinned.rest.model.jaxb.PinnedChildPage;
-import org.xwiki.index.tree.pinned.rest.model.jaxb.PinnedChildPages;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.stability.Unstable;
 
@@ -47,11 +47,11 @@ public interface PinnedChildPagesResource
      *
      * @param wikiName the name of the wiki
      * @param spaceName the space where to look for the pinned child pages
-     * @return the list of pinned child pages.
+     * @return the list of pinned child pages as serialized references.
      * @throws XWikiRestException in case of problem when accessing the information
      */
     @GET
-    PinnedChildPages getPinnedChildPages(@PathParam("wikiName") String wikiName,
+    List<String> getPinnedChildPages(@PathParam("wikiName") String wikiName,
         @PathParam("spaceName") String spaceName) throws XWikiRestException;
 
     /**
@@ -59,11 +59,12 @@ public interface PinnedChildPagesResource
      *
      * @param wikiName the name of the wiki
      * @param spaceName the space where to look for the pinned child pages
-     * @param pinnedChildPage the new pinned page information
+     * @param pinnedChildPages the list of pinned child pages
      * @return an http response with the status of the operation
      * @throws XWikiRestException in case of problem when accessing the information
      */
-    @PUT
-    Response addPinnedChildPages(@PathParam("wikiName") String wikiName,
-        @PathParam("spaceName") String spaceName, PinnedChildPage pinnedChildPage) throws XWikiRestException;
+    @POST
+    Response setPinnedChildPages(@PathParam("wikiName") String wikiName,
+        @PathParam("spaceName") String spaceName, List<String> pinnedChildPages)
+        throws XWikiRestException;
 }

@@ -73,7 +73,7 @@
   ## which is probably lower than ECMAScript 2020 (ES11) when support for dynamic imports was introduced.
   ## See also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import
   ## and https://caniuse.com/?search=import()
-  #set ($discard = $xwiki.jsx.use($sheetReference, {'minify': false}))
+  #set ($discard = $xwiki.jsx.use($sheetReference, {'minify': false, 'defer': false}))
   #set ($discard = $xwiki.ssx.use($pdfExportConfig.template))
   #set ($discard = $xwiki.jsx.use($pdfExportConfig.template))
   ## Use the specified PDF file name as the title of the HTML page in order to have it suggested as file name when
@@ -549,6 +549,35 @@ define('paged-polyfill-patched', [
   return PagedPolyfill;
 });
 
+// Collect the MutationObserver instances in order to be able to disconnect them before generating the print preview
+// with paged.js (a process which generates a lot of DOM mutations because the content is split into print pages).
+(function() {
+  const mutationObservers = new Set();
+
+  const originalObserve = MutationObserver.prototype.observe;
+  MutationObserver.prototype.observe = function(...args) {
+    mutationObservers.add(this);
+    return originalObserve.apply(this, args);
+  };
+
+  const originalDisconnect = MutationObserver.prototype.disconnect;
+  MutationObserver.prototype.disconnect = function(...args) {
+    mutationObservers.delete(this);
+    return originalDisconnect.apply(this, args);
+  };
+
+  function disconnectAll() {
+    console.debug(`Disconnecting ${mutationObservers.size} mutation observers.`);
+    mutationObservers.forEach(mutationObserver =&gt; mutationObserver.disconnect());
+  }
+
+  define('xwiki-export-pdf-mutationObserverManager', function() {
+    return {
+      disconnectAll
+    };
+  });
+})();
+
 define('xwiki-export-pdf-config', ['jquery'], function($) {
   const pdfExportConfig = {
     documents: [],
@@ -565,8 +594,9 @@ define('xwiki-export-pdf-config', ['jquery'], function($) {
 require([
   'jquery',
   'xwiki-page-ready',
-  'xwiki-export-pdf-config'
-], function($, pageReady, pdfExportConfig) {
+  'xwiki-export-pdf-config',
+  'xwiki-export-pdf-mutationObserverManager'
+], function($, pageReady, pdfExportConfig, mutationObserverManager) {
   // Workaround for a paged.js bug (#267: Missing CSS stylesheets can break the page rendering).
   // See https://github.com/pagedjs/pagedjs/issues/267
   const protectAgainstMissingStyleSheets = function() {
@@ -912,12 +942,25 @@ require([
     const usePagedPolyfill = $('body').children('.pdf-toc, .pdf-header, .pdf-footer').length;
     if (usePagedPolyfill) {
       return new Promise((resolve, reject) =&gt; {
-        window.PagedConfig = {after: resolve};
+        let start;
+        window.PagedConfig = {after: (...args) =&gt; {
+          const duration = (new Date().getTime() - start) / 1000;
+          console.debug(`Print preview ready in ${duration}s`);
+          resolve(...args);
+        }};
         // Replace each canvas with an image before paged.js layouts the print pages, otherwise all canvases become
         // blank when they are moved around within the DOM tree.
         replaceCanvasesWithImages($('#xwikicontent')).catch((cause) =&gt; {
           console.log('Failed to replace canvases with images. Cause: ' + cause);
         }).finally(() =&gt; {
+          // Splitting the content into print pages triggers a lot of DOM mutations. We disconnect all the mutation
+          // observers in order to speed up the print preview generation and also because we consider the current state
+          // of the content as final (i.e. that's how the content should end up in the PDF) so the DOM mutations
+          // triggered by paged.js should not lead to any new content changes.
+          mutationObserverManager.disconnectAll();
+
+          console.debug('Generating print preview...');
+          start = new Date().getTime();
           require(['paged-polyfill'], function(PagedPolyfill) {});
         })
       });

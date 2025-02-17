@@ -247,8 +247,8 @@
   #if ($mustSync)
     <div class="box warningmessage deprecatedProperties">
       $services.localization.render('core.editors.object.removeDeprecatedProperties.all.info')
-      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" title="$services.localization
-      .render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
+      <div><a class="syncProperties syncAllProperties" href="$doc.getURL('objectsync')" 
+        title="$services.localization.render('core.editors.object.removeDeprecatedProperties.all.link.tooltip')">
         $services.icon.renderHTML('cross')
         $services.localization.render('core.editors.object.removeDeprecatedProperties.all.link')
       </a></div>

@@ -89,41 +89,47 @@ Caused by: #printThrowable($throwable.cause true)
       #set ($argument = $NULL)
     #end
     #set ($message = "$message$escapetool.xml($messageElement)")
-    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
-    ## We will display a link to that entity, so we need to extract the document from it.
-    #set ($documentReference = $argument.extractReference("DOCUMENT"))
-    #if ($documentReference)
-      #set ($documentReferenceDisplay = "#displayDocumentReference($documentReference)")
-      #set ($message = "$message$documentReferenceDisplay.trim()")
-    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
-      ## Search for the extension/dependency only in the core and local repositories.
-      #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
-      #if (!$_extension)
-        #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
-      #end
-      #if ($_extension)
-        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
-        #set ($_extensionName = "#displayExtensionName($_extension)")
-        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
-      #else
-        #set ($version = $argument.version)
-        #if (!$version)
-          #set ($version = $argument.versionConstraint)
+    #try ('argumentDisplayException')
+      ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
+      ## TODO: implement using a proper Java framework which job is to serialize a log argument and which can be extended to support more argument types
+      ## We will display a link to that entity, so we need to extract the document from it.
+      #if ($objecttool.instanceOf($argument, 'org.xwiki.model.reference.EntityReference'))
+        #set ($documentReference = $argument.extractReference("DOCUMENT"))
+        #set ($documentReferenceDisplay = "#displayDocumentReference($documentReference)")
+        #set ($message = "$message$documentReferenceDisplay.trim()")
+      #elseif (($objecttool.instanceOf($argument, 'org.xwiki.extension.ExtensionId') || $objecttool.instanceOf($argument, 'org.xwiki.extension.ExtensionDependency')) && ($argument.version || $argument.versionConstraint))
+        ## Search for the extension/dependency only in the core and local repositories.
+        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
+        #if (!$_extension)
+          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
         #end
-        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
-        #set ($_extensionName = $argument)
+        #if ($_extension)
+          #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
+          #set ($_extensionName = "#displayExtensionName($_extension)")
+          #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
+        #else
+          #set ($version = $argument.version)
+          #if (!$version)
+            #set ($version = $argument.versionConstraint)
+          #end
+          #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
+          #set ($_extensionName = $argument)
+        #end
+        #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+      #elseif ($argument.listIterator())
+        ## Assume the argument is a job id.
+        #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
+      #elseif ($argument.class.name == 'java.lang.String' && $argument.startsWith('wiki:'))
+        #set ($message = "$message#wikiHomePageLink($argument)")
+      #elseif ($objecttool.instanceOf($argument, 'org.xwiki.diff.Delta'))
+        #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
+      #else
+        #set ($message = "$message$!escapetool.xml($argument)")
       #end
-      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
-    #elseif ($argument.listIterator())
-      ## Assume the argument is a job id.
-      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
-    #elseif ($argument.class.name == 'java.lang.String' && $argument.startsWith('wiki:'))
-      #set ($message = "$message#wikiHomePageLink($argument)")
-    #elseif ($argument.previous && $argument.next)
-      ## Assume the argument is a diff Delta.
-      #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
-    #else
-      #set ($message = "$message$!escapetool.xml($argument)")
+    #end
+    #if ("$!argumentDisplayException" != '')
+      $services.logging.getLogger("logging_macros.vm").error("Failed to display log argument [{}]. Fallbacking on the toString", $foreach.index, $argumentDisplayException)
+      #set ($messageArgumentResult = $!escapetool.xml($argument))
     #end
   #end
   ## Add the last message element.

@@ -19,19 +19,29 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DBTreeListClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
@@ -55,6 +65,18 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     private QueryFilter viewableValueFilter;
 
     private DBListClass dbListClass = new DBListClass();
+
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    private BaseClass usersClass;
+
+    private PropertyClass propertyClass;
+
+    private Provider<XWikiContext> xcontextProvider;
+
+    private XWikiContext xcontext;
+
+    private XWiki xwiki;
 
     @Before
     public void configure() throws Exception
@@ -128,6 +150,8 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithIdAndClassName() throws Exception
     {
+        setPropertyType();
+
         this.dbListClass.setClassname("XWiki.XWikiUsers");
         this.dbListClass.setIdField("doc.name");
         Query query = assertQuery(
@@ -202,7 +226,9 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithIdValueAndClassName() throws Exception
     {
-        this.dbListClass.setClassname("XWiki.TagClass");
+        setPropertyType();
+
+        this.dbListClass.setClassname("XWiki.XWikiUsers");
         this.dbListClass.setIdField("doc.name");
         this.dbListClass.setValueField("doc.name");
         assertQuery(
@@ -277,6 +303,8 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     @Test
     public void buildWithParent() throws Exception
     {
+        setPropertyType();
+
         DBTreeListClass dbTreeListClass = new DBTreeListClass();
         dbTreeListClass.setOwnerDocument(this.dbListClass.getOwnerDocument());
         dbTreeListClass.setParentField("parent");
@@ -301,12 +329,34 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
         assertQuery("select distinct doc.fullName as unfilterable0, doc.fullName, doc.title, doc.parent"
             + " from XWikiDocument as doc");
 
-        this.dbListClass.setClassname("XWiki.TagClass");
+        this.dbListClass.setClassname("XWiki.XWikiUsers");
         assertQuery("select distinct doc.fullName as unfilterable0, idProp.value, valueProp.value, parentProp.value"
             + " from XWikiDocument as doc, BaseObject as obj, StringProperty as idProp, StringProperty as valueProp,"
             + " StringProperty as parentProp where doc.fullName = obj.name and obj.className = :className and"
             + " doc.fullName <> :templateName and obj.id = idProp.id.id and idProp.id.name = :idProp and"
             + " obj.id = valueProp.id.id and valueProp.id.name = :valueProp and obj.id = parentProp.id.id and"
             + " parentProp.id.name = :parentProp");
+    }
+
+    private void setPropertyType() throws Exception
+    {
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        xcontext = mock(XWikiContext.class);
+        when(xcontextProvider.get()).thenReturn(xcontext);
+
+        xwiki = mock(XWiki.class);
+        when(xcontext.getWiki()).thenReturn(xwiki);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("className", "XWiki.XWikiUsers");
+
+        documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+        DocumentReference usersClassReference = new DocumentReference("wiki", "XWiki", "XWikiUsers");
+        when(documentReferenceResolver.resolve((String) parameters.get("className"))).thenReturn(usersClassReference);
+
+        usersClass = mock(BaseClass.class);
+        when(xwiki.getXClass(usersClassReference, xcontext)).thenReturn(usersClass);
+        propertyClass = mock(PropertyClass.class);
+        when(usersClass.get("")).thenReturn(propertyClass);
     }
 }

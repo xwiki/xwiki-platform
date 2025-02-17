@@ -26,9 +26,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryBuilder;
 import org.xwiki.query.QueryException;
@@ -36,8 +39,13 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DBTreeListClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Builds a query from the meta data of a Database List property.
@@ -80,6 +88,16 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
     private static final String TEMPLATE_NAME = "templateName";
 
     private static final String COLUMN_SEPARATOR = ", ";
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     @Inject
     private QueryManager queryManager;
@@ -156,8 +174,17 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         } else if (!hasClassName) {
             selectClause.add(DOC_PREFIX + fieldName);
         } else {
+            PropertyClass pc = null;
+            try {
+                pc = (PropertyClass) contextProvider.get().getWiki()
+                    .getXClass(documentReferenceResolver.resolve((String) parameters.get(CLASS_NAME)),
+                        contextProvider.get()).get(fieldName);
+            } catch (XWikiException e) {
+                logger.error("Failed to get property [{}] for class [{}]", fieldName, parameters.get(CLASS_NAME), e);
+            }
+            String propertyType = pc != null ? pc.newProperty().getClass().getSimpleName() : "StringProperty";
             selectClause.add(fieldAlias + ".value");
-            fromClause.add("StringProperty as " + fieldAlias);
+            fromClause.add(propertyType + " as " + fieldAlias);
             whereClause.add(String.format("obj.id = %1$s.id.id and %1$s.id.name = :%1$s", fieldAlias));
             parameters.put(fieldAlias, fieldName);
         }

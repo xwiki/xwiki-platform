@@ -272,6 +272,12 @@ ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.noChanges=No c
 ckeditor.plugin.realtime.notification.sourcearea.rejoiningSession.alone=There are unsaved changes, but no one else is in the realtime session. Re-joining.
 ckeditor.plugin.realtime.notification.sourcearea.notRejoiningSession=Could not rejoin the realtime session because there are unsaved changes.
 
+ckeditor.plugin.upload.downloadingPastedImages=Downloading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageDownloadFailed=Failed to download {0} out of {1} pasted images
+ckeditor.plugin.upload.starting=Starting upload in {0}s
+ckeditor.plugin.upload.uploadingPastedImages=Uploading pasted images: {0} / {1}
+ckeditor.plugin.upload.imageUploadFailed=Failed to upload {0} out of {1} pasted images
+
 ckeditor.inline.failedToInit=Failed to initialize CKEditor.
 
 ckeditor.upload.error.csrf=The CSRF token is missing.

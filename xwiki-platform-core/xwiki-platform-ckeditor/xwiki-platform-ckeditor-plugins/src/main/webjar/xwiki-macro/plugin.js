@@ -182,6 +182,30 @@
         toHtml: wrapMacroOutput
       });
 
+      // Remove the bogus BR tags that are being added by the CKEDITOR.htmlDataProcessor.dataFilter to the empty blocks
+      // from the macro output, since otherwise we can't detect if the macro output is visible or not in order to toggle
+      // the macro placeholder.
+      //
+      // CKEDITOR.htmlDataProcessor.dataFilter is called on the 'toHtml' event with priority 10 and it adds a bogus BR
+      // tag to all the empty block elements, including those from the read-only macro output. These bogus BR tags are
+      // marked with the 'data-cke-bogus' attribute which is removed also by the same dataFilter in a different rule
+      // that has priority 10. We're adding a rule to remove these bogus BR tags from the read-only macro output. This
+      // rule must be applied after the bogus BR tags are added by the dataFilter but before the 'data-cke-bogus'
+      // attribute is removed (with priority 10) so that we can identify the bogus BR tags.
+      // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#event-toHtml
+      editor.dataProcessor?.dataFilter?.addRules({
+        elements: {
+          br: function(br) {
+            if (br.attributes['data-cke-bogus'] === 1 && CKEDITOR.plugins.xwikiMacro.isMacroOutput(br)) {
+              return false;
+            }
+          }
+        }
+      }, {
+        applyToAll: true,
+        priority: 9
+      });
+
       editor.ui.addButton('xwiki-macro', {
         label: editor.localization.get('xwiki-macro.buttonHint'),
         command: 'xwiki-macro',

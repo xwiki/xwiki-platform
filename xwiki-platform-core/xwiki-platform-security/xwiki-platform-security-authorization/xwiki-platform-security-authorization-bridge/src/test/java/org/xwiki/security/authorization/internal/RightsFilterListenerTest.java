@@ -234,6 +234,30 @@ public class RightsFilterListenerTest
     }
 
     @Test
+    void checkNewEnforcedProgrammingRight() throws Exception
+    {
+        XWikiDocument document = createTestDocument();
+        document.setOriginalDocument(document.clone());
+        BaseObject rightObject =
+            document.newXObject(XWikiRightsDocumentInitializer.CLASS_REFERENCE, this.oldcore.getXWikiContext());
+        rightObject.setStringValue("levels", "programming");
+
+        DocumentRequiredRights requiredRights = new DocumentRequiredRights(true,
+            Set.of(new DocumentRequiredRight(Right.PROGRAM, null)));
+
+        when(this.requiredRightsReader.readRequiredRights(same(document))).thenReturn(requiredRights);
+        when(this.requiredRightsReader.readRequiredRights(same(document.getOriginalDocument())))
+            .thenReturn(DocumentRequiredRights.EMPTY);
+
+        doThrow(AccessDeniedException.class).when(this.authorization).checkAccess(Right.PROGRAM, null,
+            null);
+
+        UserUpdatingDocumentEvent event = new UserUpdatingDocumentEvent();
+        this.listener.onEvent(event, document, null);
+        assertTrue(event.isCanceled());
+    }
+
+    @Test
     void checkEnforcedButAllowedRequiredRights() throws AccessDeniedException
     {
         XWikiDocument document = createTestDocument();

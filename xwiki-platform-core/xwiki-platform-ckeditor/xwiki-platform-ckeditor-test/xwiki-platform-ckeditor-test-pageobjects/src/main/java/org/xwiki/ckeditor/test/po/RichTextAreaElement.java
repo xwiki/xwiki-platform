@@ -570,22 +570,35 @@ public class RichTextAreaElement extends BaseElement
      */
     public void waitForOwnNotificationSuccessMessage(String message)
     {
-        waitForOwnNotificationMessage("success", message);
+        waitForOwnNotificationMessage("success", message, true);
     }
 
-    private void waitForOwnNotificationMessage(String level, String message)
+    /**
+     * Waits for a progress notification message to be displayed for this rich text area element.
+     *
+     * @param message the notification message to wait for
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     */
+    public void waitForOwnNotificationProgressMessage(String message)
+    {
+        waitForOwnNotificationMessage("info", message, false);
+    }
+
+    private void waitForOwnNotificationMessage(String level, String message, boolean close)
     {
         String notificationMessageLocator =
             String.format("//div[contains(@class,'cke_notification_%s') and contains(., '%s')]", level, message);
         getDriver().waitUntilElementIsVisible(By.xpath(notificationMessageLocator));
         // In order to improve test speed, clicking on the notification will make it disappear. This also ensures that
         // this method always waits for the last notification message of the specified level.
-        try {
-            String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
-            getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
-        } catch (WebDriverException e) {
-            // The notification message may disappear before we get to click on it and thus we ignore in case there's
-            // an error.
+        if (close) {
+            try {
+                String notificationCloseLocator = notificationMessageLocator + "/a[@class = 'cke_notification_close']";
+                getDriver().findElementWithoutWaiting(By.xpath(notificationCloseLocator)).click();
+            } catch (WebDriverException e) {
+                // The notification message may disappear before we get to click on it.
+            }
         }
     }
 

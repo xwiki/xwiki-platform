@@ -3194,6 +3194,9 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
@@ -3224,7 +3227,9 @@ public class Document extends Api
      * <p>
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
-     * </p>
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3239,6 +3244,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
@@ -3266,6 +3274,9 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
+     * <p>
+     * It is recommended to use the newer {@code refactoring} script service APIs to perform refactoring
+     * operations as they offer more options and are better maintained.
      *
      * @param newReference the reference to the new document
      * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to

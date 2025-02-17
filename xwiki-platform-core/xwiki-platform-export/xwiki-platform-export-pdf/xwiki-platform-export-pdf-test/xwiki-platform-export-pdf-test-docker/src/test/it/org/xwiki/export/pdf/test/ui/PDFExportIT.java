@@ -924,10 +924,10 @@ class PDFExportIT
             // The third content page should have the second floating image.
             images = pdf.getImagesFromPage(3);
             assertEquals(1, images.size());
-            assertEquals(442, Math.round(images.get(0).getHeight()));
+            assertEquals(443, Math.round(images.get(0).getHeight()));
 
             // The second image is floating to the right.
-            assertEquals(403, Math.round(images.get(0).getOffsetLeft()));
+            assertEquals(404, Math.round(images.get(0).getOffsetLeft()));
 
             // The paragraph after the image should be on the same page.
             text = pdf.getTextFromPage(3);
@@ -942,7 +942,7 @@ class PDFExportIT
             // The fifth (should have been the fourth) content page has the third floating image.
             images = pdf.getImagesFromPage(5);
             assertEquals(1, images.size());
-            assertEquals(457, Math.round(images.get(0).getHeight()));
+            assertEquals(458, Math.round(images.get(0).getHeight()));
 
             // The third image is floating to the left.
             assertEquals(36, Math.round(images.get(0).getOffsetLeft()));

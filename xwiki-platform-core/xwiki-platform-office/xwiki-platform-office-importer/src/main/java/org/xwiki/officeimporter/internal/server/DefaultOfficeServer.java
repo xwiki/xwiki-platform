@@ -21,6 +21,7 @@ package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,6 +40,7 @@ import org.xwiki.officeimporter.internal.converter.DefaultOfficeConverter;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
 import org.xwiki.officeimporter.server.OfficeServerException;
+import org.xwiki.text.StringUtils;
 
 /**
  * Default {@link OfficeServer} implementation.
@@ -109,35 +111,10 @@ public class DefaultOfficeServer implements OfficeServer
     public void initialize() throws OfficeServerException
     {
         if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_INTERNAL) {
-            LocalOfficeManager.Builder configuration = LocalOfficeManager.builder();
-            configuration.portNumbers(this.config.getServerPorts());
-
-            String homePath = this.config.getHomePath();
-            if (homePath != null) {
-                configuration.officeHome(homePath);
-            }
-
-            String profilePath = this.config.getProfilePath();
-            if (profilePath != null) {
-                configuration.templateProfileDir(new File(profilePath));
-            }
-
-            configuration.maxTasksPerProcess(this.config.getMaxTasksPerProcess());
-            configuration.taskExecutionTimeout(this.config.getTaskExecutionTimeout());
-
-            try {
-                this.jodManager = configuration.build();
-            } catch (Exception e) {
-                // Protect against exceptions raised by JodManager. For example if it cannot autodetect the office home,
-                // it'll throw an java.lang.IllegalStateException exception...
-                // We wrap this in an OfficeServerException in order to display some nicer message to the user.
-                throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
-            }
-        } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
-            externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
-            externalProcessOfficeManager.connectOnStart(true);
-            this.jodManager = externalProcessOfficeManager.build();
+            initializeInternalServer();
+        } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL
+                || this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_REMOTE) {
+            initializeExternalServer();
         } else {
             setState(ServerState.CONF_ERROR);
             throw new OfficeServerException("Invalid office server configuration.");
@@ -166,8 +143,58 @@ public class DefaultOfficeServer implements OfficeServer
                 .filterChain(new LinkedImagesEmbedderFilter()).build();
         }
 
-        File workDir = this.environment.getTemporaryDirectory();
-        this.converter = new DefaultOfficeConverter(this.jodConverter, workDir);
+        this.converter = new DefaultOfficeConverter(this.jodConverter, getWorkDir());
+    }
+
+    private void initializeInternalServer() throws OfficeServerException
+    {
+        LocalOfficeManager.Builder configuration = LocalOfficeManager.builder();
+        configuration.portNumbers(this.config.getServerPorts());
+
+        String homePath = this.config.getHomePath();
+        if (homePath != null) {
+            configuration.officeHome(homePath);
+        }
+
+        String profilePath = this.config.getProfilePath();
+        if (profilePath != null) {
+            configuration.templateProfileDir(new File(profilePath));
+        }
+
+        configuration.maxTasksPerProcess(this.config.getMaxTasksPerProcess());
+        configuration.taskExecutionTimeout(this.config.getTaskExecutionTimeout());
+
+        try {
+            this.jodManager = configuration.build();
+        } catch (Exception e) {
+            // Protect against exceptions raised by JodManager. For example if it cannot autodetect the office home,
+            // it'll throw an java.lang.IllegalStateException exception...
+            // We wrap this in an OfficeServerException in order to display some nicer message to the user.
+            throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
+        }
+    }
+
+    private void initializeExternalServer()
+    {
+        ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
+        externalProcessOfficeManager.portNumbers(this.config.getServerPorts());
+        externalProcessOfficeManager.connectOnStart(true);
+        if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_REMOTE) {
+            externalProcessOfficeManager.hostName(config.getServerHost());
+        }
+        this.jodManager = externalProcessOfficeManager.build();
+    }
+
+    private File getWorkDir()
+    {
+        Optional<String> workDirFromConfiguration = this.config.getWorkDir();
+        if (workDirFromConfiguration.isPresent() && StringUtils.isNotBlank(workDirFromConfiguration.get())) {
+            File workDir = new File(workDirFromConfiguration.get());
+            if (workDir.isDirectory() && workDir.canWrite()) {
+                return workDir;
+            }
+        }
+        return this.environment.getTemporaryDirectory();
     }
 
     @Override

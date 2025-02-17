@@ -201,7 +201,9 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
             this.name = null;
             this.referenceCache = null;
 
-            setDirty(true);
+            if (isDirty()) {
+                setDirty(true);
+            }
         }
     }
 

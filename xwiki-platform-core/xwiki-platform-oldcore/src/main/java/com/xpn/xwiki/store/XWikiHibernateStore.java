@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
@@ -205,7 +206,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private final Map<Long, ReentrantLock> spaceSavingLockMap = Collections.synchronizedMap(new ReferenceMap<>());
 
-    private Set<EntityReference> optimizedObjectClasses;
+    private Optional<Set<EntityReference>> optimizedObjectClasses;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -535,6 +536,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         });
     }
 
+    private boolean isClassOptimized(DocumentReference classReference)
+    {
+        return this.optimizedObjectClasses.isEmpty()
+            || this.optimizedObjectClasses.get().contains(classReference.getLocalDocumentReference());
+    }
+
     @Override
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction) throws XWikiException
     {
@@ -725,8 +732,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     && doc.isChangeTracked()
                                     // Get from the configuration the xobject classes on which to apply save
                                     // optimization
-                                    && (this.optimizedObjectClasses == null || this.optimizedObjectClasses
-                                        .contains(entry.getKey().getLocalDocumentReference()));
+                                    && isClassOptimized(entry.getKey());
 
                                 for (BaseObject obj : objects) {
                                     // Only save modified (or new) objects

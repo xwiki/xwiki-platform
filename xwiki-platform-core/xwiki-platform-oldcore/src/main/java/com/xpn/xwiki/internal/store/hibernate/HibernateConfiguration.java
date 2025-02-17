@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.store.hibernate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -176,18 +177,19 @@ public class HibernateConfiguration
 
     /**
      * @return the local references of the classes for which we should apply a save optimization (save only the modified
-     *         ones)
+     *         ones). An empty list means enabled for no class and {@link Optional#empty()} means allowed for all.
      * @since 17.1.0RC1
      * @since 16.10.4
      * @since 16.4.7
      */
-    public Set<EntityReference> getOptimizedXObjectClasses()
+    public Optional<Set<EntityReference>> getOptimizedXObjectClasses()
     {
         List<String> references =
             this.xwikiConfiguration.getProperty("xwiki.store.hibernate.optimizedObjectSave.classes", List.class);
 
         return references != null
-            ? references.stream().map(r -> this.resolver.resolve(r, EntityType.DOCUMENT)).collect(Collectors.toSet())
-            : null;
+            ? Optional.of(
+                references.stream().map(r -> this.resolver.resolve(r, EntityType.DOCUMENT)).collect(Collectors.toSet()))
+            : Optional.empty();
     }
 }

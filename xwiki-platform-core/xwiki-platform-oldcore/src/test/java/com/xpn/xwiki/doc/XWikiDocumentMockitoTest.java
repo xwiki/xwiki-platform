@@ -1816,4 +1816,21 @@ public class XWikiDocumentMockitoTest
         assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
             new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
     }
+
+    @Test
+    void getXClassDoesNotChangeDirtyFlagWhenEmpty()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        BaseClass xClass = document.getXClass();
+
+        assertNotNull(xClass);
+
+        assertFalse(xClass.isDirty());
+        assertFalse(document.isMetaDataDirty());
+        assertFalse(document.isContentDirty());
+    }
 }

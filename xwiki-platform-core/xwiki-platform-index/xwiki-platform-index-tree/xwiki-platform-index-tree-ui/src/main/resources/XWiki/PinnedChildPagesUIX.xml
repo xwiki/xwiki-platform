@@ -36,12 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set ($targetDoc = $xcontext.get('targetDoc'))
-#if ("$!targetDoc" != '')
-  {{documentTree showTranslations="false" showAttachments="false" compact="true" root="document:$targetDoc" /}}
-#end
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.PinnedChildPagesUIX</name>
     <number>0</number>
@@ -810,7 +805,8 @@ require([
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content>{{velocity output="false"}}
+      <content>{{template name="documentTree_macros.vm" /}}
+{{velocity output="false"}}
 #macro (displayEdit $configObj)
   #set ($discard = $xwiki.ssx.use('XWiki.PinnedChildPagesUIX'))
   #set ($discard = $xwiki.jsx.use('XWiki.PinnedChildPagesUIX'))
@@ -840,10 +836,14 @@ require([
 #macro (displayNavigationPanel)
   #navigationPanelHeader($services.localization.render('xe.panels.navigation'))
   #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
-  #set ($discard = $xcontext.put('targetDoc', $openToDoc))
-  #set ($navigationPanel = $xwiki.getDocument('XWiki.PinnedChildPagesUIX'))
   {{html clean="false"}}
-  $navigationPanel.displayDocument().replace('data-dragAndDrop = "false"', 'data-dragAndDrop = "true"').replace('class = "xtree"', 'class = "xtree jstree-no-links jstree-xwiki-large"')
+  #documentTree({
+    'dragAndDrop': true,
+    'root': "document:$openToDoc",
+    'showTranslations': false,
+    'showAttachments': false,
+    'compact': true
+  })
   {{/html}}
   #panelfooter()
 #end

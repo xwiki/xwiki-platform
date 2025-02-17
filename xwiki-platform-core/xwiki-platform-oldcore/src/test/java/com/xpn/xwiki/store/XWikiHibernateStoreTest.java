@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -157,7 +158,7 @@ public class XWikiHibernateStoreTest
     @AfterComponent
     void afterComponent()
     {
-        when(this.hibernateConfiguration.getOptimizedXObjectClasses()).thenReturn(null);
+        when(this.hibernateConfiguration.getOptimizedXObjectClasses()).thenReturn(Optional.empty());
     }
 
     @BeforeEach

@@ -38,6 +38,10 @@
   <hidden>false</hidden>
   <content>{{velocity output="false"}}
 $xwiki.ssfx.use('missing.css')
+$xwiki.linkx.use('https://www.example.com/missing.css', {
+  'rel': 'stylesheet',
+  'type': 'text/css'
+})
 {{/velocity}}
 
 Some content.</content>
@@ -147,7 +151,8 @@ Some content.</content>
       <cache>long</cache>
     </property>
     <property>
-      <code>@import url("missing.css")</code>
+      <code>@import url("missing.css")
+@import url("https://www.example.com/missing.css")</code>
     </property>
     <property>
       <contentType>CSS</contentType>

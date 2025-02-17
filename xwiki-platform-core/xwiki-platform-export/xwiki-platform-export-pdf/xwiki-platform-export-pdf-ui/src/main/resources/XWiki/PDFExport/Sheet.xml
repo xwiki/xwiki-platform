@@ -601,6 +601,7 @@ require([
   // See https://github.com/pagedjs/pagedjs/issues/267
   const protectAgainstMissingStyleSheets = function() {
     const missingStyleSheets = [...document.styleSheets].flatMap(getMissingStyleSheets);
+    console.debug('Missing stylesheets: ', missingStyleSheets);
     const originalOpen = window.XMLHttpRequest.prototype.open;
     window.XMLHttpRequest.prototype.open = function(...args) {
       if (missingStyleSheets.includes(args[1])) {
@@ -616,10 +617,16 @@ require([
   function getMissingStyleSheets(styleSheet) {
     // If a stylesheet has an URL (i.e. it's not inline in the HTML page) but no CSS rules, this usually means the
     // stylesheet failed to be loaded.
-    if (styleSheet.href &amp;&amp; !styleSheet.cssRules.length) {
+    const cssRules = getCSSRules(styleSheet);
+    if (cssRules?.length) {
+      return getMissingStyleSheetsFromCSSRules(cssRules);
+    } else if (styleSheet.href) {
+      // We consider stylesheets loaded from a different domain as missing because paged.js fails to load them and
+      // doesn't recover so this breaks the PDF export. This problem is going to be fixed by #267: Missing CSS
+      // stylesheets can break the page rendering.
       return [styleSheet.href];
     } else {
-      return getMissingStyleSheetsFromCSSRules(styleSheet.cssRules);
+      return [];
     }
   }
 
@@ -633,6 +640,15 @@ require([
       }
     });
     return missingStyleSheets;
+  }
+
+  function getCSSRules(styleSheet) {
+    try {
+      return styleSheet.cssRules;
+    } catch (e) {
+      // We can't access the CSS rules if the stylesheet is loaded from a different domain.
+      return null;
+    }
   }
 
   const refactorAnchors = function() {

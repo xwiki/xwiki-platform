@@ -145,8 +145,6 @@
    *   error - This is used to pass back any error message from the server side code.
    *
    * NOTE: This template uses a registration method which requires:
-   *        * register_first_name
-   *        * register_last_name
    *        * xwikiname
    *        * register_password
    *        * register2_password

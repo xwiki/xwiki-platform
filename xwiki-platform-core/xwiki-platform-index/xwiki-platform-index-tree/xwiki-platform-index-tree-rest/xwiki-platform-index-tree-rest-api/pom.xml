@@ -27,8 +27,10 @@
     <artifactId>xwiki-platform-index-tree-rest</artifactId>
     <version>17.1.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>xwiki-platform-index-tree-rest-api</artifactId>
+  <name>XWiki Platform - Index - Tree - Rest - API</name>
+  <description>REST API for Index Tree module</description>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -50,37 +52,4 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.jvnet.jaxb</groupId>
-        <artifactId>jaxb-maven-plugin</artifactId>
-        <configuration>
-          <generatePackage>org.xwiki.index.tree.pinned.rest.model.jaxb</generatePackage>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <excludes>org/xwiki/index/tree/pinned/rest/model/jaxb/*.java</excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

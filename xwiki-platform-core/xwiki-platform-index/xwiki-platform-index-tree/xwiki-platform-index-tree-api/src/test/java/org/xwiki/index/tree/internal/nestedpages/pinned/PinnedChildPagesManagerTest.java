@@ -32,6 +32,7 @@ import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
@@ -41,6 +42,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -74,6 +77,9 @@ class PinnedChildPagesManagerTest
 
     @MockComponent
     private UserReferenceResolver<CurrentUserReference> currentUserReferenceResolver;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Mock
     XWikiContext xcontext;
@@ -167,6 +173,13 @@ class PinnedChildPagesManagerTest
         verify(this.storageDocument).clone();
         verify(documentAuthors).setOriginalMetadataAuthor(userReference);
         verify(this.xwiki).saveDocument(this.storageDocument, "Update pinned pages", true, this.xcontext);
+        assertEquals(3, this.logCapture.size());
+        assertEquals("Page [xwiki:Some.Page] is not a child of [Wiki foo] so it won't be pinned.",
+            this.logCapture.getMessage(0));
+        assertEquals("Page [xwiki:Some.Sub.Page] is not a child of [Wiki foo] so it won't be pinned.",
+            this.logCapture.getMessage(1));
+        assertEquals("Page [foo:Test.Page1] is not a child of [Wiki foo] so it won't be pinned.",
+            this.logCapture.getMessage(2));
     }
 
     @Test
@@ -196,6 +209,11 @@ class PinnedChildPagesManagerTest
         verify(this.storageDocument).clone();
         verify(documentAuthors).setOriginalMetadataAuthor(userReference);
         verify(this.xwiki).saveDocument(this.storageDocument, "Update pinned pages", true, this.xcontext);
+        assertEquals(2, this.logCapture.size());
+        assertEquals("Page [foo:Main.WebHome] is not a child of [Space xwiki:Some] so it won't be pinned.",
+            this.logCapture.getMessage(0));
+        assertEquals("Page [foo:Test.Page1] is not a child of [Space xwiki:Some] so it won't be pinned.",
+            this.logCapture.getMessage(1));
     }
 
     @Test

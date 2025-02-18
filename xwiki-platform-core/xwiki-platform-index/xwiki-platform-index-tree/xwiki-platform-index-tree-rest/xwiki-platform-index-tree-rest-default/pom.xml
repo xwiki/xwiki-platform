@@ -27,8 +27,10 @@
     <artifactId>xwiki-platform-index-tree-rest</artifactId>
     <version>17.1.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>xwiki-platform-index-tree-rest-default</artifactId>
+  <name>XWiki Platform - Index - Tree - Rest - Default</name>
+  <description>REST Implementation for Index Tree module</description>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>

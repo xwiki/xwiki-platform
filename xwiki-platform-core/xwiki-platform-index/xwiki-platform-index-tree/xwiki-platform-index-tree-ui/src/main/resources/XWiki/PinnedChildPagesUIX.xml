@@ -812,7 +812,7 @@ require([
   #set ($discard = $xwiki.jsx.use('XWiki.PinnedChildPagesUIX'))
   {{html clean="false"}}
   &lt;div class="hidden"&gt;
-    #set ($pinnedPages = $services.indextree.getPinnedChildPages($doc.documentReference))
+    #set ($pinnedPages = $services.index.tree.getPinnedChildPages($doc.documentReference))
     #set ($serializedPinnedPages = [])
     #foreach ($pinnedPage in $pinnedPages)
       #set ($discard = $serializedPinnedPages.add($services.model.serialize($pinnedPage, 'default')))

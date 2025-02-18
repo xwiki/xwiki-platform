@@ -129,7 +129,15 @@ public class PinnedChildPagesManager
         // Make sure we pin only the pages that are children of the specified parent.
         List<DocumentReference> pinnedChildPages = pagesToPin
             .stream()
-            .filter(childReference -> Objects.equals(getParent(childReference), parentEntityReference))
+            .filter(childReference -> {
+                if (!Objects.equals(getParent(childReference), parentEntityReference)) {
+                    this.logger.warn("Page [{}] is not a child of [{}] so it won't be pinned.", childReference,
+                        parentEntityReference);
+                    return false;
+                } else {
+                    return true;
+                }
+            })
             .toList();
         getPinnedChildPagesStorage(parentReference)
             .ifPresent(storageReference -> setPinnedChildPages(storageReference, pinnedChildPages));

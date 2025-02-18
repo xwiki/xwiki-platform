@@ -17,44 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree;
-
-import java.util.List;
+package org.xwiki.index;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.index.tree.internal.nestedpages.pinned.PinnedChildPagesManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
 
 /**
- * Script service for index tree operations.
+ * Script service for index module.
  *
  * @version $Id$
  * @since 17.2.0RC1
  * @since 16.10.4
  * @since 16.4.7
  */
-@Unstable
 @Component
+@Named("index")
 @Singleton
-@Named("index.tree")
-public class IndexTreeScriptService implements ScriptService
+@Unstable
+public class IndexScriptService implements ScriptService
 {
     @Inject
-    private PinnedChildPagesManager pinnedChildPagesManager;
+    private ScriptServiceManager scriptServiceManager;
 
     /**
-     * Retrieve the list of pinned child pages of the given parent.
-     * @param parent the document for which to find pinned child pages.
-     * @return the ordered list of pinned child pages.
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
      */
-    public List<DocumentReference> getPinnedChildPages(DocumentReference parent)
+    @SuppressWarnings("unchecked")
+    public <S extends ScriptService> S get(String serviceName)
     {
-        return this.pinnedChildPagesManager.getPinnedChildPages(parent);
+        return (S) this.scriptServiceManager.get("index." + serviceName);
     }
 }

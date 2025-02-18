@@ -151,14 +151,25 @@ public class PDFDocument implements AutoCloseable
      */
     public Map<String, String> getLinksFromPage(int pageNumber) throws IOException
     {
-        return getLinksFromPage(this.document.getPage(pageNumber));
+        return getLinksFromPage(pageNumber, true);
+    }
+
+    /**
+     * @param pageNumber the page number
+     * @param merge whether to merge consecutive link annotations with the same target
+     * @return a mapping between link labels and link targets
+     * @throws IOException if we fail to extract the links from the specified page
+     */
+    public Map<String, String> getLinksFromPage(int pageNumber, boolean merge) throws IOException
+    {
+        return getLinksFromPage(this.document.getPage(pageNumber), merge);
     }
 
     /**
      * Code adapted from
      * https://github.com/apache/pdfbox/blob/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/PrintURLs.java
      */
-    private Map<String, String> getLinksFromPage(PDPage page) throws IOException
+    private Map<String, String> getLinksFromPage(PDPage page, boolean merge) throws IOException
     {
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         List<PDAnnotation> annotations = page.getAnnotations();
@@ -197,7 +208,7 @@ public class PDFDocument implements AutoCloseable
             if (annotation instanceof PDAnnotationLink) {
                 PDAnnotationLink link = (PDAnnotationLink) annotation;
                 String linkTarget = getLinkTarget(link);
-                if (previousLinkTarget != null && !previousLinkTarget.equals(linkTarget)) {
+                if (!merge || (previousLinkTarget != null && !previousLinkTarget.equals(linkTarget))) {
                     // Commit the current link group and start a new link group.
                     links.put(linkLabel.toString(), previousLinkTarget);
                     linkLabel.setLength(0);

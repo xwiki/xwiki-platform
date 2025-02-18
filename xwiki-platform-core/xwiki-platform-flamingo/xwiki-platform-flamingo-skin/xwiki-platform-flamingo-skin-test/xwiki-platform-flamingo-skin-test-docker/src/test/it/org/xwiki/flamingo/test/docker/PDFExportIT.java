@@ -108,7 +108,7 @@ class PDFExportIT
         URL pdfURL =
             new URL(createURL("xwiki/bin/export/Sandbox/WebHome?format=pdf&pdftoc=1&attachments=1&pdfcover=0"));
         try (PDFDocument document = new PDFDocument(pdfURL)) {
-            Map<String, String> links = document.getLinksFromPage(0);
+            Map<String, String> links = document.getLinksFromPage(0, false);
             // Make sure we have a Table of Contents.
             assertTrue(links.containsKey("Mixed list"));
             // Make sure the Table of Contents links point to their corresponding heading.

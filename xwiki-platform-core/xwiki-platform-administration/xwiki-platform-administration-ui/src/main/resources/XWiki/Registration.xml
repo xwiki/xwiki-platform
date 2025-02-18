@@ -155,8 +155,7 @@
    *###
   #set($mainFields = [])
   ##
-  ## If the admin chose to, we exclude the first and last names to keep it simple.
-  $registrationConfig.useFirstLastNames
+  ## If the admin chose to, we exclude the first and last names to keep the form simple.
   #if($registrationConfig.useFirstLastNames)
     ## The first name field.
     #set($field =

@@ -811,6 +811,11 @@ require([
         // here because top level pages are always nested.
         return topLevelSpaceName.replaceAll('%', '%25').replaceAll('/', '%2F');
       });
+    // We need to ensure to never send a unique value to the server to avoid having a unique string splitted using
+    // standard separators. See also XWIKI-22885
+    if (pinnedTopLevelPages.length &gt; 0) {
+      pinnedTopLevelPages.push('');
+    }
     // We need to have at least one value in order to be able to overwrite the value stored on the server.
     return pinnedTopLevelPages.length ? pinnedTopLevelPages : [''];
   }

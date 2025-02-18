@@ -37,11 +37,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   padding: 8px 2px;
 }
 
-.more-actions .edit-all {
-  display: block;
-  padding: 2px 18px;
-}
-
 /* Object editor */
 /* XClass */
 .xclass-title {

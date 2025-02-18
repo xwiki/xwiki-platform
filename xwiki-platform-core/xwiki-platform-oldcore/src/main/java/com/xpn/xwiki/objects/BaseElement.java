@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Objects;
 
 import javax.inject.Provider;
 
@@ -37,6 +38,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.store.merge.MergeManagerResult;
 
@@ -101,7 +103,37 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
-    
+
+    private transient boolean dirty = true;
+
+    /**
+     * @return true of the element was modified (or created)
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
+
+    /**
+     * @param dirty true of the element was modified (or created)
+     * @since 17.1.0RC1
+     * @since 16.10.4
+     * @since 16.4.7
+     */
+    @Unstable
+    public void setDirty(boolean dirty)
+    {
+        this.dirty = dirty;
+
+        if (dirty && this.ownerDocument != null) {
+            this.ownerDocument.setMetaDataDirty(true);
+        }
+    }
+
     /**
      * @return a merge manager instance.
      * @since 11.8RC1
@@ -161,12 +193,18 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     @Override
-    public void setDocumentReference(DocumentReference reference)
+    public void setDocumentReference(DocumentReference documentReference)
     {
-        // If the name is already set then reset it since we're now using a reference
-        this.documentReference = reference;
-        this.name = null;
-        this.referenceCache = null;
+        if (!Objects.equals(documentReference, this.documentReference)) {
+            // If the name is already set then reset it since we're now using a reference
+            this.documentReference = documentReference;
+            this.name = null;
+            this.referenceCache = null;
+
+            if (isDirty()) {
+                setDirty(true);
+            }
+        }
     }
 
     /**
@@ -185,8 +223,12 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
             throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
         }
 
-        this.name = name;
-        this.referenceCache = null;
+        if (!StringUtils.equals(name, this.name)) {
+            this.name = name;
+            this.referenceCache = null;
+
+            setDirty(true);
+        }
     }
 
     public String getPrettyName()
@@ -349,6 +391,8 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
             }
 
             element.setPrettyName(getPrettyName());
+
+            element.dirty = this.dirty;
         } catch (Exception e) {
             // This should not happen
             element = null;
@@ -417,7 +461,13 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
+        if (this.ownerDocument != ownerDocument) {
+            this.ownerDocument = ownerDocument;
+
+            if (this.ownerDocument != null && isDirty()) {
+                this.ownerDocument.setMetaDataDirty(true);
+            }
+        }
     }
 
     /**

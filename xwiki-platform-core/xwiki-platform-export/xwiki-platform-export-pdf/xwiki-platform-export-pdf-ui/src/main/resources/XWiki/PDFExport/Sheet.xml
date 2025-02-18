@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.5" reference="XWiki.PDFExport.Sheet" locale="">
+<xwikidoc version="1.6" reference="XWiki.PDFExport.Sheet" locale="">
   <web>XWiki.PDFExport</web>
   <name>Sheet</name>
   <language/>
@@ -567,6 +567,60 @@ require([
   'xwiki-page-ready',
   'xwiki-export-pdf-config'
 ], function($, pageReady, pdfExportConfig) {
+  // Workaround for a paged.js bug (#267: Missing CSS stylesheets can break the page rendering).
+  // See https://github.com/pagedjs/pagedjs/issues/267
+  const protectAgainstMissingStyleSheets = function() {
+    const missingStyleSheets = [...document.styleSheets].flatMap(getMissingStyleSheets);
+    console.debug('Missing stylesheets: ', missingStyleSheets);
+    const originalOpen = window.XMLHttpRequest.prototype.open;
+    window.XMLHttpRequest.prototype.open = function(...args) {
+      if (missingStyleSheets.includes(args[1])) {
+        // Paged.js needs to reload the stylesheets but unfortunately it doesn't check the response status so it treats
+        // the returned 404 Not Found HTML page as CSS which breaks the page rendering. We avoid this by replacing the
+        // request for the missing stylesheet with a request that gets an empty response.
+        args[1] = new XWiki.Document('MissingStyleSheet', 'XWiki.PDFExport').getURL('get', 'xpage=get');
+      }
+      return originalOpen.call(this, ...args);
+    };
+  };
+
+  function getMissingStyleSheets(styleSheet) {
+    // If a stylesheet has an URL (i.e. it's not inline in the HTML page) but no CSS rules, this usually means the
+    // stylesheet failed to be loaded.
+    const cssRules = getCSSRules(styleSheet);
+    if (cssRules?.length) {
+      return getMissingStyleSheetsFromCSSRules(cssRules);
+    } else if (styleSheet.href) {
+      // We consider stylesheets loaded from a different domain as missing because paged.js fails to load them and
+      // doesn't recover so this breaks the PDF export. This problem is going to be fixed by #267: Missing CSS
+      // stylesheets can break the page rendering.
+      return [styleSheet.href];
+    } else {
+      return [];
+    }
+  }
+
+  function getMissingStyleSheetsFromCSSRules(cssRules) {
+    let missingStyleSheets = [];
+    [...cssRules].forEach(cssRule =&gt; {
+      if (cssRule.href &amp;&amp; cssRule.styleSheet) {
+        missingStyleSheets = missingStyleSheets.concat(getMissingStyleSheets(cssRule.styleSheet));
+      } else if (cssRule.cssRules?.length) {
+        missingStyleSheets = missingStyleSheets.concat(getMissingStyleSheetsFromCSSRules(cssRule.cssRules));
+      }
+    });
+    return missingStyleSheets;
+  }
+
+  function getCSSRules(styleSheet) {
+    try {
+      return styleSheet.cssRules;
+    } catch (e) {
+      // We can't access the CSS rules if the stylesheet is loaded from a different domain.
+      return null;
+    }
+  }
+
   const refactorAnchors = function() {
     // Fix anchors that use relative URLs to point to the right document (that generated that anchor).
     fixRelativeAnchors($('#xwikicontent'));
@@ -856,6 +910,7 @@ require([
 
   // Adjust the exported content before performing the print layout.
   pageReady.afterPageReady(() =&gt; {
+    protectAgainstMissingStyleSheets();
     refactorAnchors();
     removeEmptyTableOfContents();
     validateTableOfContentsAnchors();
@@ -1276,7 +1331,7 @@ require([
         <separators>|, </separators>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <values>action=Action|doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <values>action=Action|doc.reference=Document|doc.revision|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.cookies|request.headers|request.parameters=Request parameters|request.remoteAddr|request.session|request.url=Request URL|request.wiki=Request wiki|sheet|user=User|wiki=Wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </async_context>
       <async_enabled>

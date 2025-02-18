@@ -22,6 +22,7 @@ package org.xwiki.ckeditor.test.ui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.xwiki.ckeditor.test.po.CKEditor;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
@@ -69,8 +70,17 @@ public abstract class AbstractCKEditorIT
 
     protected void assertSourceEquals(String expected)
     {
+        assertSourceEquals(expected, false);
+    }
+
+    protected void assertSourceEquals(String expected, boolean normalizeSpaces)
+    {
         editor.getToolBar().toggleSourceMode();
-        assertEquals(expected, editor.getSourceTextArea().getAttribute("value"));
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        if (actualSource != null && normalizeSpaces) {
+            actualSource = actualSource.replace('\u00A0', ' ');
+        }
+        assertEquals(expected, actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }
@@ -78,8 +88,8 @@ public abstract class AbstractCKEditorIT
     protected void assertSourceContains(String expectedSource)
     {
         editor.getToolBar().toggleSourceMode();
-        String actualSource = editor.getSourceTextArea().getAttribute("value");
-        assertTrue(actualSource.contains(expectedSource), "Unexpected source: " + actualSource);
+        String actualSource = editor.getSourceTextArea().getDomProperty("value");
+        assertTrue(StringUtils.contains(actualSource, expectedSource), "Unexpected source: " + actualSource);
         editor.getToolBar().toggleSourceMode();
         this.textArea = this.editor.getRichTextArea();
     }

@@ -157,6 +157,33 @@
    *###
   #set($mainFields = [])
   ##
+  ## If the admin chose to, we exclude the first and last names to keep it simple.
+  $registrationConfig.useFirstLastNames
+  #if($registrationConfig.useFirstLastNames)
+    ## The first name field.
+    #set($field =
+      {'name' : 'register_first_name',
+        'label' : $services.localization.render('core.register.firstName'),
+        'params' : {
+          'type' : 'text',
+          'size' : '60',
+          'autocomplete' : 'given-name'
+        }
+      })
+    #set($discard = $mainFields.add($field))
+    ##
+    ## The last name field.
+    #set($field =
+      {'name' : 'register_last_name',
+      'label' : $services.localization.render('core.register.lastName'),
+      'params' : {
+        'type' : 'text',
+        'size' : '60',
+        'autocomplete' : 'family-name'
+        }
+      })
+    #set($discard = $mainFields.add($field))
+  #end
   ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
   #set($field =
     {'name' : 'xwikiname',
@@ -246,31 +273,6 @@
     $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
   #end
   *********###
-  #set($aboutYouFields = [])
-  ##
-  ## The first name field, no checking.
-  #set($field =
-    {'name' : 'register_first_name',
-      'label' : $services.localization.render('core.register.firstName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'given-name'
-      }
-    })
-  #set($discard = $aboutYouFields.add($field))
-  ##
-  ## The last name field, no checking.
-  #set($field =
-    {'name' : 'register_last_name',
-      'label' : $services.localization.render('core.register.lastName'),
-      'params' : {
-        'type' : 'text',
-        'size' : '60',
-        'autocomplete' : 'family-name'
-      }
-    })
-  #set($discard = $aboutYouFields.add($field))
   ##
   ## To disable the CAPTCHA on this page, comment out the next entry.
   ## The CAPTCHA, not really an input field but still defined the same way.
@@ -297,7 +299,7 @@
         },
         'noReturn' : true
       })
-    #set($discard = $aboutYouFields.add($field))
+    #set($discard = $mainFields.add($field))
   #end
   ## Pass the redirect parameter on so that the login page may redirect to the right place.
   ## Not necessary in Firefox 3.0.10 or Opera 9.64, I don't know about IE or Safari.
@@ -307,10 +309,8 @@
         'type' : 'hidden'
       }
     })
-  #set($discard = $aboutYouFields.add($field))
-  #set($fields = [])
-  #set($discard = $fields.addAll($mainFields))
-  #set($discard = $fields.addAll($aboutYouFields))
+  #set($discard = $mainFields.add($field))
+  #set($fields = $mainFields)
   ##
   #######################################################################
   ## The Code.
@@ -373,8 +373,6 @@
         &lt;/div&gt;
         ## Note that the macro inject the form_token field.
         #generateHtml($mainFields, $request, 'false')
-        &lt;h2&gt;$services.localization.render('core.register.aboutYou')&lt;/h2&gt;
-        #generateHtml($aboutYouFields, $request, 'false')
         &lt;input type="hidden" name="form_token" value="$services.csrf.getToken()" /&gt;
         #generateJavascript($fields)
         &lt;p class="buttons"&gt;
@@ -532,7 +530,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>defaultRedirect</name>
-      <number>7</number>
+      <number>8</number>
       <picker>0</picker>
       <prettyName>Redirect here after registration</prettyName>
       <size>30</size>
@@ -563,7 +561,7 @@
       <displayType/>
       <hint/>
       <name>loginButton_autoLogin_enabled</name>
-      <number>6</number>
+      <number>7</number>
       <prettyName>Enable automatic login</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -578,7 +576,7 @@
       <displayType/>
       <hint/>
       <name>loginButton_enabled</name>
-      <number>5</number>
+      <number>6</number>
       <prettyName>Enable login button</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -590,7 +588,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>passwordLength</name>
-      <number>10</number>
+      <number>11</number>
       <numberType>integer</numberType>
       <prettyName>Require a password with the given length</prettyName>
       <size>10</size>
@@ -607,7 +605,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneLowerCaseEnabled</name>
-      <number>11</number>
+      <number>12</number>
       <prettyName>Require at least one lower case character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -622,7 +620,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneNumberEnabled</name>
-      <number>13</number>
+      <number>14</number>
       <prettyName>Require at least one number in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -637,7 +635,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneSymbolEnabled</name>
-      <number>14</number>
+      <number>15</number>
       <prettyName>Require at least one symbol character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -652,13 +650,28 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneUpperCaseEnabled</name>
-      <number>12</number>
+      <number>13</number>
       <prettyName>Require at least one upper case character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </passwordRuleOneUpperCaseEnabled>
+    <registrationFirstLastNameEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>registrationFirstLastNameEnabled</name>
+      <number>3</number>
+      <prettyName>Include first and last name fields in the registration form</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </registrationFirstLastNameEnabled>
     <registrationSuccessMessage>
       <contenttype>---</contenttype>
       <customDisplay/>
@@ -666,7 +679,7 @@
       <editor>PureText</editor>
       <hint/>
       <name>registrationSuccessMessage</name>
-      <number>9</number>
+      <number>10</number>
       <picker>0</picker>
       <prettyName>Registration Successful Message</prettyName>
       <restricted>0</restricted>
@@ -685,7 +698,7 @@
       <displayType/>
       <hint/>
       <name>requireCaptcha</name>
-      <number>8</number>
+      <number>9</number>
       <prettyName>Require CAPTCHA to register</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -731,7 +744,7 @@
         <displayFormType>select</displayFormType>
         <displayType>allow</displayType>
         <name>allow</name>
-        <number>4</number>
+        <number>5</number>
         <prettyName>Allow/Deny</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -771,7 +784,7 @@
         <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
-        <number>3</number>
+        <number>4</number>
         <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>

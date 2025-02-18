@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authentication.RegistrationConfiguration;
 import org.xwiki.security.script.SecurityScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Script service for accessing configuration related to registration.
@@ -102,5 +103,14 @@ public class RegistrationScriptService implements ScriptService
     public boolean isLoginEnabled()
     {
         return this.registrationConfiguration.isLoginEnabled();
+    }
+    /**
+     * @since 17.1.0
+     * @return {@code true} if the registration form should propose to edit the first and last names.
+     */
+    @Unstable
+    public boolean isFirstLastNameEnabled()
+    {
+        return this.registrationConfiguration.isFirstLastNameEnabled();
     }
 }

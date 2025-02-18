@@ -652,10 +652,10 @@ editors.XDataEditors = Class.create({
     if (objectContent.childElementCount === 0) {
       object.addClassName('collapsed');
     }
-    var objectTitle = object.down('.xobject-title');
+    var objectToggle = object.down('.xobject-title h3 button');
     var xclassName = this.getXClassNameFromXObjectId(object.id);
     var xObjectNumber = this.getXObjectNumberFromXObjectId(object.id);
-    objectTitle.observe('click', function(event) {
+    objectToggle.observe('click', function() {
       var isAlreadyLoaded = objectContent.childElementCount > 0;
       if (!isAlreadyLoaded && !object.hasClassName('loading')) {
         object.addClassName('loading');
@@ -750,14 +750,45 @@ editors.XDataEditors = Class.create({
     });
     // Create and insert move button
     element.select('.xproperty-title .tools').each(function(item) {
-      var movebutton = new Element('span', {
-        'class': 'tool move',
+      var movebutton = new Element('button', {
+        'class': 'btn btn-secondary btn-xs tool move',
         title: $jsontool.serialize($services.localization.render('core.editors.class.moveProperty.handle.label'))
-      }).update($jsontool.serialize($services.icon.renderHTML('reposition')));
+      }).update('<span class="sr-only">' +
+        $jsontool.serialize($services.localization.render('core.editors.class.moveProperty.handle.label')) +
+        '</span>' +
+        $jsontool.serialize($services.icon.renderHTML('reposition')));
       item.makePositioned();
       item.appendChild(movebutton);
       movebutton.observe('click', function(event) {
         event.stop();
+      }.bindAsEventListener());
+      // Extend the Sortable items with arrow keys support
+      movebutton.observe('keydown', function(event){
+        // We only do something when the key is ArrowUp (keyCode: 38) or ArrowDown (keyCode: 40)
+        if (![38, 40].includes(event.keyCode)) { return; }
+        var sequence = Sortable.sequence($('xclassContent'));
+        var sequenceLength = sequence.length;
+        var item = event.target.parentElement.parentElement.parentElement;
+        /* We need to recompute the name of the entry similarly to what's done in scriptaculous
+          to make sure it matches the one we get in the sequence. 
+          See https://github.com/madrobby/scriptaculous/blob/b0a8422f7f6f2e2e17f0d5ddfef1d9a6f5428472/src/dragdrop.js#L592 
+          for the source of the format regex. */
+        let format = /^[^_\-](?:[A-Za-z0-9\-\_]*)[_](.*)$/;
+        let currentElementName = item.id.match(format) ? item.id.match(format)[1] : '';
+        let currentElementIndex = sequence.indexOf(currentElementName);
+        let swapWithIndex;
+        if (event.keyCode === 38) { // UP ARROW
+          swapWithIndex = (currentElementIndex + sequenceLength - 1) % sequenceLength;
+        } else if (event.keyCode === 40) { // DOWN ARROW
+          swapWithIndex = (currentElementIndex + sequenceLength + 1) % sequenceLength;
+        }
+        [ sequence[currentElementIndex], sequence[swapWithIndex] ] = [ sequence[swapWithIndex], sequence[currentElementIndex] ];
+        /* We update the content of the sortable object.*/
+        Sortable.setSequence($('xclassContent'), sequence);
+        /* We make sure to trigger the listener that should be called with such an update. */
+        Sortable.sortables['xclassContent'].onUpdate(Sortable.sortables['xclassContent'].containment);
+        /* We refocus the element, so that the focus isn't lost when moving it. */
+        event.target.focus();
       }.bindAsEventListener());
     });
     // Attach behavior to the move buttons

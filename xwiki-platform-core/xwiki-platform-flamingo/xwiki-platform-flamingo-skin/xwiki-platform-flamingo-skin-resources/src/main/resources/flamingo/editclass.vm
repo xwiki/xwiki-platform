@@ -126,12 +126,12 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
  *#
 #macro(addPropertyForm)
   <div id="add_xproperty" class="add_xproperty">
-    <div class="xeditor-input-group">
+    <div>
       $services.icon.renderHTML('add')
       <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
       <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
     </div>
-    <div class="xeditor-input-group">
+    <div>
       <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>
       <select id="proptype" name="proptype" size="1">
         #foreach($prop in $xwiki.metaclass.properties)

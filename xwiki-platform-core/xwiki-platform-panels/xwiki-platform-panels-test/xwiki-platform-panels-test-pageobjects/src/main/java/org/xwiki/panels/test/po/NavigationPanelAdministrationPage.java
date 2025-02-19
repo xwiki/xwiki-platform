@@ -226,7 +226,7 @@ public class NavigationPanelAdministrationPage extends ViewPage
     }
 
     /**
-     * Drag the given page before the second page argument. Note that performing the drag&drop should also perform a
+     * Drag the given page before the second page argument. Note that performing the drag&amp;drop should also perform a
      * pin.
      * @param pageTitleToDrag the title of the page to drag
      * @param pageTitleToDropBefore the title of the page before which to drag

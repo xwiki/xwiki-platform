@@ -395,7 +395,10 @@ public class XWikiCacheStore extends AbstractXWikiStore
                 cachedoc = null;
             }
 
-            if (cachedoc != null) {
+            // Return the document from the cache only if it was not modified.
+            // The reason is that a modified cache document has, bad definition, been corrupted and cannot be trusted to
+            // accurately represent what is stored in the database.
+            if (cachedoc != null && !cachedoc.isMetaDataDirty()) {
                 cachedoc.setFromCache(true);
 
                 LOGGER.debug("Document [{}] was retrieved from cache", key);

@@ -105,6 +105,7 @@ import org.xwiki.link.LinkException;
 import org.xwiki.link.LinkStore;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.DefaultDocumentAuthors;
@@ -2428,6 +2429,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
 
     public void setMetaDataDirty(boolean metaDataDirty)
     {
+        if (metaDataDirty && !this.isMetaDataDirty && isCached()) {
+            // Warn about abusive modification of cached document
+            LoggerConfiguration loggerConfiguration = Utils.getComponent(LoggerConfiguration.class);
+            String logMessage = "Abusive modification of the cached document [{}]";
+            IllegalStateException exception = new IllegalStateException("Abusive modification of the cached document");
+            if (loggerConfiguration.isDeprecatedLogEnabled()) {
+                // We generally don't print a stack trace in case of warning log, but in this specific case the warning
+                // is almost useless without a way to know what code is responsible for this call
+                LOGGER.warn(logMessage, getDocumentReferenceWithLocale(), exception);
+            } else {
+                LOGGER.debug(logMessage, getDocumentReferenceWithLocale(), exception);
+            }
+        }
+
         this.isMetaDataDirty = metaDataDirty;
     }
 

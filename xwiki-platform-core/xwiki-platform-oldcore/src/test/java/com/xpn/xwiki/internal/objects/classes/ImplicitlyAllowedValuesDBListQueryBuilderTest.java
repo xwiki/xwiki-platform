@@ -19,21 +19,32 @@
  */
 package com.xpn.xwiki.internal.objects.classes;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.xwiki.mail.GeneralMailConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryBuilder;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.DBTreeListClass;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,24 +55,32 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 9.8RC1
  */
-public class ImplicitlyAllowedValuesDBListQueryBuilderTest
+@OldcoreTest
+@ReferenceComponentList
+@SuppressWarnings("checkstyle:MultipleStringLiterals")
+class ImplicitlyAllowedValuesDBListQueryBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<QueryBuilder<DBListClass>> mocker =
-        new MockitoComponentMockingRule<QueryBuilder<DBListClass>>(ImplicitlyAllowedValuesDBListQueryBuilder.class);
+    @InjectMockComponents
+    private ImplicitlyAllowedValuesDBListQueryBuilder implicitlyAllowedValuesDBListQueryBuilder;
 
+    @MockComponent
     private QueryManager queryManager;
 
+    @MockComponent
+    @Named("viewableAllowedDBListPropertyValue")
     private QueryFilter viewableValueFilter;
+
+    @MockComponent
+    private GeneralMailConfiguration mailConfiguration;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private DBListClass dbListClass = new DBListClass();
 
-    @Before
-    public void configure() throws Exception
+    @BeforeEach
+    void configure()
     {
-        this.queryManager = this.mocker.getInstance(QueryManager.class);
-        this.viewableValueFilter = this.mocker.getInstance(QueryFilter.class, "viewableAllowedDBListPropertyValue");
-
         XWikiDocument ownerDocument = mock(XWikiDocument.class);
         when(ownerDocument.getDocumentReference()).thenReturn(new DocumentReference("tests", "Some", "Page"));
         this.dbListClass.setOwnerDocument(ownerDocument);
@@ -72,12 +91,12 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
         Query query = mock(Query.class);
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(query);
 
-        assertSame(query, this.mocker.getComponentUnderTest().build(this.dbListClass));
+        assertSame(query, this.implicitlyAllowedValuesDBListQueryBuilder.build(this.dbListClass));
         return query;
     }
 
     @Test
-    public void buildDefaultQuery() throws Exception
+    void buildDefaultQuery() throws Exception
     {
         Query query = assertQuery("select doc.name from XWikiDocument doc where 1 = 0");
 
@@ -86,7 +105,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithClassName() throws Exception
+    void buildWithClassName() throws Exception
     {
         this.dbListClass.setClassname("Blog.CategoryClass");
 
@@ -98,7 +117,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithId() throws Exception
+    void buildWithId() throws Exception
     {
         this.dbListClass.setIdField("doc.name");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc");
@@ -112,7 +131,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithValue() throws Exception
+    void buildWithValue() throws Exception
     {
         this.dbListClass.setValueField("doc.name");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.name from XWikiDocument as doc");
@@ -126,7 +145,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithIdAndClassName() throws Exception
+    void buildWithIdAndClassName() throws Exception
     {
         this.dbListClass.setClassname("XWiki.XWikiUsers");
         this.dbListClass.setIdField("doc.name");
@@ -150,7 +169,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithIdAndValue() throws Exception
+    void buildWithIdAndValue() throws Exception
     {
         this.dbListClass.setIdField("doc.name");
         this.dbListClass.setValueField("doc.name");
@@ -200,7 +219,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithIdValueAndClassName() throws Exception
+    void buildWithIdValueAndClassName() throws Exception
     {
         this.dbListClass.setClassname("XWiki.TagClass");
         this.dbListClass.setIdField("doc.name");
@@ -275,7 +294,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
     }
 
     @Test
-    public void buildWithParent() throws Exception
+    void buildWithParent() throws Exception
     {
         DBTreeListClass dbTreeListClass = new DBTreeListClass();
         dbTreeListClass.setOwnerDocument(this.dbListClass.getOwnerDocument());
@@ -292,7 +311,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
         this.dbListClass.setValueField("title");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
             + " from XWikiDocument as doc");
-        
+
         this.dbListClass.setIdField("title");
         assertQuery("select distinct doc.fullName as unfilterable0, doc.title, doc.title, doc.parent"
             + " from XWikiDocument as doc");
@@ -308,5 +327,72 @@ public class ImplicitlyAllowedValuesDBListQueryBuilderTest
             + " doc.fullName <> :templateName and obj.id = idProp.id.id and idProp.id.name = :idProp and"
             + " obj.id = valueProp.id.id and valueProp.id.name = :valueProp and obj.id = parentProp.id.id and"
             + " parentProp.id.name = :parentProp");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "doc.invalid, other", "foo, bar", "obj.a, b" })
+    void buildWithInvalidId(String field)
+    {
+        this.dbListClass.setIdField(field);
+        QueryException queryException = assertThrows(QueryException.class, () -> assertQuery(null));
+        assertEquals("Invalid field name [%s]".formatted(field), queryException.getMessage());
+        this.dbListClass.setIdField("");
+
+        this.dbListClass.setValueField(field);
+        queryException = assertThrows(QueryException.class, () -> assertQuery(null));
+        assertEquals("Invalid field name [%s]".formatted(field), queryException.getMessage());
+    }
+
+    @Test
+    void buildWithPasswordField() throws Exception
+    {
+        DocumentReference classReference = new DocumentReference("tests", "Space", "XClass");
+        XWikiDocument classDocument =
+            this.oldcore.getSpyXWiki().getDocument(classReference, this.oldcore.getXWikiContext());
+        String fieldName = "passwordField";
+        classDocument.getXClass().addPasswordField(fieldName, "My Password", 10);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, "Add password field", this.oldcore.getXWikiContext());
+
+        this.dbListClass.setIdField(fieldName);
+        this.dbListClass.setClassname("Space.XClass");
+        QueryException queryException = assertThrows(QueryException.class, () -> assertQuery(null));
+
+        assertEquals("Queries for password field [passwordField] on class [Space.XClass] aren't allowed",
+            queryException.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { true, false })
+    void buildWithEmailField(boolean obfuscate) throws Exception
+    {
+        when(this.mailConfiguration.shouldObfuscate()).thenReturn(obfuscate);
+
+        DocumentReference classReference = new DocumentReference("tests", "Space", "XClass");
+        XWikiDocument classDocument =
+            this.oldcore.getSpyXWiki().getDocument(classReference, this.oldcore.getXWikiContext());
+        String fieldName = "emailField";
+        classDocument.getXClass().addEmailField(fieldName, "My Email", 10);
+        this.oldcore.getSpyXWiki().saveDocument(classDocument, "Add email field", this.oldcore.getXWikiContext());
+
+        this.dbListClass.setIdField(fieldName);
+        this.dbListClass.setClassname("Space.XClass");
+
+        if (obfuscate) {
+            QueryException queryException = assertThrows(QueryException.class, () -> assertQuery(null));
+            assertEquals(
+                "Queries for email property [emailField] on class [Space.XClass] aren't allowed as email"
+                    + " obfuscation is enabled.",
+                queryException.getMessage());
+        } else {
+            Query query =
+                assertQuery(
+                    "select distinct doc.fullName as unfilterable0, idProp.value from XWikiDocument as doc, "
+                        + "BaseObject as obj, StringProperty as idProp where doc.fullName = obj.name and "
+                        + "obj.className = :className and doc.fullName <> :templateName and obj.id = idProp.id.id "
+                        + "and idProp.id.name = :idProp");
+            verify(query).bindValue("className", "Space.XClass");
+            verify(query).bindValue("templateName", "Space.XTemplate");
+            verify(query).bindValue("idProp", fieldName);
+        }
     }
 }

@@ -40,7 +40,9 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 14.5
  * @since 14.4.1
+ * @deprecated use {@link HttpSessionDestroyedEvent} instead
  */
+@Deprecated(since = "17.1.0RC1")
 public class SessionDestroyedEvent implements Event
 {
     @Override

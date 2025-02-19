@@ -568,6 +568,17 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
+    void testCloneIdentical()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
+        document.setChangeTracked(true);
+
+        XWikiDocument clonedDocument = document.clone();
+
+        assertTrue(clonedDocument.isChangeTracked());
+    }
+
+    @Test
     void testCloneNullObjects()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", DOCSPACE, DOCNAME));
@@ -1804,5 +1815,22 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(Set.of(backlink1, backlink21.withoutLocale()),
             new HashSet<>(doc.getBackLinkedReferences(this.oldcore.getXWikiContext())));
+    }
+
+    @Test
+    void getXClassDoesNotChangeDirtyFlagWhenEmpty()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setMetaDataDirty(false);
+        document.setContentDirty(false);
+
+        BaseClass xClass = document.getXClass();
+
+        assertNotNull(xClass);
+
+        assertFalse(xClass.isDirty());
+        assertFalse(document.isMetaDataDirty());
+        assertFalse(document.isContentDirty());
     }
 }

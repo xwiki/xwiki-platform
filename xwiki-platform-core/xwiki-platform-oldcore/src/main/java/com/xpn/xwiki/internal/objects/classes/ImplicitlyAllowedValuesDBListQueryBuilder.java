@@ -52,23 +52,23 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
 {
     private static final class DBListQuerySpec
     {
-        public String wiki;
+        private String wiki;
 
-        public String className;
+        private String className;
 
-        public String idField;
+        private String idField;
 
-        public String valueField;
+        private String valueField;
 
-        public String parentField;
+        private String parentField;
 
-        public boolean hasClassName;
+        private boolean hasClassName;
 
-        public boolean hasIdField;
+        private boolean hasIdField;
 
-        public boolean hasValueField;
+        private boolean hasValueField;
 
-        public boolean hasParentField;
+        private boolean hasParentField;
     }
 
     private static final String DOC_PREFIX = "doc.";

@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>17.1.0-SNAPSHOT</version>
+    <version>17.2.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>17.1.0-SNAPSHOT</version>
+  <version>17.2.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform modules -->
@@ -55,13 +55,13 @@
     <!-- Dependencies versions -->
     <batik.version>1.18</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>2.9.2</tika.version>
-    <pdfbox.version>2.0.31</pdfbox.version>
+    <tika.version>2.9.3</tika.version>
+    <pdfbox.version>2.0.33</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
     <jetty.server.version>12.0.16</jetty.server.version>
     <jetty.client.version>10.0.24</jetty.client.version>
     <jetty.version>${jetty.client.version}</jetty.version>
-    <netty.version>4.1.117.Final</netty.version>
+    <netty.version>4.1.118.Final</netty.version>
     <hibernate.version>5.6.15.Final</hibernate.version>
     <dockerJava.version>3.4.1</dockerJava.version>
     <cvssCalculator.version>1.4.3</cvssCalculator.version>
@@ -113,7 +113,7 @@
     <mysql.version>9.2.0</mysql.version>
     <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
     <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
-    <mariadb.version>3.5.1</mariadb.version>
+    <mariadb.version>3.5.2</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
@@ -125,8 +125,8 @@
     <oracle.version>21.17.0.0</oracle.version>
     
     <!-- Versions of Node related tools -->
-    <node.version>v20.12.0</node.version>
-    <npm.version>10.5.1</npm.version>
+    <node.version>v22.13.1</node.version>
+    <npm.version>11.1.0</npm.version>
   </properties>
   <scm>
     <tag>HEAD</tag>
@@ -146,7 +146,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>mchange-commons-java</artifactId>
-        <version>0.3.1</version>
+        <version>0.3.2</version>
       </dependency>
       <dependency>
         <groupId>com.mchange</groupId>
@@ -178,7 +178,7 @@
       <dependency>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
-        <version>4.31.0</version>
+        <version>4.31.1</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>

@@ -57,5 +57,15 @@
   "engines": {
     "node": "22.13.1"
   },
-  "packageManager": "pnpm@10.2.1"
+  "packageManager": "pnpm@10.2.1",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "esbuild",
+      "nx",
+      "vue-demi"
+    ],
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
+  }
 }

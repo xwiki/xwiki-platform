@@ -37,7 +37,6 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -52,8 +51,7 @@ import org.xwiki.security.authorization.Right;
  */
 @Component
 @Named("org.xwiki.index.internal.tree.pinned.DefaultPinnedChildPagesResource")
-public class DefaultPinnedChildPagesResource extends XWikiResource
-    implements PinnedChildPagesResource, XWikiRestComponent
+public class DefaultPinnedChildPagesResource extends XWikiResource implements PinnedChildPagesResource
 {
     @Inject
     private PinnedChildPagesManager pinnedChildPagesManager;

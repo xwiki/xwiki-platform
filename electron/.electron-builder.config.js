@@ -50,6 +50,11 @@ module.exports = async function () {
       executableName: "cristal",
       category: "Application",
     },
+    flatpak: {
+      artifactName: "${productName}-${version}-linux-${arch}.${ext}",
+      category: "Application",
+      mimeTypes: null,
+    },
     mac: {
       artifactName: "${productName}-${version}-mac-${arch}.${ext}",
       executableName: "cristal",

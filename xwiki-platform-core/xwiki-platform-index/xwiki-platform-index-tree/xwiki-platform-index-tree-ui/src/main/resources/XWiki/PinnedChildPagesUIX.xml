@@ -820,13 +820,11 @@ require([
     &lt;input type="hidden" name="pinnedPages" value="$escapetool.xml($jsontool.serialize($serializedPinnedPages))" /&gt;
   &lt;/div&gt;
   {{/html}}
-  (% class="row" %)(((
-    (% class="col-sm-12" %)(((
-      #displayNavigationPanel
-      {{info}}{{translation key="index.tree.pinnedChildPages.topLevelHint" /}}{{/info}}
-    )))
-  )))
+  
+  {{info}}{{translation key="index.tree.pinnedChildPages.topLevelHint" /}}{{/info}}
+  
   {{html}}
+  #displayNavigationPanel
   &lt;div class="admin-buttons"&gt;
   &lt;input type="button" value="Save" class="btn btn-primary" /&gt;
   &lt;/div&gt;
@@ -834,9 +832,9 @@ require([
 #end
 
 #macro (displayNavigationPanel)
-  #navigationPanelHeader($services.localization.render('xe.panels.navigation'))
   #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
-  {{html clean="false"}}
+  &lt;div class="panel expanded"&gt;
+  &lt;div class="xwikipanelcontents"&gt;
   #documentTree({
     'dragAndDrop': true,
     'root': "document:$openToDoc",
@@ -844,8 +842,8 @@ require([
     'showAttachments': false,
     'compact': true
   })
-  {{/html}}
-  #panelfooter()
+  &lt;/div&gt;
+  &lt;/div&gt;
 #end
 {{/velocity}}
 

@@ -62,7 +62,7 @@ class CristalAppLoader extends CristalLoader {
     this.cristal.setAvailableConfigurations(config);
 
     await handleCallback(this.cristal.getContainer());
-    configName = this.resolveCurrentConfiguration(isElectron);
+    configName = this.resolveCurrentConfiguration(isElectron, config);
 
     let wikiConfig = this.cristal.getAvailableConfigurations().get(configName);
     if (wikiConfig == null) {
@@ -116,7 +116,7 @@ class CristalAppLoader extends CristalLoader {
         this.container,
         staticMode,
         additionalComponents,
-        config[this.resolveCurrentConfiguration(isElectron)],
+        config[this.resolveCurrentConfiguration(isElectron, config)],
       );
     }
 
@@ -156,13 +156,13 @@ class CristalAppLoader extends CristalLoader {
     );
   }
 
-  private resolveCurrentConfiguration(isElectron: boolean) {
+  private resolveCurrentConfiguration(
+    isElectron: boolean,
+    config: Configurations,
+  ) {
     if (isElectron) {
       const localConfigName = window.localStorage.getItem("currentApp");
-      if (
-        localConfigName != null &&
-        this.cristal.getAvailableConfigurations().has(localConfigName)
-      ) {
+      if (localConfigName != null && config[localConfigName]) {
         return localConfigName;
       } else {
         return "FileSystemSL";

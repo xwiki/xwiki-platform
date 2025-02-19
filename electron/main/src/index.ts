@@ -30,6 +30,10 @@ import load from "@xwiki/cristal-electron-storage/main";
 import { BrowserWindow, app } from "electron";
 import { platform } from "node:process";
 
+// Set up IPC listener for configuration loading before the app actually starts
+// It needs to be setup before the preload script runs, which means the first window mustn't have been created
+loadConfiguration();
+
 /**
  * Prevent electron from running multiple instances.
  */
@@ -69,7 +73,6 @@ app
     restoreOrCreateWindow().then((w) => {
       loadBrowser(w);
       loadAuthentication(w, loadFile);
-      loadConfiguration();
     });
     /**
      * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.

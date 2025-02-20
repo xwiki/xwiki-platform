@@ -159,10 +159,12 @@ class CreateInlinePageTest extends PageTest
 
         String expectedMessage;
         if (allowedSpaces.size() == 1) {
-            expectedMessage = String.format("core.create.template.allowedspace.inline [%s, %s]",
+            expectedMessage = String.format("$services.icon.renderHTML($iconName) error " 
+                + "core.create.template.allowedspace.inline [%s, %s]",
                 provider, allowedSpaces.get(0));
         } else {
-            expectedMessage = String.format("core.create.template.allowedspaces.inline [%s, %s]",
+            expectedMessage = String.format("$services.icon.renderHTML($iconName) error "
+                + "core.create.template.allowedspaces.inline [%s, %s]",
                 provider, allowedSpaces);
         }
         assertEquals(expectedMessage, errormessage.text());

@@ -31,7 +31,7 @@ import org.xwiki.attachment.internal.DefaultAttachmentsManager;
 import org.xwiki.attachment.internal.configuration.DefaultAttachmentConfiguration;
 import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
-import org.xwiki.icon.IconManagerScriptServiceComponentList;
+import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
@@ -60,7 +60,6 @@ import static org.mockito.Mockito.when;
  * @since 14.0RC1
  */
 @SecurityScriptServiceComponentList
-@IconManagerScriptServiceComponentList
 @ComponentList({
     ModelScriptService.class,
     AttachmentScriptService.class,
@@ -153,7 +152,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("error: attachment.move.targetNotWritable",
+        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.targetNotWritable",
             render.getElementsByClass("errormessage").get(0).text());
     }
 
@@ -164,7 +163,8 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
         this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("error: attachment.move.emptyName", render.select(".errormessage").text());
+        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.emptyName", 
+            render.select(".errormessage").text());
     }
 
     @Test
@@ -194,7 +194,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("error: attachment.move.alreadyExists "
+        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.alreadyExists "
                 + "[attachment.txt, Space.Target\"', /xwiki/bin/view/Space/Target%22%27]",
             render.getElementsByClass("errormessage").get(0).text());
     }

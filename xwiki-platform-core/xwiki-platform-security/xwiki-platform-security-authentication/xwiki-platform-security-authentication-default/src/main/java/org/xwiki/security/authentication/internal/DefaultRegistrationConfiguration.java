@@ -97,10 +97,4 @@ public class DefaultRegistrationConfiguration implements RegistrationConfigurati
     {
         return configuration.getProperty("loginButton_enabled", 1) == 1;
     }
-
-    @Override
-    public boolean isFirstLastNameEnabled()
-    {
-        return configuration.getProperty("registrationFirstLastNameEnabled", 0) == 1;
-    }
 }

@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define the various configuration options for registration.
@@ -109,11 +108,4 @@ public interface RegistrationConfiguration
      * @return {@code true} if there's a mechanism to login in single click after registration.
      */
     boolean isLoginEnabled();
-
-    /**
-     * @since 17.1.0
-     * @return {@code true} if the registration form should propose to edit the first and last names.
-     */
-    @Unstable
-    boolean isFirstLastNameEnabled();
 }

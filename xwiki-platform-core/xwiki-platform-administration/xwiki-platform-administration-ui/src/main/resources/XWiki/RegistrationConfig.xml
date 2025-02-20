@@ -442,21 +442,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </passwordRuleOneUpperCaseEnabled>
-      <registrationFirstLastNameEnabled>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>checkbox</displayFormType>
-        <displayType/>
-        <hint/>
-        <name>registrationFirstLastNameEnabled</name>
-        <number>3</number>
-        <prettyName>Include first and last name fields in the registration form</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </registrationFirstLastNameEnabled>
       <registrationSuccessMessage>
         <contenttype>---</contenttype>
         <customDisplay/>
@@ -535,9 +520,6 @@
     </property>
     <property>
       <passwordRuleOneUpperCaseEnabled>0</passwordRuleOneUpperCaseEnabled>
-    </property>
-    <property>
-      <registrationFirstLastNameEnabled>0</registrationFirstLastNameEnabled>
     </property>
     <property>
       <registrationSuccessMessage>#set($discard = $xwiki.ssx.use("XWiki.RegistrationConfig"))

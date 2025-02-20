@@ -145,6 +145,8 @@
    *   error - This is used to pass back any error message from the server side code.
    *
    * NOTE: This template uses a registration method which requires:
+   *        * register_first_name
+   *        * register_last_name 
    *        * xwikiname
    *        * register_password
    *        * register2_password
@@ -154,33 +156,30 @@
    *
    *###
   #set($mainFields = [])
-  ##
-  ## If the admin chose to, we exclude the first and last names to keep the form simple.
-  #if($registrationConfig.useFirstLastNames)
-    ## The first name field.
-    #set($field =
-      {'name' : 'register_first_name',
-        'label' : $services.localization.render('core.register.firstName'),
-        'params' : {
-          'type' : 'text',
-          'size' : '60',
-          'autocomplete' : 'given-name'
-        }
-      })
-    #set($discard = $mainFields.add($field))
-    ##
-    ## The last name field.
-    #set($field =
-      {'name' : 'register_last_name',
-      'label' : $services.localization.render('core.register.lastName'),
+
+  ## The first name field.
+  #set($field =
+    {'name' : 'register_first_name',
+      'label' : $services.localization.render('core.register.firstName'),
       'params' : {
         'type' : 'text',
         'size' : '60',
-        'autocomplete' : 'family-name'
-        }
-      })
-    #set($discard = $mainFields.add($field))
-  #end
+        'autocomplete' : 'given-name'
+      }
+    })
+  #set($discard = $mainFields.add($field))
+  ##
+  ## The last name field.
+  #set($field =
+    {'name' : 'register_last_name',
+    'label' : $services.localization.render('core.register.lastName'),
+    'params' : {
+      'type' : 'text',
+      'size' : '60',
+      'autocomplete' : 'family-name'
+      }
+    })
+  #set($discard = $mainFields.add($field))
   ## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
   #set($field =
     {'name' : 'xwikiname',

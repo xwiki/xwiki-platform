@@ -483,7 +483,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #set($registrationConfig.autoLogin = $services.security.registration.isAutoLoginEnabled())
   #set($registrationConfig.requireCaptcha = $services.security.registration.isCaptchaRequired())
   #set($registrationConfig.useEmailVerification = $services.security.registration.isEmailValidationRequired())
-  #set($registrationConfig.useFirstLastNames = $services.security.registration.isFirstLastNameEnabled())
   #_loadPasswordOptions($passwordOptions)
   #set ($registrationConfig.passwordOptions = $passwordOptions)
   ## FIXME: All remaining values should probably also be retrieved from API

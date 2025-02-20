@@ -782,12 +782,9 @@ function noaccent(txt) {
  * @return
  */
 function prepareName(form) {
-    var fname = form.register_first_name?.value;
-    var lname = form.register_last_name?.value;
+    var fname = form.register_first_name.value;
+    var lname = form.register_last_name.value;
     var cxwikiname = form.xwikiname;
-    /* We want to fallback to an empty string even if the fields are not found. */
-    fname = fname ? fname : "";
-    lname = lname ? lname : "";
     if (fname != "") {
         fname = fname.substring(0,1).toUpperCase() + fname.substring(1);
     }

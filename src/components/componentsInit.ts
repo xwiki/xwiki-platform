@@ -19,16 +19,20 @@
  */
 
 import { name } from "@xwiki/cristal-hierarchy-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { getRestSpacesApiUrl } from "@xwiki/cristal-xwiki-utils";
 import { Container, inject, injectable, named } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { StorageProvider } from "@xwiki/cristal-backend-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
-import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
 import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 
@@ -61,14 +65,11 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
   async getPageHierarchy(
-    pageData: PageData,
+    page: DocumentReference | SpaceReference,
   ): Promise<Array<PageHierarchyItem>> {
-    const documentId = pageData.document.getIdentifier();
-    if (documentId == null) {
-      this.logger.debug(
-        `No identifier found for page ${pageData.name}, falling back to default hierarchy resolver.`,
-      );
-      return this.defaultHierarchyResolver.getPageHierarchy(pageData);
+    let documentId = this.referenceSerializer.serialize(page)!;
+    if (page.type == EntityType.SPACE) {
+      documentId += ".WebHome";
     }
     // TODO: support subwikis.
     const restApiUrl = getRestSpacesApiUrl(
@@ -121,9 +122,9 @@ class XWikiPageHierarchyResolver implements PageHierarchyResolver {
     } catch (error) {
       this.logger.error(error);
       this.logger.debug(
-        `Could not load hierarchy for page ${pageData.name}, falling back to default hierarchy resolver.`,
+        `Could not load hierarchy for page ${documentId}, falling back to default hierarchy resolver.`,
       );
-      return this.defaultHierarchyResolver.getPageHierarchy(pageData);
+      return this.defaultHierarchyResolver.getPageHierarchy(page);
     }
   }
 }

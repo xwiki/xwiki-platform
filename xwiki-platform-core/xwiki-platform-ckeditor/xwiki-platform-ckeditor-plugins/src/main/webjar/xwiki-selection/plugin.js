@@ -661,20 +661,41 @@ define('textSelection', ['jquery', 'xwiki-diff-service', 'scrollUtils'], functio
   }
 
   function scrollSelectionIntoView(element, range) {
+    const padding = 65;
     if (isTextInput(element)) {
       // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
-      var fullText = element.value;
+      const fullText = element.value;
+      const styleBackup = element.style.cssText;
+      // Determine the scroll offset corresponding to the start and end of the text selection.
+      element.style.height = element.style.minHeight = 0;
+      element.style.overflowY = 'hidden';
+      // Cut the text after the selection start.
+      element.value = fullText.substring(0, range.startOffset);
+      const scrollStartOfset = element.scrollHeight;
+      // Cut the text after the selection end.
       element.value = fullText.substring(0, range.endOffset);
-      // Scroll to the bottom.
-      element.scrollTop = element.scrollHeight;
-      var canScroll = element.scrollHeight > element.clientHeight;
+      const scrollEndOffset = element.scrollHeight;
+      const selectionHeight = scrollEndOffset - scrollStartOfset;
+      // Restore the full text and the text area styles.
       element.value = fullText;
-      if (canScroll) {
-        // Scroll to center the selection.
-        element.scrollTop += element.clientHeight / 2;
+      element.style.cssText = styleBackup;
+      const canScrollVertically = element.scrollHeight > element.clientHeight;
+      if (canScrollVertically) {
+        if (selectionHeight < element.clientHeight) {
+          // Center the selection inside the text area.
+          element.scrollTop = scrollStartOfset - (element.clientHeight - selectionHeight) / 2;
+        } else {
+          // Align the selection start to the top of the text area.
+          element.scrollTop = scrollStartOfset;
+        }
+      } else {
+        scrollUtils.centerVertically(element, padding, {
+          startOffset: scrollStartOfset,
+          endOffset: scrollEndOffset
+        });
       }
     } else {
-      scrollUtils.centerVertically(getScrollTarget(range), 65);
+      scrollUtils.centerVertically(getScrollTarget(range), padding);
     }
   }
 
@@ -789,16 +810,26 @@ define('scrollUtils', ['jquery'], function($) {
    * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
    *          area; when specified, the element is centered vertically only if it's not already in the center area
    *          defined by this padding
+   * @param verticalRange the vertical segment of the given element that should be centered, defaults to the entire
+   *          element
    */
-  var centerVertically = function(element, padding) {
-    var verticalScrollParent = getVerticalScrollParent(element);
+  var centerVertically = function(
+    element,
+    padding = 0,
+    verticalRange = {startOffset: 0, endOffset: element.clientHeight}
+  ) {
+    const verticalScrollParent = getVerticalScrollParent(element);
     if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
+      const rangeHeight = verticalRange.endOffset - verticalRange.startOffset;
+      const relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent) + verticalRange.startOffset;
       if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
-        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
-        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
-        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
-        verticalScrollParent.scrollTop = scrollTop;
+        if (rangeHeight < verticalScrollParent.clientHeight) {
+          // Center the specified vertical range inside the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight - rangeHeight) / 2;
+        } else {
+          // Align the top of the specified vertical range to the top of the scroll parent.
+          verticalScrollParent.scrollTop = relativeTopOffset;
+        }
       }
     }
   };

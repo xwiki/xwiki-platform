@@ -345,4 +345,95 @@ class InplaceEditIT
         assertEquals("No pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
+
+    @Test
+    @Order(7)
+    void selectionRestoreOnSwitchToSource(TestUtils setup, TestReference testReference)
+    {
+        // We test using the in-place editor because the Source area doesn't have the vertical scrollbar (as it happens
+        // with the standalone editor) so the way the restored selection is scrolled into view is different.
+
+        // Enter in-place edit mode.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+
+        // Insert some long text (vertically).
+        for (int i = 1; i < 50; i++) {
+            richTextArea.sendKeys(String.valueOf(i), Keys.ENTER);
+        }
+        richTextArea.sendKeys("50");
+        // Go back to the start of the content, on the second line (paragraph).
+        richTextArea.sendKeys(Keys.HOME, Keys.PAGE_UP, Keys.PAGE_UP, Keys.PAGE_UP, Keys.DOWN);
+        // Select the text on the second line.
+        richTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+
+        // Switch to Source mode.
+        ckeditor.getToolBar().toggleSourceMode();
+        WebElement sourceTextArea = ckeditor.getSourceTextArea();
+
+        // Verify that the selection is restored.
+        assertEquals("2", sourceTextArea.getDomProperty("selectionStart"));
+        assertEquals("4", sourceTextArea.getDomProperty("selectionEnd"));
+
+        // Verify that the top left corner of the Source text area is visible (inside the viewport).
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, 0));
+
+        // Select something from the middle of the edited content.
+        for (int i = 0; i < 46; i++) {
+            sourceTextArea.sendKeys(Keys.DOWN);
+        }
+        sourceTextArea.sendKeys(Keys.HOME);
+        sourceTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+
+        // Switch back to WYSIWYG mode.
+        ckeditor.getToolBar().toggleSourceMode();
+        // Verify that the selection is restored.
+        assertEquals("25", richTextArea.getSelectedText());
+        // Verify that the restored selection is visible.
+        assertTrue(richTextArea.isVisible(0, richTextArea.getSize().height / 2));
+
+        // Switch back to Source.
+        richTextArea.sendKeys(Keys.DOWN);
+        richTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
+        ckeditor.getToolBar().toggleSourceMode();
+        sourceTextArea = ckeditor.getSourceTextArea();
+
+        // Verify that the selection is restored.
+        int selectionStart = Integer.parseInt(sourceTextArea.getDomProperty("selectionStart"));
+        int selectionEnd = Integer.parseInt(sourceTextArea.getDomProperty("selectionEnd"));
+        assertEquals("26", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
+
+        // Verify that the restored selection is visible (inside the viewport).
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height / 2));
+
+        sourceTextArea.sendKeys(Keys.PAGE_DOWN, Keys.UP, Keys.UP);
+        sourceTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME));
+
+        // Switch back to WYSIWYG mode.
+        ckeditor.getToolBar().toggleSourceMode();
+        // Verify that the selection is restored.
+        assertEquals("49", richTextArea.getSelectedText());
+        // Verify that the restored selection is visible.
+        // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(richTextArea.isVisible(0, richTextArea.getSize().height - 1));
+
+        // Switch back to Source.
+        richTextArea.sendKeys(Keys.DOWN);
+        richTextArea.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
+        ckeditor.getToolBar().toggleSourceMode();
+        sourceTextArea = ckeditor.getSourceTextArea();
+
+        // Verify that the selection is restored.
+        selectionStart = Integer.parseInt(sourceTextArea.getDomProperty("selectionStart"));
+        selectionEnd = Integer.parseInt(sourceTextArea.getDomProperty("selectionEnd"));
+        assertEquals("50", sourceTextArea.getDomProperty("value").substring(selectionStart, selectionEnd));
+
+        // Verify that the restored selection is visible (inside the viewport).
+        // Note that we have to subtract 1 from the height because the floating toolbar is overlapping the text area.
+        assertTrue(setup.getDriver().isVisible(sourceTextArea, 0, sourceTextArea.getSize().height - 1));
+
+        viewPage.cancel();
+    }
 }

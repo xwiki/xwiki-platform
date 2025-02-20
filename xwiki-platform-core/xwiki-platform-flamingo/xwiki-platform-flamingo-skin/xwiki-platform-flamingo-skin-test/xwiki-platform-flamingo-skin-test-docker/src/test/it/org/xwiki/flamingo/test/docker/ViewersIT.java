@@ -19,9 +19,12 @@
  */
 package org.xwiki.flamingo.test.docker;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.flamingo.skin.test.po.ChildrenPage;
+import org.xwiki.flamingo.skin.test.po.PinnedChildPagesTab;
 import org.xwiki.flamingo.skin.test.po.SiblingsPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,6 +34,8 @@ import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.xwiki.security.internal.XWikiConstants.GUEST_USER;
 import static org.xwiki.security.internal.XWikiConstants.XWIKI_SPACE;
 
@@ -44,6 +49,8 @@ import static org.xwiki.security.internal.XWikiConstants.XWIKI_SPACE;
 @UITest
 class ViewersIT
 {
+    private static final String EDIT_USER = "ViewersITUser";
+
     /**
      * Creates a page with two children {@code ChildA} and {@code ChildB}. Then, visit the siblings listing of {@code
      * ChildB} and assert the content of the siblings Live Data as Guest. Finally, repeat the operation as superadmin to
@@ -108,15 +115,19 @@ class ViewersIT
 
         testUtils.loginAsSuperAdmin();
         testUtils.deletePage(testReference, true);
-        testUtils.forceGuestUser();
-
         testUtils.createPage(testReference, "");
         testUtils.createPage(childADocumentReference, "", "ChildA");
         testUtils.createPage(childBDocumentReference, "", "ChildB");
+        testUtils.createUser(EDIT_USER, EDIT_USER, null);
+        testUtils.loginAsSuperAdmin();
+        testUtils.setRights(testReference, null, EDIT_USER, "edit", true);
 
+        testUtils.forceGuestUser();
         testUtils.gotoPage(testReference);
 
-        TableLayoutElement guestTableLayoutElement = ChildrenPage.clickOnChildrenMenu().getLiveData().getTableLayout();
+        ChildrenPage childrenPage = ChildrenPage.clickOnChildrenMenu();
+        assertFalse(childrenPage.hasTabs());
+        TableLayoutElement guestTableLayoutElement = childrenPage.getLiveData().getTableLayout();
         assertEquals(2, guestTableLayoutElement.countRows());
         guestTableLayoutElement
             .assertCellWithLink(ChildrenPage.LIVE_DATA_TITLE, "ChildA", testUtils.getURL(childADocumentReference));
@@ -124,13 +135,15 @@ class ViewersIT
             .assertCellWithLink(ChildrenPage.LIVE_DATA_TITLE, "ChildB", testUtils.getURL(childBDocumentReference));
         guestTableLayoutElement
             .assertRow(ChildrenPage.LIVE_DATA_DATE, hasItem(guestTableLayoutElement.getDatePatternMatcher()));
-        guestTableLayoutElement.assertCellWithLink(ChildrenPage.LIVE_DATA_LAST_AUTHOR, "XWikiGuest",
-            testUtils.getURL(new DocumentReference("xwiki", XWIKI_SPACE, GUEST_USER)));
+        guestTableLayoutElement.assertCellWithLink(ChildrenPage.LIVE_DATA_LAST_AUTHOR, "superadmin",
+            testUtils.getURL(new DocumentReference("xwiki", XWIKI_SPACE, "superadmin")));
         guestTableLayoutElement.assertCellWithLink(ChildrenPage.LIVE_DATA_ACTIONS, "Copy",
             testUtils.getURL(childADocumentReference, "view", "xpage=copy"));
 
         // Visit the children page as superadmin to verify the administration actions too.
         testUtils.loginAsSuperAdmin();
+        childrenPage = ChildrenPage.goToPage(testReference);
+        assertTrue(childrenPage.hasTabs());
 
         TableLayoutElement adminTableLayoutElement =
             ChildrenPage.goToPage(testReference).getLiveData().getTableLayout();
@@ -146,5 +159,33 @@ class ViewersIT
         // Removes the form_token parameter from the expected URL because it is not found in the URL of the delete 
         // action.
         adminTableLayoutElement.assertCellWithDeleteAction(ChildrenPage.LIVE_DATA_ACTIONS, childADocumentReference);
+
+        // test using pinned child pages with a simple user with edit rights
+        testUtils.login(EDIT_USER, EDIT_USER);
+        childrenPage = ChildrenPage.goToPage(testReference);
+        assertTrue(childrenPage.hasTabs());
+
+        PinnedChildPagesTab pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
+        assertEquals(List.of("ChildA", "ChildB"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertFalse(pinnedChildPagesTab.isPinned("ChildA"));
+        assertFalse(pinnedChildPagesTab.isPinned("ChildB"));
+
+        pinnedChildPagesTab.dragBefore("ChildB", "ChildA");
+        assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
+        pinnedChildPagesTab.save();
+        childrenPage = ChildrenPage.goToPage(testReference);
+        pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
+        assertEquals(List.of("ChildB", "ChildA"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
+        assertFalse(pinnedChildPagesTab.isPinned("ChildA"));
+
+        pinnedChildPagesTab.unpinPage("ChildB");
+        pinnedChildPagesTab.save();
+
+        childrenPage = ChildrenPage.goToPage(testReference);
+        pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
+        assertEquals(List.of("ChildA", "ChildB"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertFalse(pinnedChildPagesTab.isPinned("ChildA"));
+        assertFalse(pinnedChildPagesTab.isPinned("ChildB"));
     }
 }

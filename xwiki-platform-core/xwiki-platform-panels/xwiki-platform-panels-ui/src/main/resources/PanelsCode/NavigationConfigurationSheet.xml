@@ -704,7 +704,7 @@ require([
   //
 
   const pinActionTemplate = $(`
-    &lt;button class="jstree-action-pin" type="button"&gt;
+    &lt;button class="jstree-action-pin" type="button" aria-hidden="true" tabindex="-1"&gt;
       &lt;i class="icon fa fa-thumb-tack"&gt;&lt;/i&gt;
       &lt;span class="jstree-action-pin-on"&gt;&lt;/span&gt;
       &lt;span class="jstree-action-pin-off"&gt;&lt;/span&gt;

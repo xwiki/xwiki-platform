@@ -19,13 +19,6 @@
  */
 package org.xwiki.configuration.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +44,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiPreferencesConfigurationSource}.
@@ -201,8 +201,9 @@ class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigu
         BaseClass baseClass = document.getXClass();
         baseClass.addTextField("textKey", "Text Key", 30);
         baseClass.addBooleanField("booleanKey", "Boolean Key");
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
 
-        Map<String, Object> properties =new HashMap<>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("textKey", "value");
         properties.put("booleanKey", true);
         this.source.setProperties(properties);

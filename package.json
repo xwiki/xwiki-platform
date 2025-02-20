@@ -23,7 +23,8 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@xwiki/cristal-api": "workspace:*"
+    "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-model-api": "workspace:*"
   },
   "devDependencies": {
     "@xwiki/cristal-dev-config": "workspace:*",

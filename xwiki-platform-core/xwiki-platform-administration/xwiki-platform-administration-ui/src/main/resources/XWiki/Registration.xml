@@ -146,7 +146,7 @@
    *
    * NOTE: This template uses a registration method which requires:
    *        * register_first_name
-   *        * register_last_name 
+   *        * register_last_name
    *        * xwikiname
    *        * register_password
    *        * register2_password
@@ -526,7 +526,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>defaultRedirect</name>
-      <number>8</number>
+      <number>7</number>
       <picker>0</picker>
       <prettyName>Redirect here after registration</prettyName>
       <size>30</size>
@@ -557,7 +557,7 @@
       <displayType/>
       <hint/>
       <name>loginButton_autoLogin_enabled</name>
-      <number>7</number>
+      <number>6</number>
       <prettyName>Enable automatic login</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -572,7 +572,7 @@
       <displayType/>
       <hint/>
       <name>loginButton_enabled</name>
-      <number>6</number>
+      <number>5</number>
       <prettyName>Enable login button</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -584,7 +584,7 @@
       <disabled>0</disabled>
       <hint/>
       <name>passwordLength</name>
-      <number>11</number>
+      <number>10</number>
       <numberType>integer</numberType>
       <prettyName>Require a password with the given length</prettyName>
       <size>10</size>
@@ -601,7 +601,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneLowerCaseEnabled</name>
-      <number>12</number>
+      <number>11</number>
       <prettyName>Require at least one lower case character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -616,7 +616,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneNumberEnabled</name>
-      <number>14</number>
+      <number>13</number>
       <prettyName>Require at least one number in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -631,7 +631,7 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneSymbolEnabled</name>
-      <number>15</number>
+      <number>14</number>
       <prettyName>Require at least one symbol character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -646,28 +646,13 @@
       <displayType/>
       <hint/>
       <name>passwordRuleOneUpperCaseEnabled</name>
-      <number>13</number>
+      <number>12</number>
       <prettyName>Require at least one upper case character in the password</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </passwordRuleOneUpperCaseEnabled>
-    <registrationFirstLastNameEnabled>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>checkbox</displayFormType>
-      <displayType/>
-      <hint/>
-      <name>registrationFirstLastNameEnabled</name>
-      <number>3</number>
-      <prettyName>Include first and last name fields in the registration form</prettyName>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </registrationFirstLastNameEnabled>
     <registrationSuccessMessage>
       <contenttype>---</contenttype>
       <customDisplay/>
@@ -675,7 +660,7 @@
       <editor>PureText</editor>
       <hint/>
       <name>registrationSuccessMessage</name>
-      <number>10</number>
+      <number>9</number>
       <picker>0</picker>
       <prettyName>Registration Successful Message</prettyName>
       <restricted>0</restricted>
@@ -694,7 +679,7 @@
       <displayType/>
       <hint/>
       <name>requireCaptcha</name>
-      <number>9</number>
+      <number>8</number>
       <prettyName>Require CAPTCHA to register</prettyName>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
@@ -740,7 +725,7 @@
         <displayFormType>select</displayFormType>
         <displayType>allow</displayType>
         <name>allow</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Allow/Deny</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>

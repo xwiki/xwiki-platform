@@ -591,6 +591,7 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpagewithmodifications = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki", "space1", "modified"), getXWikiContext());
         deletedpagewithmodifications.setContent("modified content");
+        this.oldcore.getSpyXWiki().saveDocument(deletedpagewithmodifications, getXWikiContext());
 
         // upgrade
 
@@ -724,6 +725,7 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpagewithmodifications = this.oldcore.getSpyXWiki()
             .getDocument(new DocumentReference("wiki1", "space1", "modified"), getXWikiContext());
         deletedpagewithmodifications.setContent("modified content");
+        this.oldcore.getSpyXWiki().saveDocument(deletedpagewithmodifications, getXWikiContext());
 
         // upgrade
 

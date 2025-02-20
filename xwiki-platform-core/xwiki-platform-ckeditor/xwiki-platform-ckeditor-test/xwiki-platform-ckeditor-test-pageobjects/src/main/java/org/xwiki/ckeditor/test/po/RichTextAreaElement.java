@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -633,5 +634,39 @@ public class RichTextAreaElement extends BaseElement
     public void waitUntilWidgetSelected()
     {
         waitUntilContentContains("cke_widget_selected");
+    }
+
+    /**
+     * @return the text selected in the rich text area, or an empty string if no text is selected
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public String getSelectedText()
+    {
+        return (String) getDriver().executeScript(
+            "return CKEDITOR.instances[arguments[0]].getSelection().getSelectedText()", this.editor.getName());
+    }
+
+    /**
+     * @return the size of the rich text area
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public Dimension getSize()
+    {
+        return this.container.getSize();
+    }
+
+    /**
+     * @param xOffset the horizontal offset from the text area's left border
+     * @param yOffset the vertical offset from the text area's top border
+     * @return {@code true} if the specified point inside the text area is visible (i.e. inside the viewport),
+     *         {@code false} otherwise
+     * @since 16.10.5
+     * @since 17.1.0
+     */
+    public boolean isVisible(int xOffset, int yOffset)
+    {
+        return getDriver().isVisible(this.container, xOffset, yOffset);
     }
 }

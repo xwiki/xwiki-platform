@@ -20,17 +20,19 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import messages from "../translations";
 import { CIcon } from "@xwiki/cristal-icons";
-import { defineProps, inject, ref } from "vue";
+import { inject, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
-import type { SpaceReference } from "@xwiki/cristal-model-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 import type {
   ModelReferenceHandler,
   ModelReferenceHandlerProvider,
   ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
-import type { NavigationTreeNode } from "@xwiki/cristal-navigation-tree-api";
 import type { Ref } from "vue";
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -47,23 +49,17 @@ const referenceSerializer: ModelReferenceSerializer = cristal
 const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
 const namePlaceholder: Ref<string> = ref("");
-const location: Ref<string> = ref("");
+const location: Ref<SpaceReference | undefined> = ref(undefined);
 const existingPage: Ref<PageData | undefined> = ref(undefined);
-var locationReference: SpaceReference | undefined = undefined;
 let newDocumentReference: string = "";
 
 defineProps<{
-  currentPage: PageData;
+  currentPageReference?: DocumentReference;
 }>();
 
 const { t } = useI18n({
   messages,
 });
-
-function treeNodeClickAction(node: NavigationTreeNode) {
-  locationReference = node.location;
-  location.value = referenceSerializer.serialize(locationReference)!;
-}
 
 function updateCurrentPage() {
   namePlaceholder.value = cristal.getWikiConfig().getNewPageDefaultName();
@@ -73,10 +69,7 @@ function updateCurrentPage() {
 async function createPage() {
   const newDocumentName = name.value ? name.value : namePlaceholder.value;
   newDocumentReference = referenceSerializer.serialize(
-    referenceHandler.createDocumentReference(
-      newDocumentName,
-      locationReference!,
-    ),
+    referenceHandler.createDocumentReference(newDocumentName, location.value!),
   )!;
 
   existingPage.value = await cristal.getPage(newDocumentReference);
@@ -100,14 +93,14 @@ function editExistingPage() {
     width="auto"
     :title="t('page.creation.menu.title')"
   >
-    <template #activator="{ props }">
+    <template #activator="{ activatorProps }">
       <x-btn
         id="new-page-button"
         size="small"
         color="secondary"
         @click="updateCurrentPage"
       >
-        <c-icon name="plus" v-bind="props"></c-icon>
+        <c-icon name="plus" v-bind="activatorProps"></c-icon>
         {{ t("page.creation.menu.button") }}
       </x-btn>
     </template>
@@ -169,33 +162,31 @@ function editExistingPage() {
             </x-alert>
           </div>
         </div>
-        <x-form class="subgrid" @form-submit="createPage">
+        <x-form id="page-creation-form" @form-submit="createPage">
           <x-text-field
             v-model="name"
             :placeholder="namePlaceholder"
             :label="t('page.creation.menu.field.name')"
             name="name"
+            :help="t('page.creation.menu.field.name.help')"
             autofocus
-            required
           ></x-text-field>
-          <div>
-            <label>{{ t("page.creation.menu.field.location") }}</label>
-            <div id="new-page-navigation-tree" class="location-box">
-              <XNavigationTree
-                :click-action="treeNodeClickAction"
-                :current-page="currentPage"
-              ></XNavigationTree>
-            </div>
-          </div>
-          <!-- This is a hidden button to enable submit events for Vuetify.
-               We do not want to put the other button inside the form, we want
-               to keep it in the footer instead. -->
-          <input type="submit" />
+          <XNavigationTreeSelect
+            v-model="location"
+            :label="t('page.creation.menu.field.location')"
+            :help="t('page.creation.menu.field.location.help')"
+            :current-page-reference="currentPageReference"
+          ></XNavigationTreeSelect>
         </x-form>
       </div>
     </template>
     <template #footer>
-      <x-btn @click="createPage">{{ t("page.creation.menu.submit") }}</x-btn>
+      <x-btn @click.stop="dialogOpen = false">
+        {{ t("page.creation.menu.cancel") }}
+      </x-btn>
+      <x-btn variant="primary" type="submit" form="page-creation-form">
+        {{ t("page.creation.menu.submit") }}
+      </x-btn>
     </template>
   </x-dialog>
 </template>
@@ -207,26 +198,12 @@ function editExistingPage() {
 #new-page-content {
   min-width: 600px;
 }
-#new-page-navigation-tree {
-  overflow: auto;
-}
-.location-box {
-  border: 1px solid #ddd;
-  border-radius: var(--cr-border-radius-medium);
-  padding: var(--cr-spacing-small);
-}
 
 .grid {
   display: grid;
   gap: 0.5rem;
   grid-auto-columns: 1fr;
   grid-template-columns: 1fr;
-}
-.subgrid {
-  display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / 1;
-  gap: 0.5rem;
 }
 
 .alerts-wrapper {

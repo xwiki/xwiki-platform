@@ -19,13 +19,18 @@
  */
 
 import { name as PageHierarchyResolverName } from "@xwiki/cristal-hierarchy-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Default implementation for PageHierarchyResolver.
@@ -48,7 +53,7 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
   }
 
   async getPageHierarchy(
-    pageData: PageData,
+    page: DocumentReference | SpaceReference,
   ): Promise<Array<PageHierarchyItem>> {
     const hierarchy: Array<PageHierarchyItem> = [
       {
@@ -60,9 +65,9 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
         }).href,
       },
     ];
-    if (pageData != null) {
+    if (page.type == EntityType.DOCUMENT) {
       hierarchy.push({
-        label: pageData.name,
+        label: (page as DocumentReference).name,
         pageId: this.cristalApp.getCurrentPage(),
         url: window.location.href,
       });

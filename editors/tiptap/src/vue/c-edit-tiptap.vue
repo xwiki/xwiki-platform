@@ -68,6 +68,7 @@ import type {
   LinkSuggestService,
   LinkSuggestServiceProvider,
 } from "@xwiki/cristal-link-suggest-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type { Markdown } from "tiptap-markdown";
 import type { Ref } from "vue";
 
@@ -94,13 +95,15 @@ const loading = documentService.isLoading();
 const error: Ref<Error | undefined> = documentService.getError();
 const currentPage: Ref<PageData | undefined> =
   documentService.getCurrentDocument();
+const currentPageReference: Ref<DocumentReference | undefined> =
+  documentService.getCurrentDocumentReference();
 
 // TODO: load this content first, then initialize the editor.
 // Make the loading status first.
 const content = ref("");
 const title = ref("");
 const titlePlaceholder = modelReferenceHandler?.getTitle(
-  documentService.getCurrentDocumentReference().value!,
+  currentPageReference.value!,
 );
 
 const hasRealtime = cristal.getWikiConfig().realtimeURL != undefined;
@@ -158,7 +161,7 @@ const save = async () => {
   if (!currentPage.value) {
     documentService.setCurrentDocument(currentPageName.value ?? "");
   }
-  documentService.notifyDocumentChange("update", currentPage.value!);
+  documentService.notifyDocumentChange("update", currentPageReference.value!);
 };
 const submit = async () => {
   if (!hasRealtime) {
@@ -336,6 +339,7 @@ watch(
     :loading="loading"
     :error="error"
     :current-page="currentPage"
+    :current-page-reference="currentPageReference"
     :page-exist="true"
     before-u-i-x-p-id="edit.before"
     after-u-i-x-p-id="edit.after"

@@ -31,11 +31,14 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  */
 import { inject, onBeforeMount, ref, watch } from "vue";
 import { VTreeview } from "vuetify/labs/VTreeview";
-import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
-import type { SpaceReference } from "@xwiki/cristal-model-api";
+import type { NavigationTreeProps } from "@xwiki/cristal-dsapi";
 import type {
-  NavigationTreeNode,
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
+import type {
   NavigationTreeSource,
   NavigationTreeSourceProvider,
 } from "@xwiki/cristal-navigation-tree-api";
@@ -48,8 +51,6 @@ type TreeItem = {
   children?: Array<TreeItem>;
   _location: SpaceReference;
 };
-
-type OnClickAction = (node: NavigationTreeNode) => void;
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const documentService: DocumentService = cristal
@@ -66,10 +67,7 @@ const activatedNodes: Ref<Array<string>> = ref(new Array<string>());
 const expandedNodes: Ref<Array<string>> = ref(new Array<string>());
 var isExpanding: boolean = false;
 
-const props = defineProps<{
-  clickAction?: OnClickAction;
-  currentPage?: PageData;
-}>();
+const props = defineProps<NavigationTreeProps>();
 
 onBeforeMount(async () => {
   for (const node of await treeSource.getChildNodes("")) {
@@ -87,14 +85,16 @@ onBeforeMount(async () => {
   documentService.registerDocumentChangeListener("update", onDocumentUpdate);
 });
 
-watch(() => props.currentPage, expandTree);
+watch(() => props.currentPageReference, expandTree);
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 async function expandTree() {
-  if (props.currentPage && !isExpanding) {
+  if (props.currentPageReference && !isExpanding) {
     isExpanding = true;
-    const newExpandedNodes = treeSource.getParentNodesId(props.currentPage);
+    const newExpandedNodes = treeSource.getParentNodesId(
+      props.currentPageReference,
+    );
     let i;
     let currentNodes = rootNodes.value;
     for (i = 0; i < newExpandedNodes.length - 1; i++) {
@@ -163,7 +163,7 @@ function clearSelection() {
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
-async function onDocumentDelete(page: PageData) {
+async function onDocumentDelete(page: DocumentReference) {
   const parents = treeSource.getParentNodesId(page);
   let currentItem: TreeItem | undefined = undefined;
   let currentItemChildren: TreeItem[] | undefined = rootNodes.value;
@@ -192,7 +192,7 @@ async function onDocumentDelete(page: PageData) {
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
-async function onDocumentUpdate(page: PageData) {
+async function onDocumentUpdate(page: DocumentReference) {
   const parents = treeSource.getParentNodesId(page);
   let currentParent: string | undefined = undefined;
   let currentItems: TreeItem[] | undefined = rootNodes.value;
@@ -238,7 +238,9 @@ async function onDocumentUpdate(page: PageData) {
   const newItems = await treeSource.getChildNodes(
     currentParent ? currentParent : "",
   );
-  const currentPageParents = treeSource.getParentNodesId(props.currentPage);
+  const currentPageParents = treeSource.getParentNodesId(
+    props.currentPageReference,
+  );
   newItemsLoop: for (const newItem of newItems) {
     for (const i of currentItems!.keys()) {
       if (newItem.id == currentItems![i].id) {

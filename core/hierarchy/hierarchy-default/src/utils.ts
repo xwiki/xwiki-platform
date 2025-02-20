@@ -18,37 +18,46 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import { EntityType } from "@xwiki/cristal-model-api";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
 import type { PageHierarchyItem } from "@xwiki/cristal-hierarchy-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Returns the page hierarchy for a path-like page id.
  * This does not include a Home segment.
  *
- * @param pageData - the data of the page
+ * @param page - the reference to the page
  * @param cristalApp - the current app
  * @returns the page hierarchy
- * @since 0.10
+ * @since 0.15
  **/
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
 export async function getPageHierarchyFromPath(
-  pageData: PageData,
+  page: DocumentReference | SpaceReference,
   cristalApp: CristalApp,
 ): Promise<Array<PageHierarchyItem>> {
   const hierarchy: Array<PageHierarchyItem> = [];
-  const fileHierarchy = pageData.id.split("/");
+  const fileHierarchy = [];
+  if (page.type == EntityType.SPACE) {
+    fileHierarchy.push(...(page as SpaceReference).names);
+  } else if (page.type == EntityType.DOCUMENT) {
+    fileHierarchy.push(
+      ...(page as DocumentReference).space!.names,
+      (page as DocumentReference).name,
+    );
+  }
   let currentFile = "";
 
   for (let i = 0; i < fileHierarchy.length; i++) {
     const file = fileHierarchy[i];
     currentFile += `${i == 0 ? "" : "/"}${file}`;
-    let currentPageData: PageData | undefined;
-    if (i == fileHierarchy.length - 1) {
-      currentPageData = pageData;
-    } else {
-      currentPageData = await cristalApp.getPage(currentFile);
-    }
+    const currentPageData: PageData | undefined =
+      await cristalApp.getPage(currentFile);
     hierarchy.push({
       label: currentPageData?.name ? currentPageData.name : file,
       pageId: currentFile,

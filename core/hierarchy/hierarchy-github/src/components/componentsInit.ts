@@ -19,12 +19,17 @@
  */
 
 import { name } from "@xwiki/cristal-hierarchy-api";
+import { EntityType } from "@xwiki/cristal-model-api";
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Implementation of PageHierarchyResolver for the GitHub backend.
@@ -46,7 +51,7 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
   }
 
   async getPageHierarchy(
-    pageData: PageData,
+    page: DocumentReference | SpaceReference,
   ): Promise<Array<PageHierarchyItem>> {
     const hierarchy: Array<PageHierarchyItem> = [
       {
@@ -58,8 +63,14 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
         }).href,
       },
     ];
-    if (pageData != null) {
-      const fileHierarchy = pageData.id.split("/");
+    if (page != null) {
+      const fileHierarchy =
+        page.type == EntityType.SPACE
+          ? [...(page as SpaceReference).names]
+          : [
+              ...(page as DocumentReference).space!.names,
+              (page as DocumentReference).name,
+            ];
       let currentFile = "";
       for (let i = 0; i < fileHierarchy.length; i++) {
         const file = fileHierarchy[i];

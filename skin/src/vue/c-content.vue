@@ -48,6 +48,7 @@ const currentPage: Ref<PageData | undefined> =
 const currentPageRevision: Ref<string | undefined> =
   documentService.getCurrentDocumentRevision();
 const currentPageName = documentService.getCurrentDocumentReferenceString();
+const currentPageReference = documentService.getCurrentDocumentReference();
 const displayTitle = documentService.getDisplayTitle();
 
 const contentRoot = ref(undefined);
@@ -85,6 +86,7 @@ onUpdated(() => {
     :loading="loading"
     :error="error"
     :current-page="currentPage"
+    :current-page-reference="currentPageReference"
     :page-exist="pageExist"
     before-u-i-x-p-id="content.before"
     after-u-i-x-p-id="content.after"
@@ -108,6 +110,7 @@ onUpdated(() => {
         <page-actions
           :current-page="currentPage"
           :current-page-name="currentPageName ?? ''"
+          :current-page-reference="currentPageReference!"
           :disabled="currentPageRevision !== undefined || !currentPage?.canEdit"
         ></page-actions>
       </div>

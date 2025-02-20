@@ -32,6 +32,7 @@ import {
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
 import { MarkdownRenderer } from "@xwiki/cristal-markdown-api";
+import { DocumentReference, SpaceReference } from "@xwiki/cristal-model-api";
 import { ClickListener } from "@xwiki/cristal-model-click-listener";
 import { Container } from "inversify";
 import { DeepPartial } from "ts-essentials";
@@ -74,6 +75,14 @@ function mountCComponent(params: {
         return ref(undefined);
       }
 
+      getCurrentDocumentReference() {
+        return ref(
+          new DocumentReference(
+            "Reference",
+            new SpaceReference(undefined, "The", "Page"),
+          ),
+        );
+      }
       getCurrentDocumentReferenceString() {
         return ref("The.Page.Reference");
       }

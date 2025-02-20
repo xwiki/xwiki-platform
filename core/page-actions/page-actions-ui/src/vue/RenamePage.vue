@@ -46,6 +46,7 @@ const { t } = useI18n({
 const props = defineProps<{
   currentPage: PageData | undefined;
   currentPageName: string;
+  currentPageReference: DocumentReference;
 }>();
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -76,7 +77,8 @@ const dialogOpen: Ref<boolean> = ref(false);
 const name: Ref<string> = ref("");
 const existingPage: Ref<PageData | undefined> = ref(undefined);
 let currentDocumentReference: DocumentReference;
-let newDocumentReference: string;
+let newDocumentReference: DocumentReference;
+let newDocumentReferenceSerialized: string;
 
 onMounted(() => {
   currentDocumentReference = referenceParser.parse(
@@ -86,18 +88,18 @@ onMounted(() => {
 });
 
 async function renamePage() {
-  newDocumentReference = referenceSerializer.serialize(
-    referenceHandler.createDocumentReference(
-      name.value,
-      currentDocumentReference.space!,
-    ),
-  )!;
+  newDocumentReference = referenceHandler.createDocumentReference(
+    name.value,
+    currentDocumentReference.space!,
+  );
+  newDocumentReferenceSerialized =
+    referenceSerializer.serialize(newDocumentReference)!;
 
-  existingPage.value = await cristal.getPage(newDocumentReference);
+  existingPage.value = await cristal.getPage(newDocumentReferenceSerialized);
   if (!existingPage.value) {
     const result = await pageRenameManager.updateReference(
       props.currentPage!,
-      newDocumentReference,
+      newDocumentReferenceSerialized,
       true,
     );
     dialogOpen.value = false;
@@ -107,16 +109,15 @@ async function renamePage() {
 
 async function handleSuccess(result: { success: boolean; error?: string }) {
   if (result.success) {
-    documentService.notifyDocumentChange("delete", props.currentPage!);
-    cristal.setCurrentPage(newDocumentReference, "view");
+    documentService.notifyDocumentChange("delete", props.currentPageReference);
+    cristal.setCurrentPage(newDocumentReferenceSerialized, "view");
     alertsService.success(
       t("page.action.action.rename.page.success", {
         page: props.currentPageName,
-        newPage: newDocumentReference,
+        newPage: newDocumentReferenceSerialized,
       }),
     );
-    const newPage: PageData = (await cristal.getPage(newDocumentReference))!;
-    documentService.notifyDocumentChange("update", newPage);
+    documentService.notifyDocumentChange("update", newDocumentReference);
   } else {
     alertsService.error(
       t("page.action.action.rename.page.error", {
@@ -149,7 +150,7 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
               :href="
                 cristal.getRouter().resolve({
                   name: 'view',
-                  params: { page: newDocumentReference },
+                  params: { page: newDocumentReferenceSerialized },
                 }).href
               "
               >{{ newDocumentReference }}</a
@@ -157,10 +158,11 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
           </template>
         </i18n-t>
       </x-alert>
-      <x-form @form-submit="renamePage">
+      <x-form id="page-rename-form" @form-submit="renamePage">
         <x-text-field
           v-model="name"
           :label="t('page.action.action.rename.page.name.label')"
+          :help="t('page.action.action.rename.page.name.help')"
           name="name"
           autofocus
           required
@@ -171,7 +173,7 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
       <x-btn @click.stop="dialogOpen = false">
         {{ t("page.action.action.rename.page.cancel") }}
       </x-btn>
-      <x-btn variant="primary" @click.stop="renamePage">
+      <x-btn variant="primary" type="submit" form="page-rename-form">
         {{ t("page.action.action.rename.page.title") }}
       </x-btn>
     </template>

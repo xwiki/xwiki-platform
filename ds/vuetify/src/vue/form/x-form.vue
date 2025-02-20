@@ -8,10 +8,14 @@ function submit() {
 
 <template>
   <v-form @submit.prevent="submit">
-    <v-container>
-      <slot></slot>
-    </v-container>
+    <slot></slot>
   </v-form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cr-spacing-x-small);
+}
+</style>

@@ -20,7 +20,7 @@
 
 import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree-api";
 import { Container, inject, injectable, named } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type { ModelReferenceSerializer } from "@xwiki/cristal-model-reference-api";
@@ -80,31 +80,21 @@ class XWikiNavigationTreeSource implements NavigationTreeSource {
     return navigationTree;
   }
 
-  // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-  // eslint-disable-next-line max-statements
-  getParentNodesId(page?: PageData): Array<string> {
+  getParentNodesId(page?: DocumentReference): Array<string> {
     const result = [];
-    if (page) {
-      const documentId = page.document.getIdentifier();
-      if (!documentId) {
-        this.logger.debug(
-          `No identifier found for page ${page.name}, cannot resolve parents.`,
-        );
-        return [];
-      }
-      // TODO: Use a page resolver instead when CRISTAL-234 is fixed.
-      const parents = documentId
-        .replace(/\.WebHome$/, "")
-        .split(/(?<![^\\](?:\\\\)*\\)\./);
+    if (page && page.space) {
       let currentParent = "";
-      let i;
-      for (i = 0; i < parents.length - 1; i++) {
-        currentParent += parents[i];
+      for (const parent of page.space!.names) {
+        currentParent += parent;
         // TODO: Support subwikis.
         result.push(`document:xwiki:${currentParent}.WebHome`);
         currentParent += ".";
       }
-      result.push(`document:xwiki:${documentId}`);
+      if (page.name != "WebHome") {
+        result.push(
+          `document:xwiki:${this.referenceSerializer.serialize(page)}`,
+        );
+      }
     }
     return result;
   }

@@ -20,6 +20,7 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 <script setup lang="ts">
 import { inject, onMounted, ref, shallowRef } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   PageAction,
   PageActionCategory,
@@ -31,6 +32,7 @@ const props = defineProps<{
   category: PageActionCategory;
   currentPage: PageData | undefined;
   currentPageName: string;
+  currentPageReference: DocumentReference;
   isLast: boolean;
 }>();
 
@@ -62,6 +64,7 @@ onMounted(async () => {
       :is="action.component"
       :current-page="currentPage"
       :current-page-name="currentPageName"
+      :current-page-reference="currentPageReference"
     ></component>
   </x-menu-item>
   <x-divider v-if="!isLast" />

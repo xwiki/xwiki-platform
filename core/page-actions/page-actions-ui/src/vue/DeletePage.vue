@@ -30,6 +30,7 @@ import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type { Ref } from "vue";
 
 const { t } = useI18n({
@@ -38,6 +39,7 @@ const { t } = useI18n({
 const props = defineProps<{
   currentPage: PageData | undefined;
   currentPageName: string;
+  currentPageReference: DocumentReference;
 }>();
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -56,7 +58,7 @@ async function deletePage() {
     .getContainer()
     .get<PageHierarchyResolverProvider>("PageHierarchyResolverProvider")
     .get()
-    .getPageHierarchy(props.currentPage!);
+    .getPageHierarchy(props.currentPageReference);
 
   const storage = cristal
     .getContainer()
@@ -66,7 +68,7 @@ async function deletePage() {
   deleteDialogOpen.value = false;
 
   if (result.success) {
-    const deletedPage = props.currentPage!;
+    documentService.notifyDocumentChange("delete", props.currentPageReference);
     if (hierarchy.length > 1) {
       cristal.setCurrentPage(hierarchy[hierarchy.length - 2].pageId, "view");
     } else {
@@ -77,7 +79,6 @@ async function deletePage() {
         page: props.currentPageName,
       }),
     );
-    documentService.notifyDocumentChange("delete", deletedPage);
   } else {
     alertsService.error(
       t("page.action.action.delete.page.error", {

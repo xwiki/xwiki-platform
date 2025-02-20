@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { PageData } from "@xwiki/cristal-api";
-import type { SpaceReference } from "@xwiki/cristal-model-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Description of a navigation tree node.
@@ -53,10 +55,11 @@ interface NavigationTreeSource {
   /**
    * Returns the ids of the parents nodes for a given page.
    *
-   * @param page - the data of the page
+   * @param page - the reference to the page
    * @returns the parents nodes ids
+   * @since 0.15
    **/
-  getParentNodesId(page?: PageData): Array<string>;
+  getParentNodesId(page?: DocumentReference): Array<string>;
 }
 
 /**

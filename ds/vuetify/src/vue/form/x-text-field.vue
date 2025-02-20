@@ -32,6 +32,8 @@ const rules = computed(() => {
     :label="label"
     :name="name"
     :autofocus="autofocus"
+    :hint="help"
+    :persistent-hint="help !== undefined"
     :rules="rules"
   ></v-text-field>
 </template>

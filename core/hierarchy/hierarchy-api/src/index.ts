@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { PageData } from "@xwiki/cristal-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Description of a hierarchy item for a given page.
@@ -39,10 +42,13 @@ interface PageHierarchyResolver {
   /**
    * Returns the page hierarchy for a given page.
    *
-   * @param pageData - the page for which to compute the hierarchy
+   * @param page - the reference to the page for which to compute the hierarchy
    * @returns the page hierarchy
+   * @since 0.15
    */
-  getPageHierarchy(pageData: PageData): Promise<Array<PageHierarchyItem>>;
+  getPageHierarchy(
+    page: DocumentReference | SpaceReference,
+  ): Promise<Array<PageHierarchyItem>>;
 }
 
 /**

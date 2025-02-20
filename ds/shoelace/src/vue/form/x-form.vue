@@ -11,4 +11,10 @@ function submit() {
   </form>
 </template>
 
-<style scoped></style>
+<style scoped>
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cr-spacing-x-small);
+}
+</style>

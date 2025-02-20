@@ -1,4 +1,6 @@
 {
   "vuetify.file.input.mandatory": "Mandatory field",
-  "vuetify.text.input.mandatory": "Mandatory field"
+  "vuetify.text.input.mandatory": "Mandatory field",
+  "vuetify.tree.select.location.label": "Change Page Location",
+  "vuetify.tree.select.location.select": "Select"
 }

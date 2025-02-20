@@ -180,12 +180,8 @@ configs.forEach(
       await new SidebarPageObject(page).openSidebar();
       await page.locator("#sidebar #new-page-button").nth(0).click();
 
-      const newPageDialogButton = page.getByRole('button', { name: 'Create' }).nth(0);
-
-      // The button can end up unclickable sometimes, due to the speed of the test.
-      // This ensures that it still gets clicked no matter what.
-      await expect(newPageDialogButton).toBeEnabled();
-      await newPageDialogButton.dispatchEvent("click");
+      const newPageDialogForm = page.locator("form");
+      await newPageDialogForm.dispatchEvent("submit");
 
       const editorHeader = page.locator(".content .doc-header input").nth(0);
       const editorContent = page.locator(".content .doc-content p").nth(0);

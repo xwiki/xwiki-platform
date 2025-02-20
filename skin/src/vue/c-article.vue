@@ -15,16 +15,18 @@ import type {
   PageHierarchyItem,
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 
 const { t } = useI18n({
   messages,
 });
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
-const { currentPage } = defineProps<{
+const { currentPage, currentPageReference } = defineProps<{
   loading: boolean;
   error: Error | undefined;
   currentPage: PageData | undefined;
+  currentPageReference: DocumentReference | undefined;
   pageExist: boolean;
   beforeUIXPId: string;
   afterUIXPId: string;
@@ -32,7 +34,7 @@ const { currentPage } = defineProps<{
 
 const breadcrumbItems: Ref<Array<PageHierarchyItem>> = ref([]);
 watch(
-  () => currentPage,
+  () => currentPageReference,
   async (p) => {
     if (p) {
       try {

@@ -11,6 +11,7 @@ const input = defineModel<string>();
   <sl-input
     :label="label"
     :name="name"
+    :help-text="help"
     :required="required"
     :autofocus.attr="autofocus"
     :value="input"

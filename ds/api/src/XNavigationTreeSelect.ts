@@ -18,13 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import de from "../langs/translation-de.json";
-import en from "../langs/translation-en.json";
-import fr from "../langs/translation-fr.json";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
-const translations: Record<string, Record<string, string>> = {
-  en,
-  fr,
-  de,
+/**
+ * @since 0.15
+ */
+type NavigationTreeSelectProps = {
+  label: string;
+  help?: string;
+  currentPageReference?: DocumentReference;
+  modelValue?: SpaceReference;
 };
-export default translations;
+
+export type { NavigationTreeSelectProps };

@@ -32,12 +32,9 @@ import type {
 import type {
   ModelReferenceHandler,
   ModelReferenceHandlerProvider,
-  ModelReferenceParser,
-  ModelReferenceParserProvider,
   ModelReferenceSerializer,
   ModelReferenceSerializerProvider,
 } from "@xwiki/cristal-model-reference-api";
-import type { NavigationTreeNode } from "@xwiki/cristal-navigation-tree-api";
 import type {
   PageRenameManager,
   PageRenameManagerProvider,
@@ -50,6 +47,7 @@ const { t } = useI18n({
 const props = defineProps<{
   currentPage: PageData | undefined;
   currentPageName: string;
+  currentPageReference: DocumentReference;
 }>();
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
@@ -67,10 +65,6 @@ const referenceHandler: ModelReferenceHandler = cristal
   .getContainer()
   .get<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
   .get()!;
-const referenceParser: ModelReferenceParser = cristal
-  .getContainer()
-  .get<ModelReferenceParserProvider>("ModelReferenceParserProvider")
-  .get()!;
 const referenceSerializer: ModelReferenceSerializer = cristal
   .getContainer()
   .get<ModelReferenceSerializerProvider>("ModelReferenceSerializerProvider")
@@ -79,29 +73,23 @@ const referenceSerializer: ModelReferenceSerializer = cristal
 const dialogOpen: Ref<boolean> = ref(false);
 const preserveChildren: Ref<boolean> = ref(true);
 const existingPage: Ref<PageData | undefined> = ref(undefined);
-let locationReference: SpaceReference | undefined = undefined;
-let newDocumentReference: string;
-
-function treeNodeClickAction(node: NavigationTreeNode) {
-  locationReference = node.location;
-}
+const locationReference: Ref<SpaceReference | undefined> = ref(undefined);
+let newDocumentReference: DocumentReference;
+let newDocumentReferenceSerialized: string;
 
 async function movePage() {
-  const documentReference: DocumentReference = referenceParser.parse(
-    props.currentPageName,
-  ) as DocumentReference;
-  newDocumentReference = referenceSerializer.serialize(
-    referenceHandler.createDocumentReference(
-      documentReference.name,
-      locationReference!,
-    ),
-  )!;
+  newDocumentReference = referenceHandler.createDocumentReference(
+    props.currentPageReference.name,
+    locationReference.value!,
+  );
+  newDocumentReferenceSerialized =
+    referenceSerializer.serialize(newDocumentReference)!;
 
-  existingPage.value = await cristal.getPage(newDocumentReference);
+  existingPage.value = await cristal.getPage(newDocumentReferenceSerialized);
   if (!existingPage.value) {
     const result = await pageRenameManager.updateReference(
       props.currentPage!,
-      newDocumentReference,
+      newDocumentReferenceSerialized,
       preserveChildren.value,
     );
     dialogOpen.value = false;
@@ -112,17 +100,19 @@ async function movePage() {
 async function handleSuccess(result: { success: boolean; error?: string }) {
   if (result.success) {
     if (preserveChildren.value) {
-      documentService.notifyDocumentChange("delete", props.currentPage!);
+      documentService.notifyDocumentChange(
+        "delete",
+        props.currentPageReference,
+      );
     }
-    cristal.setCurrentPage(newDocumentReference, "view");
+    cristal.setCurrentPage(newDocumentReferenceSerialized, "view");
     alertsService.success(
       t("page.action.action.move.page.success", {
         page: props.currentPageName,
-        newPage: newDocumentReference,
+        newPage: newDocumentReferenceSerialized,
       }),
     );
-    const newPage: PageData = (await cristal.getPage(newDocumentReference))!;
-    documentService.notifyDocumentChange("update", newPage);
+    documentService.notifyDocumentChange("update", newDocumentReference);
   } else {
     alertsService.error(
       t("page.action.action.move.page.error", {
@@ -152,7 +142,7 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
               :href="
                 cristal.getRouter().resolve({
                   name: 'view',
-                  params: { page: newDocumentReference },
+                  params: { page: newDocumentReferenceSerialized },
                 }).href
               "
               >{{ newDocumentReference }}</a
@@ -161,26 +151,26 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
         </i18n-t>
       </x-alert>
       <div class="dialog-content">
-        <div class="dialog-tree">
-          <XNavigationTree
-            :click-action="treeNodeClickAction"
-            :current-page="currentPage"
-          ></XNavigationTree>
-        </div>
-        <div class="dialog-options">
+        <x-form id="page-move-form" @form-submit="movePage">
+          <XNavigationTreeSelect
+            v-model="locationReference"
+            :label="t('page.action.action.move.page.location.label')"
+            :help="t('page.action.action.move.page.location.help')"
+            :current-page-reference="currentPageReference"
+          ></XNavigationTreeSelect>
           <XCheckbox
             v-model="preserveChildren"
             :label="t('page.action.action.move.page.preserve.children.label')"
             :help="t('page.action.action.move.page.preserve.children.help')"
           ></XCheckbox>
-        </div>
+        </x-form>
       </div>
     </template>
     <template #footer>
       <x-btn @click.stop="dialogOpen = false">
         {{ t("page.action.action.move.page.cancel") }}
       </x-btn>
-      <x-btn variant="primary" @click.stop="movePage">
+      <x-btn variant="primary" type="submit" form="page-move-form">
         {{ t("page.action.action.move.page.title") }}
       </x-btn>
     </template>
@@ -189,11 +179,6 @@ async function handleSuccess(result: { success: boolean; error?: string }) {
 
 <style scoped>
 .dialog-content {
-  display: flex;
   min-width: 600px;
-  gap: var(--cr-spacing-small);
-}
-.dialog-tree {
-  min-width: 40%;
 }
 </style>

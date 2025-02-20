@@ -32,6 +32,11 @@ type TextFieldProps = {
    */
   autofocus?: boolean;
   modelValue?: string;
+  /**
+   * Help message.
+   * @since 0.15
+   */
+  help?: string;
 };
 
 export type { TextFieldProps };

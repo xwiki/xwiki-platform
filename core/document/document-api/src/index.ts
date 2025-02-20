@@ -101,21 +101,24 @@ interface DocumentService {
    * made on the whole Cristal instance.
    * @param change - the kind of change
    * @param listener - the listener to register
-   * @since 0.12
+   * @since 0.15
    */
   registerDocumentChangeListener(
     change: DocumentChange,
-    listener: (page: PageData) => Promise<void>,
+    listener: (page: DocumentReference) => Promise<void>,
   ): void;
 
   /**
    * Notify that a document change happened. This will execute all registered
    * listeners for the given kind of change.
    * @param change - the kind of change
-   * @param page - the document changed
-   * @since 0.12
+   * @param page - the reference to the changed document
+   * @since 0.15
    */
-  notifyDocumentChange(change: DocumentChange, page: PageData): Promise<void>;
+  notifyDocumentChange(
+    change: DocumentChange,
+    page: DocumentReference,
+  ): Promise<void>;
 }
 
 const name: string = "DocumentService";

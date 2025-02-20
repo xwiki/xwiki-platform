@@ -22,6 +22,7 @@ import PageActionsCategory from "./PageActionsCategory.vue";
 import { CIcon, Size } from "@xwiki/cristal-icons";
 import { inject } from "vue";
 import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   PageActionCategory,
   PageActionCategoryService,
@@ -30,6 +31,7 @@ import type {
 defineProps<{
   currentPage: PageData | undefined;
   currentPageName: string;
+  currentPageReference: DocumentReference;
   disabled: boolean;
 }>();
 
@@ -52,6 +54,7 @@ const actionCategories: PageActionCategory[] = actionCategoryService.list();
       :category="category"
       :current-page="currentPage"
       :current-page-name="currentPageName"
+      :current-page-reference="currentPageReference"
       :is-last="i == actionCategories.length - 1"
     ></page-actions-category>
   </x-menu>

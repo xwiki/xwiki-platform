@@ -187,7 +187,7 @@ export class DefaultDocumentService implements DocumentService {
   private readonly store: DocumentStore;
   private readonly documentChangeListeners: Map<
     DocumentChange,
-    Array<(page: PageData) => Promise<void>>
+    Array<(page: DocumentReference) => Promise<void>>
   > = new Map();
 
   constructor(@inject("CristalApp") private cristal: CristalApp) {
@@ -242,7 +242,7 @@ export class DefaultDocumentService implements DocumentService {
 
   registerDocumentChangeListener(
     change: DocumentChange,
-    listener: (page: PageData) => Promise<void>,
+    listener: (page: DocumentReference) => Promise<void>,
   ): void {
     if (this.documentChangeListeners.has(change)) {
       this.documentChangeListeners.get(change)!.push(listener);
@@ -253,7 +253,7 @@ export class DefaultDocumentService implements DocumentService {
 
   async notifyDocumentChange(
     change: DocumentChange,
-    page: PageData,
+    page: DocumentReference,
   ): Promise<void> {
     if (this.documentChangeListeners.has(change)) {
       await Promise.all(

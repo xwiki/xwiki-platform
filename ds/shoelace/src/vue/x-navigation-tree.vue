@@ -36,16 +36,16 @@ import XNavigationTreeItem from "./x-navigation-tree-item.vue";
 import { inject, onBeforeMount, ref, useTemplateRef, watch } from "vue";
 import "@shoelace-style/shoelace/dist/components/tree/tree";
 import type SlTreeItem from "@shoelace-style/shoelace/dist/components/tree-item/tree-item";
-import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
 import type { DocumentService } from "@xwiki/cristal-document-api";
+import type { NavigationTreeProps } from "@xwiki/cristal-dsapi";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   NavigationTreeNode,
   NavigationTreeSource,
   NavigationTreeSourceProvider,
 } from "@xwiki/cristal-navigation-tree-api";
 import type { Ref } from "vue";
-
-type OnClickAction = (node: NavigationTreeNode) => void;
 
 const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const documentService: DocumentService = cristal
@@ -61,10 +61,7 @@ const items = useTemplateRef<Array<typeof XNavigationTreeItem>>("items");
 
 var selectedTreeItem: SlTreeItem | undefined;
 
-const props = defineProps<{
-  clickAction?: OnClickAction;
-  currentPage?: PageData;
-}>();
+const props = defineProps<NavigationTreeProps>();
 
 onBeforeMount(async () => {
   rootNodes.value.push(...(await treeSource.getChildNodes("")));
@@ -73,12 +70,14 @@ onBeforeMount(async () => {
   documentService.registerDocumentChangeListener("update", onDocumentUpdate);
 });
 
-watch(() => props.currentPage, expandTree);
+watch(() => props.currentPageReference, expandTree);
 watch(items, expandTree);
 
 async function expandTree() {
-  if (props.currentPage) {
-    const nodesToExpand = treeSource.getParentNodesId(props.currentPage);
+  if (props.currentPageReference) {
+    const nodesToExpand = treeSource.getParentNodesId(
+      props.currentPageReference,
+    );
     if (items.value) {
       await Promise.all(
         items.value!.map(async (it) => it.expandTree(nodesToExpand)),
@@ -105,7 +104,7 @@ function onSelectionChange(selection: SlTreeItem) {
   selectedTreeItem = selection;
 }
 
-async function onDocumentDelete(page: PageData) {
+async function onDocumentDelete(page: DocumentReference) {
   const parents = treeSource.getParentNodesId(page);
   for (const i of rootNodes.value.keys()) {
     if (rootNodes.value[i].id == parents[0]) {
@@ -122,7 +121,7 @@ async function onDocumentDelete(page: PageData) {
 
 // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
 // eslint-disable-next-line max-statements
-async function onDocumentUpdate(page: PageData) {
+async function onDocumentUpdate(page: DocumentReference) {
   const parents = treeSource.getParentNodesId(page);
 
   for (const i of rootNodes.value.keys()) {

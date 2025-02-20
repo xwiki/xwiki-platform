@@ -21,11 +21,15 @@
 import { name } from "@xwiki/cristal-hierarchy-api";
 import { getPageHierarchyFromPath } from "@xwiki/cristal-hierarchy-default";
 import { Container, inject, injectable } from "inversify";
-import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type {
   PageHierarchyItem,
   PageHierarchyResolver,
 } from "@xwiki/cristal-hierarchy-api";
+import type {
+  DocumentReference,
+  SpaceReference,
+} from "@xwiki/cristal-model-api";
 
 /**
  * Implementation of PageHierarchyResolver for the FileSystem backend.
@@ -49,7 +53,7 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
   }
 
   async getPageHierarchy(
-    pageData: PageData,
+    page: DocumentReference | SpaceReference,
   ): Promise<Array<PageHierarchyItem>> {
     let hierarchy: Array<PageHierarchyItem> = [
       {
@@ -61,9 +65,9 @@ class FileSystemPageHierarchyResolver implements PageHierarchyResolver {
         }).href,
       },
     ];
-    if (pageData != null) {
+    if (page != null) {
       hierarchy = hierarchy.concat(
-        await getPageHierarchyFromPath(pageData, this.cristalApp),
+        await getPageHierarchyFromPath(page, this.cristalApp),
       );
     }
     return hierarchy;

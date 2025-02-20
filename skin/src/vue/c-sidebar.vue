@@ -31,7 +31,8 @@ import {
 import { CIcon } from "@xwiki/cristal-icons";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { Ref, inject, onMounted, ref, watch } from "vue";
-import type { CristalApp, PageData } from "@xwiki/cristal-api";
+import type { CristalApp } from "@xwiki/cristal-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 
 const logo = xlogo;
 const viewportType: Ref<ViewportType> = useViewportType();
@@ -45,8 +46,8 @@ const cristal: CristalApp = inject<CristalApp>("cristal")!;
 const documentService = cristal
   .getContainer()
   .get<DocumentService>(documentServiceName);
-const currentPage: Ref<PageData | undefined> =
-  documentService.getCurrentDocument();
+const currentPageReference: Ref<DocumentReference | undefined> =
+  documentService.getCurrentDocumentReference();
 
 defineEmits(["collapseMainSidebar"]);
 
@@ -158,9 +159,11 @@ function onClickOutsideMainSidebar() {
       <!-- TODO: Use wiki name as panel name (CRISTAL-374). -->
       <c-sidebar-panel name="">
         <c-page-creation-menu
-          :current-page="currentPage!"
+          :current-page-reference="currentPageReference"
         ></c-page-creation-menu>
-        <XNavigationTree :current-page="currentPage"></XNavigationTree>
+        <XNavigationTree
+          :current-page-reference="currentPageReference"
+        ></XNavigationTree>
       </c-sidebar-panel>
       <UIX uixname="sidebar.after" />
     </div>

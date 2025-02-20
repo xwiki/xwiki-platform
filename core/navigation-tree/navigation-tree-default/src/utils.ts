@@ -18,30 +18,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { PageData } from "@xwiki/cristal-api";
+import type { DocumentReference } from "@xwiki/cristal-model-api";
 
 /**
  * Returns the ids of the parents nodes for a path-like page id.
  *
- * @param pageData - the data of the page
+ * @param pageData - the page
  * @returns the parents nodes ids
- * @since 0.10
+ * @since 0.15
  **/
-// TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
-// eslint-disable-next-line max-statements
-export function getParentNodesIdFromPath(page?: PageData): Array<string> {
+export function getParentNodesIdFromPath(
+  page?: DocumentReference,
+): Array<string> {
   const result: Array<string> = [];
   if (page) {
-    // TODO: Use a page resolver instead when CRISTAL-234 is fixed.
-    const parents = page.id.split("/");
+    const parents = [
+      ...(page as DocumentReference).space!.names,
+      (page as DocumentReference).name,
+    ];
     let currentParent = "";
     let i;
-    for (i = 0; i < parents.length - 1; i++) {
+    for (i = 0; i < parents.length; i++) {
       currentParent += parents[i];
       result.push(currentParent);
       currentParent += "/";
     }
-    result.push(page.id);
   }
   return result;
 }

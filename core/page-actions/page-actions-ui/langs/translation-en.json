@@ -10,6 +10,8 @@
   "page.action.action.move.page.cancel": "Cancel",
   "page.action.action.move.page.dialog.title": "Move Page",
   "page.action.action.move.page.alert.content": "The page {pageName} already exists.",
+  "page.action.action.move.page.location.label": "New Location",
+  "page.action.action.move.page.location.help": "The new location for the page",
   "page.action.action.move.page.preserve.children.label": "Preserve Children",
   "page.action.action.move.page.preserve.children.help": "Preserve child pages by updating their paths and moving them to the new location.",
   "page.action.action.move.page.success": "Page \"{page}\" has been moved to \"{newPage}\".",
@@ -19,6 +21,7 @@
   "page.action.action.rename.page.dialog.title": "Rename Page",
   "page.action.action.rename.page.alert.content": "Page {pageName} already exists.",
   "page.action.action.rename.page.name.label": "Name",
+  "page.action.action.rename.page.name.help": "The new name for the page",
   "page.action.action.rename.page.success": "Page \"{page}\" has been renamed to \"{newPage}\".",
   "page.action.action.rename.page.error": "Failed to rename page \"{page}\". Reason: [{reason}]"
 }

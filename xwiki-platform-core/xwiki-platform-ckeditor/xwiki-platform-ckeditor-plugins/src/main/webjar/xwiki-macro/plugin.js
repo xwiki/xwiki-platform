@@ -166,7 +166,7 @@
       var isWidgetVisible = function(widget) {
         // We don't use CKEDITOR.dom.element#isVisible() because we want to check that the widget has both width and
         // height, otherwise the user cannot select it (to edit it for instance).
-        return widget.element.$.offsetHeight > 0 && widget.element.$.offsetWidth > 0;
+        return isElementVisible(widget.element.$);
       };
 
       var ensureMacroWidgetVisible = function(macroWidget) {
@@ -581,10 +581,9 @@
             });
           }
         });
-
-
       });
 
+      this.toggleMacroPlaceholderOnDOMUpdate(editor);
     },
 
     // Setup the balloon tool bar for the nested editables, after the balloontoolbar plugin has been fully initialized.
@@ -967,8 +966,70 @@
         output.push(separator, macroCall.content);
       }
       return CKEDITOR.tools.escapeComment(output.join(''));
+    },
+
+    toggleMacroPlaceholderOnDOMUpdate: function(editor) {
+      let cleanUp = () => {};
+      editor.on('contentDom', function() {
+        cleanUp();
+        const doc = editor.document.$;
+        $(doc).on("xwiki:dom:updated", onDOMUpdated);
+        // We need to update the cleanUp function whenever the editing area is (re)created. For in-place edit mode this
+        // happens only once (per editing session) while for standalone edit mode this happens multiple times (e.g.
+        // when we switch to Source and back or when the edited content is refreshed).
+        cleanUp = () => $(doc).off("xwiki:dom:updated", onDOMUpdated);
+      });
+      // We don't pass directly the cleanUp function because the cleanUp function may change during the lifetime of the
+      // editor (e.g. when the editing area is recreated for the standalone edit mode).
+      editor.on('beforeDestroy', () => cleanUp());
+
+      function onDOMUpdated(event, data) {
+        const editable = editor.editable()?.$;
+        const macroElements = data.elements
+          .flatMap(getMacroElements)
+          .filter(element => editable?.contains(element))
+          .sort((alice, bob) => {
+            const delta = alice.compareDocumentPosition(bob);
+            // We need to reverse the pre-order depth-first traversal in order to be able to handle the nested macros
+            // first.
+            if (delta & Node.DOCUMENT_POSITION_PRECEDING) {
+              return -1;
+            } else if (delta & Node.DOCUMENT_POSITION_FOLLOWING) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+        // Hide all the affected macro placeholders first, to trigger a single repaint.
+        macroElements.forEach(hideMacroPlaceholder);
+        // Then show the macro placeholders where needed.
+        macroElements.forEach(maybeToggleMacroPlaceholder);
+      }
+
+      function getMacroElements(root) {
+        const macroElementSelector = '.macro.cke_widget_element[data-macro]';
+        const macroElements = [...root.querySelectorAll(macroElementSelector)];
+        const macroElementAncestor = root.closest(macroElementSelector);
+        if (macroElementAncestor) {
+          macroElements.push(macroElementAncestor);
+        }
+        return macroElements;
+      }
+    
+      function hideMacroPlaceholder(macroElement) {
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.add('hidden');
+      }
+    
+      function maybeToggleMacroPlaceholder(macroElement) {
+        const macroVisible = isElementVisible(macroElement);
+        macroElement.querySelector(':scope > .macro-placeholder')?.classList.toggle('hidden', macroVisible);
+      }
     }
   });
+
+  function isElementVisible(element) {
+    return element.offsetHeight > 0 && element.offsetWidth > 0;
+  }
 
   CKEDITOR.plugins.xwikiMacro = {
     // The passed element is of type CKEDITOR.htmlParser.element

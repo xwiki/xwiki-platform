@@ -35,6 +35,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.ckeditor.test.po.AutocompleteDropdown;
 import org.xwiki.ckeditor.test.po.CKEditor;
+import org.xwiki.ckeditor.test.po.MacroDialogEditModal;
 import org.xwiki.ckeditor.test.po.RichTextAreaElement;
 import org.xwiki.edit.test.po.InplaceEditablePage;
 import org.xwiki.test.docker.junit5.TestReference;
@@ -304,5 +305,44 @@ class InplaceEditIT
 
         viewPage.saveAndView();
         assertEquals("new content", viewPage.getContent());
+    }
+
+    @Test
+    @Order(6)
+    void macroPlaceholder(TestUtils setup, TestReference testReference)
+    {
+        // We test using the in-place editor (and not the standalone editor) because we want the JavaScript code used by
+        // dynamic macros such as the Children macro to be executed. We want to test that the macro placeholder is
+        // hidden after the Children macro is lazy loaded.
+
+        // Enter in-place edit mode.
+        InplaceEditablePage viewPage = new InplaceEditablePage().editInplace();
+        CKEditor ckeditor = new CKEditor("content");
+        RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
+        richTextArea.clear();
+
+        // Insert the Id macro. The macro placeholder should be displayed.
+        richTextArea.sendKeys(Keys.ENTER, "/id");
+        AutocompleteDropdown qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/id", "Id");
+        richTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+
+        // We need to set the required name parameter through the Macro Edit dialog.
+        MacroDialogEditModal macroEditModal = new MacroDialogEditModal().waitUntilReady();
+        macroEditModal.setMacroParameter("name", "test").clickSubmit();
+        richTextArea.waitForContentRefresh();
+
+        // Insert the Children macro. The macro placeholder is initially displayed but then hidden, because the macro
+        // output is empty until the tree is lazy loaded.
+        richTextArea.sendKeys(Keys.UP, "/chi");
+        qa = new AutocompleteDropdown();
+        qa.waitForItemSelected("/chi", "Children");
+        richTextArea.sendKeys(Keys.ENTER);
+        qa.waitForItemSubmitted();
+        richTextArea.waitForContentRefresh();
+
+        assertEquals("No pages found\nmacro:id", richTextArea.getText());
+        viewPage.cancel();
     }
 }

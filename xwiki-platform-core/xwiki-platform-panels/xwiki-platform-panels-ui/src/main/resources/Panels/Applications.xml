@@ -164,6 +164,7 @@
     </property>
     <property>
       <async_context>
+        <value>doc.reference</value>
         <value>icon.theme</value>
         <value>locale</value>
         <value>request.wiki</value>
@@ -226,7 +227,12 @@
 {{/velocity}}
 
 {{velocity}}
-#set ($discard = $xwiki.ssx.use('Panels.Applications'))
+## We make sure to use the color theme of the document where this UIX is used.
+#set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
+#if ("$!colorTheme" != '')
+  #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
+#end
+#set ($discard = $xwiki.ssx.use('Panels.Applications', {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use('Panels.Applications'))
 
 #panelheader($services.localization.render('panels.applications.title'))
@@ -532,9 +538,7 @@ require(['scriptaculous/effects'], function() {
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')
-
-.applicationsPanel li img {
+      <code>.applicationsPanel li img {
   float: left;
   width: 16px;
   height: 16px;
@@ -555,7 +559,7 @@ require(['scriptaculous/effects'], function() {
   padding: 0;
   margin: 10px 0 0 0;
   border: 0;
-  color: $theme.linkColor;
+  color: @link-color;
   box-shadow: none;
   background-color: transparent;
   width: 100%;
@@ -565,7 +569,7 @@ require(['scriptaculous/effects'], function() {
 
 .applicationPanelMoreButton:hover,
 .applicationPanelMoreButton:focus {
-  background-color: $theme.highlightColor;
+  color: @link-hover-color;
 }
 
 .applicationPanelMoreButton .application-label {
@@ -692,12 +696,6 @@ require(['scriptaculous/effects'], function() {
     float: left;
     width: 33%;
   }
-
-  /* no responsive design for colibri */
-  .skin-colibri .panel-width-Small .applicationsPanel li {
-    float: none;
-    width: inherit;
-  }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
@@ -705,53 +703,17 @@ require(['scriptaculous/effects'], function() {
     float: left;
     width: 20%;
   }
-
-  /* no responsive design for colibri */
-  .skin-colibri .panel-width-Small .applicationsPanel li {
-    float: none;
-    width: inherit;
-  }
-}
-
-/* for colibri */
-
-.skin-colibri .panel-width-Small .applicationsPanel {
-  margin: 0;
-}
-
-.skin-colibri .panel-width-Small .applicationsPanel li {
-  padding: 15px 0;
-  -moz-border-radius: 7px;
-  -webkit-border-radius: 7px;
-  border-radius: 7px;
-  margin: 1px 0;
-}
-
-.skin-colibri .panel-width-Small .applicationsPanel li.active {
-  background-color: $theme.buttonPrimaryBackgroundColor;
-}
-
-.skin-colibri .panel-width-Small .applicationsPanel li.active a {
-  color: $theme.buttonPrimaryTextColor
-}
-
-.skin-colibri .panel-width-Small .applicationsPanel li:hover {
-  background-color: $theme.highlightColor;
-}
-
-.skin-colibri .panel-width-Small .applicationsPanel li:hover a {
-  color: $theme.textPrimaryColor;
 }
 </code>
     </property>
     <property>
-      <contentType/>
+      <contentType>LESS</contentType>
     </property>
     <property>
       <name>Applications Panel</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

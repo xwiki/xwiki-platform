@@ -765,7 +765,7 @@
         <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
-        <number>4</number>
+        <number>3</number>
         <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>

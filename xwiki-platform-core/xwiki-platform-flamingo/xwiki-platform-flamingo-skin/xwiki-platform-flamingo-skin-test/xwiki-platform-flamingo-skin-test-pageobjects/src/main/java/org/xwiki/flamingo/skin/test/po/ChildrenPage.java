@@ -97,7 +97,7 @@ public class ChildrenPage extends BaseElement
     /**
      * @return {@code true} if the viewer has tabs.
      * @since 17.2.0RC1
-     * @since 16.10.4
+     * @since 16.10.5
      * @since 16.4.7
      */
     public boolean hasTabs()
@@ -109,7 +109,7 @@ public class ChildrenPage extends BaseElement
      * Open the pinned child pages tab.
      * @return an instance of {@link PinnedChildPagesTab} after loading it.
      * @since 17.2.0RC1
-     * @since 16.10.4
+     * @since 16.10.5
      * @since 16.4.7
      */
     public PinnedChildPagesTab openPinnedChildPagesTab()
@@ -124,7 +124,7 @@ public class ChildrenPage extends BaseElement
     /**
      * Open the main tab.
      * @since 17.2.0RC1
-     * @since 16.10.4
+     * @since 16.10.5
      * @since 16.4.7
      */
     public void openChildrenTab()

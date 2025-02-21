@@ -29,7 +29,7 @@ import org.xwiki.test.ui.po.BaseElement;
  *
  * @version $Id$
  * @since 17.2.0RC1
- * @since 16.10.4
+ * @since 16.10.5
  * @since 16.4.7
  */
 public class PinnedChildPagesTab extends BaseElement

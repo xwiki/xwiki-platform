@@ -97,7 +97,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     private SolrFieldNameEncoder fieldNameEncoder;
 
     @Override
-    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         DocumentReference documentReference = new DocumentReference(entityReference);
@@ -218,7 +218,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale of which to index the extra data.
      * @throws XWikiException if problems occur.
      */
-    protected void setExtras(DocumentReference documentReference, LengthSolrInputDocument solrDocument, Locale locale)
+    protected void setExtras(DocumentReference documentReference, XWikiSolrInputDocument solrDocument, Locale locale)
         throws XWikiException
     {
         // We need to support the following types of queries:
@@ -244,7 +244,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param locale the locale for which to index the objects.
      * @param originalDocument the original document where the objects come from.
      */
-    protected void setObjects(LengthSolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
+    protected void setObjects(XWikiSolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
             boolean hasObjectsOfThisType = false;
@@ -260,7 +260,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     }
 
     @Override
-    protected void setPropertyValue(LengthSolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(XWikiSolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         Object value = typedValue.getValue();

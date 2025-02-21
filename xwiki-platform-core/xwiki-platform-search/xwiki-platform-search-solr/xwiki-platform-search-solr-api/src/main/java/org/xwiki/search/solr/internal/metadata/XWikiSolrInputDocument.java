@@ -26,14 +26,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 
 /**
- * Extended SolrInputDocument with calculated size.
+ * Extended SolrInputDocument with calculated size and support for adding fields once.
  * 
  * @version $Id$
  * @since 5.1M2
  */
-public class LengthSolrInputDocument extends SolrInputDocument
+public class XWikiSolrInputDocument extends SolrInputDocument
 {
     /**
      * Serialization identifier.
@@ -66,9 +67,24 @@ public class LengthSolrInputDocument extends SolrInputDocument
             this.length += ((byte[]) value).length;
         }
 
+        // Remove the field as the values have been reset.
         this.uniqueFields.remove(name);
 
         // TODO: support more type ?
+    }
+
+    @Override
+    public SolrInputField removeField(String name)
+    {
+        this.uniqueFields.remove(name);
+        return super.removeField(name);
+    }
+
+    @Override
+    public void clear()
+    {
+        this.uniqueFields.clear();
+        super.clear();
     }
 
     /**

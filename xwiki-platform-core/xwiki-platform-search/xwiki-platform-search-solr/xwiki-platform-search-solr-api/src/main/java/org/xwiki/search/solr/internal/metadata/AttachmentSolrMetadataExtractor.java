@@ -51,7 +51,7 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
-    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         AttachmentReference attachmentReference = new AttachmentReference(entityReference);

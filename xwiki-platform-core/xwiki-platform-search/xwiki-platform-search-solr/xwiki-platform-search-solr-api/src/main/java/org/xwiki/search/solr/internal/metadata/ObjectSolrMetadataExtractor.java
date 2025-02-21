@@ -54,7 +54,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     private SolrReferenceResolver resolver;
 
     @Override
-    public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
+    public boolean setFieldsInternal(XWikiSolrInputDocument solrDocument, EntityReference entityReference)
         throws Exception
     {
         BaseObjectReference objectReference = new BaseObjectReference(entityReference);
@@ -95,7 +95,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param object the object.
      * @throws Exception if problems occur.
      */
-    protected void setLocaleAndContentFields(DocumentReference documentReference, LengthSolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, XWikiSolrInputDocument solrDocument,
         BaseObject object) throws Exception
     {
         // Do the work for each locale.

@@ -271,7 +271,9 @@ const linkAction = getLinkAction(props.editor);
   position: relative;
   display: flex;
   border-radius: var(--cr-tooltip-border-radius);
+  border: 1px solid var(--cr-color-neutral-200);
   background: white; /* TODO: define a global variable for background color */
+  box-shadow: var(--cr-shadow-medium);
 }
 
 .items > div {

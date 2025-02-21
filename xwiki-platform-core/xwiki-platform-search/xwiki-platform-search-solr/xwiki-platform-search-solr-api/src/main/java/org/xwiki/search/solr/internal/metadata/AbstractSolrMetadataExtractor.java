@@ -365,7 +365,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document; in case of translations, this will obviously be different than
      *            the original document's locale
      */
-    protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, Locale locale)
+    protected void setObjectContent(LengthSolrInputDocument solrDocument, BaseObject object, Locale locale)
     {
         if (object == null) {
             // Yes, the platform can return null objects.
@@ -392,7 +392,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param propertyClass the class that describes the given property
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(LengthSolrInputDocument solrDocument, BaseProperty<?> property,
         PropertyClass propertyClass, Locale locale)
     {
         Object propertyValue = property.getValue();
@@ -454,7 +454,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param locale the locale of the indexed document
      * @see "XWIKI-9417: Search does not return any results for Static List values"
      */
-    private void setStaticListPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    private void setStaticListPropertyValue(LengthSolrInputDocument solrDocument, BaseProperty<?> property,
         StaticListClass propertyClass, Locale locale)
     {
         // The list of known values specified in the XClass.
@@ -489,7 +489,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param typedValue the value to add
      * @param locale the locale of the indexed document
      */
-    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<?> property,
+    protected void setPropertyValue(LengthSolrInputDocument solrDocument, BaseProperty<?> property,
         TypedValue typedValue, Locale locale)
     {
         // Collect all the property values from all the objects of a document in a single (localized) field.
@@ -508,12 +508,9 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * @param fieldName the field name
      * @param fieldValue the field value to add
      */
-    protected void addFieldValueOnce(SolrInputDocument solrDocument, String fieldName, Object fieldValue)
+    protected void addFieldValueOnce(LengthSolrInputDocument solrDocument, String fieldName, Object fieldValue)
     {
-        Collection<Object> fieldValues = solrDocument.getFieldValues(fieldName);
-        if (fieldValues == null || !fieldValues.contains(fieldValue)) {
-            solrDocument.addField(fieldName, fieldValue);
-        }
+        solrDocument.addFieldOnce(fieldName, fieldValue);
     }
 
     /**

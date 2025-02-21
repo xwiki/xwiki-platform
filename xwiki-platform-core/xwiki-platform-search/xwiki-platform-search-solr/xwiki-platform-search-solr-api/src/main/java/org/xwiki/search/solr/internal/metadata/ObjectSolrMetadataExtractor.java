@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -96,7 +95,7 @@ public class ObjectSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      * @param object the object.
      * @throws Exception if problems occur.
      */
-    protected void setLocaleAndContentFields(DocumentReference documentReference, SolrInputDocument solrDocument,
+    protected void setLocaleAndContentFields(DocumentReference documentReference, LengthSolrInputDocument solrDocument,
         BaseObject object) throws Exception
     {
         // Do the work for each locale.

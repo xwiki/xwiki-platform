@@ -42,6 +42,8 @@ jobs:
           key: ${{ github.ref }}-restore-cache-electron-linux
       - run: pnpm install
       - run: pnpm run build
+      - run: sudo apt install flatpak-builder
+      - run: flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
       - run: pnpm run --filter @xwiki/cristal-electron build:linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

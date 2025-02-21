@@ -25,6 +25,7 @@ import java.net.URL;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
@@ -184,6 +186,8 @@ public class MockitoOldcore
     private QueryManager queryManager;
 
     private WikiDescriptorManager wikiDescriptorManager;
+
+    private Set<String> wikis = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
@@ -1158,6 +1162,14 @@ public class MockitoOldcore
                     return getXWikiContext().getWikiId();
                 }
             });
+            when(this.wikiDescriptorManager.getAllIds()).then(new Answer<Collection<String>>()
+            {
+                @Override
+                public Collection<String> answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return wikis;
+                }
+            });
         }
 
         // A default implementation of UserReferenceResolver<CurrentUserReference> is expected by
@@ -1256,7 +1268,9 @@ public class MockitoOldcore
 
         XWikiDocument savedDocument = document.clone();
 
-        documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+        this.documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
+
+        this.wikis.add(document.getDocumentReference().getWikiReference().getName());
 
         // Set the document as it's original document
         savedDocument.setOriginalDocument(savedDocument.clone());
@@ -1497,5 +1511,10 @@ public class MockitoOldcore
     public UserPropertiesResolver getMockAllUserPropertiesResolver()
     {
         return this.allUserPropertiesResolver;
+    }
+
+    public void addWiki(String wikiId)
+    {
+        this.wikis.add(wikiId);
     }
 }

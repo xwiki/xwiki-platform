@@ -20,5 +20,8 @@
     "page.action.action.move.page.preserve.children.help": "Behalte untergeordnete Seiten bei, indem du ihre Pfade aktualisierst und sie an den neuen Speicherort verschiebst.",
     "page.action.action.rename.page.title": "Umbenennen",
     "page.action.action.rename.page.cancel": "Abbrechen",
-    "page.action.action.rename.page.alert.content": "Seite {pageName} existiert bereits."
+    "page.action.action.rename.page.alert.content": "Seite {pageName} existiert bereits.",
+    "page.action.action.move.page.location.label": "Neuer Speicherort",
+    "page.action.action.move.page.location.help": "Der neue Speicherort für die Seite",
+    "page.action.action.rename.page.name.help": "Der neue Name für die Seite"
 }

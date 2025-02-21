@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -26,9 +27,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
@@ -39,14 +40,18 @@ import org.xwiki.rest.resources.objects.ObjectResource;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * @version $Id$
  */
 @Component
 @Named("org.xwiki.rest.internal.resources.objects.ObjectPropertyResourceImpl")
-public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectPropertyResource
+public class ObjectPropertyResourceImpl extends BaseObjectsResource implements ObjectPropertyResource
 {
+    @Inject
+    private ModelFactory factory;
+
     @Override
     public Property getObjectProperty(String wikiName, String spaceName, String pageName, String className,
             Integer objectNumber, String propertyName, Boolean withPrettyNames) throws XWikiRestException
@@ -103,21 +108,19 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
+            com.xpn.xwiki.api.Object xwikiObject = doc.getObject(className, objectNumber);
 
-            com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
-            if (baseObject == null) {
+            if (xwikiObject == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            baseObject.set(propertyName, property.getValue(), Utils.getXWikiContext(componentManager));
+            xwikiObject.set(propertyName, property.getValue());
 
             doc.save("", Boolean.TRUE.equals(minorRevision));
 
-            baseObject = xwikiDocument.getObject(className, objectNumber);
-            Object object = DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                    componentManager), doc, baseObject, false, Utils.getXWikiApi(componentManager), false);
+            BaseObject baseObject = getBaseObject(doc, className, xwikiObject.getNumber());
+
+            Object object = this.factory.toRestObject(this.uriInfo.getBaseUri(), doc, baseObject, false, false);
 
             for (Property p : object.getProperties()) {
                 if (p.getName().equals(propertyName)) {

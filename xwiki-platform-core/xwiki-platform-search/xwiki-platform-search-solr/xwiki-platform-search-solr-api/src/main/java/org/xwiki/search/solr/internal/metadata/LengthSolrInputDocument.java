@@ -19,6 +19,12 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.solr.common.SolrInputDocument;
 
 /**
@@ -39,6 +45,8 @@ public class LengthSolrInputDocument extends SolrInputDocument
      */
     private int length;
 
+    private final Map<String, Set<Object>> uniqueFields = new HashMap<>();
+
     /**
      * @return the length (generally the number of characters). It's not the exact byte length, it's more a scale value.
      */
@@ -58,6 +66,45 @@ public class LengthSolrInputDocument extends SolrInputDocument
             this.length += ((byte[]) value).length;
         }
 
+        this.uniqueFields.remove(name);
+
         // TODO: support more type ?
+    }
+
+    /**
+     * Add a value to a field if it's not already present.
+     *
+     * @param name the field name
+     * @param value the value to add
+     * @since 16.4.7
+     * @since 16.10.5
+     * @since 17.2.0RC1
+     */
+    protected void addFieldOnce(String name, Object value)
+    {
+        Set<Object> existingValues = this.uniqueFields.computeIfAbsent(name, k -> {
+            Collection<Object> fieldValues = getFieldValues(name);
+            if (fieldValues != null) {
+                return new HashSet<>(fieldValues);
+            } else {
+                return new HashSet<>();
+            }
+        });
+
+        if (existingValues.add(value)) {
+            addField(name, value);
+        }
+    }
+
+    @Override
+    public void addField(String name, Object value)
+    {
+        // Add the value, but only if the field was already used with the "once" method.
+        // This adds the value again when called from the "once" method.
+        this.uniqueFields.computeIfPresent(name, (k, existingValues) -> {
+            existingValues.add(value);
+            return existingValues;
+        });
+        super.addField(name, value);
     }
 }

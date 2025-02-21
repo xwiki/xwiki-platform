@@ -1459,6 +1459,9 @@ public class XWiki implements EventListener
             if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
 
+                // Avoid modifying the cached document
+                document = document.clone();
+
                 if (initializer.updateDocument(document)) {
                     saveDocument(document,
                         localizePlainOrKey("core.model.xclass.mandatoryUpdateProperty.versionSummary"), context);

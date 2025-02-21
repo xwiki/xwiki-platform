@@ -441,20 +441,6 @@ TODO: should be moved to a css specific to the empty line placeholder plugin.
   content: attr(data-placeholder);
 }
 
-.doc-title {
-  max-width: var(--cr-sizes-max-page-width);
-  width: 100%;
-  display: flex;
-  flex-flow: column;
-  margin: 0;
-  font-size: var(--cr-font-size-2x-large);
-  line-height: var(--cr-font-size-2x-large);
-  outline: none;
-  border: none;
-  align-self: center;
-  justify-self: center;
-}
-
 :deep(.editor table td),
 :deep(.editor table th) {
   border: 1px solid var(--cr-color-neutral-300);

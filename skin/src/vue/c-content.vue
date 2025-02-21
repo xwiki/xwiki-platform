@@ -157,14 +157,6 @@ onUpdated(() => {
   height: auto;
 }
 
-.doc-title {
-  grid-area: doc-title;
-  margin: 0;
-  font-size: var(--cr-font-size-2x-large);
-  line-height: var(--cr-font-size-2x-large);
-  padding-block-start: var(--cr-spacing-small);
-}
-
 .doc-page-actions {
   display: flex;
   flex-wrap: wrap;

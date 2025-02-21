@@ -151,6 +151,23 @@ watch(
   margin: 0;
 }
 
+:deep(.doc-title) {
+  grid-area: doc-title;
+  align-self: center;
+  display: flex;
+  border: none;
+  font-size: var(--cr-font-size-2x-large);
+  font-weight: var(--cr-font-weight-bold);
+  flex-flow: column;
+  justify-self: center;
+  outline: none;
+  margin: 0;
+  max-width: var(--cr-sizes-max-page-width);
+  width: 100%;
+  line-height: var(--cr-font-size-2x-large);
+  padding-block-start: var(--cr-spacing-small);
+}
+
 @container xwCristal (max-width: 600px) {
   .content {
     padding-left: 0 var(--cr-spacing-x-small);

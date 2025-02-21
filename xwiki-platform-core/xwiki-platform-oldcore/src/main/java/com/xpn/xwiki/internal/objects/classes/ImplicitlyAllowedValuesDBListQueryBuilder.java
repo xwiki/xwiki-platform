@@ -214,7 +214,7 @@ public class ImplicitlyAllowedValuesDBListQueryBuilder implements QueryBuilder<D
         if (!StringUtils.isAlphanumeric(
             // Remove whitespace at both ends and a document or object prefix. We don't care about having both
             // prefixes after each other, this is not about catching all invalid names.
-            StringUtils.removeStart(StringUtils.removeStart(fieldName, StringUtils.strip(DOC_PREFIX)), OBJ_PREFIX)))
+            StringUtils.removeStart(StringUtils.removeStart(StringUtils.strip(fieldName), DOC_PREFIX), OBJ_PREFIX)))
         {
             throw new QueryException("Invalid field name [%s]".formatted(fieldName), null);
         }

@@ -47,7 +47,7 @@
 #end
 #set ($defaultTab = {
   'tabName': 'children',
-  'title': 'Children',
+  'title': $services.localization.render('docextra.children'),
   'content': $parentChildrenContent
 })
 #set ($discard = $tabs.add($defaultTab))

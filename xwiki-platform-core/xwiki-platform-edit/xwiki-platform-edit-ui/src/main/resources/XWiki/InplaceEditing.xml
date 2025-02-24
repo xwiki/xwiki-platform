@@ -346,7 +346,6 @@ define('xwiki-document-api', ['jquery', 'xwiki-meta'], function($, xcontext) {
         lockAction: action,
         force: force,
         language: this.getRealLocale(),
-        outputSyntax: 'plain',
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       })).then(() =&gt; {

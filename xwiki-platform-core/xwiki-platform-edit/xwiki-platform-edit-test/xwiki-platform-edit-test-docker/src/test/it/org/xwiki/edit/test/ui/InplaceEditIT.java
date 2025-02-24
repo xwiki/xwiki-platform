@@ -320,6 +320,7 @@ class InplaceEditIT
         CKEditor ckeditor = new CKEditor("content");
         RichTextAreaElement richTextArea = ckeditor.getRichTextArea();
         richTextArea.clear();
+        richTextArea.sendKeys("a first line", Keys.ENTER);
 
         // Insert the Id macro. The macro placeholder should be displayed.
         richTextArea.sendKeys(Keys.ENTER, "/id");
@@ -342,7 +343,7 @@ class InplaceEditIT
         qa.waitForItemSubmitted();
         richTextArea.waitForContentRefresh();
 
-        assertEquals("No pages found\nmacro:id", richTextArea.getText());
+        assertEquals("a first line\nNo pages found\nmacro:id", richTextArea.getText());
         viewPage.cancel();
     }
 

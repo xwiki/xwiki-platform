@@ -126,4 +126,13 @@ public class DefaultSolrConfigurationTest
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("");
         assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
     }
+
+    @Test
+    void getSynchronizationBatchSize()
+    {
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_BATCH_SIZE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_BATCH_SIZE_DEFAULT)).thenReturn(42);
+
+        assertEquals(42, this.configuration.getSynchronizationBatchSize());
+    }
 }

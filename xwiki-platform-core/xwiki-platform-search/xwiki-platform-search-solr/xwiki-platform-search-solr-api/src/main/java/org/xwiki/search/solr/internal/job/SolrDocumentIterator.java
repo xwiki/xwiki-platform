@@ -165,7 +165,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
             // plan to update the index to match the database during the synchronization process).
             // See https://cwiki.apache.org/confluence/display/solr/Pagination+of+Results
             query.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
-            query.setRows(LIMIT);
+            query.setRows(getLimit());
         }
         return query;
     }

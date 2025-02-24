@@ -21,6 +21,8 @@ package org.xwiki.attachment;
 
 import java.nio.charset.Charset;
 
+import javax.inject.Named;
+
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,6 +34,7 @@ import org.xwiki.attachment.internal.configuration.DefaultAttachmentConfiguratio
 import org.xwiki.attachment.script.AttachmentScriptService;
 import org.xwiki.csrf.script.CSRFTokenScriptService;
 import org.xwiki.icon.IconManagerScriptService;
+import org.xwiki.icon.internal.DefaultIconRenderer;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.internal.reference.converter.EntityReferenceConverter;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +48,7 @@ import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.DocumentReferenceConverter;
@@ -79,8 +83,13 @@ class MovePageTest extends PageTest
 
     private TemplateManager templateManager;
 
-    @Mock
-    private CSRFTokenScriptService csrfScriptService;
+    @MockComponent(classToMock = CSRFTokenScriptService.class)
+    @Named("csrf")
+    private ScriptService csrfScriptService;
+
+    @MockComponent(classToMock = IconManagerScriptService.class)
+    @Named("icon")
+    private ScriptService iconManagerScriptService;
 
     private ContextualAuthorizationManager contextualAuthorizationManager;
 
@@ -90,10 +99,11 @@ class MovePageTest extends PageTest
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         // Initializes then environment for the icon extension.
         IconSetup.setUp(this, "/icons/default.iconset");
-        this.componentManager.registerComponent(ScriptService.class, "csrf", this.csrfScriptService);
         this.componentManager.registerMockComponent(JobExecutor.class);
-        when(this.csrfScriptService.isTokenValid(any(String.class))).thenReturn(true);
+        when(((CSRFTokenScriptService)this.csrfScriptService).isTokenValid(any(String.class))).thenReturn(true);
         this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .thenReturn("errorIcon");
     }
 
     @Test
@@ -121,7 +131,7 @@ class MovePageTest extends PageTest
         this.context.setDoc(document);
         this.request.put("attachment", ATTACHMENT_NAME);
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("Space Page attachment.txt", render.getElementsByClass("breadcrumb").get(0).text());
+        assertEquals("errorIcon Space Page attachment.txt", render.getElementsByClass("breadcrumb").get(0).text());
         assertEquals(ATTACHMENT_NAME, render.getElementById("targetAttachmentNameTitle").val());
         assertEquals("xwiki:Space.Page", render.getElementsByAttributeValue("name", "sourceLocation").val());
         assertEquals(ATTACHMENT_NAME, render.getElementsByAttributeValue("name", "sourceAttachmentName").val());
@@ -152,7 +162,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.targetNotWritable",
+        assertEquals("errorIcon error attachment.move.targetNotWritable",
             render.getElementsByClass("errormessage").get(0).text());
     }
 
@@ -163,7 +173,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
         this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.emptyName", 
+        assertEquals("errorIcon error attachment.move.emptyName", 
             render.select(".errormessage").text());
     }
 
@@ -194,7 +204,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("$services.icon.renderHTML($iconName) error attachment.move.alreadyExists "
+        assertEquals("errorIcon error attachment.move.alreadyExists "
                 + "[attachment.txt, Space.Target\"', /xwiki/bin/view/Space/Target%22%27]",
             render.getElementsByClass("errormessage").get(0).text());
     }

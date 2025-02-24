@@ -145,9 +145,9 @@ describe('LivedataPagination.vue', () => {
         }
       }
     });
-    expect(wrapper.find('.pagination-indexes').text()).toContain('livedata.pagination.page')
     expect(wrapper.findAll('.pagination-indexes .page-nav').length).toBe(1)
-    expect(wrapper.find('.pagination-indexes .page-nav').text()).toBe("1");
+    expect(wrapper.find('.pagination-indexes .page-nav').text()).toContain("1");
+    expect(wrapper.find('.pagination-indexes .page-nav').text()).toContain("livedata.pagination.loadPageByNumber");
   })
 
   it('Displays the pagination indexes when there is some entries', () => {
@@ -160,11 +160,13 @@ describe('LivedataPagination.vue', () => {
         }
       }
     });
-    expect(wrapper.find('.pagination-indexes').text()).toContain('livedata.pagination.page')
     let pageNavs = wrapper.findAll('.pagination-indexes .page-nav');
     expect(pageNavs.length).toBe(3)
-    expect(pageNavs.at(0).text()).toBe("1");
-    expect(pageNavs.at(1).text()).toBe("2");
-    expect(pageNavs.at(2).text()).toBe("3");
+    expect(pageNavs.at(0).text()).toContain("1");
+    expect(pageNavs.at(0).text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(pageNavs.at(1).text()).toContain("2");
+    expect(pageNavs.at(1).text()).toContain("livedata.pagination.loadPageByNumber");
+    expect(pageNavs.at(2).text()).toContain("3");
+    expect(pageNavs.at(2).text()).toContain("livedata.pagination.loadPageByNumber");
   })
 })

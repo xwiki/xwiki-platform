@@ -100,6 +100,8 @@ public enum Browser
         }
         // We want to ensure that those events are taking into account.
         options.addPreference("dom.disable_beforeunload", false);
+        // Workaround for https://github.com/mozilla/geckodriver/issues/2212
+        options.addPreference("remote.events.async.enabled", false);
         return options;
     }
 

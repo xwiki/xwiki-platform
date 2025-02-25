@@ -4481,7 +4481,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     // Copy the attachments from the template document, but don't overwrite existing attachments because
                     // the user can add attachments from the WYSIWYG editor before the save button is clicked (and thus
                     // before the template is applied).
-                    copyAttachments(templatedoc, false);
+                    copyAttachments(templatedoc, false, true);
                 }
             }
         }
@@ -4679,6 +4679,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private void copyAttachments(XWikiDocument sourceDocument, boolean overwrite)
     {
+        copyAttachments(sourceDocument, overwrite, false);
+    }
+
+    private void copyAttachments(XWikiDocument sourceDocument, boolean overwrite, boolean reset)
+    {
         if (overwrite) {
             // Note: when clearing the attachment list, we automatically mark the document's metadata as dirty.
             getAttachmentList().clear();
@@ -4687,7 +4692,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment attachment : sourceDocument.getAttachmentList()) {
             if (overwrite || this.getAttachment(attachment.getFilename()) == null) {
                 try {
-                    copyAttachment(attachment, true);
+                    copyAttachment(attachment, reset);
                 } catch (XWikiException e) {
                     LOGGER.warn("Cannot copy attachment [{}] from [{}] to [{}]. Root cause is [{}].",
                         attachment.getFilename(), sourceDocument.getDocumentReference(), this.getDocumentReference(),

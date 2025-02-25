@@ -42,7 +42,7 @@
 <div class="box warningmessage ${extraClass}">
   <span class="icon-block">$services.icon.renderHTML('warning')</span>
   <span class="sr-only">$services.localization.render('warning')</span>
-  $text
+  <div>$text</div>
 </div>
 #end
 ##

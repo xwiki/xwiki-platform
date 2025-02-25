@@ -79,10 +79,12 @@ public class PinnedChildPagesTab extends BaseElement
     {
         WebElement pageItem = getPageByTitle(pageTitle);
         pageItem.click();
-        getDriver().findElementsWithoutWaiting(getTreeElement(), By.cssSelector(".jstree-action-pin"))
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst().get().click();
+        WebElement buttonElement = getDriver().findElementWithoutWaiting(getTreeElement(),
+            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "']/following-sibling::div"
+                + "[contains(@class, 'jstree-action')]/button)"));
+        getDriver().createActions().moveToElement(buttonElement).perform();
+        getDriver().waitUntilCondition(driver -> buttonElement.isDisplayed());
+        buttonElement.click();
     }
 
     /**

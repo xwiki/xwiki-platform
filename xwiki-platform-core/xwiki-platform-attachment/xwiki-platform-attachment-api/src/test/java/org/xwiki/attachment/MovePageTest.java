@@ -46,7 +46,6 @@ import org.xwiki.security.script.SecurityScriptServiceComponentList;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.script.TemplateScriptService;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.page.IconSetup;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -97,8 +96,6 @@ class MovePageTest extends PageTest
     void setUp() throws Exception
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
-        // Initializes then environment for the icon extension.
-        IconSetup.setUp(this, "/icons/default.iconset");
         this.componentManager.registerMockComponent(JobExecutor.class);
         when(((CSRFTokenScriptService)this.csrfScriptService).isTokenValid(any(String.class))).thenReturn(true);
         this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);

@@ -8902,10 +8902,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setHidden(Boolean hidden)
     {
+        boolean hiddenValue;
         if (hidden == null) {
-            this.hidden = false;
+            hiddenValue = false;
         } else {
-            this.hidden = hidden;
+            hiddenValue = hidden;
+        }
+
+        if (this.hidden != hiddenValue) {
+            this.hidden = hiddenValue;
+
+            setMetaDataDirty(hiddenValue);
         }
     }
 

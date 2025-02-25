@@ -1154,10 +1154,26 @@ ul.exclusion-filter-pages a {
 .navigationPanelConfiguration .jstree-active + .jstree-actions .jstree-action-pin {
   display: inline-block;
 }
+
+// When a node is pinned but not in focus anymore, the pin is still shown, and we make sure an alternative text is still
+// available for assistive technologies.
+.navigationPanelConfiguration [data-pinned=true]:not(.jstree-clicked):not(.jstree-active) + .jstree-actions 
+.jstree-action-pin-off { 
+  display: inline;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+}
+
 .navigationPanelConfiguration .jstree-action-pin-on,
 .navigationPanelConfiguration .jstree-action-pin-off {
   display: none;
 }
+
 .navigationPanelConfiguration .jstree-active[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
 .navigationPanelConfiguration .jstree-clicked[data-pinned=true] + .jstree-actions .jstree-action-pin-off,
 .navigationPanelConfiguration .jstree-active:not([data-pinned=true]) + .jstree-actions .jstree-action-pin-on,

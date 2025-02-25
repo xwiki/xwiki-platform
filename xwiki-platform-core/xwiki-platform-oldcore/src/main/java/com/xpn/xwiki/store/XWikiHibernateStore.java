@@ -260,6 +260,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         this.registerLogoutListener();
 
         this.optimizedObjectClasses = this.hibernateConfiguration.getOptimizedXObjectClasses();
+
+        this.logger.debug("optimizedObjectClasses: {}", this.optimizedObjectClasses);
     }
 
     /**
@@ -734,9 +736,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     // optimization
                                     && isClassOptimized(entry.getKey());
 
+                                int count = 0;
                                 for (BaseObject obj : objects) {
                                     // Only save modified (or new) objects
                                     if (obj != null && (!optimizedObjects || obj.isDirty())) {
+                                        count++;
                                         obj.setDocumentReference(doc.getDocumentReference());
                                         /* If the object doesn't have a GUID, create it before saving */
                                         if (StringUtils.isEmpty(obj.getGuid())) {
@@ -744,6 +748,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                         }
                                         saveXWikiCollection(obj, context, false);
                                     }
+                                }
+
+                                if (this.logger.isDebugEnabled()) {
+                                    this.logger.debug("saveXWikiDoc:");
+                                    this.logger.debug("    - document: [{}]", doc.getDocumentReferenceWithLocale());
+                                    this.logger.debug(
+                                        "    - optimizedObjects: {} (doc.isNew: {} doc.isChangeTracked: {}, isClassOptimized: {})",
+                                        optimizedObjects, doc.isNew(), doc.isChangeTracked(),
+                                        isClassOptimized(entry.getKey()));
+                                    this.logger.debug("    - saved xobjects: [{}]", count);
                                 }
                             }
                         }

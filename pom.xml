@@ -73,7 +73,7 @@
     <zookeeper.version>3.9.3</zookeeper.version>
 
     <!-- Versions of other software we need in our functional tests -->
-    <testcontainers.version>1.20.4</testcontainers.version>
+    <testcontainers.version>1.20.5</testcontainers.version>
     <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
          sure the new version is available from https://download.documentfoundation.org/libreoffice/stable/
          Note: We don't need to exact version (e.g. 7.2.7.2) since the LTS is made available using a max of 2 dots
@@ -713,7 +713,7 @@
       <dependency>
         <groupId>io.sf.carte</groupId>
         <artifactId>css4j</artifactId>
-        <version>5.1</version>
+        <version>5.2</version>
       </dependency>
       <dependency>
         <groupId>io.sf.carte</groupId>
@@ -985,7 +985,7 @@
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
-        <version>1.25.0</version>
+        <version>1.26.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.zookeeper</groupId>

@@ -34,6 +34,7 @@
   <modules>
     <module>xwiki-platform-index-tree-api</module>
     <module>xwiki-platform-index-tree-macro</module>
+    <module>xwiki-platform-index-tree-rest</module>
     <module>xwiki-platform-index-tree-ui</module>
     <module>xwiki-platform-index-tree-war</module>
     <module>xwiki-platform-index-tree-webjar</module>

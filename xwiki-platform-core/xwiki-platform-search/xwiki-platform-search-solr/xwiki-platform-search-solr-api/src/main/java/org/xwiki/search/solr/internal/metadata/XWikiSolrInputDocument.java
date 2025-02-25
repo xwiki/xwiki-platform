@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,13 +33,16 @@ import org.apache.solr.common.SolrInputField;
  * Extended SolrInputDocument with calculated size and support for adding fields once.
  * 
  * @version $Id$
- * @since 5.1M2
+ * @since 16.4.7
+ * @since 16.10.5
+ * @since 17.2.0RC1
  */
 public class XWikiSolrInputDocument extends SolrInputDocument
 {
     /**
      * Serialization identifier.
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -61,10 +65,10 @@ public class XWikiSolrInputDocument extends SolrInputDocument
     {
         super.setField(name, value);
 
-        if (value instanceof String) {
-            this.length += ((String) value).length();
-        } else if (value instanceof byte[]) {
-            this.length += ((byte[]) value).length;
+        if (value instanceof String stringValue) {
+            this.length += stringValue.length();
+        } else if (value instanceof byte[] bytesValue) {
+            this.length += bytesValue.length;
         }
 
         // Remove the field as the values have been reset.
@@ -92,9 +96,6 @@ public class XWikiSolrInputDocument extends SolrInputDocument
      *
      * @param name the field name
      * @param value the value to add
-     * @since 16.4.7
-     * @since 16.10.5
-     * @since 17.2.0RC1
      */
     protected void addFieldOnce(String name, Object value)
     {

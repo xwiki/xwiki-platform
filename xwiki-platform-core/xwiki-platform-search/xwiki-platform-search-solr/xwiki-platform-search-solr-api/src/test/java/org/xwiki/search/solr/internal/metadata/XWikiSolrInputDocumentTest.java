@@ -82,4 +82,16 @@ class XWikiSolrInputDocumentTest
         doc.addFieldOnce(FIELD_1, VALUE_1);
         assertEquals(List.of(VALUE_1), doc.getFieldValues(FIELD_1));
     }
+
+    @Test
+    void setField()
+    {
+        XWikiSolrInputDocument doc = new XWikiSolrInputDocument();
+        doc.setField(FIELD_1, VALUE_1);
+        assertEquals(VALUE_1.length(), doc.getLength());
+        doc.setField(FIELD_1, VALUE_1);
+        assertEquals(2 * VALUE_1.length(), doc.getLength());
+        doc.setField(FIELD_1, VALUE_1.getBytes());
+        assertEquals(3 * VALUE_1.length(), doc.getLength());
+    }
 }

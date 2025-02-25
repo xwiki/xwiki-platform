@@ -191,10 +191,12 @@ public class NavigationPanelAdministrationPage extends ViewPage
     {
         WebElement pageItem = getPageByTitle(pageTitle);
         pageItem.click();
-        getDriver().findElementsWithoutWaiting(this.treeElement, By.cssSelector(".jstree-action-pin"))
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst().get().click();
+        WebElement buttonElement = getDriver().findElementWithoutWaiting(this.treeElement,
+            By.xpath("(.//li[contains(@class, 'jstree-node')]/a[. = '" + pageTitle + "']/following-sibling::div"
+                + "[contains(@class, 'jstree-action')]/button)"));
+        getDriver().createActions().moveToElement(buttonElement).perform();
+        getDriver().waitUntilCondition(driver -> buttonElement.isDisplayed());
+        buttonElement.click();
     }
 
     /**

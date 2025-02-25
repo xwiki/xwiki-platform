@@ -462,6 +462,7 @@ public class MoveJobTest extends AbstractMoveJobTest
         DocumentReference spaceHome = new DocumentReference("chess", List.of("A", "B", "C"), "WebHome");
         DocumentReference docFromSpace = new DocumentReference("X", spaceHome.getLastSpaceReference());
         DocumentReference otherDocFromSpace = new DocumentReference("Y", spaceHome.getLastSpaceReference());
+        DocumentReference prefFromSpace = new DocumentReference("WebPreferences", spaceHome.getLastSpaceReference());
         when(this.modelBridge.getDocumentReferences(spaceHome.getLastSpaceReference()))
             .thenReturn(List.of(spaceHome, docFromSpace, otherDocFromSpace));
         when(this.modelBridge.exists(spaceHome)).thenReturn(false);

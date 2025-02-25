@@ -99,10 +99,8 @@ class MovePageTest extends PageTest
         this.componentManager.registerMockComponent(JobExecutor.class);
         when(((CSRFTokenScriptService)this.csrfScriptService).isTokenValid(any(String.class))).thenReturn(true);
         this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);
-        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("exclamation"))
-            .thenReturn("errorIcon");
-        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("home"))
-            .thenReturn("homeIcon");
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     @Test
@@ -161,7 +159,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.targetNotWritable",
+        assertEquals("exclamationIcon error attachment.move.targetNotWritable",
             render.getElementsByClass("errormessage").get(0).text());
     }
 
@@ -172,7 +170,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
         this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.emptyName", 
+        assertEquals("exclamationIcon error attachment.move.emptyName", 
             render.select(".errormessage").text());
     }
 
@@ -203,7 +201,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.alreadyExists "
+        assertEquals("exclamationIcon error attachment.move.alreadyExists "
                 + "[attachment.txt, Space.Target\"', /xwiki/bin/view/Space/Target%22%27]",
             render.getElementsByClass("errormessage").get(0).text());
     }

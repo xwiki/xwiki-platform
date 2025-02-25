@@ -97,7 +97,7 @@ class EditMacrosPageTest extends PageTest
     {
         this.request.setSession(this.httpSession);
         when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
-            .thenReturn("errorIcon");
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     @Test
@@ -136,7 +136,7 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("warning", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("errorIcon warning " 
+        assertEquals("warningIcon warning " 
             + "platform.core.editConfirmation.warnings", message.selectFirst(".warningmessage").text());
         assertEquals("Warning", message.selectFirst("#warning1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
@@ -171,7 +171,7 @@ class EditMacrosPageTest extends PageTest
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
         // This test is not to test the structure, but to verify the order in which the text are displayed.
-        assertEquals("errorIcon error " 
+        assertEquals("exclamationIcon error " 
             + "platform.core.editConfirmation.errors Error 1 Error 2 platform.core.editConfirmation"
             + ".additionalWarnings Warning 1 Warning 2", message.text());
         assertEquals("cancel", editConfirmation.get("reject"));
@@ -228,7 +228,7 @@ class EditMacrosPageTest extends PageTest
         Map<String, String> editConfirmation = (Map<String, String>) scriptContext.getAttribute("editConfirmation");
         assertEquals("error", editConfirmation.get("title"));
         Document message = Jsoup.parse(editConfirmation.get("message"));
-        assertEquals("errorIcon error platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
+        assertEquals("exclamationIcon error platform.core.editConfirmation.errors", message.selectFirst(".errormessage").text());
         assertEquals("Error", message.selectFirst("#error1").text());
         assertEquals("cancel", editConfirmation.get("reject"));
         assertNull(editConfirmation.get("confirm"));

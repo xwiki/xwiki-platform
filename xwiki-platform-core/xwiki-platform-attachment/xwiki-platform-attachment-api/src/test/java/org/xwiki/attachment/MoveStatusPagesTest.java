@@ -86,8 +86,8 @@ class MoveStatusPagesTest extends PageTest
     {
         this.templateManager = this.oldcore.getMocker().getInstance(TemplateManager.class);
         this.componentManager.registerComponent(ScriptService.class, "job", this.jobScriptService);
-        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("exclamation"))
-            .thenReturn("errorIcon");
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     @Test
@@ -95,7 +95,7 @@ class MoveStatusPagesTest extends PageTest
     {
         this.request.put("moveId", "42");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_STATUS_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.status.notFound", render.select(".errormessage").text());
+        assertEquals("exclamationIcon error attachment.move.status.notFound", render.select(".errormessage").text());
         verify(this.jobScriptService).getJobStatus(List.of("refactoring", "moveAttachment", "42"));
     }
 

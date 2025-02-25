@@ -959,8 +959,9 @@ $html
   <#if($isInline)span#{else}div#end class="box ${classAffix}message $!{extraClass}">
     <span class="icon-block">$services.icon.renderHTML($iconName)</span>
     <span class="sr-only">$services.localization.render($prettyNameKey)</span>
-    <div>#if("$!title" != "")<div class="box-title">$!title</div>#end
-    <p>$text</p>
+    <div>
+      #if("$!title" != "")<div class="box-title">$!title</div>#end
+      $text
     </div>
   </#if($isInline)span#{else}div#end>
 #end

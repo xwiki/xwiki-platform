@@ -18,13 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import type { Logger } from "@xwiki/cristal-api";
-import { AttachmentsData, DefaultPageData, PageAttachment, PageData } from "@xwiki/cristal-api";
+import {
+  AttachmentsData,
+  DefaultPageData,
+  PageAttachment,
+  PageData,
+} from "@xwiki/cristal-api";
 import { PASSWORD, USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
-import { inject, injectable } from "inversify";
-import type { UserDetails } from "@xwiki/cristal-authentication-api";
 import { XMLParser } from "fast-xml-parser";
+import { inject, injectable } from "inversify";
+import type { Logger } from "@xwiki/cristal-api";
+import type { UserDetails } from "@xwiki/cristal-authentication-api";
 
 /**
  * Access Nextcloud storage through http.
@@ -52,6 +57,7 @@ export class NextcloudStorage extends AbstractStorage {
     return "";
   }
 
+  // eslint-disable-next-line max-statements
   async getPageContent(page: string): Promise<PageData | undefined> {
     await this.initBaseContent();
     const baseRestURL = this.getWikiConfig().baseRestURL;
@@ -115,9 +121,9 @@ export class NextcloudStorage extends AbstractStorage {
     if (response.status >= 200 && response.status < 300) {
       // window.DOMParser can't be used because it is not available in web
       // workers.
-      const parser = new XMLParser();
-      const data = parser.parse(await response.text());
-      const prop = data["d:multistatus"]["d:response"]["d:propstat"]["d:prop"];
+      const prop = new XMLParser().parse(await response.text())[
+        "d:multistatus"
+      ]["d:response"]["d:propstat"]["d:prop"];
       const modified = prop["d:getlastmodified"];
       if (modified) {
         lastModificationDate = new Date(Date.parse(modified));

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.invocation.InvocationOnMock;
 import org.xwiki.icon.IconManagerScriptService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -88,7 +89,7 @@ class CreateInlinePageTest extends PageTest
         this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "space", "page")));
 
         when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
-            .thenReturn("errorIcon");
+            .then(invocationOnMock -> { return invocationOnMock.getArgument(0) + "Icon";});
     }
 
     /**
@@ -172,11 +173,11 @@ class CreateInlinePageTest extends PageTest
 
         String expectedMessage;
         if (allowedSpaces.size() == 1) {
-            expectedMessage = String.format("errorIcon error " 
+            expectedMessage = String.format("exclamationIcon error " 
                 + "core.create.template.allowedspace.inline [%s, %s]",
                 provider, allowedSpaces.get(0));
         } else {
-            expectedMessage = String.format("errorIcon error "
+            expectedMessage = String.format("exclamationIcon error "
                 + "core.create.template.allowedspaces.inline [%s, %s]",
                 provider, allowedSpaces);
         }

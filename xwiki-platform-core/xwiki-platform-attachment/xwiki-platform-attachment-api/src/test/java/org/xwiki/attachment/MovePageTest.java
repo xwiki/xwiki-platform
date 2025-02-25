@@ -102,8 +102,12 @@ class MovePageTest extends PageTest
         this.componentManager.registerMockComponent(JobExecutor.class);
         when(((CSRFTokenScriptService)this.csrfScriptService).isTokenValid(any(String.class))).thenReturn(true);
         this.contextualAuthorizationManager = this.componentManager.getInstance(ContextualAuthorizationManager.class);
-        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML(any(String.class)))
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("cross"))
             .thenReturn("errorIcon");
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("exclamation"))
+            .thenReturn("errorIcon");
+        when(((IconManagerScriptService)this.iconManagerScriptService).renderHTML("home"))
+            .thenReturn("homeIcon");
     }
 
     @Test
@@ -131,7 +135,7 @@ class MovePageTest extends PageTest
         this.context.setDoc(document);
         this.request.put("attachment", ATTACHMENT_NAME);
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon Space Page attachment.txt", render.getElementsByClass("breadcrumb").get(0).text());
+        assertEquals("homeIcon Space Page attachment.txt", render.getElementsByClass("breadcrumb").get(0).text());
         assertEquals(ATTACHMENT_NAME, render.getElementById("targetAttachmentNameTitle").val());
         assertEquals("xwiki:Space.Page", render.getElementsByAttributeValue("name", "sourceLocation").val());
         assertEquals(ATTACHMENT_NAME, render.getElementsByAttributeValue("name", "sourceAttachmentName").val());
@@ -162,7 +166,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.targetNotWritable",
+        assertEquals("error: attachment.move.targetNotWritable",
             render.getElementsByClass("errormessage").get(0).text());
     }
 
@@ -173,7 +177,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
         this.request.put("form_token", "a6DSv7pKWcPargoTvyx2Ww");
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.emptyName", 
+        assertEquals("error: attachment.move.emptyName", 
             render.select(".errormessage").text());
     }
 
@@ -204,7 +208,7 @@ class MovePageTest extends PageTest
         this.request.put("step", "2");
 
         Document render = Jsoup.parse(this.templateManager.render(MOVE_TEMPLATE));
-        assertEquals("errorIcon error attachment.move.alreadyExists "
+        assertEquals("error: attachment.move.alreadyExists "
                 + "[attachment.txt, Space.Target\"', /xwiki/bin/view/Space/Target%22%27]",
             render.getElementsByClass("errormessage").get(0).text());
     }

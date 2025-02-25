@@ -1833,4 +1833,26 @@ public class XWikiDocumentMockitoTest
         assertFalse(document.isMetaDataDirty());
         assertFalse(document.isContentDirty());
     }
+
+    @Test
+    void hidden()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "document"));
+
+        document.setHidden(false);
+        document.setMetaDataDirty(false);
+
+        assertFalse(document.isHidden());
+        assertFalse(document.isMetaDataDirty());
+
+        document.setHidden(true);
+
+        assertTrue(document.isMetaDataDirty());
+
+        document.setMetaDataDirty(false);
+
+        document.setHidden(true);
+
+        assertFalse(document.isMetaDataDirty());
+    }
 }

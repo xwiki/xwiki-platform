@@ -128,26 +128,7 @@ export class ContentTools {
   public static transformImages(cristal: CristalApp, element: string): void {
     const xwikiContentEl = document.getElementById(element);
     if (xwikiContentEl) {
-      const transform = function (img: HTMLImageElement | HTMLScriptElement) {
-        const srcItem = img.attributes.getNamedItem("src");
-        if (srcItem) {
-          ContentTools.logger?.debug("Found image with url ", srcItem.value);
-          if (srcItem.value.indexOf("http") != 0) {
-            const storage = cristal
-              .getContainer()
-              .get<StorageProvider>("StorageProvider")
-              .get();
-            const src = storage.getImageURL(
-              cristal.getCurrentPage(),
-              srcItem.value,
-            );
-            if (src) {
-              img.src = src;
-              ContentTools.logger?.debug("Transforming image to url ", img.src);
-            }
-          }
-        }
-      };
+      const transformImagesFunction = this.getTransformImagesFunction(cristal);
       new MutationObserver(function (mutations: Array<MutationRecord>) {
         ContentTools.logger?.debug("Called in mutation records");
         for (const { addedNodes } of mutations) {
@@ -155,16 +136,51 @@ export class ContentTools {
             if (addedNode.nodeType == 1) {
               const imgs = (addedNode as HTMLElement).querySelectorAll("img");
               imgs.forEach((img) => {
-                transform(img);
+                transformImagesFunction(img);
               });
               if ((addedNode as HTMLElement).tagName === "IMG") {
-                transform(addedNode as HTMLImageElement);
+                transformImagesFunction(addedNode as HTMLImageElement);
               }
             }
           });
         }
       }).observe(xwikiContentEl, { childList: true, subtree: true });
     }
+  }
+
+  public static transformImagesInElement(
+    element: HTMLElement,
+    cristal: CristalApp,
+  ): void {
+    const transformImagesFunction = this.getTransformImagesFunction(cristal);
+    element
+      .querySelectorAll("img")
+      .forEach((image) => transformImagesFunction(image));
+  }
+
+  private static getTransformImagesFunction(
+    cristal: CristalApp,
+  ): (img: HTMLImageElement | HTMLScriptElement) => void {
+    return function (img: HTMLImageElement | HTMLScriptElement) {
+      const srcItem = img.attributes.getNamedItem("src");
+      if (srcItem) {
+        ContentTools.logger?.debug("Found image with url ", srcItem.value);
+        if (srcItem.value.indexOf("http") != 0) {
+          const storage = cristal
+            .getContainer()
+            .get<StorageProvider>("StorageProvider")
+            .get();
+          const src = storage.getImageURL(
+            cristal.getCurrentPage(),
+            srcItem.value,
+          );
+          if (src) {
+            img.src = src;
+            ContentTools.logger?.debug("Transforming image to url ", img.src);
+          }
+        }
+      }
+    };
   }
 
   /**

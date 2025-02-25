@@ -20,6 +20,7 @@
   "dependencies": {
     "@xwiki/cristal-browser-electron": "workspace:*",
     "@xwiki/cristal-configuration-electron-main": "workspace:*",
+    "@xwiki/cristal-electron-authentication-github-main": "workspace:*",
     "@xwiki/cristal-electron-authentication-xwiki-main": "workspace:*",
     "@xwiki/cristal-electron-storage": "workspace:*",
     "electron": "34.0.2"

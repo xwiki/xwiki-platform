@@ -21,6 +21,7 @@
 import { inject, injectable } from "inversify";
 import type { AlertsService } from "@xwiki/cristal-alerts-api";
 import type { CristalApp, Logger, PageData } from "@xwiki/cristal-api";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type {
   PageRevision,
   PageRevisionManager,
@@ -38,6 +39,8 @@ class GitHubPageRevisionManager implements PageRevisionManager {
     @inject<Logger>("Logger") private readonly logger: Logger,
     @inject<AlertsService>("AlertsService")
     private readonly alertsService: AlertsService,
+    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    private readonly authenticationManagerProvider: AuthenticationManagerProvider,
   ) {
     this.logger.setModule("history-github.GitHubPageRevisionManager");
   }
@@ -49,10 +52,18 @@ class GitHubPageRevisionManager implements PageRevisionManager {
     if (pageData) {
       const currentId = pageData.id;
 
+      const authorization = await this.authenticationManagerProvider
+        .get()
+        ?.getAuthorizationHeader();
+      const headers: { Accept: string; Authorization?: string } = {
+        Accept: "application/vnd.github+json",
+      };
+      if (authorization) {
+        headers.Authorization = authorization;
+      }
+
       const historyRequestUrl = new URL(
-        this.cristalApp
-          .getWikiConfig()
-          .baseURL.replace("/tree/", "/commits/deferred_commit_data/"),
+        `${this.cristalApp.getWikiConfig().baseRestURL}/commits`,
       );
       historyRequestUrl.search = new URLSearchParams([
         ["path", currentId],
@@ -60,54 +71,31 @@ class GitHubPageRevisionManager implements PageRevisionManager {
 
       try {
         const response = await fetch(historyRequestUrl, {
-          headers: {
-            Accept: "application/json",
-          },
+          headers: headers,
         });
-        const jsonResponse = await response.json();
-        revisions.push(
-          ...(await Promise.all(
-            jsonResponse.deferredCommits.map(
-              async (commit: { oid: string }) => {
-                const commitRequestUrl = this.cristalApp
-                  .getWikiConfig()
-                  .baseURL.replace(/\/tree\/.*$/, `/commits/${commit.oid}`);
-                const commitResponse = await fetch(commitRequestUrl, {
-                  headers: {
-                    Accept: "application/json",
-                  },
-                });
-                const jsonCommitResponse = await commitResponse.json();
-                const version: string = commit.oid.substring(0, 7);
-                const commitData: {
-                  committedDate: string;
-                  shortMessage: string;
-                  authors: Array<{ displayName: string; path: string }>;
-                } = jsonCommitResponse.payload.commitGroups[0].commits[0];
-                const authorProfile: URL = new URL(
-                  this.cristalApp.getWikiConfig().baseURL,
-                );
-                authorProfile.pathname = commitData.authors[0].path;
-                return {
-                  version: version,
-                  date: new Date(commitData.committedDate),
-                  user: {
-                    profile: authorProfile.toString(),
-                    name: commitData.authors[0].displayName,
-                  },
-                  comment: commitData.shortMessage,
-                  url: this.cristalApp.getRouter().resolve({
-                    name: "view",
-                    params: {
-                      page: currentId,
-                      revision: version,
-                    },
-                  }).href,
-                };
+        const jsonResponse: Array<{
+          sha: string;
+          commit: { author: { name: string; date: string }; message: string };
+          author: { avatar_url: string; html_url: string };
+        }> = await response.json();
+        for (const commit of jsonResponse) {
+          revisions.push({
+            version: commit.sha.slice(0, 7),
+            date: new Date(commit.commit.author.date),
+            user: {
+              profile: commit.author.html_url,
+              name: commit.commit.author.name,
+            },
+            comment: commit.commit.message,
+            url: this.cristalApp.getRouter().resolve({
+              name: "view",
+              params: {
+                page: currentId,
+                revision: commit.sha.slice(0, 7),
               },
-            ),
-          )),
-        );
+            }).href,
+          });
+        }
       } catch (error) {
         this.logger.error(error);
         this.alertsService.error(

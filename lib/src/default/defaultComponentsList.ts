@@ -24,6 +24,7 @@ import { ComponentInit as AttachmentsUIComponentInit } from "@xwiki/cristal-atta
 import { ComponentInit as AuthenticationDefaultComponentInit } from "@xwiki/cristal-authentication-default";
 import { ComponentInit as AuthenticationUIComponentInit } from "@xwiki/cristal-authentication-ui";
 import { ComponentInit as BackendAPIComponentInit } from "@xwiki/cristal-backend-api";
+import { ComponentInit as GithubBackendComponentInit } from "@xwiki/cristal-backend-github";
 import { ComponentInit as NextcloudBackendComponentInit } from "@xwiki/cristal-backend-nextcloud";
 import { ComponentInit as XWikiBackendComponentInit } from "@xwiki/cristal-backend-xwiki";
 import { Configuration } from "@xwiki/cristal-configuration-api";
@@ -82,6 +83,8 @@ export async function defaultComponentsList(
     (await import("./nextcloud")).load(container);
   } else if (configuration.configType == "XWiki") {
     (await import("./xwiki")).load(container);
+  } else if (configuration.configType == "GitHub") {
+    (await import("./github")).load(container);
   }
 
   new RenderingComponentInit(container);
@@ -110,4 +113,5 @@ export async function defaultComponentsList(
   new DateAPIComponentInit(container);
   new MarkdownDefaultComponentInit(container);
   new RenameComponentInit(container);
+  new GithubBackendComponentInit(container);
 }

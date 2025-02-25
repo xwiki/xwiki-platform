@@ -19,7 +19,7 @@
  */
 
 import { name } from "@xwiki/cristal-hierarchy-api";
-import { EntityType } from "@xwiki/cristal-model-api";
+import { getPageHierarchyFromPath } from "@xwiki/cristal-hierarchy-default";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
 import type {
@@ -64,26 +64,9 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
       },
     ];
     if (page != null) {
-      const fileHierarchy =
-        page.type == EntityType.SPACE
-          ? [...(page as SpaceReference).names]
-          : [
-              ...(page as DocumentReference).space!.names,
-              (page as DocumentReference).name,
-            ];
-      let currentFile = "";
-      for (let i = 0; i < fileHierarchy.length; i++) {
-        const file = fileHierarchy[i];
-        currentFile += `${i == 0 ? "" : "/"}${file}`;
-        hierarchy.push({
-          label: file,
-          pageId: currentFile,
-          url: this.cristalApp.getRouter().resolve({
-            name: "view",
-            params: { page: currentFile },
-          }).href,
-        });
-      }
+      hierarchy.push(
+        ...(await getPageHierarchyFromPath(page, this.cristalApp)),
+      );
     }
     return hierarchy;
   }

@@ -23,6 +23,7 @@ import { name as NavigationTreeSourceName } from "@xwiki/cristal-navigation-tree
 import { getParentNodesIdFromPath } from "@xwiki/cristal-navigation-tree-default";
 import { Container, inject, injectable } from "inversify";
 import type { CristalApp, Logger } from "@xwiki/cristal-api";
+import type { AuthenticationManagerProvider } from "@xwiki/cristal-authentication-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
 import type {
   NavigationTreeNode,
@@ -36,12 +37,11 @@ import type {
  **/
 @injectable()
 class GitHubNavigationTreeSource implements NavigationTreeSource {
-  private cristalApp: CristalApp;
-  public logger: Logger;
-
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") private readonly logger: Logger,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    private readonly authenticationManagerProvider: AuthenticationManagerProvider,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -56,37 +56,68 @@ class GitHubNavigationTreeSource implements NavigationTreeSource {
     const currentId = id ? id : "";
     const navigationTree: Array<NavigationTreeNode> = [];
 
+    const authorization = await this.authenticationManagerProvider
+      .get()
+      ?.getAuthorizationHeader();
+    const headers: { Accept: string; Authorization?: string } = {
+      Accept: "application/vnd.github.raw+json",
+    };
+    if (authorization) {
+      headers.Authorization = authorization;
+    }
+
     const navigationTreeRequestUrl = new URL(
-      `${this.cristalApp.getWikiConfig().baseURL}/${currentId}`,
+      this.cristalApp.getWikiConfig().storage.getPageRestURL(currentId, ""),
     );
-    navigationTreeRequestUrl.search = new URLSearchParams([
-      ["noancestors", "1"],
-    ]).toString();
     try {
       const response = await fetch(navigationTreeRequestUrl, {
-        headers: {
-          Accept: "application/json",
-        },
+        headers: headers,
       });
       const jsonResponse = await response.json();
-      jsonResponse.payload.tree.items.forEach(
-        (treeNode: { name: string; path: string; contentType: string }) => {
-          navigationTree.push({
-            id: treeNode.path,
-            label: treeNode.name,
-            location: new SpaceReference(
-              undefined,
-              ...treeNode.path.split("/"),
-            ),
-            url: this.cristalApp.getRouter().resolve({
-              name: "view",
-              params: {
-                page: treeNode.path,
+      navigationTree.push(
+        ...(
+          await Promise.all(
+            jsonResponse.map(
+              async (treeNode: {
+                name: string;
+                path: string;
+                type: string;
+                git_url: string;
+              }) => {
+                if (treeNode.type == "dir" && treeNode.name != "attachments") {
+                  const currentPageData = await this.cristalApp.getPage(
+                    treeNode.path,
+                  );
+                  const gitResponse = await fetch(treeNode.git_url, {
+                    headers: headers,
+                  });
+                  return {
+                    id: treeNode.path,
+                    label:
+                      currentPageData && currentPageData.name
+                        ? currentPageData.name
+                        : treeNode.name,
+                    location: new SpaceReference(
+                      undefined,
+                      ...treeNode.path.split("/"),
+                    ),
+                    url: this.cristalApp.getRouter().resolve({
+                      name: "view",
+                      params: {
+                        page: treeNode.path,
+                      },
+                    }).href,
+                    has_children: (
+                      (await gitResponse.json()) as {
+                        tree: Array<{ type: string }>;
+                      }
+                    ).tree.some((n) => n.type == "tree"),
+                  };
+                }
               },
-            }).href,
-            has_children: treeNode.contentType == "directory",
-          });
-        },
+            ),
+          )
+        ).filter((n: NavigationTreeNode) => n !== undefined),
       );
     } catch (error) {
       this.logger.error(error);

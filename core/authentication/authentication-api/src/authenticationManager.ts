@@ -27,9 +27,10 @@ import type { UserDetails } from "./userDetails";
  */
 interface AuthenticationManager {
   /**
-   *  Starts the authentication process.
+   * Starts the authentication process.
+   * @since 0.15
    */
-  start(): void;
+  start(): Promise<void>;
 
   /**
    * Handle the callback.

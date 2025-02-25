@@ -51,7 +51,7 @@ class XWikiAuthenticationManager implements AuthenticationManager {
     @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
   ) {}
 
-  start(): void {
+  async start(): Promise<void> {
     window.authenticationXWiki.login(this.cristalApp.getWikiConfig().baseURL);
   }
 

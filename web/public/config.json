@@ -87,6 +87,30 @@
     "designSystem": "vuetify",
     "realtimeURL": "http://localhost:15681/collaboration"
   },
+  "GitHub": {
+    "name": "GitHub",
+    "configType": "GitHub",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://raw.githubusercontent.com/USERNAME/REPOSITORY/BRANCH",
+    "baseRestURL": "https://api.github.com/repos/USERNAME/REPOSITORY",
+    "homePage": "home",
+    "designSystem": "vuetify",
+    "realtimeURL": "http://localhost:15681/collaboration",
+    "authenticationBaseURL": "http://localhost:15682"
+  },
+  "GitHubSL": {
+    "name": "GitHubSL",
+    "configType": "GitHub",
+    "serverRendering": false,
+    "offline": false,
+    "baseURL": "https://raw.githubusercontent.com/USERNAME/REPOSITORY/BRANCH",
+    "baseRestURL": "https://api.github.com/repos/USERNAME/REPOSITORY",
+    "homePage": "home",
+    "designSystem": "shoelace",
+    "realtimeURL": "http://localhost:15681/collaboration",
+    "authenticationBaseURL": "http://localhost:15682"
+  },
   "Nextcloud": {
     "name": "Nextcloud",
     "configType": "Nextcloud",

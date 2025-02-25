@@ -18,9 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+import de from "../langs/translation-de.json";
 import en from "../langs/translation-en.json";
+import fr from "../langs/translation-fr.json";
 
 const translations = {
   en,
+  fr,
+  de,
 };
 export default translations;

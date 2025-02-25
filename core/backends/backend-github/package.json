@@ -23,9 +23,12 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@xwiki/cristal-alerts-api": "workspace:*",
     "@xwiki/cristal-api": "workspace:*",
+    "@xwiki/cristal-authentication-api": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
-    "inversify": "6.2.2"
+    "inversify": "6.2.2",
+    "mime": "4.0.6"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

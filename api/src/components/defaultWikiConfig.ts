@@ -42,6 +42,12 @@ export class DefaultWikiConfig implements WikiConfig {
    * @since 0.11
    */
   public realtimeURL?: string;
+
+  /**
+   * Authentication server base URL.
+   * @since 0.15
+   */
+  authenticationBaseURL?: string;
   // @ts-expect-error homePage is temporarily undefined during class
   // initialization
   public homePage: string;
@@ -77,12 +83,13 @@ export class DefaultWikiConfig implements WikiConfig {
     serverRendering: boolean,
     designSystem: string,
     offline: boolean,
-    optional?: { realtimeURL?: string },
+    optional?: { realtimeURL?: string; authenticationBaseURL?: string },
   ): void {
     this.name = name;
     this.baseURL = baseURL;
     this.baseRestURL = baseRestURL;
     this.realtimeURL = optional?.realtimeURL;
+    this.authenticationBaseURL = optional?.authenticationBaseURL;
     this.homePage = homePage;
     this.serverRendering = serverRendering;
     this.designSystem = designSystem;
@@ -96,6 +103,7 @@ export class DefaultWikiConfig implements WikiConfig {
     this.baseURL = configObject.baseURL;
     this.baseRestURL = configObject.baseRestURL;
     this.realtimeURL = configObject.realtimeURL;
+    this.authenticationBaseURL = configObject.authenticationBaseURL;
     this.homePage = configObject.homePage;
     this.serverRendering = configObject.serverRendering;
     this.offline = configObject.offline;

@@ -35,6 +35,7 @@ const rules = computed(() => {
     :hint="help"
     :persistent-hint="help !== undefined"
     :rules="rules"
+    :readonly="readonly"
   ></v-text-field>
 </template>
 

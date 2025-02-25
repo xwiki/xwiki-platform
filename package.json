@@ -15,13 +15,14 @@
   "scripts": {
     "build": "nx run-many -t build --nxBail=true",
     "clean": "nx run-many -t clean",
-    "dev": "nx build @xwiki/cristal-web && concurrently --kill-others 'pnpm run dev:cristal-web' 'pnpm run dev:cristal-realtime'",
+    "dev": "nx build @xwiki/cristal-web && concurrently --kill-others 'pnpm run dev:cristal-web' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-github-authentication'",
+    "dev:cristal-github-authentication": "nx dev @xwiki/cristal-github-authentication",
     "dev:cristal-realtime": "nx dev @xwiki/cristal-realtime",
     "dev:cristal-web": "nx dev @xwiki/cristal-web",
     "lint": "nx run-many -t lint",
     "quickstart": "nx run @xwiki/cristal-web:quickstart",
     "start": "nx run @xwiki/cristal-web:start",
-    "start:electron": "concurrently --kill-others 'pnpm run start:electron:ui' 'pnpm run dev:cristal-realtime'",
+    "start:electron": "concurrently --kill-others 'pnpm run start:electron:ui' 'pnpm run dev:cristal-realtime' 'pnpm run dev:cristal-github-authentication'",
     "start:electron:ui": "nx build @xwiki/cristal-electron-main && nx build @xwiki/cristal-electron-renderer && nx build @xwiki/cristal-electron-storage && nx run @xwiki/cristal-electron:start",
     "test": "nx run-many -t test"
   },

@@ -31,6 +31,7 @@
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-authentication-default": "workspace:*",
     "@xwiki/cristal-backend-dexie": "workspace:*",
+    "@xwiki/cristal-backend-github": "workspace:*",
     "@xwiki/cristal-backend-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-xwiki": "workspace:*",
     "@xwiki/cristal-configuration-api": "workspace:*",

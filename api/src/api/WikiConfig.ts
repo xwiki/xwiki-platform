@@ -32,6 +32,11 @@ export interface WikiConfig {
    * @since 0.11
    */
   realtimeURL?: string;
+  /**
+   * Authentication server base URL.
+   * @since 0.15
+   */
+  authenticationBaseURL?: string;
   homePage: string;
   storage: Storage;
   serverRendering: boolean;

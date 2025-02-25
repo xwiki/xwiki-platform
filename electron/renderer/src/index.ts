@@ -21,6 +21,7 @@
 import "reflect-metadata";
 import { ComponentInit as BrowserComponentInit } from "@xwiki/cristal-browser-electron";
 import { loadConfig } from "@xwiki/cristal-configuration-electron-renderer";
+import { ComponentInit as GitHubAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-github-renderer";
 import { ComponentInit as XWikiAuthenticationComponentInit } from "@xwiki/cristal-electron-authentication-xwiki-renderer";
 import { ComponentInit as ElectronStorageComponentInit } from "@xwiki/cristal-electron-storage";
 import { ComponentInit as FileSystemPageHierarchyComponentInit } from "@xwiki/cristal-hierarchy-filesystem";
@@ -46,6 +47,7 @@ CristalAppLoader.init(
   true,
   true,
   "FileSystemSL",
+  // eslint-disable-next-line max-statements
   async (container, configuration) => {
     await defaultComponentsList(container, configuration);
     new ElectronStorageComponentInit(container);
@@ -57,5 +59,6 @@ CristalAppLoader.init(
     new ModelRemoteURLFilesystemComponentInit(container);
     new FileSystemLinkSuggestComponentInit(container);
     new FileSystemRenameComponentInit(container);
+    new GitHubAuthenticationComponentInit(container);
   },
 );

@@ -47,7 +47,7 @@ export class XWikiAuthenticationManager implements AuthenticationManager {
 
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements
-  start(): void {
+  async start(): Promise<void> {
     const config = this.cristalApp.getWikiConfig();
     const authorizationUrl = new URL(`${config.baseURL}/oidc/authorization`);
     authorizationUrl.searchParams.set("response_type", "code");

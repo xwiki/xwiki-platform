@@ -15,6 +15,7 @@ const input = defineModel<string>();
     :required="required"
     :autofocus.attr="autofocus"
     :value="input"
+    :readonly="readonly"
     type="text"
     @input="input = $event.target.value"
   ></sl-input>

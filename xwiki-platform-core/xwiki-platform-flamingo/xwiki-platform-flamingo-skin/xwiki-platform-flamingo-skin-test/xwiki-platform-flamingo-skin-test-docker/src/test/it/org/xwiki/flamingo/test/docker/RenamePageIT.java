@@ -529,6 +529,8 @@ class RenamePageIT
         // add attachment
         AttachmentReference attachmentReference = new AttachmentReference("file.txt", testReference);
         testUtils.rest().attachFile(attachmentReference, "attachment1".getBytes(), true);
+        testUtils.rest().attachFile(attachmentReference, "attachment2".getBytes(), false);
+        testUtils.rest().attachFile(attachmentReference, "attachment3".getBytes(), false);
         //add object
         Object styleSheetObject = testUtils.rest().object(testReference, "XWiki.StyleSheetExtension");
         styleSheetObject.getProperties().add(testUtils.rest().property("title", "a ssx"));
@@ -536,8 +538,8 @@ class RenamePageIT
 
         ViewPage viewPage = testUtils.gotoPage(testReference);
         HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
-        assertEquals(7, historyPane.getNumberOfVersions());
-        assertEquals("7.1", historyPane.getCurrentVersion());
+        assertEquals(9, historyPane.getNumberOfVersions());
+        assertEquals("9.1", historyPane.getCurrentVersion());
 
         RenamePage rename = viewPage.rename();
         rename.getDocumentPicker().setTitle("Another Title");
@@ -545,9 +547,11 @@ class RenamePageIT
         assertEquals("Done.", statusPage.getInfoMessage());
         viewPage = statusPage.gotoNewPage();
         historyPane = viewPage.openHistoryDocExtraPane();
-        assertEquals(7, historyPane.getNumberOfVersions());
-        assertEquals("7.2", historyPane.getCurrentVersion());
+        assertEquals(9, historyPane.getNumberOfVersions());
+        assertEquals("9.2", historyPane.getCurrentVersion());
         assertEquals("Update document after refactoring.", historyPane.getCurrentVersionComment());
+        AttachmentsPane attachmentsPane = new AttachmentsViewPage().openAttachmentsDocExtraPane();
+        assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("file.txt"));
     }
 
     @Order(7)

@@ -109,7 +109,7 @@
   #end
   #info($infoMessageContent)
   #else
-    {{warning}}$escapetool.xml($services.localization.render('extension.security.indexed.nojob')){{/warning}}
+    {{warning}}{{translation key='extension.security.indexed.nojob'/}}{{/warning}}
   #end
   {{/html}}
 #end

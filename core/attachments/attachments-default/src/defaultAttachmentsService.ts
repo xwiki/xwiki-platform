@@ -175,6 +175,8 @@ export class DefaultAttachmentsService implements AttachmentsService {
           ),
           count,
         );
+      } else {
+        this.store.updateAttachments([], 0);
       }
     } catch (e) {
       if (e instanceof Error) {

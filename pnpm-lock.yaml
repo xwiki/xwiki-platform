@@ -594,6 +594,9 @@ importers:
       '@xwiki/cristal-backend-api':
         specifier: workspace:*
         version: link:../backend-api
+      fast-xml-parser:
+        specifier: 5.0.7
+        version: 5.0.7
       inversify:
         specifier: 6.2.2
         version: 6.2.2(reflect-metadata@0.2.2)
@@ -6329,6 +6332,10 @@ packages:
   fast-uri@3.0.2:
     resolution: {integrity: sha512-GR6f0hD7XXyNJa25Tb9BuIdN0tdr+0BMi6/CJPH3wJO1JjNG3n/VsSw38AwRdKZABm8lGbPfakLRkYzx2V9row==}
 
+  fast-xml-parser@5.0.7:
+    resolution: {integrity: sha512-hRgQW2Az3ASwFo7wqBM2Uq9LcLoOVhGhE/yhjsIfd4gdDk0pqwKTHOSQYO1Zf7Nl/7Th2ykdmkPNntCfq3gBFg==}
+    hasBin: true
+
   fastq@1.18.0:
     resolution: {integrity: sha512-QKHXPW0hD8g4UET03SdOdunzSouc9N4AuHdsX8XNcTsuz+yYFILVNIX4l9yHABMhiEI9Db0JTTIpu0wB+Y1QQw==}
 
@@ -8091,6 +8098,9 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  strnum@2.0.4:
+    resolution: {integrity: sha512-qrXhLMohxtEPKMlajtNaOp5zvAQUo6L3fNcdiJKzWH98kGfklqGwmxhFjM7DzxsuoVM7rJeiYr+lEcu4Jlu9UQ==}
 
   stubborn-fs@1.2.5:
     resolution: {integrity: sha512-H2N9c26eXjzL/S/K+i/RHHcFanE74dptvvjM8iwzwbVcWY/zjBbgRqF3K0DY4+OD+uTTASTBvDoxPDaPN02D7g==}
@@ -11675,6 +11685,10 @@ snapshots:
 
   fast-uri@3.0.2: {}
 
+  fast-xml-parser@5.0.7:
+    dependencies:
+      strnum: 2.0.4
+
   fastq@1.18.0:
     dependencies:
       reusify: 1.0.4
@@ -13610,6 +13624,8 @@ snapshots:
   strip-bom@3.0.0: {}
 
   strip-json-comments@3.1.1: {}
+
+  strnum@2.0.4: {}
 
   stubborn-fs@1.2.5: {}
 

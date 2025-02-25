@@ -18,17 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import {
-  AttachmentsData,
-  DefaultPageData,
-  PageAttachment,
-  PageData,
-} from "@xwiki/cristal-api";
+import type { Logger } from "@xwiki/cristal-api";
+import { AttachmentsData, DefaultPageData, PageAttachment, PageData } from "@xwiki/cristal-api";
 import { PASSWORD, USERNAME } from "@xwiki/cristal-authentication-nextcloud";
 import { AbstractStorage } from "@xwiki/cristal-backend-api";
 import { inject, injectable } from "inversify";
-import type { Logger } from "@xwiki/cristal-api";
 import type { UserDetails } from "@xwiki/cristal-authentication-api";
+import { XMLParser } from "fast-xml-parser";
 
 /**
  * Access Nextcloud storage through http.
@@ -74,19 +70,22 @@ export class NextcloudStorage extends AbstractStorage {
 
         const json = await response.json();
 
-        return {
-          ...json,
-          id: page,
-          headline: json.name,
-          headlineRaw: json.name,
-          lastAuthor: lastAuthor,
-          lastModificationDate: lastModificationDate,
-          canEdit: true,
-        };
+        // A PageData instance must be returned as toObject is expected to be
+        // available to serialize page data. For instance, for the offline
+        // storage
+        const pageData = new DefaultPageData();
+        pageData.fromObject(json);
+        pageData.headline = json.name;
+        pageData.headlineRaw = json.name;
+        pageData.lastAuthor = lastAuthor;
+        pageData.lastModificationDate = lastModificationDate;
+        pageData.canEdit = true;
+        return pageData;
       } else {
         return undefined;
       }
-    } catch {
+    } catch (e) {
+      console.error("Unable to get page content", e);
       return undefined;
     }
   }
@@ -114,18 +113,17 @@ export class NextcloudStorage extends AbstractStorage {
       },
     );
     if (response.status >= 200 && response.status < 300) {
-      const data = new window.DOMParser().parseFromString(
-        await response.text(),
-        "text/xml",
-      );
-
-      const modified =
-        data.getElementsByTagName("d:getlastmodified")[0]?.innerHTML;
+      // window.DOMParser can't be used because it is not available in web
+      // workers.
+      const parser = new XMLParser();
+      const data = parser.parse(await response.text());
+      const prop = data["d:multistatus"]["d:response"]["d:propstat"]["d:prop"];
+      const modified = prop["d:getlastmodified"];
       if (modified) {
         lastModificationDate = new Date(Date.parse(modified));
       }
       lastAuthor = {
-        name: data.getElementsByTagName("oc:owner-display-name")[0]?.innerHTML,
+        name: prop["oc:owner-display-name"],
       };
     }
 

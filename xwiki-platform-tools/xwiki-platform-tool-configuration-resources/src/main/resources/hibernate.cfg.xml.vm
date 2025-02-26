@@ -323,10 +323,6 @@ jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=tr
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
-#foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
-    <mapping resource="$mapping"/>
-#end
-## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmOracleExtraMappings.split(","))
     <mapping resource="$mapping"/>
 #end

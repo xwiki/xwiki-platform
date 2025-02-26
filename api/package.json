@@ -37,7 +37,7 @@
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.3",
     "vite": "6.1.0",
-    "vue-tsc": "2.2.2"
+    "vue-tsc": "2.2.0"
   },
   "publishConfig": {
     "exports": {

@@ -44,7 +44,7 @@
     "typescript": "5.7.3",
     "vite": "6.1.0",
     "vitest": "3.0.5",
-    "vue-tsc": "2.2.2"
+    "vue-tsc": "2.2.0"
   },
   "publishConfig": {
     "exports": {

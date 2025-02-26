@@ -17,6 +17,14 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+## The variables defined in this file were added in XWiki 17.2.0
+## They should not be considered as API yet.
+## After some first "private" uses and some unavoidable cleanup/completion, 
+## this set of CSS variables should become an Unstable API (end be properly documented...).
+
+######################
+## Preparation
+######################
 #set ($themeDocFullName = "$!xwiki.getUserPreference('colorTheme')")
 #if ($themeDocFullName == '')
 #set ($themeDocFullName = 'ColorThemes.DefaultColorTheme')
@@ -26,19 +34,171 @@
 
 ## List of Bootstrap variables we need to give default values for XWiki standard variables
 ## We make sure font-size-base is set in em since it's a more powerful and reliable unit for font sizes
-#set($bootstrapVariables = {
-"text-muted": "#555",
+## The key is their name and the value is the string representing the value in CSS syntax.
+   #set($bootstrapVariables = {
+"btn-danger-color" : "#fff",
+"btn-default-border" : "#ccc",
+"btn-font-weight" : "normal",
+"btn-info-color" : "#fff",
+"btn-info-bg" : "var(--brand-info)",
+"btn-warning-bg" : "var(--brand-warning)",
+"breadcrumb-bg": "#f5f5f5",
+"breadcrumb-link-color": "var(--link-color)",
+"breadcrumb-separator": "/",
+"component-active-color": "#fff",
+"component-active-bg":"var(--brand-primary)",
+"dropdown-border" : "rgba(0, 0, 0, .15)",
+"dropdown-divider-bg" : "#e5e5e5",
+"font-family-base": "var(--font-family-sans-serif)",
+"font-family-sans-serif": '"Helvetica Neue", Helvetica, Arial, sans-serif',
+"font-family-serif": 'Georgia, "Times New Roman", Times, serif',
+"font-family-monospace": 'Georgia, "Times New Roman", Times, serif',
+"font-size-base": "1em",
 "grid-gutter-width": "30px",
-"font-size-base": "1em"
+"input-bg" : "#fff",
+"legend-color" : "#333",
+"legend-border-color": "#e5e5e5",
+"navbar-height" : "50px",
+"table-bg-hover": "#f5f5f5",
+"table-border-color": "#ddd"
 })
 
+## List of all the variables set in XWiki standard for various purposes.
+## Those should all be defined in variables.less and variablesInit.vm
+## Some values are changed from the bootstrap default in order to make sure there's no accessibility contrast issue
+## The default for these CSS values is directly taken from variablesInit.vm
+## The key is their name and the value is the string representing the value in CSS syntax.
+#set($xsVariables = {
+"figure-caption-font-size": "90%",
+"figure-caption-color": "var(--text-muted)",
+"loginFormMaxWidth": "450px",
+"login-form-max-width": "450px",
+"target-size-minimum": "24px",
+"target-size-recommended": "44px",
+"border-width": "1px",
+"headings-font-weight": "400",
+"nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
+"border-radius-base": "7px",
+"border-radius-large": "10px",
+"border-radius-small": "5px",
+"button-spacing": "2px",
+"button-border-width": "1px",
+"edit-section-relative-height": ".7",
+"main-padding": "calc(var(--grid-gutter-width) * 2)",
+"font-size-headings-scale": "1.190",
+"font-size-headings-scale-min": "1.125",
+"min-screen-size": "768",
+"max-screen-size": "1200",
+"min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
+"max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
+"min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
+"max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
+"min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
+"max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
+"min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
+"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))", 
+"min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
+"max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
+"min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
+"max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
+"100vw": "100vw",
+"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
+"font-size-document-title": "max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px + (@{max-document-title-font-size} - @{min-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
+"font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"font-size-h5": "var(--font-size-base)",
+"font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
+"navbar-default-link-color": "#727272",
+"navbar-default-color": "#727272",
+"input-color-placeholder": "#727272",
+"breadcrumb-active-color": "#707070",
+"breadcrumb-color": "#707070",
+"text-muted": "#555",
+"brand-primary": "#2f70a7",
+"text-color": "#222222",
+"btn-primary-bg": "#386da7",
+"btn-danger-bg": "#ca302c",
+"brand-success": "#077537",
+"btn-warning-color": "#000",
+"alert-danger-bg": "#f8ecec",
+"alert-success-bg": "#e5f3df",
+"alert-info-bg": "#e1f1f9",
+"brand-danger": "#cc3333"
+})
+
+#template('colorThemeInit.vm')
+
+#set($variablesOldColorTheme = {
+"text-color": $theme.textColor,
+"link-color": $theme.linkColor,
+"headings-color": $theme.titleColor,
+"body-bg": $theme.pageBackgroundColor,
+"nav-tabs-border-color": $theme.borderColor,
+"nav-tabs-active-link-hover-border-color": $theme.borderColor,
+"pagination-border":                   $theme.borderColor,
+"pagination-hover-border":             $theme.borderColor,
+"pagination-disabled-border":          $theme.borderColor,
+"list-group-border":                   $theme.borderColor,
+"thumbnail-border":                    $theme.borderColor,
+"input-border":                        $theme.borderColor,
+
+"navbar-default-toggle-border-color":  $theme.borderColor,
+"navbar-default-bg":                   $theme.menuBackgroundColor,
+"navbar-default-link-color":           $theme.menuLinkColor,
+"navbar-default-link-disabled-color":  $theme.menuContentLinkColor,
+"navbar-default-link-active-bg":       $theme.menuBackgroundColor,
+"navbar-default-link-active-color":    $theme.menuLinkColor,
+"navbar-default-link-hover-bg":        $theme.menuBackgroundColor,
+"navbar-default-link-hover-color":     $theme.menuLinkColor,
+"dropdown-bg":                         $theme.pageContentBackgroundColor,
+"dropdown-link-color":                 $theme.textColor,
+"dropdown-link-hover-bg":              $theme.submenuContentBackgroundColor,
+"dropdown-link-hover-color":           $theme.textColor,
+
+"btn-primary-color":                   $theme.buttonPrimaryTextColor,
+"btn-primary-bg":                      $theme.buttonPrimaryBackgroundColor,
+"btn-default-color":                   $theme.buttonSecondaryTextColor,
+"btn-default-bg":                      $theme.buttonSecondaryBackgroundColor,
+"btn-success-color":                   $theme.menuAddEntryLinkColor,
+"btn-success-bg":                      $theme.menuAddEntryBackgroundColor,
+"nav-tabs-active-link-hover-bg":       $theme.pageContentBackgroundColor,
+"nav-link-hover-bg":                   $theme.highlightColor,
+"brand-primary":                       $theme.buttonPrimaryBackgroundColor,
+"brand-success":                       $theme.notificationSuccessColor,
+"brand-info":                          $theme.notificationInfoColor,
+"brand-warning":                       $theme.notificationWarningColor,
+"brand-danger":                        $theme.notificationErrorColor,
+"panel-bg":                            $theme.panelBackgroundColor,
+"panel-default-text":                  $theme.panelTextColor,
+"panel-header-bg":                     $theme.panelHeaderBackgroundColor,
+"panel-header-text":                   $theme.panelHeaderTextColor,
+"xwiki-border-color":                  $theme.borderColor,
+"panel-header-bg":                     $theme.panelHeaderBackgroundColor,
+"panel-header-text":                   $theme.panelHeaderTextColor,
+"xwiki-page-content-bg":               $theme.pageContentBackgroundColor,
+"xwiki-background-secondary-color":    $theme.backgroundSecondaryColor,
+"xwiki-page-header-bg-color":          $theme.pageHeaderBackgroundColor,
+"xwiki-page-header-bg-image":          $stringtool.defaultString($theme.headerBackgroundImage, '""'),
+"xwiki-page-header-bg-position":       $stringtool.defaultString($theme.headerBackgroundPosition, '""')
+})
+
+## We merge those maps into one long list. 
+## We allow different values from different maps for the same variable. This is an extra fallback in case the first
+## doesn't work. This could be the case for defaults that rely on other variables.
+## Values will follow CSS cascading order (last one wins).
+#set($variableValueSets = [$variablesOldColorTheme, $bootstrapVariables, $xsVariables])
+
 ## List of all the variables available to customize directly in the Flamingo theme editor.
+## These mappings will not always end up in the initialization of a CSS variable.
+## To make sure all of those variables are still available even when not set in the colortheme,
+## check that they all appear in another map with a proper default value above.
 ## The key is the name and the value is the CSS type of the variable.
 #set($colorThemeVariables = {
 "text-color": "color",
 "body-bg": "color",
 "xwiki-page-content-bg" : "color",
-"font-family-base": "text",
 "link-color": "color",
 "brand-primary": "color",
 "brand-success": "color",
@@ -98,53 +258,13 @@
 "table-bg-hover": "color",
 "table-border-color": "color"
 })
-## List of all the variables set in XWiki standard for various purposes.
-## Those should all be defined in variables.less
-#set($xsVariables = {
-"figure-caption-font-size": "90%",
-"figure-caption-color": "var(--text-muted)",
-"loginFormMaxWidth": "450px",
-"login-form-max-width": "450px",
-"target-size-minimum": "24px",
-"target-size-recommended": "44px",
-"border-width": "1px",
-"headings-font-weight": "400",
-"nav-tabs-active-link-hover-bg": "var(--xwiki-page-content-bg)",
-"border-radius-base": "7px",
-"border-radius-large": "10px",
-"border-radius-small": "5px",
-"button-spacing": "2px",
-"button-border-width": "1px",
-"edit-section-relative-height": ".7",
-"main-padding": "calc(var(--grid-gutter-width) * 2)",
-"font-size-headings-scale": "1.190",
-"font-size-headings-scale-min": "1.125",
-"min-screen-size": "768",
-"max-screen-size": "1200",
-"min-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 4))",
-"max-h1-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 4))",
-"min-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 3))",
-"max-h2-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 3))",
-"min-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 2))",
-"max-h3-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 2))",
-"min-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 1))",
-"max-h4-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 1))", 
-"min-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), -1))",
-"max-h6-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), -1))",
-"min-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale-min), 5))",
-"max-document-title-font-size": "calc(var(--font-size-base) * pow(var(--font-size-headings-scale), 5))",
-"100vw": "100vw",
-"int-viewport-width": "calc(10000 * tan(atan2(var(--100vw), 10000px)))",
-"font-size-document-title": "max(@{min-document-title-font-size}px, min(@{max-document-title-font-size}px, calc(@{min-document-title-font-size}px + (@{max-document-title-font-size} - @{min-document-title-font-size}) * (100vw - @{min-screen-size}px) / (@{max-screen-size} - @{min-screen-size}))))",
-"font-size-h1": "calc(max(var(--min-h1-font-size), min(var(--max-h1-font-size), var(--min-h1-font-size) + (var(--max-h1-font-size) - var(--min-h1-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h2": "calc(max(var(--min-h2-font-size), min(var(--max-h2-font-size), var(--min-h2-font-size) + (var(--max-h2-font-size) - var(--min-h2-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h3": "calc(max(var(--min-h3-font-size), min(var(--max-h3-font-size), var(--min-h3-font-size) + (var(--max-h3-font-size) - var(--min-h3-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h4": "calc(max(var(--min-h4-font-size), min(var(--max-h4-font-size), var(--min-h4-font-size) + (var(--max-h4-font-size) - var(--min-h4-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))",
-"font-size-h5": "var(--font-size-base)",
-"font-size-h6": "calc(max(var(--min-h6-font-size), min(var(--max-h6-font-size), var(--min-h6-font-size) + (var(--max-h6-font-size) - var(--min-h6-font-size)) * (var(--int-viewport-width) - var(--min-screen-size)) / (var(--max-screen-size) - var(--min-screen-size)))))"
-})
 
-## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and Units module Level 4 is accepted and supported in browsers.
+######################
+## Generation
+######################
+
+## We use a tan/arctan2 hack to get a proper unitless viewport width. This hack can be avoided when the CSS Values and 
+## Units module Level 4 is accepted and supported in browsers.
 ## https://drafts.csswg.org/css-values/#calc-type-checking
 @property --100vw {
   syntax: "<length>";
@@ -153,15 +273,19 @@
 }
 
 :root {
-#foreach($property in $bootstrapVariables.keySet())
-#set($value = $bootstrapVariables.get($property))
-#if("$!value" != '')
---$property: $escapetool.javascript($!value);
+## First, we make sure that the necessary variables from bootstrap and XS are given at least one value.
+#foreach($variableWithValue in $variableValueSets)
+  #foreach($variableName in $variableWithValue.keySet())
+    #set($value = $variableWithValue.get($variableName))
+    #if("$!value" != '')
+      --$variableName: $escapetool.javascript($!value);
+    #end
+  #end
 #end
-#end
-
 
 ## Create CSS variables for each colorTheme variable that is set.
+## Right now we have the variable type info for all of those, but we don't use those yet.
+## Those values will override anything already declared in the XS/bootstrap defaults.
 #foreach($property in $colorThemeVariables.keySet())
 #set($value = $themeDoc.getValue($property, $themeObj))
 #if("$!value" != '')
@@ -171,19 +295,12 @@
 #end
 #set($propertyType = $colorThemeVariables.get($property))
 ## For now we only use `string` variables, because it's the easiest to setup and because it's 100% compatible with 
-## LESS variables. We could use extra info on the variable types to use @property syntax later.
+## LESS variables. We could use the extra info we have on the variable types to use the @property syntax later.
 #if($propertyType == 'escapedText')
 --$property: "$escapetool.javascript($!value)";
 #else
 --$property: $!value;
 #end
-#end
-#end
-
-#foreach($property in $xsVariables.keySet())
-#set($value = $xsVariables.get($property))
-#if("$!value" != '')
---$property: $!value;
 #end
 #end
 }

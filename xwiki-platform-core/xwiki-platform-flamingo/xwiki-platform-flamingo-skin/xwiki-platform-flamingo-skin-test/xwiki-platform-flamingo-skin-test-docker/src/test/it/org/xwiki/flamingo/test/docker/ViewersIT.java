@@ -28,9 +28,13 @@ import org.xwiki.flamingo.skin.test.po.PinnedChildPagesTab;
 import org.xwiki.flamingo.skin.test.po.SiblingsPage;
 import org.xwiki.livedata.test.po.TableLayoutElement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.repository.test.SolrTestUtils;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.RenamePage;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,7 +110,8 @@ class ViewersIT
      */
     @Test
     @Order(2)
-    void children(TestUtils testUtils, TestReference testReference)
+    void children(TestUtils testUtils, TestReference testReference, TestConfiguration testConfiguration)
+        throws Exception
     {
         DocumentReference childADocumentReference =
             new DocumentReference("ChildA", testReference.getLastSpaceReference());
@@ -120,7 +125,7 @@ class ViewersIT
         testUtils.createPage(childBDocumentReference, "", "ChildB");
         testUtils.createUser(EDIT_USER, EDIT_USER, null);
         testUtils.loginAsSuperAdmin();
-        testUtils.setRights(testReference, null, EDIT_USER, "edit", true);
+        testUtils.setRightsOnSpace(testReference.getLastSpaceReference(), null, EDIT_USER, "edit,delete", true);
 
         testUtils.forceGuestUser();
         testUtils.gotoPage(testReference);
@@ -147,7 +152,8 @@ class ViewersIT
 
         TableLayoutElement adminTableLayoutElement =
             ChildrenPage.goToPage(testReference).getLiveData().getTableLayout();
-        assertEquals(2, adminTableLayoutElement.countRows());
+        // WebPreferences is visible by superadmin
+        assertEquals(3, adminTableLayoutElement.countRows());
         adminTableLayoutElement
             .assertCellWithLink(ChildrenPage.LIVE_DATA_TITLE, "ChildA", testUtils.getURL(childADocumentReference));
         adminTableLayoutElement
@@ -166,13 +172,15 @@ class ViewersIT
         assertTrue(childrenPage.hasTabs());
 
         PinnedChildPagesTab pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
-        assertEquals(List.of("ChildA", "ChildB"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertEquals(List.of("ChildA", "ChildB"),
+            pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
         assertFalse(pinnedChildPagesTab.isPinned("ChildA"));
         assertFalse(pinnedChildPagesTab.isPinned("ChildB"));
 
         pinnedChildPagesTab.dragBefore("ChildB", "ChildA");
         assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
         pinnedChildPagesTab.save();
+
         childrenPage = ChildrenPage.goToPage(testReference);
         pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
         assertEquals(List.of("ChildB", "ChildA"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
@@ -187,5 +195,34 @@ class ViewersIT
         assertEquals(List.of("ChildA", "ChildB"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
         assertFalse(pinnedChildPagesTab.isPinned("ChildA"));
         assertFalse(pinnedChildPagesTab.isPinned("ChildB"));
+
+        pinnedChildPagesTab.pinPage("ChildB");
+        assertTrue(pinnedChildPagesTab.isPinned("ChildA"));
+        assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
+        pinnedChildPagesTab.save();
+
+        testUtils.loginAsSuperAdmin();
+        new SolrTestUtils(testUtils, testConfiguration.getServletEngine()).waitEmptyQueue();
+        childrenPage = ChildrenPage.goToPage(testReference);
+        pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
+        assertEquals(List.of("ChildA", "ChildB", "WebPreferences"),
+            pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertTrue(pinnedChildPagesTab.isPinned("ChildA"));
+        assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
+        assertFalse(pinnedChildPagesTab.isPinned("WebPreferences"));
+
+        testUtils.login(EDIT_USER, EDIT_USER);
+        // Check that pinned page are preserved after a move
+        RenamePage renamePage = testUtils.gotoPage(testReference).rename();
+        renamePage.setPreserveChildren(true);
+        renamePage.getDocumentPicker().setTitle("ChildrenRenamed");
+        CopyOrRenameOrDeleteStatusPage statusPage = renamePage.clickRenameButton().waitUntilFinished();
+        statusPage.gotoNewPage();
+        childrenPage = ChildrenPage.clickOnChildrenMenu();
+
+        pinnedChildPagesTab = childrenPage.openPinnedChildPagesTab();
+        assertEquals(List.of("ChildA", "ChildB"), pinnedChildPagesTab.getNavigationTree().getTopLevelPages());
+        assertTrue(pinnedChildPagesTab.isPinned("ChildA"));
+        assertTrue(pinnedChildPagesTab.isPinned("ChildB"));
     }
 }

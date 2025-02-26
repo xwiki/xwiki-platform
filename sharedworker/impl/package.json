@@ -51,7 +51,7 @@
     "typescript": "5.7.3",
     "vite": "6.1.0",
     "vite-plugin-comlink": "5.1.0",
-    "vue-tsc": "2.2.0"
+    "vue-tsc": "2.2.2"
   },
   "publishConfig": {
     "exports": {

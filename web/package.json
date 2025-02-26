@@ -52,7 +52,7 @@
     "@playwright/test": "1.50.1",
     "@types/node": "22.13.5",
     "@vitejs/plugin-vue": "5.2.1",
-    "globals": "15.14.0",
+    "globals": "16.0.0",
     "inversify": "6.2.2",
     "reflect-metadata": "0.2.2",
     "typescript": "5.7.3",

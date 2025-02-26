@@ -1,5 +1,17 @@
 # @xwiki/cristal-attachments-api
 
+## 0.15.0
+
+### Minor Changes
+
+- Cristal 0.15 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-authentication-api@0.15.0
+  - @xwiki/cristal-model-api@0.15.0
+
 ## 0.14.0
 
 ### Minor Changes

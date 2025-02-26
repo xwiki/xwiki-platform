@@ -1,5 +1,18 @@
 # @xwiki/cristal-backend-dexie
 
+## 0.15.0
+
+### Minor Changes
+
+- Cristal 0.15 Release
+
+### Patch Changes
+
+- Updated dependencies
+  - @xwiki/cristal-api@0.15.0
+  - @xwiki/cristal-backend-api@0.15.0
+  - @xwiki/cristal-sharedworker-api@0.15.0
+
 ## 0.14.0
 
 ### Minor Changes

@@ -75,7 +75,9 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
 
     /**
      * @return the list of references that have been selected to be refactored.
-     * @since 16.10.0RC1
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
      */
     public Map<EntityReference, EntityReference> getSelectedEntities()
     {

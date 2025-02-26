@@ -309,28 +309,34 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
     {
         boolean isWebPreferences =
             isSpacePreferencesReference(oldReference) && isSpacePreferencesReference(newReference);
-        if (!isWebPreferences) {
+        DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
+        boolean result = true;
+        // if we're trying to move a WebPreferences not as part of moving a WebHome we treat it with standard rights
+        // like we do for other pages.
+        if (!isWebPreferences || !this.concernedEntities.containsKey(oldHomeReference)) {
             if (!hasAccess(Right.VIEW, oldReference)) {
                 this.logger.error("You don't have sufficient permissions over the source document [{}].", oldReference);
-                return false;
+                result = false;
             } else if (!hasAccess(Right.EDIT, newReference)
-                || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference)))
-            {
+                || (this.modelBridge.exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
                 this.logger.error("You don't have sufficient permissions over the destination document [{}].",
                     newReference);
-                return false;
+                result = false;
             }
+        // else if we're moving a WebHome as part of moving its WebHome we check rights on the space itself.
+        // Note that we don't perform other checks regarding overwriting because WebPreferences is checked last:
+        //   - if there's only a WebPreferences document alone in the destination then it's ok to overwrite it as
+        //   we're creating a new space (since we move WebHome)
+        //   - if we're overwriting also WebHome then we already performed the check if it's allowed to overwrite it
         } else {
-            DocumentReference newHomeReference = getSpaceHomeReference(newReference);
-            DocumentReference oldHomeReference = getSpaceHomeReference(oldReference);
-            if (!this.concernedEntities.containsKey(oldHomeReference) || !hasAccess(Right.EDIT, newHomeReference)) {
+            if (!hasAccess(Right.EDIT, oldHomeReference)) {
                 this.logger.error("You don't have sufficient permissions over the home document of WebPreferences "
                         + "[{}].",
                     newReference);
-                return false;
+                result = false;
             }
         }
-        return true;
+        return result;
     }
 
     protected void maybePerformRefactoring(DocumentReference oldReference, DocumentReference newReference)

@@ -83,7 +83,9 @@ public class ChildrenPage extends BaseElement
     public static ChildrenPage goToPage(DocumentReference documentReference)
     {
         getUtil().gotoPage(documentReference, "view", Collections.singletonMap("viewer", "children"));
-        return new ChildrenPage();
+        ChildrenPage result = new ChildrenPage();
+        result.waitUntilPageIsReady();
+        return result;
     }
 
     /**

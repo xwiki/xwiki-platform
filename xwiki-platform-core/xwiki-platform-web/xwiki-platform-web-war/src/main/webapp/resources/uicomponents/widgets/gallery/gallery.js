@@ -121,6 +121,7 @@ XWiki.Gallery = Class.create({
       "${escapetool.javascript($services.localization.render('core.widgets.gallery.minimize'))}";
     this.container.toggleClassName('maximized');
     $(document.documentElement).toggleClassName('maximized');
+    this.maximizeToggle.focus();
   },
   show : function(index) {
     if (index < 0 || index >= this.images.length || index == this.index) {

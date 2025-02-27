@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -101,6 +100,7 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiSpace;
 import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
+import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
@@ -2902,28 +2902,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String createSQLQuery(String queryPrefix, String whereSQL)
     {
-        StringBuilder sql = new StringBuilder(queryPrefix);
-
-        String normalizedWhereSQL;
-        if (StringUtils.isBlank(whereSQL)) {
-            normalizedWhereSQL = "";
-        } else {
-            normalizedWhereSQL = whereSQL.trim();
-        }
-
-        sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
-        sql.append(" from XWikiDocument as doc");
-
-        if (!normalizedWhereSQL.equals("")) {
-            if ((!normalizedWhereSQL.startsWith("where")) && (!normalizedWhereSQL.startsWith(","))) {
-                sql.append(" where ");
-            } else {
-                sql.append(" ");
-            }
-            sql.append(normalizedWhereSQL);
-        }
-
-        return sql.toString();
+        return HqlQueryUtils.createLegacySQLQuery(queryPrefix, whereSQL);
     }
 
     /**
@@ -2935,22 +2914,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String getColumnsForSelectStatement(String whereSQL)
     {
-        StringBuilder columns = new StringBuilder();
-
-        int orderByPos = whereSQL.toLowerCase().indexOf("order by");
-        if (orderByPos >= 0) {
-            String orderByStatement = whereSQL.substring(orderByPos + "order by".length() + 1);
-            StringTokenizer tokenizer = new StringTokenizer(orderByStatement, ",");
-            while (tokenizer.hasMoreTokens()) {
-                String column = tokenizer.nextToken().trim();
-                // Remove "desc" or "asc" from the column found
-                column = StringUtils.removeEndIgnoreCase(column, " desc");
-                column = StringUtils.removeEndIgnoreCase(column, " asc");
-                columns.append(", ").append(column.trim());
-            }
-        }
-
-        return columns.toString();
+        return HqlQueryUtils.getColumnsForSelectStatement(whereSQL);
     }
 
     @Override

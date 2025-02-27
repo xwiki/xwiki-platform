@@ -32,6 +32,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
+import org.xwiki.stability.Unstable;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.web.Utils;
@@ -153,7 +154,32 @@ public class XWikiAttachmentContent implements Cloneable
     @Override
     public Object clone()
     {
-        return new XWikiAttachmentContent(this);
+        return clone(true);
+    }
+
+    /**
+     * Clone current instance and possibly copy the content.
+     * Note that {@link #clone()} never copy the actual content of the instance.
+     * @param skipContent {@code false} to also copy the content while performing the clone.
+     * @return a clone with the copied content or not depending on the parameter.
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    @Unstable
+    public XWikiAttachmentContent clone(boolean skipContent)
+    {
+        XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
+        // this AttachmentContent is not attached to any document yet.
+        clone.setOwnerDocument(null);
+        if (!skipContent) {
+            try {
+                clone.setContent(getContentInputStream());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to clone data to storage.", e);
+            }
+        }
+        return clone;
     }
 
     /**

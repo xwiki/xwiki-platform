@@ -171,7 +171,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
     }
 
     /**
-     * Check whether the current user is {@code superadmin}.
+     * Check whether the user is {@code superadmin}.
      *
      * @param user a user reference
      * @return {@code true} if the current user is {@code superadmin}, {@code false} otherwise

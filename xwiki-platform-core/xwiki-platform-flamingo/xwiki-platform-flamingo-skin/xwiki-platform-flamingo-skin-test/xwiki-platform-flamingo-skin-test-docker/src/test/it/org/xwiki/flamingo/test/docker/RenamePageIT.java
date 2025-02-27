@@ -649,8 +649,7 @@ class RenamePageIT
 
         testUtils.gotoPage(p2, "edit", "editor=wiki");
         WikiEditPage wikiEditPage = new WikiEditPage();
-        // Refactoring is removing absolute link and creates a relative link.
-        assertEquals(String.format("[[P1 link>>doc:%s]]", "P43"), wikiEditPage.getContent());
+        assertEquals(String.format("[[P1 link>>doc:%s]]", p1Reference.replace("P1", "P43")), wikiEditPage.getContent());
 
         p3Content = testUtils.gotoPage(p3).getContent();
         assertEquals(String.format(displayedContent, "xwiki:XWiki." + userLogin, "XWiki.superadmin",

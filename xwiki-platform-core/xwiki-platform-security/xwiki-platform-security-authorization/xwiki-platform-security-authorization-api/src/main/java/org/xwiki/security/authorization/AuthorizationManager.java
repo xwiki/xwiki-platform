@@ -24,6 +24,7 @@ import java.util.Set;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * This API is for checking the access rights of any users on any XWiki entities. It replaces
@@ -47,6 +48,21 @@ public interface AuthorizationManager
      * The Superadmin username.
      */
     String SUPERADMIN_USER = "superadmin";
+
+    /**
+     * Check whether the current user is {@code superadmin}.
+     *
+     * @param user a user reference
+     * @return {@code true} if the current user is {@code superadmin}, {@code false} otherwise
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    @Unstable
+    default boolean isSuperAdmin(DocumentReference user)
+    {
+        return false;
+    }
 
     /**
      * Check if the user identified by {@code userReference} has the access identified by {@code right} on the

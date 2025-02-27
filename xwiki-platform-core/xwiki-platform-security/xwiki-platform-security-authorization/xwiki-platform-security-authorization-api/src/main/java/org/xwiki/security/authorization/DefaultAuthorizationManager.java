@@ -100,7 +100,8 @@ public class DefaultAuthorizationManager implements AuthorizationManager
      * @param user A document reference representing a user identity.
      * @return {@code true} if and only if the user is determined to be the super user.
      */
-    private boolean isSuperAdmin(DocumentReference user)
+    @Override
+    public boolean isSuperAdmin(DocumentReference user)
     {
         return user != null && StringUtils.equalsIgnoreCase(user.getName(), AuthorizationManager.SUPERADMIN_USER);
     }

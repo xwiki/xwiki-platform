@@ -6000,7 +6000,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
+     * Returns a list of references of all documents which list this document as their parent, in the wiki of current
+     * document.
      *
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
@@ -6024,6 +6025,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
+            WikiReference wikiReference = this.getDocumentReference().getWikiReference();
             Query query = getStore().getQueryManager()
                 .createQuery("select distinct doc.fullName from XWikiDocument doc where "
                     + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
@@ -6035,10 +6037,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space",
                 LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference()));
-            query.setLimit(nb).setOffset(start);
+            query.setLimit(nb).setOffset(start).setWiki(wikiReference.getName());
 
             List<String> queryResults = query.execute();
-            WikiReference wikiReference = this.getDocumentReference().getWikiReference();
+
             for (String fullName : queryResults) {
                 children.add(getCurrentDocumentReferenceResolver().resolve(fullName, wikiReference));
             }

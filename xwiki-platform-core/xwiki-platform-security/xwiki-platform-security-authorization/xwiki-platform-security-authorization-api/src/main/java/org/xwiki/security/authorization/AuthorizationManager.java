@@ -21,6 +21,7 @@ package org.xwiki.security.authorization;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

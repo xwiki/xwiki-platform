@@ -216,7 +216,12 @@ public class XWikiAttachment implements Cloneable
     @Override
     public XWikiAttachment clone()
     {
-        return internalClone(false, false);
+        return internalClone(false, false, true);
+    }
+
+    protected XWikiAttachment cloneWithActualContent()
+    {
+        return internalClone(false, false, false);
     }
 
     /**
@@ -232,7 +237,7 @@ public class XWikiAttachment implements Cloneable
     public XWikiAttachment clone(String name, XWikiContext context)
         throws XWikiException, IOException
     {
-        XWikiAttachment clone = internalClone(true, true);
+        XWikiAttachment clone = internalClone(true, true, true);
         if (clone == null) {
             // According to #internalClone, this should never happen.
             throw new XWikiException("Failed to clone the attachment", null);
@@ -1518,7 +1523,15 @@ public class XWikiAttachment implements Cloneable
         }
     }
 
-    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent)
+    /**
+     *
+     * @param skipArchive {@code true} to skip the attachment archive when cloning
+     * @param skipContent {@code true} to skip content metadata
+     * @param skipActualContent {@code false} will also include {@link XWikiAttachmentContent} content, but this
+     * flag is only used if {@code skipContent} is {@code false}.
+     * @return
+     */
+    private XWikiAttachment internalClone(boolean skipArchive, boolean skipContent, boolean skipActualContent)
     {
         XWikiAttachment attachment = null;
 
@@ -1536,7 +1549,7 @@ public class XWikiAttachment implements Cloneable
             attachment.setRCSVersion(getRCSVersion());
             attachment.setMetaDataDirty(isMetaDataDirty());
             if (!skipContent && getAttachment_content() != null) {
-                attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
+                attachment.setAttachment_content(getAttachment_content().clone(skipActualContent));
                 attachment.getAttachment_content().setAttachment(attachment);
             }
             if (!skipArchive && getAttachment_archive() != null) {

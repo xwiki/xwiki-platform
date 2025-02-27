@@ -206,6 +206,8 @@ public class XWikiDocumentMockitoTest
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
         when(query.setLimit(7)).thenReturn(query);
+        when(query.setOffset(3)).thenReturn(query);
+        when(query.setWiki(DOCWIKI)).thenReturn(query);
 
         List<String> result = Arrays.asList("X.y", "A.b");
         when(query.<String>execute()).thenReturn(result);
@@ -216,6 +218,7 @@ public class XWikiDocumentMockitoTest
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
         verify(query).setOffset(3);
+        verify(query).setWiki(DOCWIKI);
 
         assertEquals(2, childrenReferences.size());
         assertEquals(new DocumentReference("wiki", "X", "y"), childrenReferences.get(0));

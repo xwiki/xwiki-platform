@@ -203,6 +203,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // Create the descriptor document
             descriptorDoc = wikiDescriptorDocumentHelper.getDocumentFromWikiId(descriptor.getId());
 
+            // Avoid modifying the cached document
+            descriptorDoc = descriptorDoc.clone();
+
             // Create the server class object
             BaseObject obj = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS, true, context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, descriptor.getDefaultAlias(), context);

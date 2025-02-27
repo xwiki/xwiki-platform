@@ -1180,23 +1180,11 @@ public class XWikiDocumentMockitoTest
         template.setAttachment(aliceAttachment);
 
         XWikiAttachment bobAttachment = new XWikiAttachment(template, "bob.png");
+        bobAttachment.setContent(new ByteArrayInputStream("bob content".getBytes()));
         bobAttachment.setVersion("5.3");
         bobAttachment.setDate(simpleDateFormat.parse("25/5/2019"));
         bobAttachment.setAuthorReference(templateAuthor);
         template.setAttachment(bobAttachment);
-
-        // Verify that the attachment content is loaded before being copied.
-        XWikiAttachmentStoreInterface attachmentContentStore = mock(XWikiAttachmentStoreInterface.class);
-        xcontext.getWiki().setDefaultAttachmentContentStore(attachmentContentStore);
-        doAnswer(invocation -> {
-            XWikiAttachment attachment = invocation.getArgument(0);
-            if ("bob.png".equals(attachment.getFilename())) {
-                XWikiAttachmentContent attachmentContent = new XWikiAttachmentContent(attachment);
-                attachmentContent.setContent(new ByteArrayInputStream("bob content".getBytes()));
-                attachment.setAttachment_content(attachmentContent);
-            }
-            return null;
-        }).when(attachmentContentStore).loadAttachmentContent(any(XWikiAttachment.class), eq(xcontext), eq(true));
 
         this.oldcore.getSpyXWiki().saveDocument(template, xcontext);
 

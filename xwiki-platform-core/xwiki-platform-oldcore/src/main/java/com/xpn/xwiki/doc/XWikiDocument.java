@@ -4766,8 +4766,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
                     LOGGER.warn("Cannot copy attachment [{}] from [{}] to [{}]. Root cause is [{}].",
                         attachment.getFilename(), sourceDocument.getDocumentReference(), this.getDocumentReference(),
                         ExceptionUtils.getRootCauseMessage(e));
-                    // Skip this attachment because we cannot load its content.
-                    continue;
                 }
             }
         }
@@ -4783,28 +4781,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     private void copyAttachment(XWikiAttachment attachment, boolean reset) throws XWikiException
     {
-        XWikiContext xcontext = getXWikiContext();
-        XWikiAttachment newAttachment = attachment.clone();
-
-        // Make sure we copy the attachment content also, not just its meta data. For this we need to load
-        // the attachment content from the source document. Note that the owner document will be overwritten
-        // below when we call setAttachment().
-        newAttachment.setDoc(attachment.getDoc(), false);
-        newAttachment.loadAttachmentContent(xcontext);
-        // We need to set the content of the attachment to be dirty because the dirty bit is used to signal
-        // that there is a reason to save the copied attachment, otherwise the copied attachment will be
-        // empty since the original attachment content is not modified in this operation.
-        newAttachment.getAttachment_content().setContentDirty(true);
+        XWikiAttachment newAttachment = attachment.cloneWithActualContent();
 
         if (reset) {
             // Reset the meta data that is specific to the original attachment (version, author, date).
             newAttachment.setRCSVersion(null);
-            newAttachment.setAuthorReference(xcontext.getUserReference());
+            newAttachment.setAuthorReference(getXWikiContext().getUserReference());
             newAttachment.setDate(new Date());
         }
 
         // Add the attachment copy to the list of attachments of this document.
         setAttachment(newAttachment);
+        setMetaDataDirty(true);
     }
 
     /**

@@ -668,7 +668,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     The value below is just about twice the line-height. */
   max-height: 2.9em;
   /* For the few names that need three lines, we make sure the user can scroll to read the whole name. */
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   /* Make sure the name wraps onto multiple lines instead of overflowing. */
   white-space: pre-wrap;

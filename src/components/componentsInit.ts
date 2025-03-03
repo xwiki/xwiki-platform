@@ -44,18 +44,18 @@ import type { RemoteURLParser } from "@xwiki/cristal-model-remote-url-api";
 @injectable()
 class XWikiPageHierarchyResolver implements PageHierarchyResolver {
   constructor(
-    @inject("Logger") private readonly logger: Logger,
-    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<Logger>("Logger") private readonly logger: Logger,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
     @inject("PageHierarchyResolver")
     private readonly defaultHierarchyResolver: PageHierarchyResolver,
-    @inject("AuthenticationManagerProvider")
+    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
     private readonly authenticationManagerProvider: AuthenticationManagerProvider,
-    @inject("StorageProvider")
+    @inject<StorageProvider>("StorageProvider")
     private readonly storageProvider: StorageProvider,
-    @inject("RemoteURLParser")
+    @inject<RemoteURLParser>("RemoteURLParser")
     @named("XWiki")
     private readonly urlParser: RemoteURLParser,
-    @inject("ModelReferenceSerializer")
+    @inject<ModelReferenceSerializer>("ModelReferenceSerializer")
     @named("XWiki")
     private readonly referenceSerializer: ModelReferenceSerializer,
   ) {
@@ -135,6 +135,6 @@ export class ComponentInit {
       .bind<PageHierarchyResolver>(name)
       .to(XWikiPageHierarchyResolver)
       .inSingletonScope()
-      .whenNamed("XWiki");
+      .whenTargetNamed("XWiki");
   }
 }

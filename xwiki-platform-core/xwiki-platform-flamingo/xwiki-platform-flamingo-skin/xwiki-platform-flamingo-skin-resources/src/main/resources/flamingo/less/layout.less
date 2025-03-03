@@ -5,207 +5,135 @@
   .container-fluid();
 }
 
-#menuview, #headerglobal, #contentcontainer, #xwikieditor, #footerglobal {
+#menuview, #headerglobal, #xwikieditor, #footerglobal {
   .make-row();
 }
 
 @main-padding: @grid-gutter-width * 2;
 
 #body {
-  // Both left and right panels are displayed
-  &.content {
-    // Left panels are small
-    &.panel-left-width-Small {
-      .main {
-        .make-md-column-push(1);
-      }
-      // Left panels are small and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(10, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(10);
-        }
-      }
-      // Left panels are small and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(9, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(9);
-        }
-      }
-      // Left panels are small and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
+  // We use CSS flex to display the default column sizes.
+  // The size "unit" is 8vw which is approximately equal to 1/12th of the viewport.
+  & #contentcontainer {
+    display: flex;
+  }
+  
+  // We reorganize the DOM order so that it makes sense visually.
+  & #contentcolumn {
+    order: 2;
+    flex-basis: 68vw;
+  }
+  
+  & #leftPanels {
+    order: 1;
+    flex-basis: 16vw;
+  }
+  
+  & #rightPanels, & #editPanels {
+    order: 3;
+    flex-basis: 16vw;
+  }
+
+  &.panel-left-width-Small #leftPanels {
+    flex-basis: 8vw;
+  }
+  
+  &.panel-left-width-Large #leftPanels {
+    flex-basis: 24vw;
+  }
+  
+  &.panel-right-width-Small #rightPanels,
+  &.panel-right-width-Small #editPanels {
+    flex-basis: 8vw;
+  }
+  
+  &.panel-right-width-Large #rightPanels,
+  &.panel-right-width-Large #editPanels {
+    flex-basis: 24vw;
+  }
+  
+  // Left panels are small
+  &.panel-left-width-Small {
+    // Left panels are small and right panels are small
+    &.panel-right-width-Small #contentcolumn {
+      flex-basis: 84vw;
     }
-    // Left panels are medium
-    &.panel-left-width-Medium {
-      .main {
-        .make-md-column-push(2);
-      }
-      // Left panels are medium and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(9, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(9);
-        }
-      }
-      // Left panels are medium and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
-      // Left panels are medium and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(7, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(7);
-        }
-      }
+    // Left panels are small and right panels are medium
+    &.panel-right-width-Medium #contentcolumn {
+      flex-basis: 76vw;
     }
-    // Left panels are large
-    &.panel-left-width-Large {
-      .main {
-        .make-md-column-push(3);
-      }
-      // Left panels are large and right panels are small
-      &.panel-right-width-Small {
-        .main {
-          .make-md-column(8, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(8);
-        }
-      }
-      // Left panels are large and right panels are medium
-      &.panel-right-width-Medium {
-        .main {
-          .make-md-column(7, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(7);
-        }
-      }
-      // Left panels are large and right panels are large
-      &.panel-right-width-Large {
-        .main {
-          .make-md-column(6, @main-padding);
-        }
-        #leftPanels {
-          .make-md-column-pull(6);
-        }
-      }
+    // Left panels are small and right panels are large
+    // Default value
+  }
+  // Left panels are medium
+  &.panel-left-width-Medium {
+    // Left panels are medium and right panels are small
+    &.panel-right-width-Small #contentcolumn {
+      flex-basis: 76vw;
+    }
+    // Left panels are medium and right panels are medium
+    // Default value
+    // Left panels are medium and right panels are large
+    &.panel-right-width-Large #contentcolumn {
+      flex-basis: 60vw;
+    }
+  }
+  // Left panels are large
+  &.panel-left-width-Large {
+    // Left panels are large and right panels are small
+    // Default value
+    // Left panels are large and right panels are medium
+    &.panel-right-width-Medium #contentcolumn {
+      flex-basis: 60vw;
+    }
+    // Left panels are large and right panels are large
+    &.panel-right-width-Large #contentcolumn {
+      flex-basis: 52vw;
     }
   }
 
   // Only right panels
   &.hideleft {
-    &.panel-right-width-Small {
-      .main {
-        .make-md-column(11, @main-padding);
-      }
+    #leftPanels {
+      width: 0;
     }
-    &.panel-right-width-Medium {
-      .main {
-        .make-md-column(10, @main-padding);
-      }
+    
+    &.panel-right-width-Small #contentcolumn {
+      flex-basis: 92vw;
     }
-    &.panel-right-width-Large {
-      .main {
-        .make-md-column(9, @main-padding);
-      }
+    
+    &.panel-right-width-Medium #contentcolumn {
+      flex-basis: 84vw;
+    }
+    
+    &.panel-right-width-Large #contentcolumn {
+      flex-basis: 72vw;
     }
   }
 
   // Only left panels
   &.hideright {
-    &.panel-left-width-Small {
-      .main {
-        .make-md-column(11, @main-padding);
-        .make-md-column-push(1);
-      }
-      #leftPanels {
-        .make-md-column-pull(11);
-      }
+    #rightPanels {
+      width: 0;
     }
-    &.panel-left-width-Medium {
-      .main {
-        .make-md-column(10, @main-padding);
-        .make-md-column-push(2);
-      }
-      #leftPanels {
-        .make-md-column-pull(10);
-      }
+    
+    &.panel-left-width-Small #contentcolumn {
+      flex-basis: 92vw;
     }
-    &.panel-left-width-Large {
-      .main {
-        .make-md-column(9, @main-padding);
-        .make-md-column-push(3);
-      }
-      #leftPanels {
-        .make-md-column-pull(9);
-      }
+    
+    &.panel-left-width-Medium #contentcolumn {
+      flex-basis: 84vw;
+    }
+    
+    &.panel-left-width-Large #contentcolumn {
+      flex-basis: 76vw;
     }
   }
 
-  // No Panels
-  &.hidelefthideright {
-    .main {
-      .make-md-column(12, @main-padding);
-    }
+  // No Panels, make sure the priority is high enough to take over other rules when needed.
+  &.hidelefthideright #contentcontainer #contentcolumn {
+    flex-basis: 100vw;
   }
-
-  &.panel-left-width-Small {
-    #leftPanels {
-      .make-md-column(1);
-    }
-  }
-  &.panel-left-width-Medium {
-    #leftPanels {
-      .make-md-column(2);
-    }
-  }
-  &.panel-left-width-Large {
-    #leftPanels {
-      .make-md-column(3);
-    }
-  }
-  &.panel-right-width-Small {
-    #rightPanels, #editPanels {
-      .make-md-column(1);
-    }
-  }
-  &.panel-right-width-Medium {
-    #rightPanels, #editPanels {
-      .make-md-column(2);
-    }
-  }
-  &.panel-right-width-Large {
-    #rightPanels, #editPanels {
-      .make-md-column(3);
-    }
-  }
-}
-
-#leftPanels, #rightPanels {
-  .make-xs-column(12);
 }
 
 .rightmenu {
@@ -299,7 +227,6 @@
 #xdocFooter,
 #docextrapanes {
   background-color: @xwiki-page-content-bg;
-  margin: 0 -@grid-gutter-width;
   padding: @line-height-computed @grid-gutter-width;
 }
 
@@ -354,7 +281,7 @@ already take care of padding and shadow. */
 }
 
 #docExtrasTabsUl {
-  margin-left: -(floor((@grid-gutter-width / 2)));
+  margin-left: floor((@grid-gutter-width / 2));
 }
 
 .xwikitabbar > li.active > a {

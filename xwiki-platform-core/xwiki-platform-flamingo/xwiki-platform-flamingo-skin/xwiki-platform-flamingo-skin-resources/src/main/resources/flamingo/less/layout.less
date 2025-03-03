@@ -177,8 +177,45 @@
 .main,
 #leftPanels, #rightPanels, #editPanels,
 #docextrapanes {
+  position: relative;
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
+}
+
+#rightPanels > button.resize-handle,
+#leftPanels > button.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  opacity: 0;
+  padding: 0;
+  cursor: col-resize;
+  min-width: 0;
+  width: 0;
+  border-width: 2px;
+  border-radius: 0;
+  border-style: solid;
+}
+
+#leftPanels > button.resize-handle {
+  right: 0;
+  margin-left: 5px;
+}
+
+#rightPanels > button.resize-handle {
+  left: 0;
+  margin-right: 5px;
+}
+
+#rightPanels > button.resize-handle:focus,
+#rightPanels > button.resize-handle:hover,
+#leftPanels > button.resize-handle:focus,
+#leftPanels > button.resize-handle:hover {
+  opacity: 1;
+  border-color: @navbar-default-bg;
+  border-width: 2px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 #xwikicontent {

@@ -199,10 +199,9 @@ export class Worker implements MyWorker {
 
     let wikiConfig;
     try {
-      wikiConfig = this.container.getNamed<WikiConfig>(
-        "WikiConfig",
-        configType,
-      );
+      wikiConfig = this.container.get<WikiConfig>("WikiConfig", {
+        name: configType,
+      });
       this.cristal.setWikiConfig(wikiConfig);
       wikiConfig.setConfigFromObject(wikiConfigObject);
 

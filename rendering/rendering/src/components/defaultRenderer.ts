@@ -29,8 +29,8 @@ export class DefaultRenderer implements Renderer {
   private cristalApp: CristalApp;
 
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject("Logger") logger: Logger,
+    @inject("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.cristalApp = cristalApp;
@@ -57,7 +57,7 @@ export class DefaultRenderer implements Renderer {
     try {
       const converter = this.cristalApp
         .getContainer()
-        .getNamed<Converter>("Converter", syntaxRenderer);
+        .get<Converter>("Converter", { name: syntaxRenderer });
       return converter.convert(source, wikiConfig);
     } catch {
       this.logger.error("Could not find a converter for ", syntaxRenderer);

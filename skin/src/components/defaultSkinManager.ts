@@ -81,9 +81,9 @@ export class DefaultSkinManager implements SkinManager {
     let designSystemLoader: DesignSystemLoader | null = null;
 
     try {
-      designSystemLoader = container.getNamed<DesignSystemLoader>(
+      designSystemLoader = container.get<DesignSystemLoader>(
         "DesignSystemLoader",
-        this.designSystem,
+        { name: this.designSystem },
       );
     } catch {
       console.error(
@@ -91,9 +91,9 @@ export class DefaultSkinManager implements SkinManager {
         this.designSystem,
       );
       if (DefaultSkinManager.DEFAULT_DESIGN_SYSTEM != "") {
-        designSystemLoader = container.getNamed<DesignSystemLoader>(
+        designSystemLoader = container.get<DesignSystemLoader>(
           "DesignSystemLoader",
-          DefaultSkinManager.DEFAULT_DESIGN_SYSTEM,
+          { name: DefaultSkinManager.DEFAULT_DESIGN_SYSTEM },
         );
       }
     }

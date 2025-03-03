@@ -29,7 +29,7 @@ class ComponentInit {
       .bind<PageRevisionManager>(PageRevisionManagerName)
       .to(XWikiPageRevisionManager)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
   }
 }
 

@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<ModelReferenceParser>("ModelReferenceParser")
       .to(NextcloudModelReferenceParser)
       .inSingletonScope()
-      .whenTargetNamed("Nextcloud");
+      .whenNamed("Nextcloud");
     container
       .bind<ModelReferenceSerializer>("ModelReferenceSerializer")
       .to(NextcloudModelReferenceSerializer)
       .inSingletonScope()
-      .whenTargetNamed("Nextcloud");
+      .whenNamed("Nextcloud");
   }
 }

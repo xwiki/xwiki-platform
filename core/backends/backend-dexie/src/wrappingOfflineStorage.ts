@@ -42,9 +42,9 @@ export class WrappingOfflineStorage implements WrappingStorage {
   public queueWorker: QueueWorker;
 
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<OfflineStorage>("OfflineStorage") offlineStorage: OfflineStorage,
-    @inject<QueueWorker>("QueueWorker") queueWorker: QueueWorker,
+    @inject("Logger") logger: Logger,
+    @inject("OfflineStorage") offlineStorage: OfflineStorage,
+    @inject("QueueWorker") queueWorker: QueueWorker,
   ) {
     this.logger = logger;
     this.logger.setModule("storage.components.wrappingOfflineStorage");

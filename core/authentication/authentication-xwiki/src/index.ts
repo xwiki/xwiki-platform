@@ -28,6 +28,6 @@ export class ComponentInit {
       .bind<AuthenticationManager>("AuthenticationManager")
       .to(XWikiAuthenticationManager)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
   }
 }

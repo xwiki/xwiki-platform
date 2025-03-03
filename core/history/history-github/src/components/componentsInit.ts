@@ -35,11 +35,11 @@ import type {
 @injectable()
 class GitHubPageRevisionManager implements PageRevisionManager {
   constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<Logger>("Logger") private readonly logger: Logger,
-    @inject<AlertsService>("AlertsService")
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject("Logger") private readonly logger: Logger,
+    @inject("AlertsService")
     private readonly alertsService: AlertsService,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("AuthenticationManagerProvider")
     private readonly authenticationManagerProvider: AuthenticationManagerProvider,
   ) {
     this.logger.setModule("history-github.GitHubPageRevisionManager");

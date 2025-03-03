@@ -41,7 +41,7 @@ export class DefaultExtensionManager
 
   public logger: Logger;
 
-  constructor(@inject<Logger>("Logger") logger: Logger) {
+  constructor(@inject("Logger") logger: Logger) {
     super();
     this.logger = logger;
     this.logger.setModule(

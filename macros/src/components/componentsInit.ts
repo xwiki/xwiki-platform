@@ -30,18 +30,18 @@ export default class ComponentInit {
     container
       .bind<MacroProvider>("MacroProvider")
       .to(ErrorMacro)
-      .whenTargetNamed(ErrorMacro.macroName);
+      .whenNamed(ErrorMacro.macroName);
     container
       .bind<MacroProvider>("MacroProvider")
       .to(WarningMacro)
-      .whenTargetNamed(WarningMacro.macroName);
+      .whenNamed(WarningMacro.macroName);
     container
       .bind<MacroProvider>("MacroProvider")
       .to(InfoMacro)
-      .whenTargetNamed(InfoMacro.macroName);
+      .whenNamed(InfoMacro.macroName);
     container
       .bind<MacroProvider>("MacroProvider")
       .to(SuccessMacro)
-      .whenTargetNamed(SuccessMacro.macroName);
+      .whenNamed(SuccessMacro.macroName);
   }
 }

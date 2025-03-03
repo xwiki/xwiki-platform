@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<RemoteURLParser>("RemoteURLParser")
       .to(NextcloudRemoteURLParser)
       .inSingletonScope()
-      .whenTargetNamed("Nextcloud");
+      .whenNamed("Nextcloud");
     container
       .bind<RemoteURLSerializer>("RemoteURLSerializer")
       .to(NextcloudRemoteURLSerializer)
       .inSingletonScope()
-      .whenTargetNamed("Nextcloud");
+      .whenNamed("Nextcloud");
   }
 }

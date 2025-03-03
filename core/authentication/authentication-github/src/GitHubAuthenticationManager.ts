@@ -35,8 +35,8 @@ import type { CookieAttributes } from "js-cookie";
 @injectable()
 export class GitHubAuthenticationManager implements AuthenticationManager {
   constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<GitHubAuthenticationState>(GitHubAuthenticationState)
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject(GitHubAuthenticationState)
     private readonly authenticationState: GitHubAuthenticationState,
   ) {}
 

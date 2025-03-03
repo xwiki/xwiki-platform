@@ -38,9 +38,9 @@ import type {
 @injectable()
 class GitHubNavigationTreeSource implements NavigationTreeSource {
   constructor(
-    @inject<Logger>("Logger") private readonly logger: Logger,
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("Logger") private readonly logger: Logger,
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject("AuthenticationManagerProvider")
     private readonly authenticationManagerProvider: AuthenticationManagerProvider,
   ) {
     this.logger = logger;
@@ -137,6 +137,6 @@ export class ComponentInit {
       .bind<NavigationTreeSource>(NavigationTreeSourceName)
       .to(GitHubNavigationTreeSource)
       .inSingletonScope()
-      .whenTargetNamed("GitHub");
+      .whenNamed("GitHub");
   }
 }

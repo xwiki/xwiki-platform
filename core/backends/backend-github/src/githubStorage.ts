@@ -36,10 +36,10 @@ export class GitHubStorage extends AbstractStorage {
   private readonly ATTACHMENTS = "attachments";
 
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("Logger") logger: Logger,
+    @inject("AuthenticationManagerProvider")
     private readonly authenticationManagerProvider: AuthenticationManagerProvider,
-    @inject<AlertsServiceProvider>("AlertsServiceProvider")
+    @inject("AlertsServiceProvider")
     private readonly alertsServiceProvider: AlertsServiceProvider,
   ) {
     super(logger, "storage.components.githubStorage");

@@ -28,7 +28,7 @@
     "@xwiki/cristal-authentication-nextcloud": "workspace:*",
     "@xwiki/cristal-backend-api": "workspace:*",
     "fast-xml-parser": "5.0.7",
-    "inversify": "6.2.2"
+    "inversify": "7.0.1"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

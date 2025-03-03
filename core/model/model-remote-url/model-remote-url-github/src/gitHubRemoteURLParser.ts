@@ -30,9 +30,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 class GitHubRemoteURLParser implements RemoteURLParser {
-  constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-  ) {}
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   parse(urlStr: string): EntityReference | undefined {
     const baseURL = this.getWikiConfig().baseURL;

@@ -29,7 +29,7 @@ class ComponentInit {
       .bind<PageRevisionManager>(PageRevisionManagerName)
       .to(GitHubPageRevisionManager)
       .inSingletonScope()
-      .whenTargetNamed("GitHub");
+      .whenNamed("GitHub");
   }
 }
 

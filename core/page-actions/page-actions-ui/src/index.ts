@@ -36,19 +36,10 @@ class ComponentInit {
     container
       .bind<PageActionCategory>("PageActionCategory")
       .to(PageManagementActionCategory)
-      .whenTargetIsDefault();
-    container
-      .bind<PageAction>("PageAction")
-      .to(PageMoveAction)
-      .whenTargetIsDefault();
-    container
-      .bind<PageAction>("PageAction")
-      .to(PageRenameAction)
-      .whenTargetIsDefault();
-    container
-      .bind<PageAction>("PageAction")
-      .to(PageDeleteAction)
-      .whenTargetIsDefault();
+      .whenDefault();
+    container.bind<PageAction>("PageAction").to(PageMoveAction).whenDefault();
+    container.bind<PageAction>("PageAction").to(PageRenameAction).whenDefault();
+    container.bind<PageAction>("PageAction").to(PageDeleteAction).whenDefault();
   }
 }
 

@@ -40,8 +40,8 @@ class FileSystemNavigationTreeSource implements NavigationTreeSource {
   public logger: Logger;
 
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject("Logger") logger: Logger,
+    @inject("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -98,6 +98,6 @@ export class ComponentInit {
       .bind<NavigationTreeSource>(NavigationTreeSourceName)
       .to(FileSystemNavigationTreeSource)
       .inSingletonScope()
-      .whenTargetNamed("FileSystem");
+      .whenNamed("FileSystem");
   }
 }

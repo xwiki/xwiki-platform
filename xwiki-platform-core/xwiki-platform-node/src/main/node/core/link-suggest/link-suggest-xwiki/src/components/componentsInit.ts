@@ -35,12 +35,12 @@ import type { RemoteURLSerializerProvider } from "@xwiki/cristal-model-remote-ur
 @injectable()
 class XWikiLinkSuggestService implements LinkSuggestService {
   constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject("RemoteURLSerializerProvider")
     private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
-    @inject<ModelReferenceParserProvider>("ModelReferenceParserProvider")
+    @inject("ModelReferenceParserProvider")
     private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
   ) {}
 
@@ -183,6 +183,6 @@ export class ComponentInit {
       .bind<LinkSuggestService>(name)
       .to(XWikiLinkSuggestService)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
   }
 }

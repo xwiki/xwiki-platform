@@ -730,8 +730,8 @@ importers:
         specifier: workspace:*
         version: link:../backend-api
       fast-xml-parser:
-        specifier: 5.0.7
-        version: 5.0.7
+        specifier: 5.0.8
+        version: 5.0.8
       inversify:
         specifier: 7.0.1
         version: 7.0.1(reflect-metadata@0.2.2)
@@ -6537,8 +6537,8 @@ packages:
   fast-uri@3.0.2:
     resolution: {integrity: sha512-GR6f0hD7XXyNJa25Tb9BuIdN0tdr+0BMi6/CJPH3wJO1JjNG3n/VsSw38AwRdKZABm8lGbPfakLRkYzx2V9row==}
 
-  fast-xml-parser@5.0.7:
-    resolution: {integrity: sha512-hRgQW2Az3ASwFo7wqBM2Uq9LcLoOVhGhE/yhjsIfd4gdDk0pqwKTHOSQYO1Zf7Nl/7Th2ykdmkPNntCfq3gBFg==}
+  fast-xml-parser@5.0.8:
+    resolution: {integrity: sha512-qY8NiI5L8ff00F2giyICiJxSSKHO52tC36LJqx2JtvGyAd5ZfehC/l4iUVVHpmpIa6sM9N5mneSLHQG2INGoHA==}
     hasBin: true
 
   fastq@1.18.0:
@@ -8333,8 +8333,8 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  strnum@2.0.4:
-    resolution: {integrity: sha512-qrXhLMohxtEPKMlajtNaOp5zvAQUo6L3fNcdiJKzWH98kGfklqGwmxhFjM7DzxsuoVM7rJeiYr+lEcu4Jlu9UQ==}
+  strnum@2.0.5:
+    resolution: {integrity: sha512-YAT3K/sgpCUxhxNMrrdhtod3jckkpYwH6JAuwmUdXZsmzH1wUyzTMrrK2wYCEEqlKwrWDd35NeuUkbBy/1iK+Q==}
 
   stubborn-fs@1.2.5:
     resolution: {integrity: sha512-H2N9c26eXjzL/S/K+i/RHHcFanE74dptvvjM8iwzwbVcWY/zjBbgRqF3K0DY4+OD+uTTASTBvDoxPDaPN02D7g==}
@@ -11844,9 +11844,9 @@ snapshots:
 
   fast-uri@3.0.2: {}
 
-  fast-xml-parser@5.0.7:
+  fast-xml-parser@5.0.8:
     dependencies:
-      strnum: 2.0.4
+      strnum: 2.0.5
 
   fastq@1.18.0:
     dependencies:
@@ -13798,7 +13798,7 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  strnum@2.0.4: {}
+  strnum@2.0.5: {}
 
   stubborn-fs@1.2.5: {}
 

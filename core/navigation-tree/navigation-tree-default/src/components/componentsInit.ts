@@ -38,7 +38,7 @@ import type {
 class DefaultNavigationTreeSource implements NavigationTreeSource {
   public logger: Logger;
 
-  constructor(@inject<Logger>("Logger") logger: Logger) {
+  constructor(@inject("Logger") logger: Logger) {
     this.logger = logger;
     this.logger.setModule(
       "navigation-tree-default.components.DefaultNavigationTreeSource",
@@ -67,8 +67,8 @@ class DefaultNavigationTreeSourceProvider
   public logger: Logger;
 
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
+    @inject("Logger") logger: Logger,
+    @inject("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -80,11 +80,10 @@ class DefaultNavigationTreeSourceProvider
   get(): NavigationTreeSource {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    if (container.isBoundNamed(NavigationTreeSourceName, wikiConfigType)) {
-      return container.getNamed<NavigationTreeSource>(
-        NavigationTreeSourceName,
-        wikiConfigType,
-      );
+    if (container.isBound(NavigationTreeSourceName, { name: wikiConfigType })) {
+      return container.get<NavigationTreeSource>(NavigationTreeSourceName, {
+        name: wikiConfigType,
+      });
     } else {
       return container.get<NavigationTreeSource>(NavigationTreeSourceName);
     }
@@ -97,11 +96,11 @@ export class ComponentInit {
       .bind<NavigationTreeSource>(NavigationTreeSourceName)
       .to(DefaultNavigationTreeSource)
       .inSingletonScope()
-      .whenTargetIsDefault();
+      .whenDefault();
     container
       .bind<NavigationTreeSourceProvider>(`${NavigationTreeSourceName}Provider`)
       .to(DefaultNavigationTreeSourceProvider)
       .inSingletonScope()
-      .whenTargetIsDefault();
+      .whenDefault();
   }
 }

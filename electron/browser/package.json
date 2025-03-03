@@ -28,7 +28,7 @@
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
     "@xwiki/cristal-browser-api": "workspace:*",
-    "inversify": "6.2.2"
+    "inversify": "7.1.0"
   },
   "peerDependencies": {
     "electron": "34.3.0",

@@ -118,7 +118,7 @@ export class DefaultAttachmentsService implements AttachmentsService {
   private readonly store: AttachmentsStore;
 
   constructor(
-    @inject<StorageProvider>("StorageProvider")
+    @inject("StorageProvider")
     private readonly storageProvider: StorageProvider,
   ) {
     // An internal store is kept to easily provide refs for updatable elements.

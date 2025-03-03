@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "dayjs": "1.11.13",
-    "inversify": "6.2.2"
+    "inversify": "7.1.0"
   },
   "peerDependencies": {
     "reflect-metadata": "0.2.2"

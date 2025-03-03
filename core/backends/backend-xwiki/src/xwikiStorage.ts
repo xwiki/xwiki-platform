@@ -65,10 +65,10 @@ type AttachmentsRest = {
 @injectable()
 export class XWikiStorage extends AbstractStorage {
   constructor(
-    @inject<Logger>("Logger") logger: Logger,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("Logger") logger: Logger,
+    @inject("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
-    @inject<AlertsServiceProvider>("AlertsServiceProvider")
+    @inject("AlertsServiceProvider")
     private readonly alertsServiceProvider: AlertsServiceProvider,
   ) {
     super(logger, "storage.components.xwikiStorage");

@@ -29,6 +29,6 @@ export class ComponentInit {
       .bind<LinkSuggestService>(name)
       .to(FilesystemLinkSuggestService)
       .inSingletonScope()
-      .whenTargetNamed("FileSystem");
+      .whenNamed("FileSystem");
   }
 }

@@ -32,7 +32,7 @@ class ComponentInit {
       .bind<LinkSuggestService>(name)
       .to(NextcloudLinkSuggestService)
       .inSingletonScope()
-      .whenTargetNamed("Nextcloud");
+      .whenNamed("Nextcloud");
   }
 }
 

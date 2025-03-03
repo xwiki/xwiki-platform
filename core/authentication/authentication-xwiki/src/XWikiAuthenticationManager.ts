@@ -31,9 +31,7 @@ import type { CookieAttributes } from "js-cookie";
  */
 @injectable()
 export class XWikiAuthenticationManager implements AuthenticationManager {
-  constructor(
-    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
-  ) {}
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   private readonly localStorageOriginKey = "authentication.origin";
 

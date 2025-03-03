@@ -28,6 +28,6 @@ export class ComponentInit {
       .bind<DateService>("DateService")
       .to(DefaultDateService)
       .inSingletonScope()
-      .whenTargetIsDefault();
+      .whenDefault();
   }
 }

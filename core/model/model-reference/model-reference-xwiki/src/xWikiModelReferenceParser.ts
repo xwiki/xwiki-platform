@@ -34,7 +34,7 @@ import type { DocumentService } from "@xwiki/cristal-document-api";
 @injectable()
 export class XWikiModelReferenceParser implements ModelReferenceParser {
   constructor(
-    @inject<DocumentService>("DocumentService")
+    @inject("DocumentService")
     private readonly documentService: DocumentService,
   ) {}
 

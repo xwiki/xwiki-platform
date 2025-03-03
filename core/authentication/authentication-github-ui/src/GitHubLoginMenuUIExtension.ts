@@ -39,7 +39,7 @@ export class GitHubLoginMenuUIExtension implements UIExtension {
   parameters = {};
 
   constructor(
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("AuthenticationManagerProvider")
     private authenticationManager: AuthenticationManagerProvider,
   ) {}
 

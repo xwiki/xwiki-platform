@@ -31,7 +31,7 @@ import type { PageRenameManager } from "@xwiki/cristal-rename-api";
 @injectable()
 class FileSystemPageRenameManager implements PageRenameManager {
   constructor(
-    @inject<StorageProvider>("StorageProvider")
+    @inject("StorageProvider")
     private readonly storageProvider: StorageProvider,
   ) {}
 

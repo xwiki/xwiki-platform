@@ -35,9 +35,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class DefaultModelReferenceHandlerProvider
   implements ModelReferenceHandlerProvider
 {
-  constructor(
-    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
-  ) {}
+  constructor(@inject("CristalApp") private cristalApp: CristalApp) {}
 
   get(type?: string): ModelReferenceHandler | undefined {
     const container = this.cristalApp.getContainer();
@@ -45,8 +43,8 @@ class DefaultModelReferenceHandlerProvider
     // If there is no specific ModelReferenceHandler registered for the
     // requested type, we return an instance of DefaultModelReferenceHandler
     // (which should be the only unnamed one).
-    if (container.isBoundNamed("ModelReferenceHandler", resolvedType)) {
-      return container.getNamed("ModelReferenceHandler", resolvedType);
+    if (container.isBound("ModelReferenceHandler", { name: resolvedType })) {
+      return container.get("ModelReferenceHandler", { name: resolvedType });
     } else {
       return container.get("ModelReferenceHandler");
     }

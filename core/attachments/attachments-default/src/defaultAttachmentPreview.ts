@@ -95,7 +95,7 @@ class DefaultAttachmentPreview implements AttachmentPreview {
   private readonly refs: StateRefs;
   private readonly store: AttachmentPreviewStore;
   constructor(
-    @inject<StorageProvider>("StorageProvider")
+    @inject("StorageProvider")
     private readonly storageProvider: StorageProvider,
     @inject("ModelReferenceSerializerProvider")
     private readonly modelReferenceSerializerProvider: ModelReferenceSerializerProvider,

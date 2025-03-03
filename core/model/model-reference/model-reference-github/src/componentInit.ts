@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<ModelReferenceParser>("ModelReferenceParser")
       .to(GitHubModelReferenceParser)
       .inSingletonScope()
-      .whenTargetNamed("GitHub");
+      .whenNamed("GitHub");
     container
       .bind<ModelReferenceSerializer>("ModelReferenceSerializer")
       .to(GitHubModelReferenceSerializer)
       .inSingletonScope()
-      .whenTargetNamed("GitHub");
+      .whenNamed("GitHub");
   }
 }

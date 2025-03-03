@@ -29,6 +29,6 @@ export class ComponentInit {
       .bind<PageRevisionManagerProvider>(`${PageRevisionManagerName}Provider`)
       .to(DefaultPageRevisionManagerProvider)
       .inSingletonScope()
-      .whenTargetIsDefault();
+      .whenDefault();
   }
 }

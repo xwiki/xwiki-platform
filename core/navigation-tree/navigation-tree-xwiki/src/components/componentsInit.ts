@@ -38,14 +38,14 @@ import type {
 @injectable()
 class XWikiNavigationTreeSource implements NavigationTreeSource {
   constructor(
-    @inject<Logger>("Logger") private readonly logger: Logger,
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
+    @inject("Logger") private readonly logger: Logger,
+    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject("AuthenticationManagerProvider")
     private authenticationManagerProvider: AuthenticationManagerProvider,
-    @inject<RemoteURLParser>("RemoteURLParser")
+    @inject("RemoteURLParser")
     @named("XWiki")
     private readonly urlParser: RemoteURLParser,
-    @inject<ModelReferenceSerializer>("ModelReferenceSerializer")
+    @inject("ModelReferenceSerializer")
     @named("XWiki")
     private readonly referenceSerializer: ModelReferenceSerializer,
   ) {
@@ -172,6 +172,6 @@ export class ComponentInit {
       .bind<NavigationTreeSource>(NavigationTreeSourceName)
       .to(XWikiNavigationTreeSource)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
   }
 }

@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<RemoteURLParser>("RemoteURLParser")
       .to(XWikiRemoteURLParser)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
     container
       .bind<RemoteURLSerializer>("RemoteURLSerializer")
       .to(XWikiRemoteURLSerializer)
       .inSingletonScope()
-      .whenTargetNamed("XWiki");
+      .whenNamed("XWiki");
   }
 }

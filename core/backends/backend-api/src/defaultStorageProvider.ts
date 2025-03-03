@@ -29,9 +29,7 @@ import type { CristalApp } from "@xwiki/cristal-api";
  */
 @injectable()
 class DefaultStorageProvider implements StorageProvider {
-  constructor(
-    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
-  ) {}
+  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
 
   get(): Storage {
     return this.cristalApp.getWikiConfig().storage;

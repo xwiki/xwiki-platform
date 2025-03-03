@@ -34,16 +34,14 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class DefaultAuthenticationManagerProvider
   implements AuthenticationManagerProvider
 {
-  constructor(
-    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
-  ) {}
+  constructor(@inject("CristalApp") private cristalApp: CristalApp) {}
 
   get(type?: string): AuthenticationManager | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .getNamed("AuthenticationManager", resolvedType);
+        .get("AuthenticationManager", { name: resolvedType });
     } catch (e) {
       this.cristalApp
         .getLogger("authentication.api")

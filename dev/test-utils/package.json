@@ -21,7 +21,7 @@
     "lint": "eslint \"./src/**/*.{ts,tsx,vue}\" --max-warnings=0"
   },
   "dependencies": {
-    "inversify": "6.2.2",
+    "inversify": "7.1.0",
     "vue": "3.5.13",
     "vue-i18n": "11.1.1"
   },

@@ -164,9 +164,10 @@ export class DefaultCristalApp implements CristalApp {
       const wikiConfigObject = configs[configKey];
       const configType = wikiConfigObject?.configType;
       if (wikiConfigObject) {
-        const wikiConfig = this.container.get<WikiConfig>("WikiConfig", {
-          name: configType,
-        });
+        const wikiConfig = this.container.getNamed<WikiConfig>(
+          "WikiConfig",
+          configType,
+        );
         wikiConfig.setConfigFromObject(wikiConfigObject);
         this.availableConfigurations.set(configKey, wikiConfig);
       }
@@ -533,10 +534,11 @@ export class DefaultCristalApp implements CristalApp {
         "Searching for UIX with extension Point",
         extensionPoint,
       );
-      const uixComponents = this.getContainer().getAll<UIXTemplateProvider>(
-        "UIXTemplateProvider",
-        { name: extensionPoint },
-      );
+      const uixComponents =
+        this.getContainer().getAllNamed<UIXTemplateProvider>(
+          "UIXTemplateProvider",
+          extensionPoint,
+        );
       this.logger?.debug(
         "All uix components for extension point ",
         extensionPoint,

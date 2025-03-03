@@ -42,8 +42,8 @@ class GitHubPageHierarchyResolver implements PageHierarchyResolver {
   public logger: Logger;
 
   constructor(
-    @inject("Logger") logger: Logger,
-    @inject("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule("storage.components.FileSystemPageHierarchyResolver");
@@ -78,6 +78,6 @@ export class ComponentInit {
       .bind<PageHierarchyResolver>(name)
       .to(GitHubPageHierarchyResolver)
       .inSingletonScope()
-      .whenNamed("GitHub");
+      .whenTargetNamed("GitHub");
   }
 }

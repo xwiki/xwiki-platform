@@ -28,14 +28,16 @@ import type { CristalApp } from "@xwiki/cristal-api";
  */
 @injectable()
 class DefaultLinkSuggestServiceProvider implements LinkSuggestServiceProvider {
-  constructor(@inject("CristalApp") private cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   get(type?: string): LinkSuggestService | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .get("LinkSuggestService", { name: resolvedType });
+        .getNamed("LinkSuggestService", resolvedType);
     } catch (e) {
       this.cristalApp
         .getLogger("link.suggest.api")

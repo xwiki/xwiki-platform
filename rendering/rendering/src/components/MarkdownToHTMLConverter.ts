@@ -43,7 +43,7 @@ export class MarkdownToHTMLConverter implements Converter {
     FORCE_BODY: true,
   };
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     this.logger = logger;
     this.logger.setModule("rendering.markdown");
     this.markedInit = false;

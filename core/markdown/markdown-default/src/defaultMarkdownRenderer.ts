@@ -36,9 +36,9 @@ export class DefaultMarkdownRenderer implements MarkdownRenderer {
   private md: MarkdownIt;
 
   constructor(
-    @inject("ModelReferenceParserProvider")
+    @inject<ModelReferenceParserProvider>("ModelReferenceParserProvider")
     private readonly modelReferenceParserProvider: ModelReferenceParserProvider,
-    @inject("RemoteURLSerializerProvider")
+    @inject<RemoteURLSerializerProvider>("RemoteURLSerializerProvider")
     private readonly remoteURLSerializerProvider: RemoteURLSerializerProvider,
   ) {
     this.md = markdownit();

@@ -34,11 +34,11 @@ export default class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(FileSystemConfig)
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
     container
       .bind<Storage>("Storage")
       .to(FileSystemStorage)
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
     this.logger?.debug("Init Sample Module components end");
   }
 }

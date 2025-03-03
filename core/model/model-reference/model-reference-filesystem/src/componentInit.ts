@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<ModelReferenceParser>("ModelReferenceParser")
       .to(FileSystemModelReferenceParser)
       .inSingletonScope()
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
     container
       .bind<ModelReferenceSerializer>("ModelReferenceSerializer")
       .to(FileSystemModelReferenceSerializer)
       .inSingletonScope()
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
   }
 }

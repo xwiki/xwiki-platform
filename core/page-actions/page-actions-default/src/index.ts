@@ -31,10 +31,10 @@ export class ComponentInit {
     container
       .bind<PageActionService>("PageActionService")
       .to(DefaultPageActionService)
-      .whenDefault();
+      .whenTargetIsDefault();
     container
       .bind<PageActionCategoryService>("PageActionCategoryService")
       .to(DefaultPageActionCategoryService)
-      .whenDefault();
+      .whenTargetIsDefault();
   }
 }

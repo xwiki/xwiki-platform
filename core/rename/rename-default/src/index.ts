@@ -29,6 +29,6 @@ export class ComponentInit {
       .bind<PageRenameManagerProvider>(`${pageRenameManagerName}Provider`)
       .to(DefaultPageRenameManagerProvider)
       .inSingletonScope()
-      .whenDefault();
+      .whenTargetIsDefault();
   }
 }

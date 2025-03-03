@@ -33,20 +33,23 @@ import type {
  **/
 @injectable()
 class DefaultPageRenameManagerProvider implements PageRenameManagerProvider {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
 
   has(): boolean {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    return container.isBound(pageRenameManagerName, { name: wikiConfigType });
+    return container.isBoundNamed(pageRenameManagerName, wikiConfigType);
   }
 
   get(): PageRenameManager {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    return container.get<PageRenameManager>(pageRenameManagerName, {
-      name: wikiConfigType,
-    });
+    return container.getNamed<PageRenameManager>(
+      pageRenameManagerName,
+      wikiConfigType,
+    );
   }
 }
 

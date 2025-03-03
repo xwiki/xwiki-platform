@@ -48,11 +48,11 @@ export default class ComponentInit {
     container
       .bind<UIXTemplateProvider>("UIXTemplateProvider")
       .to(UIXLoginTemplateProvider)
-      .whenNamed(UIXLoginTemplateProvider.extensionPoint);
+      .whenTargetNamed(UIXLoginTemplateProvider.extensionPoint);
     container
       .bind<UIXTemplateProvider>("UIXTemplateProvider")
       .to(UIXSearchTemplateProvider)
-      .whenNamed(UIXSearchTemplateProvider.extensionPoint);
+      .whenTargetNamed(UIXSearchTemplateProvider.extensionPoint);
     container.bind<SkinManager>("SkinManager").to(DefaultSkinManager);
     container
       .bind<VueTemplateProvider>("VueTemplateProvider")

@@ -29,7 +29,7 @@ class ComponentInit {
       .bind<MarkdownRenderer>("MarkdownRenderer")
       .to(DefaultMarkdownRenderer)
       .inSingletonScope()
-      .whenDefault();
+      .whenTargetIsDefault();
   }
 }
 

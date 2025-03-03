@@ -35,9 +35,9 @@ export class AttachmentsInfoAction implements InfoAction {
   order = 3000;
 
   constructor(
-    @inject("AttachmentsService")
+    @inject<AttachmentsService>("AttachmentsService")
     private readonly attachmentsService: AttachmentsService,
-    @inject("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
   ) {}
 
   async counter(): Promise<Ref<number>> {

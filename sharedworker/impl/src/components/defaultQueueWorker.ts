@@ -35,8 +35,8 @@ export default class DefaultQueueWorker implements QueueWorker {
   private logger: Logger;
 
   public constructor(
-    @inject("Logger") logger: Logger,
-    @inject("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.initialize();
     this.logger = logger;

@@ -34,7 +34,7 @@ export class LoggedInMenuUIExtension implements UIExtension {
   parameters = {};
 
   constructor(
-    @inject("AuthenticationManagerProvider")
+    @inject<AuthenticationManagerProvider>("AuthenticationManagerProvider")
     private authenticationManager: AuthenticationManagerProvider,
   ) {}
 

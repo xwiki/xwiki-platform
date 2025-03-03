@@ -82,9 +82,10 @@ export class WorkerCristalApp implements CristalApp {
       const wikiConfigObject = configs[configKey];
       const configType = wikiConfigObject?.configType;
       if (wikiConfigObject) {
-        const wikiConfig = this.container.get<WikiConfig>("WikiConfig", {
-          name: configType,
-        });
+        const wikiConfig = this.container.getNamed<WikiConfig>(
+          "WikiConfig",
+          configType,
+        );
         wikiConfig.setConfigFromObject(wikiConfigObject);
         this.availableConfigurations.set(configKey, wikiConfig);
       }

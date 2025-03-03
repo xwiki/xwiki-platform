@@ -29,6 +29,6 @@ export class ComponentInit {
       .bind<PageRenameManager>(pageRenameManagerName)
       .to(FileSystemPageRenameManager)
       .inSingletonScope()
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
   }
 }

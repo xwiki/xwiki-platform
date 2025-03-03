@@ -29,7 +29,7 @@ class ComponentInit {
       .bind<AuthenticationManager>("AuthenticationManager")
       .to(GitHubAuthenticationManager)
       .inSingletonScope()
-      .whenNamed("GitHub");
+      .whenTargetNamed("GitHub");
     container
       .bind<GitHubAuthenticationState>(GitHubAuthenticationState)
       .toSelf()

@@ -29,7 +29,10 @@ export class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(GitHubWikiConfig)
-      .whenNamed("GitHub");
-    container.bind<Storage>("Storage").to(GitHubStorage).whenNamed("GitHub");
+      .whenTargetNamed("GitHub");
+    container
+      .bind<Storage>("Storage")
+      .to(GitHubStorage)
+      .whenTargetNamed("GitHub");
   }
 }

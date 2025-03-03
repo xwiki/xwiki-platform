@@ -29,7 +29,10 @@ export class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(XWikiWikiConfig)
-      .whenNamed("XWiki");
-    container.bind<Storage>("Storage").to(XWikiStorage).whenNamed("XWiki");
+      .whenTargetNamed("XWiki");
+    container
+      .bind<Storage>("Storage")
+      .to(XWikiStorage)
+      .whenTargetNamed("XWiki");
   }
 }

@@ -30,14 +30,16 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class DefaultModelReferenceParserProvider
   implements ModelReferenceParserProvider
 {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   get(type?: string): ModelReferenceParser | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .get("ModelReferenceParser", { name: resolvedType });
+        .getNamed("ModelReferenceParser", resolvedType);
     } catch (e) {
       this.cristalApp
         .getLogger("model-reference.api")

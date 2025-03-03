@@ -43,7 +43,7 @@ export class NextcloudStorage extends AbstractStorage {
   private readonly ATTACHMENTS = "attachments";
   private initBaseContentCalled: boolean = false;
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     super(logger, "storage.components.nextcloudStorage");
   }
 

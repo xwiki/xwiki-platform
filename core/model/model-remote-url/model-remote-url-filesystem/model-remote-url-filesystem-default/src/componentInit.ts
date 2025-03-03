@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<RemoteURLParser>("RemoteURLParser")
       .to(FileSystemRemoteURLParser)
       .inSingletonScope()
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
     container
       .bind<RemoteURLSerializer>("RemoteURLSerializer")
       .to(FileSystemRemoteURLSerializer)
       .inSingletonScope()
-      .whenNamed("FileSystem");
+      .whenTargetNamed("FileSystem");
   }
 }

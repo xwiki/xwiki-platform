@@ -27,6 +27,6 @@ export default class ComponentInit {
     container
       .bind<UIXTemplateProvider>("UIXTemplateProvider")
       .to(UixTiptapEditorProvider)
-      .whenNamed(UixTiptapEditorProvider.extensionPoint);
+      .whenTargetNamed(UixTiptapEditorProvider.extensionPoint);
   }
 }

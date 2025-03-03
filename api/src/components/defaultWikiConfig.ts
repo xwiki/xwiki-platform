@@ -69,7 +69,7 @@ export class DefaultWikiConfig implements WikiConfig {
   public cristal: CristalApp;
   public logger: Logger;
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     this.logger = logger;
     this.logger.setModule("storage.components.defaultWikiStorage");
     this.offlineSetup = false;

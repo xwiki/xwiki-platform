@@ -33,7 +33,7 @@ declare const fileSystemStorage: APITypes;
 
 @injectable()
 export default class FileSystemStorage extends AbstractStorage {
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     super(logger, "storage.components.fileSystemStorage");
   }
 

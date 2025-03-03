@@ -31,12 +31,12 @@ export default class ComponentInit {
       .bind<Converter>("Converter")
       .to(MarkdownToHTMLConverter)
       .inSingletonScope()
-      .whenNamed(MarkdownToHTMLConverter.converterName);
+      .whenTargetNamed(MarkdownToHTMLConverter.converterName);
     container
       .bind<Converter>("Converter")
       .to(XWiki21ToHTMLConverter)
       .inSingletonScope()
-      .whenNamed(XWiki21ToHTMLConverter.converterName);
+      .whenTargetNamed(XWiki21ToHTMLConverter.converterName);
     container.bind<Renderer>("Renderer").to(DefaultRenderer).inSingletonScope();
   }
 }

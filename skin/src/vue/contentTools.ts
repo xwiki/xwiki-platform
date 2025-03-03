@@ -295,7 +295,7 @@ export class ContentTools {
           try {
             const macroProvider = cristal
               ?.getContainer()
-              .get<MacroProvider>("MacroProvider", { name: macroName });
+              .getNamed<MacroProvider>("MacroProvider", macroName);
             const vueComponent = await macroProvider?.getVueComponent();
             if (vueComponent && cristal?.getApp()) {
               macroTag.id = "wikimodel-macro-" + macroName + "-1";

@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@xwiki/cristal-extra-tabs-api": "workspace:*",
-    "inversify": "7.0.1",
+    "inversify": "6.2.2",
     "lodash-es": "4.17.21"
   },
   "peerDependencies": {

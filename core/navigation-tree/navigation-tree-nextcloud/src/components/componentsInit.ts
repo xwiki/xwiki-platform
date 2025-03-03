@@ -41,8 +41,8 @@ class NextcloudNavigationTreeSource implements NavigationTreeSource {
   public logger: Logger;
 
   constructor(
-    @inject("Logger") logger: Logger,
-    @inject("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -142,6 +142,6 @@ export class ComponentInit {
       .bind<NavigationTreeSource>(NavigationTreeSourceName)
       .to(NextcloudNavigationTreeSource)
       .inSingletonScope()
-      .whenNamed("Nextcloud");
+      .whenTargetNamed("Nextcloud");
   }
 }

@@ -32,7 +32,7 @@ export default class DexieOfflineStorage implements OfflineStorage {
   >();
   private logger: Logger;
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     this.logger = logger;
     this.logger.setModule("storage.components.dexieOfflineStorage");
   }

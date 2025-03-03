@@ -30,14 +30,16 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class DefaultModelReferenceSerializerProvider
   implements ModelReferenceSerializerProvider
 {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   get(type?: string): ModelReferenceSerializer | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .get("ModelReferenceSerializer", { name: resolvedType });
+        .getNamed("ModelReferenceSerializer", resolvedType);
     } catch (e) {
       this.cristalApp
         .getLogger("model-reference.api")

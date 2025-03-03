@@ -32,11 +32,11 @@ export class ComponentInit {
       .bind<RemoteURLParser>("RemoteURLParser")
       .to(GitHubRemoteURLParser)
       .inSingletonScope()
-      .whenNamed("GitHub");
+      .whenTargetNamed("GitHub");
     container
       .bind<RemoteURLSerializer>("RemoteURLSerializer")
       .to(GitHubRemoteURLSerializer)
       .inSingletonScope()
-      .whenNamed("GitHub");
+      .whenTargetNamed("GitHub");
   }
 }

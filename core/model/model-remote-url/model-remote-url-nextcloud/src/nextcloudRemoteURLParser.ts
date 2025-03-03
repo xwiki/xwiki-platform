@@ -31,7 +31,9 @@ import type { CristalApp } from "@xwiki/cristal-api";
 
 @injectable()
 class NextcloudRemoteURLParser implements RemoteURLParser {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
 
   parse(urlStr: string): EntityReference | undefined {
     const baseRestURL = this.getWikiConfig().baseRestURL;

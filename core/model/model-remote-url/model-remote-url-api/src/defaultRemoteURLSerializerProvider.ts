@@ -27,14 +27,16 @@ import type { CristalApp } from "@xwiki/cristal-api";
 class DefaultRemoteURLSerializerProvider
   implements RemoteURLSerializerProvider
 {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   get(type?: string): RemoteURLSerializer | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .get("RemoteURLSerializer", { name: resolvedType });
+        .getNamed("RemoteURLSerializer", resolvedType);
     } catch (e) {
       this.cristalApp
         .getLogger("remote-url.api")

@@ -50,8 +50,8 @@ declare const window: AuthenticationWindow;
 @injectable()
 class GitHubAuthenticationManager implements AuthenticationManager {
   constructor(
-    @inject("CristalApp") private readonly cristalApp: CristalApp,
-    @inject(GitHubAuthenticationState)
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+    @inject<GitHubAuthenticationState>(GitHubAuthenticationState)
     private readonly authenticationState: GitHubAuthenticationState,
   ) {}
 

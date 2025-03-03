@@ -30,7 +30,7 @@ export class XWiki21ToHTMLConverter implements Converter {
   private logger: Logger;
   public wikimodel: WikiModel;
 
-  constructor(@inject("Logger") logger: Logger) {
+  constructor(@inject<Logger>("Logger") logger: Logger) {
     this.logger = logger;
     this.logger.setModule("rendering.xwiki");
     this.wikimodel = new WikiModel();

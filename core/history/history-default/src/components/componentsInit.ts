@@ -35,20 +35,23 @@ import type {
 class DefaultPageRevisionManagerProvider
   implements PageRevisionManagerProvider
 {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
 
   has(): boolean {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    return container.isBound(PageRevisionManagerName, { name: wikiConfigType });
+    return container.isBoundNamed(PageRevisionManagerName, wikiConfigType);
   }
 
   get(): PageRevisionManager {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    return container.get<PageRevisionManager>(PageRevisionManagerName, {
-      name: wikiConfigType,
-    });
+    return container.getNamed<PageRevisionManager>(
+      PageRevisionManagerName,
+      wikiConfigType,
+    );
   }
 }
 

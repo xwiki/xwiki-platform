@@ -27,6 +27,6 @@ export default class ComponentInit {
     container
       .bind<DesignSystemLoader>("DesignSystemLoader")
       .to(VuetifyDesignSystemLoader)
-      .whenNamed("vuetify");
+      .whenTargetNamed("vuetify");
   }
 }

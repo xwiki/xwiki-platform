@@ -27,7 +27,7 @@ export class FileSystemConfig extends DefaultWikiConfig {
   override storage: Storage;
   override cristal: CristalApp;
   constructor(
-    @inject("Logger") logger: Logger,
+    @inject<Logger>("Logger") logger: Logger,
     @inject("Storage") @named("FileSystem") storage: Storage,
     @inject("CristalApp") cristal: CristalApp,
   ) {

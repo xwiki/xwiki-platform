@@ -28,14 +28,16 @@ import type { CristalApp } from "@xwiki/cristal-api";
  */
 @injectable()
 class DefaultRemoteURLParserProvider implements RemoteURLParserProvider {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   get(type?: string): RemoteURLParser | undefined {
     const resolvedType = type || this.cristalApp.getWikiConfig().getType();
     try {
       return this.cristalApp
         .getContainer()
-        .get("RemoteURLParser", { name: resolvedType });
+        .getNamed("RemoteURLParser", resolvedType);
     } catch (e) {
       this.cristalApp
         .getLogger("remote-url.api")

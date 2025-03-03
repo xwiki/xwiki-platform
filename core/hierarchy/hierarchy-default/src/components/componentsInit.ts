@@ -44,8 +44,8 @@ class DefaultPageHierarchyResolver implements PageHierarchyResolver {
   public logger: Logger;
 
   constructor(
-    @inject("Logger") logger: Logger,
-    @inject("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule("api.components.DefaultPageHierarchyResolver");
@@ -89,8 +89,8 @@ class DefaultPageHierarchyResolverProvider
   public logger: Logger;
 
   constructor(
-    @inject("Logger") logger: Logger,
-    @inject("CristalApp") cristalApp: CristalApp,
+    @inject<Logger>("Logger") logger: Logger,
+    @inject<CristalApp>("CristalApp") cristalApp: CristalApp,
   ) {
     this.logger = logger;
     this.logger.setModule(
@@ -102,12 +102,11 @@ class DefaultPageHierarchyResolverProvider
   get(): PageHierarchyResolver {
     const container = this.cristalApp.getContainer();
     const wikiConfigType = this.cristalApp.getWikiConfig().getType();
-    if (
-      container.isBound(PageHierarchyResolverName, { name: wikiConfigType })
-    ) {
-      return container.get<PageHierarchyResolver>(PageHierarchyResolverName, {
-        name: wikiConfigType,
-      });
+    if (container.isBoundNamed(PageHierarchyResolverName, wikiConfigType)) {
+      return container.getNamed<PageHierarchyResolver>(
+        PageHierarchyResolverName,
+        wikiConfigType,
+      );
     } else {
       return container.get<PageHierarchyResolver>(PageHierarchyResolverName);
     }
@@ -120,13 +119,13 @@ export class ComponentInit {
       .bind<PageHierarchyResolver>(PageHierarchyResolverName)
       .to(DefaultPageHierarchyResolver)
       .inSingletonScope()
-      .whenDefault();
+      .whenTargetIsDefault();
     container
       .bind<PageHierarchyResolverProvider>(
         `${PageHierarchyResolverName}Provider`,
       )
       .to(DefaultPageHierarchyResolverProvider)
       .inSingletonScope()
-      .whenDefault();
+      .whenTargetIsDefault();
   }
 }

@@ -34,16 +34,16 @@ export class ComponentInit {
       .bind<ModelReferenceHandler>("ModelReferenceHandler")
       .to(XWikiModelReferenceHandler)
       .inSingletonScope()
-      .whenNamed("XWiki");
+      .whenTargetNamed("XWiki");
     container
       .bind<ModelReferenceParser>("ModelReferenceParser")
       .to(XWikiModelReferenceParser)
       .inSingletonScope()
-      .whenNamed("XWiki");
+      .whenTargetNamed("XWiki");
     container
       .bind<ModelReferenceSerializer>("ModelReferenceSerializer")
       .to(XWikiModelReferenceSerializer)
       .inSingletonScope()
-      .whenNamed("XWiki");
+      .whenTargetNamed("XWiki");
   }
 }

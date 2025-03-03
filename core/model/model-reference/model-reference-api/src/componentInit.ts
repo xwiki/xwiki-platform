@@ -34,7 +34,7 @@ class ComponentInit {
       .bind<ModelReferenceHandler>("ModelReferenceHandler")
       .to(DefaultModelReferenceHandler)
       .inSingletonScope()
-      .whenDefault();
+      .whenTargetIsDefault();
     container
       .bind<ModelReferenceHandlerProvider>("ModelReferenceHandlerProvider")
       .to(DefaultModelReferenceHandlerProvider)

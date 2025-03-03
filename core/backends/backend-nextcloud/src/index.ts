@@ -28,10 +28,10 @@ export class ComponentInit {
     container
       .bind<WikiConfig>("WikiConfig")
       .to(NextcloudWikiConfig)
-      .whenNamed("Nextcloud");
+      .whenTargetNamed("Nextcloud");
     container
       .bind<Storage>("Storage")
       .to(NextcloudStorage)
-      .whenNamed("Nextcloud");
+      .whenTargetNamed("Nextcloud");
   }
 }

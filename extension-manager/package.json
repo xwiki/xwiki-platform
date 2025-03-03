@@ -27,7 +27,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@xwiki/cristal-api": "workspace:*",
-    "inversify": "7.0.1",
+    "inversify": "6.2.2",
     "reflect-metadata": "0.2.2"
   },
   "devDependencies": {

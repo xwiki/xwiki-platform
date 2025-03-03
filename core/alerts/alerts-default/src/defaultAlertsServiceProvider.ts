@@ -31,7 +31,9 @@ import type { CristalApp } from "@xwiki/cristal-api";
  */
 @injectable()
 export class DefaultAlertsServiceProvider implements AlertsServiceProvider {
-  constructor(@inject("CristalApp") private readonly cristal: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristal: CristalApp,
+  ) {}
 
   get(): AlertsService {
     return this.cristal.getContainer().get<AlertsService>("AlertsService");

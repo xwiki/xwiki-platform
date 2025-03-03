@@ -30,7 +30,9 @@ import type { EntityReference } from "@xwiki/cristal-model-api";
 
 @injectable()
 class XWikiRemoteURLParser implements RemoteURLParser {
-  constructor(@inject("CristalApp") private readonly cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private readonly cristalApp: CristalApp,
+  ) {}
 
   // TODO: reduce the number of statements in the following method and reactivate the disabled eslint rule.
   // eslint-disable-next-line max-statements

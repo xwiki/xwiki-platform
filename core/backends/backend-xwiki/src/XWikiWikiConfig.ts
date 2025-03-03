@@ -28,7 +28,7 @@ export class XWikiWikiConfig extends DefaultWikiConfig {
   override cristal: CristalApp;
 
   constructor(
-    @inject("Logger") logger: Logger,
+    @inject<Logger>("Logger") logger: Logger,
     @inject("Storage") @named("XWiki") storage: Storage,
     @inject("CristalApp") cristal: CristalApp,
   ) {

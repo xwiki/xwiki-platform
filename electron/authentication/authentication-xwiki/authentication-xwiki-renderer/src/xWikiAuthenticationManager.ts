@@ -47,7 +47,9 @@ declare module window {
 
 @injectable()
 class XWikiAuthenticationManager implements AuthenticationManager {
-  constructor(@inject("CristalApp") private cristalApp: CristalApp) {}
+  constructor(
+    @inject<CristalApp>("CristalApp") private cristalApp: CristalApp,
+  ) {}
 
   async start(): Promise<void> {
     window.authenticationXWiki.login(this.cristalApp.getWikiConfig().baseURL);

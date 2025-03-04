@@ -31,10 +31,10 @@ importers:
         version: 8.25.0(eslint@9.21.0)(typescript@5.7.3)
       '@vitejs/plugin-vue':
         specifier: 5.2.1
-        version: 5.2.1(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+        version: 5.2.1(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       '@vitest/coverage-v8':
         specifier: 3.0.7
-        version: 3.0.7(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.7(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
       concurrently:
         specifier: 9.1.2
         version: 9.1.2
@@ -76,16 +76,16 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-css-injected-by-js:
         specifier: 3.5.2
-        version: 3.5.2(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.5.2(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       vite-plugin-dts:
         specifier: 4.5.3
-        version: 4.5.3(@types/node@22.13.8)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 4.5.3(@types/node@22.13.9)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vue-eslint-parser:
         specifier: 9.4.3
         version: 9.4.3(eslint@9.21.0)
@@ -119,7 +119,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -141,7 +141,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/alerts/alerts-default:
     dependencies:
@@ -172,7 +172,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/alerts/alerts-ui:
     dependencies:
@@ -206,7 +206,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -231,7 +231,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/attachments/attachments-default:
     dependencies:
@@ -274,7 +274,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/attachments/attachments-ui:
     dependencies:
@@ -350,13 +350,13 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -374,7 +374,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/authentication/authentication-default:
     dependencies:
@@ -399,7 +399,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/authentication/authentication-github:
     dependencies:
@@ -439,7 +439,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/authentication/authentication-github-state:
     dependencies:
@@ -464,7 +464,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/authentication/authentication-github-ui:
     dependencies:
@@ -519,10 +519,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -537,7 +537,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/authentication/authentication-ui:
     dependencies:
@@ -586,10 +586,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -626,7 +626,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/backends/backend-api:
     dependencies:
@@ -648,7 +648,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/backends/backend-dexie:
     dependencies:
@@ -679,7 +679,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/backends/backend-github:
     dependencies:
@@ -713,7 +713,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/backends/backend-nextcloud:
     dependencies:
@@ -747,7 +747,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/backends/backend-xwiki:
     dependencies:
@@ -781,10 +781,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
 
   core/browser/browser-api:
     dependencies:
@@ -800,7 +800,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/browser/browser-default:
     dependencies:
@@ -828,7 +828,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/configuration/configuration-api:
     dependencies:
@@ -844,7 +844,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/configuration/configuration-web:
     dependencies:
@@ -860,7 +860,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/date/date-api:
     dependencies:
@@ -882,7 +882,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/date/date-ui:
     dependencies:
@@ -904,7 +904,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -929,7 +929,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/document/document-default:
     dependencies:
@@ -969,10 +969,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
 
   core/extra-tabs/extra-tabs-api:
     dependencies:
@@ -997,7 +997,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/extra-tabs/extra-tabs-default:
     dependencies:
@@ -1025,7 +1025,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/extra-tabs/extra-tabs-ui:
     dependencies:
@@ -1050,7 +1050,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -1078,7 +1078,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -1100,7 +1100,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/hierarchy/hierarchy-default:
     dependencies:
@@ -1128,7 +1128,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/hierarchy/hierarchy-filesystem:
     dependencies:
@@ -1159,7 +1159,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/hierarchy/hierarchy-github:
     dependencies:
@@ -1190,7 +1190,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/hierarchy/hierarchy-nextcloud:
     dependencies:
@@ -1221,7 +1221,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/hierarchy/hierarchy-xwiki:
     dependencies:
@@ -1264,7 +1264,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/history/history-api:
     dependencies:
@@ -1283,7 +1283,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/history/history-default:
     dependencies:
@@ -1308,7 +1308,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/history/history-github:
     dependencies:
@@ -1339,7 +1339,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/history/history-ui:
     dependencies:
@@ -1385,7 +1385,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -1422,7 +1422,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/icons:
     dependencies:
@@ -1444,7 +1444,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -1463,7 +1463,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/info-actions/info-actions-default:
     dependencies:
@@ -1491,7 +1491,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/info-actions/info-actions-ui:
     dependencies:
@@ -1525,7 +1525,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -1550,7 +1550,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/link-suggest/link-suggest-nextcloud:
     dependencies:
@@ -1584,7 +1584,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/link-suggest/link-suggest-xwiki:
     dependencies:
@@ -1618,7 +1618,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/markdown/markdown-api:
     dependencies:
@@ -1634,7 +1634,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/markdown/markdown-default:
     dependencies:
@@ -1671,10 +1671,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
 
   core/model/model-api:
     devDependencies:
@@ -1686,7 +1686,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-click-listener:
     dependencies:
@@ -1720,7 +1720,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-local-url:
     dependencies:
@@ -1742,10 +1742,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-reference/model-reference-api:
     dependencies:
@@ -1770,7 +1770,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-reference/model-reference-filesystem:
     dependencies:
@@ -1795,7 +1795,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-reference/model-reference-github:
     dependencies:
@@ -1820,7 +1820,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-reference/model-reference-nextcloud:
     dependencies:
@@ -1845,7 +1845,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-reference/model-reference-xwiki:
     dependencies:
@@ -1876,13 +1876,13 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -1910,7 +1910,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-api:
     devDependencies:
@@ -1922,7 +1922,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-remote-url/model-remote-url-filesystem/model-remote-url-filesystem-default:
     dependencies:
@@ -1950,7 +1950,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-remote-url/model-remote-url-github:
     dependencies:
@@ -1978,7 +1978,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-remote-url/model-remote-url-nextcloud:
     dependencies:
@@ -2009,7 +2009,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/model/model-remote-url/model-remote-url-xwiki:
     dependencies:
@@ -2037,7 +2037,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-api:
     dependencies:
@@ -2056,7 +2056,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-default:
     dependencies:
@@ -2084,7 +2084,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-filesystem:
     dependencies:
@@ -2118,7 +2118,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-github:
     dependencies:
@@ -2152,7 +2152,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-nextcloud:
     dependencies:
@@ -2186,7 +2186,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/navigation-tree/navigation-tree-xwiki:
     dependencies:
@@ -2223,7 +2223,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/page-actions/page-actions-api:
     dependencies:
@@ -2248,7 +2248,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/page-actions/page-actions-default:
     dependencies:
@@ -2276,7 +2276,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/page-actions/page-actions-ui:
     dependencies:
@@ -2337,7 +2337,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2356,7 +2356,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/rename/rename-default:
     dependencies:
@@ -2381,7 +2381,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/rename/rename-filesystem:
     dependencies:
@@ -2409,7 +2409,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/tiptap-extensions/tiptap-extension-image:
     dependencies:
@@ -2526,7 +2526,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/uiextension/uiextension-default:
     dependencies:
@@ -2554,7 +2554,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   core/uiextension/uiextension-ui:
     dependencies:
@@ -2576,7 +2576,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2598,7 +2598,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2616,7 +2616,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   dev/config:
     devDependencies:
@@ -2625,7 +2625,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   dev/test-utils:
     dependencies:
@@ -2647,7 +2647,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   ds/api:
     dependencies:
@@ -2672,7 +2672,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   ds/dsfr:
     dependencies:
@@ -2709,7 +2709,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2770,7 +2770,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2825,7 +2825,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -2982,7 +2982,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3010,7 +3010,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/authentication/authentication-github/authentication-github-main:
     dependencies:
@@ -3035,7 +3035,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/authentication/authentication-github/authentication-github-preload:
     dependencies:
@@ -3054,7 +3054,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/authentication/authentication-github/authentication-github-renderer:
     dependencies:
@@ -3082,7 +3082,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue:
         specifier: 3.5.13
         version: 3.5.13(typescript@5.7.3)
@@ -3110,7 +3110,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-preload:
     dependencies:
@@ -3129,7 +3129,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/authentication/authentication-xwiki/authentication-xwiki-renderer:
     dependencies:
@@ -3154,7 +3154,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/browser:
     dependencies:
@@ -3182,7 +3182,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/configuration/configuration-electron/configuration-electron-main:
     dependencies:
@@ -3204,7 +3204,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/configuration/configuration-electron/configuration-electron-preload:
     dependencies:
@@ -3223,7 +3223,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/configuration/configuration-electron/configuration-electron-renderer:
     dependencies:
@@ -3239,7 +3239,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/link-suggest/link-suggest-filesystem:
     dependencies:
@@ -3273,7 +3273,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/main:
     dependencies:
@@ -3297,14 +3297,14 @@ importers:
         version: 34.3.0
     devDependencies:
       '@types/node':
-        specifier: 22.13.8
-        version: 22.13.8
+        specifier: 22.13.9
+        version: 22.13.9
       typescript:
         specifier: 5.7.3
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/preload:
     dependencies:
@@ -3319,8 +3319,8 @@ importers:
         version: link:../authentication/authentication-xwiki/authentication-xwiki-preload
     devDependencies:
       '@types/node':
-        specifier: 22.13.8
-        version: 22.13.8
+        specifier: 22.13.9
+        version: 22.13.9
       '@xwiki/cristal-browser-electron':
         specifier: workspace:*
         version: link:../browser
@@ -3332,7 +3332,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/renderer:
     dependencies:
@@ -3383,14 +3383,14 @@ importers:
         version: 3.5.13(typescript@5.7.3)
     devDependencies:
       '@types/node':
-        specifier: 22.13.8
-        version: 22.13.8
+        specifier: 22.13.9
+        version: 22.13.9
       typescript:
         specifier: 5.7.3
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   electron/storage:
     dependencies:
@@ -3420,8 +3420,8 @@ importers:
         version: 4.0.6
     devDependencies:
       '@types/node':
-        specifier: 22.13.8
-        version: 22.13.8
+        specifier: 22.13.9
+        version: 22.13.9
       '@xwiki/cristal-dev-config':
         specifier: workspace:*
         version: link:../../dev/config
@@ -3433,10 +3433,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-node:
         specifier: 4.0.0
-        version: 4.0.0(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 4.0.0(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
 
   extension-manager:
     dependencies:
@@ -3458,7 +3458,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   extensions/menubuttons:
     dependencies:
@@ -3486,7 +3486,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3511,7 +3511,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   lib:
     dependencies:
@@ -3722,7 +3722,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3756,7 +3756,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3790,7 +3790,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   rendering/rendering:
     dependencies:
@@ -3827,7 +3827,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3842,7 +3842,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3864,10 +3864,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-comlink:
         specifier: 5.1.0
-        version: 5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -3937,10 +3937,10 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-comlink:
         specifier: 5.1.0
-        version: 5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -4046,13 +4046,13 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: 3.0.7
-        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
       vitest-mock-extended:
         specifier: 3.0.1
-        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -4074,13 +4074,13 @@ importers:
         version: 3.1.9
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@types/node@22.13.8)(typescript@5.7.3)
+        version: 10.9.2(@types/node@22.13.9)(typescript@5.7.3)
       typescript:
         specifier: 5.7.3
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   web:
     dependencies:
@@ -4131,11 +4131,11 @@ importers:
         specifier: 1.50.1
         version: 1.50.1
       '@types/node':
-        specifier: 22.13.8
-        version: 22.13.8
+        specifier: 22.13.9
+        version: 22.13.9
       '@vitejs/plugin-vue':
         specifier: 5.2.1
-        version: 5.2.1(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+        version: 5.2.1(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       globals:
         specifier: 16.0.0
         version: 16.0.0
@@ -4150,13 +4150,13 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-dts:
         specifier: 4.5.3
-        version: 4.5.3(@types/node@22.13.8)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+        version: 4.5.3(@types/node@22.13.9)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       vite-plugin-vuetify:
         specifier: 2.1.0
-        version: 2.1.0(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
+        version: 2.1.0(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -4187,7 +4187,7 @@ importers:
         version: 5.7.3
       vite:
         specifier: 6.2.0
-        version: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+        version: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue-tsc:
         specifier: 2.2.0
         version: 2.2.0(typescript@5.7.3)
@@ -5261,8 +5261,8 @@ packages:
   '@types/node@20.16.10':
     resolution: {integrity: sha512-vQUKgWTjEIRFCvK6CyriPH3MZYiYlNy0fKiEYHWbcoWLEgs4opurGGKlebrTLqdSMIbXImH6XExNiIyNUv3WpA==}
 
-  '@types/node@22.13.8':
-    resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
+  '@types/node@22.13.9':
+    resolution: {integrity: sha512-acBjXdRJ3A6Pb3tqnw9HZmyR3Fiol3aGxRCK1x3d+6CDAMjl7I649wpSd+yNURCjbOUGu9tqtLKnTGxmK6CyGw==}
 
   '@types/plist@3.0.5':
     resolution: {integrity: sha512-E6OCaRmAe4WDmWNsL/9RMqdkkzDCY1etutkflWk4c+AcjDU07Pcz1fQwTX0TQz+Pxqn9i4L1TU3UFpjnrcDgxA==}
@@ -9563,23 +9563,23 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@microsoft/api-extractor-model@7.30.3(@types/node@22.13.8)':
+  '@microsoft/api-extractor-model@7.30.3(@types/node@22.13.9)':
     dependencies:
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.8)
+      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.9)
     transitivePeerDependencies:
       - '@types/node'
 
-  '@microsoft/api-extractor@7.51.1(@types/node@22.13.8)':
+  '@microsoft/api-extractor@7.51.1(@types/node@22.13.9)':
     dependencies:
-      '@microsoft/api-extractor-model': 7.30.3(@types/node@22.13.8)
+      '@microsoft/api-extractor-model': 7.30.3(@types/node@22.13.9)
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.8)
+      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.9)
       '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.15.0(@types/node@22.13.8)
-      '@rushstack/ts-command-line': 4.23.5(@types/node@22.13.8)
+      '@rushstack/terminal': 0.15.0(@types/node@22.13.9)
+      '@rushstack/ts-command-line': 4.23.5(@types/node@22.13.9)
       lodash: 4.17.21
       minimatch: 3.0.8
       resolve: 1.22.10
@@ -9745,7 +9745,7 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@rushstack/node-core-library@5.11.0(@types/node@22.13.8)':
+  '@rushstack/node-core-library@5.11.0(@types/node@22.13.9)':
     dependencies:
       ajv: 8.13.0
       ajv-draft-04: 1.0.0(ajv@8.13.0)
@@ -9756,23 +9756,23 @@ snapshots:
       resolve: 1.22.10
       semver: 7.5.4
     optionalDependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@rushstack/rig-package@0.5.3':
     dependencies:
       resolve: 1.22.10
       strip-json-comments: 3.1.1
 
-  '@rushstack/terminal@0.15.0(@types/node@22.13.8)':
+  '@rushstack/terminal@0.15.0(@types/node@22.13.9)':
     dependencies:
-      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.8)
+      '@rushstack/node-core-library': 5.11.0(@types/node@22.13.9)
       supports-color: 8.1.1
     optionalDependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
-  '@rushstack/ts-command-line@4.23.5(@types/node@22.13.8)':
+  '@rushstack/ts-command-line@4.23.5(@types/node@22.13.9)':
     dependencies:
-      '@rushstack/terminal': 0.15.0(@types/node@22.13.8)
+      '@rushstack/terminal': 0.15.0(@types/node@22.13.9)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -10022,18 +10022,18 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/cacheable-request@6.0.3':
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       '@types/responselike': 1.0.3
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/debug@4.1.12':
     dependencies:
@@ -10047,7 +10047,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.0.0':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       '@types/qs': 6.9.11
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -10067,7 +10067,7 @@ snapshots:
 
   '@types/fs-extra@9.0.13':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/http-cache-semantics@4.0.4': {}
 
@@ -10081,7 +10081,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/linkify-it@3.0.5': {}
 
@@ -10119,13 +10119,13 @@ snapshots:
     dependencies:
       undici-types: 6.19.8
 
-  '@types/node@22.13.8':
+  '@types/node@22.13.9':
     dependencies:
       undici-types: 6.20.0
 
   '@types/plist@3.0.5':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       xmlbuilder: 15.1.1
     optional: true
 
@@ -10143,20 +10143,20 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/scheduler@0.23.0': {}
 
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/serve-static@1.15.5':
     dependencies:
       '@types/http-errors': 2.0.4
       '@types/mime': 3.0.4
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/trusted-types@2.0.7': {}
 
@@ -10165,13 +10165,13 @@ snapshots:
 
   '@types/ws@8.5.12':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
 
   '@types/xml-escape@1.1.3': {}
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
     optional: true
 
   '@typescript-eslint/eslint-plugin@8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0)(typescript@5.7.3))(eslint@9.21.0)(typescript@5.7.3)':
@@ -10251,12 +10251,12 @@ snapshots:
       '@typescript-eslint/types': 8.25.0
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-vue@5.2.1(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))':
+  '@vitejs/plugin-vue@5.2.1(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))':
     dependencies:
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue: 3.5.13(typescript@5.7.3)
 
-  '@vitest/coverage-v8@3.0.7(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))':
+  '@vitest/coverage-v8@3.0.7(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -10270,7 +10270,7 @@ snapshots:
       std-env: 3.8.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+      vitest: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10281,13 +10281,13 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.0.7(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))':
+  '@vitest/mocker@3.0.7(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))':
     dependencies:
       '@vitest/spy': 3.0.7
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
   '@vitest/pretty-format@3.0.7':
     dependencies:
@@ -13929,14 +13929,14 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.3
 
-  ts-node@10.9.2(@types/node@22.13.8)(typescript@5.7.3):
+  ts-node@10.9.2(@types/node@22.13.9)(typescript@5.7.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       acorn: 8.11.3
       acorn-walk: 8.3.2
       arg: 4.1.3
@@ -14080,13 +14080,13 @@ snapshots:
       extsprintf: 1.4.1
     optional: true
 
-  vite-node@3.0.7(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0):
+  vite-node@3.0.7(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -14101,21 +14101,21 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-comlink@5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-comlink@5.1.0(comlink@4.4.2)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
       comlink: 4.4.2
       json5: 2.2.3
       magic-string: 0.30.12
       source-map: 0.7.4
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
-  vite-plugin-css-injected-by-js@3.5.2(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-css-injected-by-js@3.5.2(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
 
-  vite-plugin-dts@4.5.3(@types/node@22.13.8)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-dts@4.5.3(@types/node@22.13.9)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
-      '@microsoft/api-extractor': 7.51.1(@types/node@22.13.8)
+      '@microsoft/api-extractor': 7.51.1(@types/node@22.13.9)
       '@rollup/pluginutils': 5.1.4(rollup@4.32.1)
       '@volar/typescript': 2.4.11
       '@vue/language-core': 2.2.0(typescript@5.7.3)
@@ -14126,53 +14126,53 @@ snapshots:
       magic-string: 0.30.17
       typescript: 5.7.3
     optionalDependencies:
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite-plugin-node@4.0.0(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-node@4.0.0(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       chalk: 4.1.2
       debug: 4.3.7(supports-color@5.5.0)
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vuetify@2.1.0(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14):
+  vite-plugin-vuetify@2.1.0(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14):
     dependencies:
       '@vuetify/loader-shared': 2.1.0(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
       debug: 4.4.0
       upath: 2.0.1
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       vue: 3.5.13(typescript@5.7.3)
       vuetify: 3.7.14(typescript@5.7.3)(vite-plugin-vuetify@2.1.0)(vue@3.5.13(typescript@5.7.3))
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0):
+  vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.0
       postcss: 8.5.3
       rollup: 4.32.1
     optionalDependencies:
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       fsevents: 2.3.3
       tsx: 4.19.3
       yaml: 2.7.0
 
-  vitest-mock-extended@3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)):
+  vitest-mock-extended@3.0.1(typescript@5.7.3)(vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
       ts-essentials: 10.0.4(typescript@5.7.3)
       typescript: 5.7.3
-      vitest: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
+      vitest: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
 
-  vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.8)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0):
+  vitest@3.0.7(@types/debug@4.1.12)(@types/node@22.13.9)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
       '@vitest/expect': 3.0.7
-      '@vitest/mocker': 3.0.7(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))
+      '@vitest/mocker': 3.0.7(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))
       '@vitest/pretty-format': 3.0.7
       '@vitest/runner': 3.0.7
       '@vitest/snapshot': 3.0.7
@@ -14188,12 +14188,12 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
-      vite-node: 3.0.7(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
+      vite-node: 3.0.7(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.12
-      '@types/node': 22.13.8
+      '@types/node': 22.13.9
       happy-dom: 17.1.8
     transitivePeerDependencies:
       - jiti
@@ -14270,7 +14270,7 @@ snapshots:
       vue: 3.5.13(typescript@5.7.3)
     optionalDependencies:
       typescript: 5.7.3
-      vite-plugin-vuetify: 2.1.0(vite@6.2.0(@types/node@22.13.8)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
+      vite-plugin-vuetify: 2.1.0(vite@6.2.0(@types/node@22.13.9)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
 
   w3c-keyname@2.2.8: {}
 

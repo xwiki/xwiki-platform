@@ -64,7 +64,7 @@ const treeSource: NavigationTreeSource = cristal
 const rootNodes: Ref<Array<TreeItem>> = ref([]);
 
 const activatedNodes: Ref<Array<string>> = ref(new Array<string>());
-const expandedNodes: Ref<Array<string>> = ref(new Array<string>());
+const expandedNodes: Ref<unknown> = ref([]);
 var isExpanding: boolean = false;
 
 const props = defineProps<NavigationTreeProps>();
@@ -104,8 +104,8 @@ async function expandTree() {
             if (node.children?.length == 0) {
               await lazyLoadChildren(node);
             }
-            if (!expandedNodes.value.includes(node.id)) {
-              expandedNodes.value.push(node.id);
+            if (!(expandedNodes.value as unknown[]).includes(node.id)) {
+              (expandedNodes.value as unknown[]).push(node.id);
             }
             currentNodes = node.children!;
           }

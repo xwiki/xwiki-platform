@@ -23,7 +23,7 @@ import type { CheckboxProps } from "@xwiki/cristal-dsapi";
 
 defineProps<CheckboxProps>();
 
-const checked = defineModel<boolean>();
+const checked = defineModel<boolean | null>();
 </script>
 <template>
   <v-checkbox

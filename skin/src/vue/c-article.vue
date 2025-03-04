@@ -1,3 +1,23 @@
+<!--
+See the LICENSE file distributed with this work for additional
+information regarding copyright ownership.
+
+This is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation; either version 2.1 of
+the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this software; if not, write to the Free
+Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <script setup lang="ts">
 import UIX from "./c-uix.vue";
 import messages from "../translations";
@@ -8,7 +28,7 @@ import { ExtraTabs } from "@xwiki/cristal-extra-tabs-ui";
 import { InfoActions } from "@xwiki/cristal-info-actions-ui";
 import { UIExtensions } from "@xwiki/cristal-uiextension-ui";
 import { User } from "@xwiki/cristal-user-ui";
-import { Ref, inject, ref, watch } from "vue";
+import { inject, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { CristalApp } from "@xwiki/cristal-api";
 import type {
@@ -16,8 +36,12 @@ import type {
   PageHierarchyResolverProvider,
 } from "@xwiki/cristal-hierarchy-api";
 import type { DocumentReference } from "@xwiki/cristal-model-api";
+import type { Ref } from "vue";
 
-const { t } = useI18n({
+// FIXME: since vue-tsc 2.2.6, this line fix with a compilation error for no obvious reasons as other components of the
+// same package are also relying on use18n + object destructuring. Therefore, we need to define a fake type for t until
+// this is fixed.
+const { t }: { t: (key: string) => string } = useI18n({
   messages,
 });
 

@@ -29,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.document.DocumentAuthors;
 import org.xwiki.model.internal.document.SafeDocumentAuthors;
 import org.xwiki.model.reference.DocumentReference;
@@ -91,6 +92,10 @@ class DocumentTest
 
     @MockComponent
     private ObservationManager observationManager;
+
+    // Needed for XML serialization/document display
+    @MockComponent
+    private JobProgressManager jobProgressManager;
 
     @MockComponent
     private SkinManager skinManager;
@@ -483,7 +488,7 @@ class DocumentTest
         assertEquals(
             """
                 <?xml version='1.1' encoding='UTF-8'?>
-                <xwikidoc version="1.6" reference="Space.Page" locale="">
+                <xwikidoc version="1.5" reference="Space.Page" locale="">
                   <web>Space</web>
                   <name>Page</name>
                   <language/>

@@ -120,4 +120,30 @@ require(['jquery'], function($) {
     });
   });
 });
+/* Panel column interactivity.
+  WIP
+  */
+require( ['jquery', 'jquery-ui'], function($) {
+  let resizeCustomFunctionLeft = function( event, ui ) {
+    // We remove the default inline CSS properties.
+    ui.element. attr("style", "");
+    // We set the one we want when displayed in the flex layout.
+    document.body.style.setProperty('--panel-column-left-width', ui.size.width+"px");
+  };
+  let resizeCustomFunctionRight = function( event, ui ) {
+    // We remove the default inline CSS properties.
+    ui.element. attr("style", "");
+    // We set the one we want when displayed in the flex layout.
+    document.body.style.setProperty('--panel-column-right-width', ui.size.width+"px");
+    //ui.element.css('widt', ui.size.width);
+  };
+  $( "#rightPanels" ).resizable({
+    handles: "w",
+    resize: resizeCustomFunctionRight
+  });
+  $( "#leftPanels" ).resizable({
+    handles: "e",
+    resize: resizeCustomFunctionLeft
+  });
+});
 

@@ -81,8 +81,8 @@ importers:
         specifier: 3.5.2
         version: 3.5.2(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))
       vite-plugin-dts:
-        specifier: 4.5.1
-        version: 4.5.1(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))
+        specifier: 4.5.3
+        version: 4.5.3(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))
       vitest:
         specifier: 3.0.7
         version: 3.0.7(@types/debug@4.1.12)(@types/node@22.13.5)(happy-dom@17.1.8)(tsx@4.19.3)(yaml@2.7.0)
@@ -4152,8 +4152,8 @@ importers:
         specifier: 6.2.0
         version: 6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0)
       vite-plugin-dts:
-        specifier: 4.5.1
-        version: 4.5.1(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))
+        specifier: 4.5.3
+        version: 4.5.3(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))
       vite-plugin-vuetify:
         specifier: 2.1.0
         version: 2.1.0(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))(vuetify@3.7.14)
@@ -5442,14 +5442,6 @@ packages:
       typescript:
         optional: true
 
-  '@vue/language-core@2.2.4':
-    resolution: {integrity: sha512-eGGdw7eWUwdIn9Fy/irJ7uavCGfgemuHQABgJ/hU1UgZFnbTg9VWeXvHQdhY+2SPQZWJqWXvRWIg67t4iWEa+Q==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@vue/reactivity@3.5.13':
     resolution: {integrity: sha512-NaCwtw8o48B9I6L1zl2p41OHo/2Z4wqYGGIK1Khu5T7yxrn+ATOixn/Udn2m+6kZKB/J7cuT9DbWWhRxqixACg==}
 
@@ -5572,9 +5564,6 @@ packages:
 
   alien-signals@0.4.14:
     resolution: {integrity: sha512-itUAVzhczTmP2U5yX67xVpsbbOiquusbWVyA9N+sy6+r6YVbFkahXvNCeEPWEOMhwDYwbVbGHFkVL03N9I5g+Q==}
-
-  alien-signals@1.0.4:
-    resolution: {integrity: sha512-DJqqQD3XcsaQcQ1s+iE2jDUZmmQpXwHiR6fCAim/w87luaW+vmLY8fMlrdkmRwzaFXhkxf3rqPCR59tKVv1MDw==}
 
   ansi-colors@4.1.3:
     resolution: {integrity: sha512-/6w/C21Pm1A7aZitlI5Ni/2J6FFQN8i1Cvz3kHABAAbw93v/NlvKdVOqz7CCWz/3iv/JplRSEEZ83XION15ovw==}
@@ -8652,8 +8641,8 @@ packages:
     peerDependencies:
       vite: '>2.0.0-0'
 
-  vite-plugin-dts@4.5.1:
-    resolution: {integrity: sha512-Yo1dHT05B2nD47AVB7b0+wK1FPFpJJnUf/muRF7+tP+sbPFRhLs70TTRGwJw7NDBwAUAmSwhrD+ZPTe4P6Wv9w==}
+  vite-plugin-dts@4.5.3:
+    resolution: {integrity: sha512-P64VnD00dR+e8S26ESoFELqc17+w7pKkwlBpgXteOljFyT0zDwD8hH4zXp49M/kciy//7ZbVXIwQCekBJjfWzA==}
     peerDependencies:
       typescript: '*'
       vite: '*'
@@ -10405,19 +10394,6 @@ snapshots:
     optionalDependencies:
       typescript: 5.7.3
 
-  '@vue/language-core@2.2.4(typescript@5.7.3)':
-    dependencies:
-      '@volar/language-core': 2.4.11
-      '@vue/compiler-dom': 3.5.13
-      '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.13
-      alien-signals: 1.0.4
-      minimatch: 9.0.5
-      muggle-string: 0.4.1
-      path-browserify: 1.0.1
-    optionalDependencies:
-      typescript: 5.7.3
-
   '@vue/reactivity@3.5.13':
     dependencies:
       '@vue/shared': 3.5.13
@@ -10551,8 +10527,6 @@ snapshots:
       require-from-string: 2.0.2
 
   alien-signals@0.4.14: {}
-
-  alien-signals@1.0.4: {}
 
   ansi-colors@4.1.3: {}
 
@@ -14139,12 +14113,12 @@ snapshots:
     dependencies:
       vite: 6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0)
 
-  vite-plugin-dts@4.5.1(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0)):
+  vite-plugin-dts@4.5.3(@types/node@22.13.5)(rollup@4.32.1)(typescript@5.7.3)(vite@6.2.0(@types/node@22.13.5)(tsx@4.19.3)(yaml@2.7.0)):
     dependencies:
       '@microsoft/api-extractor': 7.51.1(@types/node@22.13.5)
       '@rollup/pluginutils': 5.1.4(rollup@4.32.1)
       '@volar/typescript': 2.4.11
-      '@vue/language-core': 2.2.4(typescript@5.7.3)
+      '@vue/language-core': 2.2.0(typescript@5.7.3)
       compare-versions: 6.1.1
       debug: 4.4.0
       kolorist: 1.8.0

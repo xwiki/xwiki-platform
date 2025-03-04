@@ -41,7 +41,7 @@
     "@types/dompurify": "3.2.0",
     "@xwiki/cristal-dev-config": "workspace:*",
     "reflect-metadata": "0.2.2",
-    "typescript": "5.7.3",
+    "typescript": "5.8.2",
     "vite": "6.2.0",
     "vue-tsc": "2.2.0"
   },

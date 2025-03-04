@@ -19,7 +19,6 @@
 ## ---------------------------------------------------------------------------
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
 <div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
-<button class="resize-handle"></button>
 ## Global Variable
 #set($xwikiPanelWidth = $leftPanelsWidth)
 #set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))

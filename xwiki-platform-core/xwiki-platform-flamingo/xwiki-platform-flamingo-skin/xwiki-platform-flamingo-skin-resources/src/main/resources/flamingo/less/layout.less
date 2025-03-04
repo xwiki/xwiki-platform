@@ -8,50 +8,58 @@
 #menuview, #headerglobal, #xwikieditor, #footerglobal {
   .make-row();
 }
-
 @main-padding: @grid-gutter-width * 2;
 
+@property ~"--panel-column-left-width" {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16vw;
+}
+@property ~"--panel-column-right-width" {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16vw;
+}
 #body {
   // We use CSS flex to display the default column sizes.
   // The size "unit" is 8vw which is approximately equal to 1/12th of the viewport.
   & #contentcontainer {
     display: flex;
   }
-  
   // We reorganize the DOM order so that it makes sense visually.
   & #contentcolumn {
     order: 2;
-    flex-basis: 68vw;
+    width: ~"calc(100vw - var(--panel-column-left-width) - var(--panel-column-right-width))";
   }
-  
+
   & #leftPanels {
     order: 1;
-    flex-basis: 16vw;
+    width: ~"var(--panel-column-left-width)";
   }
-  
+
   & #rightPanels, & #editPanels {
     order: 3;
-    flex-basis: 16vw;
+    width: ~"var(--panel-column-right-width)";
   }
 
   &.panel-left-width-Small #leftPanels {
     flex-basis: 8vw;
   }
-  
+
   &.panel-left-width-Large #leftPanels {
     flex-basis: 24vw;
   }
-  
+
   &.panel-right-width-Small #rightPanels,
   &.panel-right-width-Small #editPanels {
     flex-basis: 8vw;
   }
-  
+
   &.panel-right-width-Large #rightPanels,
   &.panel-right-width-Large #editPanels {
     flex-basis: 24vw;
   }
-  
+
   // Left panels are small
   &.panel-left-width-Small {
     // Left panels are small and right panels are small
@@ -97,15 +105,15 @@
     #leftPanels {
       width: 0;
     }
-    
+
     &.panel-right-width-Small #contentcolumn {
       flex-basis: 92vw;
     }
-    
+
     &.panel-right-width-Medium #contentcolumn {
       flex-basis: 84vw;
     }
-    
+
     &.panel-right-width-Large #contentcolumn {
       flex-basis: 72vw;
     }
@@ -116,15 +124,15 @@
     #rightPanels {
       width: 0;
     }
-    
+
     &.panel-left-width-Small #contentcolumn {
       flex-basis: 92vw;
     }
-    
+
     &.panel-left-width-Medium #contentcolumn {
       flex-basis: 84vw;
     }
-    
+
     &.panel-left-width-Large #contentcolumn {
       flex-basis: 76vw;
     }
@@ -182,8 +190,8 @@
   padding-bottom: (@grid-gutter-width / 2);
 }
 
-#rightPanels > button.resize-handle,
-#leftPanels > button.resize-handle {
+#rightPanels > .ui-resizable-w,
+#leftPanels > .ui-resizable-e {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -192,28 +200,27 @@
   cursor: col-resize;
   min-width: 0;
   width: 0;
-  border-width: 2px;
+  border-width: 1px;
   border-radius: 0;
   border-style: solid;
 }
 
-#leftPanels > button.resize-handle {
+#leftPanels > .ui-resizable-e {
   right: 0;
   margin-left: 5px;
 }
 
-#rightPanels > button.resize-handle {
+#rightPanels > .ui-resizable-w {
   left: 0;
   margin-right: 5px;
 }
 
-#rightPanels > button.resize-handle:focus,
-#rightPanels > button.resize-handle:hover,
-#leftPanels > button.resize-handle:focus,
-#leftPanels > button.resize-handle:hover {
+#rightPanels > .ui-resizable-w:focus,
+#rightPanels > .ui-resizable-w:hover,
+#leftPanels > .ui-resizable-e:focus,
+#leftPanels > .ui-resizable-e:hover {
   opacity: 1;
   border-color: @navbar-default-bg;
-  border-width: 2px;
   margin-left: 0;
   margin-right: 0;
 }

@@ -6449,6 +6449,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable, Disposable
      */
     public XWikiAttachment setAttachment(XWikiAttachment attachment)
     {
+        attachment.setDoc(this);
         return this.attachmentList.set(attachment);
     }
 

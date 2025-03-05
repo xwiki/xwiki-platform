@@ -222,8 +222,9 @@ class FilesystemAttachmentVersioningStoreTest
         }
 
         @Override
-        public StringAttachmentContent clone()
+        public XWikiAttachmentContent clone(boolean skipContent)
         {
+            // we never skip content as there's no way to load it for the test.
             return this;
         }
     }

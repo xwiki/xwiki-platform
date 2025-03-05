@@ -58,9 +58,6 @@ public class XWikiAttachmentContent implements Cloneable
     // TODO: use TemporaryDeferredFileRepository instead (see DeletedAttachment)
     private FileItem file;
 
-    /** The owner document. */
-    private XWikiDocument ownerDocument;
-
     /**
      * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
      *
@@ -72,7 +69,6 @@ public class XWikiAttachmentContent implements Cloneable
         this.file = original.file;
         this.attachment = original.attachment;
         this.isContentDirty = original.isContentDirty;
-        this.ownerDocument = original.ownerDocument;
     }
 
     /**
@@ -170,11 +166,9 @@ public class XWikiAttachmentContent implements Cloneable
     public XWikiAttachmentContent clone(boolean skipContent)
     {
         XWikiAttachmentContent clone = new XWikiAttachmentContent(this);
-        // this AttachmentContent is not attached to any document yet.
-        clone.setOwnerDocument(null);
         if (!skipContent) {
             try {
-                clone.setContent(getContentInputStream());
+                clone.setContent(getContentInputStream(), true);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to clone data to storage.", e);
             }
@@ -230,10 +224,6 @@ public class XWikiAttachmentContent implements Cloneable
     public void setAttachment(XWikiAttachment attachment)
     {
         this.attachment = attachment;
-
-        if (this.attachment != null) {
-            setOwnerDocument(this.attachment.getDoc());
-        }
     }
 
     /**
@@ -255,8 +245,8 @@ public class XWikiAttachmentContent implements Cloneable
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
-        if (contentDirty && this.ownerDocument != null) {
-            this.ownerDocument.setMetaDataDirty(contentDirty);
+        if (contentDirty && this.attachment != null) {
+            this.attachment.setMetaDataDirty(contentDirty);
         }
     }
 
@@ -345,6 +335,23 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is) throws IOException
     {
+        setContent(is, false);
+    }
+
+    /**
+     * Set the content of the attachment from an InputStream.
+     *
+     * @param is the input stream that will be read
+     * @param skipDirty don't change the dirty flag: use {@code true} when using this method for cloning an already
+     * existing attachment content.
+     * @throws IOException when an error occurs during streaming operation
+     * @since 17.2.0RC1
+     * @since 16.10.5
+     * @since 16.4.7
+     */
+    @Unstable
+    public void setContent(InputStream is, boolean skipDirty) throws IOException
+    {
         OutputStream fios = getContentOutputStream();
         try {
             IOUtils.copy(is, fios);
@@ -352,8 +359,10 @@ public class XWikiAttachmentContent implements Cloneable
             fios.close();
         }
 
-        // Indicate the content has been modified
-        setContentDirty(true);
+        if (!skipDirty) {
+            // Indicate the content has been modified
+            setContentDirty(true);
+        }
     }
 
     /**
@@ -382,15 +391,12 @@ public class XWikiAttachmentContent implements Cloneable
      * Set the owner document in order to propagate the content dirty flag.
      *
      * @param ownerDocument the owner document.
+     * @deprecated This method doesn't perform any action anymore. Call {@link #getAttachment()} and
+     * {@link XWikiAttachment#setDoc(XWikiDocument)} instead.
      */
+    @Deprecated(since = "17.2.0RC1")
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        if (this.ownerDocument != ownerDocument) {
-            this.ownerDocument = ownerDocument;
-            if (this.isContentDirty && ownerDocument != null) {
-                ownerDocument.setMetaDataDirty(true);
-            }
-        }
     }
 
     /**

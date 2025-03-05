@@ -30,6 +30,8 @@
   & #contentcolumn {
     order: 2;
     width: ~"calc(100vw - var(--panel-column-left-width) - var(--panel-column-right-width))";
+    /* Whatever the user preference/actions, we make sure that the content is still at least somewhat visible. */
+    min-width: 10vw;
   }
 
   & #leftPanels {
@@ -41,106 +43,40 @@
     order: 3;
     width: ~"var(--panel-column-right-width)";
   }
-
-  &.panel-left-width-Small #leftPanels {
-    flex-basis: 8vw;
-  }
-
-  &.panel-left-width-Large #leftPanels {
-    flex-basis: 24vw;
-  }
-
-  &.panel-right-width-Small #rightPanels,
-  &.panel-right-width-Small #editPanels {
-    flex-basis: 8vw;
-  }
-
-  &.panel-right-width-Large #rightPanels,
-  &.panel-right-width-Large #editPanels {
-    flex-basis: 24vw;
-  }
-
-  // Left panels are small
-  &.panel-left-width-Small {
-    // Left panels are small and right panels are small
-    &.panel-right-width-Small #contentcolumn {
-      flex-basis: 84vw;
-    }
-    // Left panels are small and right panels are medium
-    &.panel-right-width-Medium #contentcolumn {
-      flex-basis: 76vw;
-    }
-    // Left panels are small and right panels are large
-    // Default value
-  }
-  // Left panels are medium
-  &.panel-left-width-Medium {
-    // Left panels are medium and right panels are small
-    &.panel-right-width-Small #contentcolumn {
-      flex-basis: 76vw;
-    }
-    // Left panels are medium and right panels are medium
-    // Default value
-    // Left panels are medium and right panels are large
-    &.panel-right-width-Large #contentcolumn {
-      flex-basis: 60vw;
-    }
-  }
-  // Left panels are large
-  &.panel-left-width-Large {
-    // Left panels are large and right panels are small
-    // Default value
-    // Left panels are large and right panels are medium
-    &.panel-right-width-Medium #contentcolumn {
-      flex-basis: 60vw;
-    }
-    // Left panels are large and right panels are large
-    &.panel-right-width-Large #contentcolumn {
-      flex-basis: 52vw;
-    }
-  }
-
-  // Only right panels
+  
+  /* Depending on the admin parameters, we want to change the default size. */
+  
   &.hideleft {
-    #leftPanels {
-      width: 0;
-    }
-
-    &.panel-right-width-Small #contentcolumn {
-      flex-basis: 92vw;
-    }
-
-    &.panel-right-width-Medium #contentcolumn {
-      flex-basis: 84vw;
-    }
-
-    &.panel-right-width-Large #contentcolumn {
-      flex-basis: 72vw;
-    }
+    -/**/-panel-column-left-width: 0;
   }
 
-  // Only left panels
+  &.panel-left-width-Small {
+    // In order to set CSS variable values in this LESS file, we need to make sure the LESS lexer
+    //  doesn't interpret the double dash as the start of a CDC.
+    // We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
+    // Once this file is migrated to native CSS, this hack can be removed.
+    -/**/-panel-column-left-width: 8vw;
+  }
+
+  &.panel-left-width-Large {
+    -/**/-panel-column-left-width: 24vw;
+  }
+
   &.hideright {
-    #rightPanels {
-      width: 0;
-    }
-
-    &.panel-left-width-Small #contentcolumn {
-      flex-basis: 92vw;
-    }
-
-    &.panel-left-width-Medium #contentcolumn {
-      flex-basis: 84vw;
-    }
-
-    &.panel-left-width-Large #contentcolumn {
-      flex-basis: 76vw;
-    }
+    -/**/-panel-column-right-width: 0;
   }
 
-  // No Panels, make sure the priority is high enough to take over other rules when needed.
-  &.hidelefthideright #contentcontainer #contentcolumn {
-    flex-basis: 100vw;
+  &.panel-right-width-Small {
+    -/**/-panel-column-left-width: 8vw;
+  }
+
+  &.panel-right-width-Large {
+    -/**/-panel-column-left-width: 24vw;
+  }
+
+  &.hidelefthideright {
+    -/**/-panel-column-left-width: 0;
+    -/**/-panel-column-right-width: 0;
   }
 }
 
@@ -217,8 +153,10 @@
 
 #rightPanels > .ui-resizable-w:focus,
 #rightPanels > .ui-resizable-w:hover,
+#rightPanels > .ui-resizable-w:active,
 #leftPanels > .ui-resizable-e:focus,
-#leftPanels > .ui-resizable-e:hover {
+#leftPanels > .ui-resizable-e:hover,
+#leftPanels > .ui-resizable-e:active {
   opacity: 1;
   border-color: @navbar-default-bg;
   margin-left: 0;

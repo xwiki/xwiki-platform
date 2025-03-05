@@ -121,7 +121,7 @@ require(['jquery'], function($) {
   });
 });
 /* Panel column interactivity.
-  WIP
+  This script makes sure they are resizable using the mouse.
   */
 require( ['jquery', 'jquery-ui'], function($) {
   let resizeCustomFunctionLeft = function( event, ui ) {
@@ -135,14 +135,13 @@ require( ['jquery', 'jquery-ui'], function($) {
     ui.element. attr("style", "");
     // We set the one we want when displayed in the flex layout.
     document.body.style.setProperty('--panel-column-right-width', ui.size.width+"px");
-    //ui.element.css('widt', ui.size.width);
   };
   $( "#rightPanels" ).resizable({
-    handles: "w",
+    handles: 'w',
     resize: resizeCustomFunctionRight
   });
   $( "#leftPanels" ).resizable({
-    handles: "e",
+    handles: 'e',
     resize: resizeCustomFunctionLeft
   });
 });

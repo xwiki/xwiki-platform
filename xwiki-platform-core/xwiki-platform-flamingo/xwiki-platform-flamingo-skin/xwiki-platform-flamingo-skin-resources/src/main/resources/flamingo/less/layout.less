@@ -40,16 +40,15 @@
   }
   
   /* Depending on the admin parameters, we want to change the default size. */
-  
+  /* In order to set CSS property values in this LESS file, we need to make sure the LESS lexer
+     doesn't interpret the double dash as the start of a HTML comment close.
+     We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
+     Once this file is migrated to native CSS, this hack can be removed. */
   &.hideleft {
     -/**/-panel-column-left-width: 0;
   }
 
   &.panel-left-width-Small {
-    /* In order to set CSS variable values in this LESS file, we need to make sure the LESS lexer
-     doesn't interpret the double dash as the start of a CDC.
-     We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
-     Once this file is migrated to native CSS, this hack can be removed. */
     -/**/-panel-column-left-width: 8vw;
   }
 

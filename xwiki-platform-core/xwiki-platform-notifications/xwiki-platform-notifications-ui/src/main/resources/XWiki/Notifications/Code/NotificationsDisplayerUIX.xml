@@ -281,7 +281,7 @@ Get the actual notifications.
     // Create the counter if it is not present
     if (counter.length == 0) {
       counter = $('&lt;span&gt;').addClass('notifications-count badge');
-      let stylingContainer = $('&lt;div&gt;').addClass("badge-count-container");
+      const stylingContainer = $('&lt;div&gt;').addClass("badge-count-container");
       stylingContainer.append(counter);
       $('#tmNotifications &gt; button.dropdown-toggle').prepend(stylingContainer);
     }

@@ -21,7 +21,7 @@
   initial-value: 16vw;
 }
 #body {
-  // We reorganize the DOM order so that it makes sense visually.
+  /* We reorganize the DOM order so that it makes sense visually. */
   & #contentcolumn {
     order: 2;
     width: ~"calc(100vw - var(--panel-column-left-width) - var(--panel-column-right-width))";
@@ -46,10 +46,10 @@
   }
 
   &.panel-left-width-Small {
-    // In order to set CSS variable values in this LESS file, we need to make sure the LESS lexer
-    //  doesn't interpret the double dash as the start of a CDC.
-    // We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
-    // Once this file is migrated to native CSS, this hack can be removed.
+    /* In order to set CSS variable values in this LESS file, we need to make sure the LESS lexer
+     doesn't interpret the double dash as the start of a CDC.
+     We add a HIDDEN block in between the two dashes. With the LESS4J lexer, inline comments are good for this.
+     Once this file is migrated to native CSS, this hack can be removed. */
     -/**/-panel-column-left-width: 8vw;
   }
 
@@ -74,12 +74,12 @@
     -/**/-panel-column-right-width: 0;
   }
 
-  // We use CSS flex to display the default column sizes.
-  // The size "unit" is 8vw which is approximately equal to 1/12th of the viewport.
+  /* We use CSS flex to display the default column sizes.
+   The size "unit" is 8vw which is approximately equal to 1/12th of the viewport. */
   & #contentcontainer {
     display: flex;
 
-    // The bootstrap grid system had a breakpoint at this width to send the panel columns down.
+    /* The bootstrap grid system had a breakpoint at this width to send the panel columns down. */
     @media (max-width: @screen-md-min) {
       flex-wrap: wrap;
 
@@ -87,10 +87,10 @@
         width: 100vw;
         order: initial;
         
-        // We disable the resize handles totally when 
-        // the view is too small to display panels next to the content anyways.
-        // Jquery UI adds the inline display:block if the handle is hidden at the start. We need to be extra secure when
-        // hiding those handles.
+        /* We disable the resize handles totally when 
+         the view is too small to display panels next to the content anyways.
+         Jquery UI adds the inline display:block if the handle is hidden at the start. We need to be extra secure when
+         hiding those handles. */
         & > .ui-resizable-handle {
           display: none;
           width: 0;
@@ -148,6 +148,7 @@
   padding-bottom: (@grid-gutter-width / 2);
 }
 
+/* Styles for the panel column handles.. */
 #rightPanels > .ui-resizable-w,
 #leftPanels > .ui-resizable-e {
   position: absolute;

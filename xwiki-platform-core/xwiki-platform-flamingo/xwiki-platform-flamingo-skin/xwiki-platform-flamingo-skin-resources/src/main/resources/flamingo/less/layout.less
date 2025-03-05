@@ -21,11 +21,6 @@
   initial-value: 16vw;
 }
 #body {
-  // We use CSS flex to display the default column sizes.
-  // The size "unit" is 8vw which is approximately equal to 1/12th of the viewport.
-  & #contentcontainer {
-    display: flex;
-  }
   // We reorganize the DOM order so that it makes sense visually.
   & #contentcolumn {
     order: 2;
@@ -77,6 +72,33 @@
   &.hidelefthideright {
     -/**/-panel-column-left-width: 0;
     -/**/-panel-column-right-width: 0;
+  }
+
+  // We use CSS flex to display the default column sizes.
+  // The size "unit" is 8vw which is approximately equal to 1/12th of the viewport.
+  & #contentcontainer {
+    display: flex;
+
+    // The bootstrap grid system had a breakpoint at this width to send the panel columns down.
+    @media (max-width: @screen-md-min) {
+      flex-wrap: wrap;
+
+      & > * {
+        width: 100vw;
+        order: initial;
+        
+        // We disable the resize handles totally when 
+        // the view is too small to display panels next to the content anyways.
+        // Jquery UI adds the inline display:block if the handle is hidden at the start. We need to be extra secure when
+        // hiding those handles.
+        & > .ui-resizable-handle {
+          display: none;
+          width: 0;
+          height: 0;
+          border-color: transparent;
+        }
+      }
+    }
   }
 }
 

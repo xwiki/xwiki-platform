@@ -455,10 +455,10 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Optional<Long> getQueueSize()
+    public Optional<Long> getEventQueueSize()
     {
-        Optional<Long> storeCount = Optional.ofNullable(this.store).flatMap(EventStore::getQueueSize);
-        Optional<Long> legacyStoreCount = Optional.ofNullable(this.legacyStore).flatMap(EventStore::getQueueSize);
+        Optional<Long> storeCount = Optional.ofNullable(this.store).flatMap(EventStore::getEventQueueSize);
+        Optional<Long> legacyStoreCount = Optional.ofNullable(this.legacyStore).flatMap(EventStore::getEventQueueSize);
 
         return Stream.of(storeCount, legacyStoreCount)
             .filter(Optional::isPresent)

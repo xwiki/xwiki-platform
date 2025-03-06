@@ -191,23 +191,23 @@ public class DefaultEventStoreTest
     }
 
     @Test
-    void getQueueSizeNoCount()
+    void getEventQueueSizeNoCount()
     {
-        assertEquals(Optional.empty(), this.defaultStore.getQueueSize());
+        assertEquals(Optional.empty(), this.defaultStore.getEventQueueSize());
     }
 
     @Test
-    void getQueueSizeOneCount()
+    void getEventQueueSizeOneCount()
     {
-        when(this.store.getQueueSize()).thenReturn(Optional.of(1L));
-        assertEquals(Optional.of(1L), this.defaultStore.getQueueSize());
+        when(this.store.getEventQueueSize()).thenReturn(Optional.of(1L));
+        assertEquals(Optional.of(1L), this.defaultStore.getEventQueueSize());
     }
 
     @Test
-    void getQueueSizeTwoCounts()
+    void getEventQueueSizeTwoCounts()
     {
-        when(this.store.getQueueSize()).thenReturn(Optional.of(1L));
-        when(this.legacyStore.getQueueSize()).thenReturn(Optional.of(2L));
-        assertEquals(Optional.of(3L), this.defaultStore.getQueueSize());
+        when(this.store.getEventQueueSize()).thenReturn(Optional.of(1L));
+        when(this.legacyStore.getEventQueueSize()).thenReturn(Optional.of(2L));
+        assertEquals(Optional.of(3L), this.defaultStore.getEventQueueSize());
     }
 }

@@ -204,7 +204,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
      * @since 12.7.1
      * @since 12.6.2
      */
-    public int getQueueSizeDelta()
+    public int getQueueSize()
     {
         int size = 0;
         for (EventStoreTask<?, ?> task : this.queue) {
@@ -224,7 +224,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     }
 
     @Override
-    public Optional<Long> getQueueSize()
+    public Optional<Long> getEventQueueSize()
     {
         return Optional.of((long) this.queue.size());
     }

@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Save and access store events.
@@ -181,7 +182,8 @@ public interface EventStore
      * @since 16.10.5
      * @since 16.4.7
      */
-    default Optional<Long> getQueueSize()
+    @Unstable
+    default Optional<Long> getEventQueueSize()
     {
         return Optional.empty();
     }

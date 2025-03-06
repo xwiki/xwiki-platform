@@ -179,7 +179,7 @@ class NotificationsIT
         DocumentReference queueSizeReference =
             new DocumentReference("QueueSize", testReference.getLastSpaceReference());
         setup.createPage(queueSizeReference,
-            "{{velocity}}$services.eventstream.getQueueSize(){{/velocity}}");
+            "{{velocity}}$services.eventstream.getEventQueueSize(){{/velocity}}");
 
         setup.getDriver().waitUntilCondition(input -> {
             setup.gotoPage(queueSizeReference, "get", "outputSyntax=plain&forceeload=" + System.currentTimeMillis());

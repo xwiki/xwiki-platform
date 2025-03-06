@@ -59,6 +59,9 @@ class NavigationPanelAdministrationIT
         // Reset the configuration.
         setup.deletePage("PanelsCode", "NavigationConfiguration");
 
+        // Cleanup
+        setup.deletePage("A AA", "WebHome");
+
         // Create a top level page that doesn't belong to an extension.
         setup.createPage("Denis", "WebHome", "", "");
 
